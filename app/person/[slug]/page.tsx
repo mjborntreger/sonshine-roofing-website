@@ -6,7 +6,6 @@ import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 
 export const revalidate = 3600;
 
-type Params = { params: { slug: string } };
 
 // Pre-generate static paths for known people
 export async function generateStaticParams() {
@@ -15,8 +14,9 @@ export async function generateStaticParams() {
 }
 
 // Dynamic metadata per person
-export async function generateMetadata({ params }: Params) {
-  const person = await listPersonsBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const person = await listPersonsBySlug(slug);
   if (!person) return { title: "Team Member | SonShine Roofing" };
 
   const desc = stripHtml(person.contentHtml).slice(0, 160);
@@ -31,8 +31,9 @@ export async function generateMetadata({ params }: Params) {
   };
 }
 
-export default async function PersonPage({ params }: Params) {
-  const person = await listPersonsBySlug(params.slug);
+export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const person = await listPersonsBySlug(slug);
   if (!person) return notFound();
 
   return (
