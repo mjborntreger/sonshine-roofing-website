@@ -1,23 +1,34 @@
 // middleware.ts
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
 export function middleware(req: Request) {
-  const url = new URL(req.url);
-  const host = url.host;
-  const isStaging = host.startsWith('staging.') || process.env.NEXT_PUBLIC_IS_STAGING === 'true';
+  const host = new URL(req.url).host;
+  const isStagingHost = host.startsWith("staging.");
 
-  if (!isStaging) return NextResponse.next();
+  const user = (process.env.BASIC_AUTH_USER || "").trim();
+  const pass = (process.env.BASIC_AUTH_PASS || "").trim();
 
-  const auth = req.headers.get('authorization');
-  const expected = 'Basic ' + Buffer.from(`${process.env.BASIC_AUTH_USER}:${process.env.BASIC_AUTH_PASS}`).toString('base64');
+  // Only enforce if we're on staging AND both vars exist
+  const shouldProtect = isStagingHost && !!user && !!pass;
+  if (!shouldProtect) return NextResponse.next();
 
-  if (auth !== expected) {
-    return new NextResponse('Auth required', {
+  // Edge-safe base64
+  const expected = "Basic " + btoa(`${user}:${pass}`);
+  const provided = req.headers.get("authorization") || "";
+
+  if (provided !== expected) {
+    return new NextResponse("Auth required", {
       status: 401,
-      headers: { 'WWW-Authenticate': 'Basic realm="SonShine Staging"' }
+      headers: {
+        'WWW-Authenticate': 'Basic realm="SonShine Staging", charset="UTF-8"',
+        // small hint for debugging without leaking secrets
+        'x-auth-stage': 'challenge',
+      },
     });
   }
   return NextResponse.next();
 }
 
-export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'] };
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+};
