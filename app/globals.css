@@ -1,0 +1,224 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------
+   Brand Tokens
+----------------------------------------*/
+:root {
+  --radius: 1rem;
+
+  /* Brand palette */
+  --brand-blue:  #0045d7; /* primary */
+  --brand-cyan:  #00e3fe; /* gradient partner */
+  --brand-orange:#fb9216; /* accent/CTA */
+
+  /* Neutrals */
+  --ink-900: #0b1220;
+  --ink-700: #334155;
+  --ink-600: #475569;
+  --ink-500: #64748b;
+  --paper:   #ffffff;
+
+  /* Shadows */
+  --elev-1: 0 1px 2px rgba(2, 6, 23, .06), 0 1px 1px rgba(2, 6, 23, .04);
+  --elev-2: 0 8px 24px rgba(2, 6, 23, .10);
+
+/* Sticky offset */
+--sticky-offset: 6rem;
+
+/* Skeleton defaults */
+--skeleton-base: rgba(0, 0, 0, 0.06);
+--skeleton-highlight: rgba(255, 255, 255, 0.35);
+--skeleton-radius: 0.5rem;
+}
+html { scroll-padding-top: var(--sticky-offset); }
+.prose :where(h2,h3)[id] { scroll-margin-top: var(--sticky-offset); }
+/* ---------------------------------------
+   Fonts
+----------------------------------------*/
+@font-face {
+  font-family: "Candara V2";
+  src: url("/fonts/CandaraV2.woff2") format("woff2"),
+       url("/fonts/CandaraV2.woff") format("woff"),
+       url("/fonts/CandaraV2.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+html {
+  font-feature-settings: "cv02","cv03","cv04","cv11";
+  scroll-behavior: auto;
+  background: var(--paper);
+  color: var(--ink-900);
+}
+
+html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
+
+/* ---------------------------------------
+   Utilities
+----------------------------------------*/
+@layer utilities {
+  .brand-gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan));
+  }
+  .brand-gradient-bg {
+    background-image: linear-gradient(135deg, var(--brand-blue), var(--brand-cyan));
+  }
+  .font-accent { font-family: "Candara V2", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; }
+  .ring-brand { box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand-blue) 70%, white); }
+}
+
+/* ---------------------------------------
+   Skeleton shimmer (global utility)
+----------------------------------------*/
+@keyframes sk-shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@layer utilities {
+  /* Apply to any block that should show a shimmer sweep.
+     Example: <div class="h-4 w-24 rounded shimmer"></div> */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--skeleton-highlight, rgba(255, 255, 255, 0.35)),
+      transparent
+    );
+    animation: sk-shimmer 1.25s ease-in-out infinite;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --skeleton-base: rgba(255, 255, 255, 0.08);
+  }
+}
+
+/* ---------------------------------------
+   Base
+----------------------------------------*/
+@layer base {
+  * { -webkit-tap-highlight-color: transparent; }
+  ::selection { background: color-mix(in oklab, var(--brand-blue) 20%, var(--brand-cyan)); color: #fff; }
+
+  a {text-underline-offset: 2px; text-decoration-thickness: 1.5px;}
+  /* NOTE: Prose link styles are intentionally scoped; avoid adding unscoped `.prose a` rules elsewhere. */
+  /* Style links in prose, but NOT buttons or anything inside .not-prose blocks */
+  .prose :where(a):not(:where(.not-prose *), [data-button], .btn, .button, [data-ui-link]) {
+    color: var(--brand-blue);
+  }
+  .prose :where(a):not(:where(.not-prose *), [data-button], .btn, .button, [data-ui-link]):hover {
+    color: var(--brand-cyan);
+  }
+
+
+  /* Headings */
+  h1, h2, h3, h4 { @apply font-semibold text-slate-900; }
+  h1 { @apply text-3xl md:text-4xl tracking-tight leading-loose; }
+  h2 { @apply text-2xl md:text-3xl leading-relaxed; }
+  h3 { @apply text-xl md:text-2xl leading-relaxed; }
+  h4 { @apply leading-relaxed; }
+
+  /* Cards */
+  .card { @apply rounded-2xl border border-slate-200 bg-white; box-shadow: var(--elev-1); }
+  .card:hover { box-shadow: var(--elev-2); }
+
+  /* Badges */
+  .badge { @apply inline-block rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-700; }
+  .badge--brand { color:#fff; background-image: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan)); }
+  .badge--accent { background: color-mix(in oklab, var(--brand-orange) 20%, white); color: #1f2937; }
+
+  /* Form focus */
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-cyan) 65%, white);
+    border-color: var(--brand-blue);
+  }
+}
+
+/* ---------------------------------------
+   Components: BRAND BUTTONS
+----------------------------------------*/
+@layer components {
+  /* Base button reset */
+  .btn {
+    @apply inline-flex items-center justify-center whitespace-nowrap
+           rounded-2xl font-medium 
+           transition duration-300 ease-in-out
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0
+           disabled:pointer-events-none disabled:opacity-50;
+    box-shadow: var(--elev-1);
+  }
+
+  /* Variants */
+  .btn-brand-blue   { @apply bg-[var(--brand-blue)]   text-white hover:opacity-95 focus-visible:ring-[var(--brand-blue)]; }
+  .btn-brand-orange { @apply bg-[var(--brand-orange)] text-white hover:opacity-95 focus-visible:ring-[var(--brand-orange)]; }
+  .btn-secondary    { @apply bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 focus-visible:ring-slate-200; }
+  .btn-outline      { @apply bg-transparent text-slate-900 border border-slate-300 hover:bg-slate-50; }
+  .btn-ghost        { @apply bg-transparent text-slate-900 hover:bg-slate-100; }
+
+  /* Ensure anchors inside buttons inherit the button text color and remove underline */
+  .btn a,
+  .btn a:hover,
+  .btn a:focus {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  /* Sizes */
+  .btn-lg { @apply h-11 px-6 text-lg; }
+  .btn-md { @apply h-10 px-4 text-base; }
+  .btn-sm { @apply h-9  px-3 text-sm; }
+
+  /* Motion */
+  .btn-press { @apply transition-transform motion-safe:hover:scale-[1.03] active:scale-[0.98]; }
+}
+
+/* ---------------------------------------
+   Prose
+----------------------------------------*/
+.prose { @apply text-slate-700; }
+
+.prose blockquote {
+  border-left: 4px solid transparent;
+  background:
+    linear-gradient(#ffffff, #ffffff) padding-box,
+    linear-gradient(180deg, var(--brand-blue), var(--brand-cyan)) border-box;
+  @apply rounded-xl p-4 text-slate-700;
+}
+
+/* Normalize Typography plugin defaults inside blockquotes */
+.prose blockquote p { font-style: italic; opacity: 1; }
+.prose blockquote p:first-of-type::before,
+.prose blockquote p:last-of-type::after { content: none; }
+
+.prose code { @apply rounded-md bg-slate-100 px-1.5 py-0.5 text-slate-800; }
+.prose pre code { @apply bg-transparent p-0; }
+
+.prose hr { @apply my-8 border-none h-[1px]; background: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan)); }
+.prose img { @apply rounded-2xl; }
+.prose.prose-tight :where(h2,h3){ @apply mt-0; }
+.prose.prose-tight :where(p,ul,ol){ @apply mt-3 mb-0; }
+
+/* ---------------------------------------
+   Layout polish
+----------------------------------------*/
+.container-edge { @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8; }
+.header-blur { @apply sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-white/70; box-shadow: var(--elev-1); }
+.gradient-divider { height: 2px; background: linear-gradient(90deg, transparent, var(--brand-blue), var(--brand-cyan), transparent); }
+
+/* Project page niceties */
+.project-hero { @apply rounded-2xl bg-neutral-50; box-shadow: var(--elev-1); }
+.project-badges { @apply mt-4 flex flex-wrap gap-2; }

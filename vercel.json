@@ -1,0 +1,12 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "staging.sonshineroofing.com" }],
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow, noimageindex" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
