@@ -1,0 +1,101 @@
+import Section from "@/components/layout/Section";
+import TocFromHeadings from "@/components/TocFromHeadings";
+import ServicesQuickLinks from "@/components/ServicesQuickLinks";
+import UiLink from "@/components/UiLink";
+import Image from "next/image";
+import { listRecentPostsPool } from "@/lib/wp";
+import YouMayAlsoLike from "@/components/YouMayAlsoLike";
+import RoofCareClub from "@/components/RoofCareClub";
+
+const scrollGuard = "scroll-mt-24";
+
+export default async function Page({ params }: { params: { slug: string } }) {
+  const pool = await listRecentPostsPool(36);
+  return (
+    <Section>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+        <div id="article-root" className="prose min-w-0">
+          <span id="page-top" className="sr-only" />
+          <h1>Roof Maintenance</h1>
+          <h2 className={scrollGuard}>
+            Undoubtedly, lack of maintenance is among the top reasons why roofs fail.
+          </h2>
+          <p>
+            Whether it’s a large hole or a small leak, water that seeps below the top 
+            layer of a roof can destroy everything in its path. Small leaks, in particular, 
+            are dangerous because the damage often goes undetected for years. This hidden 
+            moisture leads to rotting wood sheathing and trusses, increased utility costs, 
+            and serious health risks due to mold and mildew growth. In fact, such damage can 
+            silently erode your safety, comfort, and security—sometimes for as long as 13 years 
+            before it becomes visible inside the home.
+          </p>
+
+          <figure className="not-prose">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+              <Image
+                src="https://next.sonshineroofing.com/wp-content/uploads/taking-care-of-your-roof-maintenance-saves-moneybak.webp"
+                alt="taking care of your roof maintenance saves you money"
+                fill
+                className="object-cover mb-2"
+                sizes="(max-width: 768px) 100vw, 800px"
+                loading="lazy"
+              />
+            </div>
+          </figure>
+
+          <p>
+            While it may be tempting to ignore your roof’s maintenance needs, doing so can shorten 
+            its lifespan and lead to major expenses down the road. Roofing materials are built to 
+            last, but only when they’re properly maintained. That’s why Sonshine Roofing strongly 
+            recommends following a roof maintenance schedule and sticking with it year after year.
+            <br></br><br></br>
+            Routine roof inspections are critical to catching these hidden problems early—before 
+            they escalate into major roof repairs, structural rot, or indoor health hazards that 
+            threaten your home and well-being.
+          </p>
+
+          <RoofCareClub />
+
+          <div className="mt-6">
+            <a href="#page-top" className="text-sm text-slate-600 hover:text-[#0045d7]">Back to top ↑</a>
+          </div>
+        </div>
+
+        <aside className="sticky top-24 self-start h-fit">
+          <ServicesQuickLinks />
+
+          <TocFromHeadings
+            root="#article-root"
+            offset={128}
+            className="hidden lg:block" />
+          
+          <div className="mt-4 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm not-prose">
+            <div className="mb-2 text-sm font-semibold text-slate-900 text-center">Ready to get started?</div>
+            <UiLink
+              href="/contact-us#book-an-appointment"
+              className="btn btn-brand-blue btn-press w-full h-11"
+              aria-label="Free Consultation">
+              Free Consultation
+            </UiLink>
+            <UiLink
+              href="tel:19418664320"
+              className="h-11 mt-2 rounded-xl border border-slate-200 grid place-items-center hover:bg-slate-50"
+              aria-label="Call SonShine Roofing">
+              (941) 866-4320
+            </UiLink>
+          </div>
+
+        </aside>
+      </div>
+
+      <div data-toc-exclude>
+        <YouMayAlsoLike
+          posts={pool}
+          category="roof-maintenance-services"
+          excludeSlug={params.slug}
+        />
+      </div>
+
+    </Section>
+  );
+}

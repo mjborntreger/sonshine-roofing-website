@@ -1,0 +1,157 @@
+import Section from "@/components/layout/Section";
+import { listRecentPosts, listPostsPaged } from "@/lib/wp";
+import { ChevronDown } from "lucide-react";
+import ResourcesAside from "@/components/ResourcesAside";
+import InfiniteList from "@/components/InfiniteList";
+import SkeletonGrid from "@/components/layout/SkeletonGrid";
+import ResourceSearchController from "@/components/resource-search/ResourceSearchController";
+
+export const revalidate = 900;
+
+export default async function BlogArchivePage() {
+  // Initial page for the list (SSR for speed/SEO)
+  const first = 24;
+  const initial = await listPostsPaged({ first: 6, after: null, filters: {} }).catch(() => ({ items: [], pageInfo: { hasNextPage: false, endCursor: null } }));
+
+  // Separate pool for category counts and the "All" pill (keep your previous 200 fetch)
+  const postsForCats = await listRecentPosts(200).catch(() => []);
+
+  // Derive category names (no counts) from fetched posts (exclude featured, uncategorized)
+  const EXCLUDE = new Set(["featured", "uncategorized"]);
+  const categories = Array.from(
+    new Set(
+      postsForCats.flatMap((p: any) =>
+        (p.categories || [])
+          .map((c: any) => String(c).trim())
+          .filter(Boolean)
+      )
+    )
+  )
+    .filter((name) => !EXCLUDE.has(name.toLowerCase()))
+    .sort((a, b) => a.localeCompare(b));
+
+  return (
+    <Section>
+      <div className="container-edge py-8">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+          <span id="page-top" className="sr-only" />
+
+          {/* Main Content (Left) */}
+          <div>
+            <h1 className="text-3xl font-semibold">Blog</h1>
+            <p className="mt-2 text-slate-600">
+              Enjoy these handcrafted articles from our team that discuss
+              a wide variety of roofing topics (and a few extras,
+              from our family to yours).
+            </p>
+
+            {/* Filters */}
+            <div className="mt-6 rounded-xl border border-slate-400 bg-[#cef3ff]/30 p-4">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                {/* Search input */}
+                <label htmlFor="blog-search" className="sr-only">Search blog</label>
+                <input
+                  id="blog-search"
+                  type="search"
+                  placeholder="Search posts..."
+                  className="w-full rounded-lg border border-slate-400 px-4 py-2 text-[15px] outline-none focus:ring-2 focus:ring-[--brand-cyan]"
+                  autoComplete="off"
+                />
+              </div>
+
+              {/* Filters accordion */}
+              <details id="blog-filters" className="mt-3 group rounded-lg border border-slate-400 bg-white/70">
+                <summary className="flex items-center justify-between cursor-pointer select-none px-4 py-2 text-sm font-semibold text-slate-800 hover:translate-y-[1px] transition">
+                  <span>Search Filters</span>
+                  <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" aria-hidden="true" />
+                </summary>
+
+                <div className="px-4 pb-4 pt-2">
+                  {/* Clear filters (now inside the accordion on both mobile & desktop) */}
+                  <button
+                    id="blog-clear"
+                    type="button"
+                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
+                    aria-label="Clear filters"
+                  >
+                    Reset filters
+                  </button>
+
+                  {/* Category pills */}
+                  <div id="blog-pills" className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      data-cat="__all__"
+                      aria-pressed="true"
+                      className="px-3 py-1.5 rounded-full border text-sm transition select-none border-[--brand-blue] text-white bg-[--brand-blue] hover:bg-[--brand-blue]/90 hover:text-white"
+                    >
+                      All
+                    </button>
+
+                    {categories.map((name: string) => (
+                      <button
+                        key={name}
+                        type="button"
+                        data-cat={name}
+                        aria-pressed="false"
+                        className="px-3 py-1.5 rounded-full border text-sm transition select-none border-slate-300 text-slate-700 hover:border-[--brand-blue] bg-white"
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </details>
+
+              {/* Active filter chips */}
+              <div id="blog-chips" className="mt-6 hidden flex-wrap gap-2">
+                {/* Chips will be injected here */}
+              </div>
+
+            </div>
+
+            <div id="blog-no-results" className="mt-8 hidden rounded-xl border border-slate-200 bg-white p-6 text-slate-700">
+              <p className="mb-2 font-medium">No results found.</p>
+              <p className="text-sm">Try clearing filters or adjusting your search terms.</p>
+              <button id="blog-clear-2" type="button" className="mt-3 rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50">Clear filters</button>
+            </div>
+
+            <div id="blog-skeleton" className="mt-8 hidden">
+              <SkeletonGrid variant="blog" count={6} className="grid-cols-1 lg:grid-cols-2" />
+            </div>
+
+
+            <div id="blog-grid">
+              <InfiniteList
+                kind="blog"
+                initial={initial}
+                filters={{}} // server-side pagination only; client handles exact-phrase filtering
+                pageSize={6}
+                gridClass="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-4"
+              />
+            </div>
+            <ResourceSearchController
+              kind="blog"
+              ids={{
+                query: "blog-search",
+                grid: "blog-grid",
+                chips: "blog-chips",
+                skeleton: "blog-skeleton",
+                noResults: "blog-no-results",
+              }}
+              urlKeys={{ q: "q", cat: "cat" }}
+              minQueryLen={2}
+            />
+            <div className="mt-6">
+              <a href="#page-top" className="text-sm text-slate-600 prose">Back to top ↑</a>
+            </div>
+          </div>
+
+          {/* Floating Content (Right) */}
+          <ResourcesAside />
+
+        </div>
+      </div>
+    </Section>
+  );
+}

@@ -1,0 +1,213 @@
+import Section from '@/components/layout/Section';
+import Link from 'next/link';
+import { listFaqIndex, listFaqTopics } from '@/lib/wp';
+import type { FaqSummary, FaqTopic } from '@/lib/wp';
+import ResourceSearchController from '@/components/resource-search/ResourceSearchController';
+import ResourcesAside from '@/components/ResourcesAside';
+
+export const revalidate = 86400; // daily ISR
+
+type PageProps = { searchParams?: Promise<{ q?: string; topic?: string }> };
+
+export default async function FAQArchivePage({ searchParams }: PageProps) {
+  const sp = (await searchParams) ?? ({} as { q?: string; topic?: string });
+  const qRaw = sp.q ?? '';
+  const q = qRaw.trim();
+
+  const [topics, index] = await Promise.all([
+    listFaqTopics(200).catch(() => [] as FaqTopic[]),
+    listFaqIndex(1000).catch(() => [] as FaqSummary[]),
+  ]);
+
+  // Sort topics: featured topics first (if available), then alphabetically
+  const topicsSorted = [...topics].sort((a, b) => {
+    const af = (a as any).featured ? 1 : 0;
+    const bf = (b as any).featured ? 1 : 0;
+    if (af !== bf) return bf - af; // featured first
+    return a.name.localeCompare(b.name);
+  });
+
+  // Group all items by topic for display
+  const groups = new Map<string, FaqSummary[]>();
+  for (const f of index) {
+    const slugs = f.topicSlugs ?? [];
+    if (slugs.length > 0) {
+      for (const t of slugs) {
+        if (!groups.has(t)) groups.set(t, []);
+        groups.get(t)!.push(f);
+      }
+    } else {
+      if (!groups.has('uncategorized')) groups.set('uncategorized', []);
+      groups.get('uncategorized')!.push(f);
+    }
+  }
+
+  // Resolve group ordering by topics list (so featured first)
+  const topicOrder = new Map<string, number>(topicsSorted.map((t, i) => [t.slug, i] as const));
+  const orderedGroupKeys = Array.from(groups.keys()).sort((a, b) => {
+    const ia = topicOrder.has(a) ? topicOrder.get(a)! : 9_999;
+    const ib = topicOrder.has(b) ? topicOrder.get(b)! : 9_999;
+    if (ia !== ib) return ia - ib;
+    const na = topicsSorted.find((t) => t.slug === a)?.name || a;
+    const nb = topicsSorted.find((t) => t.slug === b)?.name || b;
+    return na.localeCompare(nb);
+  });
+
+  return (
+    <Section>
+      <div className="container-edge py-8">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+          <span id="page-top" className="sr-only" />
+          {/* LEFT: main content */}
+          <div>
+            <h1 className="text-3xl font-semibold">Frequently Asked Questions</h1>
+            <p className="mt-2 text-slate-600">
+              Answers to common roofing questions from our team in Sarasota. If you can’t find what you need,
+              we’re one call away.
+            </p>
+
+            {/* Search (client-side, exact phrase like Blog) */}
+            <div className="mt-6" role="search">
+              <input
+                id="faq-search"
+                type="search"
+                defaultValue={q}
+                placeholder="Search questions..."
+                aria-label="Search FAQs"
+                autoComplete="off"
+                className="w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#0045d7] focus:outline-none"
+              />
+            </div>
+
+            {/* Results meta + controls */}
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <span className="text-sm text-slate-700">Showing <span id="faq-result-count" aria-live="polite">{index.length}</span> FAQs</span>
+              <div className="ml-auto sm:flex items-center gap-2">
+                <button id="faq-expand-all" type="button" className="rounded-md border border-slate-400 px-3 py-1.5 text-sm bg-white hover:bg-slate-50">
+                  Expand all
+                </button>
+                <button id="faq-collapse-all" type="button" className="rounded-md border border-slate-400 px-3 py-1.5 text-sm bg-white hover:bg-slate-50">
+                  Collapse all
+                </button>
+              </div>
+            </div>
+
+            {/* Client-driven No results panel */}
+            <div id="faq-no-results" className="mt-6 hidden rounded-md border border-slate-400 bg-white p-4">
+              <p className="text-sm text-slate-700">
+                No results for <span id="faq-query" className="font-semibold"></span>.
+              </p>
+              <div id="faq-suggestions" className="mt-2 hidden">
+                <p className="text-sm text-slate-600">Did you mean:</p>
+                <ul id="faq-suggestion-list" className="mt-2 flex flex-wrap gap-2"></ul>
+              </div>
+            </div>
+
+            {/* Groups as accordions */}
+            <div className="mt-8 space-y-6" id="faq-topics">
+              {orderedGroupKeys.map((slug) => {
+                const term = topicsSorted.find((t) => t.slug === slug);
+                const title = term?.name || slug;
+                const list = groups.get(slug) || [];
+                if (list.length === 0) return null;
+                return (
+                  <section key={slug} id={`topic-${slug}`}>
+                    <details className="faq-topic rounded-lg border border-slate-400 bg-white">
+                      <summary className="flex items-center justify-between cursor-pointer select-none px-4 py-2 text-sm font-semibold text-slate-800 hover:translate-y-[1px] transition">
+                        <span data-topic-name={title}>{title}</span>
+                        <span className="inline-flex items-center gap-2 text-slate-600">
+                          <span className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-[#cef3ff] px-2 text-xs font-medium text-slate-700 faq-count">
+                            {list.length}
+                          </span>
+                        </span>
+                      </summary>
+                      <div className="px-4 pb-4 pt-2 space-y-2">
+                        {list.map((f) => {
+                          const ex = (f as any).excerpt || '';
+                          return (
+                            <details
+                              key={f.slug}
+                              id={`faq-${f.slug}`}
+                              className="faq-item rounded-md border border-slate-200 bg-white"
+                              data-title={(f.title || '').toString()}
+                              data-topic={title}
+                              data-excerpt={(ex || '').toString()}
+                            >
+                              <summary className="flex items-start justify-between gap-4 px-4 py-3 cursor-pointer">
+                                <h3 className="prose text-slate-900">{f.title}</h3>
+                                <svg
+                                  className="h-5 w-5 shrink-0 self-center opacity-70 transition-transform"
+                                  viewBox="0 0 20 20"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  aria-hidden
+                                >
+                                  <path d="M7 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </summary>
+                              <div className="px-4 pb-4 pt-0 text-sm text-slate-700">
+                                {ex ? <div className="prose prose-sm" dangerouslySetInnerHTML={{ __html: ex }} /> : null}
+                                <div className="mt-3">
+                                  <Link
+                                    href={{ pathname: `/faq/${f.slug}` }}
+                                    className="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+                                  >
+                                    Read full answer
+                                  </Link>
+                                </div>
+                              </div>
+                            </details>
+                          );
+                        })}
+                      </div>
+                    </details>
+                  </section>
+                );
+              })}
+            </div>
+
+            {/* Mobile CTAs (fallback) */}
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:hidden">
+              <Link
+                href="tel:19418664320"
+                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition"
+              >
+                <div className="text-sm font-semibold text-slate-900">Still stuck?</div>
+                <div className="mt-1 text-slate-700">Talk to a real roofer now.</div>
+                <div className="mt-3 inline-flex rounded-md bg-[#0045d7] px-4 py-2 text-sm font-semibold text-white">Call (941) 866-4320</div>
+              </Link>
+              <Link
+                href="/contact-us#book-an-appointment"
+                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition"
+              >
+                <div className="text-sm font-semibold text-slate-900">Prefer to write?</div>
+                <div className="mt-1 text-slate-700">Send us a message and we’ll follow up.</div>
+                <div className="mt-3 inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Contact form</div>
+              </Link>
+            </div>
+            <div className="mt-6">
+              <a href="#page-top" className="text-sm text-slate-600 prose">Back to top ↑</a>
+            </div>
+          </div>
+
+          {/* RIGHT: floating aside on desktop */}
+          <ResourcesAside />
+
+        </div>
+      </div>
+      <ResourceSearchController
+        kind="faq"
+        ids={{
+          query: "#faq-search",
+          grid: "#faq-topics",
+          chips: "",             // not used on FAQ
+          skeleton: "",          // not used by default
+          noResults: "#faq-no-results",
+          resultCount: "#faq-result-count",
+        }}
+        urlKeys={{ q: "q" }}
+        minQueryLen={2}
+      />
+    </Section>
+  );
+}
