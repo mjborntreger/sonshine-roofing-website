@@ -1,4 +1,3 @@
-// lib/resource-fetch.ts
 import type { PageResult, ResourceKind, ResourceQuery } from "@/lib/pagination";
 
 const cache = new Map<string, PageResult<any>[]>();

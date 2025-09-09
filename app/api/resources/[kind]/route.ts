@@ -1,6 +1,5 @@
-// app/api/resources/[kind]/route.ts
 import { NextResponse } from "next/server";
-import type { ResourceKind, ResourceQuery, PageResult } from "@/lib/pagination";
+import type { ResourceQuery, PageResult } from "@/lib/pagination";
 import {
   // BLOG
   listPostsPaged,
@@ -12,8 +11,9 @@ import {
 
 export async function POST(
   req: Request,
-  { params }: { params: { kind: string } }
+  ctx: any
 ) {
+  const { params } = ctx as { params: { kind: string } };
   try {
     const { kind } = params;
     const body = (await req.json()) as ResourceQuery;
