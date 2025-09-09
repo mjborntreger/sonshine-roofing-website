@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata, Viewport } from "next";
 import RouteTransitions from "@/components/RouteTransitions"
 import "./globals.css";
@@ -7,7 +6,6 @@ import Footer from "@/components/Footer";
 import AnalyticsScripts from "@/lib/analytics";
 import { inter, candara } from "@/lib/fonts";
 import Script from "next/script";
-import { listGlossaryIndex } from "@/lib/wp";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sonshineroofing.com"),
@@ -23,15 +21,6 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  let glossaryIndex: { slug: string; title: string }[] = [];
-  try {
-    const idx = await listGlossaryIndex(500);
-    if (Array.isArray(idx)) {
-      glossaryIndex = idx
-        .filter(t => t && typeof t.slug === "string" && typeof t.title === "string")
-        .map(t => ({ slug: t.slug, title: t.title }));
-    }
-  } catch { }
   return (
     <html
       lang="en"
@@ -45,12 +34,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* Facebook Share Button Attribution*/}
         <meta property="fb:app_id" content="1087269253041713" />
-
-        {/* site-wide glossary index (filled server-side when available) */}
-        <script id="glossary-index" type="application/json">
-          {JSON.stringify(glossaryIndex)}
-        </script>
-
 
       </head>
       <body

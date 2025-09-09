@@ -3,6 +3,7 @@ import { BestOfTheBestVideo } from "./BestOfTheBestVideo";
 
 const imageHeight = 175;
 const imageWidth = 175;
+const imageClasses = "transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm"
 
 export default async function bestOfTheBest() {
   return (
@@ -29,7 +30,7 @@ export default async function bestOfTheBest() {
             loading="eager"
             decoding="async"
             alt="Best of the Best 2021 Award"
-            className="transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm"
+            className={imageClasses}
           />
         </li>
 
@@ -43,7 +44,7 @@ export default async function bestOfTheBest() {
             loading="lazy"
             decoding="async"
             alt="Best of the Best 2022 Award"
-            className="transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm"
+            className={imageClasses}
           />
           
         </li>
@@ -58,7 +59,7 @@ export default async function bestOfTheBest() {
             loading="lazy"
             decoding="async"
             alt="Best of the Best 2023 Award"
-            className="transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm"
+            className={imageClasses}
           />
           
         </li>
@@ -73,7 +74,7 @@ export default async function bestOfTheBest() {
             loading="lazy"
             decoding="async"
             alt="Best of the Best 2024 Award"
-            className="transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm"
+            className={imageClasses}
           />
           
         </li>
@@ -88,7 +89,7 @@ export default async function bestOfTheBest() {
             loading="lazy"
             decoding="async"
             alt="Best of the Best 2025 Award"
-            className="transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm"
+            className={imageClasses}
           />
           
         </li>
