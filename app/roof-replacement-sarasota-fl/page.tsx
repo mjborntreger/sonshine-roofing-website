@@ -16,7 +16,7 @@ const liStyles = "relative pl-4";
 const stepperStyles = "absolute -left-[5px] top-2 h-2 w-2 rounded-full bg-[#0045d7]";
 
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page() {
   const pool = await listRecentPostsPool(36);
   return (
     <>
@@ -319,7 +319,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
           <YouMayAlsoLike
             posts={pool}
             category="roof-replacement-services"
-            excludeSlug={params.slug}
+            excludeSlug={''}
           />
         </div>
 

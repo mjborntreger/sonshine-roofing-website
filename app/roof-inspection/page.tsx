@@ -9,7 +9,7 @@ import TipTopRoofCheckup from "@/components/TipTopRoofCheckup";
 
 const scrollGuard = "scroll-mt-24";
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page() {
   const pool = await listRecentPostsPool(36);
   return (
     <Section>
@@ -120,7 +120,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
         <YouMayAlsoLike
           posts={pool}
           category="roof-inspection"
-          excludeSlug={params.slug}
+          excludeSlug={''}
         />
       </div>
 

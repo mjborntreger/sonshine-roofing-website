@@ -13,7 +13,7 @@ const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-whi
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 const figureStyles = "not-prose py-8";
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page() {
   const pool = await listRecentPostsPool(36);
   return (
     <Section>
@@ -282,7 +282,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
         <YouMayAlsoLike
           posts={pool}
           category="roof-repair-services"
-          excludeSlug={params.slug}
+          excludeSlug={''}
         />
       </div>
 

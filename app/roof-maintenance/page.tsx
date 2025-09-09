@@ -9,7 +9,7 @@ import RoofCareClub from "@/components/RoofCareClub";
 
 const scrollGuard = "scroll-mt-24";
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page() {
   const pool = await listRecentPostsPool(36);
   return (
     <Section>
@@ -92,7 +92,7 @@ export default async function Page({ params }: { params: { slug: string } }) {
         <YouMayAlsoLike
           posts={pool}
           category="roof-maintenance-services"
-          excludeSlug={params.slug}
+          excludeSlug={''}
         />
       </div>
 
