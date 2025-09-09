@@ -67,7 +67,7 @@ export default function AcculynxLeadForm() {
         // Hide form visually (keep layout) and show success UI
         (form as HTMLFormElement).style.visibility = 'hidden';
         setTimeout(() => {
-          window.location.href = 'https://sonshineroofing.com/thank-you';
+          window.location.href = '/thank-you';
         }, 1500);
       })
       .catch((error) => {

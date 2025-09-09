@@ -143,7 +143,7 @@ export default function Footer() {
                 >Blog</Link>
               </li>
               <li>
-                <Link href="/expert-answers-to-your-roofing-questions" className={linkStyles}
+                <Link href="/faq" className={linkStyles}
                 >FAQ</Link>
               </li>
             </ul>
