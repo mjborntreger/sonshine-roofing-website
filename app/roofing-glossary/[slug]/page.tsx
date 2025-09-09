@@ -93,17 +93,16 @@ export async function generateStaticParams() {
   return index.map((t) => ({ slug: t.slug }));
 }
 
-type Props = { params: { slug: string } };
-
-export default async function GlossaryTermPage({ params }: Props) {
+export default async function GlossaryTermPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const [index, term] = await Promise.all([
     listGlossaryIndex(1000).catch(() => []),
-    getGlossaryTerm(params.slug),
+    getGlossaryTerm(slug),
   ]);
 
   // If not found, show a friendly suggestion list ("Did you mean …")
   if (!term) {
-    const q = params.slug || '';
+    const q = slug || '';
     const scored = suggest(q, index, 5).map((t) => ({ t }));
 
     return (
@@ -141,7 +140,7 @@ export default async function GlossaryTermPage({ params }: Props) {
   }
 
   // Compute prev/next from the index
-  const pos = index.findIndex((t) => t.slug === params.slug);
+  const pos = index.findIndex((t) => t.slug === slug);
   const hasPos = pos >= 0;
   const prev = hasPos && pos > 0 ? index[pos - 1] : hasPos ? index[index.length - 1] : null;
   const next = hasPos && pos < index.length - 1 ? index[pos + 1] : hasPos ? index[0] : null;
