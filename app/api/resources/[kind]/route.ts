@@ -12,7 +12,7 @@ import {
 
 export async function POST(
   req: Request,
-  { params }: { params: { kind: ResourceKind } }
+  { params }: { params: { kind: string } }
 ) {
   try {
     const { kind } = params;
