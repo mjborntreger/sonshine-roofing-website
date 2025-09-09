@@ -1,10 +1,10 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Turnstile from "@/components/Turnstile";
 
-export default function TellUsWhyPage() {
+function TellUsWhyForm() {
   const qs = useSearchParams();
   const ratingParam = qs.get("rating");
   const rating = ratingParam && ["1", "2", "3"].includes(ratingParam) ? ratingParam : "3"; // default to 3 if missing
@@ -163,5 +163,20 @@ export default function TellUsWhyPage() {
         </div>
       </form>
     </main>
+  );
+}
+
+export default function TellUsWhyPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="container-edge mx-auto max-w-2xl py-10">
+          <h1 className="text-3xl font-semibold">Tell us what went wrong</h1>
+          <p className="mt-2 text-slate-700">Loading…</p>
+        </main>
+      }
+    >
+      <TellUsWhyForm />
+    </Suspense>
   );
 }
