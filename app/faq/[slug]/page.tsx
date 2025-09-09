@@ -1,9 +1,6 @@
-
-
 import Section from '@/components/layout/Section';
 import Link from 'next/link';
 import type { Route } from 'next';
-import { notFound } from 'next/navigation';
 import { getFaq, listFaqIndex, listFaqSlugs } from '@/lib/wp';
 import type { FaqSummary } from '@/lib/wp';
 import { suggest } from '@/lib/fuzzy';
@@ -19,19 +16,20 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const faq = await getFaq(params.slug).catch(() => null);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const faq = await getFaq(slug).catch(() => null);
   const title = faq?.title ? `${faq.title} – FAQ` : 'FAQ';
   const desc = faq?.contentHtml ? stripTags(faq.contentHtml).slice(0, 155) : 'Common roofing questions answered by SonShine Roofing.';
   return {
     title,
     description: desc,
-    alternates: { canonical: `/faq/${params.slug}` },
+    alternates: { canonical: `/faq/${slug}` },
   };
 }
 
-export default async function FAQSlugPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function FAQSlugPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const faq = await getFaq(slug).catch(() => null);
 
   if (!faq) {
