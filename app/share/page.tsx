@@ -20,8 +20,8 @@ export default function SharePage() {
 
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
+              id="closeBtn"
               type="button"
-              onClick={() => { try { window.close(); } catch {} }}
               className="btn btn-brand-blue btn-md btn-press"
             >
               Close Window
@@ -47,6 +47,10 @@ export default function SharePage() {
               var msg = document.getElementById('autoCloseMsg');
               var ref = document.referrer;
               var base = location.origin + '/';
+              var btn = document.getElementById('closeBtn');
+              if (btn) btn.addEventListener('click', function(){
+                try { window.close(); } catch(e) {}
+              });
               if (link) link.setAttribute('href', ref || base);
 
               if (openedByScript) {
