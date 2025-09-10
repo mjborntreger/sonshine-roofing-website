@@ -7,6 +7,7 @@ import { listRecentPostsPool } from "@/lib/wp";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, ChevronDown } from "lucide-react";
 import RepairVsReplace from "@/components/RepairVsReplace";
+import type { Metadata } from 'next';
 
 const scrollGuard = "scroll-mt-24";
 const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white mb-4";
@@ -15,9 +16,88 @@ const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
 const stepperStyles = "absolute -left-[5px] top-2 h-2 w-2 rounded-full bg-[#0045d7]";
 
+// ===== STATIC SEO FOR /roof-replacement-sarasota-fl (EDIT HERE) =====
+const SEO_TITLE_ROOF_REPLACEMENT = 'Roof Replacement in Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
+const SEO_DESCRIPTION_ROOF_REPLACEMENT = 'Need a roof replacement in Southwest Florida? Since 1987, SonShine Roofing has installed long‑lasting shingle, tile, and metal roofs with strong workmanship warranties.';
+const SEO_KEYWORDS_ROOF_REPLACEMENT = [
+  'roof replacement',
+  'new roof',
+  're-roof',
+  'shingle roof replacement',
+  'tile roof replacement',
+  'metal roof replacement',
+  'Sarasota roofing',
+  'Manatee County roofing',
+  'Charlotte County roofing'
+];
+const SEO_CANONICAL_ROOF_REPLACEMENT = '/roof-replacement-sarasota-fl';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SEO_TITLE_ROOF_REPLACEMENT,
+    description: SEO_DESCRIPTION_ROOF_REPLACEMENT,
+    keywords: SEO_KEYWORDS_ROOF_REPLACEMENT,
+    alternates: { canonical: SEO_CANONICAL_ROOF_REPLACEMENT },
+    openGraph: {
+      type: 'website',
+      title: SEO_TITLE_ROOF_REPLACEMENT,
+      description: SEO_DESCRIPTION_ROOF_REPLACEMENT,
+      url: SEO_CANONICAL_ROOF_REPLACEMENT,
+      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SEO_TITLE_ROOF_REPLACEMENT,
+      description: SEO_DESCRIPTION_ROOF_REPLACEMENT,
+      images: [SEO_OG_IMAGE_DEFAULT],
+    },
+  };
+}
+
 
 export default async function Page() {
   const pool = await listRecentPostsPool(36);
+  // JSON-LD (WebPage, BreadcrumbList, HowTo) — keep simple & page-scoped
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const pagePath = SEO_CANONICAL_ROOF_REPLACEMENT;
+  const pageUrl = `${base}${pagePath}`;
+
+  const webPageLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: SEO_TITLE_ROOF_REPLACEMENT,
+    description: SEO_DESCRIPTION_ROOF_REPLACEMENT,
+    url: pageUrl,
+    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
+    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
+  } as const;
+
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Roof Replacement', item: pageUrl },
+    ],
+  } as const;
+
+  const howToLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HowTo',
+    name: 'Roof Replacement: What to Expect',
+    description: 'Step-by-step overview of a typical roof replacement from permits through final inspection and warranty.',
+    totalTime: undefined,
+    step: [
+      { '@type': 'HowToStep', name: 'Permits & Scheduling', text: 'We file permits and set your installation date.' },
+      { '@type': 'HowToStep', name: 'Site Prep', text: 'We protect landscaping and the home exterior.' },
+      { '@type': 'HowToStep', name: 'Tear-off & Inspection', text: 'We remove old materials and inspect decking.' },
+      { '@type': 'HowToStep', name: 'Install New Roof', text: 'Underlayment, flashing, ventilation, and finishing materials are installed.' },
+      { '@type': 'HowToStep', name: 'Final Inspection & Cleanup', text: 'We inspect the final install and clean the site.' },
+      { '@type': 'HowToStep', name: 'Warranty & Maintenance', text: 'We provide warranty info and maintenance tips.' }
+    ],
+    url: pageUrl,
+  } as const;
   return (
     <>
       <Section>
@@ -25,6 +105,22 @@ export default async function Page() {
           <div id="article-root" className="prose min-w-0">
             <span id="page-top" className="sr-only" />
             <h1>Roof Replacement</h1>
+            {/* JSON-LD: WebPage + BreadcrumbList + HowTo */}
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
+            />
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+            />
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
+            />
 
             <h2 className={scrollGuard}>How do you know if you need a roof replacement?</h2>
             <p>

@@ -5,6 +5,47 @@ import PersonGrid from "./PersonGrid";
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import { HoursAndInformation } from "./HoursAndInformation";
 import { UserRoundSearch, CloudRainWind, ChevronDown, BadgeCheck, ShieldCheck, ExternalLink, ChevronRight } from "lucide-react";
+import type { Metadata } from 'next';
+
+// ===== STATIC SEO FOR /about-sonshine-roofing (EDIT HERE) =====
+const SEO_TITLE_ABOUT = 'About SonShine Roofing | Sarasota Roofing Company';
+const SEO_DESCRIPTION_ABOUT = 'Family-owned roofing contractor in Sarasota serving Sarasota, Manatee, and Charlotte Counties since 1987. Meet the team, our values, and what sets us apart.';
+const SEO_KEYWORDS_ABOUT = [
+  'about sonshine roofing',
+  'sarasota roofing company',
+  'roofing contractor',
+  'our team',
+  'roof repair',
+  'roof replacement',
+  'roof maintenance',
+  'sarasota',
+  'manatee county',
+  'charlotte county',
+];
+const SEO_CANONICAL_ABOUT = '/about-sonshine-roofing';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SEO_TITLE_ABOUT,
+    description: SEO_DESCRIPTION_ABOUT,
+    keywords: SEO_KEYWORDS_ABOUT,
+    alternates: { canonical: SEO_CANONICAL_ABOUT },
+    openGraph: {
+      type: 'website',
+      title: SEO_TITLE_ABOUT,
+      description: SEO_DESCRIPTION_ABOUT,
+      url: SEO_CANONICAL_ABOUT,
+      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SEO_TITLE_ABOUT,
+      description: SEO_DESCRIPTION_ABOUT,
+      images: [SEO_OG_IMAGE_DEFAULT],
+    },
+  };
+}
 
 const ORDER: string[] = [
   'nathan-borntreger',
@@ -32,6 +73,29 @@ export default async function Page() {
     ? await listPersonsBySlugs(ORDER)
     : await listPersons(20);
 
+  // JSON-LD: Breadcrumbs + WebPage (About page)
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const pageUrl = `${base}${SEO_CANONICAL_ABOUT}`;
+
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'About SonShine Roofing', item: pageUrl },
+    ],
+  } as const;
+
+  const webPageLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: SEO_TITLE_ABOUT,
+    description: SEO_DESCRIPTION_ABOUT,
+    url: pageUrl,
+    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
+    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
+  } as const;
+
   return (
     <>
       <Section>
@@ -41,6 +105,18 @@ export default async function Page() {
             {/* About us */}
             <div className="py-4 prose w-full">
               <h1>About SonShine Roofing</h1>
+
+              {/* JSON-LD: Breadcrumbs + WebPage */}
+              <script
+                type="application/ld+json"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+              />
+              <script
+                type="application/ld+json"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
+              />
 
               {/* Credentials pill strip */}
               <div className="not-prose mt-2 mb-2 flex flex-wrap items-center gap-2">

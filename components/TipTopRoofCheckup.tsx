@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
-import UiLink from './UiLink';
 
 type Item = { label: string; why: string };
 
@@ -78,6 +77,48 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
 
     const current = useMemo(() => CHECKLIST[tab], [tab]);
 
+    // JSON-LD (client-side): HowTo + page-specific Service for Tip Top Roof Check‑up
+    const base = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://sonshineroofing.com');
+    const pageUrl = `${base}/roof-inspection`;
+    const providerId = `${base}/#roofingcontractor`;
+
+    const howToSections = useMemo(() => {
+        return (Object.values(CHECKLIST) as { title: string; blurb: string; items: Item[] }[]).map((group) => ({
+            '@type': 'HowToSection',
+            name: group.title,
+            itemListElement: group.items.map((it) => ({
+                '@type': 'HowToStep',
+                name: it.label,
+                text: it.why,
+            })),
+        }));
+    }, []);
+
+    const howToLd = useMemo(() => ({
+        '@context': 'https://schema.org',
+        '@type': 'HowTo',
+        name: 'Tip Top Roof Check‑up',
+        description: 'What we inspect during a roof check‑up to catch issues early and extend roof life.',
+        step: howToSections,
+        url: pageUrl,
+    }), [howToSections, pageUrl]);
+
+    const serviceLd = useMemo(() => ({
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        '@id': `${base}/#roof-checkup`,
+        name: 'Tip Top Roof Check‑up',
+        serviceType: 'Roof Inspection',
+        description: 'An in‑depth multi‑point inspection covering interior, attic, and exterior roof systems.',
+        url: pageUrl,
+        provider: { '@id': providerId },
+        areaServed: [
+            { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
+            { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
+            { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
+        ],
+    }), [base, pageUrl, providerId]);
+
     useEffect(() => {
         const el = rootRef.current;
         if (!el || typeof window === 'undefined') return;
@@ -105,6 +146,18 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
                 </p>
                 <div className="mx-auto my-6 h-[3px] w-40 bg-gradient-to-r from-[#0045d7] to-[#00e3fe] rounded-full" />
             </header>
+
+            {/* JSON-LD: HowTo + Service for Tip Top Roof Check‑up */}
+            <script
+                type="application/ld+json"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
+            />
+            <script
+                type="application/ld+json"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+            />
 
             <div className="mx-auto mt-4 max-w-3xl rounded-xl border border-slate-400 bg-white p-4 text-center shadow-sm">
                 <p className="text-sm text-slate-700">

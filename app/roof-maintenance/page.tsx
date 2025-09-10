@@ -6,17 +6,90 @@ import Image from "next/image";
 import { listRecentPostsPool } from "@/lib/wp";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import RoofCareClub from "@/components/RoofCareClub";
+import type { Metadata } from 'next';
+
+// ===== STATIC SEO FOR /roof-maintenance (EDIT HERE) =====
+const SEO_TITLE_ROOF_MAINT = 'Roof Maintenance in Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
+const SEO_DESCRIPTION_ROOF_MAINT = 'Prevent leaks, catch issues early, and extend roof life with scheduled inspections and upkeep. Serving Southwest Florida since 1987.';
+const SEO_KEYWORDS_ROOF_MAINT = [
+  'roof maintenance',
+  'roof upkeep',
+  'roof inspection',
+  'preventative maintenance',
+  'Sarasota roofing',
+  'Manatee County roofing',
+  'Charlotte County roofing',
+];
+const SEO_CANONICAL_ROOF_MAINT = '/roof-maintenance';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SEO_TITLE_ROOF_MAINT,
+    description: SEO_DESCRIPTION_ROOF_MAINT,
+    keywords: SEO_KEYWORDS_ROOF_MAINT,
+    alternates: { canonical: SEO_CANONICAL_ROOF_MAINT },
+    openGraph: {
+      type: 'website',
+      title: SEO_TITLE_ROOF_MAINT,
+      description: SEO_DESCRIPTION_ROOF_MAINT,
+      url: SEO_CANONICAL_ROOF_MAINT,
+      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SEO_TITLE_ROOF_MAINT,
+      description: SEO_DESCRIPTION_ROOF_MAINT,
+      images: [SEO_OG_IMAGE_DEFAULT],
+    },
+  };
+}
 
 const scrollGuard = "scroll-mt-24";
 
 export default async function Page() {
   const pool = await listRecentPostsPool(36);
+
+  // JSON-LD: WebPage + BreadcrumbList (page-specific Service will live in RoofCareClub component)
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const pageUrl = `${base}${SEO_CANONICAL_ROOF_MAINT}`;
+
+  const webPageLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: SEO_TITLE_ROOF_MAINT,
+    description: SEO_DESCRIPTION_ROOF_MAINT,
+    url: pageUrl,
+    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
+    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
+  } as const;
+
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Roof Maintenance', item: pageUrl },
+    ],
+  } as const;
+
   return (
     <Section>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
         <div id="article-root" className="prose min-w-0">
           <span id="page-top" className="sr-only" />
           <h1>Roof Maintenance</h1>
+          {/* JSON-LD: WebPage + BreadcrumbList */}
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
+          />
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+          />
           <h2 className={scrollGuard}>
             Undoubtedly, lack of maintenance is among the top reasons why roofs fail.
           </h2>
