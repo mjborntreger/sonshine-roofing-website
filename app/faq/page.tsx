@@ -1,11 +1,37 @@
 import Section from '@/components/layout/Section';
 import Link from 'next/link';
-import { listFaqIndex, listFaqTopics } from '@/lib/wp';
-import type { FaqSummary, FaqTopic } from '@/lib/wp';
+import { listFaqTopics, listFaqsWithContent, faqListToJsonLd } from '@/lib/wp';
+import type { FaqFull, FaqTopic } from '@/lib/wp';
+import type { Metadata } from 'next';
 import ResourceSearchController from '@/components/resource-search/ResourceSearchController';
 import ResourcesAside from '@/components/ResourcesAside';
 
 export const revalidate = 86400; // daily ISR
+
+export async function generateMetadata(): Promise<Metadata> {
+  // EDIT: FAQ archive SEO title/description/copy here (applies to prod + staging)
+  const title = 'Roofing FAQs | SonShine Roofing';
+  const description = 'Clear, no-nonsense answers to the most common roofing questions in Sarasota, Manatee, and Charlotte Counties. Get the facts before you climb a ladder.';
+
+  return {
+    title,
+    description,
+    alternates: { canonical: '/faq' },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: '/faq',
+      images: [{ url: '/og-default.jpg', width: 1200, height: 630 }], // EDIT: swap if you add a dedicated FAQ OG image
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/og-default.jpg'],
+    },
+  };
+}
 
 type PageProps = { searchParams?: Promise<{ q?: string; topic?: string }> };
 
@@ -14,10 +40,22 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
   const qRaw = sp.q ?? '';
   const q = qRaw.trim();
 
-  const [topics, index] = await Promise.all([
+  const [topics, faqs] = await Promise.all([
     listFaqTopics(200).catch(() => [] as FaqTopic[]),
-    listFaqIndex(1000).catch(() => [] as FaqSummary[]),
+    listFaqsWithContent(50).catch(() => [] as FaqFull[]),
   ]);
+
+  // JSON-LD: build FAQPage + Breadcrumbs (first 50 items)
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const faqLd = faqListToJsonLd(faqs, base, '/faq');
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'FAQ', item: `${base}/faq` },
+    ],
+  } as const;
 
   // Sort topics: featured topics first (if available), then alphabetically
   const topicsSorted = [...topics].sort((a, b) => {
@@ -28,8 +66,8 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
   });
 
   // Group all items by topic for display
-  const groups = new Map<string, FaqSummary[]>();
-  for (const f of index) {
+  const groups = new Map<string, FaqFull[]>();
+  for (const f of faqs) {
     const slugs = f.topicSlugs ?? [];
     if (slugs.length > 0) {
       for (const t of slugs) {
@@ -66,6 +104,18 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
               we’re one call away.
             </p>
 
+            {/* JSON-LD: FAQPage + Breadcrumbs */}
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+            />
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+            />
+
             {/* Search (client-side, exact phrase like Blog) */}
             <div className="mt-6" role="search">
               <input
@@ -81,7 +131,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
 
             {/* Results meta + controls */}
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <span className="text-sm text-slate-700">Showing <span id="faq-result-count" aria-live="polite">{index.length}</span> FAQs</span>
+              <span className="text-sm text-slate-700">Showing <span id="faq-result-count" aria-live="polite">{faqs.length}</span> FAQs</span>
               <div className="ml-auto sm:flex items-center gap-2">
                 <button id="faq-expand-all" type="button" className="rounded-md border border-slate-400 px-3 py-1.5 text-sm bg-white hover:bg-slate-50">
                   Expand all
@@ -123,7 +173,6 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                       </summary>
                       <div className="px-4 pb-4 pt-2 space-y-2">
                         {list.map((f) => {
-                          const ex = (f as any).excerpt || '';
                           return (
                             <details
                               key={f.slug}
@@ -131,7 +180,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                               className="faq-item rounded-md border border-slate-200 bg-white"
                               data-title={(f.title || '').toString()}
                               data-topic={title}
-                              data-excerpt={(ex || '').toString()}
+                              data-excerpt=""
                             >
                               <summary className="flex items-start justify-between gap-4 px-4 py-3 cursor-pointer">
                                 <h3 className="prose text-slate-900">{f.title}</h3>
@@ -145,17 +194,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                                   <path d="M7 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </summary>
-                              <div className="px-4 pb-4 pt-0 text-sm text-slate-700">
-                                {ex ? <div className="prose prose-sm" dangerouslySetInnerHTML={{ __html: ex }} /> : null}
-                                <div className="mt-3">
-                                  <Link
-                                    href={{ pathname: `/faq/${f.slug}` }}
-                                    className="inline-flex items-center rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
-                                  >
-                                    Read full answer
-                                  </Link>
-                                </div>
-                              </div>
+                              <div className="prose prose-sm" dangerouslySetInnerHTML={{ __html: (f as any).contentHtml || '' }} />
                             </details>
                           );
                         })}

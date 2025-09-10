@@ -9,10 +9,21 @@ import Script from "next/script";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sonshineroofing.com"),
+  openGraph: {
+    type: "website",
+    siteName: "SonShine Roofing",
+    title: "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte",
+    description: "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!",
+    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "SonShine Roofing" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: "@ssroofinginc",
+  },
   alternates: { canonical: "./" },
-  title: "SonShine Roofing — Sarasota, Manatee & Charlotte Counties",
+  title: "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte",
   description:
-    "Residential roof repair, replacement, inspections, and preventative maintenance. Since 1987 we’ve got you covered.",
+    "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!",
   icons: { icon: "/favicon.ico" },
 };
 

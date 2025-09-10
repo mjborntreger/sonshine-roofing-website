@@ -177,6 +177,7 @@ export default function InfiniteList<T>({
         } else if (kind === "video") {
             return (v: any, i: number) => {
                 const safeKey = v?.id ?? v?.slug ?? v?.youtubeId ?? i;
+                const safeSlug = (v?.slug || v?.id || v?.youtubeId || String(safeKey)) as string;
                 const cats: any[] = Array.isArray(v?.categories) ? v.categories : [];
                 const catNames = cats.map((c: any) => c?.name).filter(Boolean).join(", ");
                 const bucketSlugs = cats.map((c: any) => (c?.slug || c?.name || "")).filter(Boolean).join(",");
@@ -187,13 +188,14 @@ export default function InfiniteList<T>({
                     e.preventDefault();
                     e.stopPropagation();
                     if (onVideoOpen) onVideoOpen(v);
-                    else if (typeof window !== "undefined") {
-                        window.dispatchEvent(new CustomEvent("video:open", { detail: v }));
+                    // Always announce a normalized slug so page-level URL logic can update ?v=
+                    if (typeof window !== "undefined") {
+                        try { window.dispatchEvent(new CustomEvent("video:open", { detail: { slug: safeSlug } })); } catch {}
                     }
                 };
 
                 return (
-                    <div className="vid-item group block">
+                    <div className="vid-item group block" data-video-slug={safeSlug}>
                         <Card
                             className="vid-card overflow-hidden transition hover:shadow-lg"
                             data-title={v?.title || ""}
@@ -210,6 +212,7 @@ export default function InfiniteList<T>({
                                 type="button"
                                 aria-label={`Play ${v?.title || "video"}`}
                                 onClick={handleOpen}
+                                data-video-slug={safeSlug}
                                 className="relative block w-full"
                             >
                                 <Frame

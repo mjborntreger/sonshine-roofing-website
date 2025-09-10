@@ -135,20 +135,50 @@ export async function generateStaticParams() {
 // -------- Metadata (SEO) --------
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getPostBySlug(slug);
-  if (!post) return { title: "Post Not Found | SonShine Roofing" };
 
-  const base = await getBaseUrlFromHeaders();
-  const url = `${base}/${slug}`;
-  const desc = decodeEntities(stripHtml(sanitizeHtml(post.contentHtml))).slice(0, 160);
-  const images = post.featuredImage?.url ? [{ url: post.featuredImage.url }] : undefined;
+  // Use unified post fetcher (deduped with page) that now includes RankMath SEO
+  const post = await getPostBySlug(slug);
+  if (!post) {
+    return {
+      title: "Post Not Found | SonShine Roofing",
+      description: "This article could not be found.",
+      alternates: { canonical: `/${slug}` },
+    };
+  }
+
+  const seo = post.seo ?? {};
+  const og = seo.openGraph ?? {};
+
+  const rawExcerpt = stripHtml(sanitizeHtml(post.excerpt || ""));
+  const title = (seo.title || og.title || post.title || "Article · SonShine Roofing").trim();
+  const description = (seo.description || og.description || rawExcerpt).slice(0, 160);
+
+  // Best-image selection: RankMath OG > featured image > site default
+  const rmImg = (og.image || {}) as any;
+  const ogUrl: string = rmImg.secureUrl || rmImg.url || post.featuredImage?.url || "/og-default.jpg";
+  const ogWidth: number = rmImg.width || 1200;
+  const ogHeight: number = rmImg.height || 630;
 
   return {
-    title: post.title,
-    description: desc,
-    alternates: { canonical: url },
-    openGraph: { title: post.title, description: desc, url, images, type: "article" },
-    twitter: { card: "summary_large_image", title: post.title, description: desc, images: images?.[0]?.url },
+    title,
+    description,
+    // Relative canonical so metadataBase resolves to production
+    alternates: { canonical: `/${slug}` },
+    openGraph: {
+      type: "article" as const,
+      title,
+      description,
+      images: [{ url: ogUrl, width: ogWidth, height: ogHeight }],
+      publishedTime: post.date ?? undefined,
+      modifiedTime: post.modified ?? undefined,
+      authors: post.authorName ? [post.authorName] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogUrl],
+    },
   };
 }
 
@@ -182,6 +212,30 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   });
   const readingMinutes = calcReadingMinutes(post.contentHtml);
 
+  // JSON-LD (BlogPosting) using the same post object
+  const descSeo = (post.seo?.description || post.seo?.openGraph?.description || stripHtml(sanitizeHtml(post.excerpt || ""))).slice(0, 160);
+  const rmImg2 = (post.seo?.openGraph?.image || {}) as any;
+  const ogImgAbs = rmImg2.secureUrl || rmImg2.url || post.featuredImage?.url || `${base}/og-default.jpg`;
+  const authorObj = post.authorName ? { "@type": "Person", name: post.authorName } : { "@type": "Organization", name: "SonShine Roofing" };
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.seo?.title || post.title,
+    description: descSeo,
+    datePublished: post.date,
+    dateModified: post.modified,
+    mainEntityOfPage: { "@type": "WebPage", "@id": shareUrl },
+    image: ogImgAbs,
+    url: shareUrl,
+    author: authorObj,
+    publisher: {
+      "@type": "Organization",
+      name: "SonShine Roofing",
+      logo: { "@type": "ImageObject", url: `${base}/icon.png` }
+    }
+  };
+
   // Build TOC + decorate + inject CTA (all on the server)
   const safeHtml = sanitizeHtml(post.contentHtml || "");
   const { html: withIds, toc } = addIdsAndBuildToc(safeHtml);
@@ -196,6 +250,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <Section>
+      {/* JSON-LD */}
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Back link */}
       <div className="mb-3">
         <SmartLink href="/blog" className="text-sm text-slate-600 no-underline hover:underline">
