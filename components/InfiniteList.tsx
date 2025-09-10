@@ -90,12 +90,20 @@ export default function InfiniteList<T>({
     }, []);
 
     const { ref: sentinelRef, intersecting } = useIntersection<HTMLDivElement>({ root: null, rootMargin });
+    // Prevent rapid-fire loads while the sentinel remains intersecting
+    const firedRef = useRef(false);
+    useEffect(() => {
+        if (!intersecting) {
+            firedRef.current = false; // re-arm once sentinel leaves viewport
+        }
+    }, [intersecting]);
     // Match the loading shimmer to page size (capped at 12)
     const skeletonCountEff = typeof skeletonCount === "number" ? skeletonCount : Math.min(pageSize, 12);
 
     useEffect(() => {
-        if (!intersecting || !hasMore || loading) return;
+        if (!intersecting || !hasMore || loading || firedRef.current) return;
 
+        firedRef.current = true; // only fire once per intersecting period
         setLoading(true);
         const ac = new AbortController();
         abortRef.current = ac;
