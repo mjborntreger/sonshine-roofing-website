@@ -7,9 +7,9 @@ import PlanQuiz from './PlanQuiz';
 import type { Metadata } from 'next';
 
 // ===== STATIC SEO FOR /financing (EDIT HERE) =====
-export const SEO_TITLE_FINANCING = 'Roof Financing | SonShine Roofing';
-export const SEO_DESCRIPTION_FINANCING = 'Flexible roof financing options in Sarasota, Manatee, and Charlotte Counties. Equity‑based (PACE) and credit‑based plans available — including no money down, deferred payments, and fixed‑rate terms.';
-export const SEO_KEYWORDS_FINANCING = [
+const SEO_TITLE_FINANCING = 'Roof Financing | SonShine Roofing';
+const SEO_DESCRIPTION_FINANCING = 'Flexible roof financing options in Sarasota, Manatee, and Charlotte Counties. Equity‑based (PACE) and credit‑based plans available — including no money down, deferred payments, and fixed‑rate terms.';
+const SEO_KEYWORDS_FINANCING = [
   'roof financing',
   'roof loans',
   'PACE financing',
@@ -20,8 +20,8 @@ export const SEO_KEYWORDS_FINANCING = [
   'Manatee County roofing',
   'Charlotte County roofing',
 ];
-export const SEO_CANONICAL_FINANCING = '/financing';
-export const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+const SEO_CANONICAL_FINANCING = '/financing';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
