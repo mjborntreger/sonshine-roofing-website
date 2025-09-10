@@ -128,6 +128,18 @@ function withLoading(toggleEl: Element | null, skeletonEl: Element | null, run: 
     }
 }
 
+// Coalesce repeated calls into a single rAF tick
+function makeScheduler(fn: () => void) {
+    let raf = 0;
+    return () => {
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+            raf = 0;
+            try { fn(); } catch { }
+        });
+    };
+}
+
 function setPillPressed(btn: Element, pressed: boolean) {
     try {
         btn.setAttribute("aria-pressed", pressed ? "true" : "false");
@@ -308,6 +320,7 @@ function strategyBlog(opts: MountOptions): Cleaner {
             [keys.cat]: catsCsv || null,
         } as any);
     }
+    const scheduleFilter = makeScheduler(filterNow);
 
     // URL init (q + categories)
     try {
@@ -401,7 +414,7 @@ function strategyBlog(opts: MountOptions): Cleaner {
                     rerun = true;
                 }
             }
-            if (rerun) queueMicrotask(filterNow);
+            if (rerun) scheduleFilter();
         });
         // Observe the grid itself; subtree:true lets us see attribute changes on descendants too.
         mo.observe(grid, { attributes: true, attributeFilter: ["data-loading"], childList: true, subtree: true });
@@ -554,6 +567,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
             } as any);
         });
     }
+    const scheduleFilter = makeScheduler(filterNow);
 
     // Init from URL
     try {
@@ -612,7 +626,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
             for (const m of muts) {
                 if (m.type === "attributes" && m.attributeName === "data-loading") {
                     const val = (m.target as Element).getAttribute("data-loading");
-                    if (val === "false") { queueMicrotask(filterNow); }
+                    if (val === "false") { scheduleFilter(); }
                 }
             }
         });
@@ -805,6 +819,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
             } as any);
         });
     }
+    const scheduleFilter = makeScheduler(filterNow);
 
     // Init from URL
     try {
@@ -916,7 +931,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
                     rerun = true;
                 }
             }
-            if (rerun) queueMicrotask(filterNow);
+            if (rerun) scheduleFilter();
         });
         mo.observe(wrap, { attributes: true, attributeFilter: ["data-loading"], childList: true, subtree: true });
     }
