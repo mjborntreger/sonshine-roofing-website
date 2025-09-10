@@ -4,12 +4,46 @@ import UiLink from '@/components/UiLink';
 import { Phone } from "lucide-react";
 import MonthlyEstimator from './MonthlyEstimator';
 import PlanQuiz from './PlanQuiz';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Roof Financing | SonShine Roofing',
-  description:
-    'Flexible roof financing options in Sarasota, Manatee, and Charlotte Counties. Equity‑based (PACE) and credit‑based plans available — including no money down, deferred payments, and fixed‑rate terms.',
-};
+// ===== STATIC SEO FOR /financing (EDIT HERE) =====
+export const SEO_TITLE_FINANCING = 'Roof Financing | SonShine Roofing';
+export const SEO_DESCRIPTION_FINANCING = 'Flexible roof financing options in Sarasota, Manatee, and Charlotte Counties. Equity‑based (PACE) and credit‑based plans available — including no money down, deferred payments, and fixed‑rate terms.';
+export const SEO_KEYWORDS_FINANCING = [
+  'roof financing',
+  'roof loans',
+  'PACE financing',
+  'YGrene',
+  'Service Finance',
+  'roof payment plans',
+  'Sarasota roofing',
+  'Manatee County roofing',
+  'Charlotte County roofing',
+];
+export const SEO_CANONICAL_FINANCING = '/financing';
+export const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SEO_TITLE_FINANCING,
+    description: SEO_DESCRIPTION_FINANCING,
+    keywords: SEO_KEYWORDS_FINANCING,
+    alternates: { canonical: SEO_CANONICAL_FINANCING },
+    openGraph: {
+      type: 'website',
+      title: SEO_TITLE_FINANCING,
+      description: SEO_DESCRIPTION_FINANCING,
+      url: SEO_CANONICAL_FINANCING,
+      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SEO_TITLE_FINANCING,
+      description: SEO_DESCRIPTION_FINANCING,
+      images: [SEO_OG_IMAGE_DEFAULT],
+    },
+  };
+}
 
 const h2 = 'text-xl md:text-2xl font-semibold text-slate-900';
 const lead = 'text-lg text-slate-700';
@@ -84,6 +118,64 @@ export default function FinancingPage() {
       }
     ],
   };
+
+  // JSON-LD objects (Service, Breadcrumbs, WebPage)
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const pageUrl = `${base}${SEO_CANONICAL_FINANCING}`;
+  const org = {
+    '@type': 'Organization',
+    name: 'SonShine Roofing',
+    url: base,
+    logo: { '@type': 'ImageObject', url: `${base}/icon.png` },
+  } as const;
+
+  const serviceLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: 'Roof Financing',
+    description: SEO_DESCRIPTION_FINANCING,
+    provider: org,
+    areaServed: [
+      { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
+      { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
+      { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
+    ],
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: 'Financing Programs',
+      itemListElement: [
+        { '@type': 'Offer', name: 'YGrene (PACE, equity‑based)', url: 'https://prequalification.ygrene.com/ContractorApply/XYFMHC' },
+        { '@type': 'Offer', name: 'Service Finance (credit‑based)', url: pageUrl },
+      ],
+    },
+    url: pageUrl,
+  } as const;
+
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Financing', item: pageUrl },
+    ],
+  } as const;
+
+  const webPageLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: SEO_TITLE_FINANCING,
+    description: SEO_DESCRIPTION_FINANCING,
+    url: pageUrl,
+    primaryImageOfPage: {
+      '@type': 'ImageObject',
+      url: `${base}${SEO_OG_IMAGE_DEFAULT}`,
+    },
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'SonShine Roofing',
+      url: base,
+    },
+  } as const;
   return (
     <Section>
       <div className="container-edge py-10 md:py-16">
@@ -400,7 +492,24 @@ export default function FinancingPage() {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
         />
-        
+        {/* Service Schema */}
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+        />
+        {/* BreadcrumbList Schema */}
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+        />
+        {/* WebPage Schema (mirrors SEO metadata) */}
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
+        />
       </div>
     </Section>
   );

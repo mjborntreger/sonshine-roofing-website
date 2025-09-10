@@ -272,7 +272,7 @@ const mapProductLinks = (rows?: any[]): ProductLink[] =>
   }));
 
 // calcReadingTimeMinutes Helper Function
-function stripHtml(html: string): string {
+export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 function calcReadingTimeMinutes(html: string, wpm = 225): number {

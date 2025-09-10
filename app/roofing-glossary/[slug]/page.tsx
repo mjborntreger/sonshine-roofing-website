@@ -1,7 +1,8 @@
 import Section from '@/components/layout/Section';
 import Link from 'next/link';
-import { getGlossaryTerm, listGlossaryIndex } from '@/lib/wp';
+import { getGlossaryTerm, listGlossaryIndex, stripHtml } from '@/lib/wp';
 import { suggest } from '@/lib/fuzzy';
+import type { Metadata } from 'next';
 
 // Escapes a string for safe use inside a RegExp
 function escapeRegExp(s: string) {
@@ -87,6 +88,78 @@ function autoLinkGlossary(
 
 export const revalidate = 86400;
 
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  // Defaults if a term is missing (EDIT if you want different fallbacks)
+  const fallbackTitle = 'Roofing Glossary | SonShine Roofing';
+  const fallbackDesc = 'Plain-English definitions of common roofing terms used across Sarasota, Manatee, and Charlotte Counties.';
+
+  const { slug } = await params;
+  try {
+    const term = await getGlossaryTerm(slug);
+    if (!term) {
+      return {
+        title: fallbackTitle,
+        description: fallbackDesc,
+        alternates: { canonical: '/roofing-glossary' },
+        openGraph: {
+          type: 'article',
+          title: fallbackTitle,
+          description: fallbackDesc,
+          url: '/roofing-glossary',
+          images: [{ url: '/og-default.jpg', width: 1200, height: 630 }],
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: fallbackTitle,
+          description: fallbackDesc,
+          images: ['/og-default.jpg'],
+        },
+      };
+    }
+
+    const title = `${term.title} | Roofing Glossary`;
+    const description = stripHtml(term.contentHtml || '').slice(0, 160);
+
+    return {
+      title,
+      description,
+      alternates: { canonical: `/roofing-glossary/${term.slug}` },
+      openGraph: {
+        type: 'article',
+        title,
+        description,
+        url: `/roofing-glossary/${term.slug}`,
+        images: [{ url: '/og-default.jpg', width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        images: ['/og-default.jpg'],
+      },
+    };
+  } catch {
+    return {
+      title: fallbackTitle,
+      description: fallbackDesc,
+      alternates: { canonical: '/roofing-glossary' },
+      openGraph: {
+        type: 'article',
+        title: fallbackTitle,
+        description: fallbackDesc,
+        url: '/roofing-glossary',
+        images: [{ url: '/og-default.jpg', width: 1200, height: 630 }],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: fallbackTitle,
+        description: fallbackDesc,
+        images: ['/og-default.jpg'],
+      },
+    };
+  }
+}
+
 // (Optional) Prebuild many static pages:
 export async function generateStaticParams() {
   const index = await listGlossaryIndex(1000).catch(() => []);
@@ -145,6 +218,26 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
   const prev = hasPos && pos > 0 ? index[pos - 1] : hasPos ? index[index.length - 1] : null;
   const next = hasPos && pos < index.length - 1 ? index[pos + 1] : hasPos ? index[0] : null;
 
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const termUrl = `${base}/roofing-glossary/${term.slug}`;
+  const definedTermLd = {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTerm',
+    name: term.title,
+    description: stripHtml(term.contentHtml || '').slice(0, 300),
+    url: termUrl,
+    inDefinedTermSet: `${base}/roofing-glossary`,
+  } as const;
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Roofing Glossary', item: `${base}/roofing-glossary` },
+      { '@type': 'ListItem', position: 3, name: term.title, item: termUrl },
+    ],
+  } as const;
+
   return (
     <Section>
       <div className="container-edge py-8">
@@ -154,6 +247,17 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
 
         <article className="prose max-w-none">
           <h1>{term.title}</h1>
+          {/* JSON-LD: DefinedTerm + Breadcrumbs */}
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermLd) }}
+          />
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+          />
           {/* definition body from WordPress */}
           <div
             dangerouslySetInnerHTML={{

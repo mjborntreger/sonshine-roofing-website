@@ -42,12 +42,12 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
 
   const [topics, faqs] = await Promise.all([
     listFaqTopics(200).catch(() => [] as FaqTopic[]),
-    listFaqsWithContent(50).catch(() => [] as FaqFull[]),
+    listFaqsWithContent(500).catch(() => [] as FaqFull[]),
   ]);
 
   // JSON-LD: build FAQPage + Breadcrumbs (first 50 items)
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const faqLd = faqListToJsonLd(faqs, base, '/faq');
+  const faqLd = faqListToJsonLd(faqs.slice(0, 50), base, '/faq');
   const breadcrumbsLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -177,7 +177,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                             <details
                               key={f.slug}
                               id={`faq-${f.slug}`}
-                              className="faq-item rounded-md border border-slate-200 bg-white"
+                              className="faq-item group rounded-md border border-slate-200 bg-white"
                               data-title={(f.title || '').toString()}
                               data-topic={title}
                               data-excerpt=""
@@ -185,7 +185,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                               <summary className="flex items-start justify-between gap-4 px-4 py-3 cursor-pointer">
                                 <h3 className="prose text-slate-900">{f.title}</h3>
                                 <svg
-                                  className="h-5 w-5 shrink-0 self-center opacity-70 transition-transform"
+                                  className="h-5 w-5 shrink-0 self-center opacity-70 transition-transform duration-200 group-open:rotate-90"
                                   viewBox="0 0 20 20"
                                   fill="none"
                                   xmlns="http://www.w3.org/2000/svg"
@@ -194,7 +194,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                                   <path d="M7 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </summary>
-                              <div className="prose prose-sm" dangerouslySetInnerHTML={{ __html: (f as any).contentHtml || '' }} />
+                              <div className="prose prose-sm px-4 pb-4 mt-1" dangerouslySetInnerHTML={{ __html: (f as any).contentHtml || '' }} />
                             </details>
                           );
                         })}
@@ -234,6 +234,128 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
 
         </div>
       </div>
+      {/* Deep-linking, hash handling, and expand/collapse controls */}
+      <script
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{
+          __html: `(() => {
+            function $(sel, ctx) { return (ctx || document).querySelector(sel); }
+            function $all(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
+
+            const expandAllBtn = document.getElementById('faq-expand-all');
+            const collapseAllBtn = document.getElementById('faq-collapse-all');
+
+            function openTopicFor(el) {
+              try {
+                const topic = el.closest('details.faq-topic');
+                if (topic) topic.open = true;
+              } catch (_) {}
+            }
+
+            function highlight(el) {
+              try {
+                el.classList.add('ring-2');
+                el.classList.add('ring-[#00e3fe]');
+                el.classList.add('ring-offset-2');
+                setTimeout(() => {
+                  el.classList.remove('ring-2');
+                  el.classList.remove('ring-[#00e3fe]');
+                  el.classList.remove('ring-offset-2');
+                }, 1800);
+              } catch (_) {}
+            }
+
+            function setHash(id) {
+              try {
+                const url = new URL(window.location.href);
+                url.hash = id || '';
+                history.replaceState(null, '', url);
+              } catch (_) {}
+            }
+
+            function openById(id) {
+              if (!id) return false;
+              const el = document.getElementById(id);
+              if (!el) return false;
+              if (el.tagName && el.tagName.toLowerCase() === 'details') {
+                el.open = true;
+              }
+              openTopicFor(el);
+              // If it's a nested FAQ item, ensure it is open
+              if (el.matches && el.matches('details.faq-item')) {
+                el.open = true;
+              }
+              try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
+              highlight(el);
+              return true;
+            }
+
+            function handleHash() {
+              const hash = (window.location.hash || '').replace(/^#/, '');
+              if (!hash) return;
+              // Support both \`faq-<slug>\` and \`topic-<slug>\` ids
+              openById(hash);
+            }
+
+            // Wire toggle listeners to update the hash to the opened FAQ id, or clear when closed
+            function wireToggleHash() {
+              $all('details.faq-item').forEach((d) => {
+                d.addEventListener('toggle', () => {
+                  if (d.open) setHash(d.id);
+                  else setHash('');
+                });
+              });
+            }
+
+            // Expand/Collapse all buttons
+            function wireBulkControls() {
+              if (expandAllBtn) {
+                expandAllBtn.addEventListener('click', () => {
+                  $all('details.faq-topic').forEach((t) => t.open = true);
+                  $all('details.faq-item').forEach((d) => d.open = true);
+                  // Do not change hash for bulk actions
+                });
+              }
+              if (collapseAllBtn) {
+                collapseAllBtn.addEventListener('click', () => {
+                  $all('details.faq-item').forEach((d) => d.open = false);
+                  $all('details.faq-topic').forEach((t) => t.open = false);
+                  setHash('');
+                });
+              }
+            }
+
+            // Delegate clicks on anchors that already point to #faq-<slug>
+            document.addEventListener('click', (ev) => {
+              try {
+                const a = ev.target && ev.target.closest ? ev.target.closest('a[href^="#faq-"]') : null;
+                if (a) {
+                  const frag = a.getAttribute('href') || '';
+                  const id = frag.replace(/^#/, '');
+                  // Open immediately without waiting for hashchange
+                  if (openById(id)) {
+                    ev.preventDefault();
+                    setHash(id);
+                  }
+                }
+              } catch (_) {}
+            }, true);
+
+            // Handle back/forward navigation of hashes
+            window.addEventListener('hashchange', handleHash);
+
+            // Initial wiring
+            wireToggleHash();
+            wireBulkControls();
+            // Open any hash present on first paint
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', handleHash);
+            } else {
+              handleHash();
+            }
+          })();`,
+        }}
+      />
       <ResourceSearchController
         kind="faq"
         ids={{
