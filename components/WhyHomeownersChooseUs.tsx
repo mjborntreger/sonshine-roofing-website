@@ -4,7 +4,7 @@ import { ShieldCheck, Shield, MapPin, HandCoins, ChevronDown } from "lucide-reac
 const pillarsGrid = "mt-8 grid grid-cols-1 md:grid-cols-2 gap-5 items-start auto-rows-fr";
 const detailsBase = "group h-full flex flex-col rounded-2xl border border-[--brand-blue] bg-white p-8 shadow-lg transition hover:shadow-md hover:-translate-y-0.5";
 const detailsPosition = "inline-flex items-center gap-3";
-const detailsSummary = "flex cursor-pointer select-none items-center justify-between gap-3 text-slate-900";
+const detailsSummary = "flex cursor-pointer text-lg select-none items-center justify-between gap-3 text-slate-900";
 const iconChip = "grid h-9 w-9 place-items-center rounded-full text-[--brand-blue] bg-[[--brand-blue]]/10 ring-1 ring-[[--brand-blue]]/20 transition-transform group-hover:scale-105";
 const titleAccent = "font-semibold relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-[[--brand-orange]] after:to-[#00e3fe] after:transition-all group-hover:after:w-12";
 const gradientDivider = "gradient-divider my-8";
@@ -32,7 +32,7 @@ export default async function WhyHomeownersChooseUs() {
       <div className="md:hidden mt-8 space-y-3">
         {/* Local Expertise */}
         <details className={`${detailsBase} hover:ring-1 hover:ring-[#00e3fe4d]`}>
-          <summary className={`${detailsSummary}`}>
+          <summary className={detailsSummary}>
             <span className={detailsPosition}>
               <span className={iconChip}>
                 <MapPin className="h-5 w-5" aria-hidden="true" />
