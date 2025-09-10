@@ -62,7 +62,12 @@ const ORDER: string[] = [
   'matthew',
   'mina',
   'steve',
-  'michael'
+  'michael',
+  'erick',
+  'antonio',
+  'martinez',
+  'jose-sergio',
+  'jose'
 ];
 
 const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white mb-4";
@@ -119,7 +124,7 @@ export default async function Page() {
               />
 
               {/* Credentials pill strip */}
-              <div className="not-prose mt-2 mb-2 flex flex-wrap items-center gap-2">
+              <div className="not-prose mt-2 mb-4 flex flex-wrap items-center gap-2">
                 <a
                   href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
                   target="_blank"
@@ -131,20 +136,7 @@ export default async function Page() {
                   <span>License #CCC1331483</span>
                   <ExternalLink className="ml-1 inline h-3 w-3 align-[-0.125em]" aria-hidden="true" />
                 </a>
-                <a
-                  href="/docs/sonshine-liability-insurance.pdf"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="View SonShine Roofing liability insurance certificate (PDF) in a new tab"
-                  className="btn btn-outline btn-sm inline-flex items-center"
-                >
-                  <ShieldCheck className="mr-1 inline h-4 w-4 align-[-0.125em] text-[--brand-blue]" aria-hidden="true" />
-                  <span>Proof of Insurance (PDF)</span>
-                  <ExternalLink className="ml-1 inline h-3 w-3 align-[-0.125em]" aria-hidden="true" />
-                </a>
               </div>
-
-              <div className="mb-8">Jump to: <a href="#hours-and-information" className="underline underline-offset-2">Hours and Information</a></div>
 
               <details open className={detailsStyles}>
                 <summary className={summaryStyles}>
@@ -194,15 +186,11 @@ export default async function Page() {
 
               <AboutVideo />
 
-              <div className="not-prose">
-                <h2 id="meet-our-team" className="text-center mt-12 mb-8 meet-our-team scroll-mt-8">Meet Our Team</h2>
-                <div className="gradient-divider my-4" />
-                <PersonGrid people={people} />
-              </div>
+              <HoursAndInformation />
 
             </div>
 
-            <div className="lg:sticky lg:top-24 self-start min-w-0">            
+            <div className="sticky hidden lg:block lg:top-24 self-start min-w-0">
               <SocialMediaProfiles />
             </div>
 
@@ -210,7 +198,11 @@ export default async function Page() {
         </div>
       </Section>
 
-      <HoursAndInformation />
+      <Section>
+        <h2 id="meet-our-team" className="text-center mb-8 meet-our-team scroll-mt-8">Meet Our Team</h2>
+        <div className="gradient-divider my-4" />
+        <PersonGrid people={people} />
+      </Section>
     </>
   );
 }

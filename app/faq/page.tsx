@@ -234,124 +234,36 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
 
         </div>
       </div>
-      {/* Deep-linking, hash handling, and expand/collapse controls */}
+      {/* Expand/Collapse controls */}
       <script
         suppressHydrationWarning
         dangerouslySetInnerHTML={{
           __html: `(() => {
-            function $(sel, ctx) { return (ctx || document).querySelector(sel); }
-            function $all(sel, ctx) { return Array.from((ctx || document).querySelectorAll(sel)); }
+            const $all = (sel, ctx) => Array.from((ctx || document).querySelectorAll(sel));
 
-            const expandAllBtn = document.getElementById('faq-expand-all');
-            const collapseAllBtn = document.getElementById('faq-collapse-all');
-
-            function openTopicFor(el) {
-              try {
-                const topic = el.closest('details.faq-topic');
-                if (topic) topic.open = true;
-              } catch (_) {}
-            }
-
-            function highlight(el) {
-              try {
-                el.classList.add('ring-2');
-                el.classList.add('ring-[#00e3fe]');
-                el.classList.add('ring-offset-2');
-                setTimeout(() => {
-                  el.classList.remove('ring-2');
-                  el.classList.remove('ring-[#00e3fe]');
-                  el.classList.remove('ring-offset-2');
-                }, 1800);
-              } catch (_) {}
-            }
-
-            function setHash(id) {
-              try {
-                const url = new URL(window.location.href);
-                url.hash = id || '';
-                history.replaceState(null, '', url);
-              } catch (_) {}
-            }
-
-            function openById(id) {
-              if (!id) return false;
-              const el = document.getElementById(id);
-              if (!el) return false;
-              if (el.tagName && el.tagName.toLowerCase() === 'details') {
-                el.open = true;
-              }
-              openTopicFor(el);
-              // If it's a nested FAQ item, ensure it is open
-              if (el.matches && el.matches('details.faq-item')) {
-                el.open = true;
-              }
-              try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (_) {}
-              highlight(el);
-              return true;
-            }
-
-            function handleHash() {
-              const hash = (window.location.hash || '').replace(/^#/, '');
-              if (!hash) return;
-              // Support both \`faq-<slug>\` and \`topic-<slug>\` ids
-              openById(hash);
-            }
-
-            // Wire toggle listeners to update the hash to the opened FAQ id, or clear when closed
-            function wireToggleHash() {
-              $all('details.faq-item').forEach((d) => {
-                d.addEventListener('toggle', () => {
-                  if (d.open) setHash(d.id);
-                  else setHash('');
-                });
-              });
-            }
-
-            // Expand/Collapse all buttons
             function wireBulkControls() {
+              const expandAllBtn = document.getElementById('faq-expand-all');
+              const collapseAllBtn = document.getElementById('faq-collapse-all');
+
               if (expandAllBtn) {
                 expandAllBtn.addEventListener('click', () => {
-                  $all('details.faq-topic').forEach((t) => t.open = true);
-                  $all('details.faq-item').forEach((d) => d.open = true);
-                  // Do not change hash for bulk actions
+                  $all('details.faq-topic').forEach((t) => (t.open = true));
+                  $all('details.faq-item').forEach((d) => (d.open = true));
                 });
               }
+
               if (collapseAllBtn) {
                 collapseAllBtn.addEventListener('click', () => {
-                  $all('details.faq-item').forEach((d) => d.open = false);
-                  $all('details.faq-topic').forEach((t) => t.open = false);
-                  setHash('');
+                  $all('details.faq-item').forEach((d) => (d.open = false));
+                  $all('details.faq-topic').forEach((t) => (t.open = false));
                 });
               }
             }
 
-            // Delegate clicks on anchors that already point to #faq-<slug>
-            document.addEventListener('click', (ev) => {
-              try {
-                const a = ev.target && ev.target.closest ? ev.target.closest('a[href^="#faq-"]') : null;
-                if (a) {
-                  const frag = a.getAttribute('href') || '';
-                  const id = frag.replace(/^#/, '');
-                  // Open immediately without waiting for hashchange
-                  if (openById(id)) {
-                    ev.preventDefault();
-                    setHash(id);
-                  }
-                }
-              } catch (_) {}
-            }, true);
-
-            // Handle back/forward navigation of hashes
-            window.addEventListener('hashchange', handleHash);
-
-            // Initial wiring
-            wireToggleHash();
-            wireBulkControls();
-            // Open any hash present on first paint
             if (document.readyState === 'loading') {
-              document.addEventListener('DOMContentLoaded', handleHash);
+              document.addEventListener('DOMContentLoaded', wireBulkControls);
             } else {
-              handleHash();
+              wireBulkControls();
             }
           })();`,
         }}

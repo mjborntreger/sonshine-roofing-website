@@ -20,7 +20,7 @@ const h3Styles = "text-xs font-semibold uppercase tracking-wider text-slate-700"
 export default function Footer() {
   return (
     <footer className="mt-16 pt-8 border-t border-slate-300 bg-[#CEF3FF]/50">
-      <div className="mx-auto max-w-6xl px-10 py-10">
+      <div className="mx-auto max-w-6xl px-10 pt-8">
         <h2 className="sr-only">Footer</h2>
 
         {/* Columns */}
@@ -45,29 +45,26 @@ export default function Footer() {
                 className="mb-5"
               />
             </Link>
-            <Link
-              className={linkStyles}
-              href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
-              aria-label="Florida Roofing Contractor's License Number CCC1331483"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <p>
-                License: #CCC1331483
-                <ArrowUpRight 
-                  className="inline ml-1 h-3 w-3 align-[-0.125em] text-slate-700" 
-                  aria-hidden="true" 
-                />
-              </p>
-            </Link>
-
-            <p className="text-sm text-slate-700 my-4">Insured</p>
-
             <ul className="mt-3 space-y-3 text-sm">
               <li>
                 <Link
+                  className={linkStyles}
+                  href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
+                  aria-label="Florida Roofing Contractor's License Number CCC1331483"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  License: #CCC1331483
+                  <ArrowUpRight
+                    className="inline ml-1 h-3 w-3 align-[-0.125em] text-slate-700"
+                    aria-hidden="true"
+                  />
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/"
-                  className={h3Styles}
+                  className={linkStyles}
                 >
                   Home
                 </Link>
@@ -75,7 +72,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/about-sonshine-roofing"
-                  className={h3Styles}
+                  className={linkStyles}
                 >
                   About
                 </Link>
@@ -83,7 +80,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/contact-us"
-                  className={h3Styles}
+                  className={linkStyles}
                 >
                   Contact
                 </Link>
@@ -149,6 +146,29 @@ export default function Footer() {
             </ul>
           </div>
 
+          {/* Hours */}
+          <div>
+            <h3 className={h3Styles}>
+              Hours of Operation
+            </h3>
+            <dl className="mt-4 grid grid-cols-[max-content_auto] gap-x-1 gap-y-2 text-sm">
+              <dt className="text-slate-600">Mon.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Tues.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Wed.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Thurs.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Fri.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Sat.</dt>
+              <dd className="text-right text-slate-600">Closed</dd>
+              <dt className="text-slate-600">Sun.</dt>
+              <dd className="text-right text-slate-600">Closed</dd>
+            </dl>
+          </div>
+
           {/* Get In Touch */}
           <div>
             <h3 className={h3Styles}>
@@ -187,29 +207,6 @@ export default function Footer() {
                 </Link>
               </p>
             </address>
-          </div>
-
-          {/* Hours */}
-          <div>
-            <h3 className={h3Styles}>
-              Hours of Operation
-            </h3>
-            <dl className="mt-4 grid grid-cols-[max-content_auto] gap-x-1 gap-y-2 text-sm">
-              <dt className="text-slate-600">Mon.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Tues.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Wed.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Thurs.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Fri.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Sat.</dt>
-              <dd className="text-right text-slate-600">Closed</dd>
-              <dt className="text-slate-600">Sun.</dt>
-              <dd className="text-right text-slate-600">Closed</dd>
-            </dl>
           </div>
         </nav>
 
