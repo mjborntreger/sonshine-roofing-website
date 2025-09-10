@@ -978,25 +978,33 @@ export async function listVideoItemsPaged({
   after?: string | null;
   filters?: VideoFiltersInput;
 }) {
-  // Fetch a bounded pool (cached by Next via wpFetch revalidate)
-  const [entries, projects] = await Promise.all([
-    listRecentVideoEntries(200),
-    listProjectVideos(200),
-  ]);
-  const all = [...entries, ...projects];
-
+  // Determine which pools to fetch based on filters
   const f: any = filters || {};
   const q = (f.q || '').toString().trim().toLowerCase();
 
-  // Accept `buckets` (preferred) or `bucket` (alias) or `b`
   const bucketsList: any[] | null =
     Array.isArray(f.buckets) ? f.buckets
     : Array.isArray(f.bucket) ? f.bucket
     : Array.isArray(f.b) ? f.b
     : null;
-  const buckets = bucketsList && bucketsList.length
-    ? new Set(bucketsList as VideoBucketKey[])
-    : null;
+  const bucketSet = bucketsList && bucketsList.length ? new Set(bucketsList as VideoBucketKey[]) : null;
+
+  const mtSelected = Array.isArray(f.materialTypeSlugs) && f.materialTypeSlugs.length > 0;
+  const saSelected = Array.isArray(f.serviceAreaSlugs) && f.serviceAreaSlugs.length > 0;
+
+  const wantProjects = mtSelected || saSelected || !bucketSet || bucketSet.has('roofing-project');
+  const wantEntries = !bucketSet || Array.from(bucketSet).some((b) => b !== 'roofing-project');
+
+  // Bound the pool size relative to requested page + cursor offset
+  const offset = decodeOffset(after);
+  const poolSize = Math.min(200, Math.max(60, offset + first * 3));
+
+  const [entries, projects] = await Promise.all([
+    wantEntries ? listRecentVideoEntries(poolSize) : Promise.resolve([]),
+    wantProjects ? listProjectVideos(poolSize) : Promise.resolve([]),
+  ]);
+  const all = [...(entries as VideoItem[]), ...(projects as VideoItem[])];
+  const buckets = bucketSet;
 
   // Accept `categorySlugs` (preferred) or `categories`/`cat`
   const catInput: any[] | null =
@@ -1102,6 +1110,23 @@ export async function listRecentPosts(limit = 12): Promise<PostCard[]> {
     readingTimeMinutes: n.content ? calcReadingTimeMinutes(n.content) : undefined,
     excerpt: n.excerpt ? String(n.excerpt) : undefined,
   }));
+}
+
+/**
+ * Lightweight list of blog categories (taxonomy terms) for building filter pills.
+ * Uses hideEmpty to avoid fetching posts just to discover categories.
+ */
+export async function listBlogCategories(limit = 100): Promise<TermLite[]> {
+  const query = /* GraphQL */ `
+    query ListBlogCategories($first: Int!) {
+      categories(first: $first, where: { hideEmpty: true }) {
+        nodes { name slug }
+      }
+    }
+  `;
+  const data = await wpFetch<{ categories: { nodes: any[] } }>(query, { first: limit }, 86400);
+  const nodes = data?.categories?.nodes || [];
+  return nodes.map((n) => ({ name: String(n?.name || ''), slug: String(n?.slug || '') }));
 }
 
 /**
@@ -1286,6 +1311,25 @@ export async function listPostSlugs(limit = 200): Promise<string[]> {
   `;
   const data = await wpFetch<{ posts: { nodes: { slug: string | null }[] } }>(query, { limit });
   return (data.posts?.nodes || []).map((n) => n.slug).filter(Boolean) as string[];
+}
+
+/**
+ * Lightweight recent post list for prev/next navigation.
+ * Returns only slug, title, date. Keeps payload very small compared to full cards.
+ */
+export async function listRecentPostNav(limit = 200): Promise<Array<{ slug: string; title: string; date: string }>> {
+  const query = /* GraphQL */ `
+    query ListRecentPostNav($limit: Int!) {
+      posts(first: $limit, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+        nodes { slug title date }
+      }
+    }
+  `;
+  const data = await wpFetch<{ posts: { nodes: any[] } }>(query, { limit }, 1800);
+  const nodes = data?.posts?.nodes || [];
+  return nodes
+    .map((n) => ({ slug: String(n?.slug || ''), title: String(n?.title || ''), date: String(n?.date || '') }))
+    .filter((n) => !!n.slug);
 }
 
 // --- Single post fetch (for your /[slug] page later) ---

@@ -1,5 +1,5 @@
 import Section from "@/components/layout/Section";
-import { listRecentPosts, listPostsPaged } from "@/lib/wp";
+import { listBlogCategories, listPostsPaged } from "@/lib/wp";
 import { ChevronDown } from "lucide-react";
 import ResourcesAside from "@/components/ResourcesAside";
 import InfiniteList from "@/components/InfiniteList";
@@ -51,8 +51,8 @@ export default async function BlogArchivePage() {
   const first = 24;
   const initial = await listPostsPaged({ first: 6, after: null, filters: {} }).catch(() => ({ items: [], pageInfo: { hasNextPage: false, endCursor: null } }));
 
-  // Separate pool for category counts and the "All" pill (keep your previous 200 fetch)
-  const postsForCats = await listRecentPosts(200).catch(() => []);
+  // Lightweight taxonomy fetch for category pills (avoid fetching posts just to get categories)
+  const blogCats = await listBlogCategories(100).catch(() => []);
 
   // JSON-LD: CollectionPage + BreadcrumbList for Blog archive
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
@@ -79,16 +79,9 @@ export default async function BlogArchivePage() {
 
   // Derive category names (no counts) from fetched posts (exclude featured, uncategorized)
   const EXCLUDE = new Set(["featured", "uncategorized"]);
-  const categories = Array.from(
-    new Set(
-      postsForCats.flatMap((p: any) =>
-        (p.categories || [])
-          .map((c: any) => String(c).trim())
-          .filter(Boolean)
-      )
-    )
-  )
-    .filter((name) => !EXCLUDE.has(name.toLowerCase()))
+  const categories = blogCats
+    .map((t) => String(t.name || "").trim())
+    .filter((name) => !!name && !EXCLUDE.has(name.toLowerCase()))
     .sort((a, b) => a.localeCompare(b));
 
   return (

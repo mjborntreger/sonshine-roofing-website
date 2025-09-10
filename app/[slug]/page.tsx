@@ -4,7 +4,7 @@ import Link from "next/link";
 import Section from "@/components/layout/Section";
 import SmartLink from "@/components/SmartLink";
 import { headers } from "next/headers";
-import { getPostBySlug, listPostSlugs, listRecentPosts } from "@/lib/wp";
+import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/wp";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
 import ShareWhatYouThink from "@/components/ShareWhatYouThink"
@@ -242,8 +242,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const withAnchors = decorateExternalAnchors(withIds, new URL(base).hostname);
   const htmlWithCta = injectCtaAfterNthParagraph(withAnchors, 3);
 
-  // prev/next using recent posts list
-  const all = await listRecentPosts(200).catch(() => []);
+  // prev/next using lightweight nav list (slug + title + date)
+  const all = await listRecentPostNav(200).catch(() => []);
   const idx = all.findIndex((p) => p.slug === slug);
   const prev = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null; // older
   const next = idx > 0 ? all[idx - 1] : null; // newer
