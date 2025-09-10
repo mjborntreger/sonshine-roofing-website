@@ -22,7 +22,7 @@ export async function HoursAndInformation() {
       <div className={pillarsGrid}>
 
         {/* Hours */}
-        <details className={detailsStyles}>
+        <details open className={detailsStyles}>
           <summary className={summaryStyles}>
             <span className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />

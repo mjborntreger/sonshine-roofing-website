@@ -5,8 +5,46 @@ import ResourcesAside from "@/components/ResourcesAside";
 import InfiniteList from "@/components/InfiniteList";
 import SkeletonGrid from "@/components/layout/SkeletonGrid";
 import ResourceSearchController from "@/components/resource-search/ResourceSearchController";
+import type { Metadata } from 'next';
 
 export const revalidate = 900;
+
+// ===== STATIC SEO FOR /blog (EDIT HERE) =====
+const SEO_TITLE_BLOG = 'Roofing Blog for Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
+const SEO_DESCRIPTION_BLOG = 'Practical roofing tips, how‑tos, and local insights from our Sarasota team. Serving SW Florida since 1987.';
+const SEO_KEYWORDS_BLOG = [
+  'roofing blog',
+  'roofing tips',
+  'roof repair advice',
+  'roof replacement guide',
+  'Sarasota roofing',
+  'Manatee County roofing',
+  'Charlotte County roofing'
+];
+const SEO_CANONICAL_BLOG = '/blog';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SEO_TITLE_BLOG,
+    description: SEO_DESCRIPTION_BLOG,
+    keywords: SEO_KEYWORDS_BLOG,
+    alternates: { canonical: SEO_CANONICAL_BLOG },
+    openGraph: {
+      type: 'website',
+      title: SEO_TITLE_BLOG,
+      description: SEO_DESCRIPTION_BLOG,
+      url: SEO_CANONICAL_BLOG,
+      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SEO_TITLE_BLOG,
+      description: SEO_DESCRIPTION_BLOG,
+      images: [SEO_OG_IMAGE_DEFAULT],
+    },
+  };
+}
 
 export default async function BlogArchivePage() {
   // Initial page for the list (SSR for speed/SEO)
@@ -15,6 +53,29 @@ export default async function BlogArchivePage() {
 
   // Separate pool for category counts and the "All" pill (keep your previous 200 fetch)
   const postsForCats = await listRecentPosts(200).catch(() => []);
+
+  // JSON-LD: CollectionPage + BreadcrumbList for Blog archive
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const pageUrl = `${base}${SEO_CANONICAL_BLOG}`;
+
+  const collectionLd = {
+    '@context': 'https://schema.org',
+    '@type': ['WebPage', 'CollectionPage'],
+    name: SEO_TITLE_BLOG,
+    description: SEO_DESCRIPTION_BLOG,
+    url: pageUrl,
+    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
+    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
+  } as const;
+
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: pageUrl },
+    ],
+  } as const;
 
   // Derive category names (no counts) from fetched posts (exclude featured, uncategorized)
   const EXCLUDE = new Set(["featured", "uncategorized"]);
@@ -39,6 +100,17 @@ export default async function BlogArchivePage() {
           {/* Main Content (Left) */}
           <div>
             <h1 className="text-3xl font-semibold">Blog</h1>
+            {/* JSON-LD: CollectionPage + BreadcrumbList */}
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+            />
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+            />
             <p className="mt-2 text-slate-600">
               Enjoy these handcrafted articles from our team that discuss
               a wide variety of roofing topics (and a few extras,
