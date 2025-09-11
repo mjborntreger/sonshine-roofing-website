@@ -3,7 +3,8 @@ import TocFromHeadings from "@/components/TocFromHeadings";
 import ServicesQuickLinks from "@/components/ServicesQuickLinks";
 import UiLink from "@/components/UiLink";
 import Image from "next/image";
-import { listRecentPostsPool } from "@/lib/wp";
+import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
+import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import { Layers, Droplets, Bug, Hammer, PanelRight, ChevronDown, House } from "lucide-react";
 import RepairVsReplace from "@/components/RepairVsReplace";
@@ -54,6 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   const pool = await listRecentPostsPool(36);
+  const faqs = await listFaqsWithContent(8, "roof-repair").catch(() => []);
   // JSON-LD: WebPage + BreadcrumbList (no HowTo on this page)
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
   const pageUrl = `${base}${SEO_CANONICAL_ROOF_REPAIR}`;
@@ -67,6 +69,10 @@ export default async function Page() {
     primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
     isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
   } as const;
+  const faqLd = faqItemsToJsonLd(
+    faqs.map((f) => ({ question: f.title, answerHtml: f.contentHtml, url: `${base}/faq/${f.slug}` })),
+    pageUrl
+  );
 
   const breadcrumbsLd = {
     '@context': 'https://schema.org',
@@ -359,6 +365,15 @@ export default async function Page() {
         />
       </div>
 
+        {/* FAQs (dynamic) */}
+        <FaqInlineList heading="Roof Repair FAQs" items={faqs} seeMoreHref="/faq" />
+
+        {/* FAQ Schema */}
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
     </Section>
   );
 }

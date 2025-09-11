@@ -5,6 +5,8 @@ import { Phone } from "lucide-react";
 import MonthlyEstimator from './MonthlyEstimator';
 import PlanQuiz from './PlanQuiz';
 import type { Metadata } from 'next';
+import FaqInlineList from "@/components/FaqInlineList";
+import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 
 // ===== STATIC SEO FOR /financing (EDIT HERE) =====
 const SEO_TITLE_FINANCING = 'Roof Financing | SonShine Roofing';
@@ -53,75 +55,17 @@ const cta = 'btn btn-brand-blue btn-lg';
 const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
 const contactInfoIconStyles = "h-5 w-5 text-slate-500";
 
-export default function FinancingPage() {
-    const faqLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: [
-      {
-        '@type': 'Question',
-        name: 'Will financing affect my warranty?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'No. Your manufacturer and workmanship warranties are the same regardless of payment method.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Is there a pre-payment penalty?',
-        acceptedAnswer: { '@type': 'Answer', text: 'No — you can pay off early without a fee.' },
-      },
-      {
-        '@type': 'Question',
-        name: 'How fast can I get approved?',
-        acceptedAnswer: { '@type': 'Answer', text: 'Many approvals happen the same day.' },
-      },
-      {
-        '@type': 'Question',
-        name: 'Do these programs cover repairs as well as replacements?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes. Financing can be used for repairs, replacements, or upgrades like skylights and ventilation.',
-        },
-      },
-      {
-        '@type': 'Question',
-        name: 'Is PACE (YGrene) transferable if I sell my home?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'In many cases, PACE assessments can transfer to the new owner at sale, but transferability depends on your buyer, lender, and local rules. We can help you review options before you list.'
-        }
-      },
-      {
-        '@type': 'Question',
-        name: 'Can I finance my insurance deductible?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes. Many customers use financing to cover deductibles or portions of a claim not covered by insurance.'
-        }
-      },
-      {
-        '@type': 'Question',
-        name: 'Does financing delay my project schedule?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'No. Once you are approved and documents are signed, we can schedule just like a standard cash project.'
-        }
-      },
-      {
-        '@type': 'Question',
-        name: 'Can I combine roof work with upgrades like skylights or ventilation?',
-        acceptedAnswer: {
-          '@type': 'Answer',
-          text: 'Yes. Financing can include related improvements such as skylights, attic ventilation, gutters, or insulation.'
-        }
-      }
-    ],
-  };
+export default async function FinancingPage() {
+  // Dynamic FAQs for topic "financing-payment" (max 8)
+  const faqs = await listFaqsWithContent(8, "financing-payment").catch(() => []);
 
   // JSON-LD objects (Service, Breadcrumbs, WebPage)
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
   const pageUrl = `${base}${SEO_CANONICAL_FINANCING}`;
+  const faqLd = faqItemsToJsonLd(
+    faqs.map((f) => ({ question: f.title, answerHtml: f.contentHtml, url: `${base}/faq/${f.slug}` })),
+    pageUrl
+  );
   const org = {
     '@type': 'Organization',
     name: 'SonShine Roofing',
@@ -396,95 +340,7 @@ export default function FinancingPage() {
           provided in your financing documents.
         </p>
 
-        {/* FAQs */}
-        <div className="mt-16">
-          <h2 className={h2}>Financing FAQs</h2>
-          <div className="mt-6 space-y-4 md:columns-2 md:gap-4 [column-fill:_balance]">
-            <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm w-full break-inside-avoid">
-              <summary className="cursor-pointer font-medium text-slate-900">
-                Will financing affect my warranty?
-              </summary>
-              <p className="mt-2 text-slate-700">
-                Nope. Your manufacturer and workmanship warranties are the same regardless of payment
-                method.
-              </p>
-            </details>
-
-            <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm w-full break-inside-avoid">
-              <summary className="cursor-pointer font-medium text-slate-900">
-                Is there a pre‑payment penalty?
-              </summary>
-              <p className="mt-2 text-slate-700">No — you can pay off early without a fee.</p>
-            </details>
-
-            <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm w-full break-inside-avoid">
-              <summary className="cursor-pointer font-medium text-slate-900">
-                How fast can I get approved?
-              </summary>
-              <p className="mt-2 text-slate-700">
-                Many approvals happen the same day. We’ll guide you through the simple steps.
-              </p>
-            </details>
-
-            <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm w-full break-inside-avoid">
-              <summary className="cursor-pointer font-medium text-slate-900">
-                Do these programs cover repairs as well as replacements?
-              </summary>
-              <p className="mt-2 text-slate-700">
-                Yes. Financing can be used for repairs, replacements, or upgrades like skylights and
-                ventilation improvements.
-              </p>
-            </details>
-
-            <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm w-full break-inside-avoid">
-              <summary className="cursor-pointer font-medium text-slate-900">
-                Is PACE (YGrene) transferable if I sell my home?
-              </summary>
-              <p className="mt-2 text-slate-700">
-                In many cases, PACE assessments can transfer to the new owner at sale, but
-                transferability depends on your buyer, lender, and local rules. We can help you
-                review options before you list.
-              </p>
-            </details>
-
-            <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm w-full break-inside-avoid">
-              <summary className="cursor-pointer font-medium text-slate-900">
-                Can I finance my insurance deductible?
-              </summary>
-              <p className="mt-2 text-slate-700">
-                Yes. Many customers use financing to cover deductibles or portions of a claim not
-                covered by insurance.
-              </p>
-            </details>
-
-            <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm w-full break-inside-avoid">
-              <summary className="cursor-pointer font-medium text-slate-900">
-                Does financing delay my project schedule?
-              </summary>
-              <p className="mt-2 text-slate-700">
-                No. Once you are approved and documents are signed, we can schedule just like a
-                standard cash project.
-              </p>
-            </details>
-
-            <details className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm w-full break-inside-avoid">
-              <summary className="cursor-pointer font-medium text-slate-900">
-                Can I combine roof work with upgrades like skylights or ventilation?
-              </summary>
-              <p className="mt-2 text-slate-700">
-                Yes. Financing can include related improvements such as skylights, attic
-                ventilation, gutters, or insulation.
-              </p>
-            </details>
-          </div>
-        </div>
-
-        {/* Compliance / disclosure */}
-        <p className="mt-10 text-xs text-slate-500">
-          Rates, terms, and eligibility subject to change and based on lender approval. SonShine
-          Roofing is not a lender. Program availability may vary by municipality. Final terms will be
-          provided in your financing documents.
-        </p>
+        <FaqInlineList heading="Financing FAQs" items={faqs} seeMoreHref="/faq" />
 
         {/* FAQ Schema */}
         <script

@@ -10,6 +10,8 @@ import ServicesQuickLinks from "@/components/ServicesQuickLinks";
 import BestOfTheBest from "@/components/BestOfTheBest";
 import Section from "@/components/layout/Section";
 import type { Metadata } from 'next';
+import FaqInlineList from "@/components/FaqInlineList";
+import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Sarasota Roof Replacement & Repair Since 1987';
@@ -54,6 +56,12 @@ const sectionDivider = "h-1.5 w-full my-16 bg-gradient-to-r from-[#0045d7] via-[
 export default async function Page() {
   const projects = await listRecentProjectsPoolForFilters(4, 8);
   const posts = await listRecentPostsPoolForFilters(4, 4);
+  const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const faqLd = faqItemsToJsonLd(
+    generalFaqs.map(f => ({ question: f.title, answerHtml: f.contentHtml, url: `${base}/faq/${f.slug}` })),
+    base
+  );
   return (
     <>
       <Hero />
@@ -82,10 +90,20 @@ export default async function Page() {
         <div className="bg-[#cef3ff]">
           <ReviewsCarousel />
         </div>
-        <div className="">
-          <LatestProjectsFilter projects={projects} initial={4} />
-          <LatestPostsFilters posts={posts} initial={4} />
-        </div>
+      <div>
+        <LatestProjectsFilter projects={projects} initial={4} />
+        <LatestPostsFilters posts={posts} initial={4} />
+        {/* General FAQs at bottom of the landing page */}
+        <Section>
+          <FaqInlineList heading="General FAQs" items={generalFaqs} seeMoreHref="/faq" />
+          {/* JSON-LD for FAQs on the home page */}
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+          />
+        </Section>
+      </div>
       </div>
 
     </>
