@@ -4,7 +4,8 @@ import { Phone, Hammer, Zap } from "lucide-react"
 
 export default function Hero() {
   return (
-    <section className="relative isolate text-white min-h-[500px] h-[30svh] lg:h-[40svh]">
+    <>
+    <section className="relative isolate text-white min-h-[70svh] lg:min-h-[80svh] h-[70svh] lg:h-[80svh]">
       {/* Background video */}
       <video
         className="absolute inset-0 -z-10 h-full w-full object-cover pointer-events-none motion-safe:opacity-100 motion-reduce:hidden"
@@ -26,13 +27,13 @@ export default function Hero() {
       />
 
       {/* Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-18">
         <div className="max-w-7xl">
-          <h1 className="text-4xl lg:text-6xl font-bold tracking-tight leading-tight text-white">
+          <h1 className="text-5xl lg:text-8xl font-bold tracking-tight leading-tight text-white lg:mt-20">
             Your Trusted Local Roofing Contractor in Sarasota, Manatee, and Charlotte Counties for 38+ Years
           </h1>
 
-          <p className="mt-5 text-white/90 text-lg md:text-xl max-w-2xl">
+          <p className="mt-5 text-white/90 text-lg md:text-2xl max-w-2xl">
             We prioritize extending the lifespan of your current roof above all else. <br></br> 
             Call us today to find out more.
           </p>
@@ -43,7 +44,7 @@ export default function Hero() {
             <SmartLink 
               href="https://www.myquickroofquote.com/contractors/sonshine-roofing" 
               aria-label="Get a free 60-second quote"
-              className="flex items-center justify-center gap-x-2"
+              className="text-lg flex items-center justify-center gap-x-2 mt-4"
             >
               <Zap className="w-4 h-4 shrink-0 text-white" aria-hidden="true" />
               Free 60-Second Quote
@@ -54,7 +55,7 @@ export default function Hero() {
             <SmartLink 
               href="/project" 
               target="_self"
-              className="hidden md:flex items-center justify-center gap-x-2"
+              className="text-lg hidden md:flex items-center justify-center gap-x-2 mt-4"
             >
               <Hammer className="w-4 h-4 shrink-0 text-white" aria-hidden="true" />
               See Projects
@@ -65,7 +66,7 @@ export default function Hero() {
             <SmartLink 
               href="tel:+19418664320" 
               target="_self"
-              className="flex md:hidden items-center justify-center gap-x-2"
+              className="text-lg flex md:hidden items-center justify-center gap-x-2 mt-4"
             >
               <Phone className="w-4 h-4 shrink-0 text-white" aria-hidden="true" />
               Call (941 866-4320)
@@ -76,5 +77,7 @@ export default function Hero() {
         </div>
       </div>
     </section>
+    <div className="h-1.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
+    </>
   );
 }

@@ -48,10 +48,11 @@ export default async function ReviewsCarousel() {
   if (filtered.length === 0) return null;
 
   return (
-    <div className="p-8 md:p-10 my-12">
-      <h2 className="text-center">What Our Customers Say</h2>
-      <div className="gradient-divider my-8" />
-      <div className="not-prose text-center">
+    <>
+    <div className="h-1.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
+    <div className="py-6 md:p-10 my-12">
+      <h2 className="text-center text-slate-700 text-3xl md:text-6xl">What Our Customers Say</h2>
+      <div className="not-prose text-center mt-16">
         {data?.avg_rating && (
           <a
             href={GBP_URL}
@@ -62,12 +63,12 @@ export default async function ReviewsCarousel() {
               duration-300 hover:shadow-md hover:shadow-[#0045d7]/20
               motion-safe:hover:scale-[1.02] motion-reduce:transform-none"
           >
-            <span className="text-4xl mr-2">{Number(data.avg_rating).toFixed(1)}</span>
+            <span className="text-3xl mr-2">{Number(data.avg_rating).toFixed(1)}</span>
             <span aria-hidden="true">★</span>&nbsp;on Google
         </a>
         )}
         <ReviewsSlider reviews={filtered} gbpUrl={GBP_URL} />
-        <div className="mt-4 text-center">
+        <div className="text-center">
           <p className="text-sm italic mb-10">
             All reviews shown above are automatically pulled from Google using the official API.
           </p>
@@ -83,5 +84,7 @@ export default async function ReviewsCarousel() {
         </div>
       </div>
     </div>
+    <div className="h-1.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
+    </>
   );
 }

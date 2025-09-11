@@ -95,7 +95,7 @@ export default function LatestPostsFilter({
         </div>
       )}
 
-      <div key={selected} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div key={selected} className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {filtered.length > 0 ? (
           filtered.map((p, i) => (
             <Card

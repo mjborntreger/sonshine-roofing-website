@@ -4,8 +4,48 @@ import ResourceSearchController from "@/components/resource-search/ResourceSearc
 import { listProjectsPaged, listProjectFilterTerms } from "@/lib/wp";
 import ResourcesAside from "@/components/ResourcesAside";
 import InfiniteList from "@/components/InfiniteList";
+import type { Metadata } from 'next';
 
 export const revalidate = 900; // 15 minutes ISR
+
+// ===== STATIC SEO FOR /project (EDIT HERE) =====
+const SEO_TITLE_PROJECTS = 'Project Gallery | Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
+const SEO_DESCRIPTION_PROJECTS = 'Browse recent roof installations across Southwest Florida. Filter by material, color, and service area to find real projects like yours.';
+const SEO_KEYWORDS_PROJECTS = [
+  'roofing projects',
+  'project gallery',
+  'roof replacement photos',
+  'shingle roof projects',
+  'tile roof projects',
+  'metal roof projects',
+  'Sarasota roofing',
+  'Manatee County roofing',
+  'Charlotte County roofing',
+];
+const SEO_CANONICAL_PROJECTS = '/project';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SEO_TITLE_PROJECTS,
+    description: SEO_DESCRIPTION_PROJECTS,
+    keywords: SEO_KEYWORDS_PROJECTS,
+    alternates: { canonical: SEO_CANONICAL_PROJECTS },
+    openGraph: {
+      type: 'website',
+      title: SEO_TITLE_PROJECTS,
+      description: SEO_DESCRIPTION_PROJECTS,
+      url: SEO_CANONICAL_PROJECTS,
+      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SEO_TITLE_PROJECTS,
+      description: SEO_DESCRIPTION_PROJECTS,
+      images: [SEO_OG_IMAGE_DEFAULT],
+    },
+  };
+}
 
 type PageProps = { searchParams?: Promise<{ q?: string }> };
 
@@ -23,6 +63,29 @@ export default async function ProjectArchivePage({ searchParams }: PageProps) {
     after: null,
   });
 
+  // JSON-LD: CollectionPage + BreadcrumbList for Project Gallery
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const pageUrl = `${base}${SEO_CANONICAL_PROJECTS}`;
+
+  const collectionLd = {
+    '@context': 'https://schema.org',
+    '@type': ['WebPage', 'CollectionPage'],
+    name: SEO_TITLE_PROJECTS,
+    description: SEO_DESCRIPTION_PROJECTS,
+    url: pageUrl,
+    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
+    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
+  } as const;
+
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Project Gallery', item: pageUrl },
+    ],
+  } as const;
+
   return (
     <Section>
       <div className="container-edge py-4">
@@ -32,6 +95,17 @@ export default async function ProjectArchivePage({ searchParams }: PageProps) {
           {/* Header */}
           <div>
             <h1 className="text-3xl font-semibold">Project Gallery</h1>
+            {/* JSON-LD: CollectionPage + BreadcrumbList */}
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
+            />
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+            />
             <p className="mt-2 text-slate-600">
               Explore our latest installs across Sarasota, Manatee, and Charlotte
               counties. Filter by material, color, and service area—or search by

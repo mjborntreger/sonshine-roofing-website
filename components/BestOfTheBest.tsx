@@ -7,9 +7,9 @@ const imageClasses = "transition-transform duration-200 ease-out group-hover:tra
 
 export default async function bestOfTheBest() {
   return (
-    <section
+    <div
       aria-labelledby="botb-title"
-      className="border border-[--brand-orange] rounded-xl bg-[#fb9216]/5 shadow-md p-8 md:p-10 my-24"
+      className="border border-[--brand-orange] rounded-xl bg-white shadow-lg p-8 md:p-10"
     >
       <div className="text-center">
         <h2>Best of the Best Award Winner (2021–2025)</h2>
@@ -112,6 +112,6 @@ export default async function bestOfTheBest() {
           <BestOfTheBestVideo />
         </div>
       </div>
-    </section>
+    </div>
   );
 }

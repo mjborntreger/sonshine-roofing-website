@@ -4,9 +4,52 @@ import SmartLink from "@/components/SmartLink";
 import UiLink from "@/components/UiLink";
 import { Phone, Mail, MapPin } from "lucide-react";
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
+import type { Metadata } from 'next';
+
 
 const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
 const contactInfoIconStyles = "h-5 w-5 text-slate-500";
+
+// ===== STATIC SEO FOR /contact-us (EDIT HERE) =====
+const SEO_TITLE_CONTACT = 'Contact SonShine Roofing | Sarasota Roofing Company';
+const SEO_DESCRIPTION_CONTACT =
+  'Call (941) 866-4320 or send a message — our team responds quickly during business hours. Serving Sarasota, Manatee & Charlotte Counties since 1987.';
+const SEO_KEYWORDS_CONTACT = [
+  'contact',
+  'phone',
+  'address',
+  'email',
+  'map',
+  'Sarasota roofing',
+  'Manatee County roofing',
+  'Charlotte County roofing',
+  'roof repair',
+  'roof replacement'
+];
+const SEO_CANONICAL_CONTACT = '/contact-us';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SEO_TITLE_CONTACT,
+    description: SEO_DESCRIPTION_CONTACT,
+    keywords: SEO_KEYWORDS_CONTACT,
+    alternates: { canonical: SEO_CANONICAL_CONTACT },
+    openGraph: {
+      type: 'website',
+      title: SEO_TITLE_CONTACT,
+      description: SEO_DESCRIPTION_CONTACT,
+      url: SEO_CANONICAL_CONTACT,
+      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SEO_TITLE_CONTACT,
+      description: SEO_DESCRIPTION_CONTACT,
+      images: [SEO_OG_IMAGE_DEFAULT],
+    },
+  };
+}
 
 export default function Page() {
   return (

@@ -204,10 +204,9 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                 );
               })}
             </div>
-
-            {/* RIGHT: floating aside on desktop */}
-            <ResourcesAside />
           </div>
+          {/* RIGHT: floating aside on desktop */}
+          <ResourcesAside />
         </div>
       </div>
 

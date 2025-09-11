@@ -159,7 +159,7 @@ export default function ReviewsSlider({
           // Customize the fade color here to match the section background
           ['--reviews-fade-color' as any]: 'var(--reviews-fade-color, #00e3fe)',
           // Customize fade width here
-          ['--reviews-fade-width' as any]: '56px',
+          ['--reviews-fade-width' as any]: '24px',
         }}
       >
         {/* Left overlay: solid bg color at the extreme edge -> transparent toward content */}

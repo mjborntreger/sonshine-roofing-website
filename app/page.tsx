@@ -8,9 +8,48 @@ import { listRecentPostsPoolForFilters } from '@/lib/wp';
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks"
 import ServicesQuickLinks from "@/components/ServicesQuickLinks";
 import BestOfTheBest from "@/components/BestOfTheBest";
+import Section from "@/components/layout/Section";
+import type { Metadata } from 'next';
 
-const sectionDividers = "my-18"
+// ===== STATIC SEO FOR / (Home) — EDIT HERE =====
+const SEO_TITLE_HOME = 'SonShine Roofing | Sarasota Roof Replacement & Repair Since 1987';
+const SEO_DESCRIPTION_HOME =
+  'Local roofing contractor serving Sarasota, Manatee & Charlotte Counties. Expert roof replacement, repair, and maintenance with honest guidance and dependable warranties.';
+const SEO_KEYWORDS_HOME = [
+  'Sarasota roofing',
+  'roof replacement',
+  'roof repair',
+  'roof maintenance',
+  'Manatee County roofing',
+  'Charlotte County roofing',
+  'roofing contractor'
+];
+const SEO_CANONICAL_HOME = '/';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
 
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SEO_TITLE_HOME,
+    description: SEO_DESCRIPTION_HOME,
+    keywords: SEO_KEYWORDS_HOME,
+    alternates: { canonical: SEO_CANONICAL_HOME },
+    openGraph: {
+      type: 'website',
+      title: SEO_TITLE_HOME,
+      description: SEO_DESCRIPTION_HOME,
+      url: SEO_CANONICAL_HOME,
+      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SEO_TITLE_HOME,
+      description: SEO_DESCRIPTION_HOME,
+      images: [SEO_OG_IMAGE_DEFAULT],
+    },
+  };
+}
+
+const sectionDivider = "h-1.5 w-full my-16 bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]"
 
 export default async function Page() {
   const projects = await listRecentProjectsPoolForFilters(4, 8);
@@ -18,34 +57,39 @@ export default async function Page() {
   return (
     <>
       <Hero />
-      <div>
-        <div className="container-edge py-4">
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-            <div className="min-w-0">
+      <div className="bg-[#fb9216]/5">
+        <div className="grid gap-1 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+          <div className="min-w-0">
+            <Section>
               <WhyHomeownersChooseUs />
-              {/* Quick Links | Mobile Only */}
-              <div className="block md:hidden mt-12">
-                <h2 className="text-center">
-                  Quick Links
-                </h2>
-                <div className="gradient-divider my-8" />
-                <ServicesQuickLinks />
-                <ResourcesQuickLinks />
-              </div>
-              <ReviewsCarousel />
-              <LatestProjectsFilter projects={projects} initial={4} />
-              <BestOfTheBest />
-              <LatestPostsFilters posts={posts} initial={4} />
-            </div>
-
-            {/* Sticky Section */}
-            <div className="hidden lg:block min-w-0 lg:sticky lg:top-20 self-start">
+            </Section>
+            {/* Quick Links | Mobile Only */}
+            <div className="block p-4 md:hidden">
               <ServicesQuickLinks />
               <ResourcesQuickLinks />
             </div>
+            <Section>
+              <BestOfTheBest />
+            </Section>
+          </div>
+
+          {/* Sticky Section */}
+          <div className="hidden lg:block min-w-0 lg:sticky lg:top-16 self-start p-4">
+            <ServicesQuickLinks />
+            <ResourcesQuickLinks />
           </div>
         </div>
+        <div className="bg-[#cef3ff]">
+          <ReviewsCarousel />
+        </div>
+        <div className="">
+          <LatestProjectsFilter projects={projects} initial={4} />
+        </div>
+        <div className="">
+          <LatestPostsFilters posts={posts} initial={4} />
+        </div>
       </div>
+
     </>
   );
 }

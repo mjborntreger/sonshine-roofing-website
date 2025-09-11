@@ -1,8 +1,8 @@
 import SmartLink from "./SmartLink";
 import { ShieldCheck, Shield, MapPin, HandCoins, ChevronDown } from "lucide-react";
 
-const pillarsGrid = "mt-8 grid grid-cols-1 md:grid-cols-2 gap-5 items-start auto-rows-fr";
-const detailsBase = "group h-full flex flex-col rounded-2xl border border-[--brand-blue] bg-white p-8 shadow-lg transition hover:shadow-md hover:-translate-y-0.5";
+const pillarsGrid = "mt-8 grid grid-cols-2 gap-5 items-start auto-rows-fr";
+const detailsBase = "group h-full flex flex-col rounded-2xl border border-[--brand-orange] bg-white p-8 shadow-lg transition hover:shadow-md hover:-translate-y-0.5";
 const detailsPosition = "inline-flex items-center gap-3";
 const detailsSummary = "flex cursor-pointer text-lg select-none items-center justify-between gap-3 text-slate-900";
 const iconChip = "grid h-9 w-9 place-items-center rounded-full text-[--brand-blue] bg-[[--brand-blue]]/10 ring-1 ring-[[--brand-blue]]/20 transition-transform group-hover:scale-105";
@@ -29,7 +29,7 @@ export default async function WhyHomeownersChooseUs() {
       </div>
 
       {/* Mobile / Tablet: Accordion toggles */}
-      <div className="md:hidden mt-8 space-y-3">
+      <div className="md:hidden my-8 space-y-3">
         {/* Local Expertise */}
         <details className={`${detailsBase} hover:ring-1 hover:ring-[#00e3fe4d]`}>
           <summary className={detailsSummary}>
@@ -86,7 +86,7 @@ export default async function WhyHomeownersChooseUs() {
         </details>
 
         {/* Flexible Financing */}
-        <details className="group h-full flex flex-col rounded-2xl border border-[--brand-orange] bg-[#fb9216]/5 p-8 shadow-lg transition hover:shadow-md hover:-translate-y-0.5 hover:ring-1 hover:ring-[#00e3fe4d]">
+        <details open className={detailsBase}>
           <summary className={detailsSummary}>
             <span className={detailsPosition}>
               <span className={iconChip}>
@@ -154,7 +154,7 @@ export default async function WhyHomeownersChooseUs() {
         </div>
 
         {/* Flexible Financing */}
-        <div className="group h-full flex flex-col rounded-2xl border border-[--brand-orange] bg-[#fb9216]/5 p-8 shadow-md transition hover:shadow-lg hover:-translate-y-0.5 hover:ring-1 hover:ring-[#00e3fe4d]">
+        <div className={detailsBase}>
           <div className={detailsSummary}>
             <span className={detailsPosition}><span className={iconChip}><HandCoins className="h-5 w-5" aria-hidden="true" /></span><span className={titleAccent}>Flexible Financing</span></span>
           </div>
