@@ -108,7 +108,7 @@ export default async function Page() {
   return (
     <>
       <Section>
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start px-2">
           <div id="article-root" className="prose min-w-0">
             <span id="page-top" className="sr-only" />
             <h1>Roof Replacement</h1>
@@ -352,7 +352,7 @@ export default async function Page() {
               </summary>
               <div className="prose px-4 pb-4 pt-0">
                 {/* Stepper timeline (#4) */}
-                <ol className="my-4 not-prose border-l border-slate-400 pl-6 space-y-4">
+                <ol className="my-4 not-prose border-slate-400 pl-6 space-y-4">
                   <li className={liStyles}>
                     <span className={stepperStyles} />
                     <p className="m-0"><strong>Permits &amp; Scheduling</strong> — We file permits and set your installation date.</p>

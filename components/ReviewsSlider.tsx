@@ -23,7 +23,7 @@ export default function ReviewsSlider({
 }) {
   // Continuous auto-scroll (linear), infinite loop, pause on hover
   const autoScroll = useRef(
-    AutoScroll({ speed: 1, startDelay: 0, stopOnInteraction: false, stopOnMouseEnter: true })
+    AutoScroll({ speed: 1, startDelay: 0, stopOnInteraction: false, stopOnMouseEnter: false })
   );
 
   // Embla
@@ -133,11 +133,7 @@ export default function ReviewsSlider({
   }, [modalIndex, reviews.length]);
 
   return (
-    <div
-      className="embla relative w-full isolate py-6 md:py-8"
-      onMouseEnter={() => embla?.plugins()?.autoScroll?.stop()}
-      onMouseLeave={() => embla?.plugins()?.autoScroll?.play()}
-    >
+    <div className="embla relative w-full isolate py-6 md:py-8">
       {/**
        * Edge Fades (full-bleed to viewport)
        *

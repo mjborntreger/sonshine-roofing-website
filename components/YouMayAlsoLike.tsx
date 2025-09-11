@@ -84,7 +84,7 @@ export default function YouMayAlsoLike({
     if (!items.length) return null;
 
     return (
-        <section className={["not-prose", className].filter(Boolean).join(" ")} aria-labelledby="ymal-heading">
+        <section className={["not-prose px-2", className].filter(Boolean).join(" ")} aria-labelledby="ymal-heading">
             <div className="text-center">
                 <h2 id="ymal-heading" className="my-8">{heading}</h2>
             </div>

@@ -49,7 +49,7 @@ export default async function ReviewsCarousel() {
 
   return (
     <>
-      <div className="mt-16 h-1.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
+      <div className="mt-16 h-0.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
       <div className="py-6 md:p-10 my-12">
         <h2 className="text-center text-slate-700 text-3xl md:text-6xl">What Our Customers Say</h2>
         <div className="not-prose text-center mt-8">
@@ -84,7 +84,7 @@ export default async function ReviewsCarousel() {
           </div>
         </div>
       </div>
-      <div className="h-1.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
+      <div className="h-0.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
     </>
   );
 }

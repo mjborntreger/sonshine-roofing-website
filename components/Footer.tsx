@@ -20,7 +20,7 @@ const h3Styles = "text-xs font-semibold uppercase tracking-wider text-slate-700"
 export default function Footer() {
   return (
     <>
-    <div className="h-1.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
+    <div className="h-0.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
     <footer className="pt-16 border-t border-slate-300 bg-[#cef3ff]">
       <div className="mx-auto max-w-6xl px-10 pt-8">
         <h2 className="sr-only">Footer</h2>
@@ -214,21 +214,7 @@ export default function Footer() {
 
         {/* Badges Row */}
         <FooterBadges />
-
-        {/* Bottom bar */}
-        <div className="mt-10 border-t border-slate-300 pt-6 flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
-          <p className="text-xs text-slate-500">
-            © {new Date().getFullYear()} SonShine Roofing — Since 1987 we’ve got you covered. | All Rights Reserved
-          </p>
-
-          <nav className="text-xs text-slate-500 flex items-center justify-between gap-4">
-            <Link href="/privacy-policy">Privacy Policy</Link>
-            <Link href="/sitemap_index">XML Sitemap</Link>
-            <Link href="/html-sitemap">HTML Sitemap</Link>
-          </nav>
-        </div>
-        <div className="py-4">
-          <div className="flex flex-wrap items-center justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-1">
             {SOCIALS.map((s) => (
               <a
                 key={s.href}
@@ -249,7 +235,21 @@ export default function Footer() {
               </a>
             ))}
           </div>
-          <div className="text-xs text-slate-500 mt-6 text-center">
+
+        {/* Bottom bar */}
+        <div className="mt-10 border-t border-slate-300 pt-6 flex flex-wrap justify-between items-center gap-4">
+          <div className="text-xs text-slate-500">
+            © {new Date().getFullYear()} SonShine Roofing — Since 1987 we’ve got you covered. | All Rights Reserved
+          </div>
+
+          <nav className="text-xs font-semibold text-slate-500 flex items-center justify-end gap-4">
+            <Link href="/privacy-policy">Privacy Policy</Link>
+            <Link href="/sitemap_index">XML Sitemap</Link>
+            <Link href="/html-sitemap">HTML Sitemap</Link>
+          </nav>
+        </div>
+        <div className="py-4">
+          <div className="text-xs font-semibold text-slate-500 text-right">
             <Link href="https://michaelborntreger.life">Website created by: Michael Borntreger</Link>
           </div>
         </div>
