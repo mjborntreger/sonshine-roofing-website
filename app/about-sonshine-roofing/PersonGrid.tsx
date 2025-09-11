@@ -2,14 +2,13 @@ import Image from 'next/image';
 import type { Person } from '@/lib/wp';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import SmartLink from "@/components/SmartLink";
-import Section from '@/components/layout/Section';
 
 export default function PersonGrid({ people }: { people: Person[] }) {
   if (!people?.length) return null;
 
   return (
-    <div>
-      <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 min-w-0 px-2 py-4">
+    <div className="pb-16">
+      <ul className="grid grid-cols-1 lg:grid-cols-4 gap-4 min-w-0 px-2 py-4">
         {people.map((p) => (
           <li key={p.slug} className="min-w-0">
             <SmartLink

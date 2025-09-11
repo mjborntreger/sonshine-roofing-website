@@ -87,7 +87,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
   return (
     <Section>
       <div className="container-edge py-8">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+        <div className="gap-4 overflow-visible items-start">
 
           <article className="mx-auto max-w-5xl">
             <div className="my-4">
@@ -132,11 +132,6 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
 
             <div className="mt-8 prose max-w-none border border-slate-300 bg-white p-5 rounded-2xl" dangerouslySetInnerHTML={{ __html: person.contentHtml }} />
           </article>
-
-          <div className="lg:sticky lg:top-24 self-start min-w-0">
-            <SocialMediaProfiles />
-          </div>
-
         </div>
       </div>
     </Section>

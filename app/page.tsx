@@ -57,14 +57,14 @@ export default async function Page() {
   return (
     <>
       <Hero />
-      <div className="bg-[#fb9216]/5">
+      <div className="bg-neutral-50">
         <div className="grid gap-1 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           <div className="min-w-0">
             <Section>
               <WhyHomeownersChooseUs />
             </Section>
             {/* Quick Links | Mobile Only */}
-            <div className="block p-4 md:hidden">
+            <div className="block px-4 md:hidden">
               <ServicesQuickLinks />
               <ResourcesQuickLinks />
             </div>
@@ -84,8 +84,6 @@ export default async function Page() {
         </div>
         <div className="">
           <LatestProjectsFilter projects={projects} initial={4} />
-        </div>
-        <div className="">
           <LatestPostsFilters posts={posts} initial={4} />
         </div>
       </div>

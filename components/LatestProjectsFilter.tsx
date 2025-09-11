@@ -64,10 +64,10 @@ export default function LatestProjectsFilter({
   }, [projects, selected, initial]);
 
   return (
-    <div className="p-8 md:p-10 my-12">
+    <div className="px-8 md:px-10 pt-24">
       {showHeader && (
         <div className="text-center">
-          <h2>Latest Projects</h2>
+          <h2 className="text-3xl md:text-5xl text-slate-700">Latest Projects</h2>
           <div className={gradientDivider} />
 
           <div className="flex flex-wrap items-center justify-center gap-2 my-6">

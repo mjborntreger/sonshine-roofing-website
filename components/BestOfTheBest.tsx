@@ -9,9 +9,9 @@ export default async function bestOfTheBest() {
   return (
     <div
       aria-labelledby="botb-title"
-      className="border border-[--brand-orange] rounded-xl bg-white shadow-lg p-8 md:p-10"
+      className="border border-[--brand-blue] rounded-xl bg-white shadow-lg mx-2 p-8 md:p-10"
     >
-      <div className="text-center">
+      <div className="text-center text-2xl md:text-5xl text-slate-700">
         <h2>Best of the Best Award Winner (2021–2025)</h2>
       </div>
       <div className="gradient-divider my-4" />

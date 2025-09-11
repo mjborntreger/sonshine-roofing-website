@@ -2,7 +2,7 @@ import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
 import { Clock, Tag, Users, Languages, CreditCard, Hammer, MapPin, BadgePercent, ChevronDown } from "lucide-react";
 
-const h2Styles = "mb-8"
+const h2Styles = "mb-8 text-3xl lg:text-5xl"
 const pillarsGrid = "mt-6 grid grid-cols-1 gap-4 items-stretch";
 const pStyles = "text-md list-disc pl-5 space-y-1 marker:text-slate-400";
 const gradientDivider = "gradient-divider my-4";

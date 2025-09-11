@@ -9,13 +9,13 @@ const iconChip = "grid h-9 w-9 place-items-center rounded-full text-[--brand-blu
 const titleAccent = "font-semibold relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-[[--brand-orange]] after:to-[#00e3fe] after:transition-all group-hover:after:w-12";
 const gradientDivider = "gradient-divider my-8";
 const pStyles = "text-slate-700 mt-4";
-const pillStyles = "rounded-full bg-white/80 px-3 py-1 ring-1 ring-[--brand-orange]";
+const pillStyles = "rounded-full bg-white/80 px-3 py-1 ring-1 ring-[--brand-blue]";
 
 export default async function WhyHomeownersChooseUs() {
   return (
-    <div className="mt-12">
+    <div className="mt-6 px-2">
       <div className="text-center">
-        <h2>Why Homeowners Choose Us</h2>
+        <h2 className="text-3xl md:text-5xl text-slate-700">Why Homeowners Choose Us</h2>
         <div className={gradientDivider} />
         <div className="mt-3 flex flex-wrap justify-center gap-2 text-sm">
           <span className={pillStyles}>GAF Master Elite Certified</span>

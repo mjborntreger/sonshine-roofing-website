@@ -5,7 +5,7 @@ import { Phone, Hammer, Zap } from "lucide-react"
 export default function Hero() {
   return (
     <>
-    <section className="relative isolate text-white min-h-[70svh] lg:min-h-[80svh] h-[70svh] lg:h-[80svh]">
+    <section className="relative isolate text-white min-h-[50svh] lg:min-h-[80svh] h-auto">
       {/* Background video */}
       <video
         className="absolute inset-0 -z-10 h-full w-full object-cover pointer-events-none motion-safe:opacity-100 motion-reduce:hidden"
@@ -27,13 +27,13 @@ export default function Hero() {
       />
 
       {/* Content */}
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-18">
+      <div className="mx-auto max-w-7xl px-6 md:px-8 py-16 md:py-36">
         <div className="max-w-7xl">
-          <h1 className="text-5xl lg:text-8xl font-bold tracking-tight leading-tight text-white lg:mt-20">
+          <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold text-white">
             Your Trusted Local Roofing Contractor in Sarasota, Manatee, and Charlotte Counties for 38+ Years
           </h1>
 
-          <p className="mt-5 text-white/90 text-lg md:text-2xl max-w-2xl">
+          <p className="mt-5 text-white text-lg md:text-2xl max-w-2xl">
             We prioritize extending the lifespan of your current roof above all else. <br></br> 
             Call us today to find out more.
           </p>

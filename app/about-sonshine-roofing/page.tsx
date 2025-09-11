@@ -104,7 +104,7 @@ export default async function Page() {
   return (
     <>
       <Section>
-        <div className="container-edge py-4">
+        <div className="px-2">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
 
             {/* About us */}
@@ -130,7 +130,7 @@ export default async function Page() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="View Florida contractor license #CCC1331483 on myfloridalicense.com (opens in a new tab)"
-                  className="btn btn-outline btn-sm inline-flex items-center"
+                  className="btn btn-outline btn-sm bg-[#fb9216]/10 inline-flex items-center"
                 >
                   <BadgeCheck className="mr-1 inline h-4 w-4 align-[-0.125em] text-[--brand-blue]" aria-hidden="true" />
                   <span>License #CCC1331483</span>
@@ -199,7 +199,7 @@ export default async function Page() {
       </Section>
 
       <Section>
-        <h2 id="meet-our-team" className="text-center mb-8 meet-our-team scroll-mt-8">Meet Our Team</h2>
+        <h2 id="meet-our-team" className="text-center mb-8 meet-our-team scroll-mt-8 text-3xl lg:text-5xl">Meet Our Team</h2>
         <div className="gradient-divider my-4" />
         <PersonGrid people={people} />
       </Section>

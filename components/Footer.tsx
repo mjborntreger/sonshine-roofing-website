@@ -19,7 +19,9 @@ const h3Styles = "text-xs font-semibold uppercase tracking-wider text-slate-700"
 
 export default function Footer() {
   return (
-    <footer className="mt-16 pt-8 border-t border-slate-300 bg-[#CEF3FF]/50">
+    <>
+    <div className="h-1.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
+    <footer className="pt-16 border-t border-slate-300 bg-[#cef3ff]">
       <div className="mx-auto max-w-6xl px-10 pt-8">
         <h2 className="sr-only">Footer</h2>
 
@@ -226,7 +228,7 @@ export default function Footer() {
           </nav>
         </div>
         <div className="py-4">
-          <div className="flex flex-wrap items-center justify-start gap-1">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             {SOCIALS.map((s) => (
               <a
                 key={s.href}
@@ -235,23 +237,24 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label={s.label}
                 title={s.label}
-                className="inline-flex h-5 w-5 py-6 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                className="inline-flex h-10 w-10 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
               >
                 <img
                   src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
                   alt={s.label}
-                  className="h-5 w-5"
+                  className="h-8 w-8"
                   loading="lazy"
                   decoding="async"
                 />
               </a>
             ))}
           </div>
-          <p className="text-xs text-slate-500 hover:color-[#cef3ff]">
+          <div className="text-xs text-slate-500 mt-6 text-center">
             <Link href="https://michaelborntreger.life">Website created by: Michael Borntreger</Link>
-          </p>
+          </div>
         </div>
       </div>
     </footer>
+  </>
   );
 }
