@@ -138,15 +138,59 @@ export default function ReviewsSlider({
       onMouseEnter={() => embla?.plugins()?.autoScroll?.stop()}
       onMouseLeave={() => embla?.plugins()?.autoScroll?.play()}
     >
+      {/**
+       * Edge Fades (full-bleed to viewport)
+       *
+       * - Adjust `--reviews-fade-color` to match your section background.
+       *   Default: brand cyan-like shade. If your section uses a gradient,
+       *   pick the color that sits directly behind the slider edges so the
+       *   fade blends seamlessly.
+       * - Adjust `--reviews-fade-width` to control fade width.
+       *   Example values: `48px`, `72px`, `10vw`.
+       *
+       * These overlays extend to the viewport width (w-screen) so the fade
+       * reaches the true page edges even when the slider is inside a
+       * constrained container.
+       */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 z-10 h-full w-screen -translate-x-1/2"
+        style={{
+          // Customize the fade color here to match the section background
+          ['--reviews-fade-color' as any]: 'var(--reviews-fade-color, #00e3fe)',
+          // Customize fade width here
+          ['--reviews-fade-width' as any]: '56px',
+        }}
+      >
+        {/* Left overlay: solid bg color at the extreme edge -> transparent toward content */}
+        <div
+          className="absolute inset-y-0 left-0"
+          style={{
+            width: 'var(--reviews-fade-width)',
+            background: 'linear-gradient(to right, var(--reviews-fade-color), rgba(0,0,0,0))',
+          }}
+        />
+        {/* Right overlay */}
+        <div
+          className="absolute inset-y-0 right-0"
+          style={{
+            width: 'var(--reviews-fade-width)',
+            background: 'linear-gradient(to left, var(--reviews-fade-color), rgba(0,0,0,0))',
+          }}
+        />
+      </div>
       {/* Viewport with gutters + mask fade; spacing uses padding model */}
       <div
         className="embla__viewport overflow-x-hidden overflow-y-visible px-5 py-3"
         ref={viewportRef}
         style={{
+          // Content mask (optional): softly fade the slider contents themselves at the edges
+          // so the overlay above has no visible hard seam.
+          // Adjust the same variable for consistent widths.
           WebkitMaskImage:
-            'linear-gradient(to right, transparent, black 48px, black calc(100% - 48px), transparent)',
+            'linear-gradient(to right, transparent, black var(--reviews-fade-width, 56px), black calc(100% - var(--reviews-fade-width, 56px)), transparent)',
           maskImage:
-            'linear-gradient(to right, transparent, black 48px, black calc(100% - 48px), transparent)',
+            'linear-gradient(to right, transparent, black var(--reviews-fade-width, 56px), black calc(100% - var(--reviews-fade-width, 56px)), transparent)',
         }}
       >
         <div className="embla__container ml-[-1rem] flex flex-nowrap will-change-transform">
@@ -158,7 +202,7 @@ export default function ReviewsSlider({
                 type="button"
                 onClick={() => openModal(i)}
                 aria-label={`Open full review by ${r.author_name}`}
-                className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_50%] appearance-none bg-transparent p-0 m-0 text-left cursor-pointer"
+                className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_100%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none bg-transparent p-0 m-0 text-left cursor-pointer"
               >
                 <article className="h-full rounded-2xl border border-slate-400 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
@@ -181,6 +225,8 @@ export default function ReviewsSlider({
           })}
         </div>
       </div>
+
+
 
       {/* Modal via portal to avoid transformed ancestor / z-index issues */}
       {mounted && modalIndex !== null && createPortal(
