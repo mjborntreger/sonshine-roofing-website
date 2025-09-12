@@ -47,20 +47,32 @@ export default function Hero() {
                 aria-label="Get a free 60-second quote"
                 className="btn btn-brand-orange btn-lg md:btn-hero items-center mb-4"
               >
-                <Zap className="mr-2 inline h-4 w-4 text-md md:text-lg md:h-6 md:w-6 font-semibold" aria-hidden="true" />
+                <Zap className="mr-2 h-4 w-4 md:h-6 md:w-6" aria-hidden="true" />
                 <span>Free 60-second Quote</span>
               </a>
 
+              {/* Mobile Only */}
               <a
                 href="tel:+19418664320"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Call SonShine Roofing"
-                className="btn btn-brand-blue btn-lg md:btn-hero items-center"
+                className="inline-flex md:hidden btn btn-brand-blue btn-lg md:btn-hero items-center"
               >
-                <Phone className="mr-2 inline h-4 w-4 text-md md:text-lg md:h-6 md:w-6 font-semibold" aria-hidden="true" />
+                <Phone className="mr-2 h-4 w-4 md:h-6 md:w-6" aria-hidden="true" />
                 <span>Call (941) 866-4320</span>
               </a>
+
+              {/* Desktop Only */}
+              <a
+                href="/contact-us"
+                aria-label="Contact SonShine Roofing"
+                className="hidden md:inline-flex btn btn-brand-blue btn-lg md:btn-hero items-center"
+              >
+                <Phone className="mr-2 h-4 w-4 md:h-6 md:w-6" aria-hidden="true" />
+                <span>Contact Us</span>
+              </a>
+
             </div>
           </div>
         </div>

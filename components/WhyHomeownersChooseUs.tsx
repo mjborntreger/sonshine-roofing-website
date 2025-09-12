@@ -1,15 +1,15 @@
 import SmartLink from "./SmartLink";
-import { ShieldCheck, Shield, MapPin, HandCoins, ChevronDown } from "lucide-react";
+import { ShieldCheck, Shield, MapPin, HandCoins, ChevronDown, Award, CalendarDays, BadgeCheck, Star, Banknote } from "lucide-react";
 
 const pillarsGrid = "mt-8 grid grid-cols-2 gap-5 items-start auto-rows-fr";
-const detailsBase = "group h-full flex flex-col rounded-2xl border border-[--brand-blue] bg-white p-8 shadow-lg transition hover:shadow-md hover:-translate-y-0.5";
+const detailsBase = "group h-full flex flex-col rounded-2xl border border-slate-400 bg-white p-8 shadow-lg transition hover:shadow-md hover:-translate-y-0.5";
 const detailsPosition = "inline-flex items-center gap-3";
 const detailsSummary = "flex cursor-pointer text-lg select-none items-center justify-between gap-3 text-slate-900";
 const iconChip = "grid h-9 w-9 place-items-center rounded-full text-[--brand-blue] bg-[[--brand-blue]]/10 ring-1 ring-[[--brand-blue]]/20 transition-transform group-hover:scale-105";
 const titleAccent = "font-semibold relative after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:bg-gradient-to-r after:from-[[--brand-orange]] after:to-[#00e3fe] after:transition-all group-hover:after:w-12";
 const gradientDivider = "gradient-divider my-8";
 const pStyles = "text-slate-700 mt-4";
-const pillStyles = "rounded-full bg-white px-3 py-1 ring-1 ring-[--brand-orange]";
+const pillStyles = "badge badge--accent";
 
 export default async function WhyHomeownersChooseUs() {
   return (
@@ -18,13 +18,34 @@ export default async function WhyHomeownersChooseUs() {
         <h2 className="text-3xl md:text-5xl text-slate-700">Why Homeowners Choose Us</h2>
         <div className={gradientDivider} />
         <div className="mt-3 flex flex-wrap justify-center gap-2 text-sm">
-          <span className={pillStyles}>GAF Master Elite Certified</span>
-          <span className={pillStyles}>38+ Years</span>
-          <span className={pillStyles}>A+ Rated with the BBB</span>
-          <span className={pillStyles}>
-            <span className="text-[--brand-orange]">★</span> 4.8 on Google
+          <span className={`${pillStyles} inline-flex items-center gap-2`}>
+            <Award className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            GAF Master Elite Certified
           </span>
-          <span className={pillStyles}>Licensed and Insured</span>
+          <span className={`${pillStyles} inline-flex items-center gap-2`}>
+            <CalendarDays className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            38+ Years
+          </span>
+          <span className={`${pillStyles} inline-flex items-center gap-2`}>
+            <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            A+ Rated with the BBB
+          </span>
+          <span className={`${pillStyles} inline-flex items-center gap-2`}>
+            <Star className="h-4 w-4 text-amber-500" aria-hidden="true" />
+            4.8 on Google
+          </span>
+          <span className={`${pillStyles} inline-flex items-center gap-2`}>
+            <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            Licensed and Insured
+          </span>
+          <span className={`${pillStyles} inline-flex items-center gap-2`}>
+            <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            Warranty
+          </span>
+          <span className={`${pillStyles} inline-flex items-center gap-2`}>
+            <Banknote className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            Financing
+          </span>
         </div>
       </div>
 

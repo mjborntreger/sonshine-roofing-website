@@ -30,9 +30,9 @@ export default function SocialMediaProfiles() {
     "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-white border border-slate-200";
 
   return (
-    <aside className="lg:sticky lg:top-24 self-start mt-8">
-      <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <div className="mb-3 text-xs text-center font-semibold uppercase tracking-wide text-slate-700">
+    <div>
+      <div className="rounded-2xl border border-slate-300 bg-white p-4 shadow-sm">
+        <div className="mb-2 text-xs text-center font-semibold uppercase tracking-wide text-slate-700">
           Social Media Profiles
         </div>
 
@@ -68,6 +68,6 @@ export default function SocialMediaProfiles() {
           ))}
         </ul>
       </div>
-    </aside>
+    </div>
   );
 }

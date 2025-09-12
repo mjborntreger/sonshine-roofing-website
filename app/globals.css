@@ -136,9 +136,9 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   .card:hover { box-shadow: var(--elev-2); }
 
   /* Badges */
-  .badge { @apply inline-block rounded-full bg-slate-100 px-2.5 py-1 text-xs text-slate-700; }
+  .badge { @apply inline-block border border-[--brand-orange] rounded-full bg-slate-100 px-2.5 py-1 text-sm text-slate-700; }
   .badge--brand { color:#fff; background-image: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan)); }
-  .badge--accent { background: color-mix(in oklab, var(--brand-orange) 20%, white); color: #1f2937; }
+  .badge--accent { background: white; color: #1f2937; }
 
   /* Form focus */
   input:focus, select:focus, textarea:focus {

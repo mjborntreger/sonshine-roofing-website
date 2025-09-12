@@ -49,8 +49,9 @@ export default async function ReviewsCarousel() {
 
   return (
     <>
-      <div className="py-12 md:py-16 mt-12">
-        <h2 className="text-center text-slate-700 text-3xl md:text-6xl">What Our Customers Say</h2>
+      <div className="h-0.5 w-full bg-gradient-to-r from-[#fb9216] via-[#fb9216]/5 to-[#fb9216] mt-12" />
+      <div className="py-16">
+        <h2 className="text-center text-slate-700 text-3xl md:text-5xl">What Our Customers Say</h2>
         <div className="not-prose text-center mt-8">
           {data?.avg_rating && (
             <a
@@ -83,6 +84,7 @@ export default async function ReviewsCarousel() {
           </div>
         </div>
       </div>
+      <div className="h-0.5 w-full bg-gradient-to-r from-[#fb9216] via-[#fb9216]/5 to-[#fb9216]" />
     </>
   );
 }

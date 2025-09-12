@@ -2,14 +2,13 @@ import Section from "@/components/layout/Section";
 import AcculynxLeadForm from "@/components/AcculynxLeadForm";
 import SmartLink from "@/components/SmartLink";
 import UiLink from "@/components/UiLink";
-import { Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin, Map, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays } from "lucide-react";
+import Image from 'next/image';
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import type { Metadata } from 'next';
 import LiteMap from "@/components/LiteMap";
-
-
-const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
-const contactInfoIconStyles = "h-5 w-5 text-slate-500";
+import OpenOrClosed from "@/components/OpenOrClosed";
+import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 
 // ===== STATIC SEO FOR /contact-us (EDIT HERE) =====
 const SEO_TITLE_CONTACT = 'Contact SonShine Roofing | Sarasota Roofing Company';
@@ -52,9 +51,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const h1Styles = "text-3xl md:text-4xl py-4"
-const h2Styles = "text-xl md:text-2xl py-2"
-const pStyles = "text-md py-2"
+const contactInfoPillStyles = "not-prose inline-flex items-center gap-3 rounded-full border border-slate-400 bg-white px-4 py-2 shadow-sm text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
+const contactInfoIconStyles = "h-5 w-5 text-[--brand-blue]";
+const h1Styles = "text-3xl md:text-5xl text-slate-900";
+const h2Styles = "text-xl md:text-2xl text-slate-800";
+const pStyles = "text-md py-2 text-slate-700";
+const badgeStyles = "badge badge--accent";
 
 export default function Page() {
   return (
@@ -62,73 +64,122 @@ export default function Page() {
       <div className="container-edge py-4">
         <div className="grid gap-16 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start px-2">
           {/* Main content */}
-          <div>
+          <div className="prose">
             <h1 className={h1Styles}>Contact Us</h1>
-            <h2 className={h2Styles}>Whatever you need, we've got you covered</h2>
-            <p className={pStyles}>Whether you need to schedule an appointment with one our
-              expert Roofing Specialists to come to your home, or if you
-              just have a few questions, we’re here to help! Give us a call
-              or complete the form below to contact our office.
-            </p>
+            {/* Trust strip */}
+            <div className="mt-4 not-prose items-center">
+              <div className="flex flex-wrap items-center justify-start gap-2 text-sm font-medium text-slate-700">
+                <span className={`${badgeStyles} inline-flex items-center gap-2`}>
+                  <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+                  Licensed &amp; Insured
+                </span>
+                <span className={`${badgeStyles} inline-flex items-center gap-2`}>
+                  <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+                  Warranty
+                </span>
+                <span className={`${badgeStyles} inline-flex items-center gap-2`}>
+                  <Banknote className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+                  Financing
+                </span>
+                <span className={`${badgeStyles} inline-flex items-center gap-2`}>
+                  <Star className="h-4 w-4 text-amber-500" aria-hidden="true" />
+                  4.8 on Google
+                </span>
+              </div>
+            </div>
 
-            <h2 className={h2Styles}>Contact Information</h2>
-            <div className="mt-3 flex flex-wrap gap-3">
+            {/* “You'll talk to…” human tile */}
+            <div className="mt-6 not-prose rounded-xl border border-slate-300 bg-white p-6 shadow-md">
+              <OpenOrClosed />
+              <div className="grid grid-cols-[auto,1fr] mt-8 gap-4 items-center">
+                <Image
+                  src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
+                  alt="Tara – Project Support Specialist"
+                  width={150}
+                  height={429}
+                  className="mb-2 block rounded-full object-cover"
+                />
+                <div>
+                  <p className="text-md font-semibold text-slate-900">
+                    You’ll likely talk to <span className="text-[--brand-blue] hover:underline"><a href="/person/tara">Tara.</a></span>
+                  </p>
+                  <p className="text-md text-slate-600">She’s friendly, fast, and hates leaks.</p>
+                </div>
+              </div>
               {/* Phone */}
-              <UiLink
-                href="tel:+19418664320"
-                className={contactInfoPillStyles}
-                title="Call SonShine Roofing"
-              >
-                <Phone className={contactInfoIconStyles} aria-hidden="true" />
-                <span className="font-semibold">(941) 866-4320</span>
-              </UiLink>
+              <div className="my-8 flex flex-wrap gap-3">
+                <UiLink
+                  href="tel:+19418664320"
+                  className={contactInfoPillStyles}
+                  title="Call SonShine Roofing"
+                >
+                  <Phone className={contactInfoIconStyles} aria-hidden="true" />
+                  <span className="font-semibold">(941) 866-4320</span>
+                </UiLink>
 
-              {/* Email */}
-              <UiLink
-                href="mailto:messages@sonshineroofing.com"
-                className={contactInfoPillStyles}
-                title="Email SonShine Roofing"
-              >
-                <Mail className={contactInfoIconStyles} aria-hidden="true" />
-                <span className="font-medium">messages@sonshineroofing.com</span>
-              </UiLink>
+                {/* Email */}
+                <UiLink
+                  href="mailto:messages@sonshineroofing.com"
+                  className={contactInfoPillStyles}
+                  title="Email SonShine Roofing"
+                >
+                  <Mail className={contactInfoIconStyles} aria-hidden="true" />
+                  <span className="font-medium">messages@sonshineroofing.com</span>
+                </UiLink>
 
-              {/* Address */}
-              <UiLink
-                href="https://share.google/BO0HyQ8eoe2qcoTDX"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={contactInfoPillStyles}
-                title="Open in Google Maps"
-              >
-                <MapPin className={contactInfoIconStyles} aria-hidden="true" />
-                <span className="font-medium">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
-              </UiLink>
+                {/* Address */}
+                <UiLink
+                  href="https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={contactInfoPillStyles}
+                  title="Open in Google Maps"
+                >
+                  <MapPin className={contactInfoIconStyles} aria-hidden="true" />
+                  <span className="font-medium">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
+                </UiLink>
+              </div>
+
+              <h2 className={h2Styles}>Whatever you need, we've got you covered</h2>
+              <p className={pStyles}>Whether you need to schedule an appointment with one our
+                expert Roofing Specialists to come to your home, or if you
+                just have a few questions, we’re here to help! Give us a call
+                or complete the form below to contact our office.
+              </p>
             </div>
 
 
-            <div className="mt-8">
-              <h2 id="book-an-appointment">
-                Book an Appointment
+            <div className="mt-8 px-2">
+              <h2 className="top-24 flex items-center gap-2" id="book-an-appointment">
+                <CalendarDays className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+                <span>Book an Appointment</span>
               </h2>
-              <p className="text-xs pb-2">We respond within 30 minutes during business hours</p>
+              <p className="text-slate-700 text-sm pb-2">
+                We respond within 30 minutes during business hours
+              </p>
               <AcculynxLeadForm />
-              <div className="text-xs py-4 italic">
+              <div className="text-xs text-slate-500 py-4 italic">
                 By submitting this form, you agree to receive SMS messages from Sonshine Roofing
                 and its agents. Message frequency may vary. Message and data rates may apply.
-                Reply STOP to opt out at any time. View our
-                <SmartLink href="/privacy-policy"> Privacy Policy.</SmartLink>
+                Reply STOP to opt out at any time. For more information, <SmartLink href="/privacy-policy">view our privacy policy.</SmartLink>
               </div>
             </div>
           </div>
 
           {/* Floating/sticky */}
-          <SocialMediaProfiles />
+          <aside className="lg:sticky lg:top-24 self-start">
+            <SocialMediaProfiles />
+            <ResourcesQuickLinks />
+          </aside>
+
         </div>
-      <div className="my-24">
-        <h2 className="text-3xl md:text-5xl mb-16 text-center">Find Us on Google Maps</h2>
-        <LiteMap />
-      </div>
+        <div className="my-24">
+          <h2 className="text-3xl md:text-5xl mb-16 text-center flex items-center justify-center gap-3">
+            <Map className="h-8 w-8 md:h-12 md:w-12 text-[--brand-blue]" aria-hidden="true" />
+            <span>Find Us on Google Maps</span>
+          </h2>
+          <LiteMap />
+        </div>
 
       </div>
     </Section>
