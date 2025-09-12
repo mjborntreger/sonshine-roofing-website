@@ -53,7 +53,6 @@ const ORDER: string[] = [
   'bob',
   'dean',
   'josh',
-  'tony',
   'jb',
   'jeremy-k',
   'tara',
