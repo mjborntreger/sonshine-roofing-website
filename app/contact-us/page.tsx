@@ -5,6 +5,7 @@ import UiLink from "@/components/UiLink";
 import { Phone, Mail, MapPin } from "lucide-react";
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import type { Metadata } from 'next';
+import LiteMap from "@/components/LiteMap";
 
 
 const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
@@ -51,55 +52,59 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+const h1Styles = "text-3xl md:text-4xl py-4"
+const h2Styles = "text-xl md:text-2xl py-2"
+const pStyles = "text-md py-2"
+
 export default function Page() {
   return (
     <Section>
       <div className="container-edge py-4">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+        <div className="grid gap-16 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start px-2">
           {/* Main content */}
-          <div className="prose">
-            <h1>Contact Us</h1>
-            <h2>Whatever you need, we've got you covered</h2>
-              <p>Whether you need to schedule an appointment with one our 
-                expert Roofing Specialists to come to your home, or if you 
-                just have a few questions, we’re here to help! Give us a call 
-                or complete the form below to contact our office. 
-              </p>
+          <div>
+            <h1 className={h1Styles}>Contact Us</h1>
+            <h2 className={h2Styles}>Whatever you need, we've got you covered</h2>
+            <p className={pStyles}>Whether you need to schedule an appointment with one our
+              expert Roofing Specialists to come to your home, or if you
+              just have a few questions, we’re here to help! Give us a call
+              or complete the form below to contact our office.
+            </p>
 
-            <h2>Contact Information</h2>
-              <div className="mt-3 flex flex-wrap gap-3">
-                {/* Phone */}
-                <UiLink
-                  href="tel:+19418664320"
-                  className={contactInfoPillStyles}
-                  title="Call SonShine Roofing"
-                >
-                  <Phone className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-semibold">(941) 866-4320</span>
-                </UiLink>
+            <h2 className={h2Styles}>Contact Information</h2>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {/* Phone */}
+              <UiLink
+                href="tel:+19418664320"
+                className={contactInfoPillStyles}
+                title="Call SonShine Roofing"
+              >
+                <Phone className={contactInfoIconStyles} aria-hidden="true" />
+                <span className="font-semibold">(941) 866-4320</span>
+              </UiLink>
 
-                {/* Email */}
-                <UiLink
-                  href="mailto:messages@sonshineroofing.com"
-                  className={contactInfoPillStyles}
-                  title="Email SonShine Roofing"
-                >
-                  <Mail className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-medium">messages@sonshineroofing.com</span>
-                </UiLink>
+              {/* Email */}
+              <UiLink
+                href="mailto:messages@sonshineroofing.com"
+                className={contactInfoPillStyles}
+                title="Email SonShine Roofing"
+              >
+                <Mail className={contactInfoIconStyles} aria-hidden="true" />
+                <span className="font-medium">messages@sonshineroofing.com</span>
+              </UiLink>
 
-                {/* Address */}
-                <UiLink
-                  href="https://share.google/BO0HyQ8eoe2qcoTDX"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={contactInfoPillStyles}
-                  title="Open in Google Maps"
-                >
-                  <MapPin className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-medium">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
-                </UiLink>
-              </div>
+              {/* Address */}
+              <UiLink
+                href="https://share.google/BO0HyQ8eoe2qcoTDX"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={contactInfoPillStyles}
+                title="Open in Google Maps"
+              >
+                <MapPin className={contactInfoIconStyles} aria-hidden="true" />
+                <span className="font-medium">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
+              </UiLink>
+            </div>
 
 
             <div className="mt-8">
@@ -109,32 +114,22 @@ export default function Page() {
               <p className="text-xs pb-2">We respond within 30 minutes during business hours</p>
               <AcculynxLeadForm />
               <div className="text-xs py-4 italic">
-                By submitting this form, you agree to receive SMS messages from Sonshine Roofing 
-                and its agents. Message frequency may vary. Message and data rates may apply. 
-                Reply STOP to opt out at any time. View our 
+                By submitting this form, you agree to receive SMS messages from Sonshine Roofing
+                and its agents. Message frequency may vary. Message and data rates may apply.
+                Reply STOP to opt out at any time. View our
                 <SmartLink href="/privacy-policy"> Privacy Policy.</SmartLink>
-              </div>
-            </div>
-            
-            <h2>Find Us on Google Maps</h2>
-            <div className="mt-6">
-              <div className="mt-2 card overflow-hidden">
-                <iframe
-                  src="https://www.google.com/maps?q=SonShine+Roofing+Sarasota&output=embed"
-                  title="Map to SonShine Roofing"
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  className="w-full aspect-[16/9]"
-                  allowFullScreen
-                />
               </div>
             </div>
           </div>
 
           {/* Floating/sticky */}
           <SocialMediaProfiles />
-
         </div>
+      <div className="my-24">
+        <h2 className="text-3xl md:text-5xl mb-16 text-center">Find Us on Google Maps</h2>
+        <LiteMap />
+      </div>
+
       </div>
     </Section>
   );
