@@ -394,26 +394,25 @@ function MobileMenu() {
   );
 }
 
-function LicenseLink() {
+function PhoneLink() {
   return (
     <a
-      href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
+      href="tel:+19418664320"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="View Florida contractor license #CCC1331483 on myfloridalicense.com (opens in a new tab)"
-      className="text-sm text-[--brand-blue] inline-flex items-center"
+      aria-label="Call SonShine Roofing"
+      className="text-md font-semibold text-[--brand-blue] items-center"
     >
-      <BadgeCheck className="mr-1 inline h-3 w-3 text-sm text-[--brand-blue]" aria-hidden="true" />
-      <span>LIC: #CCC1331483</span>
-      <ArrowUpRight className="ml-1 inline h-3 w-3" aria-hidden="true" />
+      <Phone className="mr-1 inline h-4 w-4 text-sm text-[--brand-blue] font-semibold" aria-hidden="true" />
+      <span>(941) 866-4320</span>
     </a>
-  );
+  )
 }
 
 export function NavMenu() {
   return (
     <nav className="ml-auto flex items-center gap-3">
-      <LicenseLink />
+      <PhoneLink />
       <DesktopMenu />
       <MobileMenu />
     </nav>

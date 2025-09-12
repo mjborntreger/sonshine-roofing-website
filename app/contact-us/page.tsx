@@ -106,7 +106,7 @@ export default function Page() {
               <h2 id="book-an-appointment">
                 Book an Appointment
               </h2>
-              <p className="py-2">We respond within 30 minutes during business hours</p>
+              <p className="text-xs pb-2">We respond within 30 minutes during business hours</p>
               <AcculynxLeadForm />
               <div className="text-xs py-4 italic">
                 By submitting this form, you agree to receive SMS messages from Sonshine Roofing 

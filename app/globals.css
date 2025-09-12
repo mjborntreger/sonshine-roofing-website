@@ -178,6 +178,7 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   }
 
   /* Sizes */
+  .btn-hero { @apply h-12 px-6 text-2xl}
   .btn-lg { @apply h-11 px-6 text-lg; }
   .btn-md { @apply h-10 px-4 text-base; }
   .btn-sm { @apply h-9  px-3 text-sm; }

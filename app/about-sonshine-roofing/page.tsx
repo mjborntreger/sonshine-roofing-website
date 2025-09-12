@@ -128,7 +128,7 @@ export default async function Page() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="View Florida contractor license #CCC1331483 on myfloridalicense.com (opens in a new tab)"
-                  className="btn btn-outline btn-sm bg-[#fb9216]/10 inline-flex items-center"
+                  className="btn btn-outline btn-sm hover:bg-[#fb9216]/10 inline-flex items-center"
                 >
                   <BadgeCheck className="mr-1 inline h-4 w-4 align-[-0.125em] text-[--brand-blue]" aria-hidden="true" />
                   <span>License #CCC1331483</span>

@@ -87,7 +87,7 @@ export default async function Page() {
             <ResourcesQuickLinks />
           </div>
         </div>
-        <div className="bg-[#cef3ff]">
+        <div className="bg-[#fb9216]/30">
           <ReviewsCarousel />
         </div>
       <div>

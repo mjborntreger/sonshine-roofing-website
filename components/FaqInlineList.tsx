@@ -15,7 +15,7 @@ export default function FaqInlineList({
 }) {
   if (!Array.isArray(items) || items.length === 0) return null;
   return (
-    <div className="mt-16 px-2" data-toc-exclude>
+    <div className="my-8 px-2" data-toc-exclude>
       <h2 className="text-2xl text-center md:text-3xl font-semibold text-slate-900">{heading}</h2>
       <div className="mt-6 space-y-4 md:columns-2 md:gap-4 [column-fill:_balance]">
         {items.map((f, i) => (

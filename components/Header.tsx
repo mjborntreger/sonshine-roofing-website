@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { NavMenu } from "./NavMenu";
 
+import { BadgeCheck, ArrowUpRight } from "lucide-react";
 export default function Header() {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -23,15 +24,15 @@ export default function Header() {
       <div className="h-1.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
       <div ref={ref} className="w-full max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
         <SmartLink href="/" className="flex items-center gap-2">
-          <Image 
-          src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-Small-1.webp" 
-          alt="SonShine Roofing Logo"
-          aria-label="SonShine Roofing Logo"
-          width={120} 
-          height={50}
-          loading="eager" 
-          priority
-          fetchPriority="high" 
+          <Image
+            src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-Small-1.webp"
+            alt="SonShine Roofing Logo"
+            aria-label="SonShine Roofing Logo"
+            width={120}
+            height={50}
+            loading="eager"
+            priority
+            fetchPriority="high"
           />
         </SmartLink>
         <NavMenu />
