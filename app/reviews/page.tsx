@@ -4,10 +4,13 @@ import ReviewsCatcher from "@/components/ReviewsCatcher";
 
 export default function Page() {
     return (
-        <Section>
-            <ReviewsCatcher />
-            <ReviewsCarousel />
-        </Section>
-
+        <>
+            <Section>
+                <ReviewsCatcher />
+            </Section>
+            <div className="bg-[#fb9216]/10">
+                <ReviewsCarousel />
+            </div>
+        </>
     )
 }

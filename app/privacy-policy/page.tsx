@@ -40,7 +40,7 @@ export default function PrivacyPolicyPage() {
             SonShine Roofing Inc. is committed to protecting your privacy. This Privacy Policy explains how we
             collect, use, and safeguard your information when you visit
             {" "}
-            <a href="https://sonshineroofing.com" target="_blank" rel="noopener noreferrer">https://sonshineroofing.com</a>.
+            <a href="https://sonshineroofing.com" target="_blank" rel="noopener noreferrer">sonshineroofing.com</a>.
           </p>
 
           <h2>1. Information We Collect</h2>

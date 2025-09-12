@@ -101,6 +101,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         title: fallbackTitle,
         description: fallbackDesc,
         alternates: { canonical: '/roofing-glossary' },
+        robots: { index: false, follow: true },
         openGraph: {
           type: 'article',
           title: fallbackTitle,
@@ -124,6 +125,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title,
       description,
       alternates: { canonical: `/roofing-glossary/${term.slug}` },
+      robots: { index: false, follow: true },
       openGraph: {
         type: 'article',
         title,
@@ -143,6 +145,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: fallbackTitle,
       description: fallbackDesc,
       alternates: { canonical: '/roofing-glossary' },
+      robots: { index: false, follow: true },
       openGraph: {
         type: 'article',
         title: fallbackTitle,

@@ -20,8 +20,7 @@ const h3Styles = "text-xs font-semibold uppercase tracking-wider text-slate-700"
 export default function Footer() {
   return (
     <>
-    <div className="h-0.5 w-full bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]" />
-    <footer className="pt-16 border-t border-slate-300 bg-[#cef3ff]">
+    <footer className="pt-16 bg-slate-200">
       <div className="mx-auto max-w-6xl px-10 pt-8">
         <h2 className="sr-only">Footer</h2>
 
