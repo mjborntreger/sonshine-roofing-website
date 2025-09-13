@@ -6,6 +6,7 @@ import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import { HoursAndInformation } from "./HoursAndInformation";
 import { UserRoundSearch, CloudRainWind, ChevronDown, BadgeCheck, ShieldCheck, ExternalLink, ChevronRight } from "lucide-react";
 import type { Metadata } from 'next';
+import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 
 // ===== STATIC SEO FOR /about-sonshine-roofing (EDIT HERE) =====
 const SEO_TITLE_ABOUT = 'About SonShine Roofing | Sarasota Roofing Company';
@@ -189,6 +190,7 @@ export default async function Page() {
 
             <div className="sticky hidden lg:block lg:top-24 self-start min-w-0">
               <SocialMediaProfiles />
+              <ResourcesQuickLinks />
             </div>
 
           </div>

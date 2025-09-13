@@ -1,4 +1,6 @@
 import Section from "@/components/layout/Section";
+import RevealEmail from "@/components/RevealEmail";
+import RevealPhone from "@/components/RevealPhone";
 import type { Metadata } from "next";
 
 // ===== STATIC SEO FOR /privacy-policy =====
@@ -123,8 +125,13 @@ export default function PrivacyPolicyPage() {
           <address className="not-italic">
             <div>SonShine Roofing Inc.</div>
             <div>2555 Porter Lake Drive Ste. 109, Sarasota, Florida, USA.</div>
-            <div><a href="mailto:marketing@sonshineroofing.com">marketing@sonshineroofing.com</a></div>
-            <div><a href="tel:+19418664320">(941)-866-4320</a> +106</div>
+            <RevealEmail
+              encoded="bWFya2V0aW5nQHNvbnNoaW5lcm9vZmluZy5jb20=" 
+            />
+            <RevealPhone 
+              e164="+19418664320"
+              extension="106"
+            />
           </address>
         </div>
       </div>

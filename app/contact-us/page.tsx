@@ -51,8 +51,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-slate-400 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal";
-const contactInfoIconStyles = "h-5 w-5 text-[--brand-blue]";
+const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-slate-400 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal break-words overflow-hidden";
+const contactInfoIconStyles = "h-5 w-5 shrink-0 text-[--brand-blue]";
 const h1Styles = "text-3xl md:text-5xl text-slate-900";
 const h2Styles = "text-xl md:text-2xl text-slate-800";
 const pStyles = "text-md py-2 text-slate-700";
@@ -61,7 +61,7 @@ const badgeStyles = "badge badge--accent inline-flex items-center gap-2";
 export default function Page() {
   return (
     <Section>
-      <div className="container-edge py-4">
+      <div className="container-edge py-4 overflow-x-clip">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start px-2">
           {/* Main content */}
           <div className="prose">
@@ -91,13 +91,13 @@ export default function Page() {
             {/* “You'll talk to…” human tile */}
             <div className="mt-6 not-prose rounded-xl border border-slate-300 bg-white p-6 shadow-md">
               <OpenOrClosed />
-              <div className="grid grid-cols-[auto,1fr] mt-8 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr] mt-8 gap-4 items-center">
                 <Image
                   src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
                   alt="Tara – Project Support Specialist"
                   width={150}
                   height={429}
-                  className="mb-2 block rounded-full object-cover"
+                  className="mb-2 block h-24 w-auto rounded-full object-cover"
                 />
                 <div>
                   <p className="text-md font-semibold text-slate-900">
@@ -114,7 +114,7 @@ export default function Page() {
                   title="Call SonShine Roofing"
                 >
                   <Phone className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-semibold min-w-0">(941) 866-4320</span>
+                  <span className="font-semibold min-w-0 break-words">(941) 866-4320</span>
                 </UiLink>
 
                 {/* Email */}
@@ -124,7 +124,7 @@ export default function Page() {
                   title="Email SonShine Roofing"
                 >
                   <Mail className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-medium min-w-0">messages@sonshineroofing.com</span>
+                  <span className="font-semibold min-w-0 break-words">messages@sonshineroofing.com</span>
                 </UiLink>
 
                 {/* Address */}
@@ -136,7 +136,7 @@ export default function Page() {
                   title="Open in Google Maps"
                 >
                   <MapPin className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-medium min-w-0">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
+                  <span className="font-semibold min-w-0 break-words">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
                 </UiLink>
               </div>
 

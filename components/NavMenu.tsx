@@ -401,9 +401,9 @@ function PhoneLink() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Call SonShine Roofing"
-      className="text-sm font-semibold text-[--brand-blue] items-center"
+      className="text-xs md:text-sm font-semibold text-[--brand-blue] items-center"
     >
-      <Phone className="mr-1 inline h-4 w-4 text-xs text-[--brand-blue] font-semibold" aria-hidden="true" />
+      <Phone className="mr-1 inline h-3 w-3 md:h-4 md:w-4 text-[--brand-blue] font-semibold" aria-hidden="true" />
       <span>(941) 866-4320</span>
     </a>
   )
