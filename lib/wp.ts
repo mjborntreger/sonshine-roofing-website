@@ -223,7 +223,7 @@ function getAuthHeader(): string | null {
   return `Basic ${base64}`;
 }
 
-async function wpFetch<T = Json>(
+export async function wpFetch<T = Json>(
   query: string,
   variables?: Record<string, any>,
   revalidateSeconds = 600

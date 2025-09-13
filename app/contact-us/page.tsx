@@ -62,7 +62,7 @@ export default function Page() {
   return (
     <Section>
       <div className="container-edge py-4">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start px-2 max-w-full">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           {/* Main content */}
           <div className="prose max-w-full min-w-0">
             <h1 className={h1Styles}>Contact Us</h1>
@@ -149,7 +149,7 @@ export default function Page() {
             </div>
 
 
-            <div className="mt-8 px-2">
+            <div className="mt-8">
               <h2 className="top-24 flex items-center gap-2" id="book-an-appointment">
                 <CalendarDays className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
                 <span>Book an Appointment</span>

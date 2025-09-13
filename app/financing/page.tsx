@@ -341,7 +341,7 @@ export default async function FinancingPage() {
         </div>
 
         {/* Compliance */}
-        <p className="italic mt-10 mb-20 text-xs text-slate-500">
+        <p className="italic mt-10 text-xs text-slate-500">
           Rates, terms, and eligibility subject to change and based on lender approval. SonShine
           Roofing is not a lender. Program availability may vary by municipality. Final terms will be
           provided in your financing documents.
