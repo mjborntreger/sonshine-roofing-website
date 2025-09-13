@@ -56,7 +56,7 @@ const contactInfoIconStyles = "h-5 w-5 text-[--brand-blue]";
 const h1Styles = "text-3xl md:text-5xl text-slate-900";
 const h2Styles = "text-xl md:text-2xl text-slate-800";
 const pStyles = "text-md py-2 text-slate-700";
-const badgeStyles = "badge badge--accent";
+const badgeStyles = "badge badge--accent inline-flex items-center gap-2";
 
 export default function Page() {
   return (
@@ -69,19 +69,19 @@ export default function Page() {
             {/* Trust strip */}
             <div className="mt-4 not-prose items-center">
               <div className="flex flex-wrap items-center justify-start gap-2 text-sm font-medium text-slate-700">
-                <span className={`${badgeStyles} inline-flex items-center gap-2`}>
+                <span className={badgeStyles}>
                   <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
                   Licensed &amp; Insured
                 </span>
-                <span className={`${badgeStyles} inline-flex items-center gap-2`}>
+                <span className={badgeStyles}>
                   <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
                   Warranty
                 </span>
-                <span className={`${badgeStyles} inline-flex items-center gap-2`}>
+                <span className={badgeStyles}>
                   <Banknote className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
                   Financing
                 </span>
-                <span className={`${badgeStyles} inline-flex items-center gap-2`}>
+                <span className={badgeStyles}>
                   <Star className="h-4 w-4 text-amber-500" aria-hidden="true" />
                   4.8 on Google
                 </span>
