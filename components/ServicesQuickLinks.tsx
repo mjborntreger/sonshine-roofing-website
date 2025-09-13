@@ -45,7 +45,8 @@ export default function ServicesQuickLinks() {
   return (
     <div className="mt-4 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm">
       <div className="mb-3 text-xs text-center font-semibold uppercase tracking-wide text-slate-700">
-        All Services
+        <Hammer className="inline h-3 w-3 mr-2 font-semibold" />
+        Roofing Services
       </div>
 
       <ul className="space-y-2">

@@ -1,5 +1,5 @@
 import SmartLink from "@/components/SmartLink";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Share2 } from "lucide-react";
 
 // Styled like ResourcesQuickLinks (button-ified list items)
 // — maintains each platform color for the label
@@ -33,6 +33,7 @@ export default function SocialMediaProfiles() {
     <div>
       <div className="rounded-2xl border border-slate-300 bg-white p-4 shadow-sm">
         <div className="mb-2 text-xs text-center font-semibold uppercase tracking-wide text-slate-700">
+          <Share2 className="inline h-3 w-3 mr-2 font-semibold" />
           Social Media Profiles
         </div>
 

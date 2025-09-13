@@ -61,10 +61,10 @@ const badgeStyles = "badge badge--accent inline-flex items-center gap-2";
 export default function Page() {
   return (
     <Section>
-      <div className="container-edge py-4 overflow-x-clip">
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start px-2">
+      <div className="container-edge py-4">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start px-2 max-w-full">
           {/* Main content */}
-          <div className="prose">
+          <div className="prose max-w-full min-w-0">
             <h1 className={h1Styles}>Contact Us</h1>
             {/* Trust strip */}
             <div className="mt-4 not-prose items-center">
@@ -89,9 +89,9 @@ export default function Page() {
             </div>
 
             {/* “You'll talk to…” human tile */}
-            <div className="mt-6 not-prose rounded-xl border border-slate-300 bg-white p-6 shadow-md">
+            <div className="mt-6 not-prose rounded-xl border border-slate-300 bg-white p-6 shadow-md max-w-full">
               <OpenOrClosed />
-              <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr] mt-8 gap-4 items-center">
+              <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr] mt-8 gap-4 items-center min-w-0">
                 <Image
                   src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
                   alt="Tara – Project Support Specialist"
@@ -110,7 +110,7 @@ export default function Page() {
               <div className="my-8 flex flex-wrap gap-3">
                 <UiLink
                   href="tel:+19418664320"
-                  className={contactInfoPillStyles}
+                  className={`${contactInfoPillStyles} w-full`}
                   title="Call SonShine Roofing"
                 >
                   <Phone className={contactInfoIconStyles} aria-hidden="true" />
@@ -120,7 +120,7 @@ export default function Page() {
                 {/* Email */}
                 <UiLink
                   href="mailto:messages@sonshineroofing.com"
-                  className={contactInfoPillStyles}
+                  className={`${contactInfoPillStyles} w-full`}
                   title="Email SonShine Roofing"
                 >
                   <Mail className={contactInfoIconStyles} aria-hidden="true" />
@@ -132,7 +132,7 @@ export default function Page() {
                   href="https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={contactInfoPillStyles}
+                  className={`${contactInfoPillStyles} w-full`}
                   title="Open in Google Maps"
                 >
                   <MapPin className={contactInfoIconStyles} aria-hidden="true" />
@@ -140,7 +140,7 @@ export default function Page() {
                 </UiLink>
               </div>
 
-              <h2 className={h2Styles}>Whatever you need, we've got you covered</h2>
+              <h2 className={h2Styles}>Whatever you need, we've got you covered.</h2>
               <p className={pStyles}>Whether you need to schedule an appointment with one our
                 expert Roofing Specialists to come to your home, or if you
                 just have a few questions, we’re here to help! Give us a call
@@ -167,15 +167,15 @@ export default function Page() {
           </div>
 
           {/* Floating/sticky */}
-          <aside className="lg:sticky lg:top-24 self-start">
+          <aside className="lg:sticky lg:top-24 self-start lg:h-fit">
             <SocialMediaProfiles />
             <ResourcesQuickLinks />
           </aside>
 
         </div>
         <div className="my-24">
-          <h2 className="text-3xl md:text-5xl mb-16 text-center flex items-center justify-center gap-3">
-            <Map className="h-8 w-8 md:h-12 md:w-12 text-[--brand-blue]" aria-hidden="true" />
+          <h2 className="text-2xl md:text-5xl mb-16 text-center flex items-center justify-center gap-3">
+            <Map className="h-6 w-6 md:h-12 md:w-12 text-[--brand-blue]" aria-hidden="true" />
             <span>Find Us on Google Maps</span>
           </h2>
           <LiteMap />

@@ -1,7 +1,7 @@
 import Section from '@/components/layout/Section';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UiLink from '@/components/UiLink';
-import { Phone } from "lucide-react";
+import { Phone, BadgeCheck } from "lucide-react";
 import MonthlyEstimator from './MonthlyEstimator';
 import PlanQuiz from './PlanQuiz';
 import type { Metadata } from 'next';
@@ -191,7 +191,12 @@ export default async function FinancingPage() {
                 </ul>
               </CardContent>
               <div className="px-6 pb-6 pt-0 mt-auto flex justify-end">
-                <UiLink href="https://prequalification.ygrene.com/ContractorApply/XYFMHC" className="btn btn-brand-orange btn-lg" title="Ask about YGrene">
+                <UiLink 
+                  href="https://prequalification.ygrene.com/ContractorApply/XYFMHC" 
+                  className="btn btn-brand-orange btn-lg" 
+                  title="Ask about YGrene"
+                  >
+                  <BadgeCheck className="inline mr-2 h-4 w-4" />
                   Get approved
                 </UiLink>
               </div>
@@ -224,7 +229,8 @@ export default async function FinancingPage() {
                 </ul>
               </CardContent>
               <div className="px-6 pb-6 pt-0 mt-auto flex justify-end">
-                <UiLink href="tel:19418664320" className="btn btn-outline btn-lg" title="Call for details">
+                <UiLink href="/contact-us" className="btn btn-outline btn-lg" title="Call for details">
+                  <Phone className="inline mr-2 h-4 w-4" />
                   Call for details
                 </UiLink>
               </div>
@@ -292,7 +298,8 @@ export default async function FinancingPage() {
                 className={`${cta} w-full`}
                 title="Call SonShine Roofing"
               >
-                Call (941) 866‑4320
+                <Phone className="inline mr-2 h-4 w-4" />
+                (941) 866‑4320
               </UiLink>
             </div>
           </Card>
@@ -334,7 +341,7 @@ export default async function FinancingPage() {
         </div>
 
         {/* Compliance */}
-        <p className="mt-10 text-xs text-slate-500">
+        <p className="italic mt-10 mb-20 text-xs text-slate-500">
           Rates, terms, and eligibility subject to change and based on lender approval. SonShine
           Roofing is not a lender. Program availability may vary by municipality. Final terms will be
           provided in your financing documents.

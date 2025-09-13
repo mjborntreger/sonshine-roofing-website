@@ -1,7 +1,7 @@
 // components/FaqInlineList.tsx
 // Server component: renders a compact FAQ list using <details>/<summary>.
 // Keeps styles aligned with Financing + FAQ archive patterns.
-
+import { ArrowRight } from "lucide-react";
 type Item = { title: string; contentHtml: string; slug?: string };
 
 export default function FaqInlineList({
@@ -34,8 +34,9 @@ export default function FaqInlineList({
         ))}
       </div>
       <div className="mt-6 flex justify-end">
-        <a href={seeMoreHref} className="btn btn-brand-blue btn-press p-2" aria-label="See more FAQs">
+        <a href={seeMoreHref} className="not-prose btn btn-brand-blue btn-press px-4 py-2" aria-label="See more FAQs">
           See more FAQs
+          <ArrowRight className="h-4 w-4"/>
         </a>
       </div>
     </div>

@@ -1,7 +1,6 @@
 "use client";
 
-// components/ResourcesQuickLinks.tsx
-import { Image as ImageIcon, DollarSign, PlayCircle, Newspaper, BookOpen, HelpCircle, ChevronRight } from "lucide-react";
+import { Image as ImageIcon, DollarSign, PlayCircle, Newspaper, BookOpen, HelpCircle, ChevronRight, Wrench } from "lucide-react";
 import SmartLink from "@/components/SmartLink";
 import { usePathname } from "next/navigation";
 
@@ -51,7 +50,8 @@ export default function ResourcesQuickLinks() {
   return (
     <div className="my-6 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm">
       <div className="mb-3 text-xs text-center font-semibold uppercase tracking-wide text-slate-700">
-        All Resources
+        <Wrench className="h-3 w-3 inline mr-2 font-semibold" />
+        Resources
       </div>
 
       <ul className="space-y-2">
