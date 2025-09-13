@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const contactInfoPillStyles = "not-prose inline-flex items-center gap-3 rounded-full border border-slate-400 bg-white px-4 py-2 shadow-sm text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
+const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-slate-400 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal";
 const contactInfoIconStyles = "h-5 w-5 text-[--brand-blue]";
 const h1Styles = "text-3xl md:text-5xl text-slate-900";
 const h2Styles = "text-xl md:text-2xl text-slate-800";
@@ -62,7 +62,7 @@ export default function Page() {
   return (
     <Section>
       <div className="container-edge py-4">
-        <div className="grid gap-16 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start px-2">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start px-2">
           {/* Main content */}
           <div className="prose">
             <h1 className={h1Styles}>Contact Us</h1>
@@ -114,7 +114,7 @@ export default function Page() {
                   title="Call SonShine Roofing"
                 >
                   <Phone className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-semibold">(941) 866-4320</span>
+                  <span className="font-semibold min-w-0">(941) 866-4320</span>
                 </UiLink>
 
                 {/* Email */}
@@ -124,7 +124,7 @@ export default function Page() {
                   title="Email SonShine Roofing"
                 >
                   <Mail className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-medium">messages@sonshineroofing.com</span>
+                  <span className="font-medium min-w-0">messages@sonshineroofing.com</span>
                 </UiLink>
 
                 {/* Address */}
@@ -136,7 +136,7 @@ export default function Page() {
                   title="Open in Google Maps"
                 >
                   <MapPin className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-medium">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
+                  <span className="font-medium min-w-0">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
                 </UiLink>
               </div>
 

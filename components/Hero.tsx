@@ -1,5 +1,3 @@
-import SmartLink from ".//SmartLink";
-import { Button } from "@/components/ui/button";
 import { Phone, Zap } from "lucide-react"
 
 export default function Hero() {
