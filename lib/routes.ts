@@ -21,7 +21,7 @@ export const routes = [
   { href: "/privacy-policy", label: "Privacy Policy" },
 
   // Miscellaneous (developer/internal)
-  { href: "/design-system", label: "Design System" },
+  // (design-system removed)
 
   // Additional pages that exist but are not typically navigational
   { href: "/share", label: "Share" },
