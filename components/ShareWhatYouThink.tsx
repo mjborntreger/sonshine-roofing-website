@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Share2, Copy, Check } from "lucide-react";
+import { Share2, Copy, Check, Pencil } from "lucide-react";
 import type { Route } from "next";
 
 type Props = {
@@ -122,17 +122,21 @@ export default function ShareWhatYouThink({
   }
 
   const btn = "btn btn-outline btn-sm btn-press inline-flex items-center gap-2";
-  const orange = "text-white bg-[#fb9216] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#fb9216]"
-  const facebook_blue = "text-white bg-[#385898] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#385898]"
-  const x_black = "text-white bg-black btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-black"
-  const instagram_gradient = "text-white bg-[#dd2a7b] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#dd2a7b]"
-  const nextdoor_green = "text-white bg-[#479261] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#479261]"
+  const orange = "text-white bg-[#fb9216] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#fb9216]";
+  const facebook_blue = "text-white bg-[#385898] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#385898]";
+  const x_black = "text-white bg-black btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-black";
 
   return (
     <div className="mt-3">
       <div className="flex flex-wrap items-center gap-3">
         {/* Leave a Review (no icon) */}
-        <button type="button" onClick={goToReviews} className={orange} title="Leave a Review">
+        <button 
+          type="button" 
+          onClick={goToReviews} 
+          className={orange} 
+          title="Leave a Review"
+          >
+          <Pencil className="h-4 w-4" aria-hidden="true" />
           Leave a Review
         </button>
 
@@ -153,33 +157,11 @@ export default function ShareWhatYouThink({
           Share on X
         </button>
 
-        {/* Instagram: native share or copy + open profile */}
-        <button
-          type="button"
-          onClick={() => shareNative(instagramProfile)}
-          className={instagram_gradient}
-          title="Share on Instagram (copy caption)"
-        >
-          <Share2 className="h-4 w-4" aria-hidden="true" />
-          Share on Instagram
-        </button>
-
-        {/* Nextdoor: native share or copy + open profile */}
-        <button
-          type="button"
-          onClick={() => shareNative(nextdoorProfile)}
-          className={nextdoor_green}
-          title="Share on Nextdoor (copy caption)"
-        >
-          <Share2 className="h-4 w-4" aria-hidden="true" />
-          Share on Nextdoor
-        </button>
-
         {/* Utility: copy URL only */}
         <div className="flex items-center gap-2">
           <button type="button" onClick={copyUrlToClipboard} className={btn} title="Copy URL to Clipboard">
             <Copy className="h-4 w-4" aria-hidden="true" />
-            Copy URL to Clipboard
+            Copy URL
           </button>
           <span
             aria-live="polite"

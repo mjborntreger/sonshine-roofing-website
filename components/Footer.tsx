@@ -244,7 +244,6 @@ export default function Footer() {
           <nav className="text-xs font-semibold text-slate-500 flex items-center justify-end gap-4">
             <Link href="/privacy-policy">Privacy Policy</Link>
             <Link href="/sitemap_index">XML Sitemap</Link>
-            <Link href="/html-sitemap">HTML Sitemap</Link>
           </nav>
         </div>
         <div className="py-4">

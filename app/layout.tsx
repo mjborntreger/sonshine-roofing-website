@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import AnalyticsScripts from "@/lib/analytics";
 import { inter, candara } from "@/lib/fonts";
 import Script from "next/script";
+import GtmRouteChange from "@/lib/gtm-route-change";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sonshineroofing.com"),
@@ -24,7 +25,20 @@ export const metadata: Metadata = {
   title: "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte",
   description:
     "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!",
-  icons: { icon: "/favicon.ico" },
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180" },
+    ],
+    shortcut: "/favicon.ico",
+  },
 };
 
 export const viewport: Viewport = {
@@ -217,6 +231,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         "
       >
         <AnalyticsScripts />
+        <GtmRouteChange />
         <Header />
         <main className="flex-1">
           <RouteTransitions variant="zoom" duration={0.35}>

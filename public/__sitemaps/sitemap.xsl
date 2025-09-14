@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:sm="http://www.sitemaps.org/schemas/sitemap/0.9">
   <xsl:output method="html" version="1.0" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"/>
+  <xsl:strip-space elements="*"/>
 
   <xsl:template match="/">
     <html>
@@ -8,7 +11,7 @@
         <meta charset="utf-8" />
         <title>
           <xsl:choose>
-            <xsl:when test="/sitemapindex">Sitemap Index</xsl:when>
+            <xsl:when test="/sm:sitemapindex | /sitemapindex">Sitemap Index</xsl:when>
             <xsl:otherwise>Sitemap</xsl:otherwise>
           </xsl:choose>
         </title>
@@ -31,7 +34,7 @@
           <header>
             <h1>
               <xsl:choose>
-                <xsl:when test="/sitemapindex">Sitemap Index</xsl:when>
+                <xsl:when test="/sm:sitemapindex | /sitemapindex">Sitemap Index</xsl:when>
                 <xsl:otherwise>URL Sitemap</xsl:otherwise>
               </xsl:choose>
             </h1>
@@ -40,7 +43,7 @@
             </div>
           </header>
           <xsl:choose>
-            <xsl:when test="/sitemapindex">
+            <xsl:when test="/sm:sitemapindex | /sitemapindex">
               <table>
                 <thead>
                   <tr>
@@ -49,10 +52,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <xsl:for-each select="/sitemapindex/sitemap">
+                  <xsl:for-each select="/sm:sitemapindex/sm:sitemap | /sitemapindex/sitemap">
                     <tr>
-                      <td><a href="{loc}"><xsl:value-of select="loc"/></a></td>
-                      <td><xsl:value-of select="lastmod"/></td>
+                      <td><a href="{sm:loc|loc}"><xsl:value-of select="sm:loc|loc"/></a></td>
+                      <td><xsl:value-of select="sm:lastmod|lastmod"/></td>
                     </tr>
                   </xsl:for-each>
                 </tbody>
@@ -67,10 +70,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <xsl:for-each select="/urlset/url">
+                  <xsl:for-each select="/sm:urlset/sm:url | /urlset/url">
                     <tr>
-                      <td><a href="{loc}"><xsl:value-of select="loc"/></a></td>
-                      <td><xsl:value-of select="lastmod"/></td>
+                      <td><a href="{sm:loc|loc}"><xsl:value-of select="sm:loc|loc"/></a></td>
+                      <td><xsl:value-of select="sm:lastmod|lastmod"/></td>
                     </tr>
                   </xsl:for-each>
                 </tbody>
@@ -83,4 +86,3 @@
   </xsl:template>
   
 </xsl:stylesheet>
-

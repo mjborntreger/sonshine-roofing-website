@@ -69,7 +69,7 @@ export default async function ReviewsCarousel() {
           )}
           <ReviewsSlider reviews={filtered} gbpUrl={GBP_URL} />
           <div className="text-center">
-            <p className="text-sm italic mb-10">
+            <p className="text-sm text-slate-500 italic mb-10">
               All reviews shown above are automatically pulled from Google using the official API.
             </p>
             <Button variant="brandBlue" asChild>
