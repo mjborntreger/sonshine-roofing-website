@@ -45,8 +45,12 @@ export async function GET() {
   if (!ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
 
   const items = await getPostUrls();
-  const body = [
+  const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
+  ].join('');
+  const body = [
+    head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...items.map(n => `<url><loc>${BASE}${n.uri}</loc>${n.modifiedGmt ? `<lastmod>${n.modifiedGmt}</lastmod>` : ''}</url>`),
     `</urlset>`

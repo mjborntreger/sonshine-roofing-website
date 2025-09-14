@@ -28,8 +28,13 @@ export async function GET(req: Request) {
     // fall through with empty manifest
   }
 
-  const body = [
+  const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
+  ].join('');
+
+  const body = [
+    head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...manifest.routes.map((r) => {
       const loc = `${origin}${r.loc}`;

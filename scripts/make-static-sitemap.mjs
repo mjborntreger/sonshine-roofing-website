@@ -44,9 +44,13 @@ const items = files.map((f) => {
   return { loc: route, lastmod: mtime };
 });
 
+// Exclude specific routes from the static sitemap
+const EXCLUDE = new Set(["/reviews", "/tell-us-why"]);
+const filtered = items.filter(({ loc }) => !EXCLUDE.has(loc));
+
 // Optionally fallback to commit time
 const commitTs = process.env.VERCEL_GIT_COMMIT_TIMESTAMP;
-const routes = items.map(({ loc, lastmod }) => ({ loc, lastmod: commitTs || lastmod }));
+const routes = filtered.map(({ loc, lastmod }) => ({ loc, lastmod: commitTs || lastmod }));
 
 const outDir = join(ROOT, 'public', '__sitemaps');
 const outPath = join(outDir, 'static-routes.json');

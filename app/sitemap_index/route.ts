@@ -14,7 +14,11 @@ const PREVIEW =
 
 export function GET() {
   if (!ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+  const head = [
+    `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
+  ].join('');
+  const xml = `${head}
   <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <sitemap><loc>${BASE}/sitemap_index/static</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/blog</loc></sitemap>
@@ -22,6 +26,7 @@ export function GET() {
     <sitemap><loc>${BASE}/sitemap_index/video-library</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/faq</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/roofing-glossary</loc></sitemap>
+    <sitemap><loc>${BASE}/sitemap_index/person</loc></sitemap>
   </sitemapindex>`;
   return new NextResponse(xml, {
     headers: {

@@ -1,5 +1,3 @@
-
-
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch } from '@/lib/wp';
@@ -18,19 +16,19 @@ const PREVIEW =
 // Minimal node shape for sitemap entries
 interface Node { uri: string; modifiedGmt?: string | null }
 
-interface SitemapProjectsResult {
-  projects: {
+interface SitemapPersonsResult {
+  persons: {
     pageInfo: { hasNextPage: boolean; endCursor: string | null };
     nodes: Node[];
   };
 }
 
 // Cache the list with a tag so WP can ping /api/revalidate to bust it
-const getProjectUrls = unstable_cache(
+const getPersonUrls = unstable_cache(
   async () => {
     const q = /* GraphQL */ `
-      query SitemapProjects($first: Int!, $after: String) {
-        projects(
+      query SitemapPersons($first: Int!, $after: String) {
+        persons(
           first: $first,
           after: $after,
           where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
@@ -46,16 +44,16 @@ const getProjectUrls = unstable_cache(
 
     do {
       const vars: { first: number; after?: string } = after ? { first: 200, after } : { first: 200 };
-      const data = await wpFetch<SitemapProjectsResult>(q, vars);
-      const page = data?.projects;
+      const data = await wpFetch<SitemapPersonsResult>(q, vars);
+      const page = data?.persons;
       if (page?.nodes?.length) nodes.push(...page.nodes);
       after = page?.pageInfo?.hasNextPage ? (page.pageInfo.endCursor ?? undefined) : undefined;
     } while (after);
 
     return nodes;
   },
-  ['sitemap-projects'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:projects'] }
+  ['sitemap-person'],
+  { revalidate: 3600, tags: ['sitemap', 'sitemap:person'] }
 );
 
 export async function GET() {
@@ -63,7 +61,7 @@ export async function GET() {
     return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
   }
 
-  const items = await getProjectUrls();
+  const items = await getPersonUrls();
 
   const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,

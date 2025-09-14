@@ -65,8 +65,12 @@ export async function GET() {
 
   const items = await getFaqUrls();
 
-  const body = [
+  const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
+  ].join('');
+  const body = [
+    head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...items.map((n) => {
       const loc = `${BASE}${n.uri}`;
