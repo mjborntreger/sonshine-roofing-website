@@ -12,8 +12,9 @@ const PREVIEW =
   process.env.NEXT_PUBLIC_ENV !== 'production' &&
   process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
 
-export const dynamic = 'force-static';
-export const revalidate = 86400; // refresh daily; new deploys will update the manifest automatically
+// Important: render dynamically so we always read the latest manifest
+export const dynamic = 'force-dynamic';
+// (No revalidate; handled by reading the JSON at request time)
 
 export async function GET(req: Request) {
   if (!ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
