@@ -146,7 +146,7 @@ function getGlobalSchema() {
       '@type': 'Person',
       name: 'Nathan Borntreger',
       jobTitle: 'Owner & Roofing Specialist',
-      url: `${BASE_URL}/about-sonshine-roofing/nathan-borntreger-owner/`,
+      url: `${BASE_URL}/about-sonshine-roofing/`,
       image: 'https://cdn.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.png',
     },
     founder: { '@type': 'Person', name: 'Amos Borntreger' },

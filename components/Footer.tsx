@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import FooterBadges from "./FooterBadges";
 import { ArrowUpRight } from "lucide-react";
+import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from "@/lib/routes";
 
 const SOCIALS = [
   { href: "https://www.facebook.com/sonshineroofing", label: "Facebook", domain: "facebook.com" },
@@ -32,7 +33,7 @@ export default function Footer() {
           {/* Company */}
           <div>
             <Link
-              href="/"
+              href={ROUTES.home}
               aria-label="SonShine Roofing Logo"
               title="SonShine Roofing Logo"
             >
@@ -62,30 +63,13 @@ export default function Footer() {
                   />
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/"
-                  className={linkStyles}
-                >
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/about-sonshine-roofing"
-                  className={linkStyles}
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact-us"
-                  className={linkStyles}
-                >
-                  Contact
-                </Link>
-              </li>
+              {NAV_COMPANY.map((r) => (
+                <li key={r.href}>
+                  <Link href={r.href} className={linkStyles}>
+                    {r.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -95,22 +79,13 @@ export default function Footer() {
               Roofing Services
             </h3>
             <ul className="mt-4 space-y-3 text-sm">
-              <li>
-                <Link href="/roof-replacement-sarasota-fl" className={linkStyles}
-                >Roof Replacement</Link>
-              </li>
-              <li>
-                <Link href="/roof-repair" className={linkStyles}
-                >Roof Repair</Link>
-              </li>
-              <li>
-                <Link href="/roof-inspection" className={linkStyles}
-                >Roof Inspection</Link>
-              </li>
-              <li>
-                <Link href="/roof-maintenance" className={linkStyles}
-                >Roof Maintenance</Link>
-              </li>
+              {NAV_SERVICES.map((r) => (
+                <li key={r.href}>
+                  <Link href={r.href} className={linkStyles}>
+                    {r.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -120,30 +95,13 @@ export default function Footer() {
               Resources
             </h3>
             <ul className="mt-4 space-y-3 text-sm">
-              <li>
-                <Link href="/project" className={linkStyles}
-                >Project Gallery</Link>
-              </li>
-              <li>
-                <Link href="/financing" className={linkStyles}
-                >Financing</Link>
-              </li>
-              <li>
-                <Link href="/video-library" className={linkStyles}
-                >Video Library</Link>
-              </li>
-              <li>
-                <Link href="/roofing-glossary" className={linkStyles}
-                >Roofing Glossary</Link>
-              </li>
-              <li>
-                <Link href="/blog" className={linkStyles}
-                >Blog</Link>
-              </li>
-              <li>
-                <Link href="/faq" className={linkStyles}
-                >FAQ</Link>
-              </li>
+              {NAV_RESOURCES.map((r) => (
+                <li key={r.href}>
+                  <Link href={r.href} className={linkStyles}>
+                    {r.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -242,8 +200,8 @@ export default function Footer() {
           </div>
 
           <nav className="text-xs font-semibold text-slate-500 flex items-center justify-end gap-4">
-            <Link href="/privacy-policy">Privacy Policy</Link>
-            <Link href="/sitemap_index">XML Sitemap</Link>
+            <Link href={ROUTES.privacyPolicy}>Privacy Policy</Link>
+            <Link href={ROUTES.sitemapIndex}>XML Sitemap</Link>
           </nav>
         </div>
         <div className="py-4">

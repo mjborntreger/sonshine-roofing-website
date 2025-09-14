@@ -28,3 +28,76 @@ export const routes = [
   { href: "/reviews", label: "Reviews" },
   { href: "/tell-us-why", label: "Tell Us Why" },
 ] as const;
+
+// Typed route constants for shared navigation
+import type { Route } from 'next';
+
+export const ROUTES = {
+  home: '/' as Route,
+  about: '/about-sonshine-roofing' as Route,
+  roofReplacement: '/roof-replacement-sarasota-fl' as Route,
+  roofRepair: '/roof-repair' as Route,
+  roofInspection: '/roof-inspection' as Route,
+  roofMaintenance: '/roof-maintenance' as Route,
+  project: '/project' as Route,
+  videoLibrary: '/video-library' as Route,
+  blog: '/blog' as Route,
+  roofingGlossary: '/roofing-glossary' as Route,
+  faq: '/faq' as Route,
+  financing: '/financing' as Route,
+  contact: '/contact-us' as Route,
+  privacyPolicy: '/privacy-policy' as Route,
+  sitemapIndex: '/sitemap_index' as Route,
+  // additional pages that exist but are not typically in primary nav
+  share: '/share' as Route,
+  reviews: '/reviews' as Route,
+  tellUsWhy: '/tell-us-why' as Route,
+} as const;
+
+export type NavItem = { label: string; href?: Route; children?: NavItem[] };
+
+export const NAV_MAIN: ReadonlyArray<NavItem> = [
+  { label: 'About', href: ROUTES.about },
+  {
+    label: 'Roofing Services',
+    children: [
+      { label: 'Roof Replacement', href: ROUTES.roofReplacement },
+      { label: 'Roof Repair', href: ROUTES.roofRepair },
+      { label: 'Roof Inspection', href: ROUTES.roofInspection },
+      { label: 'Roof Maintenance', href: ROUTES.roofMaintenance },
+    ],
+  },
+  {
+    label: 'Resources',
+    children: [
+      { label: 'Project Gallery', href: ROUTES.project },
+      { label: 'Financing', href: ROUTES.financing },
+      { label: 'Video Library', href: ROUTES.videoLibrary },
+      { label: 'Blog', href: ROUTES.blog },
+      { label: 'Roofing Glossary', href: ROUTES.roofingGlossary },
+      { label: 'FAQ', href: ROUTES.faq },
+    ],
+  },
+];
+
+export const NAV_COMPANY: ReadonlyArray<{ label: string; href: Route }> = [
+  { label: 'Home', href: ROUTES.home },
+  { label: 'About', href: ROUTES.about },
+  { label: 'Contact', href: ROUTES.contact },
+];
+
+export const NAV_SERVICES: ReadonlyArray<{ label: string; href: Route }> = [
+  { label: 'Roof Replacement', href: ROUTES.roofReplacement },
+  { label: 'Roof Repair', href: ROUTES.roofRepair },
+  { label: 'Roof Inspection', href: ROUTES.roofInspection },
+  { label: 'Roof Maintenance', href: ROUTES.roofMaintenance },
+];
+
+export const NAV_RESOURCES: ReadonlyArray<{ label: string; href: Route }> = [
+  { label: 'Project Gallery', href: ROUTES.project },
+  { label: 'Financing', href: ROUTES.financing },
+  { label: 'Video Library', href: ROUTES.videoLibrary },
+  { label: 'Roofing Glossary', href: ROUTES.roofingGlossary },
+  { label: 'Blog', href: ROUTES.blog },
+  { label: 'FAQ', href: ROUTES.faq },
+];

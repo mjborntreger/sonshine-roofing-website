@@ -5,30 +5,11 @@ import { ChevronDown, Phone, Zap, BadgeCheck, ArrowUpRight } from "lucide-react"
 import type { Route } from "next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { NavItem } from "@/lib/routes";
+import { NAV_MAIN, ROUTES } from "@/lib/routes";
 
-type Item = { label: string; href?: Route; children?: Item[] };
-
-const NAV = [
-  { label: "About", href: "/about-sonshine-roofing" as Route },
-  {
-    label: "Roofing Services", children: [
-      { label: "Roof Replacement", href: "/roof-replacement-sarasota-fl" as Route },
-      { label: "Roof Repair", href: "/roof-repair" as Route },
-      { label: "Roof Inspection", href: "/roof-inspection" as Route },
-      { label: "Roof Maintenance", href: "/roof-maintenance" as Route },
-    ]
-  },
-  {
-    label: "Resources", children: [
-      { label: "Project Gallery", href: "/project" as Route },
-      { label: "Financing", href: "/financing" as Route },
-      { label: "Video Library", href: "/video-library" as Route },
-      { label: "Blog", href: "/blog" as Route },
-      { label: "Roofing Glossary", href: "/roofing-glossary" as Route },
-      { label: "FAQ", href: "/faq" as Route },
-    ]
-  },
-] satisfies Item[];
+type Item = NavItem;
+const NAV: Item[] = NAV_MAIN as Item[];
 
 /* ===== Animation tuning knobs (edit these values to adjust speeds/delays) ===== */
 // Close-delay when the cursor leaves a menu (hover intent)
@@ -154,7 +135,7 @@ function DesktopMenu() {
 
       <li className="pl-2">
         <Button asChild size="sm" variant="brandBlue">
-          <SmartLink href={"/contact-us" as Route} className="flex items-center gap-2">
+          <SmartLink href={ROUTES.contact} className="flex items-center gap-2">
             <Phone className="h-4 w-4 text-white" aria-hidden="true" />
             Contact Us
           </SmartLink>
@@ -406,7 +387,7 @@ function MobileMenu() {
                 style={{ transitionDelay: `${MOBILE_TOP_STAGGER_BASE_MS}ms` }}
               >
                 <SmartLink
-                  href={"/" as Route}
+                  href={ROUTES.home}
                   className="flex w-full px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
                   onClick={() => setOpen(false)}
                 >
@@ -538,7 +519,7 @@ function MobileMenu() {
               >
                 <Button asChild className="w-full h-8 mt-1 mb-2" variant="brandBlue">
                   <SmartLink
-                    href={"/contact-us" as Route}
+                    href={ROUTES.contact}
                     onClick={() => setOpen(false)}
                     className="flex items-center justify-center gap-x-2"
                   >
