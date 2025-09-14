@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import AnalyticsScripts from "@/lib/analytics";
 import { inter, candara } from "@/lib/fonts";
 import Script from "next/script";
+import { Suspense } from "react";
 import GtmRouteChange from "@/lib/gtm-route-change";
 
 export const metadata: Metadata = {
@@ -231,7 +232,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         "
       >
         <AnalyticsScripts />
-        <GtmRouteChange />
+        <Suspense fallback={null}>
+          <GtmRouteChange />
+        </Suspense>
         <Header />
         <main className="flex-1">
           <RouteTransitions variant="zoom" duration={0.35}>
