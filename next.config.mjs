@@ -4,7 +4,7 @@ const csp = `
   base-uri 'self';
   form-action 'self' https://*.acculynx.com;
   frame-ancestors 'none';
-  frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://*.acculynx.com https://challenges.cloudflare.com https://vercel.live https://www.google.com;
+  frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://*.acculynx.com https://challenges.cloudflare.com https://vercel.live https://www.google.com https://maps.google.com;
   img-src 'self' data: blob: https:;
   font-src 'self' https://*.tawk.to https://fonts.gstatic.com data:;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to;

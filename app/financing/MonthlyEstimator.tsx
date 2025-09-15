@@ -1,6 +1,8 @@
+// MonthlyEstimator — styled panel with icon header
 'use client';
 
 import { useId, useMemo, useState } from 'react';
+import { Calculator } from 'lucide-react';
 
 function currency(n: number) {
   return n.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
@@ -17,6 +19,8 @@ export default function MonthlyEstimator({
 }: { defaultAmount?: number }) {
   const inputId = useId();
   const [amount, setAmount] = useState<number>(defaultAmount);
+  // Icon style for this panel header (tweak here)
+  const panelIcon = 'inline mr-2 h-6 w-6 text-[--brand-blue]';
 
   const values = useMemo(() => {
     const a = Math.max(1000, Math.round(amount || 0));
@@ -28,15 +32,18 @@ export default function MonthlyEstimator({
     };
   }, [amount]);
 
-  const presets = [8000, 15000, 25000, 40000];
+  const presets = [8000, 15000, 25000, 40000, 60000];
 
   return (
-    <div id="estimator" className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="mb-3 text-sm font-semibold text-slate-900">Monthly payment estimator</div>
+    <div id="estimator" className="rounded-2xl border border-slate-200 bg-white px-8 py-6 shadow-sm">
+      <div className="mb-8 text-2xl text-center font-semibold text-slate-900">
+        <Calculator className={panelIcon} aria-hidden="true" />
+        Monthly Payment Calculator
+      </div>
 
-      <label htmlFor={inputId} className="block text-sm text-slate-700">Estimated project total</label>
+      <label htmlFor={inputId} className="mb-3 block text-sm text-slate-700">Estimated project total</label>
       <div className="mt-1 flex items-center gap-2">
-        <span className="inline-flex h-10 items-center rounded-lg bg-slate-50 px-3 text-slate-500">$</span>
+        <span className="inline-flex h-10 items-center rounded-lg bg-emerald-500 px-3 text-white">$</span>
         <input
           id={inputId}
           inputMode="numeric"
@@ -50,18 +57,32 @@ export default function MonthlyEstimator({
       </div>
 
       {/* Quick presets */}
-      <div className="mt-3 flex flex-wrap gap-2 text-sm">
-        {presets.map((v) => (
-          <button
-            key={v}
-            type="button"
-            className="rounded-full border border-slate-200 px-3 py-1 transition hover:bg-slate-50"
-            onClick={() => setAmount(v)}
-            aria-label={`Set amount to ${currency(v)}`}
-          >
-            {currency(v).replace('.00', '')}
-          </button>
-        ))}
+      <div className="my-3 flex flex-wrap gap-2 text-sm">
+        {presets.map((v) => {
+          const selected = amount === v;
+          return (
+            <button
+              key={v}
+              type="button"
+              className={
+                `rounded-full px-3 py-1 transition border focus:outline-none focus:ring-2 focus:ring-offset-2 ` +
+                (selected
+                  ? 'bg-[--brand-blue] text-white border-[--brand-blue]'
+                  : 'border-slate-200 hover:bg-slate-50')
+              }
+              onClick={() => setAmount(v)}
+              aria-label={`Set amount to ${currency(v)}`}
+              aria-pressed={selected}
+            >
+              {currency(v).replace('.00', '')}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tip */}
+      <div className="mb-2 mt-5 text-center text-slate-700 text-sm block">
+        Estimated Monthly Payment
       </div>
 
       <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
@@ -87,7 +108,7 @@ export default function MonthlyEstimator({
         </table>
       </div>
 
-      <p className="mt-2 text-xs text-slate-500">
+      <p className="italic mt-2 text-xs text-slate-500">
         Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments are set by the lender.
       </p>
     </div>

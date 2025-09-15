@@ -1,7 +1,7 @@
 import Section from '@/components/layout/Section';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UiLink from '@/components/UiLink';
-import { Phone, BadgeCheck } from "lucide-react";
+import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowRight, HandCoins, CircleDollarSign, Timer, Percent, MapPin, CheckCircle } from "lucide-react";
+import ProgramCard from '@/components/ProgramCard';
 import MonthlyEstimator from './MonthlyEstimator';
 import PlanQuiz from './PlanQuiz';
 import type { Metadata } from 'next';
@@ -51,7 +51,13 @@ const h2 = 'text-xl md:text-2xl font-semibold text-slate-900';
 const lead = 'text-lg text-slate-700';
 const pill =
   'inline-flex items-center gap-2 rounded-full border border-[--brand-orange] bg-white px-3 py-1 text-sm text-slate-800';
-const cta = 'btn btn-brand-blue btn-lg';
+const heroPillIcon = 'inline h-3 w-3 text-[--brand-blue]';
+
+// Checklist icon style for the documents section (tweak once here)
+const checkIcon = 'mt-0.5 inline h-4 w-4 text-[--brand-blue]';
+// Icon style for section headings (fits me / expect / questions)
+const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
+const cta = 'btn btn-press btn-brand-orange btn-lg';
 const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
 const contactInfoIconStyles = "h-5 w-5 text-slate-500";
 
@@ -120,6 +126,14 @@ export default async function FinancingPage() {
       url: base,
     },
   } as const;
+  // Local helpers for examples
+  const currency = (n: number) => n.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const pmt = (principal: number, annualRate: number, months: number) => {
+    const r = annualRate / 12; if (r === 0) return principal / months; return (principal * r) / (1 - Math.pow(1 + r, -months));
+  };
+  const defaultAmount = 15000;
+  const sampleMonthly79 = currency(Math.round(pmt(defaultAmount, 0.079, 180))) + '/mo';
+  const per10k = '$96/mo per $10k';
   return (
     <Section>
       <div className="container-edge py-10 md:py-16">
@@ -127,6 +141,7 @@ export default async function FinancingPage() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">
             Roof Financing Made Simple
+            <HandCoins className="h-7 w-7 md:h-11 md:w-11 text-[--brand-blue] inline ml-4"/>
           </h1>
           <p className={`${lead} mt-4`}>
             Spread the cost of your roof over comfortable monthly payments. Choose from
@@ -135,10 +150,23 @@ export default async function FinancingPage() {
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            <span className={pill}>No money down</span>
-            <span className={pill}>Fast approval</span>
-            <span className={pill}>Fixed‑rate options</span>
-            <span className={pill}>Local &amp; trusted</span>
+            {/* Hero benefit pills with icons */}
+            <span className={pill}>
+              <CircleDollarSign className={heroPillIcon} aria-hidden="true" />
+              No money down
+            </span>
+            <span className={pill}>
+              <Timer className={heroPillIcon} aria-hidden="true" />
+              Fast approval
+            </span>
+            <span className={pill}>
+              <Percent className={heroPillIcon} aria-hidden="true" />
+              Fixed‑rate options
+            </span>
+            <span className={pill}>
+              <MapPin className={heroPillIcon} aria-hidden="true" />
+              Local &amp; trusted
+            </span>
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -158,141 +186,99 @@ export default async function FinancingPage() {
 
         <div className="gradient-divider my-10" />
 
-        {/* Two programs */}
-        <Section>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Equity-based / PACE */}
-            <Card className="h-full flex flex-col overflow-hidden">
-              <CardHeader>
-                <CardTitle>YGrene Financing (Equity‑based)</CardTitle>
-                <p className="text-sm text-slate-600">
-                  House‑secured. Payments typically included in your property tax bill.
-                </p>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <ul className="list-disc pl-5 space-y-2 text-slate-700">
-                  <li>No money down</li>
-                  <li>No credit score required</li>
-                  <li>
-                    Approval based on:
-                    <ul className="mt-2 list-disc pl-5 space-y-1">
-                      <li>No bankruptcies in the last 3 years</li>
-                      <li>No late payments on property taxes for 3 years</li>
-                      <li>Enough home equity to cover the project</li>
-                    </ul>
-                  </li>
-                  <li>Fixed rate: <strong>8.9%</strong></li>
-                  <li>Deferred payments: <strong>18–24 months</strong> before first payment</li>
-                  <li>
-                    When payments begin, they’re typically included in escrow through your mortgage
-                    company
-                  </li>
-                  <li>Secured by your home</li>
-                </ul>
-              </CardContent>
-              <div className="px-6 pb-6 pt-0 mt-auto flex justify-end">
-                <UiLink 
-                  href="https://prequalification.ygrene.com/ContractorApply/XYFMHC" 
-                  className="btn btn-brand-orange btn-lg" 
-                  title="Ask about YGrene"
-                  >
-                  <BadgeCheck className="inline mr-2 h-4 w-4" />
-                  Get approved
-                </UiLink>
-              </div>
-            </Card>
+        {/* Two programs (plan cards) */}
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ProgramCard
+            theme="blue"
+            recommended
+            title="YGrene Financing (Equity‑based)"
+            subtitle="House‑secured. Payments typically included in your property‑tax bill."
+            chips={["No credit check", "Tax‑bill payments", "Equity‑based"]}
+            keyFigures={["From 8.9% APR", "18–24 mo deferral", per10k]}
+            sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
+            bullets={[
+              "No money down",
+              "Fixed rate throughout the term",
+              "Simple escrow alignment when payments begin",
+              "Fast approvals with property‑tax history",
+              "Secured by your home",
+            ]}
+            eligibility={[
+              "No bankruptcies in the last 3 years",
+              "No late property‑tax payments in the last 3 years",
+              "Sufficient home equity to cover the project",
+            ]}
+            finePrint="Subject to approval and municipal availability. Terms may vary."
+            cta={{ href: "https://prequalification.ygrene.com/ContractorApply/XYFMHC", label: "Get approved", title: "Ask about YGrene", className: "btn-brand-blue" }}
+          />
 
-            {/* Credit-based */}
-            <Card className="h-full flex flex-col overflow-hidden">
-              <CardHeader>
-                <CardTitle>Service Finance (Credit‑based)</CardTitle>
-                <p className="text-sm text-slate-600">
-                  Signature loan with flexible terms. No lien on your property.
-                </p>
-              </CardHeader>
-              <CardContent className="flex-1">
-                <ul className="list-disc pl-5 space-y-2 text-slate-700">
-                  <li>Signature loan (not secured by your property)</li>
-                  <li>Fast approval with credit check</li>
-                  <li>
-                    Choose from popular options:
-                    <ul className="mt-2 list-disc pl-5 space-y-1">
-                      <li>12‑Month Same‑As‑Cash</li>
-                      <li>18‑Month Deferred Interest</li>
-                      <li>10‑Year term at <strong>9.99%</strong></li>
-                      <li>
-                        15‑Year term at <strong>7.9%</strong>
-                        <span className="opacity-80"> — for every $10,000 financed, monthly is ~ $96</span>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </CardContent>
-              <div className="px-6 pb-6 pt-0 mt-auto flex justify-end">
-                <UiLink href="/contact-us" className="btn btn-outline btn-lg" title="Call for details">
-                  <Phone className="inline mr-2 h-4 w-4" />
-                  Call for details
-                </UiLink>
-              </div>
-            </Card>
-          </div>
-        </Section>
-
-        {/*Estimator + Quiz */}
-        <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <MonthlyEstimator />
-          
-          <PlanQuiz />
+          <ProgramCard
+            theme="cyan"
+            title="Service Finance (Credit‑based)"
+            subtitle="Signature loan with flexible terms. No lien on your property."
+            chips={["Signature loan", "Fixed term", "Fast approval"]}
+            keyFigures={["0% for 12 months", "From 7.9% fixed", per10k]}
+            sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
+            bullets={[
+              "No property lien",
+              "Same‑as‑cash and deferred‑interest promos",
+              "Popular 10‑ and 15‑year fixed terms",
+              "Quick application with credit check",
+            ]}
+            eligibility={["Basic identity + credit", "Estimated project total", "Income/employment basics"]}
+            finePrint="Final terms provided in loan documents. Promos subject to lender programs."
+            cta={{ href: "/contact-us", label: "Call for details", title: "Call for details", className: "btn-outline" }}
+          />
         </div>
 
-        {/* Comparison / how it works */}
+        {/* Comparison / how it works (custom panels with icons) */}
         <div className="mt-16 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle className={h2}>Which option fits me?</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul className="list-disc pl-5 space-y-2 text-slate-700">
-                <li>
-                  <strong>Want no credit check?</strong> YGrene’s equity‑based program focuses on your
-                  home equity and tax payment history.
-                </li>
-                <li>
-                  <strong>Prefer a traditional loan?</strong> Service Financing offers same‑as‑cash and
-                  fixed‑term choices.
-                </li>
-                <li>
-                  <strong>Need time before payments start?</strong> YGrene offers 18–24 month deferral.
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+          {/* Which option fits me? */}
+          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <h3 className={`${h2} flex items-center`}>
+              <ListChecks className={sectionIcon} aria-hidden="true" />
+              Which option fits me?
+            </h3>
+            <ul className="mt-3 list-disc pl-5 space-y-2 text-slate-700">
+              <li>
+                <strong>Want no credit check?</strong> YGrene’s equity‑based program focuses on your
+                home equity and tax payment history.
+              </li>
+              <li>
+                <strong>Prefer a traditional loan?</strong> Service Financing offers same‑as‑cash and
+                fixed‑term choices.
+              </li>
+              <li>
+                <strong>Need time before payments start?</strong> YGrene offers 18–24 month deferral.
+              </li>
+            </ul>
+          </section>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className={h2}>What to expect</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="list-decimal pl-5 space-y-2 text-slate-700">
-                <li>We help you pick the best program for your situation</li>
-                <li>Quick application (phone or online)</li>
-                <li>Approval and documents</li>
-                <li>We schedule your project</li>
-              </ol>
-            </CardContent>
-          </Card>
+          {/* What to expect */}
+          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+            <h3 className={`${h2} flex items-center`}>
+              <ListOrdered className={sectionIcon} aria-hidden="true" />
+              What to expect
+            </h3>
+            <ol className="mt-3 list-decimal pl-5 space-y-2 text-slate-700">
+              <li>We help you pick the best program for your situation</li>
+              <li>Quick application (phone or online)</li>
+              <li>Approval and documents</li>
+              <li>We schedule your project</li>
+            </ol>
+          </section>
 
-          <Card className="h-full flex flex-col">
-            <CardHeader>
-              <CardTitle className={h2}>Questions?</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1">
-              <p className="text-slate-700">
-                Our team has helped Sarasota homeowners finance roofs for decades. We’ll walk you
-                through monthly payments, timelines, and total costs — candidly and clearly.
-              </p>
-            </CardContent>
-            <div className="px-6 pb-6 pt-0 mt-auto">
+          {/* Questions? */}
+          <section className="rounded-2xl border border-slate-200 bg-white p-4 h-full flex flex-col">
+            <h3 className={`${h2} flex items-center`}>
+              <HelpCircle className={sectionIcon} aria-hidden="true" />
+              Questions?
+            </h3>
+            <p className="mt-3 text-slate-700 flex-1">
+              Our team has helped Sarasota homeowners finance roofs for decades. We’ll walk you
+              through monthly payments, timelines, and total costs — candidly and clearly.
+            </p>
+            <div className="pt-2">
               <UiLink
                 href="tel:19418664320"
                 className={`${cta} w-full`}
@@ -302,42 +288,47 @@ export default async function FinancingPage() {
                 (941) 866‑4320
               </UiLink>
             </div>
-          </Card>
+          </section>
         </div>
 
-        {/* Documents checklist */}
-        <div className="mt-16">
-          <h2 className={h2} id="docs">What you’ll need</h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader><CardTitle className="text-xl">YGrene (Equity-based)</CardTitle></CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-5 space-y-2 text-slate-700">
-                  <li>Driver’s license (all property owners)</li>
-                  <li>Property address & parcel details</li>
-                  <li>Mortgage/escrow info (if applicable)</li>
-                  <li>Property-tax history (no late payments in last 3 years)</li>
-                  <li>Confirmation of sufficient home equity</li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader><CardTitle className="text-xl">Service Financing (Credit-based)</CardTitle></CardHeader>
-              <CardContent>
-                <ul className="list-disc pl-5 space-y-2 text-slate-700">
-                  <li>Driver’s license</li>
-                  <li>SSN (for credit application)</li>
-                  <li>Estimated project total</li>
-                  <li>Income / employment basics (quick verification)</li>
-                  <li>Email + mobile for e-docs</li>
-                </ul>
-              </CardContent>
-            </Card>
+        {/*Estimator + Quiz */}
+        <div className="items-start mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <MonthlyEstimator />
+          <div>
+            <PlanQuiz />
           </div>
-          <p className="mt-3 text-sm text-slate-600">
-            Not sure? We’ll walk you through it on a quick call.
-          </p>
+        </div>
+
+        {/* Documents checklist (non-interactive) */}
+        <div className="mt-24">
+          <h2 className='mb-16 text-3xl md:text-5xl text-center font-semibold text-slate-900' id="docs">
+            <ListChecks className="inline mr-4 h-7 w-7 md:h-11 md:w-11 text-[--brand-blue]" />
+            What you’ll need
+          </h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <section aria-labelledby="ygrene-docs" className="rounded-2xl border border-slate-200 bg-white p-4">
+              <h3 id="ygrene-docs" className="text-xl font-semibold text-slate-900">YGrene (Equity‑based)</h3>
+              <ul className="mt-3 space-y-2 text-slate-700">
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Driver’s license (all property owners)</span></li>
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Property address &amp; parcel details</span></li>
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Mortgage/escrow info (if applicable)</span></li>
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Property‑tax history (no late payments in last 3 years)</span></li>
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Confirmation of sufficient home equity</span></li>
+              </ul>
+            </section>
+
+            <section aria-labelledby="service-docs" className="rounded-2xl border border-slate-200 bg-white p-4">
+              <h3 id="service-docs" className="text-xl font-semibold text-slate-900">Service Financing (Credit‑based)</h3>
+              <ul className="mt-3 space-y-2 text-slate-700">
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Driver’s license</span></li>
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>SSN (for credit application)</span></li>
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Estimated project total</span></li>
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Income / employment basics (quick verification)</span></li>
+                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Email + mobile for e‑docs</span></li>
+              </ul>
+            </section>
+          </div>
+          <p className="mt-3 text-sm text-slate-600">Not sure? We’ll walk you through it on a quick call.</p>
         </div>
 
         {/* Compliance */}
