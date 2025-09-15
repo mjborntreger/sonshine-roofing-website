@@ -21,10 +21,23 @@ const SEO_DESCRIPTION_ROOF_REPAIR = 'Fast, lasting roof repair for leaks, flashi
 const SEO_KEYWORDS_ROOF_REPAIR = [
   'roof repair',
   'leak repair',
+  'roof leak',
+  'rotting fascia',
+  'curling shingles',
+  'roof insect damage',
+  'roof water damage',
+  'damaged flashings',
+  'repair vs. replace',
+  'algae',
+  'mold',
   'flashing repair',
   'fascia repair',
   'shingle repair',
+  'metal roof repair',
+  'tile roof repair',
   'Sarasota roofing',
+  'North Port Roofing',
+  'Venice Roofing',
   'Manatee County roofing',
   'Charlotte County roofing'
 ];

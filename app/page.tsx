@@ -14,13 +14,28 @@ import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
-const SEO_TITLE_HOME = 'SonShine Roofing | Sarasota Roof Replacement & Repair Since 1987';
+const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
 const SEO_DESCRIPTION_HOME =
-  'Local roofing contractor serving Sarasota, Manatee & Charlotte Counties. Expert roof replacement, repair, and maintenance with honest guidance and dependable warranties.';
+  'Your trusted local roofing contractor serving Sarasota, Manatee & Charlotte Counties. Affordable financing and industry-best warranties.';
 const SEO_KEYWORDS_HOME = [
   'Sarasota roofing',
+  'North Port roofing',
+  'Bradenton roofing',
+  'venice roofing',
+  'nokomis roofing',
+  'palmetto roofing',
+  'parrish roofing',
+  'port charlotte roofing',
+  'metal roof',
+  'tile roof',
+  'shingle roof',
   'roof replacement',
+  'financing',
+  'GAF Master Elite',
+  'Licensed and Insured',
+  'warranty',
   'roof repair',
+  'roof inspection',
   'roof maintenance',
   'Manatee County roofing',
   'Charlotte County roofing',

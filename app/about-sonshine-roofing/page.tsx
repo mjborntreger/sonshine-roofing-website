@@ -14,12 +14,15 @@ const SEO_DESCRIPTION_ABOUT = 'Family-owned roofing contractor in Sarasota servi
 const SEO_KEYWORDS_ABOUT = [
   'about sonshine roofing',
   'sarasota roofing company',
+  'roofing company',
   'roofing contractor',
   'our team',
   'roof repair',
   'roof replacement',
   'roof maintenance',
-  'sarasota',
+  'Sarasota',
+  'Venice',
+  'North Port',
   'manatee county',
   'charlotte county',
 ];

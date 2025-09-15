@@ -16,11 +16,16 @@ const SEO_KEYWORDS_FINANCING = [
   'roof loans',
   'PACE financing',
   'YGrene',
+  'affordable roof financing',
+  'low interest rate',
+  'fast approval',
   'Service Finance',
   'roof payment plans',
   'Sarasota roofing',
+  'North Port Roofing',
+  'Venice Roofing',
   'Manatee County roofing',
-  'Charlotte County roofing',
+  'Charlotte County roofing'
 ];
 const SEO_CANONICAL_FINANCING = '/financing';
 const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
@@ -153,10 +158,6 @@ export default async function FinancingPage() {
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
             {/* Hero benefit pills with icons */}
             <span className={pill}>
-              <CircleDollarSign className={heroPillIcon} aria-hidden="true" />
-              No money down
-            </span>
-            <span className={pill}>
               <Timer className={heroPillIcon} aria-hidden="true" />
               Fast approval
             </span>
@@ -198,7 +199,6 @@ export default async function FinancingPage() {
             keyFigures={["From 8.9% APR", "18–24 mo deferral", per10k]}
             sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
             bullets={[
-              "No money down",
               "Fixed rate throughout the term",
               "Simple escrow alignment when payments begin",
               "Fast approvals with property‑tax history",

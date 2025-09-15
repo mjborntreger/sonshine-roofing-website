@@ -16,10 +16,13 @@ const SEO_KEYWORDS_ROOF_MAINT = [
   'roof maintenance',
   'roof upkeep',
   'roof inspection',
-  'preventative maintenance',
+  'preventative roof maintenance',
+  'roof care club',
   'Sarasota roofing',
+  'North Port Roofing',
+  'Venice Roofing',
   'Manatee County roofing',
-  'Charlotte County roofing',
+  'Charlotte County roofing'
 ];
 const SEO_CANONICAL_ROOF_MAINT = '/roof-maintenance';
 const SEO_OG_IMAGE_DEFAULT = '/og-default.png';

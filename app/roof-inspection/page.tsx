@@ -19,7 +19,11 @@ const SEO_KEYWORDS_ROOF_INSPECTION = [
   'roof evaluation',
   'leak detection',
   'roof checkup',
+  'why do I need a roof inspection',
+  'tip top roof checkup',
   'Sarasota roofing',
+  'North Port Roofing',
+  'Venice Roofing',
   'Manatee County roofing',
   'Charlotte County roofing'
 ];

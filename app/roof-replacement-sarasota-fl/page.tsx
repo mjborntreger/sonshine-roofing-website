@@ -24,10 +24,16 @@ const SEO_KEYWORDS_ROOF_REPLACEMENT = [
   'roof replacement',
   'new roof',
   're-roof',
+  'reroof',
+  'what warranties come with a new roof',
+  'what to expect',
   'shingle roof replacement',
   'tile roof replacement',
   'metal roof replacement',
+  'repair vs. replace',
   'Sarasota roofing',
+  'North Port Roofing',
+  'Venice Roofing',
   'Manatee County roofing',
   'Charlotte County roofing'
 ];
