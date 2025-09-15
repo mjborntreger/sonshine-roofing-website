@@ -17,7 +17,7 @@ export default function FaqInlineList({
   const renderItem = (f: Item, i: number) => (
     <details
       key={f.slug || i}
-      className="group not-prose rounded-xl border border-slate-400 bg-white shadow-sm w-full"
+      className="group not-prose rounded-xl border border-slate-200 bg-white shadow-sm w-full"
     >
       <summary className="flex items-center justify-between cursor-pointer select-none p-4">
         <span className="flex items-center gap-2">

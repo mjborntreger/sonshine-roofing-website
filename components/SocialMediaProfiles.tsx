@@ -17,7 +17,7 @@ const LINKS: SocialLink[] = [
   { href: "https://www.instagram.com/sonshineroofing", label: "Instagram", color: "#E4405F", domain: "instagram.com" },
   { href: "https://www.youtube.com/c/sonshineroofing", label: "YouTube", color: "#FF0000", domain: "youtube.com" },
   { href: "https://nextdoor.com/pages/sonshine-roofing-sarasota-fl", label: "Nextdoor", color: "#00B246", domain: "nextdoor.com" },
-  { href: "https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM", label: "Google", color: "#4285F4", domain: "google.com" },
+  { href: "https://www.google.com/maps/place/SonShine+Roofing/@27.3105774,-82.4518265,16z/data=!3m1!4b1!4m6!3m5!1s0x88c34710987d2023:0x5318594fb175e958!8m2!3d27.3105727!4d-82.446961!16s%2Fg%2F1wh4gn84?entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D", label: "Google", color: "#4285F4", domain: "google.com" },
   { href: "https://www.yelp.com/biz/sonshine-roofing-sarasota", label: "Yelp", color: "#D32323", domain: "yelp.com" },
   { href: "https://www.pinterest.com/sonshineroofing", label: "Pinterest", color: "#E60023", domain: "pinterest.com" },
   { href: "https://x.com/ssroofinginc", label: "X", color: "#000000", domain: "x.com" },

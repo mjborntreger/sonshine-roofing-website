@@ -57,7 +57,8 @@ const heroPillIcon = 'inline h-3 w-3 text-[--brand-blue]';
 const checkIcon = 'mt-0.5 inline h-4 w-4 text-[--brand-blue]';
 // Icon style for section headings (fits me / expect / questions)
 const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
-const cta = 'btn btn-press btn-brand-orange btn-lg';
+const ctaSecondary = 'btn btn-press btn-brand-blue btn-lg';
+const ctaPrimary = "btn btn-press btn-brand-orange btn-lg"
 const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
 const contactInfoIconStyles = "h-5 w-5 text-slate-500";
 
@@ -170,7 +171,7 @@ export default async function FinancingPage() {
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <UiLink href="/contact-us" className={cta} title="Request Financing Details">
+            <UiLink href="/contact-us" className={ctaPrimary} title="Request Financing Details">
               Request financing details
             </UiLink>
             <UiLink
@@ -281,7 +282,7 @@ export default async function FinancingPage() {
             <div className="pt-2">
               <UiLink
                 href="tel:19418664320"
-                className={`${cta} w-full`}
+                className={`${ctaSecondary} w-full`}
                 title="Call SonShine Roofing"
               >
                 <Phone className="inline mr-2 h-4 w-4" />

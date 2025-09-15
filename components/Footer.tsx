@@ -9,7 +9,7 @@ const SOCIALS = [
   { href: "https://www.instagram.com/sonshineroofing", label: "Instagram", domain: "instagram.com" },
   { href: "https://www.youtube.com/c/sonshineroofing", label: "YouTube", domain: "youtube.com" },
   { href: "https://nextdoor.com/pages/sonshine-roofing-sarasota-fl", label: "Nextdoor", domain: "nextdoor.com" },
-  { href: "https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM", label: "Google Business Profile", domain: "google.com" },
+  { href: "https://www.google.com/maps/place/SonShine+Roofing/@27.3105774,-82.4518265,16z/data=!3m1!4b1!4m6!3m5!1s0x88c34710987d2023:0x5318594fb175e958!8m2!3d27.3105727!4d-82.446961!16s%2Fg%2F1wh4gn84?entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D", label: "Google Business Profile", domain: "google.com" },
   { href: "https://www.yelp.com/biz/sonshine-roofing-sarasota", label: "Yelp", domain: "yelp.com" },
   { href: "https://www.pinterest.com/sonshineroofing", label: "Pinterest", domain: "pinterest.com" },
   { href: "https://x.com/ssroofinginc", label: "X (Twitter)", domain: "x.com" },
