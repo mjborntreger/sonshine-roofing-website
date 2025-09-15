@@ -4,12 +4,12 @@ const csp = `
   base-uri 'self';
   form-action 'self' https://*.acculynx.com;
   frame-ancestors 'none';
-  frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://*.acculynx.com https://challenges.cloudflare.com https://vercel.live https://www.google.com https://maps.google.com;
+  frame-src https://www.youtube-nocookie.com https://www.youtube.com https://player.vimeo.com https://*.acculynx.com https://challenges.cloudflare.com https://vercel.live https://www.google.com https://maps.google.com https://www.googletagmanager.com https://www.googleadservices.com;
   img-src 'self' data: blob: https:;
   font-src 'self' https://*.tawk.to https://fonts.gstatic.com data:;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.googletagmanager.com https://vercel.live https://challenges.cloudflare.com https://*.tawk.to https://www.clarity.ms blob:;
-  connect-src 'self' ws: wss: https://sonshineroofing.com https://next.sonshineroofing.com https://vitals.vercel-insights.com https://*.acculynx.com https://*.tawk.to https://challenges.cloudflare.com https://www.googletagmanager.com https://*.google-analytics.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.googletagmanager.com https://vercel.live https://challenges.cloudflare.com https://*.tawk.to https://www.clarity.ms https://scripts.clarity.ms https://cdn.callrail.com https://googleads.g.doubleclick.net https://www.googleadservices.com blob:;
+  connect-src 'self' ws: wss: https://sonshineroofing.com https://next.sonshineroofing.com https://vitals.vercel-insights.com https://*.acculynx.com https://*.tawk.to https://challenges.cloudflare.com https://www.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net;
   object-src 'none';
 `.replace(/\s{2,}/g, ' ').trim();
 
