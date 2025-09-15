@@ -13,7 +13,7 @@ export default function ThankYouPage() {
         <h1 className="text-3xl md:text-4xl font-semibold text-slate-900">Thank you!</h1>
         <p className="mt-2 text-slate-700">We will be in touch shortly.</p>
         <div className="mt-6">
-          <Link href="/" className="btn btn-brand-blue btn-press">
+          <Link href="/" className="btn btn-brand-blue btn-press p-2">
             Return to site home
           </Link>
         </div>
