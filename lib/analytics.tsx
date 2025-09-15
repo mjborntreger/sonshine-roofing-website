@@ -13,7 +13,8 @@ export default function AnalyticsScripts() {
 
   return (
     <>
-      <Script id="gtm-init">
+      {/* Google Tag Manager – head snippet (afterInteractive) */}
+      <Script id="gtm-init" strategy="afterInteractive">
         {`
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -22,6 +23,7 @@ export default function AnalyticsScripts() {
           })(window,document,'script','dataLayer','${GTM}');
         `}
       </Script>
+      {/* Google Tag Manager (noscript) – place near start of body */}
       <noscript>
         <iframe
           src={`https://www.googletagmanager.com/ns.html?id=${GTM}`}
