@@ -220,8 +220,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://i.ytimg.com" crossOrigin="" />
         <link rel="preconnect" href="https://www.youtube-nocookie.com" crossOrigin="" />
 
-        {/* Facebook Share Button Attribution*/}
+        {/* Facebook Share Button Attribution */}
         <meta property="fb:app_id" content="1087269253041713" />
+
+        {/* Google Site Verification */}
+        <meta name="google-site-verification" content="HHGHDsk0P2Er4L1Eqvt7NEY2cTVzyN5AFU7-6GM2RvI" />
+        <meta name="google-site-verification" content="H4_BoeJKqYS63iOodQ_piibvjFV9ofOcA_PYyFYTERc" />
+
+        {/* Pinterest Site Verification */}
+        <meta name="p:domain_verify" content="e5678b41c9624d0c92a4709ec9ff745d"/>
+        <meta name="p:domain_verify" content="2c239995f7c22a51da061c5c1f28b6b2"/> 
+
 
       </head>
       <body
