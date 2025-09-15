@@ -1,4 +1,4 @@
-// Security headers (CSP initially in Report-Only so we can tune without breakage)
+// Security headers (CSP enforced in all environments)
 const csp = `
   default-src 'self' https://next.sonshineroofing.com;
   base-uri 'self';
@@ -9,7 +9,7 @@ const csp = `
   font-src 'self' https://*.tawk.to https://fonts.gstatic.com data:;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tawk.to;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' https://www.googletagmanager.com https://vercel.live https://challenges.cloudflare.com https://*.tawk.to https://www.clarity.ms blob:;
-  connect-src 'self' ws: wss: https://sonshineroofing.com https://next.sonshineroofing.com https://vitals.vercel-insights.com https://*.acculynx.com https://*.tawk.to https://challenges.cloudflare.com https://www.google-analytics.com;
+  connect-src 'self' ws: wss: https://sonshineroofing.com https://next.sonshineroofing.com https://vitals.vercel-insights.com https://*.acculynx.com https://*.tawk.to https://challenges.cloudflare.com https://www.googletagmanager.com https://*.google-analytics.com;
   object-src 'none';
 `.replace(/\s{2,}/g, ' ').trim();
 
@@ -28,8 +28,7 @@ const nextConfig = {
     ]
   },
   async headers() {
-    const isProd = process.env.NEXT_PUBLIC_ENV === 'production';
-    const cspHeaderKey = isProd ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy';
+    const cspHeaderKey = 'Content-Security-Policy';
     return [
       {
         source: "/(.*)",
