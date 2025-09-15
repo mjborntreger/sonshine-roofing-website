@@ -7,8 +7,9 @@ declare global {
   interface Window {
     onTurnstileSuccess?: (token: string) => void;
     turnstile?: {
-      execute: (widget?: unknown) => void;
-      reset?: (widget?: unknown) => void;
+      execute: (container: string | HTMLElement, params: Record<string, unknown>) => void;
+      reset?: (container?: string | HTMLElement) => void;
+      getResponse?: (container?: string | HTMLElement) => string | undefined;
     };
   }
 }
@@ -18,6 +19,7 @@ export default function AcculynxLeadForm() {
   const widgetRef = useRef<HTMLDivElement | null>(null);
   const [turnstileToken, setTurnstileToken] = useState<string>('');
   const [submitted, setSubmitted] = useState<boolean>(false);
+  const isSubmittingRef = useRef(false);
 
   // Expose the callback Turnstile will call
   useEffect(() => {
@@ -34,11 +36,52 @@ export default function AcculynxLeadForm() {
         form.appendChild(hidden);
       }
       hidden.value = token;
+
+      // Continue submission automatically after token is issued
+      try {
+        form.requestSubmit();
+      } catch {
+        // Fallback if requestSubmit unsupported
+        (form as HTMLFormElement).dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
     };
   }, []);
 
+  const doSubmit = () => {
+    const form = formRef.current;
+    if (!form) return;
+
+    const submitBtn = form.querySelector<HTMLInputElement>('.webLeadForm__submit');
+    if (submitBtn) submitBtn.disabled = true;
+
+    const leadData = new FormData(form);
+    leadData.append('RecaptchaToken', turnstileToken);
+
+    isSubmittingRef.current = true;
+    fetch('https://leads.acculynx.com/api/leads/submit-new-lead?formID=af406c5e-9d45-42a0-aa3c-eef2ee624d6e', {
+      method: 'POST',
+      mode: 'no-cors',
+      body: leadData,
+    })
+      .then(() => {
+        setSubmitted(true);
+        (form as HTMLFormElement).style.visibility = 'hidden';
+        setTimeout(() => {
+          window.location.href = '/thank-you';
+        }, 1500);
+      })
+      .catch((error) => {
+        console.error('Submission error:', error);
+        if (submitBtn) submitBtn.disabled = false;
+      })
+      .finally(() => {
+        isSubmittingRef.current = false;
+      });
+  };
+
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmittingRef.current) return;
     const form = formRef.current;
     if (!form) return;
 
@@ -48,32 +91,18 @@ export default function AcculynxLeadForm() {
     // If token missing, trigger the invisible Turnstile challenge
     if (!turnstileToken || turnstileToken.length < 10) {
       if (typeof window !== 'undefined' && window.turnstile && typeof window.turnstile.execute === 'function') {
-        window.turnstile.execute(widgetRef.current as unknown);
+        const container = widgetRef.current as HTMLDivElement;
+        try {
+          window.turnstile.execute(container, { action: 'submit' });
+        } catch (e) {
+          console.error('Turnstile execute error:', e);
+          if (submitBtn) submitBtn.disabled = false;
+        }
       }
-      if (submitBtn) submitBtn.disabled = false;
       return;
     }
-
-    const leadData = new FormData(form);
-    leadData.append('RecaptchaToken', turnstileToken);
-
-    fetch('https://leads.acculynx.com/api/leads/submit-new-lead?formID=af406c5e-9d45-42a0-aa3c-eef2ee624d6e', {
-      method: 'POST',
-      mode: 'no-cors',
-      body: leadData,
-    })
-      .then(() => {
-        setSubmitted(true);
-        // Hide form visually (keep layout) and show success UI
-        (form as HTMLFormElement).style.visibility = 'hidden';
-        setTimeout(() => {
-          window.location.href = '/thank-you';
-        }, 1500);
-      })
-      .catch((error) => {
-        console.error('Submission error:', error);
-        if (submitBtn) submitBtn.disabled = false;
-      });
+    // Token available: submit immediately
+    doSubmit();
   };
 
   return (
