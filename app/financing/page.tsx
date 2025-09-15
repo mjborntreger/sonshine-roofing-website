@@ -54,7 +54,7 @@ const pill =
 const heroPillIcon = 'inline h-3 w-3 text-[--brand-blue]';
 
 // Checklist icon style for the documents section (tweak once here)
-const checkIcon = 'mt-0.5 inline h-4 w-4 text-[--brand-blue]';
+const checkIcon = 'mt-0.5 h-4 w-4 text-[--brand-blue] flex-none';
 // Icon style for section headings (fits me / expect / questions)
 const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
 const ctaSecondary = 'btn btn-press btn-brand-blue btn-lg';

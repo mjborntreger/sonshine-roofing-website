@@ -90,12 +90,12 @@ export default function PlanQuiz() {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center justify-between gap-3">
-        <p className="text-xs text-slate-600">Answered {answered}/{totalQs}. For best results, answer all.</p>
-        <div className="flex items-center gap-2">
+      <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p className="text-xs text-slate-600 order-2 sm:order-1">Answered {answered}/{totalQs}. For best results, answer all.</p>
+        <div className="flex flex-col sm:flex-row gap-2 order-1 sm:order-2 w-full sm:w-auto">
           <button
             type="button"
-            className="btn btn-ghost btn-sm btn-press"
+            className="btn btn-ghost btn-sm btn-press w-full sm:w-auto"
             onClick={() => {
               setEquity(null);
               setNoLien(null);
@@ -111,7 +111,7 @@ export default function PlanQuiz() {
           </button>
           <button
             type="button"
-            className="btn btn-brand-blue btn-sm btn-press inline-flex items-center gap-2"
+            className="btn btn-brand-blue btn-sm btn-press inline-flex items-center gap-2 w-full sm:w-auto"
             onClick={() => setShowResult(true)}
             aria-haspopup="dialog"
           >
