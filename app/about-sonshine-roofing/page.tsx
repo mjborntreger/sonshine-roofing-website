@@ -24,7 +24,7 @@ const SEO_KEYWORDS_ABOUT = [
   'charlotte county',
 ];
 const SEO_CANONICAL_ABOUT = '/about-sonshine-roofing';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

@@ -13,11 +13,6 @@ type Props = {
   urlOverride?: string;
 };
 
-function getSiteOrigin() {
-  if (typeof window !== "undefined" && window.location?.origin) return window.location.origin;
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://sonshineroofing.com";
-}
-
 export default function ShareWhatYouThink({
   reviewPath = "/reviews" as Route,
   text = "@SonShine Roofing — Sarasota’s trusted roofing pros.",
@@ -41,19 +36,9 @@ export default function ShareWhatYouThink({
 
   const router = useRouter();
   const shareUrl = getCanonicalWithUTM(urlOverride);
-  const caption = `${text} ${shareUrl}`;
-  const facebookAppId = process.env.NEXT_PUBLIC_FB_APP_ID;
-  const origin = getSiteOrigin();
-  const redirect = `${origin}/share`;
 
   // Web-intent links (desktop & mobile browsers)
-  const fb = facebookAppId
-    ? `https://www.facebook.com/dialog/share?app_id=${encodeURIComponent(
-      facebookAppId
-    )}&href=${encodeURIComponent(shareUrl)}&display=popup&hashtag=%23SonShineRoofing&quote=${encodeURIComponent(
-      text || ""
-    )}&redirect_uri=${encodeURIComponent(redirect)}`
-    : `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  const fb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   const x = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;
   function openPopup(url: string, name = "fbshare") {
     try {
@@ -71,9 +56,6 @@ export default function ShareWhatYouThink({
     }
   }
 
-  const instagramProfile = "https://instagram.com/sonshineroofing";
-  const nextdoorProfile = "https://nextdoor.com/pages/sonshine-roofing-sarasota-fl";
-
   function openExternal(url: string) {
     try {
       window.open(url, "_blank", "noopener,noreferrer");
@@ -81,25 +63,6 @@ export default function ShareWhatYouThink({
       // Fallback for strict browsers/environments
       window.location.href = url;
     }
-  }
-
-  async function shareNative(fallbackUrl?: string) {
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: "SonShine Roofing", text: caption, url: shareUrl });
-        return;
-      }
-    } catch {
-      // continue to fallback below
-    }
-    try {
-      await navigator.clipboard.writeText(caption);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // silently fail; if clipboard write is blocked we still open the fallback
-    }
-    if (fallbackUrl) openExternal(fallbackUrl);
   }
 
   async function copyUrlToClipboard() {

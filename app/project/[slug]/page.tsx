@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = (seo.description || og.description || project.projectDescription || "").trim().slice(0, 160);
 
   const rmImg = (og.image || {}) as any;
-  const ogUrl: string = rmImg.secureUrl || rmImg.url || project.heroImage?.url || "/og-default.jpg";
+  const ogUrl: string = rmImg.secureUrl || rmImg.url || project.heroImage?.url || "/og-default.png";
   const ogWidth: number = rmImg.width || 1200;
   const ogHeight: number = rmImg.height || 630;
 
@@ -115,7 +115,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
   const shareUrl = `${base}/project/${slug}`;
 
   const rmImg2 = (project.seo?.openGraph?.image || {}) as any;
-  const ogImgMaybe = rmImg2.secureUrl || rmImg2.url || project.heroImage?.url || "/og-default.jpg";
+  const ogImgMaybe = rmImg2.secureUrl || rmImg2.url || project.heroImage?.url || "/og-default.png";
   const ogImgAbs = ogImgMaybe.startsWith("http") ? ogImgMaybe : `${base}${ogImgMaybe}`;
 
   const areaServed = (project.serviceAreas || []).map((t) => ({ "@type": "AdministrativeArea", name: t.name }));

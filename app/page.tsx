@@ -27,7 +27,7 @@ const SEO_KEYWORDS_HOME = [
   'roofing contractor'
 ];
 const SEO_CANONICAL_HOME = '/';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

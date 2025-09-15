@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const canonicalPath = `/person/${slug}`;
   const title = person ? `${person.title} | SonShine Roofing` : 'Team Member | SonShine Roofing';
   const description = person ? stripHtml(person.contentHtml).slice(0, 160) : 'Meet the SonShine Roofing team serving Sarasota, Manatee, and Charlotte Counties.';
-  const ogImage = person?.featuredImage?.url || '/og-default.jpg';
+  const ogImage = person?.featuredImage?.url || '/og-default.png';
 
   return {
     title,
@@ -81,7 +81,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
     name: `${person.title} | SonShine Roofing`,
     description: stripHtml(person.contentHtml).slice(0, 160),
     url: pageUrl,
-    primaryImageOfPage: person.featuredImage?.url ? { '@type': 'ImageObject', url: person.featuredImage.url } : { '@type': 'ImageObject', url: `${base}/og-default.jpg` },
+    primaryImageOfPage: person.featuredImage?.url ? { '@type': 'ImageObject', url: person.featuredImage.url } : { '@type': 'ImageObject', url: `${base}/og-default.png` },
     isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
   } as const;
 

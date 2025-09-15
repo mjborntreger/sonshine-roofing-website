@@ -24,7 +24,6 @@ export const routes = [
   // (design-system removed)
 
   // Additional pages that exist but are not typically navigational
-  { href: "/share", label: "Share" },
   { href: "/reviews", label: "Reviews" },
   { href: "/tell-us-why", label: "Tell Us Why" },
 ] as const;
@@ -49,7 +48,6 @@ export const ROUTES = {
   privacyPolicy: '/privacy-policy' as Route,
   sitemapIndex: '/sitemap_index' as Route,
   // additional pages that exist but are not typically in primary nav
-  share: '/share' as Route,
   reviews: '/reviews' as Route,
   tellUsWhy: '/tell-us-why' as Route,
 } as const;

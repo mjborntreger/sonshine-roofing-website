@@ -23,7 +23,7 @@ const SEO_KEYWORDS_PROJECTS = [
   'Charlotte County roofing',
 ];
 const SEO_CANONICAL_PROJECTS = '/project';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

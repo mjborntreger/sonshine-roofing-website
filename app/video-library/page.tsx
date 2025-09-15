@@ -30,7 +30,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
   const defaultOg = {
     title: baseTitle,
     description: baseDesc,
-    images: [{ url: "/og-default.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/og-default.png", width: 1200, height: 630 }],
   };
 
   // If a specific video is selected (?v=slug), fetch its SEO for precise OG/Twitter
@@ -45,7 +45,7 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
           const title = (video.seo?.title || og.title || video.title || baseTitle).trim();
           const description = (video.seo?.description || og.description || baseDesc).trim().slice(0, 160);
           const img = (og.image as any) || {};
-          const ogUrl: string = img.secureUrl || img.url || video.featuredImage?.url || "/og-default.jpg";
+          const ogUrl: string = img.secureUrl || img.url || video.featuredImage?.url || "/og-default.png";
 
           return {
             title,
@@ -77,8 +77,8 @@ export async function generateMetadata({ searchParams }: { searchParams?: Promis
     title: baseTitle,
     description: baseDesc,
     alternates: { canonical: "/video-library" },
-    openGraph: { type: "website" as const, title: baseTitle, description: baseDesc, images: [{ url: "/og-default.jpg", width: 1200, height: 630 }] },
-    twitter: { card: "summary_large_image", title: baseTitle, description: baseDesc, images: ["/og-default.jpg"] },
+    openGraph: { type: "website" as const, title: baseTitle, description: baseDesc, images: [{ url: "/og-default.png", width: 1200, height: 630 }] },
+    twitter: { card: "summary_large_image", title: baseTitle, description: baseDesc, images: ["/og-default.png"] },
   };
 }
 

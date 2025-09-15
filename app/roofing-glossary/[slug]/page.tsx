@@ -107,13 +107,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           title: fallbackTitle,
           description: fallbackDesc,
           url: '/roofing-glossary',
-          images: [{ url: '/og-default.jpg', width: 1200, height: 630 }],
+          images: [{ url: '/og-default.png', width: 1200, height: 630 }],
         },
         twitter: {
           card: 'summary_large_image',
           title: fallbackTitle,
           description: fallbackDesc,
-          images: ['/og-default.jpg'],
+          images: ['/og-default.png'],
         },
       };
     }
@@ -131,13 +131,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         title,
         description,
         url: `/roofing-glossary/${term.slug}`,
-        images: [{ url: '/og-default.jpg', width: 1200, height: 630 }],
+        images: [{ url: '/og-default.png', width: 1200, height: 630 }],
       },
       twitter: {
         card: 'summary_large_image',
         title,
         description,
-        images: ['/og-default.jpg'],
+        images: ['/og-default.png'],
       },
     };
   } catch {
@@ -151,13 +151,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         title: fallbackTitle,
         description: fallbackDesc,
         url: '/roofing-glossary',
-        images: [{ url: '/og-default.jpg', width: 1200, height: 630 }],
+        images: [{ url: '/og-default.png', width: 1200, height: 630 }],
       },
       twitter: {
         card: 'summary_large_image',
         title: fallbackTitle,
         description: fallbackDesc,
-        images: ['/og-default.jpg'],
+        images: ['/og-default.png'],
       },
     };
   }

@@ -28,11 +28,13 @@ const nextConfig = {
     ]
   },
   async headers() {
+    const isProd = process.env.NEXT_PUBLIC_ENV === 'production';
+    const cspHeaderKey = isProd ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy';
     return [
       {
         source: "/(.*)",
         headers: [
-          { key: "Content-Security-Policy-Report-Only", value: csp },
+          { key: cspHeaderKey, value: csp },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Permissions-Policy", value: "geolocation=(), camera=(), microphone=()" },

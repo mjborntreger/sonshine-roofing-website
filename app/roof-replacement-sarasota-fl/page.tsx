@@ -32,7 +32,7 @@ const SEO_KEYWORDS_ROOF_REPLACEMENT = [
   'Charlotte County roofing'
 ];
 const SEO_CANONICAL_ROOF_REPLACEMENT = '/roof-replacement-sarasota-fl';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

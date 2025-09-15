@@ -155,7 +155,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   // Best-image selection: RankMath OG > featured image > site default
   const rmImg = (og.image || {}) as any;
-  const ogUrl: string = rmImg.secureUrl || rmImg.url || post.featuredImage?.url || "/og-default.jpg";
+  const ogUrl: string = rmImg.secureUrl || rmImg.url || post.featuredImage?.url || "/og-default.png";
   const ogWidth: number = rmImg.width || 1200;
   const ogHeight: number = rmImg.height || 630;
 
@@ -215,7 +215,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   // JSON-LD (BlogPosting) using the same post object
   const descSeo = (post.seo?.description || post.seo?.openGraph?.description || stripHtml(sanitizeHtml(post.excerpt || ""))).slice(0, 160);
   const rmImg2 = (post.seo?.openGraph?.image || {}) as any;
-  const ogImgAbs = rmImg2.secureUrl || rmImg2.url || post.featuredImage?.url || `${base}/og-default.jpg`;
+  const ogImgAbs = rmImg2.secureUrl || rmImg2.url || post.featuredImage?.url || `${base}/og-default.png`;
   const authorObj = post.authorName ? { "@type": "Person", name: post.authorName } : { "@type": "Organization", name: "SonShine Roofing" };
 
   const jsonLd = {

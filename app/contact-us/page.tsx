@@ -27,7 +27,7 @@ const SEO_KEYWORDS_CONTACT = [
   'roof replacement'
 ];
 const SEO_CANONICAL_CONTACT = '/contact-us';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.jpg';
+const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

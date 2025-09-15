@@ -248,19 +248,28 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(getGlobalSchema()) }}
         />
-        {/* Tawk.to live chat (loads on every page) */}
-        <Script id="tawk-init" strategy="afterInteractive">
+        {/* Tawk.to live chat — lazy-load after idle to reduce LCP/INP */}
+        <Script id="tawk-lazy" strategy="afterInteractive">
           {`
-            window.Tawk_API = window.Tawk_API || {};
-            window.Tawk_LoadStart = new Date();
+            (function(){
+              function loadTawk(){
+                if (window.__tawkLoaded) return; window.__tawkLoaded = true;
+                try {
+                  window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date();
+                  var s=document.createElement('script');
+                  s.src='https://embed.tawk.to/5a971646d7591465c708203c/default';
+                  s.async=true; s.crossOrigin='anonymous';
+                  var f=document.getElementsByTagName('script')[0]; f.parentNode.insertBefore(s,f);
+                } catch(e) {}
+              }
+              if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadTawk, { timeout: 4000 });
+              } else {
+                setTimeout(loadTawk, 2500);
+              }
+            })();
           `}
         </Script>
-        <Script
-          id="tawk-script"
-          strategy="afterInteractive"
-          src="https://embed.tawk.to/5a971646d7591465c708203c/default"
-          crossOrigin="anonymous"
-        />
       </body>
     </html>
   );
