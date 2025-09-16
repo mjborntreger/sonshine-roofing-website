@@ -117,6 +117,8 @@ export default function LatestProjectsFilter({
                     alt={p.heroImage?.altText ?? p.title}
                     width={800}
                     height={600}
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="h-48 w-full object-cover"
                   />
                 ) : (

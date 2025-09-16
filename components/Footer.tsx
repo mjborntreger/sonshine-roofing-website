@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import FooterBadges from "./FooterBadges";
+import dynamic from "next/dynamic";
 import { ArrowUpRight } from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from "@/lib/routes";
 
@@ -17,6 +17,15 @@ const SOCIALS = [
 
 const linkStyles = "text-sm text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]";
 const h3Styles = "text-xs font-semibold uppercase tracking-wider text-slate-700";
+
+const FooterBadges = dynamic(() => import("./FooterBadges"), {
+  loading: () => (
+    <div
+      aria-hidden="true"
+      className="my-10 h-24 w-full animate-pulse rounded-lg bg-slate-300/40"
+    />
+  ),
+});
 
 export default function Footer() {
   return (
@@ -182,12 +191,14 @@ export default function Footer() {
                 title={s.label}
                 className="inline-flex h-10 w-10 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
               >
-                <img
+                <Image
                   src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
                   alt={s.label}
-                  className="h-8 w-8"
+                  width={32}
+                  height={32}
                   loading="lazy"
-                  decoding="async"
+                  unoptimized
+                  className="h-8 w-8"
                 />
               </a>
             ))}

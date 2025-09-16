@@ -4,6 +4,7 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import type { PostCard } from '@/lib/wp';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import SmartLink from './SmartLink';
+import Image from 'next/image';
 
 const lessFatCta = 'btn btn-brand-blue btn-lg btn-press w-full sm:w-auto';
 const gradientDivider = 'gradient-divider my-8';
@@ -110,10 +111,13 @@ export default function LatestPostsFilter({
                   <CardTitle className="font-medium line-clamp-2">{p.title}</CardTitle>
                 </CardHeader>
                 {(p as any)?.featuredImage?.url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <Image
                     src={(p as any).featuredImage.url}
                     alt={(p as any)?.featuredImage?.altText ?? p.title}
+                    width={800}
+                    height={600}
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     className="h-48 w-full object-cover"
                   />
                 ) : (

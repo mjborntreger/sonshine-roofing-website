@@ -25,7 +25,8 @@ const nextConfig = {
       { protocol: "https", hostname: "coc.codes" },
       { protocol: "https", hostname: "res.cloudinary.com" },
       { protocol: "https", hostname: "seal-westflorida.bbb.org" },
-      { protocol: "https", hostname: "i.ytimg.com" }
+      { protocol: "https", hostname: "i.ytimg.com" },
+      { protocol: "https", hostname: "www.google.com" }
     ]
   },
   async headers() {
