@@ -1,7 +1,7 @@
 // app/sitemap_index/blog/route.ts
 import { NextResponse } from 'next/server';
 import { wpFetch } from '@/lib/wp';
-import { formatLastmod } from '../utils';
+import { formatLastmod, normalizeEntryPath } from '../utils';
 import { unstable_cache } from 'next/cache';
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL!;
@@ -54,8 +54,9 @@ export async function GET() {
     head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...items.map(n => {
+      const path = normalizeEntryPath(n.uri);
       const lastmod = formatLastmod(n.modifiedGmt);
-      return `<url><loc>${BASE}${n.uri}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
+      return `<url><loc>${BASE}${path}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
     }),
     `</urlset>`
   ].join('');

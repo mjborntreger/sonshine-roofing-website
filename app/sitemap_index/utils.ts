@@ -7,3 +7,12 @@ export const formatLastmod = (value?: string | null) => {
   const date = new Date(withZone);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 };
+
+export const normalizeEntryPath = (value?: string | null) => {
+  if (!value) return '/';
+  const trimmed = value.trim();
+  if (!trimmed) return '/';
+  const leading = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  if (leading === '/') return '/';
+  return leading.replace(/\/+$/, '');
+};

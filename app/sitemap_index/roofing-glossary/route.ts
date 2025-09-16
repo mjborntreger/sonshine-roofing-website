@@ -3,7 +3,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch } from '@/lib/wp';
-import { formatLastmod } from '../utils';
+import { formatLastmod, normalizeEntryPath } from '../utils';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600; // safety net; tag-based revalidation will be faster
@@ -74,7 +74,11 @@ export async function GET() {
     head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...items.map((n) => {
-      const loc = `${BASE}${n.uri}`;
+      const rawPath = normalizeEntryPath(n.uri);
+      const path = rawPath.startsWith('/glossary_term/')
+        ? rawPath.replace('/glossary_term/', '/roofing-glossary/')
+        : rawPath;
+      const loc = `${BASE}${path}`;
       const isoLastmod = formatLastmod(n.modifiedGmt);
       const lastmod = isoLastmod ? `<lastmod>${isoLastmod}</lastmod>` : '';
       return `<url><loc>${loc}</loc>${lastmod}</url>`;
