@@ -14,7 +14,6 @@
     "@tailwindcss/typography": "^0.5.16",
     "class-variance-authority": "0.7.0",
     "clsx": "2.1.1",
-    "cross-fetch": "4.0.0",
     "embla-carousel": "^8.6.0",
     "embla-carousel-auto-scroll": "^8.6.0",
     "framer-motion": "^12.23.12",
