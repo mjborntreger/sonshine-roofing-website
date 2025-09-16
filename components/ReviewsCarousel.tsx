@@ -1,4 +1,4 @@
-import ReviewsSlider from '@/components/ReviewsSlider';
+import ReviewsSliderLazy from '@/components/ReviewsSliderLazy';
 import { Button } from "@/components/ui/button";
 import SmartLink from "@/components/SmartLink";
 
@@ -67,7 +67,7 @@ export default async function ReviewsCarousel() {
               <span aria-hidden="true">★</span>&nbsp;on Google
             </a>
           )}
-          <ReviewsSlider reviews={filtered} gbpUrl={GBP_URL} />
+          <ReviewsSliderLazy reviews={filtered} gbpUrl={GBP_URL} />
           <div className="text-center">
             <p className="text-sm text-slate-500 italic mb-10">
               All reviews shown above are automatically pulled from Google using the official API.
