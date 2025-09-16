@@ -4,7 +4,7 @@ export async function AboutVideo() {
   const VIDEO_TITLE = "About SonShine Roofing"
   const VIDEO_PLAYBACK_SETTINGS = "?autoplay=1&mute=1&loop=1&playlist=Xla6_QBrJ_U"
   return (
-    <div className="mb-20">
+    <div className="mt-20">
       <iframe 
           className={VIDEO_STYLE}
           src={VIDEO_SOURCE + VIDEO_PLAYBACK_SETTINGS}

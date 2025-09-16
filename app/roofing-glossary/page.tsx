@@ -1,10 +1,36 @@
 import Section from '@/components/layout/Section';
 import Link from 'next/link';
-import { listGlossaryIndex } from '@/lib/wp';
+import { listGlossaryIndex, stripHtml } from '@/lib/wp';
 import GlossaryQuickSearch from './GlossaryQuickSearch';
 import ResourcesAside from '@/components/ResourcesAside';
+import type { Metadata } from 'next';
 
 export const revalidate = 86400; // daily ISR
+
+export async function generateMetadata(): Promise<Metadata> {
+  // EDIT: Roofing Glossary archive SEO (title/description)
+  const title = 'Roofing Glossary | SonShine Roofing';
+  const description = 'Plain-English definitions of roofing terms for Sarasota, Manatee, and Charlotte Counties. No jargon, just clarity.';
+
+  return {
+    title,
+    description,
+    alternates: { canonical: '/roofing-glossary' },
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: '/roofing-glossary',
+      images: [{ url: '/og-default.png', width: 1200, height: 630 }], // EDIT: swap if you add a dedicated OG image
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/og-default.png'],
+    },
+  };
+}
 
 export default async function GlossaryArchivePage() {
   const terms = await listGlossaryIndex(500);
@@ -20,6 +46,34 @@ export default async function GlossaryArchivePage() {
     a === '#' ? 1 : b === '#' ? -1 : a.localeCompare(b),
   );
 
+  // JSON-LD: DefinedTermSet + Breadcrumbs
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const definedTerms = terms.map((t) => ({
+    '@type': 'DefinedTerm',
+    name: t.title,
+    description: stripHtml((t as any).excerpt || '').slice(0, 200),
+    url: `${base}/roofing-glossary/${t.slug}`,
+    inDefinedTermSet: `${base}/roofing-glossary`,
+  }));
+
+  const glossaryLd = {
+    '@context': 'https://schema.org',
+    '@type': 'DefinedTermSet',
+    name: 'Roofing Glossary',
+    description: 'Plain-English definitions of roofing terms used by homeowners and pros in Southwest Florida.',
+    url: `${base}/roofing-glossary`,
+    hasDefinedTerm: definedTerms,
+  } as const;
+
+  const breadcrumbsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
+      { '@type': 'ListItem', position: 2, name: 'Roofing Glossary', item: `${base}/roofing-glossary` },
+    ],
+  } as const;
+
   return (
     <Section>
       <div className="container-edge py-8">
@@ -32,6 +86,18 @@ export default async function GlossaryArchivePage() {
             <p className="mt-2 text-slate-600">
               Clear, plain-English definitions for common (and not-so-common) roofing terms.
             </p>
+
+            {/* JSON-LD: DefinedTermSet + Breadcrumbs */}
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(glossaryLd) }}
+            />
+            <script
+              type="application/ld+json"
+              suppressHydrationWarning
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
+            />
 
             <GlossaryQuickSearch terms={terms} />
 

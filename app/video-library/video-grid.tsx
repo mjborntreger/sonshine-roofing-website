@@ -31,11 +31,38 @@ export default function VideoGrid({
   const scrollYRef = useRef(0);
   const [mounted, setMounted] = useState(false);
 
+  const announceOpen = (slug?: string | null) => {
+    try { window.dispatchEvent(new CustomEvent('video:open', { detail: { slug } })); } catch {}
+  };
+  const announceClose = () => {
+    try { window.dispatchEvent(new Event('video:close')); } catch {}
+  };
+  const openModal = (v: VideoItem) => {
+    setActive(v);
+    const s = (v as any)?.slug || (v as any)?.id || null;
+    if (s) announceOpen(String(s));
+  };
+  const closeModal = () => {
+    setActive(null);
+    announceClose();
+  };
+
   // Normalize initial page data for InfiniteList
   const initialPage: PageResult<VideoItem> = initial ?? {
     items: items ?? [],
     pageInfo: { hasNextPage: false, endCursor: null },
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const v = sp.get('v');
+      if (!v) return;
+      const found = (initialPage.items || []).find((it: any) => it?.slug === v || it?.id === v);
+      if (found) setActive(found);
+    } catch {}
+  }, []);
 
   // Focus trap refs
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -46,7 +73,7 @@ export default function VideoGrid({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setActive(null);
+      if (e.key === "Escape") { e.preventDefault(); closeModal(); }
       if (e.key === "Tab" && modalRef.current) {
         const focusables = modalRef.current.querySelectorAll<HTMLElement>(
           'a[href], button:not([disabled]), area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -133,7 +160,7 @@ export default function VideoGrid({
         filters={filters}
         pageSize={pageSize}
         gridClass="mt-4 grid gap-6 grid-cols-1 md:grid-cols-2"
-        onVideoOpen={(v) => setActive(v as VideoItem)}
+        onVideoOpen={(v) => openModal(v as VideoItem)}
       />
 
       {mounted &&
@@ -162,8 +189,8 @@ export default function VideoGrid({
                 <div
                   ref={modalRef}
                   className="absolute inset-0 flex items-center justify-center p-4"
-                  onPointerDown={(e) => { if (e.target === e.currentTarget) setActive(null); }}
-                  onClick={(e) => { if (e.target === e.currentTarget) setActive(null); }}
+                  onPointerDown={(e) => { if (e.target === e.currentTarget) closeModal(); }}
+                  onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
                 >
                   <motion.div
                     className="relative aspect-video w-full max-w-4xl overflow-hidden rounded-2xl bg-black shadow-xl"
@@ -183,7 +210,7 @@ export default function VideoGrid({
                     ref={closeBtnRef}
                     type="button"
                     aria-label="Close"
-                    onClick={(e) => { e.stopPropagation(); setActive(null); }}
+                    onClick={(e) => { e.stopPropagation(); closeModal(); }}
                     className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] md:top-[max(1.25rem,env(safe-area-inset-top))] md:right-[max(1.25rem,env(safe-area-inset-right))] rounded-full bg-slate-900/80 text-white p-2.5 shadow-lg backdrop-blur-sm transition hover:bg-slate-900/90 focus:outline-none focus:ring-2"
                   >
                     <X className="h-5 w-5" aria-hidden="true" />

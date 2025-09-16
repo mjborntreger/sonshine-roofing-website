@@ -1,0 +1,6 @@
+.next
+node_modules
+public/__sitemaps/static-routes.json
+**/*.snap
+**/*.lock
+.vercel

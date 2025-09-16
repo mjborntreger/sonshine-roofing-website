@@ -48,40 +48,43 @@ export default async function ReviewsCarousel() {
   if (filtered.length === 0) return null;
 
   return (
-    <div className="p-8 md:p-10 my-12">
-      <h2 className="text-center">What Our Customers Say</h2>
-      <div className="gradient-divider my-8" />
-      <div className="not-prose text-center">
-        {data?.avg_rating && (
-          <a
-            href={GBP_URL}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            aria-label={`Average Google rating ${Number(data.avg_rating).toFixed(1)} out of 5`}
-            className="inline-flex items-center rounded-full bg-[#fb9216] px-4 py-2 text-white font-bold
-              duration-300 hover:shadow-md hover:shadow-[#0045d7]/20
-              motion-safe:hover:scale-[1.02] motion-reduce:transform-none"
-          >
-            <span className="text-4xl mr-2">{Number(data.avg_rating).toFixed(1)}</span>
-            <span aria-hidden="true">★</span>&nbsp;on Google
-        </a>
-        )}
-        <ReviewsSlider reviews={filtered} gbpUrl={GBP_URL} />
-        <div className="mt-4 text-center">
-          <p className="text-sm italic mb-10">
-            All reviews shown above are automatically pulled from Google using the official API.
-          </p>
-          <Button variant="brandBlue" asChild>
-            <SmartLink 
+    <>
+      <div className="h-0.5 w-full bg-gradient-to-r from-[#fb9216] via-[#fb9216]/5 to-[#fb9216] mt-12" />
+      <div className="py-16">
+        <h2 className="text-center text-slate-700 text-3xl md:text-5xl mx-2">What Our Customers Say</h2>
+        <div className="not-prose text-center mt-8">
+          {data?.avg_rating && (
+            <a
               href={GBP_URL}
               target="_blank"
               rel="noopener noreferrer nofollow"
+              aria-label={`Average Google rating ${Number(data.avg_rating).toFixed(1)} out of 5`}
+              className="inline-flex items-center rounded-full bg-[#fb9216] px-4 py-2 text-white font-bold
+              duration-300 hover:shadow-md hover:shadow-[#0045d7]/20
+              motion-safe:hover:scale-[1.02] motion-reduce:transform-none"
+            >
+              <span className="text-3xl mr-2">{Number(data.avg_rating).toFixed(1)}</span>
+              <span aria-hidden="true">★</span>&nbsp;on Google
+            </a>
+          )}
+          <ReviewsSlider reviews={filtered} gbpUrl={GBP_URL} />
+          <div className="text-center">
+            <p className="text-sm text-slate-500 italic mb-10">
+              All reviews shown above are automatically pulled from Google using the official API.
+            </p>
+            <Button variant="brandBlue" asChild>
+              <SmartLink
+                href={GBP_URL}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
               >
-              See All Google Reviews
-            </SmartLink>
-          </Button>
+                See All Google Reviews
+              </SmartLink>
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+      <div className="h-0.5 w-full bg-gradient-to-r from-[#fb9216] via-[#fb9216]/5 to-[#fb9216]" />
+    </>
   );
 }

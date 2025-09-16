@@ -90,12 +90,20 @@ export default function InfiniteList<T>({
     }, []);
 
     const { ref: sentinelRef, intersecting } = useIntersection<HTMLDivElement>({ root: null, rootMargin });
+    // Prevent rapid-fire loads while the sentinel remains intersecting
+    const firedRef = useRef(false);
+    useEffect(() => {
+        if (!intersecting) {
+            firedRef.current = false; // re-arm once sentinel leaves viewport
+        }
+    }, [intersecting]);
     // Match the loading shimmer to page size (capped at 12)
     const skeletonCountEff = typeof skeletonCount === "number" ? skeletonCount : Math.min(pageSize, 12);
 
     useEffect(() => {
-        if (!intersecting || !hasMore || loading) return;
+        if (!intersecting || !hasMore || loading || firedRef.current) return;
 
+        firedRef.current = true; // only fire once per intersecting period
         setLoading(true);
         const ac = new AbortController();
         abortRef.current = ac;
@@ -177,6 +185,7 @@ export default function InfiniteList<T>({
         } else if (kind === "video") {
             return (v: any, i: number) => {
                 const safeKey = v?.id ?? v?.slug ?? v?.youtubeId ?? i;
+                const safeSlug = (v?.slug || v?.id || v?.youtubeId || String(safeKey)) as string;
                 const cats: any[] = Array.isArray(v?.categories) ? v.categories : [];
                 const catNames = cats.map((c: any) => c?.name).filter(Boolean).join(", ");
                 const bucketSlugs = cats.map((c: any) => (c?.slug || c?.name || "")).filter(Boolean).join(",");
@@ -187,13 +196,14 @@ export default function InfiniteList<T>({
                     e.preventDefault();
                     e.stopPropagation();
                     if (onVideoOpen) onVideoOpen(v);
-                    else if (typeof window !== "undefined") {
-                        window.dispatchEvent(new CustomEvent("video:open", { detail: v }));
+                    // Always announce a normalized slug so page-level URL logic can update ?v=
+                    if (typeof window !== "undefined") {
+                        try { window.dispatchEvent(new CustomEvent("video:open", { detail: { slug: safeSlug } })); } catch {}
                     }
                 };
 
                 return (
-                    <div className="vid-item group block">
+                    <div className="vid-item group block" data-video-slug={safeSlug}>
                         <Card
                             className="vid-card overflow-hidden transition hover:shadow-lg"
                             data-title={v?.title || ""}
@@ -210,6 +220,7 @@ export default function InfiniteList<T>({
                                 type="button"
                                 aria-label={`Play ${v?.title || "video"}`}
                                 onClick={handleOpen}
+                                data-video-slug={safeSlug}
                                 className="relative block w-full"
                             >
                                 <Frame

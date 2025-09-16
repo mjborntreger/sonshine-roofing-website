@@ -2,13 +2,14 @@ import Link from "next/link";
 import Image from "next/image";
 import FooterBadges from "./FooterBadges";
 import { ArrowUpRight } from "lucide-react";
+import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from "@/lib/routes";
 
 const SOCIALS = [
   { href: "https://www.facebook.com/sonshineroofing", label: "Facebook", domain: "facebook.com" },
   { href: "https://www.instagram.com/sonshineroofing", label: "Instagram", domain: "instagram.com" },
   { href: "https://www.youtube.com/c/sonshineroofing", label: "YouTube", domain: "youtube.com" },
   { href: "https://nextdoor.com/pages/sonshine-roofing-sarasota-fl", label: "Nextdoor", domain: "nextdoor.com" },
-  { href: "https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM", label: "Google Business Profile", domain: "google.com" },
+  { href: "https://www.google.com/maps/place/SonShine+Roofing/@27.3105774,-82.4518265,16z/data=!3m1!4b1!4m6!3m5!1s0x88c34710987d2023:0x5318594fb175e958!8m2!3d27.3105727!4d-82.446961!16s%2Fg%2F1wh4gn84?entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D", label: "Google Business Profile", domain: "google.com" },
   { href: "https://www.yelp.com/biz/sonshine-roofing-sarasota", label: "Yelp", domain: "yelp.com" },
   { href: "https://www.pinterest.com/sonshineroofing", label: "Pinterest", domain: "pinterest.com" },
   { href: "https://x.com/ssroofinginc", label: "X (Twitter)", domain: "x.com" },
@@ -19,8 +20,9 @@ const h3Styles = "text-xs font-semibold uppercase tracking-wider text-slate-700"
 
 export default function Footer() {
   return (
-    <footer className="mt-16 pt-8 border-t border-slate-300 bg-[#CEF3FF]/50">
-      <div className="mx-auto max-w-6xl px-10 py-10">
+    <>
+    <footer className="pt-16 bg-slate-200">
+      <div className="mx-auto max-w-6xl px-10 pt-8">
         <h2 className="sr-only">Footer</h2>
 
         {/* Columns */}
@@ -31,7 +33,7 @@ export default function Footer() {
           {/* Company */}
           <div>
             <Link
-              href="/"
+              href={ROUTES.home}
               aria-label="SonShine Roofing Logo"
               title="SonShine Roofing Logo"
             >
@@ -45,49 +47,29 @@ export default function Footer() {
                 className="mb-5"
               />
             </Link>
-            <Link
-              className={linkStyles}
-              href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
-              aria-label="Florida Roofing Contractor's License Number CCC1331483"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <p>
-                License: #CCC1331483
-                <ArrowUpRight 
-                  className="inline ml-1 h-3 w-3 align-[-0.125em] text-slate-700" 
-                  aria-hidden="true" 
-                />
-              </p>
-            </Link>
-
-            <p className="text-sm text-slate-700 my-4">Insured</p>
-
             <ul className="mt-3 space-y-3 text-sm">
               <li>
                 <Link
-                  href="/"
-                  className={h3Styles}
+                  className={linkStyles}
+                  href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
+                  aria-label="Florida Roofing Contractor's License Number CCC1331483"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  Home
+                  License: #CCC1331483
+                  <ArrowUpRight
+                    className="inline ml-1 h-3 w-3 align-[-0.125em] text-slate-700"
+                    aria-hidden="true"
+                  />
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/about-sonshine-roofing"
-                  className={h3Styles}
-                >
-                  About
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact-us"
-                  className={h3Styles}
-                >
-                  Contact
-                </Link>
-              </li>
+              {NAV_COMPANY.map((r) => (
+                <li key={r.href}>
+                  <Link href={r.href} className={linkStyles}>
+                    {r.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -97,22 +79,13 @@ export default function Footer() {
               Roofing Services
             </h3>
             <ul className="mt-4 space-y-3 text-sm">
-              <li>
-                <Link href="/roof-replacement-sarasota-fl" className={linkStyles}
-                >Roof Replacement</Link>
-              </li>
-              <li>
-                <Link href="/roof-repair" className={linkStyles}
-                >Roof Repair</Link>
-              </li>
-              <li>
-                <Link href="/roof-inspection" className={linkStyles}
-                >Roof Inspection</Link>
-              </li>
-              <li>
-                <Link href="/roof-maintenance" className={linkStyles}
-                >Roof Maintenance</Link>
-              </li>
+              {NAV_SERVICES.map((r) => (
+                <li key={r.href}>
+                  <Link href={r.href} className={linkStyles}>
+                    {r.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -122,31 +95,37 @@ export default function Footer() {
               Resources
             </h3>
             <ul className="mt-4 space-y-3 text-sm">
-              <li>
-                <Link href="/project" className={linkStyles}
-                >Project Gallery</Link>
-              </li>
-              <li>
-                <Link href="/financing" className={linkStyles}
-                >Financing</Link>
-              </li>
-              <li>
-                <Link href="/video-library" className={linkStyles}
-                >Video Library</Link>
-              </li>
-              <li>
-                <Link href="/roofing-glossary" className={linkStyles}
-                >Roofing Glossary</Link>
-              </li>
-              <li>
-                <Link href="/blog" className={linkStyles}
-                >Blog</Link>
-              </li>
-              <li>
-                <Link href="/faq" className={linkStyles}
-                >FAQ</Link>
-              </li>
+              {NAV_RESOURCES.map((r) => (
+                <li key={r.href}>
+                  <Link href={r.href} className={linkStyles}>
+                    {r.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
+          </div>
+
+          {/* Hours */}
+          <div>
+            <h3 className={h3Styles}>
+              Hours of Operation
+            </h3>
+            <dl className="mt-4 grid grid-cols-[max-content_auto] gap-x-1 gap-y-2 text-sm">
+              <dt className="text-slate-600">Mon.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Tues.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Wed.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Thurs.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Fri.</dt>
+              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
+              <dt className="text-slate-600">Sat.</dt>
+              <dd className="text-right text-slate-600">Closed</dd>
+              <dt className="text-slate-600">Sun.</dt>
+              <dd className="text-right text-slate-600">Closed</dd>
+            </dl>
           </div>
 
           {/* Get In Touch */}
@@ -188,48 +167,11 @@ export default function Footer() {
               </p>
             </address>
           </div>
-
-          {/* Hours */}
-          <div>
-            <h3 className={h3Styles}>
-              Hours of Operation
-            </h3>
-            <dl className="mt-4 grid grid-cols-[max-content_auto] gap-x-1 gap-y-2 text-sm">
-              <dt className="text-slate-600">Mon.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Tues.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Wed.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Thurs.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Fri.</dt>
-              <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-              <dt className="text-slate-600">Sat.</dt>
-              <dd className="text-right text-slate-600">Closed</dd>
-              <dt className="text-slate-600">Sun.</dt>
-              <dd className="text-right text-slate-600">Closed</dd>
-            </dl>
-          </div>
         </nav>
 
         {/* Badges Row */}
         <FooterBadges />
-
-        {/* Bottom bar */}
-        <div className="mt-10 border-t border-slate-300 pt-6 flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
-          <p className="text-xs text-slate-500">
-            © {new Date().getFullYear()} SonShine Roofing — Since 1987 we’ve got you covered. | All Rights Reserved
-          </p>
-
-          <nav className="text-xs text-slate-500 flex items-center justify-between gap-4">
-            <Link href="/privacy-policy">Privacy Policy</Link>
-            <Link href="/sitemap_index">XML Sitemap</Link>
-            <Link href="/html-sitemap">HTML Sitemap</Link>
-          </nav>
-        </div>
-        <div className="py-4">
-          <div className="flex flex-wrap items-center justify-start gap-1">
+        <div className="flex flex-wrap items-center justify-center gap-1">
             {SOCIALS.map((s) => (
               <a
                 key={s.href}
@@ -238,23 +180,37 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label={s.label}
                 title={s.label}
-                className="inline-flex h-5 w-5 py-6 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                className="inline-flex h-10 w-10 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
               >
                 <img
                   src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
                   alt={s.label}
-                  className="h-5 w-5"
+                  className="h-8 w-8"
                   loading="lazy"
                   decoding="async"
                 />
               </a>
             ))}
           </div>
-          <p className="text-xs text-slate-500 hover:color-[#cef3ff]">
+
+        {/* Bottom bar */}
+        <div className="mt-10 border-t border-slate-300 pt-6 flex flex-wrap justify-between items-center gap-4">
+          <div className="text-xs text-slate-500">
+            © {new Date().getFullYear()} SonShine Roofing — Since 1987 we’ve got you covered. | All Rights Reserved
+          </div>
+
+          <nav className="text-xs font-semibold text-slate-500 flex items-center justify-end gap-4">
+            <Link href={ROUTES.privacyPolicy}>Privacy Policy</Link>
+            <Link href={ROUTES.sitemapIndex}>XML Sitemap</Link>
+          </nav>
+        </div>
+        <div className="py-4">
+          <div className="text-xs font-semibold text-slate-500 text-right">
             <Link href="https://michaelborntreger.life">Website created by: Michael Borntreger</Link>
-          </p>
+          </div>
         </div>
       </div>
     </footer>
+  </>
   );
 }

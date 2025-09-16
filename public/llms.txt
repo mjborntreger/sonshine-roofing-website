@@ -1,0 +1,30 @@
+# llms.txt — Guidance for AI crawlers and LLM providers
+# Edit to match your policy. Served at /llms.txt
+
+Owner: SonShine Roofing
+Contact: info@sonshineroofing.com
+Last-Updated: 2025-09-12
+
+# High-level policy
+# Options: allow | disallow | limited
+Crawl: allow
+Index: allow
+Training: disallow
+Cache: allow
+Summarization: allow
+
+# Notes for AI crawlers
+- Honor robots.txt directives and per-page meta robots (e.g., noindex).
+- Do not store or redistribute non-public data.
+- Remove stored content upon request.
+
+# Bot-specific overrides (examples)
+# These are advisory; implementers should map to their own controls.
+Bot: GPTBot
+  Training: disallow
+Bot: CCBot
+  Training: disallow
+Bot: ClaudeBot
+  Training: disallow
+
+# This file is a best-effort signal and not a legal agreement.

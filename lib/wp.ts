@@ -44,12 +44,34 @@ export type ProjectSummary = {
 
 export type ProjectFull = ProjectSummary & {
   contentHtml: string;
+  /** Full ISO date (publish date) */
+  date?: string | null;
+  /** ISO last-modified date */
+  modified?: string | null;
   projectDescription: string | null;
   productLinks: ProductLink[];
   materialTypes: TermLite[];
   roofColors: TermLite[];
   serviceAreas: TermLite[];
   youtubeUrl?: string | null;
+  /** RankMath SEO block for OG/Twitter + JSON-LD mapping */
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    canonicalUrl?: string | null;
+    openGraph?: {
+      title?: string | null;
+      description?: string | null;
+      type?: string | null;
+      image?: {
+        url?: string | null;
+        secureUrl?: string | null;
+        width?: number | null;
+        height?: number | null;
+        type?: string | null;
+      } | null;
+    } | null;
+  };
 };
 
 export type PostCard = {
@@ -76,8 +98,30 @@ export type Post = {
   title: string;
   contentHtml: string;
   date: string; // ISO
+  modified?: string; // ISO (last modified)
+  authorName?: string | null;
   featuredImage?: { url: string; altText?: string | null };
   categories: string[];
+  /** Optional short HTML excerpt (rendered), useful for previews & SEO fallbacks */
+  excerpt?: string;
+  /** RankMath SEO (as exposed by WPGraphQL Rank Math) */
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    canonicalUrl?: string | null;
+    openGraph?: {
+      title?: string | null;
+      description?: string | null;
+      type?: string | null;
+      image?: {
+        url?: string | null;
+        secureUrl?: string | null;
+        width?: number | null;
+        height?: number | null;
+        type?: string | null;
+      } | null;
+    } | null;
+  };
 };
 
 export type VideoItem = {
@@ -132,6 +176,31 @@ export type Faq = {
   topicSlugs: string[];
 };
 
+export type FaqFull = Faq & {
+  /** Full ISO date (publish date) */
+  date?: string | null;
+  /** ISO last-modified date */
+  modified?: string | null;
+  /** RankMath SEO (as exposed by WPGraphQL Rank Math) */
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    canonicalUrl?: string | null;
+    openGraph?: {
+      title?: string | null;
+      description?: string | null;
+      type?: string | null;
+      image?: {
+        url?: string | null;
+        secureUrl?: string | null;
+        width?: number | null;
+        height?: number | null;
+        type?: string | null;
+      } | null;
+    } | null;
+  };
+};
+
 // FAQ Topic type (taxonomy term)
 export type FaqTopic = {
   slug: string;
@@ -154,7 +223,7 @@ function getAuthHeader(): string | null {
   return `Basic ${base64}`;
 }
 
-async function wpFetch<T = Json>(
+export async function wpFetch<T = Json>(
   query: string,
   variables?: Record<string, any>,
   revalidateSeconds = 600
@@ -203,7 +272,7 @@ const mapProductLinks = (rows?: any[]): ProductLink[] =>
   }));
 
 // calcReadingTimeMinutes Helper Function
-function stripHtml(html: string): string {
+export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
 function calcReadingTimeMinutes(html: string, wpm = 225): number {
@@ -355,16 +424,28 @@ export async function listFaqs(limit = 20, topicSlug?: string): Promise<FaqSumma
   return nodes.map(toSummary);
 }
 
-// Single FAQ by slug
-export async function getFaq(slug: string): Promise<Faq | null> {
+// Single FAQ by slug (returns FaqFull)
+export async function getFaq(slug: string): Promise<FaqFull | null> {
   const query = /* GraphQL */ `
     query FAQBySlug($slug: ID!) {
       faq(id: $slug, idType: SLUG) {
         slug
         title
+        date
+        modified
         content(format: RENDERED)
         faqTopics { nodes { slug } }
-        faqAttributes { featured }
+        seo {
+          title
+          description
+          canonicalUrl
+          openGraph {
+            title
+            description
+            type
+            image { url secureUrl width height type }
+          }
+        }
       }
     }
   `;
@@ -376,7 +457,91 @@ export async function getFaq(slug: string): Promise<Faq | null> {
     title: String(n.title || ""),
     contentHtml: String(n.content || ""),
     topicSlugs: (n.faqTopics?.nodes ?? []).map((t: any) => String(t.slug || "")),
-  };
+    date: n.date ?? null,
+    modified: n.modified ?? null,
+    seo: n.seo ?? undefined,
+  } as FaqFull;
+}
+/**
+ * Fetch a list of FAQs with full rendered content, optionally filtered by topic, for archive JSON-LD.
+ */
+export async function listFaqsWithContent(limit = 50, topicSlug?: string): Promise<FaqFull[]> {
+  // Inner mapper used by both branches
+  const mapNode = (n: any): FaqFull => ({
+    slug: String(n.slug || ""),
+    title: String(n.title || ""),
+    contentHtml: String(n.content || ""),
+    topicSlugs: (n?.faqTopics?.nodes ?? []).map((t: any) => String(t.slug || "")),
+    date: n?.date ?? null,
+    modified: n?.modified ?? null,
+    seo: n?.seo ?? undefined,
+  });
+
+  if (topicSlug) {
+    const query = /* GraphQL */ `
+      query FaqsWithContentByTopic($first: Int!, $slug: ID!) {
+        faqTopic(id: $slug, idType: SLUG) {
+          faqs(first: $first, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+            nodes {
+              slug
+              title
+              date
+              modified
+              content(format: RENDERED)
+              faqTopics { nodes { slug } }
+              seo {
+                title
+                description
+                canonicalUrl
+                openGraph {
+                  title
+                  description
+                  type
+                  image { url secureUrl width height type }
+                }
+              }
+            }
+          }
+        }
+      }
+    `;
+    const data = await wpFetch<{ faqTopic: { faqs?: { nodes?: any[] } } | null }>(
+      query,
+      { first: limit, slug: topicSlug },
+      1800
+    );
+    const nodes = data?.faqTopic?.faqs?.nodes ?? [];
+    return nodes.map(mapNode);
+  }
+
+  const query = /* GraphQL */ `
+    query FaqsWithContent($first: Int!) {
+      faqs(first: $first, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+        nodes {
+          slug
+          title
+          date
+          modified
+          content(format: RENDERED)
+          faqTopics { nodes { slug } }
+          seo {
+            title
+            description
+            canonicalUrl
+            openGraph {
+              title
+              description
+              type
+              image { url secureUrl width height type }
+            }
+          }
+        }
+      }
+    }
+  `;
+  const data = await wpFetch<{ faqs: { nodes: any[] } }>(query, { first: limit }, 1800);
+  const nodes = data?.faqs?.nodes ?? [];
+  return nodes.map(mapNode);
 }
 
 /**
@@ -456,6 +621,43 @@ export function faqJsonLd(items: { question: string; answerHtml: string }[]) {
       }
     }))
   };
+}
+
+/**
+ * Build a FAQPage JSON-LD object from question/answer items with optional per-question URLs.
+ * Google only requires name + acceptedAnswer.text; extra properties are safe but may be ignored.
+ */
+export function faqItemsToJsonLd(
+  items: Array<{ question: string; answerHtml: string; url?: string }>,
+  pageUrl?: string
+) {
+  const mainEntity = items.map((i) => {
+    const q: any = {
+      "@type": "Question",
+      name: i.question,
+      acceptedAnswer: { "@type": "Answer", text: i.answerHtml },
+    };
+    if (i.url) q.url = i.url;
+    return q;
+  });
+  const out: any = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity };
+  if (pageUrl) out.url = pageUrl;
+  return out;
+}
+
+/**
+ * Convenience: convert a list of FaqFull into a FAQPage JSON-LD with absolute URLs.
+ * `baseUrl` should be your site origin (e.g., https://sonshineroofing.com)
+ * `basePath` is the page path hosting the FAQ list (default: "/faq").
+ */
+export function faqListToJsonLd(faqs: FaqFull[], baseUrl: string, basePath = "/faq") {
+  const pageUrl = `${baseUrl}${basePath}`;
+  const items = faqs.map((f) => ({
+    question: f.title,
+    answerHtml: f.contentHtml,
+    url: `${baseUrl}${basePath}/${f.slug}`,
+  }));
+  return faqItemsToJsonLd(items, pageUrl);
 }
 
 // List lightweight glossary index (title + slug), A→Z
@@ -776,25 +978,33 @@ export async function listVideoItemsPaged({
   after?: string | null;
   filters?: VideoFiltersInput;
 }) {
-  // Fetch a bounded pool (cached by Next via wpFetch revalidate)
-  const [entries, projects] = await Promise.all([
-    listRecentVideoEntries(200),
-    listProjectVideos(200),
-  ]);
-  const all = [...entries, ...projects];
-
+  // Determine which pools to fetch based on filters
   const f: any = filters || {};
   const q = (f.q || '').toString().trim().toLowerCase();
 
-  // Accept `buckets` (preferred) or `bucket` (alias) or `b`
   const bucketsList: any[] | null =
     Array.isArray(f.buckets) ? f.buckets
     : Array.isArray(f.bucket) ? f.bucket
     : Array.isArray(f.b) ? f.b
     : null;
-  const buckets = bucketsList && bucketsList.length
-    ? new Set(bucketsList as VideoBucketKey[])
-    : null;
+  const bucketSet = bucketsList && bucketsList.length ? new Set(bucketsList as VideoBucketKey[]) : null;
+
+  const mtSelected = Array.isArray(f.materialTypeSlugs) && f.materialTypeSlugs.length > 0;
+  const saSelected = Array.isArray(f.serviceAreaSlugs) && f.serviceAreaSlugs.length > 0;
+
+  const wantProjects = mtSelected || saSelected || !bucketSet || bucketSet.has('roofing-project');
+  const wantEntries = !bucketSet || Array.from(bucketSet).some((b) => b !== 'roofing-project');
+
+  // Bound the pool size relative to requested page + cursor offset
+  const offset = decodeOffset(after);
+  const poolSize = Math.min(200, Math.max(60, offset + first * 3));
+
+  const [entries, projects] = await Promise.all([
+    wantEntries ? listRecentVideoEntries(poolSize) : Promise.resolve([]),
+    wantProjects ? listProjectVideos(poolSize) : Promise.resolve([]),
+  ]);
+  const all = [...(entries as VideoItem[]), ...(projects as VideoItem[])];
+  const buckets = bucketSet;
 
   // Accept `categorySlugs` (preferred) or `categories`/`cat`
   const catInput: any[] | null =
@@ -900,6 +1110,23 @@ export async function listRecentPosts(limit = 12): Promise<PostCard[]> {
     readingTimeMinutes: n.content ? calcReadingTimeMinutes(n.content) : undefined,
     excerpt: n.excerpt ? String(n.excerpt) : undefined,
   }));
+}
+
+/**
+ * Lightweight list of blog categories (taxonomy terms) for building filter pills.
+ * Uses hideEmpty to avoid fetching posts just to discover categories.
+ */
+export async function listBlogCategories(limit = 100): Promise<TermLite[]> {
+  const query = /* GraphQL */ `
+    query ListBlogCategories($first: Int!) {
+      categories(first: $first, where: { hideEmpty: true }) {
+        nodes { name slug }
+      }
+    }
+  `;
+  const data = await wpFetch<{ categories: { nodes: any[] } }>(query, { first: limit }, 86400);
+  const nodes = data?.categories?.nodes || [];
+  return nodes.map((n) => ({ name: String(n?.name || ''), slug: String(n?.slug || '') }));
 }
 
 /**
@@ -1086,6 +1313,25 @@ export async function listPostSlugs(limit = 200): Promise<string[]> {
   return (data.posts?.nodes || []).map((n) => n.slug).filter(Boolean) as string[];
 }
 
+/**
+ * Lightweight recent post list for prev/next navigation.
+ * Returns only slug, title, date. Keeps payload very small compared to full cards.
+ */
+export async function listRecentPostNav(limit = 200): Promise<Array<{ slug: string; title: string; date: string }>> {
+  const query = /* GraphQL */ `
+    query ListRecentPostNav($limit: Int!) {
+      posts(first: $limit, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
+        nodes { slug title date }
+      }
+    }
+  `;
+  const data = await wpFetch<{ posts: { nodes: any[] } }>(query, { limit }, 1800);
+  const nodes = data?.posts?.nodes || [];
+  return nodes
+    .map((n) => ({ slug: String(n?.slug || ''), title: String(n?.title || ''), date: String(n?.date || '') }))
+    .filter((n) => !!n.slug);
+}
+
 // --- Single post fetch (for your /[slug] page later) ---
 export async function getPostBySlug(slug: string): Promise<Post | null> {
   const query = /* GraphQL */ `
@@ -1094,6 +1340,9 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
         slug
         title
         date
+        modified
+        author { node { name } }
+        excerpt(format: RENDERED)
         content(format: RENDERED)
         featuredImage {
           node {
@@ -1102,8 +1351,17 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
           }
         }
         categories(first: 12) {
-          nodes {
-            name
+          nodes { name }
+        }
+        seo {
+          title
+          description
+          canonicalUrl
+          openGraph {
+            title
+            description
+            type
+            image { url secureUrl width height type }
           }
         }
       }
@@ -1117,10 +1375,14 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     title: p.title,
     contentHtml: p.content ?? "",
     date: p.date,
+    modified: p.modified,
+    authorName: p?.author?.node?.name ?? null,
     featuredImage: p.featuredImage?.node
       ? { url: p.featuredImage.node.sourceUrl, altText: p.featuredImage.node.altText }
       : undefined,
     categories: (p.categories?.nodes || []).map((c: any) => c.name),
+    excerpt: p.excerpt ? String(p.excerpt) : undefined,
+    seo: p.seo ?? undefined,
   };
 }
 
@@ -1352,8 +1614,21 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
         uri
         title
         date
+        modified
         content
         featuredImage { node { sourceUrl altText } }
+
+        seo {
+          title
+          description
+          canonicalUrl
+          openGraph {
+            title
+            description
+            type
+            image { url secureUrl width height type }
+          }
+        }
 
         # ACF Field Group: projectVideoInfo
         projectVideoInfo {
@@ -1383,26 +1658,25 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
   const p = data?.project;
   if (!p) return null;
 
-  const details = p.projectDetails ?? {};
-  const filters = p.projectFilters ?? {};
-  const video = p.projectVideoInfo ?? {};
-
   return {
     slug: String(p.slug || slug),
     uri: String(p.uri || uri),
     title: String(p.title || ""),
     year: pickYear(p.date),
+    date: p.date ?? null,
+    modified: p.modified ?? null,
     contentHtml: String(p.content || ""),
     heroImage: pickImage(p.featuredImage?.node),
 
-    projectDescription: details.projectDescription ?? null,
-    productLinks: mapProductLinks(details.productLinks),
+    projectDescription: p.projectDetails?.projectDescription ?? null,
+    productLinks: mapProductLinks(p.projectDetails?.productLinks),
 
-    materialTypes: mapTerms(filters.materialType?.nodes),
-    roofColors: mapTerms(filters.roofColor?.nodes),
-    serviceAreas: mapTerms(filters.serviceArea?.nodes),
+    materialTypes: mapTerms(p.projectFilters?.materialType?.nodes),
+    roofColors: mapTerms(p.projectFilters?.roofColor?.nodes),
+    serviceAreas: mapTerms(p.projectFilters?.serviceArea?.nodes),
 
-    youtubeUrl: video.youtubeUrl ?? null,
+    youtubeUrl: p.projectVideoInfo?.youtubeUrl ?? null,
+    seo: p.seo ?? undefined,
   };
 }
 

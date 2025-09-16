@@ -5,43 +5,47 @@ import { ChevronDown, Phone, Zap, BadgeCheck, ArrowUpRight } from "lucide-react"
 import type { Route } from "next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { NavItem } from "@/lib/routes";
+import { NAV_MAIN, ROUTES } from "@/lib/routes";
 
-type Item = { label: string; href?: Route; children?: Item[] };
+type Item = NavItem;
+const NAV: Item[] = NAV_MAIN as Item[];
 
-const NAV = [
-  { label: "About", href: "/about-sonshine-roofing" as Route },
-  {
-    label: "Roofing Services", children: [
-      { label: "Roof Replacement", href: "/roof-replacement-sarasota-fl" as Route },
-      { label: "Roof Repair", href: "/roof-repair" as Route },
-      { label: "Roof Inspection", href: "/roof-inspection" as Route },
-      { label: "Roof Maintenance", href: "/roof-maintenance" as Route },
-    ]
-  },
-  {
-    label: "Resources", children: [
-      { label: "Project Gallery", href: "/project" as Route },
-      { label: "Financing", href: "/financing" as Route },
-      { label: "Video Library", href: "/video-library" as Route },
-      { label: "Blog", href: "/blog" as Route },
-      { label: "Roofing Glossary", href: "/roofing-glossary" as Route },
-      { label: "FAQ", href: "/faq" as Route },
-    ]
-  },
-] satisfies Item[];
+/* ===== Animation tuning knobs (edit these values to adjust speeds/delays) ===== */
+// Close-delay when the cursor leaves a menu (hover intent)
+const HOVER_CLOSE_DELAY_MS = 120;
+// Container fade+lift duration for dropdown/flyout panels
+const PANEL_DURATION_MS = 150;
+// Chevron/caret rotation duration
+const CARET_DURATION_MS = 200;
+// Stagger timings for list items
+const ITEM_STAGGER_BASE_MS = 70; // first item delay
+const ITEM_STAGGER_STEP_MS = 50; // per-item additional delay
+const LEVEL_BONUS_MS = 20;       // extra delay per nested level (deeper = later)
+// Mobile-only: top-level staggering and CTA offsets
+const MOBILE_TOP_STAGGER_BASE_MS = 70;
+const MOBILE_CTA1_DELAY_MS = 70;  // "Free 60-second Quote"
+const MOBILE_CTA2_DELAY_MS = 100; // "Contact Us"
 
 /* ===== Desktop (fixed) ===== */
 function DesktopMenu() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [enteredPanel, setEnteredPanel] = useState(false);
 
   const holdOpen = (i: number) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
     setOpenIndex(i);
+    setEnteredPanel(false);
+    // defer to next frame so transitions can see initial state
+    requestAnimationFrame(() => setEnteredPanel(true));
   };
   const scheduleClose = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => setOpenIndex(null), 120);
+    closeTimer.current = setTimeout(() => {
+      setEnteredPanel(false);
+      setOpenIndex(null);
+    }, HOVER_CLOSE_DELAY_MS);
   };
 
   return (
@@ -56,31 +60,63 @@ function DesktopMenu() {
           {item.href ? (
             <SmartLink
               href={item.href}
-              className="px-2 py-2 text-slate-700 hover:text-brand-blue whitespace-nowrap flex items-center gap-1"
+              className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1"
             >
               {item.label}
-              {item.children && <ChevronDown className="h-4 w-4 opacity-70" />}
+              {item.children && (
+                <>
+                  {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 opacity-70 transition-transform duration-200",
+                      openIndex === i ? "rotate-180" : "rotate-0"
+                    )}
+                    style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
+                    aria-hidden="true"
+                  />
+                </>
+              )}
             </SmartLink>
           ) : (
             <button
               type="button"
-              className="px-2 py-2 text-slate-700 hover:text-brand-blue whitespace-nowrap flex items-center gap-1 cursor-default"
+              className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1 cursor-default"
               aria-haspopup={item.children ? "menu" : undefined}
               aria-expanded={openIndex === i || undefined}
             >
               {item.label}
-              {item.children && <ChevronDown className="h-4 w-4 opacity-70" />}
+              {item.children && (
+                <>
+                  {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 opacity-70 transition-transform duration-200",
+                      openIndex === i ? "rotate-180" : "rotate-0"
+                    )}
+                    style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
+                    aria-hidden="true"
+                  />
+                </>
+              )}
             </button>
           )}
 
           {item.children && openIndex === i && (
-            <div
-              className="absolute left-0 top-full mt-2 min-w-[240px] rounded-2xl border bg-white shadow-lg"
-              onMouseEnter={() => holdOpen(i)}
-              onMouseLeave={scheduleClose}
-            >
-              <MenuLevel items={item.children} level={1} />
-            </div>
+            <>
+              {/* ANIM: Panel fade+lift speed — edit PANEL_DURATION_MS (and/or Tailwind 'duration-150') */}
+              <div
+                className={cn(
+                  "absolute left-0 top-full mt-2 min-w-[240px] rounded-2xl border bg-white border-slate-300 shadow-lg origin-top",
+                  "transition-all duration-150 ease-out",
+                  enteredPanel ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
+                )}
+                style={{ transitionDuration: `${PANEL_DURATION_MS}ms` }}
+                onMouseEnter={() => holdOpen(i)}
+                onMouseLeave={scheduleClose}
+              >
+                <MenuLevel items={item.children} level={1} />
+              </div>
+            </>
           )}
         </li>
       ))}
@@ -99,7 +135,7 @@ function DesktopMenu() {
 
       <li className="pl-2">
         <Button asChild size="sm" variant="brandBlue">
-          <SmartLink href={"/contact-us" as Route} className="flex items-center gap-2">
+          <SmartLink href={ROUTES.contact} className="flex items-center gap-2">
             <Phone className="h-4 w-4 text-white" aria-hidden="true" />
             Contact Us
           </SmartLink>
@@ -113,6 +149,11 @@ function DesktopMenu() {
 function MenuLevel({ items, level }: { items: Item[]; level: number }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setEntered(true));
+    return () => cancelAnimationFrame(id as any);
+  }, []);
 
   const holdOpen = (i: number) => {
     if (closeTimer.current) clearTimeout(closeTimer.current);
@@ -131,7 +172,11 @@ function MenuLevel({ items, level }: { items: Item[]; level: number }) {
         return (
           <li
             key={child.label}
-            className="relative"
+            className={cn(
+              "relative transition-all duration-150 ease-out",
+              entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+            )}
+            style={{ transitionDelay: `${Math.min(300, ITEM_STAGGER_BASE_MS + i * ITEM_STAGGER_STEP_MS + (level - 1) * LEVEL_BONUS_MS)}ms` }}
             onMouseEnter={() => holdOpen(i)}
             onMouseLeave={scheduleClose}
           >
@@ -141,7 +186,19 @@ function MenuLevel({ items, level }: { items: Item[]; level: number }) {
                 className="flex items-center justify-between gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-[#0045d7]/5 hover:text-[--brand-blue]"
               >
                 <span>{child.label}</span>
-                {hasKids && <ChevronDown className="h-4 w-4 opacity-70 -rotate-90" />}
+                {hasKids && (
+                  <>
+                    {/* ANIM: Nested caret rotation — edit CARET_DURATION_MS */}
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 opacity-70 transition-transform duration-200",
+                        openIndex === i ? "rotate-90" : "-rotate-90"
+                      )}
+                      style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
+                      aria-hidden="true"
+                    />
+                  </>
+                )}
               </SmartLink>
             ) : (
               <button
@@ -152,29 +209,45 @@ function MenuLevel({ items, level }: { items: Item[]; level: number }) {
                 onClick={() => holdOpen(i)}
               >
                 <span>{child.label}</span>
-                {hasKids && <ChevronDown className="h-4 w-4 opacity-70 -rotate-90" />}
+                {hasKids && (
+                  <>
+                    {/* ANIM: Nested caret rotation — edit CARET_DURATION_MS */}
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 opacity-70 transition-transform duration-200",
+                        openIndex === i ? "rotate-90" : "-rotate-90"
+                      )}
+                      style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
+                      aria-hidden="true"
+                    />
+                  </>
+                )}
               </button>
             )}
 
             {hasKids && openIndex === i && (
-              <div
-                // keep open while inside the flyout
-                onMouseEnter={() => holdOpen(i)}
-                onMouseLeave={scheduleClose}
-                className={cn(
-                  // position the flyout WITH NO real gap:
-                  "md:absolute md:left-full md:top-0",
-                  // add a tiny internal padding for visual separation instead of margin gaps
-                  "md:pl-2",
-                  "min-w-[240px] rounded-2xl border bg-white shadow-lg"
-                )}
-              >
-                {/* optional invisible bridge in case of super fast mouse moves */}
-                <div className="pointer-events-none absolute -left-2 top-0 h-full w-3" />
-                <div className="pointer-events-auto">
-                  <MenuLevel items={child.children!} level={level + 1} />
+              <>
+                {/* ANIM: Panel fade+lift speed — edit PANEL_DURATION_MS (and/or Tailwind 'duration-150') */}
+                <div
+                  // keep open while inside the flyout
+                  onMouseEnter={() => holdOpen(i)}
+                  onMouseLeave={scheduleClose}
+                  className={cn(
+                    "md:absolute md:left-full md:top-0",
+                    "md:pl-2",
+                    "min-w-[240px] rounded-2xl border bg-white shadow-lg origin-top-left",
+                    "transition-all duration-150 ease-out",
+                    entered ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
+                  )}
+                  style={{ transitionDuration: `${PANEL_DURATION_MS}ms` }}
+                >
+                  {/* optional invisible bridge in case of super fast mouse moves */}
+                  <div className="pointer-events-none absolute -left-2 top-0 h-full w-3" />
+                  <div className="pointer-events-auto">
+                    <MenuLevel items={child.children!} level={level + 1} />
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </li>
         );
@@ -187,6 +260,8 @@ function MenuLevel({ items, level }: { items: Item[]; level: number }) {
 function MobileMenu() {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [entered, setEntered] = useState<Record<string, boolean>>({});
+  const [enteredTop, setEnteredTop] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -230,8 +305,32 @@ function MobileMenu() {
     };
   }, [open]);
 
+  useEffect(() => {
+    if (open) {
+      setEnteredTop(false);
+      const id = requestAnimationFrame(() => setEnteredTop(true));
+      return () => cancelAnimationFrame(id as any);
+    }
+    setEnteredTop(false);
+  }, [open]);
+
   const toggle = (key: string) =>
-    setExpanded((s) => ({ ...s, [key]: !s[key] }));
+    setExpanded((s) => {
+      const next = { ...s, [key]: !s[key] };
+      if (!s[key] && !entered[key]) {
+        requestAnimationFrame(() =>
+          setEntered((e) => ({ ...e, [key]: true }))
+        );
+      }
+      if (s[key]) {
+        // collapsing: remove entered to allow re-animate next time
+        setEntered((e) => {
+          const { [key]: _, ...rest } = e;
+          return rest;
+        });
+      }
+      return next;
+    });
 
   return (
     <div className="lg:hidden ml-auto">
@@ -246,11 +345,13 @@ function MobileMenu() {
       >
         <span className="inline-flex items-center gap-1 transition-transform duration-200">
           Menu
+          {/* ANIM: Mobile caret rotation — edit CARET_DURATION_MS */}
           <ChevronDown
             className={cn(
               "h-4 w-4 transition-transform duration-300",
               open ? "rotate-180" : "rotate-0"
             )}
+            style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
           />
         </span>
       </button>
@@ -277,9 +378,16 @@ function MobileMenu() {
                        max-h-[calc(100vh-var(--header-h,56px)-24px)] overflow-auto"
           >
             <ul className="space-y-1">
-              <li>
+              <li
+                className={cn(
+                  "transition-all duration-150 ease-out",
+                  enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                )}
+                // ANIM: Mobile Home item stagger — base
+                style={{ transitionDelay: `${MOBILE_TOP_STAGGER_BASE_MS}ms` }}
+              >
                 <SmartLink
-                  href={"/" as Route}
+                  href={ROUTES.home}
                   className="flex w-full px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
                   onClick={() => setOpen(false)}
                 >
@@ -291,7 +399,15 @@ function MobileMenu() {
                 const k = `lv1-${i}`;
                 const hasChildren = !!item.children?.length;
                 return (
-                  <li key={k}>
+                  <li
+                    key={k}
+                    className={cn(
+                      "transition-all duration-150 ease-out",
+                      enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                    )}
+                    // ANIM: Mobile top-level stagger — base + per-item step
+                    style={{ transitionDelay: `${Math.min(300, MOBILE_TOP_STAGGER_BASE_MS + i * ITEM_STAGGER_STEP_MS)}ms` }}
+                  >
                     {!hasChildren && item.href ? (
                       <SmartLink
                         href={item.href}
@@ -330,7 +446,11 @@ function MobileMenu() {
                             className="p-2"
                           >
                             <ChevronDown
-                              className={cn("h-4 w-4 transition", expanded[k] ? "rotate-180" : "")}
+                              className={cn(
+                                "h-4 w-4 transition-transform duration-200",
+                                expanded[k] ? "rotate-180" : "rotate-0"
+                              )}
+                              aria-hidden="true"
                             />
                           </button>
                         )}
@@ -338,11 +458,19 @@ function MobileMenu() {
                     )}
 
                     {hasChildren && expanded[k] && (
-                      <ul id={`section-${k}`} className="ml-2 border-l pl-3 py-1">
+                      <ul id={`section-${k}`} className="ml-2 border-l pl-3 py-1 group" data-open={!!expanded[k]}>
                         {item.children!.map((c, j) => {
                           const ck = `lv2-${i}-${j}`;
                           return (
-                            <li key={ck} className="py-1">
+                            <li
+                              key={ck}
+                              className={cn(
+                                "py-1 transition-all duration-150 ease-out",
+                                entered[k] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                              )}
+                              // ANIM: Mobile child stagger — base + per-item step
+                              style={{ transitionDelay: `${Math.min(300, ITEM_STAGGER_BASE_MS + j * ITEM_STAGGER_STEP_MS)}ms` }}
+                            >
                               {c.href ? (
                                 <SmartLink
                                   href={c.href}
@@ -362,7 +490,14 @@ function MobileMenu() {
                   </li>
                 );
               })}
-              <li>
+              <li
+                className={cn(
+                  "transition-all duration-150 ease-out",
+                  enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                )}
+                // ANIM: Mobile CTA1 stagger — base + NAV length step
+                style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
+              >
                 <Button asChild className="w-full h-8 mt-4" variant="brandOrange">
                   <SmartLink
                     href={"https://www.myquickroofquote.com/contractors/sonshine-roofing" as Route}
@@ -374,10 +509,17 @@ function MobileMenu() {
                   </SmartLink>
                 </Button>
               </li>
-              <li>
+              <li
+                className={cn(
+                  "transition-all duration-150 ease-out",
+                  enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                )}
+                // ANIM: Mobile CTA2 stagger — base + NAV length step
+                style={{ transitionDelay: `${Math.min(420, MOBILE_CTA2_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
+              >
                 <Button asChild className="w-full h-8 mt-1 mb-2" variant="brandBlue">
                   <SmartLink
-                    href={"/contact-us" as Route}
+                    href={ROUTES.contact}
                     onClick={() => setOpen(false)}
                     className="flex items-center justify-center gap-x-2"
                   >
@@ -394,26 +536,25 @@ function MobileMenu() {
   );
 }
 
-function LicenseLink() {
+function PhoneLink() {
   return (
     <a
-      href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
+      href="tel:+19418664320"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="View Florida contractor license #CCC1331483 on myfloridalicense.com (opens in a new tab)"
-      className="text-sm text-[--brand-blue] inline-flex items-center"
+      aria-label="Call SonShine Roofing"
+      className="text-xs md:text-sm font-semibold text-[--brand-blue] items-center"
     >
-      <BadgeCheck className="mr-1 inline h-3 w-3 text-sm text-[--brand-blue]" aria-hidden="true" />
-      <span>LIC: #CCC1331483</span>
-      <ArrowUpRight className="ml-1 inline h-3 w-3" aria-hidden="true" />
+      <Phone className="mr-1 inline h-3 w-3 md:h-4 md:w-4 text-[--brand-blue] font-semibold" aria-hidden="true" />
+      <span>(941) 866-4320</span>
     </a>
-  );
+  )
 }
 
 export function NavMenu() {
   return (
     <nav className="ml-auto flex items-center gap-3">
-      <LicenseLink />
+      <PhoneLink />
       <DesktopMenu />
       <MobileMenu />
     </nav>

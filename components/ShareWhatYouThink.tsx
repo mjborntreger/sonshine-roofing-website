@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Share2, Copy, Check } from "lucide-react";
+import { Share2, Copy, Check, Pencil } from "lucide-react";
 import type { Route } from "next";
 
 type Props = {
@@ -12,11 +12,6 @@ type Props = {
   /** Optional override for the URL to share (absolute). If omitted, uses SITE_URL + reviewPath. */
   urlOverride?: string;
 };
-
-function getSiteOrigin() {
-  if (typeof window !== "undefined" && window.location?.origin) return window.location.origin;
-  return process.env.NEXT_PUBLIC_SITE_URL || "https://sonshineroofing.com";
-}
 
 export default function ShareWhatYouThink({
   reviewPath = "/reviews" as Route,
@@ -41,19 +36,9 @@ export default function ShareWhatYouThink({
 
   const router = useRouter();
   const shareUrl = getCanonicalWithUTM(urlOverride);
-  const caption = `${text} ${shareUrl}`;
-  const facebookAppId = process.env.NEXT_PUBLIC_FB_APP_ID;
-  const origin = getSiteOrigin();
-  const redirect = `${origin}/share`;
 
   // Web-intent links (desktop & mobile browsers)
-  const fb = facebookAppId
-    ? `https://www.facebook.com/dialog/share?app_id=${encodeURIComponent(
-      facebookAppId
-    )}&href=${encodeURIComponent(shareUrl)}&display=popup&hashtag=%23SonShineRoofing&quote=${encodeURIComponent(
-      text || ""
-    )}&redirect_uri=${encodeURIComponent(redirect)}`
-    : `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  const fb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
   const x = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;
   function openPopup(url: string, name = "fbshare") {
     try {
@@ -71,9 +56,6 @@ export default function ShareWhatYouThink({
     }
   }
 
-  const instagramProfile = "https://instagram.com/sonshineroofing";
-  const nextdoorProfile = "https://nextdoor.com/pages/sonshine-roofing-sarasota-fl";
-
   function openExternal(url: string) {
     try {
       window.open(url, "_blank", "noopener,noreferrer");
@@ -81,25 +63,6 @@ export default function ShareWhatYouThink({
       // Fallback for strict browsers/environments
       window.location.href = url;
     }
-  }
-
-  async function shareNative(fallbackUrl?: string) {
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: "SonShine Roofing", text: caption, url: shareUrl });
-        return;
-      }
-    } catch {
-      // continue to fallback below
-    }
-    try {
-      await navigator.clipboard.writeText(caption);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // silently fail; if clipboard write is blocked we still open the fallback
-    }
-    if (fallbackUrl) openExternal(fallbackUrl);
   }
 
   async function copyUrlToClipboard() {
@@ -122,17 +85,21 @@ export default function ShareWhatYouThink({
   }
 
   const btn = "btn btn-outline btn-sm btn-press inline-flex items-center gap-2";
-  const orange = "text-white bg-[#fb9216] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#fb9216]"
-  const facebook_blue = "text-white bg-[#385898] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#385898]"
-  const x_black = "text-white bg-black btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-black"
-  const instagram_gradient = "text-white bg-[#dd2a7b] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#dd2a7b]"
-  const nextdoor_green = "text-white bg-[#479261] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#479261]"
+  const orange = "text-white bg-[#fb9216] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#fb9216]";
+  const facebook_blue = "text-white bg-[#385898] btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-[#385898]";
+  const x_black = "text-white bg-black btn btn-outline btn-sm btn-press inline-flex items-center gap-2 hover:bg-black";
 
   return (
     <div className="mt-3">
       <div className="flex flex-wrap items-center gap-3">
         {/* Leave a Review (no icon) */}
-        <button type="button" onClick={goToReviews} className={orange} title="Leave a Review">
+        <button 
+          type="button" 
+          onClick={goToReviews} 
+          className={orange} 
+          title="Leave a Review"
+          >
+          <Pencil className="h-4 w-4" aria-hidden="true" />
           Leave a Review
         </button>
 
@@ -153,33 +120,11 @@ export default function ShareWhatYouThink({
           Share on X
         </button>
 
-        {/* Instagram: native share or copy + open profile */}
-        <button
-          type="button"
-          onClick={() => shareNative(instagramProfile)}
-          className={instagram_gradient}
-          title="Share on Instagram (copy caption)"
-        >
-          <Share2 className="h-4 w-4" aria-hidden="true" />
-          Share on Instagram
-        </button>
-
-        {/* Nextdoor: native share or copy + open profile */}
-        <button
-          type="button"
-          onClick={() => shareNative(nextdoorProfile)}
-          className={nextdoor_green}
-          title="Share on Nextdoor (copy caption)"
-        >
-          <Share2 className="h-4 w-4" aria-hidden="true" />
-          Share on Nextdoor
-        </button>
-
         {/* Utility: copy URL only */}
         <div className="flex items-center gap-2">
           <button type="button" onClick={copyUrlToClipboard} className={btn} title="Copy URL to Clipboard">
             <Copy className="h-4 w-4" aria-hidden="true" />
-            Copy URL to Clipboard
+            Copy URL
           </button>
           <span
             aria-live="polite"

@@ -7,15 +7,16 @@ const imageClasses = "transition-transform duration-200 ease-out group-hover:tra
 
 export default async function bestOfTheBest() {
   return (
-    <section
-      aria-labelledby="botb-title"
-      className="border border-[--brand-orange] rounded-xl bg-[#fb9216]/5 shadow-md p-8 md:p-10 my-24"
-    >
-      <div className="text-center">
-        <h2>Best of the Best Award Winner (2021–2025)</h2>
+    <div className="px-4">
+      <div 
+        aria-label="botb-title" 
+        id="botb-title"
+      >
+        <h2 className="text-center text-2xl md:text-5xl text-slate-700 py-8">
+          Best of the Best Award Winner (2021–2025)
+        </h2>
       </div>
-      <div className="gradient-divider my-4" />
-      
+
 
       {/* Badges: responsive, semantic list with subtle hover affordances */}
       <ul className="mt-10 grid grid-cols-5 place-items-center justify-center gap-4">
@@ -46,7 +47,7 @@ export default async function bestOfTheBest() {
             alt="Best of the Best 2022 Award"
             className={imageClasses}
           />
-          
+
         </li>
 
         <li className="group relative">
@@ -61,7 +62,7 @@ export default async function bestOfTheBest() {
             alt="Best of the Best 2023 Award"
             className={imageClasses}
           />
-          
+
         </li>
 
         <li className="group relative">
@@ -76,7 +77,7 @@ export default async function bestOfTheBest() {
             alt="Best of the Best 2024 Award"
             className={imageClasses}
           />
-          
+
         </li>
 
         <li className="group relative">
@@ -91,7 +92,7 @@ export default async function bestOfTheBest() {
             alt="Best of the Best 2025 Award"
             className={imageClasses}
           />
-          
+
         </li>
       </ul>
 
@@ -112,6 +113,6 @@ export default async function bestOfTheBest() {
           <BestOfTheBestVideo />
         </div>
       </div>
-    </section>
+    </div>
   );
 }

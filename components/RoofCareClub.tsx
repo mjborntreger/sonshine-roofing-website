@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import UiLink from "@/components/UiLink";
 
 // -----------------------------
 // Types & Data
@@ -157,6 +156,46 @@ export default function RoofCareClub() {
     return map;
   }, []);
 
+  // JSON-LD (client-side): Service details for Roof Care Club (membership)
+  const base = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://sonshineroofing.com');
+  const pageUrl = `${base}/roof-maintenance`;
+  const providerId = `${base}/#roofingcontractor`;
+
+  const offerCatalog = useMemo(() => ({
+    '@type': 'OfferCatalog',
+    name: 'Roof Care Club Plans',
+    itemListElement: PLANS.map((plan) => ({
+      '@type': 'Offer',
+      name: plan.name,
+      category: plan.id,
+      priceCurrency: 'USD',
+      offeredBy: { '@id': providerId },
+      itemOffered: { '@type': 'Service', name: 'Roof Maintenance (Membership)' },
+      additionalProperty: [
+        { '@type': 'PropertyValue', name: '1-year', value: plan.prices[1] },
+        { '@type': 'PropertyValue', name: '2-year', value: plan.prices[2] },
+        { '@type': 'PropertyValue', name: '3-year', value: plan.prices[3] },
+      ],
+    })),
+  }), [providerId]);
+
+  const serviceLd = useMemo(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${base}/#roof-care-club`,
+    name: 'Roof Care Club',
+    serviceType: 'Roof Maintenance',
+    description: 'Membership maintenance plan with scheduled inspections, discounts, and member benefits.',
+    url: pageUrl,
+    provider: { '@id': providerId },
+    areaServed: [
+      { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
+      { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
+      { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
+    ],
+    hasOfferCatalog: offerCatalog,
+  }), [base, pageUrl, providerId, offerCatalog]);
+
   return (
     <div aria-labelledby="rcc-title" className="py-8 not-prose">
       <div className="text-center max-w-3xl mx-auto">
@@ -167,6 +206,12 @@ export default function RoofCareClub() {
           Choose your plan and term. Switch to monthly view to see the equivalent cost—
           <span className="font-medium text-slate-800">plans are billed annually</span>.
         </p>
+        {/* JSON-LD: Service (Roof Care Club) */}
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+        />
       </div>
 
       {/* Toggles */}

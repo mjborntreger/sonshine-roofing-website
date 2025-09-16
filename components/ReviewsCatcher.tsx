@@ -31,12 +31,12 @@ export default function ReviewsCatcher() {
   return (
     <section className="w-full py-10 text-center">
       <div className="mx-auto max-w-3xl">
-        <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">
+        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
           Reviews
-        </h2>
-        <h3 className="mt-2 text-xl text-slate-700 md:text-2xl">
+        </h1>
+        <h2 className="mt-2 text-xl text-slate-700 md:text-2xl">
           How did we do?
-        </h3>
+        </h2>
 
         <div className="mt-8">
           {/* Stars row */}

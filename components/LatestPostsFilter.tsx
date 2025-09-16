@@ -63,10 +63,11 @@ export default function LatestPostsFilter({
   }, [posts, selected, initial]);
 
   return (
-    <div className="p-8 md:p-10 my-12">
+    <>
+    <div className="px-8 md:px-10 py-24">
       {showHeader && (
         <div className="text-center">
-          <h2>Latest Blog Posts</h2>
+          <h2 className="text-3xl text-slate-700 md:text-5xl">Latest Blog Posts</h2>
           <div className={gradientDivider} />
           <div className="flex flex-wrap items-center justify-center gap-2 my-6">
             {tabs.map((t) => {
@@ -95,7 +96,7 @@ export default function LatestPostsFilter({
         </div>
       )}
 
-      <div key={selected} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div key={selected} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {filtered.length > 0 ? (
           filtered.map((p, i) => (
             <Card
@@ -158,5 +159,6 @@ export default function LatestPostsFilter({
         /* Tailwind variant friendly: use with motion-safe:animate-lp-fade-in */
       `}</style>
     </div>
+  </>
   );
 }

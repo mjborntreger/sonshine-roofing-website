@@ -5,12 +5,26 @@ import type { ProjectSummary } from '@/lib/wp';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import UiLink from '@/components/UiLink';
 import Image from 'next/image';
-import useEmblaCarousel from 'embla-carousel-react';
-import AutoScroll from 'embla-carousel-auto-scroll';
 
 const lessFatCta = 'btn btn-brand-blue btn-lg btn-press w-full sm:w-auto';
 const gradientDivider = 'gradient-divider my-8';
 const pStyles = 'my-8 text-center justify-center text-lg';
+
+function ExcerptHTML({ html }: { html: string }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.innerHTML = html || '';
+    }
+  }, [html]);
+  return (
+    <p
+      ref={ref}
+      className="text-sm text-slate-600 line-clamp-3"
+      suppressHydrationWarning
+    />
+  );
+}
 
 type MaterialKey = 'all' | 'shingle' | 'metal' | 'tile';
 
@@ -49,50 +63,11 @@ export default function LatestProjectsFilter({
     return out;
   }, [projects, selected, initial]);
 
-  // Embla carousel setup
-  const autoScrollOptions = useMemo(
-    () => ({
-      speed: 1, // requested
-      startDelay: 0,
-      stopOnMouseEnter: true,
-      stopOnInteraction: false,
-      direction: 'backward' as const,
-    }),
-    []
-  );
-
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: 'start', dragFree: false, slidesToScroll: 1 },
-    [AutoScroll(autoScrollOptions)]
-  );
-
-  // Respect reduced motion and (re)play after content changes
-  useEffect(() => {
-    if (!emblaApi) return;
-    const plugins = (emblaApi as any).plugins?.();
-    const auto = plugins?.autoScroll as { play: () => void; stop: () => void } | undefined;
-    const mm = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const handle = () => (mm.matches ? auto?.stop() : auto?.play());
-    handle();
-    mm.addEventListener('change', handle);
-    return () => mm.removeEventListener('change', handle);
-  }, [emblaApi, selected, filtered.length]);
-
-  // When switching tabs, reset to first slide
-  useEffect(() => {
-    if (!emblaApi) return;
-    emblaApi.scrollTo(0, false);
-    // Re-init to ensure proper slide measurements when count changes
-    try { emblaApi.reInit(); } catch {}
-    const auto = (emblaApi as any).plugins?.().autoScroll as { play: () => void } | undefined;
-    auto?.play();
-  }, [selected, filtered.length, emblaApi]);
-
   return (
-    <div className="p-8 md:p-10 my-12">
+    <div className="px-8 md:px-10 pt-24">
       {showHeader && (
         <div className="text-center">
-          <h2>Latest Projects</h2>
+          <h2 className="text-3xl md:text-5xl text-slate-700">Latest Projects</h2>
           <div className={gradientDivider} />
 
           <div className="flex flex-wrap items-center justify-center gap-2 my-6">
@@ -123,65 +98,51 @@ export default function LatestProjectsFilter({
         </div>
       )}
 
-      {/* Carousel viewport */}
-      <div key={selected} className="embla">
-        <div ref={emblaRef} className="overflow-hidden px-4 md:px-6">
-          <div className="flex py-3 -mx-3">
-            {filtered.length > 0 ? (
-              filtered.map((p, i) => (
-                <div
-                  key={p.slug}
-                  className="shrink-0 grow-0 basis-full md:basis-1/2 min-w-0 my-2 px-3"
-                >
-                  <Card
-                    className="overflow-hidden motion-safe:animate-lp-fade-in"
-                    style={{ animationDelay: `${i * 60}ms` }}
-                    data-card
-                  >
-                    <UiLink href={`/project/${p.slug}`} className="block" title={p.title}>
-                      <CardHeader>
-                        <CardTitle className="font-medium line-clamp-2">{p.title}</CardTitle>
-                      </CardHeader>
-                      {p?.heroImage?.url ? (
-                        <Image
-                          src={p.heroImage.url}
-                          alt={p.heroImage?.altText ?? p.title}
-                          width={800}
-                          height={600}
-                          className="h-48 w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-48 w-full bg-slate-100" />
-                      )}
-                      <CardContent>
-                        {(p as any)?.excerpt ? (
-                          <p
-                            className="text-sm text-slate-600 line-clamp-3"
-                            dangerouslySetInnerHTML={{ __html: (p as any).excerpt }}
-                          />
-                        ) : (
-                          <p className="text-sm text-slate-600">Full Project Details →</p>
-                        )}
-                      </CardContent>
-                    </UiLink>
-                  </Card>
-                </div>
-              ))
-            ) : (
-              <div className="shrink-0 grow-0 basis-full md:basis-1/2 min-w-0 my-2 px-3">
-                <Card className="overflow-hidden">
-                  <CardHeader>
-                    <CardTitle className="font-medium">No matching projects</CardTitle>
-                  </CardHeader>
+      <div key={selected} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {filtered.length > 0 ? (
+          filtered.map((p, i) => (
+            <Card
+              key={p.slug}
+              className="overflow-hidden motion-safe:animate-lp-fade-in"
+              style={{ animationDelay: `${i * 60}ms` }}
+              data-card
+            >
+              <UiLink href={`/project/${p.slug}`} className="block" title={p.title}>
+                <CardHeader>
+                  <CardTitle className="font-medium line-clamp-2">{p.title}</CardTitle>
+                </CardHeader>
+                {p?.heroImage?.url ? (
+                  <Image
+                    src={p.heroImage.url}
+                    alt={p.heroImage?.altText ?? p.title}
+                    width={800}
+                    height={600}
+                    className="h-48 w-full object-cover"
+                  />
+                ) : (
                   <div className="h-48 w-full bg-slate-100" />
-                  <CardContent>
-                    <p className="text-sm text-slate-600">Try another filter.</p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
-        </div>
+                )}
+                <CardContent>
+                  {(p as any)?.excerpt ? (
+                    <ExcerptHTML html={(p as any).excerpt as string} />
+                  ) : (
+                    <p className="text-sm text-slate-600">Full Project Details →</p>
+                  )}
+                </CardContent>
+              </UiLink>
+            </Card>
+          ))
+        ) : (
+          <Card className="overflow-hidden">
+            <CardHeader>
+              <CardTitle className="font-medium">No matching projects</CardTitle>
+            </CardHeader>
+            <div className="h-48 w-full bg-slate-100" />
+            <CardContent>
+              <p className="text-sm text-slate-600">Try another filter.</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {showHeader && (
@@ -192,28 +153,12 @@ export default function LatestProjectsFilter({
         </div>
       )}
       <style jsx global>{`
-        @keyframes lp-fade-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+        @keyframes lp-fade-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: none; }
+        }
         .animate-lp-fade-in { animation: lp-fade-in .28s ease-out both; }
-        /* embla */
-        .embla { position: relative; }
-        .embla::before,
-        .embla::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          width: 56px; /* match reviews slider feel */
-          pointer-events: none;
-          z-index: 10;
-        }
-        .embla::before {
-          left: 0;
-          background: linear-gradient(to right, var(--paper, #fff) 0%, rgba(255,255,255,0) 80%);
-        }
-        .embla::after {
-          right: 0;
-          background: linear-gradient(to left, var(--paper, #fff) 0%, rgba(255,255,255,0) 80%);
-        }
+        /* Tailwind variant friendly: use with motion-safe:animate-lp-fade-in */
       `}</style>
     </div>
   );

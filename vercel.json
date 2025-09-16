@@ -1,6 +1,13 @@
 {
   "headers": [
     {
+      "source": "/__sitemaps/sitemap.xsl",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" },
+        { "key": "Content-Type", "value": "text/xsl; charset=utf-8" }
+      ]
+    },
+    {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "staging.sonshineroofing.com" }],
       "headers": [

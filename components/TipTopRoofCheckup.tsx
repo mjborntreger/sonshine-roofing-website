@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import clsx from 'clsx';
-import UiLink from './UiLink';
+import { ChevronDown } from 'lucide-react';
 
 type Item = { label: string; why: string };
 
@@ -78,6 +78,48 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
 
     const current = useMemo(() => CHECKLIST[tab], [tab]);
 
+    // JSON-LD (client-side): HowTo + page-specific Service for Tip Top Roof Check‑up
+    const base = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://sonshineroofing.com');
+    const pageUrl = `${base}/roof-inspection`;
+    const providerId = `${base}/#roofingcontractor`;
+
+    const howToSections = useMemo(() => {
+        return (Object.values(CHECKLIST) as { title: string; blurb: string; items: Item[] }[]).map((group) => ({
+            '@type': 'HowToSection',
+            name: group.title,
+            itemListElement: group.items.map((it) => ({
+                '@type': 'HowToStep',
+                name: it.label,
+                text: it.why,
+            })),
+        }));
+    }, []);
+
+    const howToLd = useMemo(() => ({
+        '@context': 'https://schema.org',
+        '@type': 'HowTo',
+        name: 'Tip Top Roof Check‑up',
+        description: 'What we inspect during a roof check‑up to catch issues early and extend roof life.',
+        step: howToSections,
+        url: pageUrl,
+    }), [howToSections, pageUrl]);
+
+    const serviceLd = useMemo(() => ({
+        '@context': 'https://schema.org',
+        '@type': 'Service',
+        '@id': `${base}/#roof-checkup`,
+        name: 'Tip Top Roof Check‑up',
+        serviceType: 'Roof Inspection',
+        description: 'An in‑depth multi‑point inspection covering interior, attic, and exterior roof systems.',
+        url: pageUrl,
+        provider: { '@id': providerId },
+        areaServed: [
+            { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
+            { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
+            { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
+        ],
+    }), [base, pageUrl, providerId]);
+
     useEffect(() => {
         const el = rootRef.current;
         if (!el || typeof window === 'undefined') return;
@@ -105,6 +147,18 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
                 </p>
                 <div className="mx-auto my-6 h-[3px] w-40 bg-gradient-to-r from-[#0045d7] to-[#00e3fe] rounded-full" />
             </header>
+
+            {/* JSON-LD: HowTo + Service for Tip Top Roof Check‑up */}
+            <script
+                type="application/ld+json"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
+            />
+            <script
+                type="application/ld+json"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+            />
 
             <div className="mx-auto mt-4 max-w-3xl rounded-xl border border-slate-400 bg-white p-4 text-center shadow-sm">
                 <p className="text-sm text-slate-700">
@@ -161,20 +215,22 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
                         <h3 className="text-lg font-semibold text-slate-900">{CHECKLIST[key].title}</h3>
                         <p className="mt-1 text-sm text-slate-600">{CHECKLIST[key].blurb}</p>
 
-                        <ul className="mt-4 space-y-3 list-none p-0">
+                        <ul className="mt-4 space-y-3 list-none not-prose p-0">
                             {CHECKLIST[key].items.map((it, idx) => {
                                 const id = `${key}-${idx}`;
                                 const open = Boolean(openMap[id]);
                                 return (
-                                    <li key={id} className="rounded-lg border border-slate-300 overflow-hidden transition-colors hover:bg-slate-50">
+                                    <li key={id} className="not-prose rounded-lg border border-slate-300 overflow-hidden transition-colors hover:bg-slate-50">
                                         <button
                                             type="button"
                                             aria-expanded={open}
                                             onClick={() => toggle(id)}
                                             className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left"
                                         >
-                                            <span className="font-medium text-slate-900">• {it.label}</span>
-                                            <span className={clsx('shrink-0 transition', open ? 'rotate-180' : '')}>▾</span>
+                                            <span className="font-medium text-slate-900">{it.label}</span>
+                                            <span className={clsx('shrink-0 transition', open ? 'rotate-180' : '')}>
+                                                <ChevronDown className="inline h-4 w-4" />
+                                            </span>
                                         </button>
                                         {open && (
                                             <div className="px-4 pb-4 text-sm text-slate-700">
