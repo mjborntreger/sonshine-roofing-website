@@ -185,9 +185,9 @@ export default async function Page() {
                 </div>
               </details>
 
-              <AboutVideo />
-
               <HoursAndInformation />
+
+              <AboutVideo />
 
             </div>
 

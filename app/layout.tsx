@@ -262,7 +262,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date();
                   var s=document.createElement('script');
                   s.src='https://embed.tawk.to/5a971646d7591465c708203c/default';
-                  s.async=true; s.crossOrigin='anonymous';
+                  s.async=true;
                   var f=document.getElementsByTagName('script')[0]; f.parentNode.insertBefore(s,f);
                 } catch(e) {}
               }

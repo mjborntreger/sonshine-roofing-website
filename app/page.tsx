@@ -66,8 +66,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const sectionDivider = "h-1.5 w-full my-16 bg-gradient-to-r from-[#0045d7] via-[#00e3fe] to-[#0045d7]"
-
 export default async function Page() {
   const projects = await listRecentProjectsPoolForFilters(4, 8);
   const posts = await listRecentPostsPoolForFilters(4, 4);

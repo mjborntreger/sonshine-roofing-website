@@ -202,7 +202,7 @@ export default function ReviewsSlider({
               >
                 <article className="h-full rounded-2xl border border-slate-400 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
-                    <h4 className="m-0 font-bold text-slate-900">{r.author_name}</h4>
+                    <h3 className="m-0 font-bold text-slate-900">{r.author_name}</h3>
                     <div className="mt-1 flex items-center gap-1 text-[#fb9216]">
                       {Array.from({ length: 5 }).map((_, j) => (
                         <svg key={j} viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>
