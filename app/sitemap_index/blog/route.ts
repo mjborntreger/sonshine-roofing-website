@@ -1,6 +1,7 @@
 // app/sitemap_index/blog/route.ts
 import { NextResponse } from 'next/server';
 import { wpFetch } from '@/lib/wp';
+import { formatLastmod } from '../utils';
 import { unstable_cache } from 'next/cache';
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL!;
@@ -52,7 +53,10 @@ export async function GET() {
   const body = [
     head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-    ...items.map(n => `<url><loc>${BASE}${n.uri}</loc>${n.modifiedGmt ? `<lastmod>${n.modifiedGmt}</lastmod>` : ''}</url>`),
+    ...items.map(n => {
+      const lastmod = formatLastmod(n.modifiedGmt);
+      return `<url><loc>${BASE}${n.uri}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
+    }),
     `</urlset>`
   ].join('');
   return new NextResponse(body, {
