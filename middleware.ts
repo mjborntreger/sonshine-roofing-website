@@ -1,36 +1,34 @@
-// middleware.ts
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from 'next/server';
 
-export function middleware(req: Request) {
-  const host = new URL(req.url).host;
-  const isStagingHost = host.startsWith("staging.");
-
-  const user = (process.env.BASIC_AUTH_USER || "").trim();
-  const pass = (process.env.BASIC_AUTH_PASS || "").trim();
-
-  // Only enforce if we're on staging AND both vars exist
-  const shouldProtect = isStagingHost && !!user && !!pass;
-  if (!shouldProtect) return NextResponse.next();
-
-  // Edge-safe base64
-  const expected = "Basic " + btoa(`${user}:${pass}`);
-  const provided = req.headers.get("authorization") || "";
-
-  if (provided !== expected) {
-    return new NextResponse("Auth required", {
-      status: 401,
-      headers: {
-        'WWW-Authenticate': 'Basic realm="SonShine Staging", charset="UTF-8"',
-        // small hint for debugging without leaking secrets
-        'x-auth-stage': 'challenge',
-      },
-    });
-  }
-  return NextResponse.next();
+// 410 Gone for legacy/gone content.
+// Use matcher (below) to target only these paths.
+export function middleware(_req: NextRequest) {
+  return new NextResponse('Gone', {
+    status: 410,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      // cache for a day at edge/CDN; adjust as desired
+      'Cache-Control': 'public, max-age=86400',
+    },
+  });
 }
 
+// Apply only to the gone routes. Trailing segments with :path* cover optional trailing slashes.
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|robots\\.txt|sitemap_index|__sitemaps).*)',
+    // Category/project legacy prefixes
+    '/project_category/ellenton/:path*',
+    '/project_category/englewood/:path*',
+    '/project_category/parrish/:path*',
+    '/parrish-roofing-contractor/:path*',
+    '/ellenton-roofing-contractor/:path*',
+    '/englewood-roofing-contractor/:path*',
+
+    // Specific retired pages
+    '/about/tony/:path*',
+    '/about/adam-2/:path*',
+    '/about/stephanie/:path*',
+    '/open-for-business-update-covid-19-safety-measures/:path*',
   ],
 };
+

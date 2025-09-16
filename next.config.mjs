@@ -44,7 +44,90 @@ const nextConfig = {
         ]
       }
     ];
-  }
+  },
+
+  // Pick one canonical style to avoid slash chaos:
+  // trailingSlash: true,  // always add slash
+  trailingSlash: false,
+
+  async redirects() {
+    return [
+      // Manual rules from existing config
+      // Removed two trailing-slash adders to avoid loops with trailingSlash=false
+      // { source: "/roof-inspection", destination: "/roof-inspection/", permanent: true },
+      // { source: "/5-things-ask-sarasota-roofing-contractor", destination: "/5-things-ask-sarasota-roofing-contractor/", permanent: true },
+      { source: "/blog/:path*", destination: "/:path*", permanent: true },
+
+      // De-paginate everywhere: /something/page/2 -> /something/
+      { source: "/:prefix*/page/:n(\\d+)", destination: "/:prefix*", permanent: true },
+
+      // Strip .html endings globally
+      { source: "/:path*.html", destination: "/:path*", permanent: true },
+
+      // === Legacy Pages ===
+      { source: "/roof-repairs", destination: "/roof-repair", permanent: true },
+      { source: "/quote", destination: "https://www.myquickroofquote.com/contractors/sonshine-roofing", permanent: true },
+      { source: "/about", destination: "/about-sonshine-roofing", permanent: true },
+      { source: "/roof-replacement", destination: "/roof-replacement-sarasota-fl", permanent: true },
+      { source: "/services/roof-replacement", destination: "/roof-replacement-sarasota-fl", permanent: true },
+      { source: "/services/roof-repair", destination: "/roof-repair", permanent: true },
+      { source: "/services/roof-inspection", destination: "/roof-inspection", permanent: true },
+      { source: "/services/roof-maintenance", destination: "/roof-maintenance", permanent: true },
+      { source: "/:prefix*/:seg(wp\\-sitemap.*)", destination: "/sitemap_index", permanent: true },
+      { source: "/sitemap", destination: "/sitemap_index", permanent: true },
+      { source: "/html-sitemap", destination: "/sitemap_index", permanent: true },
+      { source: "/expert-answers-to-your-roofing-questions", destination: "/faq", permanent: true },
+      { source: "/services/roof-care-club", destination: "/roof-maintenance#roof-care-club", permanent: true },
+      { source: "/roof-care-club", destination: "/roof-maintenance#roof-care-club", permanent: true },
+      { source: "/roofing-terms-and-definitions", destination: "/roofing-glossary", permanent: true },
+      { source: "/our-services/roof-maintenance-services/why-you-need-roof-inspection", destination: "/roof-inspection", permanent: true },
+      { source: "/instant-free-quote", destination: "https://www.myquickroofquote.com/contractors/sonshine-roofing", permanent: true },
+      { source: "/roof-repair-sarasota", destination: "/roof-repair", permanent: true },
+
+      // === Persons ===
+      { source: "/about/mina-2", destination: "/person/mina", permanent: true },
+      { source: "/about/bob", destination: "/person/bob", permanent: true },
+      { source: "/about/josh", destination: "/person/josh", permanent: true },
+      { source: "/about/tara-bell", destination: "/person/tara", permanent: true },
+      { source: "/about-sonshine-roofing/nathan-borntreger-owner", destination: "/person/nathan-borntreger", permanent: true },
+      { source: "/about/nathan", destination: "/person/nathan-borntreger", permanent: true },
+      { source: "/about/nathan-borntreger", destination: "/person/nathan-borntreger", permanent: true },
+      { source: "/about/angela", destination: "/person/angela", permanent: true },
+      { source: "/about/jeremy-b", destination: "/person/jb", permanent: true },
+      { source: "/about/steve", destination: "/person/steve", permanent: true },
+
+      // === Blog Slug Changes ===
+      { source: "/irresistible-blackened-grouper-tacos-with-creamy-lime-crema", destination: "/grouper-tacos", permanent: true },
+      { source: "/9-warning-signs-of-roof-leaks/", destination: "/roof-repair", permanent: true },
+      { source: "/roof-cleaning-in-florida-expert-answers-from-hoover-pressure-cleaning", destination: "/roof-cleaning-in-florida", permanent: true },
+
+      // === Broken Backlinks ===
+      { source: "/wp-content/uploads/roof-lifespan-1-1080x619.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/extend-roof-lifespan.webp", permanent: true },
+      { source: "/wp-content/uploads/sarasota-roofing-companies-sonshine-roofing.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png", permanent: true },
+      { source: "/wp-content/uploads/sonshine-roofing-logo.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png", permanent: true },
+      { source: "/wp-content/uploads/how-long-does-a-roof-last-composite.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
+      { source: "/wp-content/uploads/pitch-roofed-roof-vs.-flat-roof.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/pitched-roof-vs-flat-roof.webp", permanent: true },
+      { source: "/wp-content/uploads/how-long-does-a-roof-last-slate.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
+      { source: "/wp-content/uploads/need-roof-repair-attic2-1080x675.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/need-roof-repair-attic-800x450-1.webp", permanent: true },
+      { source: "/wp-content/uploads/roofing-contractor-1-1080x675.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/ask-sarasota-roofing-contractor-1.webp", permanent: true },
+      { source: "/wp-content/uploads/GAF-Footer-LOGO.png", destination: "https://next.sonshineroofing.com/wp-content/uploads/master-elite-logo-hi-res-png.png", permanent: true },
+      { source: "/wp-content/uploads/roof-leak-warning-9-roof-stain.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/roof-leak-warning-9-roof-stain.webp", permanent: true },
+      { source: "/wp-content/uploads/roof-leak-warning-1-algae.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/roof-leak-warning-1-algae.webp", permanent: true },
+      { source: "/wp-content/uploads/how-long-does-a-tile-roof-last-in-florida-1080x675.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
+
+      // === Legacy Project Categories & Archives (Collapsed) ===
+      // All legacy category URLs → unified Projects page with a location filter.
+      // Query strings (UTMs, etc.) are preserved and will merge with `?sa=:city`.
+      { source: "/project_category/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)/:path*", destination: "/project?sa=:city", permanent: true },
+      { source: "/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)-roofing-contractor/:path*", destination: "/project?sa=:city", permanent: true },
+
+      // === Deleted Content (410) — you will move these to middleware later ===
+      // 410s handled in middleware.ts for proper Gone responses
+
+      // === Canonical host — www → apex ===
+      { source: "/:path*", has: [{ type: 'host', value: 'www.sonshineroofing.com' }], destination: "https://sonshineroofing.com/:path*", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
