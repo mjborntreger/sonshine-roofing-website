@@ -62,7 +62,8 @@ export async function GET() {
     return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
   }
 
-  const items = await getPersonUrls();
+  const targetPath = '/person/nathan-borntreger';
+  const items = (await getPersonUrls()).filter((n) => normalizeEntryPath(n.uri) === targetPath);
 
   const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
@@ -72,8 +73,7 @@ export async function GET() {
     head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...items.map((n) => {
-      const path = normalizeEntryPath(n.uri);
-      const loc = `${BASE}${path}`;
+      const loc = `${BASE}${targetPath}`;
       const isoLastmod = formatLastmod(n.modifiedGmt);
       const lastmod = isoLastmod ? `<lastmod>${isoLastmod}</lastmod>` : '';
       return `<url><loc>${loc}</loc>${lastmod}</url>`;

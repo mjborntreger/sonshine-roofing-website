@@ -18,6 +18,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const person = await listPersonsBySlugs([slug]).then((arr) => arr[0]);
+  const isNathan = slug === 'nathan-borntreger';
 
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
   const canonicalPath = `/person/${slug}`;
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title,
     description,
     alternates: { canonical: canonicalPath },
-    robots: { index: true, follow: true },
+    robots: { index: isNathan, follow: true },
     openGraph: {
       type: 'profile',
       title,

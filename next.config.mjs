@@ -122,11 +122,13 @@ const nextConfig = {
       { source: "/wp-content/uploads/roof-leak-warning-9-roof-stain.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/roof-leak-warning-9-roof-stain.webp", permanent: true },
       { source: "/wp-content/uploads/roof-leak-warning-1-algae.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/roof-leak-warning-1-algae.webp", permanent: true },
       { source: "/wp-content/uploads/how-long-does-a-tile-roof-last-in-florida-1080x675.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
+      { source: "/wp-content/:path*", destination: "https://next.sonshineroofing.com/wp-content/:path*", permanent: true },
 
       // === Legacy Project Categories & Archives (Collapsed) ===
       // All legacy category URLs → unified Projects page with a location filter.
       // Query strings (UTMs, etc.) are preserved and will merge with `?sa=:city`.
       { source: "/project_category/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)/:path*", destination: "/project?sa=:city", permanent: true },
+      { source: "/project-category/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)/:path*", destination: "/project?sa=:city", permanent: true },
       { source: "/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)-roofing-contractor/:path*", destination: "/project?sa=:city", permanent: true },
 
       // === Deleted Content (410) — you will move these to middleware later ===

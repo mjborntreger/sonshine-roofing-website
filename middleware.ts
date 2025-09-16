@@ -20,6 +20,9 @@ export const config = {
     '/project_category/ellenton/:path*',
     '/project_category/englewood/:path*',
     '/project_category/parrish/:path*',
+    '/project-category/ellenton/:path*',
+    '/project-category/englewood/:path*',
+    '/project-category/parrish/:path*',
     '/parrish-roofing-contractor/:path*',
     '/ellenton-roofing-contractor/:path*',
     '/englewood-roofing-contractor/:path*',
@@ -29,6 +32,7 @@ export const config = {
     '/about/adam-2/:path*',
     '/about/stephanie/:path*',
     '/open-for-business-update-covid-19-safety-measures/:path*',
+    '/know-about-tile-roof-repair/:path*',
+    '/seven-ways-to-make-sure-your-roofing-contractor-will-rip-you-off/:path*',
   ],
 };
-
