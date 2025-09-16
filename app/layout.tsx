@@ -241,9 +241,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </Suspense>
         <Header />
         <main className="flex-1">
-          <RouteTransitions variant="zoom" duration={0.35}>
-            {children}
-          </RouteTransitions>
+          <RouteTransitions>{children}</RouteTransitions>
         </main>
         <Footer />
         {/* Global JSON-LD (RoofingContractor + Services) */}
