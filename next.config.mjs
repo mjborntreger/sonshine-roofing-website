@@ -52,11 +52,15 @@ const nextConfig = {
 
   async redirects() {
     return [
+      // === Canonical host — www → apex (run first to avoid extra hops) ===
+      { source: "/:path*", has: [{ type: 'host', value: 'www.sonshineroofing.com' }], destination: "https://sonshineroofing.com/:path*", permanent: true },
+
       // Manual rules from existing config
       // Removed two trailing-slash adders to avoid loops with trailingSlash=false
       // { source: "/roof-inspection", destination: "/roof-inspection/", permanent: true },
       // { source: "/5-things-ask-sarasota-roofing-contractor", destination: "/5-things-ask-sarasota-roofing-contractor/", permanent: true },
-      { source: "/blog/:path*", destination: "/:path*", permanent: true },
+      // Move legacy blog posts from /blog/* to /*, but keep /blog archive intact
+      { source: "/blog/:path(.+)", destination: "/:path", permanent: true },
 
       // De-paginate everywhere: /something/page/2 -> /something/
       { source: "/:prefix*/page/:n(\\d+)", destination: "/:prefix*", permanent: true },
@@ -124,8 +128,7 @@ const nextConfig = {
       // === Deleted Content (410) — you will move these to middleware later ===
       // 410s handled in middleware.ts for proper Gone responses
 
-      // === Canonical host — www → apex ===
-      { source: "/:path*", has: [{ type: 'host', value: 'www.sonshineroofing.com' }], destination: "https://sonshineroofing.com/:path*", permanent: true },
+      // (host redirect placed at top)
     ];
   },
 };
