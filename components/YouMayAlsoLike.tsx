@@ -99,12 +99,12 @@ export default function YouMayAlsoLike({
 
                             {/* Image */}
                             {p.featuredImage?.url ? (
-                                // eslint-disable-next-line @next/next/no-img-element
                                 <Image
                                     src={p.featuredImage.url}
                                     alt={p.featuredImage.altText || p.title}
                                     width={800}
                                     height={600}
+                                    sizes="(max-width: 800px) 80vw, 768px"
                                     className="h-48 w-full object-cover rounded-none"
                                     loading="lazy"
                                 />

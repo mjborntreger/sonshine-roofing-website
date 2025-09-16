@@ -71,6 +71,7 @@ export default function FooterBadges() {
             title={badge.title}
             height={imageHeight}
             width={imageWidth}
+            sizes="(max-width: 150px) 25vw, 366px"
             loading="lazy"
             decoding="async"
           />

@@ -125,6 +125,7 @@ export default function ProjectVideo({ title, videoId, className }: Props) {
           alt={title}
           width={1280}
           height={720}
+          sizes="(max-width: 1280px) 100vw, 768px"
           className="aspect-video w-full object-cover"
           priority={false}
         />

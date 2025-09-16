@@ -187,6 +187,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
                 alt={project.heroImage.altText || project.title}
                 width={1280}
                 height={720}
+                sizes="(max-width: 1280px) 100vw, 768px"
                 className="rounded-2xl bg-neutral-50"
                 priority
                 fetchPriority="high"

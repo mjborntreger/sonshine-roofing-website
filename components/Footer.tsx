@@ -51,6 +51,7 @@ export default function Footer() {
                 alt="SonShine Roofing Logo"
                 width={158.5}
                 height={66}
+                sizes="(max-width: 158.5px) 33vw 366px"
                 loading="lazy"
                 fetchPriority="low"
                 className="mb-5"
@@ -196,8 +197,8 @@ export default function Footer() {
                   alt={s.label}
                   width={32}
                   height={32}
+                  sizes="(max-width: 32px) 5vw 366px"
                   loading="lazy"
-                  unoptimized
                   className="h-8 w-8"
                 />
               </a>

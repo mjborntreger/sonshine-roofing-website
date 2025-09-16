@@ -1,6 +1,6 @@
 import SmartLink from "@/components/SmartLink";
 import { ChevronRight, Share2 } from "lucide-react";
-
+import Image from "next/image";
 // Styled like ResourcesQuickLinks (button-ified list items)
 // — maintains each platform color for the label
 // — uses favicon chips for the icons
@@ -48,10 +48,12 @@ export default function SocialMediaProfiles() {
                 className={baseClass}
               >
                 <span className={chipClass} aria-hidden="true">
-                  <img
+                  <Image
                     src={`https://www.google.com/s2/favicons?domain=${l.domain}&sz=64`}
                     alt={`${l.label} favicon`}
-                    className="h-5 w-5"
+                    width={24}
+                    height={24}
+                    sizes="(max-width: 24px)"
                     loading="lazy"
                     decoding="async"
                   />

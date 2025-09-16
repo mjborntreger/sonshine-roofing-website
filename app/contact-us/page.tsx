@@ -97,6 +97,7 @@ export default function Page() {
                   alt="Tara – Project Support Specialist"
                   width={150}
                   height={429}
+                  sizes="(max-width: 150px) 20vw, 300px"
                   className="mb-2 block h-24 w-auto rounded-full object-cover"
                 />
                 <div>

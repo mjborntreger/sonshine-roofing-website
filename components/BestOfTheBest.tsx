@@ -27,6 +27,7 @@ export default async function bestOfTheBest() {
             title="Best of the Best 2021 Award"
             height={imageHeight}
             width={imageWidth}
+            sizes="(max-width: 175px) 15vw, 366px"
             priority
             loading="eager"
             decoding="async"
@@ -42,6 +43,7 @@ export default async function bestOfTheBest() {
             title="Best of the Best 2022 Award"
             height={imageHeight}
             width={imageWidth}
+            sizes="(max-width: 175px) 15vw, 366px"
             loading="lazy"
             decoding="async"
             alt="Best of the Best 2022 Award"
@@ -57,6 +59,7 @@ export default async function bestOfTheBest() {
             title="Best of the Best 2023 Award"
             height={imageHeight}
             width={imageWidth}
+            sizes="(max-width: 175px) 15vw, 366px"
             loading="lazy"
             decoding="async"
             alt="Best of the Best 2023 Award"
@@ -72,6 +75,7 @@ export default async function bestOfTheBest() {
             title="Best of the Best 2024 Award"
             height={imageHeight}
             width={imageWidth}
+            sizes="(max-width: 175px) 15vw, 366px"
             loading="lazy"
             decoding="async"
             alt="Best of the Best 2024 Award"
@@ -87,6 +91,7 @@ export default async function bestOfTheBest() {
             title="Best of the Best 2025 Award"
             height={imageHeight}
             width={imageWidth}
+            sizes="(max-width: 175px) 15vw, 366px"
             loading="lazy"
             decoding="async"
             alt="Best of the Best 2025 Award"

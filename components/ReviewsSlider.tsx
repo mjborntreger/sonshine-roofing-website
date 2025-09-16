@@ -1,8 +1,11 @@
 'use client';
 
 import AutoScroll from 'embla-carousel-auto-scroll';
-import useEmblaCarousel from 'embla-carousel-react';
-import { useEffect, useRef, useState } from 'react';
+import EmblaCarousel, {
+  type EmblaCarouselType,
+  type EmblaOptionsType,
+} from 'embla-carousel';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 type Review = {
@@ -22,15 +25,34 @@ export default function ReviewsSlider({
   gbpUrl: string;
 }) {
   // Continuous auto-scroll (linear), infinite loop, pause on hover
-  const autoScroll = useRef(
-    AutoScroll({ speed: 1, startDelay: 0, stopOnInteraction: false, stopOnMouseEnter: false })
+  const autoScrollOptions = useMemo(
+    () => ({ speed: 1, startDelay: 0, stopOnInteraction: false, stopOnMouseEnter: false }),
+    []
   );
 
-  // Embla
-  const [viewportRef, embla] = useEmblaCarousel(
-    { align: 'start', loop: true, containScroll: 'keepSnaps', dragFree: true },
-    [autoScroll.current]
+  const emblaOptions = useMemo<EmblaOptionsType>(
+    () => ({ align: 'start', loop: true, containScroll: 'keepSnaps', dragFree: true }),
+    []
   );
+
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const [embla, setEmbla] = useState<EmblaCarouselType | null>(null);
+
+  useEffect(() => {
+    if (!viewportRef.current) return;
+
+    const emblaInstance = EmblaCarousel(
+      viewportRef.current,
+      emblaOptions,
+      [AutoScroll(autoScrollOptions)]
+    );
+
+    setEmbla(emblaInstance);
+
+    return () => {
+      emblaInstance.destroy();
+    };
+  }, [autoScrollOptions, emblaOptions]);
 
   // Pagination state (use actual snap count)
   const [selected, setSelected] = useState(0);
@@ -202,7 +224,7 @@ export default function ReviewsSlider({
               >
                 <article className="h-full rounded-2xl border border-slate-400 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
-                    <h3 className="m-0 font-bold text-slate-900">{r.author_name}</h3>
+                    <h3 className="m-0 font-bold text-lg text-slate-900">{r.author_name}</h3>
                     <div className="mt-1 flex items-center gap-1 text-[#fb9216]">
                       {Array.from({ length: 5 }).map((_, j) => (
                         <svg key={j} viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden>

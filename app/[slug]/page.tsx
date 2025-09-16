@@ -298,6 +298,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <Image
             src={post.featuredImage.url}
             alt={post.featuredImage.altText || post.title}
+            sizes="(max-width: 1600px) 100vw, 1600px"
             width={1600}
             height={900}
             className="h-auto w-full object-cover"

@@ -30,6 +30,7 @@ export default function Header() {
             aria-label="SonShine Roofing Logo"
             width={120}
             height={50}
+            sizes="(max-width: 120px) 20vw, 768px"
             loading="eager"
             priority
             fetchPriority="high"
