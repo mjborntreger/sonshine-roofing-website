@@ -83,6 +83,10 @@ const nextConfig = {
       { source: "/services/roof-maintenance", destination: "/roof-maintenance", permanent: true },
       { source: "/:prefix*/:seg(wp\\-sitemap.*)", destination: "/sitemap_index", permanent: true },
       { source: "/sitemap", destination: "/sitemap_index", permanent: true },
+      { source: "/sitemap_index.xml", destination: "/sitemap_index", permanent: true },
+      { source: "/video-sitemap", destination: "/sitemap_index", permanent: true },
+      { source: "/local-sitemap", destination: "/sitemap_index", permanent: true },
+      { source: "/roof-inspection-sarasota", destination: "/roof-inspection", permanent: true },
       { source: "/html-sitemap", destination: "/sitemap_index", permanent: true },
       { source: "/expert-answers-to-your-roofing-questions", destination: "/faq", permanent: true },
       { source: "/services/roof-care-club", destination: "/roof-maintenance#roof-care-club", permanent: true },
@@ -91,6 +95,11 @@ const nextConfig = {
       { source: "/our-services/roof-maintenance-services/why-you-need-roof-inspection", destination: "/roof-inspection", permanent: true },
       { source: "/instant-free-quote", destination: "https://www.myquickroofquote.com/contractors/sonshine-roofing", permanent: true },
       { source: "/roof-repair-sarasota", destination: "/roof-repair", permanent: true },
+      { source: "/sarasota/roofing-contractors", destination: "/", permanent: true },
+      { source: "/repair-vs-replace", destination: "/roof-replacement-sarasota-fl#repair-vs-replace", permanent: true },
+      { source: "/service-areas", destination: "/about-sonshine-roofing", permanent: true },
+      { source: "/roofing-services", destination: "contact-us", permanent: true },
+      { source: "/🌞-energy-efficient-roofing-options-for-florida-homes-save-money-and-beat-the-heat-☀%EF%B8%8F💸🏠", destination: "/energy-efficient-roofing-options-florida", permanent: true },
 
       // === Persons ===
       { source: "/about/mina-2", destination: "/person/mina", permanent: true },
