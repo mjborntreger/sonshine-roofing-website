@@ -150,6 +150,127 @@ const setText = (el: Element | null, text: string) => {
     if (el) el.textContent = text;
 };
 
+// ------------------------------------------------------------
+// Disabled pill helpers (predictive filtering UX)
+// ------------------------------------------------------------
+
+const DISABLED_PILL_CLASSES = [
+    "opacity-50",
+    "cursor-not-allowed",
+    "border-slate-200",
+    "bg-slate-100",
+    "text-slate-400",
+    "hover:border-slate-200",
+    "hover:bg-slate-100",
+];
+
+let tooltipEl: HTMLDivElement | null = null;
+let tooltipOwner: HTMLElement | null = null;
+let disabledListenersReady = false;
+
+const findDisabledTarget = (ev: Event): HTMLElement | null => {
+    const node = ev.target;
+    if (!(node instanceof Element)) return null;
+    return node.closest('[data-filter-disabled="true"]') as HTMLElement | null;
+};
+
+function ensureTooltipEl() {
+    if (tooltipEl) return tooltipEl;
+    const el = document.createElement("div");
+    el.id = "resource-filter-tooltip";
+    el.className = "pointer-events-none fixed z-[9999] hidden rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white shadow-lg transition-opacity duration-100";
+    el.style.transform = "translateX(-50%)";
+    document.body.appendChild(el);
+    tooltipEl = el;
+    return el;
+}
+
+function showTooltip(target: HTMLElement, message: string) {
+    const el = ensureTooltipEl();
+    tooltipOwner = target;
+    el.textContent = message;
+    const rect = target.getBoundingClientRect();
+    const top = rect.bottom + 8 + window.scrollY;
+    const left = rect.left + rect.width / 2 + window.scrollX;
+    el.style.top = `${Math.round(top)}px`;
+    el.style.left = `${Math.round(left)}px`;
+    el.classList.remove("hidden");
+    el.style.opacity = "1";
+}
+
+function hideTooltip(owner?: HTMLElement | null) {
+    if (!tooltipEl) return;
+    if (owner && owner !== tooltipOwner) return;
+    tooltipEl.style.opacity = "0";
+    tooltipEl.classList.add("hidden");
+    tooltipOwner = null;
+}
+
+function ensureDisabledPillListeners() {
+    if (disabledListenersReady) return;
+    disabledListenersReady = true;
+
+    const onPointerEnter = (ev: Event) => {
+        const target = findDisabledTarget(ev);
+        if (!target) return;
+        const reason = target.getAttribute("data-disabled-reason") || "No matches for this combination.";
+        showTooltip(target, reason);
+    };
+
+    const onPointerLeave = (ev: Event) => {
+        const target = findDisabledTarget(ev);
+        if (!target) return;
+        hideTooltip(target);
+    };
+
+    document.addEventListener("pointerenter", onPointerEnter, true);
+    document.addEventListener("focusin", onPointerEnter, true);
+    document.addEventListener("pointerleave", onPointerLeave, true);
+    document.addEventListener("focusout", onPointerLeave, true);
+    document.addEventListener("scroll", () => hideTooltip(), true);
+
+    document.addEventListener(
+        "click",
+        (ev) => {
+            const btn = findDisabledTarget(ev);
+            if (!btn) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+        },
+        true
+    );
+
+    document.addEventListener(
+        "keydown",
+        (ev) => {
+            if (ev.key !== "Enter" && ev.key !== " ") return;
+            const btn = findDisabledTarget(ev);
+            if (!btn) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+        },
+        true
+    );
+}
+
+function setPillDisabled(btn: Element, disabled: boolean, reason?: string) {
+    const el = btn as HTMLElement;
+    if (disabled) {
+        ensureDisabledPillListeners();
+        el.setAttribute("aria-disabled", "true");
+        el.setAttribute("data-filter-disabled", "true");
+        if (reason) el.setAttribute("data-disabled-reason", reason);
+        el.tabIndex = 0;
+        DISABLED_PILL_CLASSES.forEach((cls) => el.classList.add(cls));
+    } else {
+        el.removeAttribute("aria-disabled");
+        el.removeAttribute("data-filter-disabled");
+        el.removeAttribute("data-disabled-reason");
+        DISABLED_PILL_CLASSES.forEach((cls) => el.classList.remove(cls));
+        if (tooltipOwner === el) hideTooltip(el);
+    }
+}
+
 function $(sel: string, root?: ParentNode | Document | Element | null): Element | null {
     const scope: ParentNode | Document | Element = (root ?? document);
     return (scope as any).querySelector(sel);
@@ -521,6 +642,15 @@ function strategyProjects(opts: MountOptions): Cleaner {
 
     let q = "";
     const selected = { mt: new Set<string>(), rc: new Set<string>(), sa: new Set<string>() } as const;
+    type ProjectGroup = keyof typeof selected;
+    const projectGroups: ProjectGroup[] = ["mt", "rc", "sa"];
+    const availability: Record<ProjectGroup, Map<string, number>> = {
+        mt: new Map(),
+        rc: new Map(),
+        sa: new Map(),
+    };
+    const cardDataCache = new WeakMap<Element, Record<ProjectGroup, string[]>>();
+    const disabledMessage = "No projects match this combination yet.";
 
     function ensureTitleTaxesNorm(card: Element) {
         let v = card.getAttribute("data-titlecats-norm");
@@ -546,6 +676,18 @@ function strategyProjects(opts: MountOptions): Cleaner {
         card.setAttribute("data-excerpt-norm-ready", "1");
         return ex;
     }
+    function readProjectCard(card: Element): Record<ProjectGroup, string[]> {
+        let cached = cardDataCache.get(card);
+        if (cached) return cached;
+        const read = (key: ProjectGroup) =>
+            (card.getAttribute(`data-${key}`) || "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+        const data = { mt: read("mt"), rc: read("rc"), sa: read("sa") };
+        cardDataCache.set(card, data);
+        return data;
+    }
     function matches(card: Element, qIn: string) {
         const phrase = norm(qIn);
         if (phrase.length < MINQ) return true;
@@ -555,15 +697,58 @@ function strategyProjects(opts: MountOptions): Cleaner {
         return ex.includes(phrase);
     }
     function cardMatchesGroups(card: Element) {
-        const groups: (keyof typeof selected)[] = ["mt", "rc", "sa"];
-        for (const g of groups) {
-            const set = selected[g];
-            if (!set.size) continue; // no constraint for this group
-            const own = new Set((card.getAttribute(`data-${g}`) || "").split(",").map(s => s.trim()).filter(Boolean));
-            let ok = false; for (const v of Array.from(set)) { if (own.has(v)) { ok = true; break; } }
+        const data = readProjectCard(card);
+        for (const group of projectGroups) {
+            const set = selected[group];
+            if (!set.size) continue;
+            const ok = data[group].some((slug) => set.has(slug));
             if (!ok) return false;
         }
         return true;
+    }
+
+    function rebuildAvailability() {
+        projectGroups.forEach((g) => availability[g].clear());
+        const cards = document.querySelectorAll<HTMLElement>('.proj-card');
+        cards.forEach((card) => {
+            const data = readProjectCard(card);
+            const matchesOthers = (exclude: ProjectGroup) =>
+                projectGroups.every((group) => {
+                    if (group === exclude) return true;
+                    const set = selected[group];
+                    if (!set.size) return true;
+                    return data[group].some((slug) => set.has(slug));
+                });
+
+            for (const group of projectGroups) {
+                if (!matchesOthers(group)) continue;
+                const map = availability[group];
+                for (const slug of data[group]) {
+                    map.set(slug, (map.get(slug) ?? 0) + 1);
+                }
+            }
+        });
+    }
+
+    function applyProjectDisabledState() {
+        const anyOtherSelected = (group: ProjectGroup) =>
+            projectGroups.some((g) => g !== group && selected[g].size > 0);
+
+        const btns = document.querySelectorAll<HTMLElement>(
+            '#project-pills-mt button[data-slug], #project-pills-rc button[data-slug], #project-pills-sa button[data-slug]'
+        );
+        btns.forEach((btn) => {
+            const group = btn.getAttribute('data-group') as ProjectGroup | null;
+            const slug = btn.getAttribute('data-slug') || '';
+            if (!group || !slug) return;
+            if (selected[group].has(slug)) {
+                setPillDisabled(btn, false);
+                return;
+            }
+            const count = availability[group].get(slug) ?? 0;
+            const shouldDisable = count === 0 && anyOtherSelected(group);
+            setPillDisabled(btn, shouldDisable, disabledMessage);
+        });
     }
 
     function updateChips() {
@@ -590,6 +775,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
         const grid = getGrid();
         const skeleton = getSkeleton();
         withLoading(grid, skeleton, () => {
+            rebuildAvailability();
             const items = $$(".proj-item", getGrid());
             let visible = 0;
             for (const item of items) {
@@ -613,6 +799,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
                 [keys.rc]: csvFromSet(selected.rc) || null,
                 [keys.sa]: csvFromSet(selected.sa) || null,
             } as any);
+            applyProjectDisabledState();
         });
     }
     const scheduleFilter = makeScheduler(filterNow);
@@ -720,6 +907,15 @@ function strategyVideos(opts: MountOptions): Cleaner {
     const getQuerySpan = () => $("#video-query");
 
     const selected = { bk: new Set<string>(), mt: new Set<string>(), sa: new Set<string>() } as const;
+    type VideoGroup = keyof typeof selected;
+    const videoGroups: VideoGroup[] = ["bk", "mt", "sa"];
+    const availability: Record<VideoGroup, Map<string, number>> = {
+        bk: new Map(),
+        mt: new Map(),
+        sa: new Map(),
+    };
+    const cardDataCache = new WeakMap<Element, Record<VideoGroup, string[]>>();
+    const disabledMessage = "No videos match this combination yet.";
     let q = "";
 
     function ensureTitleCatsNorm(card: Element, section?: Element | null) {
@@ -754,6 +950,22 @@ function strategyVideos(opts: MountOptions): Cleaner {
             });
         });
     }
+    function readVideoCard(card: Element): Record<VideoGroup, string[]> {
+        let cached = cardDataCache.get(card);
+        if (cached) return cached;
+        const read = (attr: string) =>
+            (card.getAttribute(attr) || "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+        const data = {
+            bk: read("data-bucket"),
+            mt: read("data-mt"),
+            sa: read("data-sa"),
+        } as Record<VideoGroup, string[]>;
+        cardDataCache.set(card, data);
+        return data;
+    }
     function matches(card: Element, section: Element | null, qIn: string) {
         const phrase = norm(qIn);
         if (phrase.length < MINQ) return true;
@@ -785,14 +997,61 @@ function strategyVideos(opts: MountOptions): Cleaner {
     }
 
     function cardMatchesGroups(card: Element) {
-        for (const g of ["mt", "sa"] as const) {
-            const set = selected[g];
+        const data = readVideoCard(card);
+        for (const group of ["mt", "sa"] as const) {
+            const set = selected[group];
             if (!set.size) continue;
-            const own = new Set((card.getAttribute(`data-${g}`) || "").split(",").map((s) => s.trim()).filter(Boolean));
-            let ok = false; for (const s of Array.from(set)) { if (own.has(s)) { ok = true; break; } }
+            const ok = data[group].some((slug) => set.has(slug));
             if (!ok) return false;
         }
         return true;
+    }
+
+    function rebuildAvailability() {
+        videoGroups.forEach((g) => availability[g].clear());
+        const cards = document.querySelectorAll<HTMLElement>('.vid-card');
+        cards.forEach((card) => {
+            const data = readVideoCard(card);
+            const matchesGroupSelection = (group: VideoGroup) => {
+                const set = selected[group];
+                if (!set.size) return true;
+                return data[group].some((slug) => set.has(slug));
+            };
+            const matchesOthers = (exclude: VideoGroup) =>
+                videoGroups.every((group) => {
+                    if (group === exclude) return true;
+                    return matchesGroupSelection(group);
+                });
+
+            for (const group of videoGroups) {
+                if (!matchesOthers(group)) continue;
+                const map = availability[group];
+                for (const slug of data[group]) {
+                    map.set(slug, (map.get(slug) ?? 0) + 1);
+                }
+            }
+        });
+    }
+
+    function applyVideoDisabledState() {
+        const anyOtherSelected = (group: VideoGroup) =>
+            videoGroups.some((g) => g !== group && selected[g].size > 0);
+
+        const buttons = document.querySelectorAll<HTMLElement>(
+            '#video-pills-bk button[data-slug], #video-pills-mt button[data-slug], #video-pills-sa button[data-slug]'
+        );
+        buttons.forEach((btn) => {
+            const group = btn.getAttribute('data-group') as VideoGroup | null;
+            const slug = btn.getAttribute('data-slug') || '';
+            if (!group || !slug) return;
+            if (selected[group].has(slug)) {
+                setPillDisabled(btn, false);
+                return;
+            }
+            const count = availability[group].get(slug) ?? 0;
+            const shouldDisable = count === 0 && anyOtherSelected(group);
+            setPillDisabled(btn, shouldDisable, disabledMessage);
+        });
     }
 
     function updateChips() {
@@ -821,6 +1080,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
         const wrap = getWrap();
         const skeleton = getSkeleton();
         withLoading(wrap, skeleton, () => {
+            rebuildAvailability();
             const sections = $$(".video-section", wrap);
             let total = 0;
             for (const section of sections) {
@@ -853,6 +1113,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
                 [keys.mt]: csvFromSet(selected.mt) || null,
                 [keys.sa]: csvFromSet(selected.sa) || null,
             } as any);
+            applyVideoDisabledState();
         });
     }
     const scheduleFilter = makeScheduler(filterNow);
