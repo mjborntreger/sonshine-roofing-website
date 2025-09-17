@@ -431,8 +431,8 @@ export async function getFaq(slug: string): Promise<FaqFull | null> {
       faq(id: $slug, idType: SLUG) {
         slug
         title
-        date
-        modified
+        date(format: "c")
+        modified(format: "c")
         content(format: RENDERED)
         faqTopics { nodes { slug } }
         seo {
