@@ -25,14 +25,20 @@ export type MountOptions = {
     ids?: ControllerIds;
     urlKeys?: UrlKeys;         // optional; q defaults to "q" if omitted
     minQueryLen?: number;
+    defer?: boolean;           // optional: allow callers to skip idle scheduling
 };
 
 /** Non-hook entry point for dynamic mounting from a tiny controller component. */
 export function mountResourceFilters(kind: ResourceKind, opts: MountOptions): Cleaner {
     if (typeof window === "undefined") return () => { };
     let cleanup: Cleaner | null = null;
+    let idleId: number | null = null;
+    let timerId: number | null = null;
 
     const run = () => {
+        idleId = null;
+        timerId = null;
+        if (cleanup) return;
         try {
             const init = STRATEGIES[kind];
             cleanup = init ? init(opts) : null;
@@ -41,14 +47,23 @@ export function mountResourceFilters(kind: ResourceKind, opts: MountOptions): Cl
         }
     };
 
-    // Mount on idle-after-hydration to reduce render blocking
-    if ("requestIdleCallback" in window) {
-        (window as any).requestIdleCallback(run, { timeout: 1200 });
+    const shouldDefer = opts.defer !== false;
+
+    if (shouldDefer && "requestIdleCallback" in window) {
+        idleId = (window as any).requestIdleCallback(run, { timeout: 1200 });
+    } else if (shouldDefer) {
+        timerId = window.setTimeout(run, 0);
     } else {
-        setTimeout(run, 0);
+        run();
     }
 
     return () => {
+        if (idleId != null && (window as any).cancelIdleCallback) {
+            try { (window as any).cancelIdleCallback(idleId); } catch { }
+        }
+        if (timerId != null) {
+            clearTimeout(timerId);
+        }
         try { cleanup?.(); } catch { }
         cleanup = null;
     };
@@ -69,6 +84,7 @@ export function useResourceFilters(kind: ResourceKind, opts: MountOptions) {
 type Cleaner = () => void;
 
 const MIN_Q = 2;
+const CHIP_BUTTON_CLASS = "inline-flex items-center gap-1 rounded-full border border-[--brand-orange] bg-white px-3 py-1 text-sm";
 const norm = (s: unknown) =>
     (s ?? "")
         .toString()
@@ -76,6 +92,63 @@ const norm = (s: unknown) =>
         .normalize("NFKD")
         .replace(/[\u0300-\u036f]/g, "")
         .trim();
+
+const parseCsvParam = (url: URL, key: string) =>
+    (url.searchParams.get(key) || "")
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+const csvFromSet = (set: Set<string>) => Array.from(set).join(",");
+
+const queryForUrl = (value: string, min = MIN_Q) => {
+    const trimmed = value.trim();
+    return trimmed.length >= min ? trimmed : null;
+};
+
+const buttonLabel = (btn: Element | null, fallback: string) => {
+    if (!btn) return fallback;
+    const text = btn.textContent || fallback;
+    return text.replace(/\s*\(\d+\)\s*$/, "").trim();
+};
+
+type ChipDescriptor = { slug: string; label: string; group?: string };
+
+function renderChipList(
+    container: Element | null,
+    chips: ChipDescriptor[],
+    onRemove: (chip: ChipDescriptor) => void
+) {
+    if (!container) return;
+    const wrap = container as HTMLElement;
+    wrap.innerHTML = "";
+    if (!chips.length) {
+        wrap.classList.add("hidden");
+        return;
+    }
+    wrap.classList.remove("hidden");
+    wrap.style.display = "";
+    for (const chip of chips) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = CHIP_BUTTON_CLASS;
+        btn.setAttribute("data-chip", chip.slug);
+        if (chip.group) btn.setAttribute("data-group", chip.group);
+        btn.innerHTML = `<span>${chip.label}</span><span aria-hidden="true" class="text-slate-500">×</span>`;
+        btn.addEventListener("click", () => onRemove(chip));
+        wrap.appendChild(btn);
+    }
+}
+
+const setHidden = (el: Element | null, hidden: boolean) => {
+    if (!(el instanceof HTMLElement)) return;
+    el.classList.toggle("hidden", hidden);
+    if (!hidden) el.style.display = "";
+};
+
+const setText = (el: Element | null, text: string) => {
+    if (el) el.textContent = text;
+};
 
 function $(sel: string, root?: ParentNode | Document | Element | null): Element | null {
     const scope: ParentNode | Document | Element = (root ?? document);
@@ -268,29 +341,19 @@ function strategyBlog(opts: MountOptions): Cleaner {
         return ensureExcerptNorm(card).includes(phrase);
     }
 
-    function renderChips() {
-        const wrap = getChipsWrap();
-        if (!wrap) return;
-        const list = Array.from(selected);
-        (wrap as HTMLElement).innerHTML = "";
-        if (!list.length) { wrap.classList.add("hidden"); return; }
-        wrap.classList.remove("hidden");
-        for (const name of list) {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "inline-flex items-center gap-1 rounded-full border border-[--brand-orange] bg-white px-3 py-1 text-sm";
-            btn.setAttribute("data-chip", name);
-            btn.innerHTML = `<span>${name}</span><span aria-hidden="true" class="text-slate-500">×</span>`;
-            btn.addEventListener("click", () => {
-                selected.delete(name);
-                const pillsWrap = getPillsWrap();
-                const pill = pillsWrap?.querySelector(`[data-cat="${cssEscape(name)}"]`);
-                if (pill) setPillPressed(pill, false);
-                filterNow();
-                renderChips();
-            });
-            wrap.appendChild(btn);
-        }
+    function updateChips() {
+        const chips = Array.from(selected).map((name) => ({ slug: name, label: name }));
+        renderChipList(getChipsWrap(), chips, ({ slug }) => {
+            selected.delete(slug);
+            const pill = getPillsWrap()?.querySelector(`[data-cat="${cssEscape(slug)}"]`);
+            if (pill) setPillPressed(pill, false);
+            if (selected.size === 0) {
+                const all = getPillsWrap()?.querySelector(`[data-cat="__all__"]`);
+                if (all) setPillPressed(all, true);
+            }
+            filterNow();
+            updateChips();
+        });
     }
 
     function filterNow() {
@@ -310,14 +373,13 @@ function strategyBlog(opts: MountOptions): Cleaner {
                 if (show) visible++;
             }
             // resultCount is optional
-            const rc = getResultCount(); if (rc) rc.textContent = String(visible);
-            const nr = getNoResults(); if (nr) nr.classList.toggle("hidden", visible !== 0);
+            setText(getResultCount(), String(visible));
+            setHidden(getNoResults(), visible !== 0);
         });
         // URL sync (q + categories as CSV)
-        const catsCsv = Array.from(selected).join(",");
         syncUrl({
-            [keys.q]: (q.trim().length >= MINQ ? q.trim() : null) as any,
-            [keys.cat]: catsCsv || null,
+            [keys.q]: queryForUrl(q, MINQ) as any,
+            [keys.cat]: csvFromSet(selected) || null,
         } as any);
     }
     const scheduleFilter = makeScheduler(filterNow);
@@ -329,9 +391,7 @@ function strategyBlog(opts: MountOptions): Cleaner {
         const si = getSearch(); if (si) si.value = q;
 
         // categories from URL
-        const catsCsv = (url.searchParams.get(keys.cat) || "")
-            .split(",").map((s) => s.trim()).filter(Boolean);
-        catsCsv.forEach((c) => selected.add(c));
+        parseCsvParam(url, keys.cat).forEach((c) => selected.add(c));
 
         // reflect pressed pills (All if none)
         $$("#blog-pills button[data-cat]").forEach((b) => {
@@ -373,7 +433,7 @@ function strategyBlog(opts: MountOptions): Cleaner {
             $$("#blog-pills button[data-cat]").forEach((b) => {
                 setPillPressed(b, b.getAttribute("data-cat") === "__all__");
             });
-            renderChips();
+            updateChips();
             filterNow();
             return;
         }
@@ -394,7 +454,7 @@ function strategyBlog(opts: MountOptions): Cleaner {
                 const all = $("#blog-pills [data-cat='__all__']"); if (all) setPillPressed(all, false);
             }
         }
-        renderChips();
+        updateChips();
         filterNow();
     });
 
@@ -422,7 +482,7 @@ function strategyBlog(opts: MountOptions): Cleaner {
 
     // initial
     filterNow();
-    renderChips();
+    updateChips();
 
     return () => { offInput(); offClick(); mo?.disconnect(); };
 }
@@ -506,35 +566,23 @@ function strategyProjects(opts: MountOptions): Cleaner {
         return true;
     }
 
-    function renderChips() {
-        const wrap = getChips(); if (!wrap) return;
-        (wrap as HTMLElement).innerHTML = "";
-        const chips: { group: keyof typeof selected; slug: string; label: string }[] = [];
+    function updateChips() {
+        const chips: ChipDescriptor[] = [];
         for (const [group, set] of Object.entries(selected) as [keyof typeof selected, Set<string>][]) {
             set.forEach((slug) => {
                 const btn = document.querySelector(`button[data-group="${group}"][data-slug="${cssEscape(slug)}"]`);
-                const label = btn ? (btn.textContent || slug).replace(/\s*\(\d+\)\s*$/, "") : slug;
-                chips.push({ group, slug, label });
+                chips.push({ group, slug, label: buttonLabel(btn, slug) });
             });
         }
-        if (!chips.length) { wrap.classList.add("hidden"); return; }
-        wrap.classList.remove("hidden");
-        for (const c of chips) {
-            const chip = document.createElement("button");
-            chip.type = "button";
-            chip.className = "inline-flex items-center gap-1 rounded-full border border-[--brand-orange] bg-white px-3 py-1 text-sm";
-            chip.setAttribute("data-chip", c.slug);
-            chip.setAttribute("data-group", c.group);
-            chip.innerHTML = `<span>${c.label}</span><span aria-hidden="true" class="text-slate-500">×</span>`;
-            chip.addEventListener("click", () => {
-                selected[c.group].delete(c.slug);
-                const pill = document.querySelector(`button[data-group="${c.group}"][data-slug="${cssEscape(c.slug)}"]`);
-                if (pill) setPillPressed(pill, false);
-                renderChips();
-                filterNow();
-            });
-            wrap.appendChild(chip);
-        }
+
+        renderChipList(getChips(), chips, ({ group, slug }) => {
+            const set = (selected as any)[group] as Set<string> | undefined;
+            if (set) set.delete(slug);
+            const pill = document.querySelector(`button[data-group="${group}"][data-slug="${cssEscape(slug)}"]`);
+            if (pill) setPillPressed(pill, false);
+            filterNow();
+            updateChips();
+        });
     }
 
     function filterNow() {
@@ -551,19 +599,18 @@ function strategyProjects(opts: MountOptions): Cleaner {
                 if (ok) visible++;
             }
             // resultCount is optional
-            const rc = getResultCount(); if (rc) rc.textContent = String(visible);
+            setText(getResultCount(), String(visible));
             const nr = getNoResults(); const qs = getQuerySpan();
             if (nr && qs) {
                 if (q.trim().length >= MINQ && visible === 0) { nr.classList.remove("hidden"); qs.textContent = `“${q.trim()}”`; }
                 else { nr.classList.add("hidden"); qs.textContent = ""; }
             }
             // URL sync
-            const toCsv = (s: Set<string>) => Array.from(s).join(",");
             syncUrl({
-                [keys.q]: (q.trim().length >= MINQ ? q.trim() : null) as any,
-                [keys.mt]: toCsv(selected.mt) || null,
-                [keys.rc]: toCsv(selected.rc) || null,
-                [keys.sa]: toCsv(selected.sa) || null,
+                [keys.q]: queryForUrl(q, MINQ) as any,
+                [keys.mt]: csvFromSet(selected.mt) || null,
+                [keys.rc]: csvFromSet(selected.rc) || null,
+                [keys.sa]: csvFromSet(selected.sa) || null,
             } as any);
         });
     }
@@ -574,10 +621,9 @@ function strategyProjects(opts: MountOptions): Cleaner {
         const url = new URL(window.location.href);
         q = (url.searchParams.get(keys.q) || "").trim();
         const si = getSearch(); if (si) si.value = q;
-        const csv = (k: string) => (url.searchParams.get(k) || "").split(",").map((s) => s.trim()).filter(Boolean);
-        for (const s of csv(keys.mt)) selected.mt.add(s);
-        for (const s of csv(keys.rc)) selected.rc.add(s);
-        for (const s of csv(keys.sa)) selected.sa.add(s);
+        for (const s of parseCsvParam(url, keys.mt)) selected.mt.add(s);
+        for (const s of parseCsvParam(url, keys.rc)) selected.rc.add(s);
+        for (const s of parseCsvParam(url, keys.sa)) selected.sa.add(s);
         // reflect pills
         document.querySelectorAll("button[data-group][data-slug]").forEach((btn) => {
             const g = btn.getAttribute("data-group") as keyof typeof selected | null;
@@ -601,7 +647,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
             q = ""; const si = getSearch(); if (si) si.value = "";
             selected.mt.clear(); selected.rc.clear(); selected.sa.clear();
             document.querySelectorAll("button[data-group][data-slug]").forEach((b) => setPillPressed(b, false));
-            renderChips();
+            updateChips();
             filterNow();
             return;
         }
@@ -614,7 +660,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
         if (!set) return;
         if (set.has(slug)) { set.delete(slug); setPillPressed(btn, false); }
         else { set.add(slug); setPillPressed(btn, true); }
-        renderChips();
+        updateChips();
         filterNow();
     });
 
@@ -634,7 +680,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
     }
 
     // initial
-    renderChips();
+    updateChips();
     filterNow();
 
     return () => { offInput(); offClick(); mo?.disconnect(); };
@@ -748,36 +794,24 @@ function strategyVideos(opts: MountOptions): Cleaner {
         return true;
     }
 
-    function renderChips() {
-        const wrap = getChips(); if (!wrap) return;
-        (wrap as HTMLElement).innerHTML = "";
-        const chips: { group: "bk" | "mt" | "sa"; slug: string; label: string }[] = [];
+    function updateChips() {
+        const chips: ChipDescriptor[] = [];
         document.querySelectorAll("button[data-group][data-slug]").forEach((b) => {
             const group = b.getAttribute("data-group") as "bk" | "mt" | "sa" | null;
             const slug = b.getAttribute("data-slug") || "";
             const pressed = b.getAttribute("aria-pressed") === "true";
             if (!group || !pressed) return;
-            const label = (b.textContent || slug).replace(/\s*\(\d+\)\s*$/, "");
-            chips.push({ group, slug, label });
+            chips.push({ group, slug, label: buttonLabel(b, slug) });
         });
-        if (!chips.length) { wrap.classList.add("hidden"); return; }
-        wrap.classList.remove("hidden");
-        for (const c of chips) {
-            const chip = document.createElement("button");
-            chip.type = "button";
-            chip.className = "inline-flex items-center gap-1 rounded-full border border-[--brand-orange] bg-white px-3 py-1 text-sm";
-            chip.setAttribute("data-chip", c.slug);
-            chip.setAttribute("data-group", c.group);
-            chip.innerHTML = `<span>${c.label}</span><span aria-hidden="true" class="text-slate-500">×</span>`;
-            chip.addEventListener("click", () => {
-                const btn = document.querySelector(`button[data-group="${c.group}"][data-slug="${cssEscape(c.slug)}"]`);
-                if (btn) { btn.setAttribute("aria-pressed", "false"); setPillPressed(btn, false); }
-                (selected as any)[c.group].delete(c.slug);
-                renderChips();
-                filterNow();
-            });
-            wrap.appendChild(chip);
-        }
+
+        renderChipList(getChips(), chips, ({ group, slug }) => {
+            const btn = document.querySelector(`button[data-group="${group}"][data-slug="${cssEscape(slug)}"]`);
+            if (btn) { btn.setAttribute("aria-pressed", "false"); setPillPressed(btn, false); }
+            (selected as any)[group]?.delete(slug);
+            if (group === "bk") updateProjectOnlyGroupsVisibility();
+            filterNow();
+            updateChips();
+        });
     }
 
     function filterNow() {
@@ -803,19 +837,18 @@ function strategyVideos(opts: MountOptions): Cleaner {
                 if (vis === 0) { hideEl(section); } else { showEl(section); }
             }
             // resultCount is optional
-            const rc = getResultCount(); if (rc) rc.textContent = String(total);
+            setText(getResultCount(), String(total));
             const nr = getNoResults(); const qs = getQuerySpan();
             if (nr && qs) {
                 if (q.trim().length >= MINQ && total === 0) { nr.classList.remove("hidden"); qs.textContent = `“${q.trim()}”`; }
                 else { nr.classList.add("hidden"); qs.textContent = ""; }
             }
             // URL sync
-            const toCsv = (s: Set<string>) => Array.from(s).join(",");
             syncUrl({
-                [keys.q]: (q.trim().length >= MINQ ? q.trim() : null) as any,
-                [keys.bk]: toCsv(selected.bk) || null,
-                [keys.mt]: toCsv(selected.mt) || null,
-                [keys.sa]: toCsv(selected.sa) || null,
+                [keys.q]: queryForUrl(q, MINQ) as any,
+                [keys.bk]: csvFromSet(selected.bk) || null,
+                [keys.mt]: csvFromSet(selected.mt) || null,
+                [keys.sa]: csvFromSet(selected.sa) || null,
             } as any);
         });
     }
@@ -826,10 +859,9 @@ function strategyVideos(opts: MountOptions): Cleaner {
         const url = new URL(window.location.href);
         q = (url.searchParams.get(keys.q) || "").trim();
         const si = getSearch(); if (si) si.value = q;
-        const csv = (k: string) => (url.searchParams.get(k) || "").split(",").map((s) => s.trim()).filter(Boolean);
-        for (const s of csv(keys.bk)) selected.bk.add(s);
-        for (const s of csv(keys.mt)) selected.mt.add(s);
-        for (const s of csv(keys.sa)) selected.sa.add(s);
+        for (const s of parseCsvParam(url, keys.bk)) selected.bk.add(s);
+        for (const s of parseCsvParam(url, keys.mt)) selected.mt.add(s);
+        for (const s of parseCsvParam(url, keys.sa)) selected.sa.add(s);
 
         // If mt/sa present, force roofing-project and drop others
         if (selected.mt.size || selected.sa.size) { selected.bk.clear(); selected.bk.add("roofing-project"); }
@@ -865,7 +897,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
             selected.bk.clear(); selected.mt.clear(); selected.sa.clear();
             document.querySelectorAll("button[data-group][data-slug]").forEach((b) => setPillPressed(b, false));
             updateProjectOnlyGroupsVisibility();
-            renderChips();
+            updateChips();
             filterNow();
             return;
         }
@@ -905,7 +937,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
             updateProjectOnlyGroupsVisibility();
         }
 
-        renderChips();
+        updateChips();
         filterNow();
     });
 
@@ -937,7 +969,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
     }
 
     // initial
-    renderChips();
+    updateChips();
     filterNow();
 
     return () => { offInput(); offClick(); mo?.disconnect(); };

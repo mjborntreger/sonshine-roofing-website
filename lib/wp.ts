@@ -1015,7 +1015,13 @@ export async function listVideoItemsPaged({
   const catSlugs = catInput ? catInput.map((s: any) => String(s).toLowerCase()) : null;
 
   // Project-only filters with friendly aliases
-  const mtInput: any[] | null = Array.isArray(f.materialTypeSlugs) ? f.materialTypeSlugs : (Array.isArray(f.material) ? f.material : null);
+  const mtInput: any[] | null = Array.isArray(f.materialTypeSlugs)
+    ? f.materialTypeSlugs
+    : Array.isArray(f.materialSlugs)
+    ? f.materialSlugs
+    : Array.isArray(f.material)
+    ? f.material
+    : null;
   const mt = mtInput ? mtInput.map((s: any) => String(s).toLowerCase()) : null;
 
   const saInput: any[] | null = Array.isArray(f.serviceAreaSlugs) ? f.serviceAreaSlugs : (Array.isArray(f.serviceArea) ? f.serviceArea : null);
@@ -1429,25 +1435,62 @@ export async function listRecentProjects(
   }));
 }
 
+export type ProjectsArchiveFilters = {
+  materialTypeSlugs?: string[];
+  roofColorSlugs?: string[];
+  serviceAreaSlugs?: string[];
+};
+
 /**
- * Cursor-based, filter-free project pagination for archives.
- * Keep this minimal to support client-side filtering/search and InfiniteList.
+ * Cursor-based project pagination for archives.
+ * Supports optional taxonomy filters for pre-selecting materials, colors, and service areas.
  */
 export async function listProjectsPaged({
   first = 24,
   after = null,
+  filters = {},
 }: {
   first?: number;
   after?: string | null;
+  filters?: ProjectsArchiveFilters;
 }) {
+  const hasMt = Array.isArray(filters.materialTypeSlugs) && filters.materialTypeSlugs.length > 0;
+  const hasRc = Array.isArray(filters.roofColorSlugs) && filters.roofColorSlugs.length > 0;
+  const hasSa = Array.isArray(filters.serviceAreaSlugs) && filters.serviceAreaSlugs.length > 0;
+
+  const paramParts = ["$first: Int!", "$after: String"];
+  const taxParts: string[] = [];
+  if (hasMt) {
+    paramParts.push("$mt: [String!]");
+    taxParts.push("{ taxonomy: MATERIAL_TYPE, terms: $mt, field: SLUG, operator: IN }");
+  }
+  if (hasRc) {
+    paramParts.push("$rc: [String!]");
+    taxParts.push("{ taxonomy: ROOF_COLOR, terms: $rc, field: SLUG, operator: IN }");
+  }
+  if (hasSa) {
+    paramParts.push("$sa: [String!]");
+    taxParts.push("{ taxonomy: SERVICE_AREA, terms: $sa, field: SLUG, operator: IN }");
+  }
+
+  const taxQueryBlock = taxParts.length
+    ? `taxQuery: {
+          relation: AND
+          taxArray: [
+            ${taxParts.join("\n            ")}
+          ]
+        }`
+    : "";
+
   const query = /* GraphQL */ `
-    query ListProjectsPaged($first: Int!, $after: String) {
+    query ListProjectsPaged(${paramParts.join(", ")}) {
       projects(
         first: $first
         after: $after
         where: {
           status: PUBLISH
           orderby: { field: DATE, order: DESC }
+          ${taxQueryBlock}
         }
       ) {
         pageInfo { hasNextPage endCursor }
@@ -1468,10 +1511,15 @@ export async function listProjectsPaged({
     }
   `;
 
-  const data = await wpFetch<any>(query, {
+  const variables: Record<string, any> = {
     first: Math.max(1, Math.min(first, 50)),
     after,
-  });
+  };
+  if (hasMt) variables.mt = filters.materialTypeSlugs;
+  if (hasRc) variables.rc = filters.roofColorSlugs;
+  if (hasSa) variables.sa = filters.serviceAreaSlugs;
+
+  const data = await wpFetch<any>(query, variables);
 
   const nodes: any[] = data?.projects?.nodes ?? [];
   const pageInfo = data?.projects?.pageInfo ?? { hasNextPage: false, endCursor: null };

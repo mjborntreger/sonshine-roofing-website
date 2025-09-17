@@ -25,7 +25,7 @@ export async function POST(
 
     if (kind === "project") {
       // Expect: { materialTypeSlugs?: string[]; roofColorSlugs?: string[]; serviceAreaSlugs?: string[] }
-      result = await listProjectsPaged({ ...filters, first, after });
+      result = await listProjectsPaged({ first, after, filters: filters as any });
     } else if (kind === "video") {
       // Merge entries + project videos; paginate client-side
       result = await listVideoItemsPaged({ first, after, filters });

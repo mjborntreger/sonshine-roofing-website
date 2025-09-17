@@ -284,6 +284,7 @@ export default function InfiniteList<T>({
                 const mtSlugs = mt.map((t: any) => t?.slug).filter(Boolean).join(",");
                 const rcSlugs = rc.map((t: any) => t?.slug).filter(Boolean).join(",");
                 const saSlugs = sa.map((t: any) => t?.slug).filter(Boolean).join(",");
+                const searchBody = (p?.projectDescription ?? p?.excerpt ?? "").toString();
 
                 const href = p?.uri || (p?.slug ? `/project/${p.slug}` : "#");
                 const img = p?.heroImage;
@@ -350,7 +351,7 @@ export default function InfiniteList<T>({
 
                         {/* Optional: body/excerpt for client-side phrase search. If not present, your page script should gracefully skip. */}
                         <template className="proj-body-src" suppressHydrationWarning>
-                            {(p?.excerpt ?? "").toString()}
+                            {searchBody}
                         </template>
                     </div>
                 );
