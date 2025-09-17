@@ -29,9 +29,9 @@ export default function PersonGrid({ people }: { people: Person[] }) {
                     <Image
                       src={p.featuredImage.url}
                       alt={p.featuredImage.altText || p.title}
-                      sizes="420px"
                       fill
-                      className="object-cover !rounded-none"
+                      loading="lazy"
+                      className="object-cover"
                     />
                   </div>
                 )}

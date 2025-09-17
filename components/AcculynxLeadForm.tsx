@@ -111,48 +111,48 @@ export default function AcculynxLeadForm() {
         {/* Form Fields */}
         <div className="webLeadForm__fieldDiv">
           <div className="webLeadForm__label"><label htmlFor="FirstName">First Name *</label></div>
-          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="FirstName" type="text" maxLength={255} name="FirstName" required /></div>
+          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="FirstName" type="text" maxLength={255} name="FirstName" required autoComplete="given-name" /></div>
         </div>
 
         <div className="webLeadForm__fieldDiv">
           <div className="webLeadForm__label"><label htmlFor="LastName">Last Name *</label></div>
-          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="LastName" type="text" maxLength={255} name="LastName" required /></div>
+          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="LastName" type="text" maxLength={255} name="LastName" required autoComplete="family-name" /></div>
         </div>
 
         <div className="webLeadForm__fieldDiv">
           <div className="webLeadForm__label"><label htmlFor="Email">Email *</label></div>
-          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="Email" type="email" maxLength={255} name="Email" required /></div>
+          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="Email" type="email" maxLength={255} name="Email" required autoComplete="email" /></div>
         </div>
 
         <div className="webLeadForm__fieldDiv">
           <div className="webLeadForm__label"><label htmlFor="Phone">Phone *</label></div>
-          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="Phone" type="tel" maxLength={255} name="Phone" required /></div>
+          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="Phone" type="tel" maxLength={255} name="Phone" required autoComplete="tel" /></div>
         </div>
 
         <div className="webLeadForm__fieldDiv">
           <div className="webLeadForm__label"><label htmlFor="Street">Street *</label></div>
-          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="Street" type="text" maxLength={255} name="Street" required /></div>
+          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="Street" type="text" maxLength={255} name="Street" required autoComplete="street-address" /></div>
         </div>
 
         <div className="webLeadForm__fieldDiv">
           <div className="webLeadForm__label"><label htmlFor="City">City *</label></div>
-          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="City" type="text" maxLength={255} name="City" required /></div>
+          <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="City" type="text" maxLength={255} name="City" required autoComplete="address-level2" /></div>
         </div>
 
         <div className="webLeadForm__stateZipDiv">
           <div className="webLeadForm__fieldDiv">
             <div className="webLeadForm__label"><label htmlFor="State">State / Prov *</label></div>
-            <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="State" type="text" maxLength={255} name="State" required /></div>
+            <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="State" type="text" maxLength={255} name="State" required autoComplete="address-level1" /></div>
           </div>
           <div className="webLeadForm__fieldDiv">
             <div className="webLeadForm__label"><label htmlFor="Zip">Zip *</label></div>
-            <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="Zip" type="text" maxLength={255} name="Zip" required /></div>
+            <div className="webLeadForm__inputDiv"><input className="webLeadForm__input" id="Zip" type="text" maxLength={255} name="Zip" required autoComplete="postal-code" /></div>
           </div>
         </div>
 
         <div className="webLeadForm__fieldDiv">
           <div className="webLeadForm__label"><label htmlFor="Message">Message</label></div>
-          <div className="webLeadForm__inputDiv"><textarea className="webLeadForm__input" id="Message" maxLength={255} rows={3} name="Message" /></div>
+          <div className="webLeadForm__inputDiv"><textarea className="webLeadForm__input" id="Message" maxLength={255} rows={3} name="Message" autoComplete="off" /></div>
         </div>
 
         {/* ✅ Turnstile Widget */}
@@ -166,7 +166,7 @@ export default function AcculynxLeadForm() {
         />
 
         <div className="webLeadForm__submitDiv">
-          <input className="webLeadForm__submit" type="submit" value="Submit" />
+          <input id="LeadFormSubmit" className="webLeadForm__submit" type="submit" value="Submit" name="submit" />
           <span className="webLeadForm__label webLeadForm__requiredLabel"> * Required </span>
         </div>
       </form>

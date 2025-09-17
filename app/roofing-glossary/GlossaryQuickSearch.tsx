@@ -22,7 +22,11 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
 
   return (
     <div className="mt-6">
+      <label htmlFor="glossary-search" className="sr-only">
+        Search glossary terms
+      </label>
       <input
+        id="glossary-search"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search terms…"
