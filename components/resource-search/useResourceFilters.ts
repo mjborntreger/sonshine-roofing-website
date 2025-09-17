@@ -576,8 +576,9 @@ function strategyProjects(opts: MountOptions): Cleaner {
         }
 
         renderChipList(getChips(), chips, ({ group, slug }) => {
-            const set = (selected as any)[group] as Set<string> | undefined;
-            if (set) set.delete(slug);
+            if (!group) return;
+            const set = selected[group as keyof typeof selected];
+            set?.delete(slug);
             const pill = document.querySelector(`button[data-group="${group}"][data-slug="${cssEscape(slug)}"]`);
             if (pill) setPillPressed(pill, false);
             filterNow();
@@ -805,9 +806,11 @@ function strategyVideos(opts: MountOptions): Cleaner {
         });
 
         renderChipList(getChips(), chips, ({ group, slug }) => {
+            if (!group) return;
             const btn = document.querySelector(`button[data-group="${group}"][data-slug="${cssEscape(slug)}"]`);
             if (btn) { btn.setAttribute("aria-pressed", "false"); setPillPressed(btn, false); }
-            (selected as any)[group]?.delete(slug);
+            const set = selected[group as keyof typeof selected];
+            set?.delete(slug);
             if (group === "bk") updateProjectOnlyGroupsVisibility();
             filterNow();
             updateChips();
