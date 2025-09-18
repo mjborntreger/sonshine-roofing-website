@@ -153,7 +153,7 @@ export default function ProgramCard({
         {/* Footer CTA + compliance */}
         <div className="px-4 pt-0 pb-4 mt-auto">
           <div className="flex justify-end">
-            <a href={cta.href} className={cn("btn btn-press btn-lg inline-flex items-center", cta.className)} title={cta.title || cta.label}>
+            <a href={cta.href} className={cn("btn btn-press btn-lg inline-flex items-center", cta.className)} target="_blank" title={cta.title || cta.label}>
               {cta.label}
               <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
             </a>

@@ -34,5 +34,6 @@ export const config = {
     '/open-for-business-update-covid-19-safety-measures/:path*',
     '/know-about-tile-roof-repair/:path*',
     '/seven-ways-to-make-sure-your-roofing-contractor-will-rip-you-off/:path*',
+    '/about/kris-marszalek/:path*',
   ],
 };
