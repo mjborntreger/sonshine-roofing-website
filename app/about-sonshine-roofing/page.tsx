@@ -66,8 +66,6 @@ const ORDER: string[] = [
   'michael',
   'erick',
   'antonio',
-  'martinez',
-  'jose-sergio',
   'jose'
 ];
 
