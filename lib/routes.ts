@@ -56,6 +56,7 @@ export type NavItem = { label: string; href?: Route; children?: NavItem[] };
 
 export const NAV_MAIN: ReadonlyArray<NavItem> = [
   { label: 'About', href: ROUTES.about },
+  { label: 'Financing', href: ROUTES.financing },
   {
     label: 'Roofing Services',
     children: [
@@ -69,7 +70,6 @@ export const NAV_MAIN: ReadonlyArray<NavItem> = [
     label: 'Resources',
     children: [
       { label: 'Project Gallery', href: ROUTES.project },
-      { label: 'Financing', href: ROUTES.financing },
       { label: 'Video Library', href: ROUTES.videoLibrary },
       { label: 'Blog', href: ROUTES.blog },
       { label: 'Roofing Glossary', href: ROUTES.roofingGlossary },

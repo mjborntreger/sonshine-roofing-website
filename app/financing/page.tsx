@@ -196,7 +196,7 @@ export default async function FinancingPage() {
             title="YGrene Financing (Equity‑based)"
             subtitle="House‑secured. Payments typically included in your property‑tax bill."
             chips={["No credit check", "Tax‑bill payments", "Equity‑based"]}
-            keyFigures={["From 8.9% APR", "18–24 mo deferral", per10k]}
+            keyFigures={["From 8.49% APR", "18–24 mo deferral", per10k]}
             sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
             bullets={[
               "Fixed rate throughout the term",

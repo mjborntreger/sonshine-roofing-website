@@ -28,7 +28,7 @@ export default function MonthlyEstimator({
       sameAsCash12: a / 12,                          // 12-month 0% promo (estimate)
       term10yr999: pmt(a, 0.0999, 120),              // 10-year @ 9.99%
       term15yr79:  pmt(a, 0.079,  180),              // 15-year @ 7.9%
-      ygrene15yr89: pmt(a, 0.089, 180),              // YGrene rough comp: 8.9% over 15yr (post-deferral)
+      ygrene15yr849: pmt(a, 0.0849, 180),            // YGrene rough comp: 8.49% over 15yr (post-deferral)
     };
   }, [amount]);
 
@@ -101,8 +101,8 @@ export default function MonthlyEstimator({
               <td className="p-3 text-right">{currency(values.term15yr79)}/mo <span className="text-slate-500">≈ $96 per $10k</span></td>
             </tr>
             <tr>
-              <td className="p-3 font-medium">YGrene (8.9% • est. after deferral)</td>
-              <td className="p-3 text-right">{currency(values.ygrene15yr89)}/mo</td>
+              <td className="p-3 font-medium">YGrene (8.49% • est. after deferral)</td>
+              <td className="p-3 text-right">{currency(values.ygrene15yr849)}/mo</td>
             </tr>
           </tbody>
         </table>

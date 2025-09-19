@@ -147,7 +147,7 @@ export default function OpenOrClosed({
           className={`${baseStyles} ${openStyles} ${className}`}
           aria-label={`Open now, closes at ${closes}. We are in the office and ready to take your call.`}
         >
-          <span className="h-2 w-2 rounded-full bg-green-500" />
+          <span className="h-2 w-2 rounded-full bg-green-500 open-or-closed__dot" />
           <span>Open now</span>
           <span className="text-green-600/70">·</span>
           <span className="text-green-700/80">until {closes}</span>
@@ -155,6 +155,20 @@ export default function OpenOrClosed({
         <span className="block sm:inline-block mt-2 sm:mt-0 sm:ml-3 text-xs text-slate-700/90">
           We are in the office and ready to take your call
         </span>
+        <style jsx>{`
+          @keyframes open-or-closed-blink {
+            0%, 55% {
+              opacity: 1;
+            }
+            65%, 100% {
+              opacity: 0.2;
+            }
+          }
+
+          .open-or-closed__dot {
+            animation: open-or-closed-blink 1.8s ease-in-out infinite;
+          }
+        `}</style>
       </>
     );
   }
