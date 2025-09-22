@@ -99,7 +99,8 @@ const nextConfig = {
       { source: "/repair-vs-replace", destination: "/roof-replacement-sarasota-fl#repair-vs-replace", permanent: true },
       { source: "/service-areas", destination: "/about-sonshine-roofing", permanent: true },
       { source: "/roofing-services", destination: "contact-us", permanent: true },
-      { source: "/🌞-energy-efficient-roofing-options-for-florida-homes-save-money-and-beat-the-heat-☀%EF%B8%8F💸🏠", destination: "/energy-efficient-roofing-options-florida", permanent: true },
+      { source: "/home", destination: "/", permanent: true },
+      { source: "/what-should-i-do-if-my-roof-is-damaged-after-a-storm/", desintation: "/roof-is-damaged-after-a-storm/", permanent: true },
 
       // === Persons ===
       { source: "/about/mina-2", destination: "/person/mina", permanent: true },
@@ -118,6 +119,8 @@ const nextConfig = {
       { source: "/9-warning-signs-of-roof-leaks/", destination: "/roof-repair", permanent: true },
       { source: "/roof-cleaning-in-florida-expert-answers-from-hoover-pressure-cleaning", destination: "/roof-cleaning-in-florida", permanent: true },
       { source: "/roof-leaks", destination: "/roof-leaks-warning-signs", permanent: true },
+      { source: "/10-warning-signs-of-roof-leaks", destination: "/roof-leaks-warning-signs", permanent: true },
+      { source: "/🌞-energy-efficient-roofing-options-for-florida-homes-save-money-and-beat-the-heat-☀%EF%B8%8F💸🏠", destination: "/energy-efficient-roofing-options-florida", permanent: true },
 
       // === Broken Backlinks ===
       { source: "/wp-content/uploads/roof-lifespan-1-1080x619.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/extend-roof-lifespan.webp", permanent: true },
@@ -133,6 +136,9 @@ const nextConfig = {
       { source: "/wp-content/uploads/roof-leak-warning-1-algae.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/roof-leak-warning-1-algae.webp", permanent: true },
       { source: "/wp-content/uploads/how-long-does-a-tile-roof-last-in-florida-1080x675.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
       { source: "/wp-content/:path*", destination: "https://next.sonshineroofing.com/wp-content/:path*", permanent: true },
+      { source: "/free-roofing-estimate", destination: "/contact-us", permanent: true },
+      { source: "/double-roof-service-life", destination: "/roof-maintenance", permanent: true },
+      { source: "/wp-content/uploads/Lifted-Cox.jpg", destination: "/", permanent: true },
 
       // === Legacy Project Categories & Archives (Collapsed) ===
       // All legacy category URLs → unified Projects page with a location filter.

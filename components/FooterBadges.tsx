@@ -6,6 +6,11 @@ const imageWidth = 150;
 const imageStyles = "my-6 h-[100px] w-auto";
 
 const badges = [
+   {
+    href: "https://mysafeflhome.com/",
+    title: "My Safe Florida Home Certified Contractor",
+    src: "https://next.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
+  },
   {
     href: "https://business.sarasotachamber.com/active-member-directory/Details/sonshine-roofing-3821919",
     title: "Sarasota Chamber of Commerce",
@@ -20,11 +25,6 @@ const badges = [
     href: "https://www.northportareachamber.com/list/member/sonshine-roofing-inc-4041",
     title: "North Port Chamber of Commerce",
     src: "https://next.sonshineroofing.com/wp-content/uploads/NPChamberLogo.webp",
-  },
-  {
-    href: "https://www.chamberofcommerce.com/business-directory/florida/sarasota/roofing-contractor/2028411929-sonshine-roofing?source=memberwebsite",
-    title: "Chamber of Commerce",
-    src: "https://coc.codes/images/badge/2028411929",
   },
   {
     href: "https://www.floridaroof.com/SONSHINE-ROOFING-INC-10-1104.html",
@@ -49,13 +49,13 @@ const badges = [
   {
     href: "https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick",
     title: "A+ Rating with the BBB",
-    src: "https://seal-westflorida.bbb.org/seals/blue-seal-280-80-bbb-6096353.png",
+    src: "https://next.sonshineroofing.com/wp-content/uploads/bbb.webp",
   },
 ];
 
 export default function FooterBadges() {
   return (
-    <div className="grid grid-cols-3 lg:grid-cols-9 place-items-center justify-center gap-3 my-10">
+    <div className="mx-auto max-w-6xl px-10 grid grid-cols-3 lg:grid-cols-9 place-items-center justify-center gap-3 my-20">
       {badges.map((badge) => (
         <SmartLink
           key={badge.href}

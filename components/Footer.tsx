@@ -30,8 +30,10 @@ const FooterBadges = dynamic(() => import("./FooterBadges"), {
 export default function Footer() {
   return (
     <>
-    <footer className="pt-16 bg-slate-200">
-      <div className="mx-auto max-w-6xl px-10 pt-8">
+    <FooterBadges />
+
+    <footer className="bg-slate-200 pt-20">
+      <div className="mx-auto max-w-6xl px-10">
         <h2 className="sr-only">Footer</h2>
 
         {/* Columns */}
@@ -179,9 +181,8 @@ export default function Footer() {
           </div>
         </nav>
 
-        {/* Badges Row */}
-        <FooterBadges />
-        <div className="flex flex-wrap items-center justify-center gap-1">
+        {/* Socials Badges Row */}
+        <div className="mt-20 flex flex-wrap items-center justify-center gap-1">
             {SOCIALS.map((s) => (
               <a
                 key={s.href}
