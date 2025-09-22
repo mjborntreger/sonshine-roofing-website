@@ -143,14 +143,6 @@ function getGlobalSchema() {
       worstRating: '1',
       ratingCount: AGG_RATING_COUNT,
     },
-    owner: {
-      '@type': 'Person',
-      name: 'Nathan Borntreger',
-      jobTitle: 'Owner & Roofing Specialist',
-      url: `${BASE_URL}/about-sonshine-roofing/`,
-      image: 'https://cdn.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.png',
-    },
-    founder: { '@type': 'Person', name: 'Amos Borntreger' },
     makesOffer: [
       { '@type': 'Offer', itemOffered: { '@id': `${BASE_URL}/#roof-replacement` } },
       { '@type': 'Offer', itemOffered: { '@id': `${BASE_URL}/#roof-repair` } },
