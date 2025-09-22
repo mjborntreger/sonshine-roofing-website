@@ -121,7 +121,6 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
   const areaServed = (project.serviceAreas || []).map((t) => ({ "@type": "AdministrativeArea", name: t.name }));
   const materials = (project.materialTypes || []).map((t) => t.name);
   const colors = (project.roofColors || []).map((t) => t.name);
-  const mentions = (project.productLinks || []).map((p) => ({ "@type": "Product", name: p.productName, ...(p.productLink ? { url: p.productLink } : {}) }));
 
   const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : undefined;
   const videoObj = videoId
@@ -151,7 +150,6 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
     areaServed: areaServed.length ? areaServed : undefined,
     isPartOf: { "@type": "CollectionPage", "@id": `${base}/project`, name: "Project Gallery" },
     publisher: { "@type": "Organization", name: "SonShine Roofing", logo: { "@type": "ImageObject", url: `${base}/icon.png` } },
-    mentions: mentions.length ? mentions : undefined,
     ...(videoObj ? { video: videoObj } : {}),
   } as const;
 

@@ -137,9 +137,9 @@ const nextConfig = {
       // === Legacy Project Categories & Archives (Collapsed) ===
       // All legacy category URLs → unified Projects page with a location filter.
       // Query strings (UTMs, etc.) are preserved and will merge with `?sa=:city`.
-      { source: "/project_category/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)/:path*", destination: "/project?sa=:city", permanent: true },
-      { source: "/project-category/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)/:path*", destination: "/project?sa=:city", permanent: true },
       { source: "/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)-roofing-contractor/:path*", destination: "/project?sa=:city", permanent: true },
+      { source: "/project-category/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)/:path*", destination: "/project?sa=:city", permanent: true },
+      { source: "/project_category/:city(sarasota|bradenton|lakewood-ranch|palmetto|punta-gorda|siesta-key|nokomis|venice|north-port|port-charlotte|myakka-city)-roofing-contractor/:path*", destination: "/project?sa=:city", permanent: true },
 
       // === Deleted Content (410) — you will move these to middleware later ===
       // 410s handled in middleware.ts for proper Gone responses
