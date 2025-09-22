@@ -207,9 +207,6 @@ export default async function BlogArchivePage() {
               urlKeys={{ q: "q", cat: "cat" }}
               minQueryLen={2}
             />
-            <div className="mt-6">
-              <a href="#page-top" className="text-sm text-slate-600 prose">Back to top ↑</a>
-            </div>
           </div>
 
           {/* Floating Content (Right) */}

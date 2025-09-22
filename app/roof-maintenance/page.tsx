@@ -138,9 +138,6 @@ export default async function Page() {
 
           <RoofCareClub />
 
-          <div className="mt-6">
-            <a href="#page-top" className="text-sm text-slate-600 hover:text-[#0045d7]">Back to top ↑</a>
-          </div>
         </div>
 
         <aside className="sticky top-24 self-start h-fit">

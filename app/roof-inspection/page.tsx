@@ -167,9 +167,6 @@ export default async function Page() {
             of small leaks that lead to costly repairs if left unchecked. For optimal peace of mind,
             pair this with a consistent roof maintenance routine by signing up for our Roof Care Club
           </p>
-          <div className="mt-6">
-            <a href="#page-top" className="text-sm text-slate-600 hover:text-[#0045d7]">Back to top ↑</a>
-          </div>
         </div>
 
         <aside className="sticky top-24 self-start h-fit lg:w-[320px]">

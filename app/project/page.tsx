@@ -246,9 +246,6 @@ export default async function ProjectArchivePage({ searchParams }: PageProps) {
               />
             </div>
 
-            <div className="mt-6">
-              <a href="#page-top" className="text-sm text-slate-600 prose">Back to top ↑</a>
-            </div>
           </div>
 
           {/* Floating Content (Right) */}
