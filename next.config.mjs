@@ -117,6 +117,7 @@ const nextConfig = {
       { source: "/irresistible-blackened-grouper-tacos-with-creamy-lime-crema", destination: "/grouper-tacos", permanent: true },
       { source: "/9-warning-signs-of-roof-leaks/", destination: "/roof-repair", permanent: true },
       { source: "/roof-cleaning-in-florida-expert-answers-from-hoover-pressure-cleaning", destination: "/roof-cleaning-in-florida", permanent: true },
+      { source: "/roof-leaks", destination: "/roof-leaks-warning-signs", permanent: true },
 
       // === Broken Backlinks ===
       { source: "/wp-content/uploads/roof-lifespan-1-1080x619.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/extend-roof-lifespan.webp", permanent: true },
