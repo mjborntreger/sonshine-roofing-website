@@ -100,7 +100,7 @@ const nextConfig = {
       { source: "/service-areas", destination: "/about-sonshine-roofing", permanent: true },
       { source: "/roofing-services", destination: "contact-us", permanent: true },
       { source: "/home", destination: "/", permanent: true },
-      { source: "/what-should-i-do-if-my-roof-is-damaged-after-a-storm/", desintation: "/roof-is-damaged-after-a-storm/", permanent: true },
+      { source: "/what-should-i-do-if-my-roof-is-damaged-after-a-storm/", destination: "/roof-is-damaged-after-a-storm/", permanent: true },
 
       // === Persons ===
       { source: "/about/mina-2", destination: "/person/mina", permanent: true },
