@@ -144,8 +144,10 @@ export async function POST(req: NextRequest) {
     return json(400, { ok: false, error: verify.error || 'Turnstile verification failed' });
   }
 
+  const fullName = `${data.firstName} ${data.lastName}`.trim();
   const wpPayload = {
     type: 'financing-calculator',
+    name: fullName,
     firstName: data.firstName,
     lastName: data.lastName,
     email: data.email,
