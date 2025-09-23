@@ -219,13 +219,19 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       return;
     }
     setErrors({});
-    setStep((prev) => Math.min(2, (prev + 1) as Step));
+    setStep((prev) => {
+      const next = (prev >= 2 ? 2 : prev + 1) as Step;
+      return next;
+    });
   };
 
   const handleBack = () => {
     setErrors({});
     setGlobalError(null);
-    setStep((prev) => Math.max(0, (prev - 1) as Step));
+    setStep((prev) => {
+      const previous = (prev <= 0 ? 0 : prev - 1) as Step;
+      return previous;
+    });
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
