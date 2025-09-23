@@ -233,7 +233,6 @@ export default async function VideoLibraryPage({
       )}
       <div className="container-edge py-4">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-          <span id="page-top" className="sr-only" />
 
           <div>
             <h1 className="text-3xl font-semibold">Video Library</h1>

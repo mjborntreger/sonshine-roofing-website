@@ -90,7 +90,6 @@ export default async function ProjectArchivePage({ searchParams }: PageProps) {
     <Section>
       <div className="container-edge py-4">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-          <span id="page-top" className="sr-only" />
 
           {/* Header */}
           <div>

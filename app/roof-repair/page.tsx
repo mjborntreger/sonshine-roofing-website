@@ -100,7 +100,6 @@ export default async function Page() {
     <Section>
       <div className="grid gap-4 px-2 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
         <div id="article-root" className="prose min-w-0">
-          <span id="page-top" className="sr-only" />
           <h1>Roof Repair</h1>
           {/* JSON-LD: WebPage + BreadcrumbList */}
           <script

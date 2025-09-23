@@ -221,6 +221,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
       </head>
       <body
+        id="page-top"
         className="
           min-h-svh flex flex-col
           bg-neutral-50 text-slate-900 antialiased

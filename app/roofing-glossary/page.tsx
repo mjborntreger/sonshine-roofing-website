@@ -78,7 +78,6 @@ export default async function GlossaryArchivePage() {
     <Section>
       <div className="container-edge py-8">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-        <span id="page-top" className="sr-only" />
 
           {/* LEFT: main content */}
           <div>
