@@ -23,6 +23,8 @@ const MAX_PAGE = 2083; // typical max URL length; we also allow path-only string
 // ---- helpers --------------------------------------------------------------
 const trim = (s: unknown) => (typeof s === "string" ? s.trim() : s);
 
+const digitsOnly = (value: string) => value.replace(/\D/g, "");
+
 function normalizePhone(input: string): string {
   // Keep digits and common formatting characters, collapse spaces
   const cleaned = input.replace(/[^0-9+()\-\s]/g, "").replace(/\s+/g, " ").trim();
@@ -95,6 +97,85 @@ export function parseFeedback(input: unknown): ParseResult<FeedbackInput> {
   const result = feedbackSchema.safeParse(input);
   if (result.success) {
     return { ok: true, data: result.data as FeedbackInput };
+  }
+  const fieldErrors: FieldErrors = {};
+  for (const issue of result.error.issues) {
+    const key = issue.path.join(".") || "_";
+    (fieldErrors[key] ||= []).push(issue.message);
+  }
+  return {
+    ok: false,
+    status: 400,
+    message: "Validation failed",
+    fieldErrors,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Financing calculator lead form
+
+const MAX_FINANCING_NAME = 200;
+const MAX_FINANCING_EMAIL = 254;
+const MAX_FINANCING_ADDRESS = 200;
+const MAX_FINANCING_CITY = 120;
+const MAX_FINANCING_STATE = 30;
+const MAX_FINANCING_ZIP = 20;
+
+const FINANCING_EMAIL_DOMAINS = [
+  ".com",
+  ".net",
+  ".org",
+  ".edu",
+  ".gov",
+  ".co",
+  ".us",
+  ".io",
+  ".info",
+  ".biz",
+];
+
+const financingEmailSchema = z
+  .preprocess(trim, z.string().min(1, "Email is required").max(MAX_FINANCING_EMAIL).email("Invalid email"))
+  .refine((email) => FINANCING_EMAIL_DOMAINS.some((suffix) => email.toLowerCase().endsWith(suffix)), {
+    message: "Email domain not allowed",
+  });
+
+const financingPhoneSchema = z
+  .preprocess(trim, z.string().min(1, "Phone is required"))
+  .transform((value) => digitsOnly(value))
+  .refine((value) => value.length === 10, { message: "Phone must include 10 digits" });
+
+export const financingLeadSchema = z
+  .object({
+    firstName: z.preprocess(trim, z.string().min(1, "First name is required").max(MAX_FINANCING_NAME)),
+    lastName: z.preprocess(trim, z.string().min(1, "Last name is required").max(MAX_FINANCING_NAME)),
+    email: financingEmailSchema,
+    phone: financingPhoneSchema,
+    address1: z
+      .preprocess(trim, z.string().min(1, "Address is required").max(MAX_FINANCING_ADDRESS)),
+    address2: z.preprocess(trim, z.string().max(MAX_FINANCING_ADDRESS)).optional(),
+    city: z.preprocess(trim, z.string().min(1, "City is required").max(MAX_FINANCING_CITY)),
+    state: z
+      .preprocess(trim, z.string().min(2, "State is required").max(MAX_FINANCING_STATE))
+      .refine((value) => /^[A-Za-z]{2}$/.test(String(value)), { message: "State must be two letters" }),
+    zip: z
+      .preprocess(trim, z.string().min(1, "ZIP is required").max(MAX_FINANCING_ZIP))
+      .refine((value) => digitsOnly(value).length === 5, { message: "ZIP must be 5 digits" }),
+    amount: z
+      .number({ invalid_type_error: "Amount must be a number" })
+      .min(1000, "Amount must be at least 1000"),
+    page: pageSchema,
+    cfToken: z.string().min(10, "Turnstile token missing").max(2000),
+    hp_field: z.string().optional(),
+  })
+  .passthrough();
+
+export type FinancingLeadInput = z.infer<typeof financingLeadSchema>;
+
+export function parseFinancingLead(input: unknown): ParseResult<FinancingLeadInput> {
+  const result = financingLeadSchema.safeParse(input);
+  if (result.success) {
+    return { ok: true, data: result.data };
   }
   const fieldErrors: FieldErrors = {};
   for (const issue of result.error.issues) {
