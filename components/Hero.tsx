@@ -7,7 +7,7 @@ export default function Hero() {
         {/* Background video */}
         <video
           className="absolute inset-0 -z-10 h-full w-full object-cover pointer-events-none motion-safe:opacity-100 motion-reduce:hidden"
-          src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-roofing-website-background-video-optimized.webm"
+          src="https://next.sonshineroofing.com/wp-content/uploads/Hero-video-optimized.webm"
           autoPlay
           muted
           loop
