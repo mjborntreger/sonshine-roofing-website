@@ -139,7 +139,9 @@ export default async function FinancingPage() {
   };
   const defaultAmount = 15000;
   const sampleMonthly79 = currency(Math.round(pmt(defaultAmount, 0.079, 180))) + '/mo';
-  const per10k = '$96/mo per $10k';
+  const sampleMonthly849 = currency(Math.round(pmt(defaultAmount, 0.0849, 180))) + "/mo";
+  const per10kService = '$96/mo per $10k';
+  const per10kYgrene = "$124/mo per $10k";
   return (
     <Section>
       <div className="container-edge py-10 md:py-16">
@@ -196,8 +198,8 @@ export default async function FinancingPage() {
             title="YGrene Financing (Equity‑based)"
             subtitle="House‑secured. Payments typically included in your property‑tax bill."
             chips={["No credit check", "Tax‑bill payments", "Equity‑based"]}
-            keyFigures={["From 8.49% APR", "18–24 mo deferral", per10k]}
-            sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
+            keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
+            sampleMonthly={`${sampleMonthly849} on ${currency(defaultAmount)} (15yr @ 8.49%)`}
             bullets={[
               "Fixed rate throughout the term",
               "Simple escrow alignment when payments begin",
@@ -210,7 +212,7 @@ export default async function FinancingPage() {
               "Sufficient home equity to cover the project",
             ]}
             finePrint="Subject to approval and municipal availability. Terms may vary."
-            cta={{ href: "https://prequalification.ygrene.com/ContractorApply/XYFMHC", label: "Get approved", title: "Ask about YGrene", className: "btn-brand-blue" }}
+            cta={{ href: "https://prequalification.ygrene.com/ContractorApply/XYFMHC", label: "Get pre-approved", title: "Ask about YGrene", className: "btn-brand-blue" }}
           />
 
           <ProgramCard
@@ -218,7 +220,7 @@ export default async function FinancingPage() {
             title="Service Finance (Credit‑based)"
             subtitle="Signature loan with flexible terms. No lien on your property."
             chips={["Signature loan", "Fixed term", "Fast approval"]}
-            keyFigures={["0% for 12 months", "From 7.9% fixed", per10k]}
+            keyFigures={["0% for 12 months", "From 7.9% fixed", per10kService]}
             sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
             bullets={[
               "No property lien",
