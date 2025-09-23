@@ -145,6 +145,12 @@ export async function POST(req: NextRequest) {
   }
 
   const fullName = `${data.firstName} ${data.lastName}`.trim();
+  const formattedAmount = Math.round(data.amount).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  });
+
   const wpPayload = {
     type: 'financing-calculator',
     name: fullName,
@@ -159,6 +165,7 @@ export async function POST(req: NextRequest) {
     zip: data.zip,
     amount: data.amount,
     page: data.page || '/financing',
+    message: `Financing calculator unlock request from ${fullName} for ${data.address1}, ${data.city}, ${data.state} ${data.zip}. Estimated project total: ${formattedAmount}.`,
   };
 
   const forwarded = await forwardToWP(wpPayload);

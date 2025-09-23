@@ -230,6 +230,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     setStep((prev) => previousStep[prev]);
   };
 
+  const friendlyError = (raw?: unknown) => {
+    if (!raw || typeof raw !== 'string') return 'We could not send your request. Please try again.';
+    if (raw.toLowerCase().includes('rating')) return 'We could not send your request just now. Please try again in a moment.';
+    return raw;
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submission === 'submitting') return;
@@ -292,7 +298,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         return;
       }
       setSubmission('error');
-      setGlobalError(json?.error || 'We could not send your request. Please try again.');
+      setGlobalError(friendlyError(json?.error));
     } catch {
       setSubmission('error');
       setGlobalError('Network error. Please try again.');
