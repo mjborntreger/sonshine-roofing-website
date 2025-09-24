@@ -196,7 +196,6 @@ export default async function FinancingPage() {
           <ListStart className={h2Icon} />
           1. Get Started
         </h2>
-
         <MonthlyEstimator />
 
         {/* Two programs (plan cards) */}
@@ -306,6 +305,7 @@ export default async function FinancingPage() {
             </div>
           </section>
         </div>
+        
         {/* Documents checklist (non-interactive) */}
           <h2 className={h2} id="docs">
             <ListChecks className={h2Icon} />

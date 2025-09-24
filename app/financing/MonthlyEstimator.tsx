@@ -476,7 +476,6 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   }, [paymentRows]);
 
   const displayMatch = persistedMatch ?? computedMatch;
-  const matchSentence = displayMatch ? formatReasonsSentence(displayMatch.reasons) : '';
 
   useEffect(() => {
     if (!customPulse) return;
@@ -1150,7 +1149,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                           <div className="text-xs font-normal text-slate-500">{program.summary}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right text-slate-900">
+                      <td className="px-4 py-3 text-right font-semibold text-slate-900">
                         {currency(amount)}/mo
                         {program.footnote && (
                           <span className="ml-2 text-xs text-slate-500">{program.footnote}</span>
@@ -1171,15 +1170,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 </p>
                 <span className="text-sm font-semibold text-emerald-600">{displayMatch.score}% match</span>
               </div>
-              {matchSentence && (
-                <p className="mt-2 text-xs text-emerald-700/90">{matchSentence}.</p>
-              )}
               <button
                 type="button"
                 onClick={() => setShowMatchDetails((prev) => !prev)}
                 className="mt-3 inline-flex items-center text-xs font-semibold text-emerald-700 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2"
               >
-                {showMatchDetails ? 'Hide why this match' : 'Why this match?'}
+                {showMatchDetails ? 'Hide ↑' : 'Why this match? →'}
               </button>
               {showMatchDetails && (
                 <ul className="mt-2 space-y-1 text-xs text-emerald-700">
