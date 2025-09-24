@@ -309,7 +309,7 @@ export default async function FinancingPage() {
         {/* Documents checklist (non-interactive) */}
           <h2 className={h2} id="docs">
             <ListChecks className={h2Icon} />
-            3. What you’ll need
+            3. What You’ll Need
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <section aria-labelledby="ygrene-docs" className="rounded-2xl border border-slate-200 bg-white p-4">

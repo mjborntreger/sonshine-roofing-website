@@ -663,7 +663,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             <p id="phone-error" className="mt-1 text-sm text-red-600">{errors.phone}</p>
           )}
         </div>
-        <Turnstile className="pt-1" />
+        <p className="mt-3 text-xs italic text-slate-500">Quick verification keeps spam away. It never impacts your credit.</p>
       </div>
     );
   };
