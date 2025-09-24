@@ -377,16 +377,17 @@ function calculateMatch(answers: (boolean | null)[]): MatchResult | null {
 
   if (!bestProgram || bestScore <= 0) return null;
 
-  const maxScore = PROGRAM_MAX_SCORE[bestProgram] || 1;
+  const bestProgramKey = bestProgram as ProgramKey;
+  const maxScore = PROGRAM_MAX_SCORE[bestProgramKey] || 1;
   const percent = Math.min(100, Math.round((bestScore / maxScore) * 100));
 
-  const topReasons = reasonBuckets[bestProgram]
+  const topReasons = [...reasonBuckets[bestProgramKey]]
     .sort((a, b) => b.weight - a.weight)
     .slice(0, 3)
     .map((item) => item.text);
 
   return {
-    program: bestProgram,
+    program: bestProgramKey,
     score: percent,
     reasons: topReasons,
   };
