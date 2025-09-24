@@ -1044,7 +1044,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   return (
     <div id="estimator" className={gradientShell}>
       <section className={innerPanel}>
-        <header className="flex flex-wrap items-center justify-between gap-3 rounded-t-3xl bg-blue-50 px-6 py-4">
+        <header className="flex items-center justify-between gap-3 rounded-t-3xl bg-blue-50 px-6 py-4">
           <div className="flex items-center gap-2 text-slate-900">
             <Calculator className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
             <h2 className="text-lg font-semibold md:text-xl">Monthly Payment Calculator</h2>

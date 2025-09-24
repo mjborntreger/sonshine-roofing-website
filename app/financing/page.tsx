@@ -144,6 +144,7 @@ export default async function FinancingPage() {
   const sampleMonthly849 = currency(Math.round(pmt(defaultAmount, 0.0849, 180))) + "/mo";
   const per10kService = '$96/mo per $10k';
   const per10kYgrene = "$124/mo per $10k";
+  
   return (
     <Section>
       <div className="container-edge py-10 md:py-16">
