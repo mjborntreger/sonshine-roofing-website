@@ -207,9 +207,9 @@ export default async function FinancingPage() {
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProgramCard
             theme="orange"
-            recommended
             title="YGrene PACE Financing (Equity‑based)"
             subtitle="House‑secured. Payments typically included in your property‑tax bill."
+            logoUrl="https://next.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
             chips={["No credit check", "Tax‑bill payments", "Equity‑based"]}
             keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
             sampleMonthly={`${sampleMonthly849} on ${currency(defaultAmount)} (15yr @ 8.49%)`}
@@ -232,6 +232,7 @@ export default async function FinancingPage() {
             theme="cyan"
             title="Service Finance (Credit‑based)"
             subtitle="Signature loan with flexible terms. No lien on your property."
+            logoUrl="https://next.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
             chips={["Signature loan", "Fixed term", "Fast approval"]}
             keyFigures={["0% for 12 months", "From 7.9% fixed", per10kService]}
             sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
@@ -316,10 +317,18 @@ export default async function FinancingPage() {
             <section 
               aria-labelledby="ygrene-docs" 
               className="rounded-2xl shadow-md border border-[--brand-orange] bg-white p-4">
-              <h3 
-                id="ygrene-docs" 
-                className="text-xl font-semibold text-slate-900">YGrene PACE Financing (Equity‑based)
-              </h3>
+              <div className="flex justify-between">
+                <h3 
+                  id="ygrene-docs" 
+                  className="text-xl font-semibold text-slate-900">YGrene PACE Financing (Equity‑based)
+                </h3>
+                <img
+                  src="https://next.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
+                  title="Ygrene Financing Logo"
+                  alt="Ygrene Financing Logo"
+                  className="h-6 w-auto opacity-70"
+                  />
+              </div>
               <ul className="mt-3 space-y-2 text-slate-700">
                 <li className={checkList}>
                   <CheckCircle className={checkIconYgrene} aria-hidden="true" />
@@ -347,12 +356,20 @@ export default async function FinancingPage() {
             <section 
               aria-labelledby="service-docs" 
               className="rounded-2xl shadow-md border border-[--brand-cyan] bg-white p-4">
-              <h3 
+              <div className="flex justify-between">
+                <h3 
                 id="service-docs" 
                 className="text-xl font-semibold text-slate-900"
                 >
                 Service Finance (Credit‑based)
               </h3>
+              <img
+                  src="https://next.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
+                  title="Service Finance Logo"
+                  alt="Service Finance Logo"
+                  className="h-8 w-auto opacity-70"
+                  />
+              </div>
               <ul className="mt-3 space-y-2 text-slate-700">
                 <li className={checkList}>
                   <CheckCircle className={checkIconServiceFinance} aria-hidden="true" />

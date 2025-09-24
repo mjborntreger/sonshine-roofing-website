@@ -85,8 +85,7 @@ export default function ProgramCard({
           <div className="flex items-center gap-2">
             {/* Optional logo placeholder — add real URL if available */}
             {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="Program logo" className="h-6 w-auto opacity-70" />
+              <img src={logoUrl} alt="Program logo" className="h-8 w-auto opacity-70" />
             ) : null}
             {recommended && (
               <span className="inline-flex items-center rounded-full bg-[--brand-orange] px-2 py-0.5 text-xs font-semibold text-white whitespace-nowrap shrink-0">
