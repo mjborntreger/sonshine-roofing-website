@@ -59,8 +59,9 @@ const pill =
   'inline-flex items-center gap-2 rounded-full border border-[--brand-orange] bg-white px-3 py-1 text-sm text-slate-800';
 const heroPillIcon = 'inline h-3 w-3 text-[--brand-blue]';
 
-const checkList = "flex items-start gap-2"
-const checkIcon = 'mt-0.5 h-4 w-4 text-[--brand-blue] flex-none';
+const checkList = "flex items-start gap-2";
+const checkIconYgrene = 'mt-0.5 h-4 w-4 text-[--brand-orange] flex-none';
+const checkIconServiceFinance = 'mt-0.5 h-4 w-4 text-[--brand-cyan] flex-none';
 // Icon style for section headings (fits me / expect / questions)
 const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
 const ctaSecondary = 'btn btn-press btn-brand-blue btn-lg';
@@ -247,7 +248,7 @@ export default async function FinancingPage() {
         </div>
 
         {/* Comparison / how it works (custom panels with icons) */}
-        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Which option fits me? */}
           <section className="rounded-2xl border border-slate-200 bg-white p-4">
             <h3 className={h3}>
@@ -305,36 +306,77 @@ export default async function FinancingPage() {
             </div>
           </section>
         </div>
-        
+
         {/* Documents checklist (non-interactive) */}
           <h2 className={h2} id="docs">
             <ListChecks className={h2Icon} />
             3. What You’ll Need
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <section aria-labelledby="ygrene-docs" className="rounded-2xl border border-slate-200 bg-white p-4">
-              <h3 id="ygrene-docs" className="text-xl font-semibold text-slate-900">YGrene (Equity‑based)</h3>
+            <section 
+              aria-labelledby="ygrene-docs" 
+              className="rounded-2xl shadow-md border border-[--brand-orange] bg-white p-4">
+              <h3 
+                id="ygrene-docs" 
+                className="text-xl font-semibold text-slate-900">YGrene PACE Financing (Equity‑based)
+              </h3>
               <ul className="mt-3 space-y-2 text-slate-700">
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Driver’s license (all property owners)</span></li>
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Property address &amp; parcel details</span></li>
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Mortgage/escrow info (if applicable)</span></li>
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Property‑tax history (no late payments in last 3 years)</span></li>
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Confirmation of sufficient home equity</span></li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconYgrene} aria-hidden="true" />
+                  <span>Driver’s license (all property owners)</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconYgrene} aria-hidden="true" />
+                  <span>Property address &amp; parcel details</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconYgrene} aria-hidden="true" />
+                  <span>Mortgage/escrow info (if applicable)</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconYgrene} aria-hidden="true" />
+                  <span>Property‑tax history (no late payments in last 3 years)</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconYgrene} aria-hidden="true" />
+                  <span>Confirmation of sufficient home equity</span>
+                </li>
               </ul>
             </section>
 
-            <section aria-labelledby="service-docs" className="rounded-2xl border border-slate-200 bg-white p-4">
-              <h3 id="service-docs" className="text-xl font-semibold text-slate-900">Service Financing (Credit‑based)</h3>
+            <section 
+              aria-labelledby="service-docs" 
+              className="rounded-2xl shadow-md border border-[--brand-cyan] bg-white p-4">
+              <h3 
+                id="service-docs" 
+                className="text-xl font-semibold text-slate-900"
+                >
+                Service Finance (Credit‑based)
+              </h3>
               <ul className="mt-3 space-y-2 text-slate-700">
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Driver’s license</span></li>
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>SSN (for credit application)</span></li>
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Estimated project total</span></li>
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Income / employment basics (quick verification)</span></li>
-                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Email + mobile for e‑docs</span></li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconServiceFinance} aria-hidden="true" />
+                  <span>Driver’s license</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconServiceFinance} aria-hidden="true" />
+                  <span>SSN (for credit application)</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconServiceFinance} aria-hidden="true" />
+                  <span>Estimated project total</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconServiceFinance} aria-hidden="true" />
+                  <span>Income / employment basics (quick verification)</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconServiceFinance} aria-hidden="true" />
+                  <span>Email + mobile for e‑docs</span>
+                </li>
               </ul>
             </section>
           </div>
-          <p className="mt-3 text-sm text-slate-600">Not sure? We’ll walk you through it on a quick call.</p>
 
         {/* Compliance */}
         <p className="italic mt-10 text-xs text-slate-500">

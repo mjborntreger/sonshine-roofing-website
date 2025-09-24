@@ -2,7 +2,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Calculator, Check, CheckCircle2, Lock, ArrowRight, Undo2, Wallet, X, SearchCheck } from 'lucide-react';
+import { Calculator, Check, CheckCircle2, Lock, ArrowRight, Undo2, Wallet, X, SearchCheck, LockKeyholeOpen } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 
@@ -1049,12 +1049,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             <Calculator className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
             <h2 className="text-lg font-semibold md:text-xl">Monthly Payment Calculator</h2>
           </div>
-          <span className={successPillClass}>Calculator unlocked</span>
+          <span className={successPillClass}>
+            <LockKeyholeOpen className="mr-2 h-3 w-3 inline" />
+            Unlocked
+          </span>
         </header>
 
         <div className="space-y-6 bg-blue-50/40 px-6 py-6">
           <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-white/90 px-4 py-3 text-sm text-emerald-700 shadow-sm">
-            <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" aria-hidden="true" />
+            <CheckCircle2 className="mt-0.5 h-6 w-6 text-emerald-500" aria-hidden="true" />
             <div>
               <p className="font-semibold">Calculator unlocked.</p>
               <p>Adjust your project total to explore updated payments for each program.</p>
@@ -1062,7 +1065,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           </div>
 
           <div className="space-y-4 rounded-2xl border border-blue-100/70 bg-white/85 px-4 py-4 shadow-sm">
-            <label htmlFor="activeAmount" className="block text-sm font-medium text-slate-700">Estimated project total</label>
+            <label htmlFor="activeAmount" className="block text-sm font-medium text-slate-700">Estimated Project Total</label>
             <div className="flex items-center gap-2">
               <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">$</span>
               <input
@@ -1108,14 +1111,14 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </div>
           </div>
 
-          <div className="rounded-2xl border border-blue-100/70 bg-white/90 shadow-sm">
-            <div className="border-b border-blue-100/60 px-4 py-3 text-center text-sm font-medium text-slate-700">
+          <div className="rounded-2xl border border-blue-100 bg-white shadow-md">
+            <div className="border-b border-blue-100 px-4 py-3 text-center text-md font-medium text-slate-700">
               Estimated Monthly Payment
             </div>
             <div className="overflow-hidden">
               <table className="w-full text-sm">
                 <tbody>
-                  <tr className="bg-blue-100/60 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+                  <tr className="bg-blue-100/60 border-b border-blue-100 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
                     <td className="px-4 py-2" colSpan={2}>
                       {MATCH_PROGRAMS.serviceFinance.label} Programs
                     </td>
@@ -1128,7 +1131,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                           <div className="text-xs font-normal text-slate-500">{program.summary}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right text-slate-900">
+                      <td className="px-4 py-3 text-right font-medium text-slate-900">
                         {currency(amount)}/mo
                         {program.footnote && (
                           <span className="ml-2 text-xs text-slate-500">{program.footnote}</span>
@@ -1136,7 +1139,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                       </td>
                     </tr>
                   ))}
-                  <tr className="bg-amber-100/60 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+                  <tr className="bg-amber-100/60 border-t border-b border-amber-100 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
                     <td className="px-4 py-2" colSpan={2}>
                       {MATCH_PROGRAMS.ygrene.label} Financing
                     </td>
