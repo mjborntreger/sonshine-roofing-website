@@ -664,6 +664,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           )}
         </div>
         <p className="mt-3 text-xs italic text-slate-500">Quick verification keeps spam away. It never impacts your credit.</p>
+        <div className="pt-2">
+          <Turnstile className="pt-1" />
+        </div>
       </div>
     );
   };
@@ -671,7 +674,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   if (!unlocked) {
     return (
       <div id="estimator" className={gradientShell}>
-        <section className={innerPanel}>
+        <form onSubmit={handleSubmit} noValidate className={innerPanel}>
+          <input
+            type="text"
+            name="company"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="hidden"
+          />
           <header className="flex flex-wrap items-center justify-between gap-3 rounded-t-3xl bg-blue-50 px-6 py-4">
             <div className="flex items-center gap-2 text-slate-900">
               <SearchCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
@@ -738,7 +749,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               )}
             </div>
           </div>
-        </section>
+        </form>
       </div>
     );
   }
