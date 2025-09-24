@@ -32,10 +32,10 @@ export default function FaqInlineList({
     </details>
   );
   return (
-    <div className="mt-20 mb-8 px-2" data-toc-exclude>
-      <h2 className="text-3xl text-center md:text-5xl font-semibold text-slate-800 flex items-center justify-center gap-2">
+    <div className="mt-40 mb-8 px-2" data-toc-exclude>
+      <h2 className="text-3xl text-center md:text-4xl font-semibold text-slate-800 flex items-center justify-center gap-2">
         {/* Heading icon (tweak size/color here) */}
-        <HelpCircle className="h-7 mr-1 inline w-7 md:h-11 md:w-11 text-[--brand-blue]" aria-hidden="true" />
+        <HelpCircle className="h-7 mr-1 inline w-7 md:h-9 md:w-9 text-[--brand-blue]" aria-hidden="true" />
         {heading}
       </h2>
       {/* Use two flex columns so each column's height is independent and items never jump columns */}

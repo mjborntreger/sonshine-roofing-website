@@ -167,6 +167,15 @@ export const financingLeadSchema = z
     page: pageSchema,
     cfToken: z.string().min(10, "Turnstile token missing").max(2000),
     hp_field: z.string().optional(),
+    quizSummary: z
+      .array(
+        z.object({
+          id: z.string().min(1).max(100),
+          question: z.string().min(1).max(500),
+          answer: z.union([z.literal('yes'), z.literal('no')]),
+        })
+      )
+      .optional(),
   })
   .passthrough();
 

@@ -2,7 +2,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Calculator, CheckCircle2, Lock, ArrowRight, Undo2 } from 'lucide-react';
+import { Calculator, Check, CheckCircle2, Lock, ArrowRight, Undo2, Wallet, X, SearchCheck } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 
@@ -65,7 +65,45 @@ const US_STATES = [
   { value: 'WY', label: 'Wyoming' },
 ];
 
-type Step = 0 | 1 | 2;
+// ============ STYLE CONSTANTS ====================== //
+const pillBase = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-tight shadow-sm';
+const infoPillClass = `${pillBase} text-slate-400`;
+const successPillClass = `${pillBase} bg-emerald-500 text-white`;
+const gradientShell = 'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
+const innerPanel = 'rounded-3xl bg-white overflow-hidden';
+const stepCardClass = 'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
+const inputBaseClass = 'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
+
+const quizQuestions = [
+  {
+    id: 'equity',
+    prompt: 'Do you have home equity and a clean recent property-tax history?',
+  },
+  {
+    id: 'noLien',
+    prompt: 'Do you prefer a loan that does not place a lien on your home?',
+  },
+  {
+    id: 'defer',
+    prompt: 'Would a payment deferral (~18–24 months) help?',
+  },
+  {
+    id: 'credit650',
+    prompt: 'Is your credit score roughly 650+?',
+  },
+  {
+    id: 'incomeDocs',
+    prompt: 'Can you document income/employment for underwriting?',
+  },
+  {
+    id: 'taxAssess',
+    prompt: 'Are you comfortable with an assessment on your property tax bill?',
+  },
+  {
+    id: 'sellSoon',
+    prompt: 'Are you likely to sell your home within ~5 years?',
+  },
+];
 
 type FormValues = {
   firstName: string;
@@ -148,32 +186,14 @@ function parseCookie(raw: string | null): FinancingCookie | null {
   }
 }
 
-function validateStep(step: Step, values: FormValues) {
-  const errors: Record<string, string> = {};
-  if (step === 0) {
-    if (!values.firstName.trim()) errors.firstName = 'Enter your first name';
-    if (!values.lastName.trim()) errors.lastName = 'Enter your last name';
-  }
-  if (step === 1) {
-    if (!values.address1.trim()) errors.address1 = 'Enter the property address';
-    if (!values.city.trim()) errors.city = 'City is required';
-    if (!values.state.trim()) errors.state = 'Select a state';
-    if (!isZipValid(values.zip)) errors.zip = 'Enter 5-digit ZIP';
-    const amountDigits = sanitizeAmountInput(values.amount);
-    const amountNumber = Number(amountDigits);
-    if (!amountDigits || Number.isNaN(amountNumber) || amountNumber < 1000) {
-      errors.amount = 'Enter a project total of at least $1,000';
-    }
-  }
-  if (step === 2) {
-    if (!isEmailValid(values.email)) errors.email = 'Enter a valid email (example@domain.com)';
-    if (sanitizePhoneInput(values.phone).length !== 10) errors.phone = 'Enter a 10-digit phone number';
-  }
-  return errors;
-}
-
 export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmount?: number }) {
-  const [step, setStep] = useState<Step>(0);
+  const totalQuizQuestions = quizQuestions.length;
+  const summaryStepIndex = totalQuizQuestions;
+  const firstFormStepIndex = summaryStepIndex + 1;
+  const secondFormStepIndex = summaryStepIndex + 2;
+  const thirdFormStepIndex = summaryStepIndex + 3;
+
+  const [step, setStep] = useState<number>(0);
   const [submission, setSubmission] = useState<SubmissionState>('idle');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -203,6 +223,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
   }, [defaultAmount]);
 
+
+  const [quizAnswers, setQuizAnswers] = useState<(boolean | null)[]>(() => Array(totalQuizQuestions).fill(null));
+
   const paymentRows = useMemo(
     () =>
       FINANCING_PROGRAMS.map((program) => ({
@@ -212,22 +235,71 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     [calculatorAmount]
   );
 
+  const validateFormStep = (currentStep: number) => {
+    const nextErrors: Record<string, string> = {};
+    if (currentStep === firstFormStepIndex) {
+      if (!formValues.firstName.trim()) nextErrors.firstName = 'Enter your first name';
+      if (!formValues.lastName.trim()) nextErrors.lastName = 'Enter your last name';
+      const amountDigits = sanitizeAmountInput(formValues.amount);
+      const amountNumber = Number(amountDigits);
+      if (!amountDigits || Number.isNaN(amountNumber) || amountNumber < 1000) {
+        nextErrors.amount = 'Enter a project total of at least $1,000';
+      }
+    }
+    if (currentStep === secondFormStepIndex) {
+      if (!formValues.address1.trim()) nextErrors.address1 = 'Enter the property address';
+      if (!formValues.city.trim()) nextErrors.city = 'City is required';
+      if (!formValues.state.trim()) nextErrors.state = 'Select a state';
+      if (!isZipValid(formValues.zip)) nextErrors.zip = 'Enter 5-digit ZIP';
+    }
+    if (currentStep === thirdFormStepIndex) {
+      if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
+      if (sanitizePhoneInput(formValues.phone).length !== 10) nextErrors.phone = 'Enter a 10-digit phone number';
+    }
+    return nextErrors;
+  };
+
+  const handleQuizAnswer = (index: number, value: boolean) => {
+    const next = [...quizAnswers];
+    next[index] = value;
+    setQuizAnswers(next);
+    setErrors({});
+    setGlobalError(null);
+    const targetStep = index === totalQuizQuestions - 1 ? summaryStepIndex : index + 1;
+    setStep(targetStep);
+  };
+
   const handleNext = () => {
-    const stepErrors = validateStep(step, formValues);
+    setGlobalError(null);
+    setErrors({});
+
+    if (step < totalQuizQuestions) {
+      if (quizAnswers[step] == null) {
+        setGlobalError('Select yes or no to continue.');
+        return;
+      }
+      setStep(step + 1);
+      return;
+    }
+
+    if (step === summaryStepIndex) {
+      setStep(step + 1);
+      return;
+    }
+
+    const stepErrors = validateFormStep(step);
     if (Object.keys(stepErrors).length) {
       setErrors(stepErrors);
       return;
     }
-    setErrors({});
-    const nextStep: Record<Step, Step> = { 0: 1, 1: 2, 2: 2 };
-    setStep((prev) => nextStep[prev]);
+
+    setStep(Math.min(step + 1, thirdFormStepIndex));
   };
 
   const handleBack = () => {
     setErrors({});
     setGlobalError(null);
-    const previousStep: Record<Step, Step> = { 0: 0, 1: 0, 2: 1 };
-    setStep((prev) => previousStep[prev]);
+    setStep((prev) => Math.max(0, prev - 1));
   };
 
   const friendlyError = (raw?: unknown) => {
@@ -240,9 +312,17 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     event.preventDefault();
     if (submission === 'submitting') return;
 
-    const stepErrors = validateStep(2, formValues);
-    if (Object.keys(stepErrors).length) {
-      setErrors(stepErrors);
+    const finalErrors = validateFormStep(thirdFormStepIndex);
+    if (Object.keys(finalErrors).length) {
+      setErrors(finalErrors);
+      setStep(thirdFormStepIndex);
+      return;
+    }
+
+    if (quizAnswers.some((answer) => answer === null)) {
+      const firstUnanswered = quizAnswers.findIndex((answer) => answer === null);
+      setGlobalError('Please answer each quick question.');
+      setStep(firstUnanswered === -1 ? 0 : firstUnanswered);
       return;
     }
 
@@ -259,6 +339,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
     const amountNumber = Number(sanitizeAmountInput(formValues.amount));
 
+    const quizSummary = quizQuestions.map((question, idx) => ({
+      id: question.id,
+      question: question.prompt,
+      answer: quizAnswers[idx] ? 'yes' : 'no',
+    }));
+
     const payload = {
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
@@ -273,6 +359,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       page: '/financing',
       cfToken,
       hp_field: honeypot,
+      quizSummary,
     };
 
     setSubmission('submitting');
@@ -305,17 +392,94 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
   };
 
+  const isQuizStep = step < totalQuizQuestions;
+  const totalFormSteps = 4;
+  const formStepNumber = step - summaryStepIndex + 1;
+  const stepTitle = isQuizStep
+    ? `Question ${step + 1} of ${totalQuizQuestions}`
+    : `Step ${formStepNumber} of ${totalFormSteps}`;
+  const stepSubtitle = isQuizStep
+    ? 'Tap yes or no to continue.'
+    : step === summaryStepIndex
+      ? 'Almost there! Hit “Next” to continue.'
+      : 'Fill out each field to continue.';
+  const nextDisabled = isQuizStep && quizAnswers[step] == null;
+
   const renderStepFields = () => {
-    if (step === 0) {
+    if (isQuizStep) {
+      const question = quizQuestions[step];
+      const answer = quizAnswers[step];
+      const yesSelected = answer === true;
+      const noSelected = answer === false;
+
       return (
-        <div className="space-y-4" aria-live="polite">
+        <div className={stepCardClass} aria-live="polite">
+          <p className="text-base font-semibold text-slate-900">{question.prompt}</p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <button
+              type="button"
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                yesSelected
+                  ? 'border-emerald-500 bg-emerald-50 text-emerald-700 focus:ring-emerald-200'
+                  : 'border-slate-200 bg-white text-slate-700 hover:bg-emerald-50 focus:ring-emerald-200'
+              }`}
+              onClick={() => handleQuizAnswer(step, true)}
+              aria-pressed={yesSelected}
+            >
+              <Check className="h-4 w-4" aria-hidden="true" />
+              <span>Yes</span>
+            </button>
+            <button
+              type="button"
+              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                noSelected
+                  ? 'border-red-500 bg-red-50 text-red-700 focus:ring-red-200'
+                  : 'border-slate-200 bg-white text-slate-700 hover:bg-red-50 focus:ring-red-200'
+              }`}
+              onClick={() => handleQuizAnswer(step, false)}
+              aria-pressed={noSelected}
+            >
+              <X className="h-4 w-4" aria-hidden="true" />
+              <span>No</span>
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (step === summaryStepIndex) {
+      const summaryItems = quizQuestions.map((question, idx) => ({
+        id: question.id,
+        prompt: question.prompt,
+        answer: quizAnswers[idx],
+      }));
+
+      return (
+        <div className={stepCardClass} aria-live="polite">
+          <p className="text-base font-semibold text-slate-900">Your answers</p>
+          <ul className="mt-3 space-y-2 text-sm text-slate-700">
+            {summaryItems.map((item) => (
+              <li key={item.id} className="flex items-start gap-2">
+                <span className="text-lg">{item.answer ? '✅' : item.answer === false ? '❌' : '❔'}</span>
+                <span>{item.prompt}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-xs italic text-slate-500">Almost there! Hit “Next” to continue.</p>
+        </div>
+      );
+    }
+
+    if (step === firstFormStepIndex) {
+      return (
+        <div className={stepCardClass} aria-live="polite">
           <div>
             <label className="block text-sm font-medium text-slate-700" htmlFor="firstName">First name*</label>
             <input
               id="firstName"
               name="firstName"
               autoComplete="given-name"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+              className={inputBaseClass}
               value={formValues.firstName}
               onChange={(e) => setFormValues((prev) => ({ ...prev, firstName: e.target.value }))}
               aria-invalid={Boolean(errors.firstName)}
@@ -331,7 +495,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               id="lastName"
               name="lastName"
               autoComplete="family-name"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+              className={inputBaseClass}
               value={formValues.lastName}
               onChange={(e) => setFormValues((prev) => ({ ...prev, lastName: e.target.value }))}
               aria-invalid={Boolean(errors.lastName)}
@@ -341,20 +505,43 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               <p id="lastName-error" className="mt-1 text-sm text-red-600">{errors.lastName}</p>
             )}
           </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700" htmlFor="amount">Estimated project total*</label>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">$</span>
+              <input
+                id="amount"
+                name="amount"
+                inputMode="numeric"
+                className="h-10 w-full rounded-lg border border-blue-100 bg-white/95 px-3 text-slate-900 shadow-sm outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+                value={formValues.amount}
+                onChange={(e) => {
+                  const digits = sanitizeAmountInput(e.target.value);
+                  setFormValues((prev) => ({ ...prev, amount: digits }));
+                }}
+                aria-invalid={Boolean(errors.amount)}
+                aria-describedby={errors.amount ? 'amount-error' : undefined}
+              />
+            </div>
+            <p className="mt-2 text-xs text-slate-500">We will prefill the calculator with this amount.</p>
+            {errors.amount && (
+              <p id="amount-error" className="mt-1 text-sm text-red-600">{errors.amount}</p>
+            )}
+          </div>
         </div>
       );
     }
 
-    if (step === 1) {
+    if (step === secondFormStepIndex) {
       return (
-        <div className="space-y-4" aria-live="polite">
+        <div className={stepCardClass} aria-live="polite">
           <div>
             <label className="block text-sm font-medium text-slate-700" htmlFor="address1">Property address*</label>
             <input
               id="address1"
               name="address1"
               autoComplete="address-line1"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+              className={inputBaseClass}
               value={formValues.address1}
               onChange={(e) => setFormValues((prev) => ({ ...prev, address1: e.target.value }))}
               aria-invalid={Boolean(errors.address1)}
@@ -370,7 +557,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               id="address2"
               name="address2"
               autoComplete="address-line2"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+              className={inputBaseClass}
               value={formValues.address2}
               onChange={(e) => setFormValues((prev) => ({ ...prev, address2: e.target.value }))}
             />
@@ -382,7 +569,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 id="city"
                 name="city"
                 autoComplete="address-level2"
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+                className={inputBaseClass}
                 value={formValues.city}
                 onChange={(e) => setFormValues((prev) => ({ ...prev, city: e.target.value }))}
                 aria-invalid={Boolean(errors.city)}
@@ -398,7 +585,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 id="state"
                 name="state"
                 autoComplete="address-level1"
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+                className={`${inputBaseClass} pr-8`}
                 value={formValues.state}
                 onChange={(e) => setFormValues((prev) => ({ ...prev, state: e.target.value }))}
                 aria-invalid={Boolean(errors.state)}
@@ -421,7 +608,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 name="zip"
                 inputMode="numeric"
                 autoComplete="postal-code"
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+                className={inputBaseClass}
                 value={formValues.zip}
                 onChange={(e) => {
                   const digits = e.target.value.replace(/\D/g, '').slice(0, 5);
@@ -435,35 +622,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               )}
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="amount">Estimated project total*</label>
-            <div className="mt-1 flex items-center gap-2">
-              <span className="inline-flex h-10 items-center rounded-lg bg-emerald-500 px-3 text-white">$</span>
-              <input
-                id="amount"
-                name="amount"
-                inputMode="numeric"
-                className="h-10 w-full rounded-lg border border-slate-300 px-3 outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
-                value={formValues.amount}
-                onChange={(e) => {
-                  const digits = sanitizeAmountInput(e.target.value);
-                  setFormValues((prev) => ({ ...prev, amount: digits }));
-                }}
-                aria-invalid={Boolean(errors.amount)}
-                aria-describedby={errors.amount ? 'amount-error' : undefined}
-              />
-            </div>
-            <p className="mt-2 text-xs text-slate-500">We will prefill the calculator with this amount.</p>
-            {errors.amount && (
-              <p id="amount-error" className="mt-1 text-sm text-red-600">{errors.amount}</p>
-            )}
-          </div>
         </div>
       );
     }
 
     return (
-      <div className="space-y-4" aria-live="polite">
+      <div className={stepCardClass} aria-live="polite">
         <div>
           <label className="block text-sm font-medium text-slate-700" htmlFor="email">Email*</label>
           <input
@@ -471,7 +635,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             name="email"
             type="email"
             autoComplete="email"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+            className={inputBaseClass}
             value={formValues.email}
             onChange={(e) => setFormValues((prev) => ({ ...prev, email: e.target.value }))}
             aria-invalid={Boolean(errors.email)}
@@ -489,7 +653,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             type="tel"
             inputMode="numeric"
             autoComplete="tel"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+            className={inputBaseClass}
             value={formatPhoneDisplay(formValues.phone)}
             onChange={(e) => setFormValues((prev) => ({ ...prev, phone: sanitizePhoneInput(e.target.value) }))}
             aria-invalid={Boolean(errors.phone)}
@@ -506,159 +670,176 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
   if (!unlocked) {
     return (
-      <div
-        id="estimator"
-        className="rounded-2xl border border-slate-200 bg-white px-8 py-6 shadow-sm"
-      >
-        <div className="mb-6 flex items-center justify-center gap-2 text-2xl font-semibold text-slate-900">
-          <Lock className="h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
-          Unlock Your Monthly Payment Estimates
-        </div>
-        <p className="mx-auto mb-6 max-w-2xl text-center text-sm text-slate-600">
-          Answer a few quick questions to reveal monthly payment estimates for YGrene and Service Finance programs.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-          <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
-
-          <div className="flex items-center justify-between text-sm font-medium text-slate-600">
-            <span>Step {step + 1} of 3</span>
-            <span className="text-xs text-slate-500">Press Tab to reach each field.</span>
-          </div>
-
-          {renderStepFields()}
-
-          {globalError && (
-            <div className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
-              {globalError}
+      <div id="estimator" className={gradientShell}>
+        <section className={innerPanel}>
+          <header className="flex flex-wrap items-center justify-between gap-3 rounded-t-3xl bg-blue-50 px-6 py-4">
+            <div className="flex items-center gap-2 text-slate-900">
+              <SearchCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+              <h3 className="text-lg font-semibold md:text-xl">Find the Right Financing Plan</h3>
             </div>
-          )}
+          </header>
 
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
-            {step > 0 ? (
-              <button
-                type="button"
-                onClick={handleBack}
-                className="inline-flex items-center gap-1 text-sm text-slate-600 transition hover:text-slate-800"
-              >
-                <Undo2 className="h-4 w-4" aria-hidden="true" />
-                Back
-              </button>
-            ) : (
-              <span />
-            )}
-
-            {step < 2 ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="btn btn-brand-blue btn-md inline-flex items-center gap-2"
-              >
-                Next
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="btn btn-brand-orange btn-md inline-flex items-center gap-2"
-                disabled={submission === 'submitting'}
-              >
-                {submission === 'submitting' ? 'Sending…' : 'Show my results'}
-                {submission !== 'submitting' && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
-              </button>
-            )}
+          <div className="bg-blue-50/40 text-sm text-slate-600 px-8 pt-6">
+            Answer a few quick questions to reveal monthly payment estimates for YGrene and Service Finance programs.
           </div>
-        </form>
+
+          <div className="space-y-6 bg-blue-50/40 px-6 py-6">
+            <div className="flex flex-col gap-2 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm md:flex-row md:items-center md:justify-between">
+              <span>{stepTitle}</span>
+              <span className="text-slate-500 md:hidden">{stepSubtitle}</span>
+              <span className={`${infoPillClass} hidden md:inline-flex`}>{stepSubtitle}</span>
+            </div>
+
+            {renderStepFields()}
+
+            {globalError && (
+              <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm" role="alert">
+                {globalError}
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 shadow-sm">
+              <button
+                type="button"
+                onClick={step > 0 ? handleBack : undefined}
+                className={`inline-flex items-center gap-1 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue] ${step === 0 ? 'cursor-not-allowed opacity-60' : ''}`}
+                disabled={step === 0}
+              >
+                <Undo2
+                  className={`h-4 w-4 ${step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}`}
+                  aria-hidden="true"
+                />
+                <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>Back</span>
+              </button>
+
+              <div className="flex-1 text-center text-xs italic text-slate-500">
+                No credit check needed — you’re just exploring options.
+              </div>
+
+              {step < thirdFormStepIndex ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="btn btn-brand-blue btn-md inline-flex items-center gap-2"
+                  disabled={nextDisabled}
+                >
+                  Next
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="btn btn-brand-orange btn-md inline-flex items-center gap-2"
+                  disabled={submission === 'submitting'}
+                >
+                  {submission === 'submitting' ? 'Sending…' : 'Show my results'}
+                  {submission !== 'submitting' && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
       </div>
     );
   }
 
+
   return (
-    <div
-      id="estimator"
-      className="rounded-2xl border border-slate-200 bg-white px-8 py-6 shadow-sm"
-    >
-      <div className="mb-4 flex items-start gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-emerald-800">
-        <CheckCircle2 className="mt-1 h-6 w-6" aria-hidden="true" />
-        <div>
-          <p className="font-semibold">Calculator unlocked.</p>
-          <p className="text-sm">Adjust your project total to explore updated payments for each program.</p>
+    <div id="estimator" className={gradientShell}>
+      <section className={innerPanel}>
+        <header className="flex flex-wrap items-center justify-between gap-3 rounded-t-3xl bg-blue-50 px-6 py-4">
+          <div className="flex items-center gap-2 text-slate-900">
+            <Calculator className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+            <h2 className="text-lg font-semibold md:text-xl">Monthly Payment Calculator</h2>
+          </div>
+          <span className={successPillClass}>Calculator unlocked</span>
+        </header>
+
+        <div className="space-y-6 bg-blue-50/40 px-6 py-6">
+          <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-white/90 px-4 py-3 text-sm text-emerald-700 shadow-sm">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-500" aria-hidden="true" />
+            <div>
+              <p className="font-semibold">Calculator unlocked.</p>
+              <p>Adjust your project total to explore updated payments for each program.</p>
+            </div>
+          </div>
+
+          <div className="space-y-4 rounded-2xl border border-blue-100/70 bg-white/85 px-4 py-4 shadow-sm">
+            <label htmlFor="activeAmount" className="block text-sm font-medium text-slate-700">Estimated project total</label>
+            <div className="flex items-center gap-2">
+              <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">$</span>
+              <input
+                id="activeAmount"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                className="h-10 w-full rounded-lg border border-blue-100 bg-white/95 px-3 text-slate-900 shadow-sm outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+                value={calculatorAmount}
+                onChange={(e) => {
+                  const digits = sanitizeAmountInput(e.target.value);
+                  setCalculatorAmount(Number(digits) || 0);
+                }}
+                min={1000}
+                step={500}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-2 text-sm">
+              {FINANCING_PRESETS.map((preset) => {
+                const selected = calculatorAmount === preset;
+                return (
+                  <button
+                    key={preset}
+                    type="button"
+                    className={`rounded-full border px-3 py-1 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                      selected
+                        ? 'border-[--brand-blue] bg-[--brand-blue] text-white'
+                        : 'border-blue-100 bg-white hover:bg-blue-50/60'
+                    }`}
+                    onClick={() => setCalculatorAmount(preset)}
+                    aria-label={`Set amount to ${currency(preset)}`}
+                    aria-pressed={selected}
+                  >
+                    {currency(preset).replace('.00', '')}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-blue-100/70 bg-white/90 shadow-sm">
+            <div className="border-b border-blue-100/60 px-4 py-3 text-center text-sm font-medium text-slate-700">
+              Estimated Monthly Payment
+            </div>
+            <div className="overflow-hidden">
+              <table className="w-full text-sm">
+                <tbody className="[&>tr:nth-child(odd)]:bg-blue-50/40">
+                  {paymentRows.map(({ program, amount }) => (
+                    <tr key={program.id}>
+                      <td className="px-4 py-3 font-medium text-slate-900">
+                        <div>{program.label}</div>
+                        {program.summary && (
+                          <div className="text-xs font-normal text-slate-500">{program.summary}</div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right text-slate-900">
+                        {currency(amount)}/mo
+                        {program.footnote && (
+                          <span className="ml-2 text-xs text-slate-500">{program.footnote}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <p className="text-xs italic text-slate-500">
+            Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments are set by the lender.
+          </p>
         </div>
-      </div>
-
-      <div className="mb-8 text-center text-2xl font-semibold text-slate-900">
-        <Calculator className="mr-2 inline h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
-        Monthly Payment Calculator
-      </div>
-
-      <label htmlFor="activeAmount" className="mb-3 block text-sm text-slate-700">Estimated project total</label>
-      <div className="mt-1 flex items-center gap-2">
-        <span className="inline-flex h-10 items-center rounded-lg bg-emerald-500 px-3 text-white">$</span>
-        <input
-          id="activeAmount"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          className="h-10 w-full rounded-lg border border-slate-300 px-3 outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
-          value={calculatorAmount}
-          onChange={(e) => {
-            const digits = sanitizeAmountInput(e.target.value);
-            setCalculatorAmount(Number(digits) || 0);
-          }}
-          min={1000}
-          step={500}
-        />
-      </div>
-
-      <div className="my-3 flex flex-wrap gap-2 text-sm">
-        {FINANCING_PRESETS.map((preset) => {
-          const selected = calculatorAmount === preset;
-          return (
-            <button
-              key={preset}
-              type="button"
-              className={`rounded-full px-3 py-1 transition border focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                selected ? 'bg-[--brand-blue] text-white border-[--brand-blue]' : 'border-slate-200 hover:bg-slate-50'
-              }`}
-              onClick={() => setCalculatorAmount(preset)}
-              aria-label={`Set amount to ${currency(preset)}`}
-              aria-pressed={selected}
-            >
-              {currency(preset).replace('.00', '')}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="mb-2 mt-5 text-center text-sm text-slate-700">
-        Estimated Monthly Payment
-      </div>
-
-      <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
-        <table className="w-full text-sm">
-          <tbody className="[&>tr:nth-child(odd)]:bg-slate-50/40">
-            {paymentRows.map(({ program, amount }) => (
-              <tr key={program.id}>
-                <td className="p-3 font-medium">
-                  <div>{program.label}</div>
-                  {program.summary && (
-                    <div className="text-xs font-normal text-slate-500">{program.summary}</div>
-                  )}
-                </td>
-                <td className="p-3 text-right">
-                  {currency(amount)}/mo
-                  {program.footnote && (
-                    <span className="ml-2 text-xs text-slate-500">{program.footnote}</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <p className="italic mt-2 text-xs text-slate-500">
-        Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments are set by the lender.
-      </p>
+      </section>
     </div>
   );
+
 }

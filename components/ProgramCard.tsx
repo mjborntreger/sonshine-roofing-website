@@ -17,7 +17,7 @@ export type ProgramCardProps = {
   sampleMonthly?: string; // e.g., "$144/mo on $15k (15yr @ 7.9%)"
   cta: CTA;
   // Theme keys: "blue" (primary/YGrene), "cyan" (secondary/Service Finance)
-  theme: "blue" | "cyan";
+  theme: "blue" | "cyan" | "orange";
   recommended?: boolean;
   // Optional logo URL placeholders (provide real URLs later)
   logoUrl?: string;
@@ -39,16 +39,30 @@ export default function ProgramCard({
   logoUrl,
 }: ProgramCardProps) {
   const isBluePrimary = theme === "blue";
-  const headerTint = isBluePrimary ? "bg-blue-50" : "bg-cyan-50";
+  const isOrange = theme === "orange";
+  const isCyan = theme === "cyan";
+  const headerTint = isBluePrimary
+    ? "bg-blue-50"
+    : isOrange
+      ? "bg-orange-50"
+      : "bg-cyan-50";
   // Motif: YGrene (blue) uses Landmark (tax/house), Service Finance (cyan) uses Percent
-  const motif = isBluePrimary
-    ? <Landmark className="h-4 w-4 text-[--brand-blue]" aria-hidden />
-    : <Percent className="h-4 w-4 text-cyan-600" aria-hidden />;
+  const motif = isBluePrimary ? (
+    <Landmark className="h-4 w-4 text-[--brand-blue]" aria-hidden />
+  ) : isOrange ? (
+    <Landmark className="h-4 w-4 text-orange-500" aria-hidden />
+  ) : (
+    <Percent className="h-4 w-4 text-cyan-600" aria-hidden />
+  );
 
-  // Wrapper style: Ygrene (blue) uses gradient ring; Service Finance (cyan) uses solid border
+  // Wrapper style per theme (blue/orange/cyan gradients)
   const wrapperClass = isBluePrimary
     ? "p-[2px] bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan]"
-    : "border border-slate-400";
+    : isOrange
+      ? "p-[2px] bg-gradient-to-r from-[--brand-orange] to-amber-400"
+      : isCyan
+        ? "p-[2px] bg-gradient-to-r from-[--brand-cyan] to-sky-400"
+        : "border border-slate-400";
 
   return (
     <div
@@ -75,7 +89,7 @@ export default function ProgramCard({
               <img src={logoUrl} alt="Program logo" className="h-6 w-auto opacity-70" />
             ) : null}
             {recommended && (
-              <span className="inline-flex items-center rounded-full bg-[--brand-blue] px-2 py-0.5 text-xs font-semibold text-white whitespace-nowrap shrink-0">
+              <span className="inline-flex items-center rounded-full bg-[--brand-orange] px-2 py-0.5 text-xs font-semibold text-white whitespace-nowrap shrink-0">
                 Most popular
               </span>
             )}
@@ -86,7 +100,7 @@ export default function ProgramCard({
         <div
           className={cn(
             "mx-4 mt-3 rounded-xl px-3 py-2 text-sm font-semibold text-slate-900",
-            isBluePrimary ? "bg-blue-50" : "bg-cyan-50",
+            isBluePrimary ? "bg-blue-50" : isOrange ? "bg-orange-50" : "bg-cyan-50",
             "animate-pulse",
           )}
           style={{ animationIterationCount: 1 as any }}
@@ -94,7 +108,13 @@ export default function ProgramCard({
           <div className="flex flex-wrap items-center gap-3">
             {keyFigures.map((k, i) => (
               <span key={i} className="inline-flex items-center gap-1 text-slate-900">
-                <CheckCircle2 className="h-4 w-4 text-[--brand-blue]" aria-hidden />
+                <CheckCircle2
+                  className={cn(
+                    "h-4 w-4",
+                    isOrange ? "text-[--brand-orange]" : isCyan ? "text-cyan-600" : "text-[--brand-blue]",
+                  )}
+                  aria-hidden
+                />
                 {k}
               </span>
             ))}
@@ -102,7 +122,12 @@ export default function ProgramCard({
         </div>
 
         {/* Body */}
-        <div className={cn("flex-1 px-4 py-4", isBluePrimary ? "bg-blue-50/20" : "bg-cyan-50/20")}>          
+        <div
+          className={cn(
+            "flex-1 px-4 py-4",
+            isBluePrimary ? "bg-blue-50/20" : isOrange ? "bg-orange-50/20" : "bg-cyan-50/20"
+          )}
+        >
           {subtitle ? (
             <p className="m-0 text-sm text-slate-700">{subtitle}</p>
           ) : null}
@@ -133,7 +158,13 @@ export default function ProgramCard({
             <details className="group mt-4 rounded-xl border border-slate-300 bg-white">
               <summary className="flex items-center justify-between cursor-pointer select-none px-3 py-2 text-sm font-medium text-slate-900">
                 <span className="inline-flex items-center gap-2">
-                  <HelpCircle className="h-4 w-4 text-[--brand-blue]" aria-hidden />
+                  <HelpCircle
+                    className={cn(
+                      "h-4 w-4",
+                      isOrange ? "text-[--brand-orange]" : isCyan ? "text-cyan-600" : "text-[--brand-blue]",
+                    )}
+                    aria-hidden
+                  />
                   {eligibilityLabel || 'How eligibility works'}
                 </span>
                 <ChevronDown className="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" aria-hidden />
@@ -153,7 +184,16 @@ export default function ProgramCard({
         {/* Footer CTA + compliance */}
         <div className="px-4 pt-0 pb-4 mt-auto">
           <div className="flex justify-end">
-            <a href={cta.href} className={cn("btn btn-press btn-lg inline-flex items-center", cta.className)} target="_blank" title={cta.title || cta.label}>
+            <a
+              href={cta.href}
+              className={cn(
+                "btn btn-press btn-lg inline-flex items-center",
+                isOrange ? "bg-[--brand-orange] hover:bg-[--brand-orange]/90" : undefined,
+                cta.className,
+              )}
+              target="_blank"
+              title={cta.title || cta.label}
+            >
               {cta.label}
               <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
             </a>

@@ -68,6 +68,8 @@ export default function Footer() {
             </Link>
             <ul className="mt-3 space-y-3 text-sm">
               <li>
+              </li>
+              <li>
                 <Link
                   className={linkStyles}
                   href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
@@ -189,7 +191,7 @@ export default function Footer() {
         </nav>
 
         {/* Socials Badges Row */}
-        <div className="mt-20 flex flex-wrap items-center justify-center gap-1">
+        <div className="mt-20 mb-8 flex items-center justify-start gap-3">
             {SOCIALS.map((s) => (
               <a
                 key={s.href}
@@ -198,7 +200,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 aria-label={s.label}
                 title={s.label}
-                className="inline-flex h-10 w-10 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                className="h-6 w-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
               >
                 <Image
                   src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
@@ -207,14 +209,14 @@ export default function Footer() {
                   height={32}
                   sizes="(max-width: 32px) 5vw 366px"
                   loading="lazy"
-                  className="h-8 w-8"
+                  className="h-6 w-6"
                 />
               </a>
             ))}
           </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 border-t border-slate-300 pt-6 flex flex-wrap justify-between items-center gap-4">
+        <div className="mt-3 border-t border-slate-300 pt-6 flex flex-wrap justify-between items-center gap-4">
           <div className="text-xs text-slate-500">
             © {new Date().getFullYear()} SonShine Roofing — Since 1987 we’ve got you covered. | All Rights Reserved
           </div>

@@ -1,9 +1,8 @@
 import Section from '@/components/layout/Section';
 import UiLink from '@/components/UiLink';
-import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowRight, HandCoins, CircleDollarSign, Timer, Percent, MapPin, CheckCircle } from "lucide-react";
+import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ListStart } from "lucide-react";
 import ProgramCard from '@/components/ProgramCard';
 import MonthlyEstimator from './MonthlyEstimator';
-import PlanQuiz from './PlanQuiz';
 import type { Metadata } from 'next';
 import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
@@ -52,13 +51,15 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const h2 = 'text-xl md:text-2xl font-semibold text-slate-900';
+const h2 = 'mb-16 mt-40 text-3xl md:text-4xl text-center font-semibold text-slate-900';
+const h2Icon = "inline mr-4 h-7 w-7 md:h-10 md:w-10 text-[--brand-blue]";
+const h3 = 'text-xl md:text-2xl font-semibold text-slate-900 flex items-center';
 const lead = 'text-lg text-slate-700';
 const pill =
   'inline-flex items-center gap-2 rounded-full border border-[--brand-orange] bg-white px-3 py-1 text-sm text-slate-800';
 const heroPillIcon = 'inline h-3 w-3 text-[--brand-blue]';
 
-// Checklist icon style for the documents section (tweak once here)
+const checkList = "flex items-start gap-2"
 const checkIcon = 'mt-0.5 h-4 w-4 text-[--brand-blue] flex-none';
 // Icon style for section headings (fits me / expect / questions)
 const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
@@ -149,7 +150,7 @@ export default async function FinancingPage() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">
             Roof Financing Made Simple
-            <HandCoins className="h-7 w-7 md:h-11 md:w-11 text-[--brand-blue] inline ml-4"/>
+            <HandCoins className="h-7 w-7 md:h-12 md:w-12 text-[--brand-blue] inline ml-4"/>
           </h1>
           <p className={`${lead} mt-4`}>
             Spread the cost of your roof over comfortable monthly payments. Choose from
@@ -174,8 +175,9 @@ export default async function FinancingPage() {
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <UiLink href="/contact-us" className={ctaPrimary} title="Request Financing Details">
-              Request financing details
+            <UiLink href="#get-started" className={ctaPrimary} title="Get Started">
+              Get Started
+              <ArrowDown className="h-5 w-5 inline ml-2 text-white" aria-hidden="true" />
             </UiLink>
             <UiLink
               href="tel:+19418664320"
@@ -188,12 +190,23 @@ export default async function FinancingPage() {
           </div>
         </div>
 
-        <div className="gradient-divider my-10" />
+        <div className="gradient-divider mt-10" />
+
+        <h2 id="get-started" className='my-16 text-3xl md:text-4xl text-center font-semibold text-slate-900'>
+          <ListStart className={h2Icon} />
+          1. Get Started
+        </h2>
+
+        <MonthlyEstimator />
 
         {/* Two programs (plan cards) */}
+        <h2 className={h2}>
+          <ArrowLeftRight className={h2Icon} />
+          2. Pick a Plan
+        </h2>
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProgramCard
-            theme="blue"
+            theme="orange"
             recommended
             title="YGrene Financing (Equity‑based)"
             subtitle="House‑secured. Payments typically included in your property‑tax bill."
@@ -235,10 +248,10 @@ export default async function FinancingPage() {
         </div>
 
         {/* Comparison / how it works (custom panels with icons) */}
-        <div className="mt-16 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Which option fits me? */}
           <section className="rounded-2xl border border-slate-200 bg-white p-4">
-            <h3 className={`${h2} flex items-center`}>
+            <h3 className={h3}>
               <ListChecks className={sectionIcon} aria-hidden="true" />
               Which option fits me?
             </h3>
@@ -259,7 +272,7 @@ export default async function FinancingPage() {
 
           {/* What to expect */}
           <section className="rounded-2xl border border-slate-200 bg-white p-4">
-            <h3 className={`${h2} flex items-center`}>
+            <h3 className={h3}>
               <ListOrdered className={sectionIcon} aria-hidden="true" />
               What to expect
             </h3>
@@ -273,7 +286,7 @@ export default async function FinancingPage() {
 
           {/* Questions? */}
           <section className="rounded-2xl border border-slate-200 bg-white p-4 h-full flex flex-col">
-            <h3 className={`${h2} flex items-center`}>
+            <h3 className={h3}>
               <HelpCircle className={sectionIcon} aria-hidden="true" />
               Questions?
             </h3>
@@ -293,46 +306,35 @@ export default async function FinancingPage() {
             </div>
           </section>
         </div>
-
-        {/*Estimator + Quiz */}
-        <div className="items-start mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <MonthlyEstimator />
-          <div>
-            <PlanQuiz />
-          </div>
-        </div>
-
         {/* Documents checklist (non-interactive) */}
-        <div className="mt-24">
-          <h2 className='mb-16 text-3xl md:text-5xl text-center font-semibold text-slate-900' id="docs">
-            <ListChecks className="inline mr-4 h-7 w-7 md:h-11 md:w-11 text-[--brand-blue]" />
-            What you’ll need
+          <h2 className={h2} id="docs">
+            <ListChecks className={h2Icon} />
+            3. What you’ll need
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <section aria-labelledby="ygrene-docs" className="rounded-2xl border border-slate-200 bg-white p-4">
               <h3 id="ygrene-docs" className="text-xl font-semibold text-slate-900">YGrene (Equity‑based)</h3>
               <ul className="mt-3 space-y-2 text-slate-700">
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Driver’s license (all property owners)</span></li>
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Property address &amp; parcel details</span></li>
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Mortgage/escrow info (if applicable)</span></li>
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Property‑tax history (no late payments in last 3 years)</span></li>
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Confirmation of sufficient home equity</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Driver’s license (all property owners)</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Property address &amp; parcel details</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Mortgage/escrow info (if applicable)</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Property‑tax history (no late payments in last 3 years)</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Confirmation of sufficient home equity</span></li>
               </ul>
             </section>
 
             <section aria-labelledby="service-docs" className="rounded-2xl border border-slate-200 bg-white p-4">
               <h3 id="service-docs" className="text-xl font-semibold text-slate-900">Service Financing (Credit‑based)</h3>
               <ul className="mt-3 space-y-2 text-slate-700">
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Driver’s license</span></li>
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>SSN (for credit application)</span></li>
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Estimated project total</span></li>
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Income / employment basics (quick verification)</span></li>
-                <li className="flex items-start gap-2"><CheckCircle className={checkIcon} aria-hidden="true" /><span>Email + mobile for e‑docs</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Driver’s license</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>SSN (for credit application)</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Estimated project total</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Income / employment basics (quick verification)</span></li>
+                <li className={checkList}><CheckCircle className={checkIcon} aria-hidden="true" /><span>Email + mobile for e‑docs</span></li>
               </ul>
             </section>
           </div>
           <p className="mt-3 text-sm text-slate-600">Not sure? We’ll walk you through it on a quick call.</p>
-        </div>
 
         {/* Compliance */}
         <p className="italic mt-10 text-xs text-slate-500">

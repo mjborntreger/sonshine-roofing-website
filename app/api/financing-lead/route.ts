@@ -151,6 +151,18 @@ export async function POST(req: NextRequest) {
     maximumFractionDigits: 0,
   });
 
+  const summaryLines = Array.isArray(data.quizSummary)
+    ? data.quizSummary.map((item) => `${item.answer === 'yes' ? '✅' : '❌'} ${item.question}`)
+    : [];
+
+  const messageLines = [
+    `Financing calculator unlock request from ${fullName} for ${data.address1}, ${data.city}, ${data.state} ${data.zip}. Estimated project total: ${formattedAmount}.`,
+  ];
+
+  if (summaryLines.length) {
+    messageLines.push('', 'Quiz snapshots:', ...summaryLines);
+  }
+
   const wpPayload = {
     type: 'financing-calculator',
     name: fullName,
@@ -165,7 +177,8 @@ export async function POST(req: NextRequest) {
     zip: data.zip,
     amount: data.amount,
     page: data.page || '/financing',
-    message: `Financing calculator unlock request from ${fullName} for ${data.address1}, ${data.city}, ${data.state} ${data.zip}. Estimated project total: ${formattedAmount}.`,
+    message: messageLines.join('\n'),
+    quizSummary: summaryLines,
   };
 
   const forwarded = await forwardToWP(wpPayload);
