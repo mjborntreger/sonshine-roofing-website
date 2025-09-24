@@ -65,7 +65,7 @@ export default function LatestPostsFilter({
 
   return (
     <>
-    <div className="px-8 md:px-10 py-24">
+    <div className="px-8 md:px-12 pt-36 pb-24">
       {showHeader && (
         <div className="text-center">
           <h2 className="text-3xl text-slate-700 md:text-5xl">Latest Blog Posts</h2>

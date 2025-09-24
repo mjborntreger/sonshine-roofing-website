@@ -704,7 +704,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           <div className="mt-4 flex flex-wrap gap-3">
             <button
               type="button"
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              className={`inline-flex items-center gap-2 rounded-full border border-emerald-300 px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                 yesSelected
                   ? 'border-emerald-500 bg-emerald-50 text-emerald-700 focus:ring-emerald-200'
                   : 'border-slate-200 bg-white text-slate-700 hover:bg-emerald-50 focus:ring-emerald-200'
@@ -712,12 +712,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               onClick={() => handleQuizAnswer(step, true)}
               aria-pressed={yesSelected}
             >
-              <Check className="h-4 w-4" aria-hidden="true" />
+              <Check className="h-4 w-4 text-emerald-900" aria-hidden="true" />
               <span>Yes</span>
             </button>
             <button
               type="button"
-              className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+              className={`inline-flex items-center gap-2 rounded-full border border-red-300 px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                 noSelected
                   ? 'border-red-500 bg-red-50 text-red-700 focus:ring-red-200'
                   : 'border-slate-200 bg-white text-slate-700 hover:bg-red-50 focus:ring-red-200'
@@ -725,7 +725,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               onClick={() => handleQuizAnswer(step, false)}
               aria-pressed={noSelected}
             >
-              <X className="h-4 w-4" aria-hidden="true" />
+              <X className="h-4 w-4 text-red-900" aria-hidden="true" />
               <span>No</span>
             </button>
           </div>

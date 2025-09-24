@@ -64,7 +64,7 @@ export default function LatestProjectsFilter({
   }, [projects, selected, initial]);
 
   return (
-    <div className="px-8 md:px-10 pt-24">
+    <div className="px-8 md:px-12 pt-36 pb-24">
       {showHeader && (
         <div className="text-center">
           <h2 className="text-3xl md:text-5xl text-slate-700">Latest Projects</h2>

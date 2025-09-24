@@ -13,7 +13,6 @@ type LinkItem = {
 
 const LINKS: LinkItem[] = [
   { href: "/project",          label: "Project Gallery",   aria: "Project Gallery",   Icon: ImageIcon },
-  { href: "/financing",        label: "Financing",         aria: "Financing",         Icon: DollarSign },
   { href: "/video-library",    label: "Video Library",     aria: "Video Library",     Icon: PlayCircle },
   { href: "/blog",             label: "Blog",              aria: "Blog",              Icon: Newspaper },
   { href: "/roofing-glossary", label: "Roofing Glossary",  aria: "Roofing Glossary",  Icon: BookOpen },
