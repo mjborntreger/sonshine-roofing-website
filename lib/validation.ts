@@ -143,7 +143,15 @@ const financingEmailSchema = z
 const financingPhoneSchema = z
   .preprocess(trim, z.string().min(1, "Phone is required"))
   .transform((value) => digitsOnly(value))
-  .refine((value) => value.length === 10, { message: "Phone must include 10 digits" });
+  .refine((value) => value.length === 10 || value.length === 11, {
+    message: "Phone must include 10 digits (country code optional)",
+  });
+
+const financingMatchSchema = z.object({
+  program: z.union([z.literal('serviceFinance'), z.literal('ygrene')]),
+  score: z.number().min(0).max(100),
+  reasons: z.array(z.string().min(1).max(200)).max(3),
+});
 
 export const financingLeadSchema = z
   .object({
@@ -176,6 +184,7 @@ export const financingLeadSchema = z
         })
       )
       .optional(),
+    match: financingMatchSchema.optional(),
   })
   .passthrough();
 

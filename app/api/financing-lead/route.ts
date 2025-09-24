@@ -155,6 +155,11 @@ export async function POST(req: NextRequest) {
     ? data.quizSummary.map((item) => `${item.answer === 'yes' ? '✅' : '❌'} ${item.question}`)
     : [];
 
+  const matchLabelMap: Record<string, string> = {
+    serviceFinance: 'Service Finance',
+    ygrene: 'YGrene PACE',
+  };
+
   const messageLines = [
     `Financing calculator unlock request from ${fullName} for ${data.address1}, ${data.city}, ${data.state} ${data.zip}. Estimated project total: ${formattedAmount}.`,
   ];
@@ -163,7 +168,20 @@ export async function POST(req: NextRequest) {
     messageLines.push('', 'Quiz snapshots:', ...summaryLines);
   }
 
-  const wpPayload = {
+  if (data.match) {
+    const matchLabel = matchLabelMap[data.match.program] || data.match.program;
+    messageLines.push(
+      '',
+      `Likely fit: ${matchLabel} (${Math.round(data.match.score)}% match)`,
+    );
+    if (Array.isArray(data.match.reasons) && data.match.reasons.length) {
+      messageLines.push(
+        ...data.match.reasons.map((reason) => `• ${reason}`)
+      );
+    }
+  }
+
+  const wpPayload: Record<string, unknown> = {
     type: 'financing-calculator',
     name: fullName,
     firstName: data.firstName,
@@ -180,6 +198,15 @@ export async function POST(req: NextRequest) {
     message: messageLines.join('\n'),
     quizSummary: summaryLines,
   };
+
+  if (data.match) {
+    wpPayload.match = {
+      program: data.match.program,
+      label: matchLabelMap[data.match.program] || data.match.program,
+      score: data.match.score,
+      reasons: data.match.reasons,
+    };
+  }
 
   const forwarded = await forwardToWP(wpPayload);
   if (!forwarded.ok) {

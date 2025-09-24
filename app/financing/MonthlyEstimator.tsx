@@ -105,6 +105,151 @@ const quizQuestions = [
   },
 ];
 
+type ProgramKey = 'serviceFinance' | 'ygrene';
+
+const MATCH_PROGRAMS: Record<ProgramKey, { label: string; programIds: string[]; description: string }> = {
+  serviceFinance: {
+    label: 'Service Finance',
+    programIds: ['same-as-cash-12', 'term-10yr-999', 'term-15yr-79'],
+    description: 'Traditional loan with fixed payments and no property tax lien.',
+  },
+  ygrene: {
+    label: 'YGrene PACE',
+    programIds: ['ygrene-15yr-849'],
+    description: 'PACE financing that leverages property equity with deferred payments.',
+  },
+};
+
+type AnswerImpact = {
+  weight: number;
+  reason: string;
+};
+
+type QuizScoringEntry = {
+  yes?: Partial<Record<ProgramKey, AnswerImpact>>;
+  no?: Partial<Record<ProgramKey, AnswerImpact>>;
+};
+
+const QUIZ_SCORING: Record<(typeof quizQuestions)[number]['id'], QuizScoringEntry> = {
+  equity: {
+    yes: {
+      ygrene: {
+        weight: 4,
+        reason: 'You have equity and a strong property-tax history.',
+      },
+    },
+    no: {
+      serviceFinance: {
+        weight: 3,
+        reason: 'You prefer options that do not rely on property equity checks.',
+      },
+    },
+  },
+  noLien: {
+    yes: {
+      serviceFinance: {
+        weight: 4,
+        reason: 'You want financing without placing a lien on the property.',
+      },
+    },
+    no: {
+      ygrene: {
+        weight: 3,
+        reason: 'You are comfortable using property-tax-backed financing.',
+      },
+    },
+  },
+  defer: {
+    yes: {
+      ygrene: {
+        weight: 3,
+        reason: 'Up-front payment deferral is valuable to you.',
+      },
+    },
+    no: {
+      serviceFinance: {
+        weight: 2,
+        reason: 'You’re ready to begin payments without a long deferral.',
+      },
+    },
+  },
+  credit650: {
+    yes: {
+      serviceFinance: {
+        weight: 3,
+        reason: 'Your credit profile supports Service Finance underwriting.',
+      },
+    },
+    no: {
+      ygrene: {
+        weight: 2,
+        reason: 'You prefer options that aren’t credit-score heavy.',
+      },
+    },
+  },
+  incomeDocs: {
+    yes: {
+      serviceFinance: {
+        weight: 2,
+        reason: 'You can provide income documentation for approval.',
+      },
+    },
+    no: {
+      ygrene: {
+        weight: 3,
+        reason: 'You want to minimize income documentation requirements.',
+      },
+    },
+  },
+  taxAssess: {
+    yes: {
+      ygrene: {
+        weight: 4,
+        reason: 'You’re comfortable adding repayment to your property tax bill.',
+      },
+    },
+    no: {
+      serviceFinance: {
+        weight: 3,
+        reason: 'You want to keep payments off your property tax bill.',
+      },
+    },
+  },
+  sellSoon: {
+    yes: {
+      serviceFinance: {
+        weight: 3,
+        reason: 'You may sell soon and want financing that’s easier to close out.',
+      },
+    },
+    no: {
+      ygrene: {
+        weight: 2,
+        reason: 'You expect to stay long term, fitting YGrene’s structure.',
+      },
+    },
+  },
+};
+
+const PROGRAM_MAX_SCORE = Object.keys(MATCH_PROGRAMS).reduce((acc, key) => {
+  acc[key as ProgramKey] = 0;
+  return acc;
+}, {} as Record<ProgramKey, number>);
+
+for (const entry of Object.values(QUIZ_SCORING)) {
+  for (const programKey of Object.keys(MATCH_PROGRAMS) as ProgramKey[]) {
+    const yesWeight = entry.yes?.[programKey]?.weight ?? 0;
+    const noWeight = entry.no?.[programKey]?.weight ?? 0;
+    PROGRAM_MAX_SCORE[programKey] += Math.max(yesWeight, noWeight, 0);
+  }
+}
+
+type MatchResult = {
+  program: ProgramKey;
+  score: number;
+  reasons: string[];
+};
+
 type FormValues = {
   firstName: string;
   lastName: string;
@@ -123,6 +268,7 @@ type SubmissionState = 'idle' | 'submitting' | 'error';
 type FinancingCookie = {
   unlocked: boolean;
   amount?: number;
+  match?: MatchResult;
 };
 
 function currency(n: number) {
@@ -138,18 +284,26 @@ function sanitizeAmountInput(value: string) {
 }
 
 function sanitizePhoneInput(value: string) {
-  return value.replace(/\D/g, '').slice(0, 10);
+  return value.replace(/\D/g, '').slice(0, 11);
 }
 
 function formatPhoneDisplay(digits: string) {
-  const d = sanitizePhoneInput(digits);
-  if (!d) return '';
-  const area = d.slice(0, 3);
-  const mid = d.slice(3, 6);
-  const last = d.slice(6, 10);
-  if (d.length <= 3) return `(${area}`;
-  if (d.length <= 6) return `(${area}) ${mid}`;
-  return `(${area}) ${mid}-${last}`;
+  const cleaned = sanitizePhoneInput(digits);
+  if (!cleaned) return '';
+  const hasCountryCode = cleaned.length === 11;
+  const country = hasCountryCode ? cleaned[0] : '';
+  const core = hasCountryCode ? cleaned.slice(1) : cleaned;
+  const area = core.slice(0, 3);
+  const mid = core.slice(3, 6);
+  const last = core.slice(6, 10);
+
+  if (core.length <= 3) {
+    return `${hasCountryCode ? `+${country} ` : ''}(${area}`;
+  }
+  if (core.length <= 6) {
+    return `${hasCountryCode ? `+${country} ` : ''}(${area}) ${mid}`;
+  }
+  return `${hasCountryCode ? `+${country} ` : ''}(${area}) ${mid}-${last}`;
 }
 
 function isEmailValid(email: string) {
@@ -186,6 +340,68 @@ function parseCookie(raw: string | null): FinancingCookie | null {
   }
 }
 
+function calculateMatch(answers: (boolean | null)[]): MatchResult | null {
+  if (!answers.length) return null;
+  if (answers.some((answer) => answer === null)) return null;
+
+  const scores: Record<ProgramKey, number> = {
+    serviceFinance: 0,
+    ygrene: 0,
+  };
+
+  const reasonBuckets: Record<ProgramKey, { text: string; weight: number }[]> = {
+    serviceFinance: [],
+    ygrene: [],
+  };
+
+  answers.forEach((answer, idx) => {
+    if (answer == null) return;
+    const question = quizQuestions[idx];
+    const config = QUIZ_SCORING[question.id];
+    if (!config) return;
+    const impacts = (answer ? config.yes : config.no) ?? {};
+    for (const [program, impact] of Object.entries(impacts) as [ProgramKey, AnswerImpact][]) {
+      scores[program] += impact.weight;
+      reasonBuckets[program].push({ text: impact.reason, weight: impact.weight });
+    }
+  });
+
+  let bestProgram: ProgramKey | null = null;
+  let bestScore = -Infinity;
+  (Object.entries(scores) as [ProgramKey, number][]).forEach(([program, score]) => {
+    if (score > bestScore) {
+      bestScore = score;
+      bestProgram = program;
+    }
+  });
+
+  if (!bestProgram || bestScore <= 0) return null;
+
+  const maxScore = PROGRAM_MAX_SCORE[bestProgram] || 1;
+  const percent = Math.min(100, Math.round((bestScore / maxScore) * 100));
+
+  const topReasons = reasonBuckets[bestProgram]
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 3)
+    .map((item) => item.text);
+
+  return {
+    program: bestProgram,
+    score: percent,
+    reasons: topReasons,
+  };
+}
+
+function formatReasonsSentence(reasons: string[]): string {
+  if (!reasons.length) return '';
+  if (reasons.length === 1) return `Because ${reasons[0].toLowerCase()}`;
+  if (reasons.length === 2) {
+    return `Because ${reasons[0].toLowerCase()} and ${reasons[1].toLowerCase()}`;
+  }
+  const [first, second, third] = reasons;
+  return `Because ${first.toLowerCase()}, ${second.toLowerCase()}, and ${third.toLowerCase()}`;
+}
+
 export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmount?: number }) {
   const totalQuizQuestions = quizQuestions.length;
   const summaryStepIndex = totalQuizQuestions;
@@ -199,6 +415,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [unlocked, setUnlocked] = useState(false);
   const [calculatorAmount, setCalculatorAmount] = useState(defaultAmount);
+  const [submittedAmount, setSubmittedAmount] = useState<number | null>(null);
+  const [persistedMatch, setPersistedMatch] = useState<MatchResult | null>(null);
+  const [customPulse, setCustomPulse] = useState(false);
+  const [showMatchDetails, setShowMatchDetails] = useState(false);
 
   const [formValues, setFormValues] = useState<FormValues>({
     firstName: '',
@@ -217,14 +437,19 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     const cookie = parseCookie(readCookie(COOKIE_NAME));
     if (cookie?.unlocked) {
       const amt = Number(cookie.amount) || defaultAmount;
+      const roundedAmount = Math.max(1000, Math.round(amt));
       setUnlocked(true);
-      setCalculatorAmount(amt);
-      setFormValues((prev) => ({ ...prev, amount: String(Math.round(amt)) }));
+      setCalculatorAmount(roundedAmount);
+      setFormValues((prev) => ({ ...prev, amount: String(roundedAmount) }));
+      setSubmittedAmount(roundedAmount);
+      setPersistedMatch(cookie.match ?? null);
+      setShowMatchDetails(false);
     }
   }, [defaultAmount]);
 
 
   const [quizAnswers, setQuizAnswers] = useState<(boolean | null)[]>(() => Array(totalQuizQuestions).fill(null));
+  const computedMatch = useMemo(() => calculateMatch(quizAnswers), [quizAnswers]);
 
   const paymentRows = useMemo(
     () =>
@@ -234,6 +459,40 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       })),
     [calculatorAmount]
   );
+
+  const amountChips = useMemo(() => {
+    const base = new Set<number>(FINANCING_PRESETS);
+    if (submittedAmount != null) {
+      base.add(Math.round(submittedAmount));
+    }
+    return Array.from(base).sort((a, b) => a - b);
+  }, [submittedAmount]);
+
+  const groupedPayments = useMemo(() => {
+    const service = paymentRows.filter(({ program }) => MATCH_PROGRAMS.serviceFinance.programIds.includes(program.id));
+    const ygrene = paymentRows.filter(({ program }) => MATCH_PROGRAMS.ygrene.programIds.includes(program.id));
+    return { service, ygrene };
+  }, [paymentRows]);
+
+  const displayMatch = persistedMatch ?? computedMatch;
+  const matchSentence = displayMatch ? formatReasonsSentence(displayMatch.reasons) : '';
+
+  useEffect(() => {
+    if (!customPulse) return;
+    const timeout = setTimeout(() => setCustomPulse(false), 800);
+    return () => clearTimeout(timeout);
+  }, [customPulse]);
+
+  useEffect(() => {
+    if (!persistedMatch) return;
+    setShowMatchDetails(false);
+  }, [persistedMatch?.program]);
+
+  useEffect(() => {
+    if (!displayMatch) {
+      setShowMatchDetails(false);
+    }
+  }, [displayMatch]);
 
   const validateFormStep = (currentStep: number) => {
     const nextErrors: Record<string, string> = {};
@@ -254,7 +513,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
     if (currentStep === thirdFormStepIndex) {
       if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
-      if (sanitizePhoneInput(formValues.phone).length !== 10) nextErrors.phone = 'Enter a 10-digit phone number';
+      const phoneDigits = sanitizePhoneInput(formValues.phone);
+      if (!(phoneDigits.length === 10 || phoneDigits.length === 11)) {
+        nextErrors.phone = 'Enter a valid phone number (10 digits, optional country code)';
+      }
     }
     return nextErrors;
   };
@@ -302,6 +564,18 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     setStep((prev) => Math.max(0, prev - 1));
   };
 
+  const handleSelectAmount = (value: number) => {
+    setCalculatorAmount(value);
+    if (submittedAmount != null && Math.round(submittedAmount) === Math.round(value)) {
+      setCustomPulse(false);
+      if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+        window.requestAnimationFrame(() => setCustomPulse(true));
+      } else {
+        setCustomPulse(true);
+      }
+    }
+  };
+
   const friendlyError = (raw?: unknown) => {
     if (!raw || typeof raw !== 'string') return 'We could not send your request. Please try again.';
     if (raw.toLowerCase().includes('rating')) return 'We could not send your request just now. Please try again in a moment.';
@@ -345,7 +619,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       answer: quizAnswers[idx] ? 'yes' : 'no',
     }));
 
-    const payload = {
+    const matchResult = computedMatch || null;
+
+    const payload: Record<string, unknown> = {
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
       email: formValues.email.trim(),
@@ -361,6 +637,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       hp_field: honeypot,
       quizSummary,
     };
+    if (matchResult) {
+      payload.match = matchResult;
+    }
 
     setSubmission('submitting');
     setGlobalError(null);
@@ -377,7 +656,14 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         setUnlocked(true);
         const nextAmount = amountNumber || defaultAmount;
         setCalculatorAmount(nextAmount);
-        writeCookie(COOKIE_NAME, JSON.stringify({ unlocked: true, amount: nextAmount }), COOKIE_MAX_AGE);
+        setSubmittedAmount(nextAmount);
+        const cookiePayload: FinancingCookie = { unlocked: true, amount: nextAmount };
+        if (matchResult) {
+          cookiePayload.match = matchResult;
+        }
+        setPersistedMatch(matchResult);
+        setShowMatchDetails(false);
+        writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
         try {
           (window as any).dataLayer = (window as any).dataLayer || [];
           (window as any).dataLayer.push({ event: 'financing_calculator_submit', form: 'monthly_estimator' });
@@ -795,22 +1081,27 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </div>
 
             <div className="flex flex-wrap gap-2 text-sm">
-              {FINANCING_PRESETS.map((preset) => {
-                const selected = calculatorAmount === preset;
+              {amountChips.map((value) => {
+                const selected = calculatorAmount === value;
+                const isCustom = submittedAmount != null && Math.round(submittedAmount) === value && !FINANCING_PRESETS.includes(value);
+                const className = selected
+                  ? isCustom
+                    ? 'border-[--brand-orange] bg-[--brand-orange]/20 text-[--brand-orange] shadow-[0_0_0_2px_rgba(249,115,22,0.35)]'
+                    : 'border-[--brand-blue] bg-[--brand-blue] text-white'
+                  : isCustom
+                    ? 'border-[--brand-orange]/60 bg-[--brand-orange]/10 text-[--brand-orange] hover:bg-[--brand-orange]/15'
+                    : 'border-blue-100 bg-white hover:bg-blue-50/60';
                 return (
                   <button
-                    key={preset}
+                    key={value}
                     type="button"
-                    className={`rounded-full border px-3 py-1 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                      selected
-                        ? 'border-[--brand-blue] bg-[--brand-blue] text-white'
-                        : 'border-blue-100 bg-white hover:bg-blue-50/60'
-                    }`}
-                    onClick={() => setCalculatorAmount(preset)}
-                    aria-label={`Set amount to ${currency(preset)}`}
+                    className={`rounded-full border px-3 py-1 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${className}`}
+                    style={isCustom && selected && customPulse ? { animation: 'chip-pop 0.85s ease-out' } : undefined}
+                    onClick={() => handleSelectAmount(value)}
+                    aria-label={`Set amount to ${currency(value)}`}
                     aria-pressed={selected}
                   >
-                    {currency(preset).replace('.00', '')}
+                    {currency(value).replace('.00', '')}
                   </button>
                 );
               })}
@@ -823,9 +1114,35 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </div>
             <div className="overflow-hidden">
               <table className="w-full text-sm">
-                <tbody className="[&>tr:nth-child(odd)]:bg-blue-50/40">
-                  {paymentRows.map(({ program, amount }) => (
-                    <tr key={program.id}>
+                <tbody>
+                  <tr className="bg-blue-100/60 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+                    <td className="px-4 py-2" colSpan={2}>
+                      {MATCH_PROGRAMS.serviceFinance.label} Programs
+                    </td>
+                  </tr>
+                  {groupedPayments.service.map(({ program, amount }, idx) => (
+                    <tr key={program.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-blue-50/40'}>
+                      <td className="px-4 py-3 font-medium text-slate-900">
+                        <div>{program.label}</div>
+                        {program.summary && (
+                          <div className="text-xs font-normal text-slate-500">{program.summary}</div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right text-slate-900">
+                        {currency(amount)}/mo
+                        {program.footnote && (
+                          <span className="ml-2 text-xs text-slate-500">{program.footnote}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-amber-100/60 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+                    <td className="px-4 py-2" colSpan={2}>
+                      {MATCH_PROGRAMS.ygrene.label} Financing
+                    </td>
+                  </tr>
+                  {groupedPayments.ygrene.map(({ program, amount }, idx) => (
+                    <tr key={program.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-amber-50/40'}>
                       <td className="px-4 py-3 font-medium text-slate-900">
                         <div>{program.label}</div>
                         {program.summary && (
@@ -845,11 +1162,55 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </div>
           </div>
 
+          {displayMatch && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-4 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-emerald-700">
+                  Likely fit: {MATCH_PROGRAMS[displayMatch.program].label}
+                </p>
+                <span className="text-sm font-semibold text-emerald-600">{displayMatch.score}% match</span>
+              </div>
+              {matchSentence && (
+                <p className="mt-2 text-xs text-emerald-700/90">{matchSentence}.</p>
+              )}
+              <button
+                type="button"
+                onClick={() => setShowMatchDetails((prev) => !prev)}
+                className="mt-3 inline-flex items-center text-xs font-semibold text-emerald-700 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2"
+              >
+                {showMatchDetails ? 'Hide why this match' : 'Why this match?'}
+              </button>
+              {showMatchDetails && (
+                <ul className="mt-2 space-y-1 text-xs text-emerald-700">
+                  {displayMatch.reasons.map((reason) => (
+                    <li key={reason}>• {reason}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
           <p className="text-xs italic text-slate-500">
             Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments are set by the lender.
           </p>
         </div>
       </section>
+      <style jsx>{`
+        @keyframes chip-pop {
+          0% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.2);
+          }
+          50% {
+            transform: scale(1.05);
+            box-shadow: 0 0 0 6px rgba(249, 115, 22, 0.12);
+          }
+          100% {
+            transform: scale(1);
+            box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+          }
+        }
+      `}</style>
     </div>
   );
 

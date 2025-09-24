@@ -208,7 +208,7 @@ export default async function FinancingPage() {
           <ProgramCard
             theme="orange"
             recommended
-            title="YGrene Financing (Equity‑based)"
+            title="YGrene PACE Financing (Equity‑based)"
             subtitle="House‑secured. Payments typically included in your property‑tax bill."
             chips={["No credit check", "Tax‑bill payments", "Equity‑based"]}
             keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
