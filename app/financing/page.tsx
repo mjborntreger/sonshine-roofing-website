@@ -144,7 +144,7 @@ export default async function FinancingPage() {
   const sampleMonthly849 = currency(Math.round(pmt(defaultAmount, 0.0849, 180))) + "/mo";
   const per10kService = '$96/mo per $10k';
   const per10kYgrene = "$124/mo per $10k";
-  
+
   return (
     <Section>
       <div className="container-edge py-10 md:py-16">
@@ -211,7 +211,7 @@ export default async function FinancingPage() {
             title="YGrene PACE Financing (Equity‑based)"
             subtitle="House‑secured. Payments typically included in your property‑tax bill."
             logoUrl="https://next.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
-            chips={["No credit check", "Tax‑bill payments", "Equity‑based"]}
+            chips={["No credit check", "Tax‑bill payments", "Equity‑based", "Fast approval"]}
             keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
             sampleMonthly={`${sampleMonthly849} on ${currency(defaultAmount)} (15yr @ 8.49%)`}
             bullets={[

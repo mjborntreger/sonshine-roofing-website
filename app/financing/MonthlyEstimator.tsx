@@ -1191,7 +1191,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           )}
 
           <p className="text-xs italic text-slate-500">
-            Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments are set by the lender.
+            Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments are set by the lender. Estimates do not include loan origination fees.
           </p>
         </div>
       </section>
