@@ -1,0 +1,54 @@
+import ServicesQuickLinks from "./ServicesQuickLinks"
+import TocFromHeadings from "./TocFromHeadings"
+import UiLink from "./UiLink"
+import { CalendarDays, ArrowRight, Zap, Phone } from "lucide-react"
+
+const arrowIconStyles = "h-4 w-4 inline ml-2";
+const semanticIconStyles = "h-4 w-4 inline mr-2";
+const buttonStyles = "btn w-full h-11 mt-2";
+
+export default function ServicesAside() {
+    return (
+        <aside className="sticky top-24 self-start h-fit lg:w-[320px]">
+            <ServicesQuickLinks />
+
+            <TocFromHeadings
+                root="#article-root"
+                offset={128}
+                className="hidden lg:block" 
+            />
+
+            <div className="h-[1px] w-full bg-slate-200 my-4" />
+
+            <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm not-prose">
+                <div className="mb-2 text-lg font-medium text-slate-900 text-center">Ready to get started?</div>
+                <UiLink
+                    href="/contact-us#book-an-appointment"
+                    className={`${buttonStyles} btn-brand-blue`}
+                    aria-label="Request a Free Roof Estimate"
+                >
+                    <CalendarDays className={semanticIconStyles} />
+                    Get on the Schedule
+                    <ArrowRight className={arrowIconStyles} />
+                </UiLink>
+                <UiLink
+                    href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
+                    className={`${buttonStyles} btn-brand-orange`}
+                    aria-label="Free 60-second Quote"
+                >
+                    <Zap className={semanticIconStyles} />
+                    Free 60-second Quote
+                    <ArrowRight className={arrowIconStyles} />
+                </UiLink>
+                <UiLink
+                    href="tel:19418664320"
+                    className={`${buttonStyles} btn-outline`}
+                    aria-label="Call SonShine Roofing"
+                >
+                    <Phone className={semanticIconStyles} />
+                    (941) 866-4320
+                </UiLink>
+            </div>
+        </aside>
+    )
+}

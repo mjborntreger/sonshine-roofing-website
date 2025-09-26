@@ -197,12 +197,12 @@ export default function RoofCareClub() {
   }), [base, pageUrl, providerId, offerCatalog]);
 
   return (
-    <div aria-labelledby="rcc-title" className="py-8 not-prose">
+    <div aria-labelledby="rcc-title" className="mt-24 py-8 not-prose">
       <div className="text-center max-w-3xl mx-auto">
-        <h2 id="rcc-title" className="text-3xl font-semibold tracking-tight">
+        <h2 id="rcc-title" className="text-3xl md:text-4xl font-semibold tracking-tight">
           Roof Care Club
         </h2>
-        <p className="mt-2 text-slate-600">
+        <p className="mt-4 text-slate-600">
           Choose your plan and term. Switch to monthly view to see the equivalent cost—
           <span className="font-medium text-slate-800">plans are billed annually</span>.
         </p>
@@ -345,7 +345,7 @@ export default function RoofCareClub() {
                           </span>
                         </summary>
                         {f.why && (
-                          <div className="px-4 pb-4 pt-2 text-sm text-slate-600">
+                          <div className="accordion-motion px-4 pb-4 pt-2 text-sm text-slate-600">
                             <span className="font-semibold text-slate-800">Why it matters: </span>
                             {f.why}
                           </div>

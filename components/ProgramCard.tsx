@@ -168,7 +168,7 @@ export default function ProgramCard({
                 </span>
                 <ChevronDown className="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" aria-hidden />
               </summary>
-              <ul className="px-4 pb-3 pt-0 text-sm text-slate-700 space-y-1">
+              <ul className="accordion-motion px-4 pb-3 pt-0 text-sm text-slate-700 space-y-1">
                 {eligibility.map((e, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 text-slate-400" aria-hidden />

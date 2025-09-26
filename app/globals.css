@@ -85,6 +85,11 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   100% { background-position: 100% 50%; }
 }
 
+@keyframes accordion-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @layer utilities {
   /* Apply to any block that should show a shimmer sweep.
      Example: <div class="h-4 w-24 rounded shimmer"></div> */
@@ -162,7 +167,7 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   /* Base button reset */
   .btn {
     @apply inline-flex items-center justify-center whitespace-nowrap
-           rounded-2xl font-medium 
+           rounded-full font-semibold 
            transition duration-300 ease-in-out
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0
            disabled:pointer-events-none disabled:opacity-50;
@@ -172,7 +177,7 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   /* Variants */
   .btn-brand-blue   { @apply bg-[var(--brand-blue)]   text-white hover:opacity-95 focus-visible:ring-[var(--brand-blue)]; }
   .btn-brand-orange { @apply bg-[var(--brand-orange)] text-white hover:opacity-95 focus-visible:ring-[var(--brand-orange)]; }
-  .btn-secondary    { @apply bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 focus-visible:ring-slate-200; }
+  .btn-secondary    { @apply bg-white text-slate-700 border border-slate-100 hover:bg-slate-50 focus-visible:ring-slate-200; }
   .btn-outline      { @apply bg-transparent text-slate-900 border border-slate-300 hover:bg-slate-50; }
   .btn-ghost        { @apply bg-transparent text-slate-900 hover:bg-slate-100; }
 
@@ -192,6 +197,27 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 
   /* Motion */
   .btn-press { @apply transition-transform motion-safe:hover:scale-[1.03] active:scale-[0.98]; }
+
+  /* Accordions */
+  .accordion-motion {
+    opacity: 0;
+    transform: translateY(4px);
+    animation: none;
+  }
+
+  details[open] .accordion-motion {
+    animation: accordion-fade-in 0.2s ease-out both;
+  }
+
+  details:not([open]) .accordion-motion {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    details[open] .accordion-motion {
+      animation: none;
+    }
+  }
 }
 
 /* ---------------------------------------

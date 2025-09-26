@@ -9,7 +9,11 @@ import GridLoadingState from "@/components/layout/GridLoadingState";
 import SmartLink from "@/components/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
+import { stripHtml } from "@/lib/wp";
+import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
 import MediaFrame from "./MediaFrame";
+import BlogArchiveCard from "@/components/archive/BlogArchiveCard";
+import ProjectArchiveCard from "@/components/archive/ProjectArchiveCard";
 
 type Props<T> = {
     kind: ResourceKind;
@@ -161,6 +165,8 @@ export default function InfiniteList<T>({
                 const href = "/" + (p?.slug || "");
                 const rawHtml = String(p?.excerpt || "");
                 const catList = (p?.categories || []).join(", ");
+                const summarySource = p?.contentPlain || stripHtml(rawHtml);
+                const summary = truncateText(summarySource, 260);
                 return (
                     <article
                         data-title={p?.title || ""}
@@ -172,8 +178,8 @@ export default function InfiniteList<T>({
                         <template className="blog-body-src" dangerouslySetInnerHTML={{ __html: rawHtml }} />
                         <SmartLink href={href} className="group block">
                             <Card className="overflow-hidden hover:shadow-lg transition">
-                                <CardHeader>
-                                    <CardTitle className="font-medium">{p?.title}</CardTitle>
+                                <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
+                                    <CardTitle className="font-semibold">{p?.title}</CardTitle>
                                 </CardHeader>
                                 {p?.featuredImage?.url ? (
                                     <Frame
@@ -186,10 +192,15 @@ export default function InfiniteList<T>({
                                 ) : (
                                     <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
                                 )}
-                                <CardContent>
+                                <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
                                     <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
                                         {dateLabel && <span>{dateLabel}</span>}
                                     </div>
+                                    {summary && (
+                                        <p className="mt-3 text-sm text-slate-600" style={lineClampStyle}>
+                                            {summary}
+                                        </p>
+                                    )}
                                     {(p?.categories?.length ?? 0) > 0 && (
                                         <div className="mt-3 flex flex-wrap gap-2">
                                             {p.categories.map((cat: string) => (
@@ -203,6 +214,12 @@ export default function InfiniteList<T>({
                                         </div>
                                     )}
                                 </CardContent>
+                                <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
+                                    <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
+                                        Read full article
+                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 group-focus-visible:translate-x-1 group-focus-visible/card:translate-x-1" />
+                                    </span>
+                                </CardFooter>
                             </Card>
                         </SmartLink>
                     </article>
@@ -227,6 +244,8 @@ export default function InfiniteList<T>({
                         try { window.dispatchEvent(new CustomEvent("video:open", { detail: { slug: safeSlug } })); } catch {}
                     }
                 };
+
+                const description = truncateText(stripHtml(String(v?.excerpt ?? "")), 220);
 
                 return (
                     <div className="vid-item group block" data-video-slug={safeSlug}>
@@ -265,30 +284,47 @@ export default function InfiniteList<T>({
                                 </span>
                             </button>
 
-                            <CardContent>
-                                <div className="flex flex-wrap gap-2">
-                                    {cats.map((c: any) => (
-                                        <span
-                                            key={`${safeKey}-${c.slug ?? c.name}`}
-                                            className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                                        >
-                                            {c.name}
-                                        </span>
-                                    ))}
-                                </div>
+                                <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
+                                    {description && (
+                                        <p className="text-sm text-slate-600" style={lineClampStyle}>
+                                            {description}
+                                        </p>
+                                    )}
 
-                                {v?.source === "project" && v?.slug ? (
-                                    <div className="mt-3">
-                                        <SmartLink
-                                            href={`/project/${v.slug}`}
-                                            className="text-sm font-medium text-[#0045d7] hover:underline"
-                                        >
-                                            See full project details
-                                        </SmartLink>
+                                    <div className="mt-3 flex flex-wrap gap-2">
+                                        {cats.map((c: any) => (
+                                            <span
+                                                key={`${safeKey}-${c.slug ?? c.name}`}
+                                                className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                                            >
+                                                {c.name}
+                                            </span>
+                                        ))}
                                     </div>
-                                ) : null}
-                            </CardContent>
-                        </Card>
+
+                                    {v?.source === "project" && v?.slug ? (
+                                        <div className="mt-3">
+                                            <SmartLink
+                                                href={`/project/${v.slug}`}
+                                                className="text-sm font-medium text-[#0045d7] hover:underline"
+                                            >
+                                                See full project details
+                                            </SmartLink>
+                                        </div>
+                                    ) : null}
+                                </CardContent>
+                                <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
+                                    <button
+                                        type="button"
+                                        onClick={handleOpen}
+                                        data-video-slug={safeSlug}
+                                        className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight focus-visible:outline-none"
+                                    >
+                                        Watch video
+                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 focus-visible:translate-x-1" />
+                                    </button>
+                                </CardFooter>
+                            </Card>
 
                         <template className="vid-body-src" suppressHydrationWarning>
                             {(v?.excerpt ?? "").toString()}
@@ -311,6 +347,7 @@ export default function InfiniteList<T>({
                 const rcSlugs = rc.map((t: any) => t?.slug).filter(Boolean).join(",");
                 const saSlugs = sa.map((t: any) => t?.slug).filter(Boolean).join(",");
                 const searchBody = (p?.projectDescription ?? p?.excerpt ?? "").toString();
+                const projectSummary = truncateText(stripHtml(searchBody), 260);
 
                 const href = p?.uri || (p?.slug ? `/project/${p.slug}` : "#");
                 const img = p?.heroImage;
@@ -343,6 +380,12 @@ export default function InfiniteList<T>({
                                 )}
 
                                 <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
+                                    {projectSummary && (
+                                        <p className="text-sm text-slate-600" style={lineClampStyle}>
+                                            {projectSummary}
+                                        </p>
+                                    )}
+
                                     {(mt.length + rc.length + sa.length > 0) && (
                                         <div className="relative mt-4 -mx-5 sm:mx-0">
                                             <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
@@ -377,7 +420,7 @@ export default function InfiniteList<T>({
                                     )}
                                 </CardContent>
 
-                                <CardFooter className="flex items-center justify-end border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
+                                <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
                                     <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
                                         View project
                                         <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 group-focus-visible:translate-x-1 group-focus-visible/card:translate-x-1" />

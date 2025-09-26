@@ -30,7 +30,7 @@ export async function HoursAndInformation() {
             </span>
             <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="px-4 pb-4">
+          <div className="accordion-motion px-4 pb-4">
             <dl className="mt-2 grid grid-cols-[max-content_auto] gap-x-1 gap-y-2 text-sm text-slate-700">
               <dt className="text-slate-600">Monday</dt>
               <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
@@ -59,7 +59,7 @@ export async function HoursAndInformation() {
             </span>
             <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="px-4 pb-4">
+          <div className="accordion-motion px-4 pb-4">
             <ul className={pStyles}>
               <li>Sarasota</li>
               <li>Bradenton</li>
@@ -86,7 +86,7 @@ export async function HoursAndInformation() {
             </span>
             <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="px-4 pb-4">
+          <div className="accordion-motion px-4 pb-4">
             <ul className={pStyles}>
               <li>
                 <SmartLink
@@ -167,7 +167,7 @@ export async function HoursAndInformation() {
             </span>
             <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="px-4 pb-4">
+          <div className="accordion-motion px-4 pb-4">
             <ul className={pStyles}>
               <li>
                 <SmartLink
@@ -270,7 +270,7 @@ export async function HoursAndInformation() {
             </span>
             <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="px-4 pb-4">
+          <div className="accordion-motion px-4 pb-4">
             <ul className={pStyles}>
               <li>Visa</li>
               <li>MasterCard</li>
@@ -312,7 +312,7 @@ export async function HoursAndInformation() {
             </span>
             <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="px-4 pb-4">
+          <div className="accordion-motion px-4 pb-4">
             <ul className={pStyles}>
               <li>
                 <SmartLink
@@ -391,7 +391,7 @@ export async function HoursAndInformation() {
             </span>
             <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="px-4 pb-4">
+          <div className="accordion-motion px-4 pb-4">
             <ul className={pStyles}>
               <li>English</li>
               <li>Spanish</li>
@@ -408,7 +408,7 @@ export async function HoursAndInformation() {
             </span>
             <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
           </summary>
-          <div className="px-4 pb-4">
+          <div className="accordion-motion px-4 pb-4">
             <ul className={pStyles}>
               <li>Veterans & Armed Forces</li>
               <li>First Responders</li>

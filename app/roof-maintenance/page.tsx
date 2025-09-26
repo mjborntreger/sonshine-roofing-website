@@ -1,13 +1,12 @@
 import Section from "@/components/layout/Section";
-import TocFromHeadings from "@/components/TocFromHeadings";
-import ServicesQuickLinks from "@/components/ServicesQuickLinks";
-import UiLink from "@/components/UiLink";
 import Image from "next/image";
 import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import RoofCareClub from "@/components/RoofCareClub";
 import type { Metadata } from 'next';
+import FinancingBand from "@/components/FinancingBand";
+import ServicesAside from "@/components/ServicesAside";
 
 // ===== STATIC SEO FOR /roof-maintenance (EDIT HERE) =====
 const SEO_TITLE_ROOF_MAINT = 'Roof Maintenance in Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
@@ -135,35 +134,13 @@ export default async function Page() {
             threaten your home and well-being.
           </p>
 
+          <FinancingBand />
+
           <RoofCareClub />
 
         </div>
 
-        <aside className="sticky top-24 self-start h-fit">
-          <ServicesQuickLinks />
-
-          <TocFromHeadings
-            root="#article-root"
-            offset={128}
-            className="hidden lg:block" />
-          
-          <div className="mt-4 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm not-prose">
-            <div className="mb-2 text-sm font-semibold text-slate-900 text-center">Ready to get started?</div>
-            <UiLink
-              href="/contact-us#book-an-appointment"
-              className="btn btn-brand-blue btn-press w-full h-11"
-              aria-label="Free Consultation">
-              Free Consultation
-            </UiLink>
-            <UiLink
-              href="tel:19418664320"
-              className="h-11 mt-2 rounded-xl border border-slate-200 grid place-items-center hover:bg-slate-50"
-              aria-label="Call SonShine Roofing">
-              (941) 866-4320
-            </UiLink>
-          </div>
-
-        </aside>
+        <ServicesAside />
       </div>
 
       <div data-toc-exclude>
@@ -175,7 +152,13 @@ export default async function Page() {
       </div>
 
       {/* FAQs (dynamic) */}
-      <FaqInlineList heading="Roof Maintenance FAQs" items={faqs} seeMoreHref="/faq" />
+      <FaqInlineList
+        heading="Roof Maintenance FAQs"
+        topicSlug="roof-maintenance"
+        limit={8}
+        initialItems={faqs}
+        seeMoreHref="/faq"
+      />
 
       {/* FAQ Schema */}
       <script

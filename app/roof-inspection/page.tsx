@@ -1,13 +1,12 @@
 import Section from "@/components/layout/Section";
-import TocFromHeadings from "@/components/TocFromHeadings";
-import ServicesQuickLinks from "@/components/ServicesQuickLinks";
-import UiLink from "@/components/UiLink";
 import Image from "next/image";
 import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import TipTopRoofCheckup from "@/components/TipTopRoofCheckup";
 import type { Metadata } from 'next';
+import FinancingBand from "@/components/FinancingBand";
+import ServicesAside from "@/components/ServicesAside";
 
 const scrollGuard = "scroll-mt-24";
 
@@ -116,6 +115,8 @@ export default async function Page() {
             structural issue before it turns into an expensive problem?
           </p>
 
+          <FinancingBand />
+
           <TipTopRoofCheckup />
 
           <h2 className={scrollGuard}>Roofs Can Leak for Years Before You See Evidence</h2>
@@ -168,31 +169,7 @@ export default async function Page() {
           </p>
         </div>
 
-        <aside className="sticky top-24 self-start h-fit lg:w-[320px]">
-          <ServicesQuickLinks />
-
-          <TocFromHeadings
-            root="#article-root"
-            offset={128}
-            className="hidden lg:block" />
-          
-          <div className="mt-4 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm not-prose">
-            <div className="mb-2 text-sm font-semibold text-slate-900 text-center">Ready to get started?</div>
-            <UiLink
-              href="/contact-us#book-an-appointment"
-              className="btn btn-brand-blue btn-press w-full h-11"
-              aria-label="Schedule an Inspection">
-              Schedule an Inspection
-            </UiLink>
-            <UiLink
-              href="tel:19418664320"
-              className="h-11 mt-2 rounded-xl border border-slate-200 grid place-items-center hover:bg-slate-50"
-              aria-label="Call SonShine Roofing">
-              (941) 866-4320
-            </UiLink>
-          </div>
-
-        </aside>
+        <ServicesAside />
       </div>
 
       <div data-toc-exclude>
@@ -204,7 +181,13 @@ export default async function Page() {
       </div>
 
       {/* FAQs (dynamic) */}
-      <FaqInlineList heading="Roof Inspection FAQs" items={faqs} seeMoreHref="/faq" />
+      <FaqInlineList
+        heading="Roof Inspection FAQs"
+        topicSlug="roof-inspection"
+        limit={8}
+        initialItems={faqs}
+        seeMoreHref="/faq"
+      />
 
       {/* FAQ Schema */}
       <script

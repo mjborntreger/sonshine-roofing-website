@@ -138,9 +138,9 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
         setOpenMap((m) => ({ ...m, [id]: !m[id] }));
 
     return (
-        <div className={clsx('scroll-mt-24', className)}>
+        <div className={clsx('scroll-mt-24 mt-32', className)}>
             <header className="text-center">
-                <h2 id="tip-top-roof-checkup" className="text-3xl font-semibold">Tip Top Roof Check‑up</h2>
+                <h2 id="tip-top-roof-checkup" className="text-3xl md:text-4xl font-semibold">Tip Top Roof Check‑up</h2>
                 <p className="mt-3 text-slate-600">
                     Our 18‑point inspection helps catch small issues before they become big problems.
                     Choose a category below to see what we check and why it matters.
