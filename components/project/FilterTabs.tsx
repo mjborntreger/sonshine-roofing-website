@@ -3,14 +3,27 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
 import type { TermLite } from "@/lib/wp";
+import { Layers, MapPin, Palette } from "lucide-react";
 
 type TabKey = "material" | "roof" | "area";
+
+type TabTerm = TermLite & { count: number };
+
+const numberFormatter = new Intl.NumberFormat("en-US");
+
+const tabIcons: Record<TabKey, typeof Layers> = {
+  material: Layers,
+  roof: Palette,
+  area: MapPin,
+};
 
 type FilterTabsProps = {
   tabs: Array<{
     key: TabKey;
     label: string;
-    terms: TermLite[];
+    terms: TabTerm[];
+    totalCount: number;
+    selectedCount: number;
   }>;
   activeKey: TabKey;
   onTabChange: (key: TabKey) => void;
@@ -54,14 +67,28 @@ export default function FilterTabs({ tabs, activeKey, onTabChange, isLoading, ch
   const activeIndex = indexMap[activeKey];
 
   return (
-    <div className="mt-6">
+    <div className="mt-2">
       <div
         role="tablist"
         aria-label="Project filters"
-        className="flex flex-wrap items-center gap-2 border-b border-slate-300 pb-2"
+        className="inline-flex w-full flex-wrap items-center justify-center md:justify-start gap-2 rounded-full border border-slate-300 bg-slate-100/70 p-1 mx-auto md:mx-0"
       >
         {orderedTabs.map((tab) => {
           const selected = tab.key === activeKey;
+          const formattedTotal = numberFormatter.format(tab.totalCount);
+          const formattedSelected = numberFormatter.format(tab.selectedCount);
+          const selectionMessage =
+            tab.selectedCount > 0
+              ? `${formattedSelected} filter${tab.selectedCount === 1 ? "" : "s"} active`
+              : "No filters active";
+          const totalMessage =
+            tab.totalCount > 0
+              ? `${formattedTotal} result${tab.totalCount === 1 ? "" : "s"} available`
+              : "No results available";
+          const Icon = tabIcons[tab.key];
+          const iconClass = selected
+            ? "h-4 w-4 inline mr-2 text-white transition-colors"
+            : "h-4 w-4 inline mr-2 text-[--brand-orange] transition-colors";
           return (
             <button
               key={tab.key}
@@ -70,13 +97,23 @@ export default function FilterTabs({ tabs, activeKey, onTabChange, isLoading, ch
               aria-controls={`project-tab-panel-${tab.key}`}
               data-tab={tab.key}
               onClick={() => onTabChange(tab.key)}
-              className={`rounded-full px-3 py-1.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[--brand-blue] ${
+              aria-label={`${tab.label} tab. ${totalMessage}. ${selectionMessage}.`}
+              className={`relative rounded-full px-3 py-1.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[--brand-orange] ${
                 selected
-                  ? "bg-[--brand-blue] text-white shadow-sm"
-                  : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  ? "border-[--brand-orange] bg-[--brand-orange] text-white shadow-sm"
+                  : "border-[--brand-orange]/40 bg-[--brand-orange]/10 text-slate-500 hover:bg-[--brand-orange]/20"
               }`}
             >
-              {tab.label}
+              <span className="flex items-center">
+                <Icon aria-hidden="true" className={iconClass} />
+                {tab.label}
+              </span>
+              {tab.selectedCount > 0 && (
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-1 -right-1 inline-flex h-3 w-3 items-center justify-center rounded-full bg-[--brand-blue] shadow border-[1px] border-white"
+                />
+              )}
             </button>
           );
         })}

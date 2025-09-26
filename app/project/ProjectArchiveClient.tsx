@@ -7,6 +7,7 @@ import InfiniteList from "@/components/InfiniteList";
 import GridLoadingState from "@/components/layout/GridLoadingState";
 import FilterTabs from "@/components/project/FilterTabs";
 import type { FacetGroup, ProjectSearchResult, TermLite } from "@/lib/wp";
+import { ListFilter, RotateCcw, Search } from "lucide-react";
 
 const MIN_SEARCH_LENGTH = 2;
 
@@ -58,6 +59,10 @@ type SelectionState = {
 };
 
 type TabKey = FacetKey;
+
+type TermWithCount = TermLite & { count: number };
+
+const numberFormatter = new Intl.NumberFormat("en-US");
 
 function buildFacetMap(facets: FacetGroup[]): FacetMap {
   const map: FacetMap = new Map();
@@ -160,7 +165,6 @@ export default function ProjectArchiveClient({
   }, [pathname, router, searchInput, selection.material, selection.roof, selection.area]);
 
   const facetMap = useMemo(() => buildFacetMap(facets), [facets]);
-
   useEffect(() => {
     setFilteredCount(typeof result.total === "number" ? result.total : result.items.length);
     if (typeof result.meta?.overallTotal === "number") {
@@ -287,15 +291,43 @@ export default function ProjectArchiveClient({
   }, [searchInput, selection.material, selection.roof, selection.area, termLabelMaps, toggleSelection]);
 
   const listKey = useMemo(() => JSON.stringify(listFilters), [listFilters]);
-  const tabDefs = useMemo(
-    () => [
-      { key: "material" as const, label: "Material", terms: filterTerms.materials },
-      { key: "roof" as const, label: "Roof Color", terms: filterTerms.roofColors },
-      { key: "area" as const, label: "Service Area", terms: filterTerms.serviceAreas },
-    ],
-    [filterTerms.materials, filterTerms.roofColors, filterTerms.serviceAreas]
-  );
+  const tabDefs = useMemo(() => {
+    const buildTab = (key: TabKey, terms: TermLite[]) => {
+      const taxonomy = FACET_TAXONOMIES[key];
+      const buckets = facetMap.get(taxonomy);
+      const termsWithCount: TermWithCount[] = terms.map((term) => ({
+        ...term,
+        count: buckets?.get(term.slug) ?? 0,
+      }));
+      const totalCount = termsWithCount.reduce((sum, term) => sum + term.count, 0);
+      return {
+        key,
+        label: taxonomyLabel[key],
+        terms: termsWithCount,
+        totalCount,
+        selectedCount: selection[key].length,
+      };
+    };
+
+    return [
+      buildTab("material", filterTerms.materials),
+      buildTab("roof", filterTerms.roofColors),
+      buildTab("area", filterTerms.serviceAreas),
+    ];
+  }, [
+    facetMap,
+    filterTerms.materials,
+    filterTerms.roofColors,
+    filterTerms.serviceAreas,
+    selection.material.length,
+    selection.roof.length,
+    selection.area.length,
+  ]);
   const [activeTab, setActiveTab] = useState<TabKey>("material");
+  const filtersRef = useRef<HTMLDivElement | null>(null);
+  const scrollToFilters = useCallback(() => {
+    filtersRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
 
   const isPillDisabled = useCallback(
     (group: FacetKey, slug: string) => {
@@ -316,39 +348,46 @@ export default function ProjectArchiveClient({
   );
 
   return (
-    <div>
-      <h1 className="text-3xl font-semibold">Project Gallery</h1>
-      <p className="mt-2 text-slate-600 max-w-3xl">
-        Explore our latest installs across Sarasota, Manatee, and Charlotte counties. Filter by material, roof color,
-        and service area — or search by phrase to find a specific project.
-      </p>
+    <>
+      <div>
+        <h1 className="text-3xl md:text-5xl font-semibold text-center tracking-tight text-slate-900 mb-12">Project Gallery</h1>
+        <p className="text-slate-600 max-w-3xl text-center mb-8">
+          Explore our latest installs across Sarasota, Manatee, and Charlotte counties. Filter by material, roof color,
+          and service area — or search by phrase to find a specific project.
+        </p>
 
-      <div className="mt-6 rounded-xl border border-slate-400 bg-[#cef3ff]/30 p-4" role="search">
-        <label htmlFor="project-search" className="sr-only">Search projects</label>
-        <input
-          id="project-search"
-          type="search"
-          value={searchInput}
-          onChange={(event) => setSearchInput(event.target.value)}
-          placeholder="Search projects..."
-          aria-label="Search projects"
-          className="w-full rounded-lg border border-slate-400 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
-        />
+        <div
+          ref={filtersRef}
+          className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-md backdrop-blur md:p-6"
+          role="search"
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex inline-flex w-full">
+              <label htmlFor="project-search" className="sr-only">Search projects</label>
+              <Search className="h-6 w-6 mr-4 transform translate-y-2 text-[--brand-blue]" />
+              <input
+                id="project-search"
+                type="search"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder="Search projects..."
+                aria-label="Search projects"
+                className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
+              />
+            </div>
 
-        <div className="mt-4 group rounded-lg border border-slate-400 bg-white/70">
-          <div className="flex items-center justify-between cursor-pointer select-none px-4 py-2 text-sm font-semibold text-slate-800 transition group-open:translate-y-[1px]">
-            <h2 className="text-slate-700 font-semibold text-sm">Search Filters</h2>
-          </div>
-
-          <div className="px-4 pb-4 pt-2">
-            <button
-              type="button"
-              onClick={clearFilters}
-              disabled={!hasActiveFilters}
-              className="rounded-lg border border-slate-300 px-3 py-2 text-sm transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-slate-50"
-            >
-              Reset filters
-            </button>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3">
+              <h2 className="text-sm font-semibold text-slate-700"><ListFilter className="h-4 w-4 mr-2 inline" />Filters</h2>
+              <button
+                type="button"
+                onClick={clearFilters}
+                disabled={!hasActiveFilters}
+                className="inline-flex items-center gap-1 rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-slate-100"
+              >
+                Reset filters
+                <RotateCcw className="h-4 w-4 inline ml-2" />
+              </button>
+            </div>
 
             <FilterTabs
               tabs={tabDefs}
@@ -356,39 +395,55 @@ export default function ProjectArchiveClient({
               onTabChange={setActiveTab}
               isLoading={loading}
             >
-              {(tabKey) => (
-                <div className="flex flex-wrap gap-2">
-                  {tabDefs
-                    .find((tab) => tab.key === tabKey)
-                    ?.terms.map((term) => {
+              {(tabKey) => {
+                const currentTab = tabDefs.find((tab) => tab.key === tabKey);
+                if (!currentTab) return null;
+                return (
+                  <div className="flex flex-wrap gap-2">
+                    {currentTab.terms.map((term) => {
                       const active = selection[tabKey].includes(term.slug);
                       const disabled = isPillDisabled(tabKey, term.slug);
+                      const countLabel = numberFormatter.format(term.count);
                       return (
                         <button
                           key={term.slug}
                           type="button"
                           onClick={() => toggleSelection(tabKey, term.slug)}
                           disabled={disabled && !active}
-                          className={`px-3 py-1.5 rounded-full border text-sm transition select-none ${
-                            active
+                          className={`px-3 py-1.5 rounded-full border text-sm transition select-none ${active
                               ? "border-[--brand-blue] bg-[--brand-blue] text-white"
                               : disabled
-                              ? "border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed"
-                              : "border-slate-300 bg-white text-slate-700 hover:border-[--brand-blue]"
-                          }`}
+                                ? "border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed"
+                                : "border-slate-200 bg-white text-slate-700 hover:border-[--brand-blue]"
+                            }`}
+                          aria-pressed={active}
                         >
-                          {term.name}
+                          {term.name} ({countLabel})
                         </button>
                       );
                     })}
-                </div>
-              )}
+                  </div>
+                );
+              }}
             </FilterTabs>
           </div>
         </div>
 
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <span className="text-sm text-slate-700">
+            Showing {filteredCount} of {overallTotalRef.current} project{overallTotalRef.current === 1 ? "" : "s"}
+          </span>
+          {loading && (
+            <span className="inline-flex items-center gap-2 rounded-full border border-[--brand-blue]/40 bg-[--brand-blue]/10 px-3 py-1 text-xs font-medium text-[--brand-blue]">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-[--brand-blue]" aria-hidden />
+              Updating projects…
+            </span>
+          )}
+          {error && <span className="text-xs text-red-600">{error}</span>}
+        </div>
+
         {chips.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap gap-2">
             {chips.map((chip) => (
               <button
                 key={chip.key}
@@ -402,54 +457,51 @@ export default function ProjectArchiveClient({
             ))}
           </div>
         )}
-      </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <span className="text-sm text-slate-700">
-          Showing {filteredCount} of {overallTotalRef.current} project{overallTotalRef.current === 1 ? "" : "s"}
-        </span>
-        {loading && (
-          <span className="inline-flex items-center gap-2 rounded-full border border-[--brand-blue]/40 bg-[--brand-blue]/10 px-3 py-1 text-xs font-medium text-[--brand-blue]">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-[--brand-blue]" aria-hidden />
-            Updating projects…
-          </span>
-        )}
-        {error && <span className="text-xs text-red-600">{error}</span>}
-      </div>
-
-      {filteredCount === 0 ? (
-        <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-700">
-          <p className="mb-2 font-medium">No results found.</p>
-          <p className="text-sm">
-            {searchForRequest
-              ? `Try clearing filters or searching for a different phrase.`
-              : `Try clearing or adjusting your filters to see more projects.`}
-          </p>
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="mt-4 rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
-            >
-              Clear all filters
-            </button>
-          )}
-        </div>
-      ) : (
-        <div className="relative">
-          {loading && <GridLoadingState mode="overlay" message="Loading projects…" />}
-          <div className={loading ? "pointer-events-none" : ""}>
-            <InfiniteList
-              key={listKey}
-              kind="project"
-              initial={result}
-              filters={listFilters}
-              pageSize={pageSize}
-              gridClass="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4"
-            />
+        {filteredCount === 0 ? (
+          <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-700">
+            <p className="mb-2 font-medium">No results found.</p>
+            <p className="text-sm">
+              {searchForRequest
+                ? `Try clearing filters or searching for a different phrase.`
+                : `Try clearing or adjusting your filters to see more projects.`}
+            </p>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="mt-4 rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+              >
+                Clear all filters
+              </button>
+            )}
           </div>
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="relative">
+            {loading && <GridLoadingState mode="overlay" message="Loading projects…" />}
+            <div className={loading ? "pointer-events-none" : ""}>
+              <InfiniteList
+                key={listKey}
+                kind="project"
+                initial={result}
+                filters={listFilters}
+                pageSize={pageSize}
+                gridClass="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="fixed left-1/2 md:hidden bottom-20 z-40 flex -translate-x-1/2 pointer-events-none">
+        <button
+          type="button"
+          onClick={scrollToFilters}
+          className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-[--brand-blue] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[--brand-blue]/30 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+        >
+          <span className="h-2 w-2 rounded-full bg-white" aria-hidden />
+          Filters
+        </button>
+      </div>
+    </>
   );
 }

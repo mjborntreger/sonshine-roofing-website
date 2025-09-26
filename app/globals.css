@@ -69,6 +69,8 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   }
   .font-accent { font-family: "Candara V2", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; }
   .ring-brand { box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand-blue) 70%, white); }
+  .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-none::-webkit-scrollbar { display: none; }
 }
 
 /* ---------------------------------------
@@ -76,6 +78,11 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 ----------------------------------------*/
 @keyframes sk-shimmer {
   100% { transform: translateX(100%); }
+}
+
+@keyframes stripe-slide {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 
 @layer utilities {

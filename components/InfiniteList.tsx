@@ -7,7 +7,8 @@ import { useIntersection } from "./useIntersection";
 import GridLoadingState from "@/components/layout/GridLoadingState";
 
 import SmartLink from "@/components/SmartLink";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
 import MediaFrame from "./MediaFrame";
 
 type Props<T> = {
@@ -316,7 +317,7 @@ export default function InfiniteList<T>({
 
                 return (
                     <div className="proj-item group block" data-key={key}>
-                        <SmartLink href={href} className="block">
+                        <SmartLink href={href} className="group block rounded-2xl focus-visible:outline-none">
                             <Card
                                 className="proj-card overflow-hidden hover:shadow-lg transition"
                                 data-title={(p?.title || "").toString()}
@@ -325,15 +326,15 @@ export default function InfiniteList<T>({
                                 data-rc={(rcSlugs || "").toString()}
                                 data-sa={(saSlugs || "").toString()}
                             >
-                                <CardHeader>
-                                    <CardTitle className="font-medium">{p?.title}</CardTitle>
+                                <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
+                                    <CardTitle className="font-semibold">{p?.title}</CardTitle>
                                 </CardHeader>
 
                                 {img?.url ? (
                                     <Frame
                                         src={p.heroImage?.url}
                                         alt={p.heroImage?.altText ?? p.title}
-                                        ratio="4 / 3"
+                                        ratio="16 / 10"
                                         className="w-full"
                                         sizes="(min-width: 1024px) 50vw, 100vw"
                                     />
@@ -341,36 +342,47 @@ export default function InfiniteList<T>({
                                     <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
                                 )}
 
-                                <CardContent>
+                                <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
                                     {(mt.length + rc.length + sa.length > 0) && (
-                                        <div className="mt-3 flex flex-wrap gap-2">
-                                            {mt.map((t: any) => (
-                                                <span
-                                                    key={`mtb-${key}-${t?.slug}`}
-                                                    className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                                                >
-                                                    {t?.name}
-                                                </span>
-                                            ))}
-                                            {sa.map((t: any) => (
-                                                <span
-                                                    key={`sab-${key}-${t?.slug}`}
-                                                    className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                                                >
-                                                    {t?.name}
-                                                </span>
-                                            ))}
-                                            {rc.map((t: any) => (
-                                                <span
-                                                    key={`rcb-${key}-${t?.slug}`}
-                                                    className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                                                >
-                                                    {t?.name}
-                                                </span>
-                                            ))}
+                                        <div className="relative mt-4 -mx-5 sm:mx-0">
+                                            <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                                                {mt.map((t: any) => (
+                                                    <span
+                                                        key={`mtb-${key}-${t?.slug}`}
+                                                        className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                                    >
+                                                        {t?.name}
+                                                    </span>
+                                                ))}
+                                                {sa.map((t: any) => (
+                                                    <span
+                                                        key={`sab-${key}-${t?.slug}`}
+                                                        className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                                    >
+                                                        {t?.name}
+                                                    </span>
+                                                ))}
+                                                {rc.map((t: any) => (
+                                                    <span
+                                                        key={`rcb-${key}-${t?.slug}`}
+                                                        className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                                    >
+                                                        {t?.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent sm:hidden" />
+                                            <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent sm:hidden" />
                                         </div>
                                     )}
                                 </CardContent>
+
+                                <CardFooter className="flex items-center justify-end border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
+                                    <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
+                                        View project
+                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 group-focus-visible:translate-x-1 group-focus-visible/card:translate-x-1" />
+                                    </span>
+                                </CardFooter>
                             </Card>
                         </SmartLink>
 

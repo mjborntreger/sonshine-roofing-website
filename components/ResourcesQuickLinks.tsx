@@ -47,7 +47,7 @@ export default function ResourcesQuickLinks() {
   const pathname = usePathname() || "/";
 
   return (
-    <div className="my-6 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm">
+    <div className="my-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="mb-3 text-xs text-center font-semibold uppercase tracking-wide text-slate-700">
         <Wrench className="h-3 w-3 inline mr-2 font-semibold text-[--brand-blue]" />
         Resources
