@@ -51,13 +51,13 @@ function slugify(s: string) {
 function decodeEntities(input: string) {
   return input
   .replace(/&nbsp;/g, " ")
-  .replace(/&amp;/g, "&")
   .replace(/&lt;/g, "<")
   .replace(/&gt;/g, ">")
   .replace(/&quot;/g, '"')
   .replace(/&#39;|&apos;/g, "'")
   .replace(/&#(\d+);/g, (_, num) => String.fromCharCode(parseInt(num, 10)))
   .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+  .replace(/&amp;/g, "&")
 }
 type TocItem = { id: string; text: string; level: 2 | 3 };
 function addIdsAndBuildToc(html: string): { html: string; toc: TocItem[] } {
