@@ -19,6 +19,10 @@ const OG_IMAGE = "/og-default.png";
 const PAGE_SIZE = 8;
 const MIN_SEARCH_LENGTH = 2;
 
+type SearchParamsRecord = Record<string, string | string[] | undefined>;
+type SearchParamsPromise = Promise<SearchParamsRecord>;
+const EMPTY_SEARCH_PARAMS: SearchParamsRecord = {};
+
 const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
   { slug: "commercials", label: "Commercials" },
   { slug: "explainers", label: "Explainers" },
@@ -30,9 +34,9 @@ const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams?: Promise<Record<string, string | string[]>> | Record<string, string | string[]>;
+  searchParams?: SearchParamsPromise;
 }): Promise<Metadata> {
-  const spObj = searchParams ? await Promise.resolve(searchParams) : {};
+  const spObj = searchParams ? await searchParams : EMPTY_SEARCH_PARAMS;
   const vParam = Array.isArray(spObj.v) ? spObj.v[0] : spObj.v;
   const v = typeof vParam === "string" ? vParam.trim() : "";
 
@@ -94,7 +98,7 @@ export async function generateMetadata({
 }
 
 type PageProps = {
-  searchParams?: Promise<Record<string, string | string[]>>;
+  searchParams?: SearchParamsPromise;
 };
 
 const toFirstParam = (value: string | string[] | undefined): string => {
@@ -134,7 +138,7 @@ function uniqueTermsFromVideos(items: VideoItem[], key: "materialTypes" | "servi
 }
 
 export default async function VideoLibraryPage({ searchParams }: PageProps) {
-  const params = searchParams ? await searchParams : {};
+  const params = searchParams ? await searchParams : EMPTY_SEARCH_PARAMS;
   const rawSearch = toFirstParam(params.q).trim();
   const bucketSlugs = toSlugArray(params.bk);
   const materialSlugs = toSlugArray(params.mt).map((s) => s.toLowerCase());
