@@ -1531,6 +1531,7 @@ export async function listProjectsPaged({
       facetCounts(
         postType: "project"
         search: $search
+        taxQuery: $taxQuery
         taxonomies: $facetTaxonomies
       ) {
         total
@@ -1548,8 +1549,8 @@ export async function listProjectsPaged({
 
   const variables: Record<string, any> = {
     offsetPagination: { offset, size },
-    search,
-    taxQuery: taxArray.length ? { relation: 'AND', taxArray } : null,
+    search: search ?? undefined,
+    taxQuery: { relation: 'AND', taxArray },
     facetTaxonomies: [
       mtSlugs.length ? { taxonomy: 'material_type', slugs: mtSlugs } : { taxonomy: 'material_type' },
       rcSlugs.length ? { taxonomy: 'roof_color', slugs: rcSlugs } : { taxonomy: 'roof_color' },
@@ -1597,10 +1598,12 @@ export async function listProjectsPaged({
       }))
     : [];
 
+  const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
+
   return {
     items,
     pageInfo,
-    total,
+    total: facetTotal,
     facets: facetGroups,
   };
 }
