@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
 import InfiniteList from "@/components/InfiniteList";
-import SkeletonGrid from "@/components/layout/SkeletonGrid";
+import GridLoadingState from "@/components/layout/GridLoadingState";
+import FilterTabs from "@/components/project/FilterTabs";
 import type { FacetGroup, ProjectSearchResult, TermLite } from "@/lib/wp";
 
 const MIN_SEARCH_LENGTH = 2;
@@ -55,6 +56,8 @@ type SelectionState = {
   roof: string[];
   area: string[];
 };
+
+type TabKey = FacetKey;
 
 function buildFacetMap(facets: FacetGroup[]): FacetMap {
   const map: FacetMap = new Map();
@@ -108,8 +111,13 @@ export default function ProjectArchiveClient({
   const [facets, setFacets] = useState<FacetGroup[]>(initialResult.facets ?? []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [visibleCount, setVisibleCount] = useState(initialResult.items.length);
-  const [totalCount, setTotalCount] = useState(
+  const initialOverallTotal = useMemo(() => {
+    if (typeof initialResult.meta?.overallTotal === "number") return initialResult.meta.overallTotal;
+    if (typeof initialResult.total === "number") return initialResult.total;
+    return initialResult.items.length;
+  }, [initialResult]);
+  const overallTotalRef = useRef<number>(initialOverallTotal);
+  const [filteredCount, setFilteredCount] = useState<number>(
     typeof initialResult.total === "number" ? initialResult.total : initialResult.items.length
   );
 
@@ -154,14 +162,9 @@ export default function ProjectArchiveClient({
   const facetMap = useMemo(() => buildFacetMap(facets), [facets]);
 
   useEffect(() => {
-    setVisibleCount(initialResult.items.length);
-    setTotalCount(typeof initialResult.total === "number" ? initialResult.total : initialResult.items.length);
-  }, [initialResult]);
-
-  useEffect(() => {
-    setVisibleCount(result.items.length);
-    if (typeof result.total === "number") {
-      setTotalCount(result.total);
+    setFilteredCount(typeof result.total === "number" ? result.total : result.items.length);
+    if (typeof result.meta?.overallTotal === "number") {
+      overallTotalRef.current = result.meta.overallTotal;
     }
   }, [result]);
 
@@ -284,6 +287,15 @@ export default function ProjectArchiveClient({
   }, [searchInput, selection.material, selection.roof, selection.area, termLabelMaps, toggleSelection]);
 
   const listKey = useMemo(() => JSON.stringify(listFilters), [listFilters]);
+  const tabDefs = useMemo(
+    () => [
+      { key: "material" as const, label: "Material", terms: filterTerms.materials },
+      { key: "roof" as const, label: "Roof Color", terms: filterTerms.roofColors },
+      { key: "area" as const, label: "Service Area", terms: filterTerms.serviceAreas },
+    ],
+    [filterTerms.materials, filterTerms.roofColors, filterTerms.serviceAreas]
+  );
+  const [activeTab, setActiveTab] = useState<TabKey>("material");
 
   const isPillDisabled = useCallback(
     (group: FacetKey, slug: string) => {
@@ -323,19 +335,10 @@ export default function ProjectArchiveClient({
           className="w-full rounded-lg border border-slate-400 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
         />
 
-        <details className="mt-4 group rounded-lg border border-slate-400 bg-white/70">
-          <summary className="flex items-center justify-between cursor-pointer select-none px-4 py-2 text-sm font-semibold text-slate-800 transition group-open:translate-y-[1px]">
-            <span>Search Filters</span>
-            <svg
-              className="h-4 w-4 transition-transform group-open:rotate-180"
-              viewBox="0 0 20 20"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              <path d="M5 8l5 5 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </summary>
+        <div className="mt-4 group rounded-lg border border-slate-400 bg-white/70">
+          <div className="flex items-center justify-between cursor-pointer select-none px-4 py-2 text-sm font-semibold text-slate-800 transition group-open:translate-y-[1px]">
+            <h2 className="text-slate-700 font-semibold text-sm">Search Filters</h2>
+          </div>
 
           <div className="px-4 pb-4 pt-2">
             <button
@@ -347,27 +350,24 @@ export default function ProjectArchiveClient({
               Reset filters
             </button>
 
-            <div className="mt-4 space-y-4">
-              {(
-                [
-                  { key: "material" as const, terms: filterTerms.materials },
-                  { key: "roof" as const, terms: filterTerms.roofColors },
-                  { key: "area" as const, terms: filterTerms.serviceAreas },
-                ]
-              ).map(({ key, terms }) => (
-                <div key={key}>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-600">
-                    {taxonomyLabel[key]}
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {terms.map((term) => {
-                      const active = selection[key].includes(term.slug);
-                      const disabled = isPillDisabled(key, term.slug);
+            <FilterTabs
+              tabs={tabDefs}
+              activeKey={activeTab}
+              onTabChange={setActiveTab}
+              isLoading={loading}
+            >
+              {(tabKey) => (
+                <div className="flex flex-wrap gap-2">
+                  {tabDefs
+                    .find((tab) => tab.key === tabKey)
+                    ?.terms.map((term) => {
+                      const active = selection[tabKey].includes(term.slug);
+                      const disabled = isPillDisabled(tabKey, term.slug);
                       return (
                         <button
                           key={term.slug}
                           type="button"
-                          onClick={() => toggleSelection(key, term.slug)}
+                          onClick={() => toggleSelection(tabKey, term.slug)}
                           disabled={disabled && !active}
                           className={`px-3 py-1.5 rounded-full border text-sm transition select-none ${
                             active
@@ -381,12 +381,11 @@ export default function ProjectArchiveClient({
                         </button>
                       );
                     })}
-                  </div>
                 </div>
-              ))}
-            </div>
+              )}
+            </FilterTabs>
           </div>
-        </details>
+        </div>
 
         {chips.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
@@ -407,13 +406,18 @@ export default function ProjectArchiveClient({
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <span className="text-sm text-slate-700">
-          Showing {visibleCount} of {totalCount} project{totalCount === 1 ? "" : "s"}
+          Showing {filteredCount} of {overallTotalRef.current} project{overallTotalRef.current === 1 ? "" : "s"}
         </span>
-        {loading && <span className="text-xs text-slate-500">Updating…</span>}
+        {loading && (
+          <span className="inline-flex items-center gap-2 rounded-full border border-[--brand-blue]/40 bg-[--brand-blue]/10 px-3 py-1 text-xs font-medium text-[--brand-blue]">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[--brand-blue]" aria-hidden />
+            Updating projects…
+          </span>
+        )}
         {error && <span className="text-xs text-red-600">{error}</span>}
       </div>
 
-      {totalCount === 0 ? (
+      {filteredCount === 0 ? (
         <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-700">
           <p className="mb-2 font-medium">No results found.</p>
           <p className="text-sm">
@@ -433,11 +437,7 @@ export default function ProjectArchiveClient({
         </div>
       ) : (
         <div className="relative">
-          {loading && (
-            <div className="absolute inset-0 z-10 rounded-xl bg-white/70 backdrop-blur-sm">
-              <SkeletonGrid variant="project" count={Math.min(pageSize, 6)} className="h-full" />
-            </div>
-          )}
+          {loading && <GridLoadingState mode="overlay" message="Loading projects…" />}
           <div className={loading ? "pointer-events-none" : ""}>
             <InfiniteList
               key={listKey}
@@ -446,8 +446,6 @@ export default function ProjectArchiveClient({
               filters={listFilters}
               pageSize={pageSize}
               gridClass="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4"
-              onVisibleCountChange={setVisibleCount}
-              onTotalChange={setTotalCount}
             />
           </div>
         </div>

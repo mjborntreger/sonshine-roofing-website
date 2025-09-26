@@ -3,7 +3,7 @@ import { listBlogCategories, listPostsPaged } from "@/lib/wp";
 import { ChevronDown } from "lucide-react";
 import ResourcesAside from "@/components/ResourcesAside";
 import InfiniteList from "@/components/InfiniteList";
-import SkeletonGrid from "@/components/layout/SkeletonGrid";
+import GridLoadingState from "@/components/layout/GridLoadingState";
 import ResourceSearchController from "@/components/resource-search/ResourceSearchController";
 import type { Metadata } from 'next';
 
@@ -181,7 +181,7 @@ export default async function BlogArchivePage() {
             </div>
 
             <div id="blog-skeleton" className="mt-8 hidden">
-              <SkeletonGrid variant="blog" count={6} className="grid-cols-1 lg:grid-cols-2" />
+              <GridLoadingState variant="blog" count={6} className="grid-cols-1 lg:grid-cols-2" />
             </div>
 
 

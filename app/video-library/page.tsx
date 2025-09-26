@@ -10,7 +10,7 @@ import {
   type VideoBucketKey,
 } from "@/lib/wp";
 import VideoGrid from "./video-grid";
-import SkeletonGrid from "@/components/layout/SkeletonGrid";
+import GridLoadingState from "@/components/layout/GridLoadingState";
 import ResourcesAside from "@/components/ResourcesAside";
 import ResourceSearchController from "@/components/resource-search/ResourceSearchController";
 
@@ -367,7 +367,7 @@ export default async function VideoLibraryPage({
 
             {/* Skeleton loading */}
             <div id="video-skeleton" className="mt-8 hidden">
-              <SkeletonGrid variant="video" count={6} className="grid-cols-1 md:grid-cols-2 lg:grid-cols-2" />
+              <GridLoadingState variant="video" count={6} className="grid-cols-1 md:grid-cols-2 lg:grid-cols-2" />
             </div>
 
             {/* Sections */}

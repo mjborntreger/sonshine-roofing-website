@@ -4,7 +4,7 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import type { PageResult, ResourceKind, ResourceQuery } from "@/lib/pagination";
 import { fetchPage, getCachedPages, setCachedPages } from "@/lib/resource-fetch";
 import { useIntersection } from "./useIntersection";
-import SkeletonGrid from "@/components/layout/SkeletonGrid";
+import GridLoadingState from "@/components/layout/GridLoadingState";
 
 import SmartLink from "@/components/SmartLink";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -401,7 +401,7 @@ export default function InfiniteList<T>({
             </div>
 
             {/* Loading shimmer while fetching next page */}
-            {loading && <SkeletonGrid variant="project" count={skeletonCountEff} />}
+            {loading && <GridLoadingState variant="project" count={skeletonCountEff} />}
 
             {/* Intersection sentinel */}
             <div ref={sentinelRef} aria-hidden="true" />

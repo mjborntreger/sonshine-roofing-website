@@ -1450,6 +1450,7 @@ export type ProjectSearchResult = {
   pageInfo: PageInfo;
   total: number;
   facets: FacetGroup[];
+  meta?: Record<string, unknown>;
 };
 
 /**
@@ -1603,8 +1604,11 @@ export async function listProjectsPaged({
   return {
     items,
     pageInfo,
-    total: facetTotal,
+    total,
     facets: facetGroups,
+    meta: {
+      overallTotal: facetTotal,
+    },
   };
 }
 
