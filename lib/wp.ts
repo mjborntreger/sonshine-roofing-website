@@ -1,4 +1,4 @@
-
+import type { PageInfo } from "./pagination";
 
 type Json = Record<string, any>;
 
@@ -1436,9 +1436,20 @@ export async function listRecentProjects(
 }
 
 export type ProjectsArchiveFilters = {
+  search?: string | null;
   materialTypeSlugs?: string[];
   roofColorSlugs?: string[];
   serviceAreaSlugs?: string[];
+};
+
+type FacetBucket = { slug: string; name: string; count: number };
+export type FacetGroup = { taxonomy: string; buckets: FacetBucket[] };
+
+export type ProjectSearchResult = {
+  items: ProjectSummary[];
+  pageInfo: PageInfo;
+  total: number;
+  facets: FacetGroup[];
 };
 
 /**
@@ -1453,47 +1464,50 @@ export async function listProjectsPaged({
   first?: number;
   after?: string | null;
   filters?: ProjectsArchiveFilters;
-}) {
-  const hasMt = Array.isArray(filters.materialTypeSlugs) && filters.materialTypeSlugs.length > 0;
-  const hasRc = Array.isArray(filters.roofColorSlugs) && filters.roofColorSlugs.length > 0;
-  const hasSa = Array.isArray(filters.serviceAreaSlugs) && filters.serviceAreaSlugs.length > 0;
+}): Promise<ProjectSearchResult> {
+  const size = Math.max(1, Math.min(first, 50));
+  const offset = after ? Math.max(0, parseInt(String(after), 10) || 0) : 0;
 
-  const paramParts = ["$first: Int!", "$after: String"];
-  const taxParts: string[] = [];
-  if (hasMt) {
-    paramParts.push("$mt: [String!]");
-    taxParts.push("{ taxonomy: MATERIAL_TYPE, terms: $mt, field: SLUG, operator: IN }");
-  }
-  if (hasRc) {
-    paramParts.push("$rc: [String!]");
-    taxParts.push("{ taxonomy: ROOF_COLOR, terms: $rc, field: SLUG, operator: IN }");
-  }
-  if (hasSa) {
-    paramParts.push("$sa: [String!]");
-    taxParts.push("{ taxonomy: SERVICE_AREA, terms: $sa, field: SLUG, operator: IN }");
-  }
+  const searchRaw = typeof filters?.search === 'string' ? filters.search.trim() : '';
+  const search = searchRaw.length ? searchRaw : null;
 
-  const taxQueryBlock = taxParts.length
-    ? `taxQuery: {
-          relation: AND
-          taxArray: [
-            ${taxParts.join("\n            ")}
-          ]
-        }`
-    : "";
+  const mtSlugs = Array.isArray(filters?.materialTypeSlugs)
+    ? filters.materialTypeSlugs.filter((s) => typeof s === 'string' && s.trim().length)
+    : [];
+  const rcSlugs = Array.isArray(filters?.roofColorSlugs)
+    ? filters.roofColorSlugs.filter((s) => typeof s === 'string' && s.trim().length)
+    : [];
+  const saSlugs = Array.isArray(filters?.serviceAreaSlugs)
+    ? filters.serviceAreaSlugs.filter((s) => typeof s === 'string' && s.trim().length)
+    : [];
+
+  const taxArray: Array<Record<string, unknown>> = [];
+  if (mtSlugs.length) {
+    taxArray.push({ taxonomy: 'MATERIALTYPE', terms: mtSlugs, field: 'SLUG', operator: 'IN' });
+  }
+  if (rcSlugs.length) {
+    taxArray.push({ taxonomy: 'ROOFCOLOR', terms: rcSlugs, field: 'SLUG', operator: 'IN' });
+  }
+  if (saSlugs.length) {
+    taxArray.push({ taxonomy: 'SERVICEAREA', terms: saSlugs, field: 'SLUG', operator: 'IN' });
+  }
 
   const query = /* GraphQL */ `
-    query ListProjectsPaged(${paramParts.join(", ")}) {
+    query ProjectArchive(
+      $offsetPagination: OffsetPagination
+      $search: String
+      $taxQuery: TaxQuery
+      $facetTaxonomies: [FacetInput!]!
+    ) {
       projects(
-        first: $first
-        after: $after
         where: {
           status: PUBLISH
           orderby: { field: DATE, order: DESC }
-          ${taxQueryBlock}
+          search: $search
+          offsetPagination: $offsetPagination
+          taxQuery: $taxQuery
         }
       ) {
-        pageInfo { hasNextPage endCursor }
         nodes {
           slug
           uri
@@ -1507,36 +1521,87 @@ export async function listProjectsPaged({
             serviceArea  { nodes { name slug } }
           }
         }
+        pageInfo {
+          offsetPagination {
+            total
+            hasMore
+          }
+        }
+      }
+      facetCounts(
+        postType: "project"
+        search: $search
+        taxonomies: $facetTaxonomies
+      ) {
+        total
+        facets {
+          taxonomy
+          buckets {
+            slug
+            name
+            count
+          }
+        }
       }
     }
   `;
 
   const variables: Record<string, any> = {
-    first: Math.max(1, Math.min(first, 50)),
-    after,
+    offsetPagination: { offset, size },
+    search,
+    taxQuery: taxArray.length ? { relation: 'AND', taxArray } : null,
+    facetTaxonomies: [
+      mtSlugs.length ? { taxonomy: 'material_type', slugs: mtSlugs } : { taxonomy: 'material_type' },
+      rcSlugs.length ? { taxonomy: 'roof_color', slugs: rcSlugs } : { taxonomy: 'roof_color' },
+      saSlugs.length ? { taxonomy: 'service_area', slugs: saSlugs } : { taxonomy: 'service_area' },
+    ],
   };
-  if (hasMt) variables.mt = filters.materialTypeSlugs;
-  if (hasRc) variables.rc = filters.roofColorSlugs;
-  if (hasSa) variables.sa = filters.serviceAreaSlugs;
 
   const data = await wpFetch<any>(query, variables);
 
   const nodes: any[] = data?.projects?.nodes ?? [];
-  const pageInfo = data?.projects?.pageInfo ?? { hasNextPage: false, endCursor: null };
+  const offsetInfo = data?.projects?.pageInfo?.offsetPagination ?? null;
+  const total = typeof offsetInfo?.total === 'number'
+    ? offsetInfo.total
+    : Math.max(offset + nodes.length, 0);
+  const hasMore = Boolean(offsetInfo?.hasMore) || offset + nodes.length < total;
+
+  const items: ProjectSummary[] = nodes.map((p: any): ProjectSummary => ({
+    slug: String(p.slug || ''),
+    uri: String(p.uri || ''),
+    title: String(p.title || ''),
+    year: pickYear(p.date),
+    heroImage: pickImage(p.featuredImage?.node),
+    projectDescription: p?.projectDetails?.projectDescription ?? null,
+    materialTypes: mapTerms(p.projectFilters?.materialType?.nodes),
+    roofColors: mapTerms(p.projectFilters?.roofColor?.nodes),
+    serviceAreas: mapTerms(p.projectFilters?.serviceArea?.nodes),
+  }));
+
+  const nextOffset = offset + items.length;
+  const pageInfo: PageInfo = {
+    hasNextPage: hasMore,
+    endCursor: hasMore ? String(nextOffset) : null,
+  };
+
+  const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
+    ? data.facetCounts.facets.map((f: any) => ({
+        taxonomy: String(f?.taxonomy || ''),
+        buckets: Array.isArray(f?.buckets)
+          ? f.buckets.map((b: any) => ({
+              slug: String(b?.slug || ''),
+              name: String(b?.name || ''),
+              count: typeof b?.count === 'number' ? b.count : 0,
+            }))
+          : [],
+      }))
+    : [];
 
   return {
+    items,
     pageInfo,
-    items: nodes.map((p: any) => ({
-      slug: String(p.slug || ""),
-      uri: String(p.uri || ""),
-      title: String(p.title || ""),
-      year: pickYear(p.date),
-      heroImage: pickImage(p.featuredImage?.node),
-      projectDescription: p?.projectDetails?.projectDescription ?? null,
-      materialTypes: mapTerms(p.projectFilters?.materialType?.nodes),
-      roofColors: mapTerms(p.projectFilters?.roofColor?.nodes),
-      serviceAreas: mapTerms(p.projectFilters?.serviceArea?.nodes),
-    })) as ProjectSummary[],
+    total,
+    facets: facetGroups,
   };
 }
 

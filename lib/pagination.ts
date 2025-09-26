@@ -4,6 +4,8 @@ export type PageInfo = { hasNextPage: boolean; endCursor: string | null };
 export type PageResult<T> = {
   items: T[];
   pageInfo: PageInfo;
+  total?: number;
+  meta?: Record<string, unknown>;
 };
 
 export type ResourceKind = "blog" | "project" | "video";

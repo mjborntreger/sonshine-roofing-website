@@ -19,6 +19,8 @@ type Props<T> = {
     renderItem?: (item: T, i: number) => React.ReactNode;
     skeletonCount?: number;
     onVideoOpen?: (item: T) => void; // optional: scoped video open handler
+    onVisibleCountChange?: (count: number) => void;
+    onTotalChange?: (total: number) => void;
 };
 
 const Frame: React.FC<{
@@ -51,9 +53,12 @@ export default function InfiniteList<T>({
     renderItem,
     skeletonCount,
     onVideoOpen,
+    onVisibleCountChange,
+    onTotalChange,
 }: Props<T>) {
     // Compose the stable query key for cache
     const baseQuery: ResourceQuery = useMemo(() => ({ first: pageSize, filters }), [pageSize, filters]);
+    const serializedFilters = useMemo(() => JSON.stringify(baseQuery.filters ?? {}), [baseQuery.filters]);
     const initialPages = useMemo(() => [initial], [initial]);
 
     // Pull any cached pages for these filters; seed with initial if empty
@@ -70,9 +75,29 @@ export default function InfiniteList<T>({
         setCachedPages(kind, baseQuery, initialPages);
         // cancel in-flight
         if (abortRef.current) abortRef.current.abort();
-    }, [kind, baseQuery.first, JSON.stringify(baseQuery.filters)]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [kind, baseQuery.first, serializedFilters, initialPages]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const items = pages.flatMap(p => p.items);
+    useEffect(() => {
+        if (typeof onVisibleCountChange === "function") {
+            onVisibleCountChange(items.length);
+        }
+    }, [items.length, onVisibleCountChange]);
+
+    const derivedTotal = useMemo(() => {
+        for (let i = pages.length - 1; i >= 0; i -= 1) {
+            const candidate = (pages[i] as any)?.total;
+            if (typeof candidate === "number") return candidate;
+        }
+        return null;
+    }, [pages]);
+
+    useEffect(() => {
+        if (typeof onTotalChange === "function" && typeof derivedTotal === "number") {
+            onTotalChange(derivedTotal);
+        }
+    }, [derivedTotal, onTotalChange]);
+
     const lastPage = pages[pages.length - 1];
     const hasMore = !!lastPage?.pageInfo?.hasNextPage;
     const after = lastPage?.pageInfo?.endCursor ?? null;
@@ -365,9 +390,10 @@ export default function InfiniteList<T>({
         <>
             <div className={gridClass} data-loading={loading ? "true" : "false"}>
                 {items.map((it, i) => {
-                    const key = (it as any).slug ?? (it as any).id ?? i;
-                    return (
-                        <Fragment key={key}>
+                const key = (it as any).slug ?? (it as any).id ?? i;
+                const uniqueKey = `${String(key)}-${i}`;
+                return (
+                    <Fragment key={uniqueKey}>
                             {effectiveRender(it, i)}
                         </Fragment>
                     );

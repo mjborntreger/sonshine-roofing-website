@@ -1,29 +1,35 @@
 // /app/project/page.tsx
 import Section from "@/components/layout/Section";
-import ResourceSearchController from "@/components/resource-search/ResourceSearchController";
-import { listProjectsPaged, listProjectFilterTerms } from "@/lib/wp";
 import ResourcesAside from "@/components/ResourcesAside";
-import InfiniteList from "@/components/InfiniteList";
-import type { Metadata } from 'next';
+import {
+  listProjectsPaged,
+  listProjectFilterTerms,
+  type ProjectsArchiveFilters,
+} from "@/lib/wp";
+import type { Metadata } from "next";
+
+import ProjectArchiveClient from "./ProjectArchiveClient";
 
 export const revalidate = 900; // 15 minutes ISR
 
 // ===== STATIC SEO FOR /project (EDIT HERE) =====
-const SEO_TITLE_PROJECTS = 'Project Gallery | Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
-const SEO_DESCRIPTION_PROJECTS = 'Browse recent roof installations across Southwest Florida. Filter by material, color, and service area to find real projects like yours.';
+const SEO_TITLE_PROJECTS = "Project Gallery | Sarasota, Manatee & Charlotte Counties | SonShine Roofing";
+const SEO_DESCRIPTION_PROJECTS = "Browse recent roof installations across Southwest Florida. Filter by material, color, and service area to find real projects like yours.";
 const SEO_KEYWORDS_PROJECTS = [
-  'roofing projects',
-  'project gallery',
-  'roof replacement photos',
-  'shingle roof projects',
-  'tile roof projects',
-  'metal roof projects',
-  'Sarasota roofing',
-  'Manatee County roofing',
-  'Charlotte County roofing',
+  "roofing projects",
+  "project gallery",
+  "roof replacement photos",
+  "shingle roof projects",
+  "tile roof projects",
+  "metal roof projects",
+  "Sarasota roofing",
+  "Manatee County roofing",
+  "Charlotte County roofing",
 ];
-const SEO_CANONICAL_PROJECTS = '/project';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
+const SEO_CANONICAL_PROJECTS = "/project";
+const SEO_OG_IMAGE_DEFAULT = "/og-default.png";
+const PAGE_SIZE = 6;
+const MIN_SEARCH_LENGTH = 2;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -32,14 +38,14 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: SEO_KEYWORDS_PROJECTS,
     alternates: { canonical: SEO_CANONICAL_PROJECTS },
     openGraph: {
-      type: 'website',
+      type: "website",
       title: SEO_TITLE_PROJECTS,
       description: SEO_DESCRIPTION_PROJECTS,
       url: SEO_CANONICAL_PROJECTS,
       images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
     },
     twitter: {
-      card: 'summary_large_image',
+      card: "summary_large_image",
       title: SEO_TITLE_PROJECTS,
       description: SEO_DESCRIPTION_PROJECTS,
       images: [SEO_OG_IMAGE_DEFAULT],
@@ -47,42 +53,78 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-type PageProps = { searchParams?: Promise<{ q?: string }> };
+type PageProps = { searchParams?: Promise<Record<string, string | string[] | undefined>> };
+
+function toFirstParam(value: string | string[] | undefined): string {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+}
+
+function toSlugArray(value: string | string[] | undefined): string[] {
+  if (Array.isArray(value)) {
+    return value
+      .flatMap((item) => (typeof item === "string" ? item.split(",") : []))
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
 
 export default async function ProjectArchivePage({ searchParams }: PageProps) {
-  const sp = (await searchParams) ?? ({} as { q?: string });
-  const qRaw = sp.q ?? "";
-  const q = qRaw.trim();
+  const params = searchParams ? await searchParams : {};
 
+  const rawSearch = toFirstParam(params.q).trim();
+  const materialTypeSlugs = toSlugArray(params.mt);
+  const roofColorSlugs = toSlugArray(params.rc);
+  const serviceAreaSlugs = toSlugArray(params.sa);
 
-  // Prepare pills (no counts)
-  const { materials, roofColors: colors, serviceAreas: areas } = await listProjectFilterTerms();
+  const searchForQuery = rawSearch.length >= MIN_SEARCH_LENGTH ? rawSearch : undefined;
 
-  const initialPage = await listProjectsPaged({
-    first: 6,
-    after: null,
-  });
+  const filters: ProjectsArchiveFilters = {
+    search: searchForQuery,
+    materialTypeSlugs,
+    roofColorSlugs,
+    serviceAreaSlugs,
+  };
+
+  const [initialResult, filterTerms] = await Promise.all([
+    listProjectsPaged({ first: PAGE_SIZE, after: null, filters }),
+    listProjectFilterTerms(),
+  ]);
+
+  const initialFilters = {
+    search: rawSearch,
+    materialTypeSlugs,
+    roofColorSlugs,
+    serviceAreaSlugs,
+  };
 
   // JSON-LD: CollectionPage + BreadcrumbList for Project Gallery
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+  const base = process.env.NEXT_PUBLIC_BASE_URL || "https://sonshineroofing.com";
   const pageUrl = `${base}${SEO_CANONICAL_PROJECTS}`;
 
   const collectionLd = {
-    '@context': 'https://schema.org',
-    '@type': ['WebPage', 'CollectionPage'],
+    "@context": "https://schema.org",
+    "@type": ["WebPage", "CollectionPage"],
     name: SEO_TITLE_PROJECTS,
     description: SEO_DESCRIPTION_PROJECTS,
     url: pageUrl,
-    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
-    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
+    primaryImageOfPage: { "@type": "ImageObject", url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
+    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: base },
   } as const;
 
   const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'Project Gallery', item: pageUrl },
+      { "@type": "ListItem", position: 1, name: "Home", item: `${base}/` },
+      { "@type": "ListItem", position: 2, name: "Project Gallery", item: pageUrl },
     ],
   } as const;
 
@@ -90,11 +132,7 @@ export default async function ProjectArchivePage({ searchParams }: PageProps) {
     <Section>
       <div className="container-edge py-4">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-
-          {/* Header */}
           <div>
-            <h1 className="text-3xl font-semibold">Project Gallery</h1>
-            {/* JSON-LD: CollectionPage + BreadcrumbList */}
             <script
               type="application/ld+json"
               suppressHydrationWarning
@@ -105,164 +143,15 @@ export default async function ProjectArchivePage({ searchParams }: PageProps) {
               suppressHydrationWarning
               dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
             />
-            <p className="mt-2 text-slate-600">
-              Explore our latest installs across Sarasota, Manatee, and Charlotte
-              counties. Filter by material, color, and service area—or search by
-              phrase to find a specific project.
-            </p>
-
-            {/* Search */}
-            <div className="mt-6 rounded-xl border border-slate-400 bg-[#cef3ff]/30 p-4" role="search">
-              <input
-                id="project-search"
-                type="search"
-                defaultValue={q}
-                placeholder="Search projects..."
-                aria-label="Search projects"
-                aria-controls="project-grid"
-                className="w-full rounded-lg border border-slate-400 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
-              />
-
-              {/* Filters accordion */}
-              <details
-                id="project-filters"
-                className="mt-4 group rounded-lg border border-slate-400 bg-white/70"
-              >
-                <summary className="flex items-center justify-between cursor-pointer select-none px-4 py-2 text-sm font-semibold text-slate-800 hover:translate-y-[1px] transition">
-                  <span>Search Filters</span>
-                  <svg
-                    className="h-4 w-4 transition-transform group-open:rotate-180"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M5 8l5 5 5-5"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </summary>
-                <div className="px-4 pb-4 pt-2">
-                  {/* Clear filters */}
-                  <button
-                    id="project-clear"
-                    type="button"
-                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50"
-                    aria-label="Clear filters"
-                  >
-                    Reset filters
-                  </button>
-
-                  {/* Material Type */}
-                  <div className="mt-4">
-                    <div className="text-xs font-semibold text-slate-600">Material</div>
-                    <div id="project-pills-mt" className="mt-2 flex flex-wrap gap-2">
-                      {materials.map((t) => (
-                        <button
-                          key={`mt-${t.slug}`}
-                          type="button"
-                          data-group="mt"
-                          data-slug={t.slug}
-                          aria-pressed="false"
-                          className="px-3 py-1.5 rounded-full border text-sm transition select-none border-slate-300 text-slate-700 hover:border-[--brand-blue] bg-white"
-                        >
-                          {t.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Roof Color */}
-                  <div className="mt-4">
-                    <div className="text-xs font-semibold text-slate-600">Roof Color</div>
-                    <div id="project-pills-rc" className="mt-2 flex flex-wrap gap-2">
-                      {colors.map((t) => (
-                        <button
-                          key={`rc-${t.slug}`}
-                          type="button"
-                          data-group="rc"
-                          data-slug={t.slug}
-                          aria-pressed="false"
-                          className="px-3 py-1.5 rounded-full border text-sm transition select-none border-slate-300 text-slate-700 hover:border-[--brand-blue] bg-white"
-                        >
-                          {t.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Service Area */}
-                  <div className="mt-4">
-                    <div className="text-xs font-semibold text-slate-600">Service Area</div>
-                    <div id="project-pills-sa" className="mt-2 flex flex-wrap gap-2">
-                      {areas.map((t) => (
-                        <button
-                          key={`sa-${t.slug}`}
-                          type="button"
-                          data-group="sa"
-                          data-slug={t.slug}
-                          aria-pressed="false"
-                          className="px-3 py-1.5 rounded-full border text-sm transition select-none border-slate-300 text-slate-700 hover:border-[--brand-blue] bg-white"
-                        >
-                          {t.name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </details>
-
-              {/* Active chips (outside accordion, like blog) */}
-              <div id="project-chips" className="mt-4 hidden flex flex-wrap gap-2">
-                {/* chips rendered by script */}
-              </div>
-            </div>
-
-            {/* No results */}
-            <div
-              id="project-no-results"
-              role="status"
-              aria-live="polite"
-              className="mt-6 hidden rounded-md border border-slate-200 bg-white p-4"
-            >
-              <p className="text-sm text-slate-700">
-                No results for <span id="project-query" className="font-semibold"></span>.
-              </p>
-            </div>
-
-            {/* Grid */}
-            <div id="project-grid">
-              <InfiniteList
-                kind="project"
-                initial={initialPage}
-                filters={{}}
-                pageSize={6}
-                gridClass="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4"
-              />
-            </div>
-
+            <ProjectArchiveClient
+              initialResult={initialResult}
+              filterTerms={filterTerms}
+              pageSize={PAGE_SIZE}
+              initialFilters={initialFilters}
+            />
           </div>
-
-          {/* Floating Content (Right) */}
           <ResourcesAside />
         </div>
-
-        <ResourceSearchController
-          kind="project"
-          ids={{
-            query: "#project-search",
-            grid: "#project-grid",
-            chips: "#project-chips",
-            skeleton: "project-skeleton",
-            noResults: "#project-no-results",
-          }}
-          urlKeys={{ q: "q", mt: "mt", rc: "rc", sa: "sa" }}
-          minQueryLen={2}
-        />
       </div>
     </Section>
   );
