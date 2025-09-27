@@ -2,7 +2,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Calculator, Check, CheckCircle2, ArrowRight, Undo2, X, SearchCheck, LockKeyholeOpen } from 'lucide-react';
+import { Calculator, Check, CheckCircle2, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 
@@ -65,49 +65,205 @@ const US_STATES = [
   { value: 'WY', label: 'Wyoming' },
 ];
 
-// ============ STYLE CONSTANTS ====================== //
-const pillBase = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-tight shadow-sm';
-const infoPillClass = `${pillBase} text-slate-400`;
-const successPillClass = `${pillBase} bg-emerald-500 text-white`;
-const gradientShell = 'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
-const innerPanel = 'rounded-3xl bg-white overflow-hidden';
-const stepCardClass = 'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
-const inputBaseClass = 'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
+type FinancingProgramKey = 'ygrene' | 'serviceFinance';
 
-const quizQuestions = [
+type ScoreWeights = Record<FinancingProgramKey, number>;
+
+type QuizOption = {
+  value: string;
+  label: string;
+};
+
+type QuizQuestion = {
+  id: string;
+  prompt: string;
+  options: QuizOption[];
+};
+
+export type FinancingScores = {
+  ygreneScore: number;
+  serviceFinanceScore: number;
+  isUncertain: boolean;
+};
+
+const MAX_SCORE = 27;
+
+const quizQuestions: QuizQuestion[] = [
+  {
+    id: 'priority',
+    prompt: "What’s your biggest priority?",
+    options: [
+      { value: 'low-monthly-payments', label: 'Low monthly payments' },
+      { value: 'fast-approval', label: 'Fast approval' },
+      { value: 'no-property-lien', label: 'No property lien' },
+      { value: 'low-upfront-costs', label: 'Low upfront costs' },
+      { value: 'not-sure', label: 'I’m not sure yet' },
+    ],
+  },
   {
     id: 'equity',
-    prompt: 'Do you have home equity and a clean recent property-tax history?',
+    prompt: 'Do you have home equity and a clean property tax record?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+      { value: 'not-sure', label: 'I’m not sure' },
+    ],
   },
   {
-    id: 'noLien',
-    prompt: 'Do you prefer a loan that does not place a lien on your home?',
+    id: 'payment-delay',
+    prompt: 'Would you prefer a delay of 12–24 months before your first payment?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+      { value: 'not-important', label: 'Not important' },
+    ],
   },
   {
-    id: 'defer',
-    prompt: 'Would a payment deferral (~18–24 months) help?',
+    id: 'credit-score',
+    prompt: 'Roughly what’s your credit score?',
+    options: [
+      { value: '700-plus', label: '700+' },
+      { value: '650-699', label: '650–699' },
+      { value: 'under-650', label: 'Under 650' },
+      { value: 'not-sure', label: 'Not sure' },
+    ],
   },
   {
-    id: 'credit650',
-    prompt: 'Is your credit score roughly 650+?',
+    id: 'income-verification',
+    prompt: 'Can you verify income and employment if needed?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+      { value: 'prefer-not-to-say', label: 'Prefer not to say' },
+    ],
   },
   {
-    id: 'incomeDocs',
-    prompt: 'Can you document income/employment for underwriting?',
+    id: 'loan-structure',
+    prompt: 'Which of these loan structures feels more comfortable to you?',
+    options: [
+      {
+        value: 'credit-based',
+        label: 'Credit-based (uses credit score + income verification)',
+      },
+      {
+        value: 'tax-based',
+        label: 'Tax-based (repaid via your property tax bill; a lien is placed if unpaid)',
+      },
+      { value: 'either', label: 'I’m okay with either' },
+      { value: 'not-sure', label: 'I’m not sure' },
+    ],
   },
   {
-    id: 'taxAssess',
-    prompt: 'Are you comfortable with an assessment on your property tax bill?',
+    id: 'tax-assessment',
+    prompt: 'Are you comfortable adding an assessment to your property tax bill?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+      { value: 'not-sure', label: 'Not sure' },
+    ],
   },
   {
-    id: 'sellSoon',
-    prompt: 'Are you likely to sell your home within ~5 years?',
+    id: 'sell-timeline',
+    prompt: 'Are you planning to sell your home in the next 5 years?',
+    options: [
+      { value: 'yes', label: 'Yes' },
+      { value: 'no', label: 'No' },
+      { value: 'maybe', label: 'Maybe' },
+    ],
+  },
+  {
+    id: 'project-timeline',
+    prompt: 'How quickly are you hoping to get this roof done?',
+    options: [
+      { value: 'asap', label: 'ASAP (within 1–2 weeks)' },
+      { value: '1-3-months', label: '1–3 months' },
+      { value: '3-6-months', label: '3–6 months' },
+      { value: '6-12-months', label: '6–12 months' },
+      { value: 'researching', label: 'I’m just researching' },
+    ],
   },
 ];
 
-type ProgramKey = 'serviceFinance' | 'ygrene';
+const QUESTION_ORDER = quizQuestions.map((question) => question.id);
 
-const MATCH_PROGRAMS: Record<ProgramKey, { label: string; programIds: string[]; description: string }> = {
+const SCORING_MATRIX: Record<string, Record<string, ScoreWeights>> = {
+  priority: {
+    'low-monthly-payments': { ygrene: 3, serviceFinance: 2 },
+    'fast-approval': { ygrene: 3, serviceFinance: 2 },
+    'no-property-lien': { ygrene: 0, serviceFinance: 3 },
+    'low-upfront-costs': { ygrene: 2, serviceFinance: 2 },
+    'not-sure': { ygrene: 1, serviceFinance: 1 },
+  },
+  equity: {
+    yes: { ygrene: 3, serviceFinance: 1 },
+    no: { ygrene: 0, serviceFinance: 2 },
+    'not-sure': { ygrene: 1, serviceFinance: 1 },
+  },
+  'payment-delay': {
+    yes: { ygrene: 1, serviceFinance: 3 },
+    no: { ygrene: 3, serviceFinance: 1 },
+    'not-important': { ygrene: 2, serviceFinance: 2 },
+  },
+  'credit-score': {
+    '700-plus': { ygrene: 1, serviceFinance: 3 },
+    '650-699': { ygrene: 1, serviceFinance: 2 },
+    'under-650': { ygrene: 3, serviceFinance: 0 },
+    'not-sure': { ygrene: 2, serviceFinance: 1 },
+  },
+  'income-verification': {
+    yes: { ygrene: 1, serviceFinance: 3 },
+    no: { ygrene: 3, serviceFinance: 0 },
+    'prefer-not-to-say': { ygrene: 2, serviceFinance: 1 },
+  },
+  'loan-structure': {
+    'credit-based': { ygrene: 0, serviceFinance: 3 },
+    'tax-based': { ygrene: 3, serviceFinance: 0 },
+    either: { ygrene: 2, serviceFinance: 2 },
+    'not-sure': { ygrene: 1, serviceFinance: 1 },
+  },
+  'tax-assessment': {
+    yes: { ygrene: 3, serviceFinance: 0 },
+    no: { ygrene: 0, serviceFinance: 3 },
+    'not-sure': { ygrene: 1, serviceFinance: 1 },
+  },
+  'sell-timeline': {
+    yes: { ygrene: 1, serviceFinance: 3 },
+    no: { ygrene: 3, serviceFinance: 2 },
+    maybe: { ygrene: 2, serviceFinance: 2 },
+  },
+  'project-timeline': {
+    asap: { ygrene: 2, serviceFinance: 3 },
+    '1-3-months': { ygrene: 2, serviceFinance: 2 },
+    '3-6-months': { ygrene: 2, serviceFinance: 2 },
+    '6-12-months': { ygrene: 2, serviceFinance: 2 },
+    researching: { ygrene: 1, serviceFinance: 1 },
+  },
+};
+
+export function calculateFinancingScores(userAnswers: string[]): FinancingScores {
+  const totals: Record<FinancingProgramKey, number> = { ygrene: 0, serviceFinance: 0 };
+
+  userAnswers.forEach((answer, index) => {
+    const questionId = QUESTION_ORDER[index];
+    if (!questionId) return;
+    const weights = SCORING_MATRIX[questionId]?.[answer];
+    if (!weights) return;
+    totals.ygrene += weights.ygrene ?? 0;
+    totals.serviceFinance += weights.serviceFinance ?? 0;
+  });
+
+  const normalize = (value: number) => Math.min(100, Math.round((value / MAX_SCORE) * 100));
+  const ygreneScore = normalize(totals.ygrene);
+  const serviceFinanceScore = normalize(totals.serviceFinance);
+
+  return {
+    ygreneScore,
+    serviceFinanceScore,
+    isUncertain: ygreneScore < 50 && serviceFinanceScore < 50,
+  };
+}
+
+const MATCH_PROGRAMS: Record<FinancingProgramKey, { label: string; programIds: string[]; description: string }> = {
   serviceFinance: {
     label: 'Service Finance',
     programIds: ['same-as-cash-12', 'term-10yr-999', 'term-15yr-79'],
@@ -120,135 +276,14 @@ const MATCH_PROGRAMS: Record<ProgramKey, { label: string; programIds: string[]; 
   },
 };
 
-type AnswerImpact = {
-  weight: number;
-  reason: string;
-};
-
-type QuizScoringEntry = {
-  yes?: Partial<Record<ProgramKey, AnswerImpact>>;
-  no?: Partial<Record<ProgramKey, AnswerImpact>>;
-};
-
-const QUIZ_SCORING: Record<(typeof quizQuestions)[number]['id'], QuizScoringEntry> = {
-  equity: {
-    yes: {
-      ygrene: {
-        weight: 4,
-        reason: 'You have equity and a strong property-tax history.',
-      },
-    },
-    no: {
-      serviceFinance: {
-        weight: 3,
-        reason: 'You prefer options that do not rely on property equity checks.',
-      },
-    },
-  },
-  noLien: {
-    yes: {
-      serviceFinance: {
-        weight: 4,
-        reason: 'You want financing without placing a lien on the property.',
-      },
-    },
-    no: {
-      ygrene: {
-        weight: 3,
-        reason: 'You are comfortable using property-tax-backed financing.',
-      },
-    },
-  },
-  defer: {
-    yes: {
-      ygrene: {
-        weight: 3,
-        reason: 'Up-front payment deferral is valuable to you.',
-      },
-    },
-    no: {
-      serviceFinance: {
-        weight: 2,
-        reason: 'You’re ready to begin payments without a long deferral.',
-      },
-    },
-  },
-  credit650: {
-    yes: {
-      serviceFinance: {
-        weight: 3,
-        reason: 'Your credit profile supports Service Finance underwriting.',
-      },
-    },
-    no: {
-      ygrene: {
-        weight: 2,
-        reason: 'You prefer options that aren’t credit-score heavy.',
-      },
-    },
-  },
-  incomeDocs: {
-    yes: {
-      serviceFinance: {
-        weight: 2,
-        reason: 'You can provide income documentation for approval.',
-      },
-    },
-    no: {
-      ygrene: {
-        weight: 3,
-        reason: 'You want to minimize income documentation requirements.',
-      },
-    },
-  },
-  taxAssess: {
-    yes: {
-      ygrene: {
-        weight: 4,
-        reason: 'You’re comfortable adding repayment to your property tax bill.',
-      },
-    },
-    no: {
-      serviceFinance: {
-        weight: 3,
-        reason: 'You want to keep payments off your property tax bill.',
-      },
-    },
-  },
-  sellSoon: {
-    yes: {
-      serviceFinance: {
-        weight: 3,
-        reason: 'You may sell soon and want financing that’s easier to close out.',
-      },
-    },
-    no: {
-      ygrene: {
-        weight: 2,
-        reason: 'You expect to stay long term, fitting YGrene’s structure.',
-      },
-    },
-  },
-};
-
-const PROGRAM_MAX_SCORE = Object.keys(MATCH_PROGRAMS).reduce((acc, key) => {
-  acc[key as ProgramKey] = 0;
-  return acc;
-}, {} as Record<ProgramKey, number>);
-
-for (const entry of Object.values(QUIZ_SCORING)) {
-  for (const programKey of Object.keys(MATCH_PROGRAMS) as ProgramKey[]) {
-    const yesWeight = entry.yes?.[programKey]?.weight ?? 0;
-    const noWeight = entry.no?.[programKey]?.weight ?? 0;
-    PROGRAM_MAX_SCORE[programKey] += Math.max(yesWeight, noWeight, 0);
-  }
-}
-
-type MatchResult = {
-  program: ProgramKey;
-  score: number;
-  reasons: string[];
-};
+// ============ STYLE CONSTANTS ====================== //
+const pillBase = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-tight shadow-sm';
+const infoPillClass = `${pillBase} text-slate-400`;
+const successPillClass = `${pillBase} bg-emerald-500 text-white`;
+const gradientShell = 'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
+const innerPanel = 'rounded-3xl bg-white overflow-hidden';
+const stepCardClass = 'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
+const inputBaseClass = 'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
 
 type FormValues = {
   firstName: string;
@@ -268,7 +303,7 @@ type SubmissionState = 'idle' | 'submitting' | 'error';
 type FinancingCookie = {
   unlocked: boolean;
   amount?: number;
-  match?: MatchResult;
+  scores?: FinancingScores;
 };
 
 function currency(n: number) {
@@ -340,69 +375,6 @@ function parseCookie(raw: string | null): FinancingCookie | null {
   }
 }
 
-function calculateMatch(answers: (boolean | null)[]): MatchResult | null {
-  if (!answers.length) return null;
-  if (answers.some((answer) => answer === null)) return null;
-
-  const scores: Record<ProgramKey, number> = {
-    serviceFinance: 0,
-    ygrene: 0,
-  };
-
-  const reasonBuckets: Record<ProgramKey, { text: string; weight: number }[]> = {
-    serviceFinance: [],
-    ygrene: [],
-  };
-
-  answers.forEach((answer, idx) => {
-    if (answer == null) return;
-    const question = quizQuestions[idx];
-    const config = QUIZ_SCORING[question.id];
-    if (!config) return;
-    const impacts = (answer ? config.yes : config.no) ?? {};
-    for (const [program, impact] of Object.entries(impacts) as [ProgramKey, AnswerImpact][]) {
-      scores[program] += impact.weight;
-      reasonBuckets[program].push({ text: impact.reason, weight: impact.weight });
-    }
-  });
-
-  let bestProgram: ProgramKey | null = null;
-  let bestScore = -Infinity;
-  (Object.entries(scores) as [ProgramKey, number][]).forEach(([program, score]) => {
-    if (score > bestScore) {
-      bestScore = score;
-      bestProgram = program;
-    }
-  });
-
-  if (!bestProgram || bestScore <= 0) return null;
-
-  const bestProgramKey = bestProgram as ProgramKey;
-  const maxScore = PROGRAM_MAX_SCORE[bestProgramKey] || 1;
-  const percent = Math.min(100, Math.round((bestScore / maxScore) * 100));
-
-  const topReasons = [...reasonBuckets[bestProgramKey]]
-    .sort((a, b) => b.weight - a.weight)
-    .slice(0, 3)
-    .map((item) => item.text);
-
-  return {
-    program: bestProgramKey,
-    score: percent,
-    reasons: topReasons,
-  };
-}
-
-function formatReasonsSentence(reasons: string[]): string {
-  if (!reasons.length) return '';
-  if (reasons.length === 1) return `Because ${reasons[0].toLowerCase()}`;
-  if (reasons.length === 2) {
-    return `Because ${reasons[0].toLowerCase()} and ${reasons[1].toLowerCase()}`;
-  }
-  const [first, second, third] = reasons;
-  return `Because ${first.toLowerCase()}, ${second.toLowerCase()}, and ${third.toLowerCase()}`;
-}
-
 export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmount?: number }) {
   const totalQuizQuestions = quizQuestions.length;
   const summaryStepIndex = totalQuizQuestions;
@@ -417,9 +389,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   const [unlocked, setUnlocked] = useState(false);
   const [calculatorAmount, setCalculatorAmount] = useState(defaultAmount);
   const [submittedAmount, setSubmittedAmount] = useState<number | null>(null);
-  const [persistedMatch, setPersistedMatch] = useState<MatchResult | null>(null);
+  const [persistedScores, setPersistedScores] = useState<FinancingScores | null>(null);
   const [customPulse, setCustomPulse] = useState(false);
-  const [showMatchDetails, setShowMatchDetails] = useState(false);
 
   const [formValues, setFormValues] = useState<FormValues>({
     firstName: '',
@@ -443,14 +414,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       setCalculatorAmount(roundedAmount);
       setFormValues((prev) => ({ ...prev, amount: String(roundedAmount) }));
       setSubmittedAmount(roundedAmount);
-      setPersistedMatch(cookie.match ?? null);
-      setShowMatchDetails(false);
+      setPersistedScores(cookie.scores ?? null);
     }
   }, [defaultAmount]);
 
-
-  const [quizAnswers, setQuizAnswers] = useState<(boolean | null)[]>(() => Array(totalQuizQuestions).fill(null));
-  const computedMatch = useMemo(() => calculateMatch(quizAnswers), [quizAnswers]);
+  const [quizAnswers, setQuizAnswers] = useState<(string | null)[]>(() => Array(totalQuizQuestions).fill(null));
+  const computedScores = useMemo(() => {
+    if (quizAnswers.some((answer) => answer == null)) return null;
+    return calculateFinancingScores(quizAnswers as string[]);
+  }, [quizAnswers]);
 
   const paymentRows = useMemo(
     () =>
@@ -475,24 +447,20 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     return { service, ygrene };
   }, [paymentRows]);
 
-  const displayMatch = persistedMatch ?? computedMatch;
+  const displayScores = persistedScores ?? computedScores;
+  const leadingProgram: FinancingProgramKey | null = displayScores
+    ? displayScores.ygreneScore === displayScores.serviceFinanceScore
+      ? null
+      : displayScores.ygreneScore > displayScores.serviceFinanceScore
+        ? 'ygrene'
+        : 'serviceFinance'
+    : null;
 
   useEffect(() => {
     if (!customPulse) return;
     const timeout = setTimeout(() => setCustomPulse(false), 800);
     return () => clearTimeout(timeout);
   }, [customPulse]);
-
-  useEffect(() => {
-    if (!persistedMatch) return;
-    setShowMatchDetails(false);
-  }, [persistedMatch?.program]);
-
-  useEffect(() => {
-    if (!displayMatch) {
-      setShowMatchDetails(false);
-    }
-  }, [displayMatch]);
 
   const validateFormStep = (currentStep: number) => {
     const nextErrors: Record<string, string> = {};
@@ -521,7 +489,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     return nextErrors;
   };
 
-  const handleQuizAnswer = (index: number, value: boolean) => {
+  const handleQuizAnswer = (index: number, value: string) => {
     const next = [...quizAnswers];
     next[index] = value;
     setQuizAnswers(next);
@@ -537,7 +505,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
     if (step < totalQuizQuestions) {
       if (quizAnswers[step] == null) {
-        setGlobalError('Select yes or no to continue.');
+        setGlobalError('Select an option to continue.');
         return;
       }
       setStep(step + 1);
@@ -613,13 +581,18 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
     const amountNumber = Number(sanitizeAmountInput(formValues.amount));
 
-    const quizSummary = quizQuestions.map((question, idx) => ({
-      id: question.id,
-      question: question.prompt,
-      answer: quizAnswers[idx] ? 'yes' : 'no',
-    }));
+    const quizSummary = quizQuestions.map((question, idx) => {
+      const answerValue = quizAnswers[idx];
+      const option = question.options.find((opt) => opt.value === answerValue);
+      return {
+        id: question.id,
+        question: question.prompt,
+        answerValue,
+        answerLabel: option?.label ?? null,
+      };
+    });
 
-    const matchResult = computedMatch || null;
+    const scoresResult = computedScores ?? null;
 
     const payload: Record<string, unknown> = {
       firstName: formValues.firstName.trim(),
@@ -637,8 +610,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       hp_field: honeypot,
       quizSummary,
     };
-    if (matchResult) {
-      payload.match = matchResult;
+    if (scoresResult) {
+      payload.scores = scoresResult;
     }
 
     setSubmission('submitting');
@@ -658,11 +631,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         setCalculatorAmount(nextAmount);
         setSubmittedAmount(nextAmount);
         const cookiePayload: FinancingCookie = { unlocked: true, amount: nextAmount };
-        if (matchResult) {
-          cookiePayload.match = matchResult;
+        if (scoresResult) {
+          cookiePayload.scores = scoresResult;
         }
-        setPersistedMatch(matchResult);
-        setShowMatchDetails(false);
+        setPersistedScores(scoresResult);
         writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
         try {
           (window as any).dataLayer = (window as any).dataLayer || [];
@@ -690,7 +662,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     ? `Question ${step + 1} of ${totalQuizQuestions}`
     : `Step ${formStepNumber} of ${totalFormSteps}`;
   const stepSubtitle = isQuizStep
-    ? 'Tap yes or no to continue.'
+    ? 'Tap an option to continue.'
     : step === summaryStepIndex
       ? 'Almost there! Hit “Next” to continue.'
       : 'Fill out each field to continue.';
@@ -700,39 +672,30 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     if (isQuizStep) {
       const question = quizQuestions[step];
       const answer = quizAnswers[step];
-      const yesSelected = answer === true;
-      const noSelected = answer === false;
 
       return (
         <div className={stepCardClass} aria-live="polite">
           <p className="text-base font-semibold text-slate-900">{question.prompt}</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button
-              type="button"
-              className={`inline-flex items-center gap-2 rounded-full border border-emerald-300 px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                yesSelected
-                  ? 'border-emerald-500 bg-emerald-50 text-emerald-700 focus:ring-emerald-200'
-                  : 'border-slate-200 bg-white text-slate-700 hover:bg-emerald-50 focus:ring-emerald-200'
-              }`}
-              onClick={() => handleQuizAnswer(step, true)}
-              aria-pressed={yesSelected}
-            >
-              <Check className="h-4 w-4 text-emerald-900" aria-hidden="true" />
-              <span>Yes</span>
-            </button>
-            <button
-              type="button"
-              className={`inline-flex items-center gap-2 rounded-full border border-red-300 px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                noSelected
-                  ? 'border-red-500 bg-red-50 text-red-700 focus:ring-red-200'
-                  : 'border-slate-200 bg-white text-slate-700 hover:bg-red-50 focus:ring-red-200'
-              }`}
-              onClick={() => handleQuizAnswer(step, false)}
-              aria-pressed={noSelected}
-            >
-              <X className="h-4 w-4 text-red-900" aria-hidden="true" />
-              <span>No</span>
-            </button>
+          <div className="mt-4 flex flex-col gap-2">
+            {question.options.map((option) => {
+              const selected = answer === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => handleQuizAnswer(step, option.value)}
+                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+                    selected
+                      ? 'border-[--brand-blue] bg-[--brand-blue]/10 text-[--brand-blue] focus-visible:ring-[--brand-blue]/40'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-[--brand-blue]/40 hover:bg-[--brand-blue]/5 focus-visible:ring-[--brand-blue]/40'
+                  }`}
+                  aria-pressed={selected}
+                >
+                  <span>{option.label}</span>
+                  {selected && <Check className="h-4 w-4" aria-hidden="true" />}
+                </button>
+              );
+            })}
           </div>
         </div>
       );
@@ -743,6 +706,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         id: question.id,
         prompt: question.prompt,
         answer: quizAnswers[idx],
+        answerLabel: question.options.find((option) => option.value === quizAnswers[idx])?.label ?? 'Not answered',
       }));
 
       return (
@@ -750,9 +714,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           <p className="text-base font-semibold text-slate-900">Your answers</p>
           <ul className="mt-3 space-y-2 text-sm text-slate-700">
             {summaryItems.map((item) => (
-              <li key={item.id} className="flex items-start gap-2">
-                <span className="text-lg">{item.answer ? '✅' : item.answer === false ? '❌' : '❔'}</span>
-                <span>{item.prompt}</span>
+              <li key={item.id} className="rounded-xl border border-blue-100 bg-white/80 px-3 py-2">
+                <p className="font-medium text-slate-900">{item.prompt}</p>
+                <p className="text-xs text-slate-600">{item.answerLabel}</p>
               </li>
             ))}
           </ul>
@@ -797,7 +761,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="amount">Estimated project total*</label>
+            <label className="block text-sm font-medium text-slate-700" htmlFor="amount">Project Budget*</label>
             <div className="mt-1 flex items-center gap-2">
               <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">$</span>
               <input
@@ -1088,7 +1052,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           </div>
 
           <div className="space-y-4 rounded-2xl border border-blue-100/70 bg-white/85 px-4 py-4 shadow-sm">
-            <label htmlFor="activeAmount" className="block text-sm font-medium text-slate-700">Estimated Project Total</label>
+            <label htmlFor="activeAmount" className="block text-sm font-medium text-slate-700">Project Budget</label>
             <div className="flex items-center gap-2">
               <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">$</span>
               <input
@@ -1188,27 +1152,48 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </div>
           </div>
 
-          {displayMatch && (
+          {displayScores && (
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-4 shadow-sm">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-emerald-700">
-                  Likely fit: {MATCH_PROGRAMS[displayMatch.program].label}
-                </p>
-                <span className="text-sm font-semibold text-emerald-600">{displayMatch.score}% match</span>
+                <p className="text-sm font-semibold text-emerald-700">Program fit snapshot</p>
+                {leadingProgram ? (
+                  <span className="text-xs font-semibold text-emerald-600">
+                    Leading fit: {MATCH_PROGRAMS[leadingProgram].label}
+                  </span>
+                ) : (
+                  <span className="text-xs font-semibold text-emerald-600">Scores based on your answers</span>
+                )}
               </div>
-              <button
-                type="button"
-                onClick={() => setShowMatchDetails((prev) => !prev)}
-                className="mt-3 inline-flex items-center text-xs font-semibold text-emerald-700 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2"
-              >
-                {showMatchDetails ? 'Hide ↑' : 'Why this match? →'}
-              </button>
-              {showMatchDetails && (
-                <ul className="mt-2 space-y-1 text-xs text-emerald-700">
-                  {displayMatch.reasons.map((reason) => (
-                    <li key={reason}>• {reason}</li>
-                  ))}
-                </ul>
+              <div className="mt-3 space-y-3">
+                {(['serviceFinance', 'ygrene'] as FinancingProgramKey[]).map((programKey) => {
+                  const score =
+                    programKey === 'serviceFinance'
+                      ? displayScores.serviceFinanceScore
+                      : displayScores.ygreneScore;
+                  const barColor =
+                    programKey === 'serviceFinance' ? 'bg-[--brand-blue]' : 'bg-[--brand-orange]';
+                  return (
+                    <div key={programKey} className="space-y-2">
+                      <div className="flex items-center justify-between text-sm font-semibold text-slate-800">
+                        <span>{MATCH_PROGRAMS[programKey].label}</span>
+                        <span>{score}%</span>
+                      </div>
+                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/70">
+                        <div className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${score}%` }} />
+                      </div>
+                      <p className="text-xs text-slate-500">{MATCH_PROGRAMS[programKey].description}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              {displayScores.isUncertain && (
+                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-800">
+                  <p className="font-semibold">Looks like both programs may require a closer look.</p>
+                  <p className="mt-1">Let’s chat and help you find the best fit.</p>
+                  <a className="mt-2 inline-block font-semibold text-[--brand-blue]" href="tel:+19419286964">
+                    (941) 866-4320
+                  </a>
+                </div>
               )}
             </div>
           )}
