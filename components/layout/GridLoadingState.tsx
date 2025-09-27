@@ -2,26 +2,27 @@ import * as React from "react";
 import CardSkeleton, { type CardSkeletonProps } from "@/components/CardSkeleton";
 import Grid from "@/components/layout/Grid";
 
-export type SkeletonGridProps = Omit<React.ComponentProps<typeof Grid>, "children"> & {
-  /** Number of skeleton cards to render */
+type Mode = "overlay" | "skeleton";
+
+type GridLoadingStateProps = Omit<React.ComponentProps<typeof Grid>, "children"> & {
   count?: number;
-  /** Pass-through options to shape each CardSkeleton */
   withImage?: CardSkeletonProps["withImage"];
   imageAspectClass?: CardSkeletonProps["imageAspectClass"];
   bodyLines?: CardSkeletonProps["bodyLines"];
   showMeta?: CardSkeletonProps["showMeta"];
-  /** Optional content kind to auto-pick a stable aspect ratio that matches the real cards */
   variant?: "blog" | "video" | "project";
+  mode?: Mode;
+  message?: string;
 };
 
 /**
- * SkeletonGrid
- * ------------
- * Drop-in loading state that mirrors your card grid.
- * - Uses the shared <Grid> wrapper so column classes and gaps remain consistent.
- * - Renders N <CardSkeleton/> items, configurable to match different card types.
+ * GridLoadingState
+ * ----------------
+ * Shared loading presentation for resource grids. Supports two modes:
+ * - "skeleton": renders card placeholders (backwards compatible).
+ * - "overlay": renders a centered status message for use atop existing grids.
  */
-export default function SkeletonGrid({
+export default function GridLoadingState({
   count = 6,
   className,
   withImage = true,
@@ -29,11 +30,22 @@ export default function SkeletonGrid({
   bodyLines = 2,
   showMeta = true,
   variant,
+  mode = "skeleton",
+  message = "Loading…",
   ...gridProps
-}: SkeletonGridProps) {
-  // Choose a stable aspect class that matches each page's real card media.
-  // - blog & video: 16/9
-  // - project: 4/3
+}: GridLoadingStateProps) {
+  if (mode === "overlay") {
+    return (
+      <div
+        role="status"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-white/70 backdrop-blur-sm"
+      >
+        <span className="inline-flex h-3 w-3 animate-pulse rounded-full bg-[--brand-blue]" aria-hidden />
+        <span className="text-sm font-medium text-slate-700">{message}</span>
+      </div>
+    );
+  }
+
   const resolvedAspect = React.useMemo(() => {
     if (imageAspectClass) return imageAspectClass;
     switch (variant) {

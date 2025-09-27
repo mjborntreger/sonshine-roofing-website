@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 type Interval = { open: string; close: string }; // 24h "HH:mm"
 type WeeklyHours = Record<number, Interval[]>; // 0 = Sunday ... 6 = Saturday
 
-export type OpenOrClosedProps = {
+type OpenOrClosedProps = {
   /**
    * Weekly schedule, keyed by weekday number (0 = Sunday ... 6 = Saturday).
    * Times are 24h "HH:mm" strings in the given timeZone.

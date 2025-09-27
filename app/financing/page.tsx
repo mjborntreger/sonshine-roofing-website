@@ -403,7 +403,13 @@ export default async function FinancingPage() {
           provided in your financing documents.
         </p>
 
-        <FaqInlineList heading="Financing FAQs" items={faqs} seeMoreHref="/faq" />
+        <FaqInlineList
+          heading="Financing FAQs"
+          topicSlug="financing-payment"
+          limit={8}
+          initialItems={faqs}
+          seeMoreHref="/faq"
+        />
 
         {/* FAQ Schema */}
         <script

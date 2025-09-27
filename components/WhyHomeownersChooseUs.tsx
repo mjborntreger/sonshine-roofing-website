@@ -176,7 +176,7 @@ export default async function WhyHomeownersChooseUs() {
                   </span>
                   <ChevronDown className={CHEVRON_BASE} aria-hidden="true" />
                 </summary>
-                <div className={`${CARD_BODY_BASE} ${theme.body}`}>
+                <div className={`${CARD_BODY_BASE} ${theme.body} accordion-motion`}>
                   <p>{pillar.description}</p>
                   {pillar.cta ? (
                     <div className="mt-6 flex justify-end">

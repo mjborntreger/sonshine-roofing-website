@@ -2,6 +2,8 @@
 
 import { useDeferredValue, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
+
 import type { GlossaryItem } from '@/lib/fuzzy';
 import { filterContains, suggest } from '@/lib/fuzzy';
 
@@ -22,17 +24,22 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
 
   return (
     <div className="mt-6">
-      <label htmlFor="glossary-search" className="sr-only">
-        Search glossary terms
-      </label>
-      <input
-        id="glossary-search"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Search terms…"
-        className="w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#0045d7] focus:outline-none"
-        aria-label="Search glossary terms"
-      />
+      <div className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-md backdrop-blur md:p-6">
+        <div className="flex inline-flex w-full items-start">
+          <label htmlFor="glossary-search" className="sr-only">
+            Search glossary terms
+          </label>
+          <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
+          <input
+            id="glossary-search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search terms..."
+            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
+            aria-label="Search glossary terms"
+          />
+        </div>
+      </div>
 
       {/* Only show results UI when user is actively searching */}
       {q ? (

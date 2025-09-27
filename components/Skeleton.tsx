@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-export type SkeletonProps = React.HTMLAttributes<HTMLDivElement> & {
+type SkeletonProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Set to false to disable the shimmer animation (keeps the base block). */
   shimmer?: boolean;
 };

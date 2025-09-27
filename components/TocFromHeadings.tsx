@@ -151,7 +151,7 @@ export default function TocFromHeadings({
   return (
     <nav
       aria-label="Table of contents"
-      className={['rounded-2xl border border-slate-300 bg-white p-4 shadow-sm mt-4', className].join(' ')}
+      className={['rounded-2xl border border-slate-200 bg-white p-4 shadow-sm mt-4', className].join(' ')}
     >
       <div className="mb-3 text-xs text-center font-semibold text-slate-900">ON THIS PAGE</div>
       <ul className="space-y-2 text-sm">

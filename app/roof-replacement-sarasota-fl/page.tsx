@@ -1,17 +1,16 @@
 import Section from "@/components/layout/Section";
-import TocFromHeadings from "@/components/TocFromHeadings";
-import UiLink from "@/components/UiLink";
+import ServicesAside from "@/components/ServicesAside";
 import Image from "next/image";
-import ServicesQuickLinks from "@/components/ServicesQuickLinks";
 import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, ChevronDown } from "lucide-react";
 import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from 'next';
+import FinancingBand from "@/components/FinancingBand";
 
 const scrollGuard = "scroll-mt-24";
-const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white mb-4";
+const detailsStyles = "group not-prose rounded-xl border border-slate-200 bg-white mb-4";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
@@ -146,13 +145,7 @@ export default async function Page() {
               the materials you choose when building your new roof.
             </p>
 
-            {/* Financing band */}
-            <div className="my-6 rounded-xl bg-[#00e3fe]/10 border border-[#00e3fe]/30 p-4 not-prose">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                <p className="m-0 text-slate-800"><strong>Prefer monthly payments?</strong> Explore our flexible financing options.</p>
-                <UiLink href="/financing" className="btn btn-brand-blue btn-press h-11 px-5" aria-label="Explore financing options">Explore financing</UiLink>
-              </div>
-            </div>
+            <FinancingBand />
 
             <h2 className={scrollGuard}>What Should You Know Before Getting a Roof Replacement?</h2>
             <details className={detailsStyles}>
@@ -163,7 +156,7 @@ export default async function Page() {
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
-              <div className="prose px-4 pb-4 pt-0">
+              <div className="accordion-motion prose px-4 pb-4 pt-0">
                 <p>
                   SonShine Roofing is licensed by the State of Florida as a roofing
                   contractor and is fully insured. While state law requires roofers
@@ -204,7 +197,7 @@ export default async function Page() {
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
-              <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
                 <p>
                   There are many roofing material options available to choose from,
                   and we’re here to help you determine what’s best for your home. As
@@ -246,7 +239,7 @@ export default async function Page() {
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
-              <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
                 <p>
                   There are usually two types of warranty that come with your new roof: workmanship and manufacturer.
                   <br /><br />
@@ -305,7 +298,7 @@ export default async function Page() {
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
-              <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
                 <p>
                   A roof replacement is a major investment—but that doesn’t mean your new roof is “set
                   it and forget it.” Regular maintenance is the key to protecting your roof’s longevity
@@ -347,7 +340,7 @@ export default async function Page() {
               </div>
             </details>
 
-            <details className="group not-prose rounded-xl border border-slate-400 bg-white mb-6">
+            <details className="group not-prose rounded-xl border border-slate200 bg-white mb-6">
               <summary className={summaryStyles}>
                 <span className="flex items-center gap-2">
                   <ListChecks className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
@@ -355,9 +348,9 @@ export default async function Page() {
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
-              <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
                 {/* Stepper timeline (#4) */}
-                <ol className="my-4 not-prose border-slate-400 pl-6 space-y-4">
+                <ol className="my-4 not-prose border-slate-200 pl-6 space-y-4">
                   <li className={liStyles}>
                     <span className={stepperStyles} />
                     <p className="m-0"><strong>Permits &amp; Scheduling</strong> — We file permits and set your installation date.</p>
@@ -390,37 +383,8 @@ export default async function Page() {
 
           </div>
 
-          <aside className="sticky top-24 self-start h-fit lg:w-[320px]">
-            <ServicesQuickLinks />
-
-            <TocFromHeadings
-              root="#article-root"
-              offset={128}
-              className="hidden lg:block" />
-
-            <div className="mt-4 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm not-prose">
-              <div className="mb-2 text-sm font-semibold text-slate-900 text-center">Ready to get started?</div>
-              <UiLink
-                href="/contact-us#book-an-appointment"
-                className="btn btn-brand-blue btn-press w-full h-11"
-                aria-label="Request a Free Roof Estimate">
-                Book a Free Estimate
-              </UiLink>
-              <UiLink
-                href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
-                className="btn btn-brand-orange btn-press w-full h-11 mt-2"
-                aria-label="Free 60-second Quote">
-                Free 60-second Quote
-              </UiLink>
-              <UiLink
-                href="tel:19418664320"
-                className="h-11 mt-2 rounded-xl border border-slate-200 grid place-items-center hover:bg-slate-50"
-                aria-label="Call SonShine Roofing">
-                (941) 866-4320
-              </UiLink>
-            </div>
-
-          </aside>
+          <ServicesAside />
+          
         </div>
 
         <div data-toc-exclude>
@@ -432,7 +396,13 @@ export default async function Page() {
         </div>
 
         {/* FAQs (dynamic) */}
-        <FaqInlineList heading="Roof Replacement FAQs" items={faqs} seeMoreHref="/faq" />
+        <FaqInlineList
+          heading="Roof Replacement FAQs"
+          topicSlug="roof-replacement"
+          limit={8}
+          initialItems={faqs}
+          seeMoreHref="/faq"
+        />
 
         {/* FAQ Schema */}
         <script

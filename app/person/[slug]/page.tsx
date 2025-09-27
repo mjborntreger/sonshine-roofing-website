@@ -1,9 +1,8 @@
-import { listPersonsBySlug, listPersons, listPersonsBySlugs } from "@/lib/wp";
+import { listPersons, listPersonsBySlugs } from "@/lib/wp";
 import type { Metadata } from 'next';
 import Image from "next/image";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
-import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 
 export const revalidate = 3600;
 

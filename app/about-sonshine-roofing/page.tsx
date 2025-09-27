@@ -4,7 +4,7 @@ import { listPersons, listPersonsBySlugs } from '@/lib/wp';
 import PersonGrid from "./PersonGrid";
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import { HoursAndInformation } from "./HoursAndInformation";
-import { UserRoundSearch, CloudRainWind, ChevronDown, BadgeCheck, ShieldCheck, ExternalLink, ChevronRight } from "lucide-react";
+import { UserRoundSearch, CloudRainWind, ChevronDown, BadgeCheck, ExternalLink } from "lucide-react";
 import type { Metadata } from 'next';
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 
@@ -145,7 +145,7 @@ export default async function Page() {
                   </span>
                   <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
                 </summary>
-                <div className="px-4 pb-4">
+                <div className="accordion-motion px-4 pb-4">
                   <p>
                     SonShine Roofing is a family-owned roofing company based in Sarasota, Florida,
                     serving Sarasota, Manatee, and Charlotte County residents with 38+ years of experience.
@@ -169,7 +169,7 @@ export default async function Page() {
                   </span>
                   <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
                 </summary>
-                <div className="px-4 pb-4">
+                <div className="accordion-motion px-4 pb-4">
                   <p className="prose">
                     Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.
                     Since we are keenly attuned to unpredictable nature of hurricane season, we focus on

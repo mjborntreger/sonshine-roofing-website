@@ -5,6 +5,8 @@ import {
   listPostsPaged,
   // PROJECTS
   listProjectsPaged,
+  type ProjectsArchiveFilters,
+  type ProjectSearchResult,
   // VIDEOS
   listVideoItemsPaged, // small adapter; see note below
 } from "@/lib/wp";
@@ -24,8 +26,35 @@ export async function POST(
     let result: PageResult<any>;
 
     if (kind === "project") {
-      // Expect: { materialTypeSlugs?: string[]; roofColorSlugs?: string[]; serviceAreaSlugs?: string[] }
-      result = await listProjectsPaged({ first, after, filters: filters as any });
+      const toSlugArray = (value: unknown): string[] => {
+        if (Array.isArray(value)) {
+          return value
+            .map((v) => (typeof v === 'string' ? v : String(v ?? '')).trim())
+            .filter(Boolean);
+        }
+        if (typeof value === 'string') {
+          return value
+            .split(',')
+            .map((v) => v.trim())
+            .filter(Boolean);
+        }
+        return [];
+      };
+
+      const projectFilters: ProjectsArchiveFilters = {
+        search:
+          typeof (filters as any)?.search === 'string'
+            ? (filters as any).search
+            : typeof (filters as any)?.q === 'string'
+            ? (filters as any).q
+            : undefined,
+        materialTypeSlugs: toSlugArray((filters as any)?.materialTypeSlugs ?? (filters as any)?.mt),
+        roofColorSlugs: toSlugArray((filters as any)?.roofColorSlugs ?? (filters as any)?.rc),
+        serviceAreaSlugs: toSlugArray((filters as any)?.serviceAreaSlugs ?? (filters as any)?.sa),
+      };
+
+      const projectResult: ProjectSearchResult = await listProjectsPaged({ first, after, filters: projectFilters });
+      return NextResponse.json(projectResult);
     } else if (kind === "video") {
       // Merge entries + project videos; paginate client-side
       result = await listVideoItemsPaged({ first, after, filters });

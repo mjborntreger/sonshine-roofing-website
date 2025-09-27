@@ -5,7 +5,7 @@ import { ExternalLink as ExternalIcon } from 'lucide-react';
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>;
 
-export type SmartLinkProps = Omit<AnchorProps, "href" | "children"> & {
+type SmartLinkProps = Omit<AnchorProps, "href" | "children"> & {
   href: string | URL;
   children: React.ReactNode;
   className?: string;

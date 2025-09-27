@@ -1,10 +1,10 @@
 "use client";
+
 import SmartLink from "@/components/SmartLink";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { NavMenu } from "./NavMenu";
 
-import { BadgeCheck, ArrowUpRight } from "lucide-react";
 export default function Header() {
   const ref = useRef<HTMLDivElement>(null);
 

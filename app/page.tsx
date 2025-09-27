@@ -103,20 +103,30 @@ export default async function Page() {
         <div className="bg-orange-50/90">
           <ReviewsCarousel />
         </div>
-        <div>
-          <LatestProjectsFilter projects={projects} initial={4} />
-          <LatestPostsFilters posts={posts} initial={4} />
-        </div>
-          {/* General FAQs at bottom of the landing page */}
-          <Section>
-            <FaqInlineList heading="General FAQs" items={generalFaqs} seeMoreHref="/faq" />
-            {/* JSON-LD for FAQs on the home page */}
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-            />
-          </Section>
+
+        
+          <div className="mx-auto w-full max-w-[1600px]">
+            <LatestProjectsFilter projects={projects} initial={4} />
+            <LatestPostsFilters posts={posts} initial={4} />
+          </div>
+        
+
+        {/* General FAQs at bottom of the landing page */}
+        <Section>
+          <FaqInlineList
+            heading="General FAQs"
+            topicSlug="general"
+            limit={8}
+            initialItems={generalFaqs}
+            seeMoreHref="/faq"
+          />
+          {/* JSON-LD for FAQs on the home page */}
+          <script
+            type="application/ld+json"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+          />
+        </Section>
       </div>
 
     </>

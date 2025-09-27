@@ -1,17 +1,22 @@
 'use client';
 
 import { useMemo } from 'react';
-import UiLink from '@/components/UiLink';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Image from 'next/image';
+import BlogArchiveCard from '@/components/archive/BlogArchiveCard';
+import type { PostCard } from '@/lib/wp';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import UiLink from './UiLink';
+
+const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
 
 // Minimal post shape expected from wp.ts
-export type YouMayAlsoLikePost = {
+type YouMayAlsoLikePost = {
     slug: string;
     title: string;
     featuredImage?: { url: string; altText?: string | null } | null;
     categories?: { slug: string; name?: string | null }[] | null;
     date?: string | null; // ISO string optional; used for stable sorting if present
+    excerpt?: string | null;
+    contentPlain?: string | null;
 };
 
 type Props = {
@@ -84,43 +89,54 @@ export default function YouMayAlsoLike({
     if (!items.length) return null;
 
     return (
-        <section className={["not-prose px-2", className].filter(Boolean).join(" ")} aria-labelledby="ymal-heading">
-            <div className="text-center">
-                <h2 id="ymal-heading" className="my-8">{heading}</h2>
+        <section className={["mt-32 not-prose px-2", className].filter(Boolean).join(" ")} aria-labelledby="ymal-heading">
+            <div className="flex justify-start mt-36 mb-12">
+                <h2 
+                    id="ymal-heading" 
+                    className="text-3xl md:text-4xl">
+                        <Sparkles className='inline h-7 w-7 md:h-10 md:w-10 text-[--brand-blue] mr-3' />
+                        {heading}
+                    </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                {items.map((p) => (
-                    <Card key={p.slug} className="overflow-hidden hover:shadow-lg transition [&_img]:rounded-none">
-                        <UiLink href={`/${p.slug}`} className="block" title={p.title} aria-label={`Read ${p.title}`}>
-                            <CardHeader>
-                                <CardTitle className="font-medium line-clamp-2">{p.title}</CardTitle>
-                            </CardHeader>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                {items.map((item, index) => {
+                    const categories = (item.categories ?? [])
+                        .map((category) => category?.name ?? category?.slug ?? '')
+                        .filter(Boolean);
 
-                            {/* Image */}
-                            {p.featuredImage?.url ? (
-                                <Image
-                                    src={p.featuredImage.url}
-                                    alt={p.featuredImage.altText || p.title}
-                                    width={800}
-                                    height={600}
-                                    sizes="(max-width: 800px) 80vw, 768px"
-                                    className="h-48 w-full object-cover rounded-none"
-                                    loading="lazy"
-                                />
-                            ) : (
-                                <div className="h-48 w-full bg-slate-100" />
-                            )}
+                    const postCard: PostCard = {
+                        slug: item.slug,
+                        title: item.title,
+                        date: item.date ?? '',
+                        categories,
+                        featuredImage: item.featuredImage?.url
+                            ? {
+                                url: item.featuredImage.url,
+                                altText: item.featuredImage.altText ?? null,
+                            }
+                            : undefined,
+                        excerpt: item.excerpt ?? undefined,
+                        contentPlain: item.contentPlain ?? undefined,
+                    };
 
-                            <CardContent>
-                                <span className="inline-flex items-center gap-1 text-[15px] text-slate-700">
-                                    Read more <span aria-hidden>→</span>
-                                </span>
-                            </CardContent>
-                        </UiLink>
-                    </Card>
-                ))}
+                    return (
+                        <BlogArchiveCard
+                            key={item.slug}
+                            post={postCard}
+                            className="motion-safe:animate-lp-fade-in"
+                            style={{ animationDelay: `${index * 60}ms` }}
+                        />
+                    );
+                })}
             </div>
+            <div className="mt-12 text-center md:text-right">
+                <UiLink href="/blog" className={lessFatCta} title="See All Blogs">
+                    See All Blogs
+                    <ArrowRight className="h-4 w-4 inline ml-2" />
+                </UiLink>
+            </div>
+
         </section>
     );
 }

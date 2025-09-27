@@ -1,5 +1,4 @@
 import Section from '@/components/layout/Section';
-import Link from 'next/link';
 import { listFaqTopics, listFaqsWithContent, faqListToJsonLd } from '@/lib/wp';
 import type { FaqFull, FaqTopic } from '@/lib/wp';
 import type { Metadata } from 'next';
@@ -170,7 +169,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                           </span>
                         </span>
                       </summary>
-                      <div className="px-4 pb-4 pt-2 space-y-2">
+                      <div className="accordion-motion px-4 pb-4 pt-2 space-y-2">
                         {list.map((f) => {
                           return (
                             <details
@@ -193,7 +192,10 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                                   <path d="M7 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                 </svg>
                               </summary>
-                              <div className="prose prose-sm px-4 pb-4 mt-1" dangerouslySetInnerHTML={{ __html: (f as any).contentHtml || '' }} />
+                              <div
+                                className="accordion-motion prose prose-sm px-4 pb-4 mt-1"
+                                dangerouslySetInnerHTML={{ __html: (f as any).contentHtml || '' }}
+                              />
                             </details>
                           );
                         })}

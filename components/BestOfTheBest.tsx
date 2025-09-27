@@ -12,7 +12,7 @@ export default async function bestOfTheBest() {
         aria-label="botb-title" 
         id="botb-title"
       >
-        <h2 className="text-center text-2xl md:text-5xl text-slate-700 py-8">
+        <h2 className="text-center text-3xl md:text-5xl text-slate-700 py-8">
           Best of the Best Award Winner (2021–2025)
         </h2>
       </div>

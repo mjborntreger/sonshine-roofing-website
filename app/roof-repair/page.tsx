@@ -1,14 +1,13 @@
 import Section from "@/components/layout/Section";
-import TocFromHeadings from "@/components/TocFromHeadings";
-import ServicesQuickLinks from "@/components/ServicesQuickLinks";
-import UiLink from "@/components/UiLink";
 import Image from "next/image";
 import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
-import { Layers, Droplets, Bug, Hammer, PanelRight, ChevronDown, House } from "lucide-react";
+import { Layers, Droplets, Bug, Hammer, PanelRight, ChevronDown } from "lucide-react";
 import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from "next";
+import FinancingBand from "@/components/FinancingBand";
+import ServicesAside from "@/components/ServicesAside";
 
 const scrollGuard = "scroll-mt-24";
 const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white mb-4";
@@ -136,13 +135,7 @@ export default async function Page() {
               HUD inspection checklist </a>for homeowners and contractors.
           </p>
 
-          {/* Financing band */}
-          <div className="my-6 rounded-xl bg-[#00e3fe]/10 border border-[#00e3fe]/30 p-4 not-prose">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <p className="m-0 text-slate-800"><strong>Prefer monthly payments?</strong> Explore our flexible financing options.</p>
-              <UiLink href="/financing" className="btn btn-brand-blue btn-press h-11 px-5" aria-label="Explore financing options">Explore financing</UiLink>
-            </div>
-          </div>
+          <FinancingBand />
 
           <h2 className={scrollGuard}>Common Roof Repairs</h2>
           <details className={detailsStyles}>
@@ -153,7 +146,7 @@ export default async function Page() {
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
-            <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
               <p>
                 When shingles begin to curl, fall off, or show signs of discoloration,
                 it’s time to schedule a roof repair. Missing or damaged shingles expose
@@ -191,7 +184,7 @@ export default async function Page() {
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
-            <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
               <p>
                 Missing or failing gutters allow water and debris to accumulate along the edges
                 of your roof. Without proper drainage, this moisture can seep beneath shingles
@@ -226,7 +219,7 @@ export default async function Page() {
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
-            <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
               <p>
                 Cracks, rot, and holes around the soffit of a home are more than just cosmetic
                 issues—they’re an open invitation to pests. Insects, rodents, and even small
@@ -264,7 +257,7 @@ export default async function Page() {
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
-            <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
               <p>
                 Flashing is one of the most common areas of concern on a roofing system.
                 It’s typically installed around roof penetrations such as chimneys, vents,
@@ -306,7 +299,7 @@ export default async function Page() {
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
-            <div className="prose px-4 pb-4 pt-0">
+            <div className="accordion-motion prose px-4 pb-4 pt-0">
               <p>
                 Moisture is one of the most common causes of fascia damage. The fascia is the
                 horizontal board that runs along the edge of your roof, directly behind the gutter
@@ -342,31 +335,7 @@ export default async function Page() {
 
         </div>
 
-        <aside className="sticky top-24 self-start h-fit lg:w-[320px]">
-          <ServicesQuickLinks />
-
-          <TocFromHeadings
-            root="#article-root"
-            offset={128}
-            className="hidden lg:block" />
-
-          <div className="mt-4 rounded-2xl border border-slate-300 bg-white p-4 shadow-sm not-prose">
-            <div className="mb-2 text-sm font-semibold text-slate-900 text-center">Ready to get started?</div>
-            <UiLink
-              href="/contact-us#book-an-appointment"
-              className="btn btn-brand-blue btn-press w-full h-11"
-              aria-label="Request a Free Roof Estimate">
-              Book a Free Estimate
-            </UiLink>
-            <UiLink
-              href="tel:19418664320"
-              className="h-11 mt-2 rounded-xl border border-slate-300 grid place-items-center hover:bg-slate-50"
-              aria-label="Call SonShine Roofing">
-              (941) 866-4320
-            </UiLink>
-          </div>
-
-        </aside>
+        <ServicesAside />
       </div>
 
       <div data-toc-exclude>
@@ -378,7 +347,13 @@ export default async function Page() {
       </div>
 
         {/* FAQs (dynamic) */}
-        <FaqInlineList heading="Roof Repair FAQs" items={faqs} seeMoreHref="/faq" />
+        <FaqInlineList
+          heading="Roof Repair FAQs"
+          topicSlug="roof-repair"
+          limit={8}
+          initialItems={faqs}
+          seeMoreHref="/faq"
+        />
 
         {/* FAQ Schema */}
         <script

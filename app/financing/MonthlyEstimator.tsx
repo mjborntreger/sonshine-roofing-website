@@ -2,7 +2,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Calculator, Check, CheckCircle2, Lock, ArrowRight, Undo2, Wallet, X, SearchCheck, LockKeyholeOpen } from 'lucide-react';
+import { Calculator, Check, CheckCircle2, ArrowRight, Undo2, X, SearchCheck, LockKeyholeOpen } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 
@@ -678,6 +678,11 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
   };
 
+  const lastStepIndex = thirdFormStepIndex;
+  const totalFlowSteps = lastStepIndex + 1;
+  const clampedStep = Math.min(Math.max(step, 0), lastStepIndex);
+  const progressPercent = Math.round(((clampedStep + 1) / totalFlowSteps) * 100);
+
   const isQuizStep = step < totalQuizQuestions;
   const totalFormSteps = 4;
   const formStepNumber = step - summaryStepIndex + 1;
@@ -982,7 +987,25 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
           <div className="space-y-6 bg-blue-50/40 px-6 py-6">
             <div className="flex flex-col gap-2 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm md:flex-row md:items-center md:justify-between">
-              <span>{stepTitle}</span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span>{stepTitle}</span>
+                <div
+                  className="flex items-center gap-2 text-xs text-slate-500"
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={progressPercent}
+                  aria-label="Progress"
+                >
+                  <div className="relative h-1.5 w-28 overflow-hidden rounded-full bg-slate-200/80 md:w-32">
+                    <div
+                      className="absolute inset-y-0 left-0 rounded-full bg-[--brand-blue] transition-all duration-300 ease-in-out"
+                      style={{ width: `${progressPercent}%` }}
+                    />
+                  </div>
+                  <span className="min-w-[3ch] text-xs font-semibold text-slate-600">{progressPercent}%</span>
+                </div>
+              </div>
               <span className="text-slate-500 md:hidden">{stepSubtitle}</span>
               <span className={`${infoPillClass} hidden md:inline-flex`}>{stepSubtitle}</span>
             </div>

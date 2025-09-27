@@ -7,7 +7,7 @@ import React, { useEffect, useRef, useState } from "react";
  * - Uses guarded access to render/reset/remove to satisfy varying typings
  */
 
-export type TurnstileProps = {
+type TurnstileProps = {
   siteKey?: string; // defaults to NEXT_PUBLIC_TURNSTILE_SITE_KEY
   theme?: "auto" | "light" | "dark";
   size?: "normal" | "compact";

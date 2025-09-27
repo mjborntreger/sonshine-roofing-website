@@ -1,4 +1,4 @@
-
+import type { PageInfo, PageResult } from "./pagination";
 
 type Json = Record<string, any>;
 
@@ -83,6 +83,7 @@ export type PostCard = {
   readingTimeMinutes?: number;
   categoryTerms?: TermLite[];
   excerpt?: string;
+  contentPlain?: string;
 };
 
 export type PostLite = {
@@ -91,6 +92,8 @@ export type PostLite = {
   date: string | null;
   featuredImage?: WpImage | null;
   categories: TermLite[];
+  excerpt?: string | null;
+  contentPlain?: string | null;
 };
 
 export type Post = {
@@ -272,8 +275,37 @@ const mapProductLinks = (rows?: any[]): ProductLink[] =>
   }));
 
 // calcReadingTimeMinutes Helper Function
+const htmlEntityMap: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  nbsp: " ",
+};
+
+function decodeHtmlEntities(input: string): string {
+  if (!input) return "";
+
+  let value = input.replace(/&#(\d+);/g, (_, dec: string) => {
+    const codePoint = Number.parseInt(dec, 10);
+    return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : "";
+  });
+
+  value = value.replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => {
+    const codePoint = Number.parseInt(hex, 16);
+    return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : "";
+  });
+
+  value = value.replace(/&([a-zA-Z]+);/g, (_, name: string) => htmlEntityMap[name.toLowerCase()] ?? `&${name};`);
+
+  return value;
+}
+
 export function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const withoutTags = html.replace(/<[^>]*>/g, " ");
+  const decoded = decodeHtmlEntities(withoutTags);
+  return decoded.replace(/\s+/g, " ").trim();
 }
 function calcReadingTimeMinutes(html: string, wpm = 225): number {
   const text = stripHtml(html);
@@ -608,7 +640,7 @@ export async function listFaqSlugs(limit = 500): Promise<string[]> {
   return (data?.faqs?.nodes ?? []).map((n) => n.slug).filter(Boolean) as string[];
 }
 
-export function faqJsonLd(items: { question: string; answerHtml: string }[]) {
+function faqJsonLd(items: { question: string; answerHtml: string }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -839,7 +871,7 @@ export async function listRecentVideoEntries(limit = 50): Promise<VideoItem[]> {
           videoCategories(first: 10) {
             nodes { name slug }
           }
-          videoLibraryMetadata { youtubeUrl }
+          videoLibraryMetadata { youtubeUrl description }
         }
       }
     }
@@ -861,6 +893,7 @@ return nodes
         source: "video_entry" as const,
         date: n.date,
         categories: (n.videoCategories?.nodes || []).map((c: any) => ({ name: c.name, slug: c.slug })),
+        excerpt: n?.videoLibraryMetadata?.description ?? null,
       } as VideoItem;
     })
     .filter(Boolean) as VideoItem[];
@@ -915,7 +948,7 @@ export async function listProjectVideos(limit = 100): Promise<VideoItem[]> {
 // ----- Grouping helper (future-proof for new buckets) -----
 export type VideoBucketKey = "roofing-project" | "commercials" | "accolades" | "explainers" | "other";
 
-export function groupVideosByBucket(items: VideoItem[]) {
+function groupVideosByBucket(items: VideoItem[]) {
   const buckets = { "roofing-project": [], commercials: [], accolades: [], explainers: [], other: [] } as
     Record<"roofing-project"|"commercials"|"accolades"|"explainers"|"other", VideoItem[]>;
 
@@ -957,9 +990,9 @@ function encodeOffset(n: number): string { return String(n); }
 function bucketOf(v: VideoItem): VideoBucketKey {
   if (v.source === "project") return "roofing-project";
   const slugs = (v.categories || []).map(c => (c.slug || c.name || "").toLowerCase());
-  if (slugs.some(s => ["commercials","tv","ads"].includes(s))) return "commercials";
-  if (slugs.some(s => ["accolades","awards","press"].includes(s))) return "accolades";
-  if (slugs.some(s => ["explainers","how-to","tips"].includes(s))) return "explainers";
+  if (slugs.some(s => ["commercial", "commercials", "tv", "ad", "ads"].includes(s))) return "commercials";
+  if (slugs.some(s => ["accolade", "accolades", "awards", "press"].includes(s))) return "accolades";
+  if (slugs.some(s => ["explainer", "explainers", "how-to", "tips", "education", "educational"].includes(s))) return "explainers";
   return "other";
 }
 
@@ -1007,61 +1040,54 @@ export async function listVideoItemsPaged({
   const buckets = bucketSet;
 
   // Accept `categorySlugs` (preferred) or `categories`/`cat`
-  const catInput: any[] | null =
-    Array.isArray(f.categorySlugs) ? f.categorySlugs
-    : Array.isArray(f.categories) ? f.categories
-    : Array.isArray(f.cat) ? f.cat
-    : null;
-  const catSlugs = catInput ? catInput.map((s: any) => String(s).toLowerCase()) : null;
+  const pickArray = (value: unknown): string[] | null =>
+    Array.isArray(value) && value.length ? value.map((v) => String(v)) : null;
+
+  const catInput = pickArray((f as any).categorySlugs) ?? pickArray((f as any).categories) ?? pickArray((f as any).cat);
+  const catSlugs = catInput ? catInput.map((s) => s.toLowerCase()) : null;
 
   // Project-only filters with friendly aliases
-  const mtInput: any[] | null = Array.isArray(f.materialTypeSlugs)
-    ? f.materialTypeSlugs
-    : Array.isArray(f.materialSlugs)
-    ? f.materialSlugs
-    : Array.isArray(f.material)
-    ? f.material
-    : null;
-  const mt = mtInput ? mtInput.map((s: any) => String(s).toLowerCase()) : null;
+  const mtInput = pickArray((f as any).materialTypeSlugs) ?? pickArray((f as any).materialSlugs) ?? pickArray((f as any).material);
+  const mt = mtInput ? mtInput.map((s) => s.toLowerCase()) : null;
 
-  const saInput: any[] | null = Array.isArray(f.serviceAreaSlugs) ? f.serviceAreaSlugs : (Array.isArray(f.serviceArea) ? f.serviceArea : null);
-  const sa = saInput ? saInput.map((s: any) => String(s).toLowerCase()) : null;
+  const saInput = pickArray((f as any).serviceAreaSlugs) ?? pickArray((f as any).serviceArea);
+  const sa = saInput ? saInput.map((s) => s.toLowerCase()) : null;
+
+  const matchesFilters = (v: VideoItem, omit?: 'bucket' | 'material_type' | 'service_area'): boolean => {
+    if (omit !== 'bucket') {
+      const bucket = bucketOf(v);
+      if (buckets && !buckets.has(bucket)) return false;
+    }
+
+    if (catSlugs) {
+      const vs = v.categories.map((c) => (c.slug || c.name || '').toLowerCase());
+      if (!includesAny(vs, catSlugs)) return false;
+    }
+
+    if (omit !== 'material_type' && mt) {
+      if (v.source !== 'project') return false;
+      const vs = (v.materialTypes || []).map((t) => (t.slug || '').toLowerCase());
+      if (!includesAny(vs, mt)) return false;
+    }
+
+    if (omit !== 'service_area' && sa) {
+      if (v.source !== 'project') return false;
+      const vs = (v.serviceAreas || []).map((t) => (t.slug || '').toLowerCase());
+      if (!includesAny(vs, sa)) return false;
+    }
+
+    if (q) {
+      const title = (v.title || '').toLowerCase();
+      const ex = (v.excerpt || '').toLowerCase();
+      if (!(title.includes(q) || (ex && ex.includes(q)))) return false;
+    }
+
+    return true;
+  };
 
   const filtered = all
-    .filter((v) => {
-      // Bucket filter (OR); if buckets null => pass
-      const b = bucketOf(v);
-      if (buckets && !buckets.has(b)) return false;
-
-      // Category slugs (OR across names/slugs)
-      if (catSlugs) {
-        const vs = v.categories.map(c => (c.slug || c.name || '').toLowerCase());
-        if (!includesAny(vs, catSlugs)) return false;
-      }
-
-      // Project-only filters
-      if (mt) {
-        if (v.source !== 'project') return false; // material selected => exclude non-projects
-        const vs = (v.materialTypes || []).map(t => (t.slug || '').toLowerCase());
-        if (!includesAny(vs, mt)) return false;
-      }
-      if (sa) {
-        if (v.source !== 'project') return false; // service area selected => exclude non-projects
-        const vs = (v.serviceAreas || []).map(t => (t.slug || '').toLowerCase());
-        if (!includesAny(vs, sa)) return false;
-      }
-
-      // Phrase match in title/excerpt
-      if (q) {
-        const title = (v.title || '').toLowerCase();
-        const ex = (v.excerpt || '').toLowerCase();
-        if (!(title.includes(q) || (ex && ex.includes(q)))) return false;
-      }
-
-      return true;
-    })
-    // newest first
-    .sort((a,b) => (b.date || '').localeCompare(a.date || ''));
+    .filter((v) => matchesFilters(v))
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
 
   const start = decodeOffset(after);
   const end = Math.min(start + Math.max(1, Math.min(first, 50)), filtered.length);
@@ -1069,10 +1095,93 @@ export async function listVideoItemsPaged({
   const hasNextPage = end < filtered.length;
   const endCursor = hasNextPage ? encodeOffset(end) : null;
 
+  const BUCKET_LABELS: Record<VideoBucketKey, string> = {
+    commercials: "Commercials",
+    explainers: "Explainers",
+    "roofing-project": "Roofing Projects",
+    accolades: "Accolades",
+    other: "Other",
+  };
+
+  const countBuckets = <T extends string>(itemsToCount: VideoItem[], getKeys: (v: VideoItem) => { slug: T; name: string }[]): Map<T, { name: string; count: number }> => {
+    const map = new Map<T, { name: string; count: number }>();
+    for (const item of itemsToCount) {
+      for (const info of getKeys(item)) {
+        const prev = map.get(info.slug);
+        if (prev) {
+          prev.count += 1;
+        } else {
+          map.set(info.slug, { name: info.name, count: 1 });
+        }
+      }
+    }
+    return map;
+  };
+
+  const bucketFacetItems = all.filter((v) => matchesFilters(v, 'bucket'));
+  const bucketCounts = countBuckets(bucketFacetItems, (v) => [{ slug: bucketOf(v), name: BUCKET_LABELS[bucketOf(v)] }]);
+
+  const materialFacetItems = all.filter((v) => matchesFilters(v, 'material_type'));
+  const materialCounts = countBuckets(materialFacetItems, (v) =>
+    (v.materialTypes || []).map((term) => ({ slug: String(term.slug || '').toLowerCase(), name: String(term.name || term.slug || '') }))
+  );
+
+  const serviceFacetItems = all.filter((v) => matchesFilters(v, 'service_area'));
+  const serviceCounts = countBuckets(serviceFacetItems, (v) =>
+    (v.serviceAreas || []).map((term) => ({ slug: String(term.slug || '').toLowerCase(), name: String(term.name || term.slug || '') }))
+  );
+
+  const ensureKeys = (map: Map<string, { name: string; count: number }>, keys: (string | undefined | null)[], fallbackName?: (slug: string) => string) => {
+    for (const key of keys) {
+      if (!key) continue;
+      const slug = String(key).toLowerCase();
+      if (!map.has(slug)) {
+        map.set(slug, { name: fallbackName ? fallbackName(slug) : slug, count: 0 });
+      }
+    }
+  };
+
+  ensureKeys(materialCounts, mtInput || []);
+  ensureKeys(serviceCounts, saInput || []);
+
+  const facets: FacetGroup[] = [
+    {
+      taxonomy: 'bucket',
+      buckets: (Object.keys(BUCKET_LABELS) as VideoBucketKey[]).map((slug) => ({
+        slug,
+        name: BUCKET_LABELS[slug],
+        count: bucketCounts.get(slug)?.count ?? 0,
+      })),
+    },
+    {
+      taxonomy: 'material_type',
+      buckets: Array.from(materialCounts.entries()).map(([slug, info]) => ({
+        slug,
+        name: info.name,
+        count: info.count,
+      })),
+    },
+    {
+      taxonomy: 'service_area',
+      buckets: Array.from(serviceCounts.entries()).map(([slug, info]) => ({
+        slug,
+        name: info.name,
+        count: info.count,
+      })),
+    },
+  ];
+
+  const total = filtered.length;
+
   return {
     pageInfo: { hasNextPage, endCursor },
     items: slice,
-  };
+    total,
+    facets,
+    meta: {
+      overallTotal: total,
+    },
+  } as PageResult<VideoItem> & { facets: FacetGroup[] };
 }
 
 // --- List recent posts for the archive ---
@@ -1150,6 +1259,8 @@ export async function listRecentPostsPool(limit = 36): Promise<PostLite[]> {
           date
           featuredImage { node { sourceUrl altText } }
           categories(first: 12) { nodes { name slug } }
+          content(format: RENDERED)
+          excerpt(format: RENDERED)
         }
       }
     }
@@ -1158,13 +1269,23 @@ export async function listRecentPostsPool(limit = 36): Promise<PostLite[]> {
   const data = await wpFetch<{ posts: { nodes: any[] } }>(query, { limit });
   const nodes = data?.posts?.nodes || [];
 
-  return nodes.map((n: any): PostLite => ({
-    slug: String(n.slug || ""),
-    title: String(n.title || ""),
-    date: n.date || null,
-    featuredImage: pickImage(n.featuredImage?.node),
-    categories: mapTerms(n.categories?.nodes),
-  }));
+  return nodes.map((n: any): PostLite => {
+    const contentHtml = typeof n.content === 'string' ? n.content : null;
+    const excerptHtml = typeof n.excerpt === 'string' ? n.excerpt : null;
+    return {
+      slug: String(n.slug || ""),
+      title: String(n.title || ""),
+      date: n.date || null,
+      featuredImage: pickImage(n.featuredImage?.node),
+      categories: mapTerms(n.categories?.nodes),
+      excerpt: toTrimmedExcerpt(excerptHtml) ?? null,
+      contentPlain: (() => {
+        const html = contentHtml?.length ? contentHtml : excerptHtml;
+        const text = stripHtml(html ?? '');
+        return text ? text : null;
+      })(),
+    } satisfies PostLite;
+  });
 }
 
 // --- Paged blog list with optional filters (categories by slug, search) ---
@@ -1183,81 +1304,144 @@ export async function listPostsPaged({
   after?: string | null;
   filters?: PostsFiltersInput;
 }) {
-  // Normalize filters
-  const includeCats = Array.isArray(filters.categorySlugs) && filters.categorySlugs.length
-    ? filters.categorySlugs
-    : null;
-  const excludeCats = Array.isArray(filters.excludeCategorySlugs) && filters.excludeCategorySlugs.length
-    ? filters.excludeCategorySlugs
-    : null;
+  const size = Math.max(1, Math.min(first, 50));
+  const offset = after ? Math.max(0, parseInt(String(after), 10) || 0) : 0;
 
-  // Build GraphQL query signature and where/taxQuery blocks dynamically so we never send
-  // `terms: null` (which can result in 0 results in WPGraphQL).
-  const paramParts: string[] = ["$first: Int!", "$after: String"]; // base params
-  const taxArrayParts: string[] = [];
-  if (includeCats) {
-    paramParts.push("$cats: [String!]");
-    taxArrayParts.push("{ taxonomy: CATEGORY, terms: $cats, field: SLUG, operator: IN }");
-  }
-  if (excludeCats) {
-    paramParts.push("$excludeCats: [String!]");
-    taxArrayParts.push("{ taxonomy: CATEGORY, terms: $excludeCats, field: SLUG, operator: NOT_IN }");
-  }
+  const searchRaw = typeof filters?.q === 'string'
+    ? filters.q
+    : typeof (filters as any)?.search === 'string'
+    ? (filters as any).search
+    : '';
+  const search = searchRaw.trim().length ? searchRaw.trim() : null;
 
-  const taxQueryBlock = taxArrayParts.length
-    ? `taxQuery: { relation: AND, taxArray: [\n              ${taxArrayParts.join("\n              ")}\n            ] }`
-    : "";
+  const includeCats = Array.isArray(filters?.categorySlugs)
+    ? filters.categorySlugs.filter((s) => typeof s === 'string' && s.trim().length)
+    : [];
+  const excludeCats = Array.isArray(filters?.excludeCategorySlugs)
+    ? filters.excludeCategorySlugs.filter((s) => typeof s === 'string' && s.trim().length)
+    : [];
+
+  const taxArray: Array<Record<string, unknown>> = [];
+  if (includeCats.length) {
+    taxArray.push({ taxonomy: 'CATEGORY', terms: includeCats, field: 'SLUG', operator: 'IN' });
+  }
+  if (excludeCats.length) {
+    taxArray.push({ taxonomy: 'CATEGORY', terms: excludeCats, field: 'SLUG', operator: 'NOT_IN' });
+  }
 
   const query = /* GraphQL */ `
-    query ListPostsPaged(${paramParts.join(", ")}) {
+    query BlogArchive(
+      $offsetPagination: OffsetPagination
+      $search: String
+      $taxQuery: TaxQuery
+      $facetTaxonomies: [FacetInput!]!
+    ) {
       posts(
-        first: $first
-        after: $after
         where: {
           status: PUBLISH
           orderby: { field: DATE, order: DESC }
-          ${taxQueryBlock}
+          search: $search
+          offsetPagination: $offsetPagination
+          taxQuery: $taxQuery
         }
       ) {
-        pageInfo { hasNextPage endCursor }
         nodes {
           slug
           title
           date
           featuredImage { node { sourceUrl altText } }
           categories(first: 12) { nodes { name slug } }
+          content(format: RENDERED)
           excerpt(format: RENDERED)
+        }
+        pageInfo {
+          offsetPagination {
+            total
+            hasMore
+          }
+        }
+      }
+      facetCounts(
+        postType: "post"
+        search: $search
+        taxQuery: $taxQuery
+        taxonomies: $facetTaxonomies
+      ) {
+        total
+        facets {
+          taxonomy
+          buckets {
+            slug
+            name
+            count
+          }
         }
       }
     }
   `;
 
   const variables: Record<string, any> = {
-    first: Math.max(1, Math.min(first, 50)),
-    after,
+    offsetPagination: { offset, size },
+    search: search ?? undefined,
+    taxQuery: taxArray.length ? { relation: 'AND', taxArray } : undefined,
+    facetTaxonomies: [{ taxonomy: 'category' }],
   };
-  if (includeCats) variables.cats = includeCats;
-  if (excludeCats) variables.excludeCats = excludeCats;
 
   const data = await wpFetch<any>(query, variables);
 
   const nodes: any[] = data?.posts?.nodes ?? [];
-  const pageInfo = data?.posts?.pageInfo ?? { hasNextPage: false, endCursor: null };
+  const offsetInfo = data?.posts?.pageInfo?.offsetPagination ?? null;
+  const total = typeof offsetInfo?.total === 'number'
+    ? offsetInfo.total
+    : Math.max(offset + nodes.length, 0);
+  const hasMore = Boolean(offsetInfo?.hasMore) || offset + nodes.length < total;
+
+  const items: PostCard[] = nodes.map((n: any) => ({
+    slug: String(n.slug || ''),
+    title: String(n.title || ''),
+    date: String(n.date || ''),
+    featuredImage: n.featuredImage?.node
+      ? { url: String(n.featuredImage.node.sourceUrl || ''), altText: n.featuredImage.node.altText }
+      : undefined,
+    categories: (n.categories?.nodes || []).map((c: any) => String(c?.name || '')),
+    categoryTerms: (n.categories?.nodes || []).map((c: any) => ({
+      name: String(c?.name || ''),
+      slug: String(c?.slug || ''),
+    })) as TermLite[],
+    excerpt: toTrimmedExcerpt(n.excerpt),
+    contentPlain: stripHtml(String(n.content || '')),
+  }));
+
+  const nextOffset = offset + items.length;
+  const pageInfo: PageInfo = {
+    hasNextPage: hasMore,
+    endCursor: hasMore ? String(nextOffset) : null,
+  };
+
+  const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
+    ? data.facetCounts.facets.map((facet: any) => ({
+        taxonomy: String(facet?.taxonomy || ''),
+        buckets: Array.isArray(facet?.buckets)
+          ? facet.buckets.map((bucket: any) => ({
+              slug: String(bucket?.slug || ''),
+              name: String(bucket?.name || ''),
+              count: typeof bucket?.count === 'number' ? bucket.count : 0,
+            }))
+          : [],
+      }))
+    : [];
+
+  const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
 
   return {
+    items,
     pageInfo,
-    items: nodes.map((n) => ({
-      slug: n.slug,
-      title: n.title,
-      date: n.date,
-      featuredImage: n.featuredImage?.node
-        ? { url: n.featuredImage.node.sourceUrl, altText: n.featuredImage.node.altText }
-        : undefined,
-      categories: (n.categories?.nodes || []).map((c: any) => c.name),
-      categoryTerms: (n.categories?.nodes || []).map((c: any) => ({ name: c.name, slug: c.slug })) as TermLite[],
-      excerpt: toTrimmedExcerpt(n.excerpt),
-    })) as PostCard[],
-  };
+    total,
+    facets: facetGroups,
+    meta: {
+      overallTotal: facetTotal,
+    },
+  } as PageResult<PostCard> & { facets: FacetGroup[] };
 }
 
 /**
@@ -1436,9 +1620,21 @@ export async function listRecentProjects(
 }
 
 export type ProjectsArchiveFilters = {
+  search?: string | null;
   materialTypeSlugs?: string[];
   roofColorSlugs?: string[];
   serviceAreaSlugs?: string[];
+};
+
+type FacetBucket = { slug: string; name: string; count: number };
+export type FacetGroup = { taxonomy: string; buckets: FacetBucket[] };
+
+export type ProjectSearchResult = {
+  items: ProjectSummary[];
+  pageInfo: PageInfo;
+  total: number;
+  facets: FacetGroup[];
+  meta?: Record<string, unknown>;
 };
 
 /**
@@ -1453,47 +1649,50 @@ export async function listProjectsPaged({
   first?: number;
   after?: string | null;
   filters?: ProjectsArchiveFilters;
-}) {
-  const hasMt = Array.isArray(filters.materialTypeSlugs) && filters.materialTypeSlugs.length > 0;
-  const hasRc = Array.isArray(filters.roofColorSlugs) && filters.roofColorSlugs.length > 0;
-  const hasSa = Array.isArray(filters.serviceAreaSlugs) && filters.serviceAreaSlugs.length > 0;
+}): Promise<ProjectSearchResult> {
+  const size = Math.max(1, Math.min(first, 50));
+  const offset = after ? Math.max(0, parseInt(String(after), 10) || 0) : 0;
 
-  const paramParts = ["$first: Int!", "$after: String"];
-  const taxParts: string[] = [];
-  if (hasMt) {
-    paramParts.push("$mt: [String!]");
-    taxParts.push("{ taxonomy: MATERIAL_TYPE, terms: $mt, field: SLUG, operator: IN }");
-  }
-  if (hasRc) {
-    paramParts.push("$rc: [String!]");
-    taxParts.push("{ taxonomy: ROOF_COLOR, terms: $rc, field: SLUG, operator: IN }");
-  }
-  if (hasSa) {
-    paramParts.push("$sa: [String!]");
-    taxParts.push("{ taxonomy: SERVICE_AREA, terms: $sa, field: SLUG, operator: IN }");
-  }
+  const searchRaw = typeof filters?.search === 'string' ? filters.search.trim() : '';
+  const search = searchRaw.length ? searchRaw : null;
 
-  const taxQueryBlock = taxParts.length
-    ? `taxQuery: {
-          relation: AND
-          taxArray: [
-            ${taxParts.join("\n            ")}
-          ]
-        }`
-    : "";
+  const mtSlugs = Array.isArray(filters?.materialTypeSlugs)
+    ? filters.materialTypeSlugs.filter((s) => typeof s === 'string' && s.trim().length)
+    : [];
+  const rcSlugs = Array.isArray(filters?.roofColorSlugs)
+    ? filters.roofColorSlugs.filter((s) => typeof s === 'string' && s.trim().length)
+    : [];
+  const saSlugs = Array.isArray(filters?.serviceAreaSlugs)
+    ? filters.serviceAreaSlugs.filter((s) => typeof s === 'string' && s.trim().length)
+    : [];
+
+  const taxArray: Array<Record<string, unknown>> = [];
+  if (mtSlugs.length) {
+    taxArray.push({ taxonomy: 'MATERIALTYPE', terms: mtSlugs, field: 'SLUG', operator: 'IN' });
+  }
+  if (rcSlugs.length) {
+    taxArray.push({ taxonomy: 'ROOFCOLOR', terms: rcSlugs, field: 'SLUG', operator: 'IN' });
+  }
+  if (saSlugs.length) {
+    taxArray.push({ taxonomy: 'SERVICEAREA', terms: saSlugs, field: 'SLUG', operator: 'IN' });
+  }
 
   const query = /* GraphQL */ `
-    query ListProjectsPaged(${paramParts.join(", ")}) {
+    query ProjectArchive(
+      $offsetPagination: OffsetPagination
+      $search: String
+      $taxQuery: TaxQuery
+      $facetTaxonomies: [FacetInput!]!
+    ) {
       projects(
-        first: $first
-        after: $after
         where: {
           status: PUBLISH
           orderby: { field: DATE, order: DESC }
-          ${taxQueryBlock}
+          search: $search
+          offsetPagination: $offsetPagination
+          taxQuery: $taxQuery
         }
       ) {
-        pageInfo { hasNextPage endCursor }
         nodes {
           slug
           uri
@@ -1507,36 +1706,93 @@ export async function listProjectsPaged({
             serviceArea  { nodes { name slug } }
           }
         }
+        pageInfo {
+          offsetPagination {
+            total
+            hasMore
+          }
+        }
+      }
+      facetCounts(
+        postType: "project"
+        search: $search
+        taxQuery: $taxQuery
+        taxonomies: $facetTaxonomies
+      ) {
+        total
+        facets {
+          taxonomy
+          buckets {
+            slug
+            name
+            count
+          }
+        }
       }
     }
   `;
 
   const variables: Record<string, any> = {
-    first: Math.max(1, Math.min(first, 50)),
-    after,
+    offsetPagination: { offset, size },
+    search: search ?? undefined,
+    taxQuery: { relation: 'AND', taxArray },
+    facetTaxonomies: [
+      mtSlugs.length ? { taxonomy: 'material_type', slugs: mtSlugs } : { taxonomy: 'material_type' },
+      rcSlugs.length ? { taxonomy: 'roof_color', slugs: rcSlugs } : { taxonomy: 'roof_color' },
+      saSlugs.length ? { taxonomy: 'service_area', slugs: saSlugs } : { taxonomy: 'service_area' },
+    ],
   };
-  if (hasMt) variables.mt = filters.materialTypeSlugs;
-  if (hasRc) variables.rc = filters.roofColorSlugs;
-  if (hasSa) variables.sa = filters.serviceAreaSlugs;
 
   const data = await wpFetch<any>(query, variables);
 
   const nodes: any[] = data?.projects?.nodes ?? [];
-  const pageInfo = data?.projects?.pageInfo ?? { hasNextPage: false, endCursor: null };
+  const offsetInfo = data?.projects?.pageInfo?.offsetPagination ?? null;
+  const total = typeof offsetInfo?.total === 'number'
+    ? offsetInfo.total
+    : Math.max(offset + nodes.length, 0);
+  const hasMore = Boolean(offsetInfo?.hasMore) || offset + nodes.length < total;
+
+  const items: ProjectSummary[] = nodes.map((p: any): ProjectSummary => ({
+    slug: String(p.slug || ''),
+    uri: String(p.uri || ''),
+    title: String(p.title || ''),
+    year: pickYear(p.date),
+    heroImage: pickImage(p.featuredImage?.node),
+    projectDescription: p?.projectDetails?.projectDescription ?? null,
+    materialTypes: mapTerms(p.projectFilters?.materialType?.nodes),
+    roofColors: mapTerms(p.projectFilters?.roofColor?.nodes),
+    serviceAreas: mapTerms(p.projectFilters?.serviceArea?.nodes),
+  }));
+
+  const nextOffset = offset + items.length;
+  const pageInfo: PageInfo = {
+    hasNextPage: hasMore,
+    endCursor: hasMore ? String(nextOffset) : null,
+  };
+
+  const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
+    ? data.facetCounts.facets.map((f: any) => ({
+        taxonomy: String(f?.taxonomy || ''),
+        buckets: Array.isArray(f?.buckets)
+          ? f.buckets.map((b: any) => ({
+              slug: String(b?.slug || ''),
+              name: String(b?.name || ''),
+              count: typeof b?.count === 'number' ? b.count : 0,
+            }))
+          : [],
+      }))
+    : [];
+
+  const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
 
   return {
+    items,
     pageInfo,
-    items: nodes.map((p: any) => ({
-      slug: String(p.slug || ""),
-      uri: String(p.uri || ""),
-      title: String(p.title || ""),
-      year: pickYear(p.date),
-      heroImage: pickImage(p.featuredImage?.node),
-      projectDescription: p?.projectDetails?.projectDescription ?? null,
-      materialTypes: mapTerms(p.projectFilters?.materialType?.nodes),
-      roofColors: mapTerms(p.projectFilters?.roofColor?.nodes),
-      serviceAreas: mapTerms(p.projectFilters?.serviceArea?.nodes),
-    })) as ProjectSummary[],
+    total,
+    facets: facetGroups,
+    meta: {
+      overallTotal: facetTotal,
+    },
   };
 }
 

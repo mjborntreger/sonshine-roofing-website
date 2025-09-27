@@ -4,10 +4,13 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import type { PageResult, ResourceKind, ResourceQuery } from "@/lib/pagination";
 import { fetchPage, getCachedPages, setCachedPages } from "@/lib/resource-fetch";
 import { useIntersection } from "./useIntersection";
-import SkeletonGrid from "@/components/layout/SkeletonGrid";
+import GridLoadingState from "@/components/layout/GridLoadingState";
 
 import SmartLink from "@/components/SmartLink";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import { stripHtml } from "@/lib/wp";
+import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
 import MediaFrame from "./MediaFrame";
 
 type Props<T> = {
@@ -19,6 +22,8 @@ type Props<T> = {
     renderItem?: (item: T, i: number) => React.ReactNode;
     skeletonCount?: number;
     onVideoOpen?: (item: T) => void; // optional: scoped video open handler
+    onVisibleCountChange?: (count: number) => void;
+    onTotalChange?: (total: number) => void;
 };
 
 const Frame: React.FC<{
@@ -51,9 +56,12 @@ export default function InfiniteList<T>({
     renderItem,
     skeletonCount,
     onVideoOpen,
+    onVisibleCountChange,
+    onTotalChange,
 }: Props<T>) {
     // Compose the stable query key for cache
     const baseQuery: ResourceQuery = useMemo(() => ({ first: pageSize, filters }), [pageSize, filters]);
+    const serializedFilters = useMemo(() => JSON.stringify(baseQuery.filters ?? {}), [baseQuery.filters]);
     const initialPages = useMemo(() => [initial], [initial]);
 
     // Pull any cached pages for these filters; seed with initial if empty
@@ -70,9 +78,29 @@ export default function InfiniteList<T>({
         setCachedPages(kind, baseQuery, initialPages);
         // cancel in-flight
         if (abortRef.current) abortRef.current.abort();
-    }, [kind, baseQuery.first, JSON.stringify(baseQuery.filters)]); // eslint-disable-line react-hooks/exhaustive-deps
+    }, [kind, baseQuery.first, serializedFilters, initialPages]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const items = pages.flatMap(p => p.items);
+    useEffect(() => {
+        if (typeof onVisibleCountChange === "function") {
+            onVisibleCountChange(items.length);
+        }
+    }, [items.length, onVisibleCountChange]);
+
+    const derivedTotal = useMemo(() => {
+        for (let i = pages.length - 1; i >= 0; i -= 1) {
+            const candidate = (pages[i] as any)?.total;
+            if (typeof candidate === "number") return candidate;
+        }
+        return null;
+    }, [pages]);
+
+    useEffect(() => {
+        if (typeof onTotalChange === "function" && typeof derivedTotal === "number") {
+            onTotalChange(derivedTotal);
+        }
+    }, [derivedTotal, onTotalChange]);
+
     const lastPage = pages[pages.length - 1];
     const hasMore = !!lastPage?.pageInfo?.hasNextPage;
     const after = lastPage?.pageInfo?.endCursor ?? null;
@@ -135,6 +163,8 @@ export default function InfiniteList<T>({
                 const href = "/" + (p?.slug || "");
                 const rawHtml = String(p?.excerpt || "");
                 const catList = (p?.categories || []).join(", ");
+                const summarySource = p?.contentPlain || stripHtml(rawHtml);
+                const summary = truncateText(summarySource, 260);
                 return (
                     <article
                         data-title={p?.title || ""}
@@ -146,8 +176,8 @@ export default function InfiniteList<T>({
                         <template className="blog-body-src" dangerouslySetInnerHTML={{ __html: rawHtml }} />
                         <SmartLink href={href} className="group block">
                             <Card className="overflow-hidden hover:shadow-lg transition">
-                                <CardHeader>
-                                    <CardTitle className="font-medium">{p?.title}</CardTitle>
+                                <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
+                                    <CardTitle className="font-semibold">{p?.title}</CardTitle>
                                 </CardHeader>
                                 {p?.featuredImage?.url ? (
                                     <Frame
@@ -160,10 +190,15 @@ export default function InfiniteList<T>({
                                 ) : (
                                     <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
                                 )}
-                                <CardContent>
+                                <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
                                     <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
                                         {dateLabel && <span>{dateLabel}</span>}
                                     </div>
+                                    {summary && (
+                                        <p className="mt-3 text-sm text-slate-600" style={lineClampStyle}>
+                                            {summary}
+                                        </p>
+                                    )}
                                     {(p?.categories?.length ?? 0) > 0 && (
                                         <div className="mt-3 flex flex-wrap gap-2">
                                             {p.categories.map((cat: string) => (
@@ -177,6 +212,12 @@ export default function InfiniteList<T>({
                                         </div>
                                     )}
                                 </CardContent>
+                                <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
+                                    <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
+                                        Read full article
+                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 group-focus-visible:translate-x-1 group-focus-visible/card:translate-x-1" />
+                                    </span>
+                                </CardFooter>
                             </Card>
                         </SmartLink>
                     </article>
@@ -201,6 +242,8 @@ export default function InfiniteList<T>({
                         try { window.dispatchEvent(new CustomEvent("video:open", { detail: { slug: safeSlug } })); } catch {}
                     }
                 };
+
+                const description = truncateText(stripHtml(String(v?.excerpt ?? "")), 220);
 
                 return (
                     <div className="vid-item group block" data-video-slug={safeSlug}>
@@ -239,30 +282,47 @@ export default function InfiniteList<T>({
                                 </span>
                             </button>
 
-                            <CardContent>
-                                <div className="flex flex-wrap gap-2">
-                                    {cats.map((c: any) => (
-                                        <span
-                                            key={`${safeKey}-${c.slug ?? c.name}`}
-                                            className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                                        >
-                                            {c.name}
-                                        </span>
-                                    ))}
-                                </div>
+                                <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
+                                    {description && (
+                                        <p className="text-sm text-slate-600" style={lineClampStyle}>
+                                            {description}
+                                        </p>
+                                    )}
 
-                                {v?.source === "project" && v?.slug ? (
-                                    <div className="mt-3">
-                                        <SmartLink
-                                            href={`/project/${v.slug}`}
-                                            className="text-sm font-medium text-[#0045d7] hover:underline"
-                                        >
-                                            See full project details
-                                        </SmartLink>
+                                    <div className="mt-3 flex flex-wrap gap-2">
+                                        {cats.map((c: any) => (
+                                            <span
+                                                key={`${safeKey}-${c.slug ?? c.name}`}
+                                                className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                                            >
+                                                {c.name}
+                                            </span>
+                                        ))}
                                     </div>
-                                ) : null}
-                            </CardContent>
-                        </Card>
+
+                                    {v?.source === "project" && v?.slug ? (
+                                        <div className="mt-3">
+                                            <SmartLink
+                                                href={`/project/${v.slug}`}
+                                                className="text-sm font-medium text-[#0045d7] hover:underline"
+                                            >
+                                                See full project details
+                                            </SmartLink>
+                                        </div>
+                                    ) : null}
+                                </CardContent>
+                                <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
+                                    <button
+                                        type="button"
+                                        onClick={handleOpen}
+                                        data-video-slug={safeSlug}
+                                        className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight focus-visible:outline-none"
+                                    >
+                                        Watch video
+                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 focus-visible:translate-x-1" />
+                                    </button>
+                                </CardFooter>
+                            </Card>
 
                         <template className="vid-body-src" suppressHydrationWarning>
                             {(v?.excerpt ?? "").toString()}
@@ -285,13 +345,14 @@ export default function InfiniteList<T>({
                 const rcSlugs = rc.map((t: any) => t?.slug).filter(Boolean).join(",");
                 const saSlugs = sa.map((t: any) => t?.slug).filter(Boolean).join(",");
                 const searchBody = (p?.projectDescription ?? p?.excerpt ?? "").toString();
+                const projectSummary = truncateText(stripHtml(searchBody), 260);
 
                 const href = p?.uri || (p?.slug ? `/project/${p.slug}` : "#");
                 const img = p?.heroImage;
 
                 return (
                     <div className="proj-item group block" data-key={key}>
-                        <SmartLink href={href} className="block">
+                        <SmartLink href={href} className="group block rounded-2xl focus-visible:outline-none">
                             <Card
                                 className="proj-card overflow-hidden hover:shadow-lg transition"
                                 data-title={(p?.title || "").toString()}
@@ -300,15 +361,15 @@ export default function InfiniteList<T>({
                                 data-rc={(rcSlugs || "").toString()}
                                 data-sa={(saSlugs || "").toString()}
                             >
-                                <CardHeader>
-                                    <CardTitle className="font-medium">{p?.title}</CardTitle>
+                                <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
+                                    <CardTitle className="font-semibold">{p?.title}</CardTitle>
                                 </CardHeader>
 
                                 {img?.url ? (
                                     <Frame
                                         src={p.heroImage?.url}
                                         alt={p.heroImage?.altText ?? p.title}
-                                        ratio="4 / 3"
+                                        ratio="16 / 10"
                                         className="w-full"
                                         sizes="(min-width: 1024px) 50vw, 100vw"
                                     />
@@ -316,36 +377,53 @@ export default function InfiniteList<T>({
                                     <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
                                 )}
 
-                                <CardContent>
+                                <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
+                                    {projectSummary && (
+                                        <p className="text-sm text-slate-600" style={lineClampStyle}>
+                                            {projectSummary}
+                                        </p>
+                                    )}
+
                                     {(mt.length + rc.length + sa.length > 0) && (
-                                        <div className="mt-3 flex flex-wrap gap-2">
-                                            {mt.map((t: any) => (
-                                                <span
-                                                    key={`mtb-${key}-${t?.slug}`}
-                                                    className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                                                >
-                                                    {t?.name}
-                                                </span>
-                                            ))}
-                                            {sa.map((t: any) => (
-                                                <span
-                                                    key={`sab-${key}-${t?.slug}`}
-                                                    className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                                                >
-                                                    {t?.name}
-                                                </span>
-                                            ))}
-                                            {rc.map((t: any) => (
-                                                <span
-                                                    key={`rcb-${key}-${t?.slug}`}
-                                                    className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
-                                                >
-                                                    {t?.name}
-                                                </span>
-                                            ))}
+                                        <div className="relative mt-4 -mx-5 sm:mx-0">
+                                            <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                                                {mt.map((t: any) => (
+                                                    <span
+                                                        key={`mtb-${key}-${t?.slug}`}
+                                                        className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                                    >
+                                                        {t?.name}
+                                                    </span>
+                                                ))}
+                                                {sa.map((t: any) => (
+                                                    <span
+                                                        key={`sab-${key}-${t?.slug}`}
+                                                        className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                                    >
+                                                        {t?.name}
+                                                    </span>
+                                                ))}
+                                                {rc.map((t: any) => (
+                                                    <span
+                                                        key={`rcb-${key}-${t?.slug}`}
+                                                        className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                                    >
+                                                        {t?.name}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                            <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent sm:hidden" />
+                                            <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent sm:hidden" />
                                         </div>
                                     )}
                                 </CardContent>
+
+                                <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
+                                    <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
+                                        View project
+                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 group-focus-visible:translate-x-1 group-focus-visible/card:translate-x-1" />
+                                    </span>
+                                </CardFooter>
                             </Card>
                         </SmartLink>
 
@@ -365,9 +443,10 @@ export default function InfiniteList<T>({
         <>
             <div className={gridClass} data-loading={loading ? "true" : "false"}>
                 {items.map((it, i) => {
-                    const key = (it as any).slug ?? (it as any).id ?? i;
-                    return (
-                        <Fragment key={key}>
+                const key = (it as any).slug ?? (it as any).id ?? i;
+                const uniqueKey = `${String(key)}-${i}`;
+                return (
+                    <Fragment key={uniqueKey}>
                             {effectiveRender(it, i)}
                         </Fragment>
                     );
@@ -375,7 +454,7 @@ export default function InfiniteList<T>({
             </div>
 
             {/* Loading shimmer while fetching next page */}
-            {loading && <SkeletonGrid variant="project" count={skeletonCountEff} />}
+            {loading && <GridLoadingState variant="project" count={skeletonCountEff} />}
 
             {/* Intersection sentinel */}
             <div ref={sentinelRef} aria-hidden="true" />

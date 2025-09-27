@@ -1,22 +1,27 @@
-import { Hammer, ChevronDown, House } from "lucide-react";
+import { Hammer, ChevronDown, House, ArrowLeftRight } from "lucide-react";
 
 const scrollGuard = "scroll-mt-24";
 const detailsStyles = "group not-prose rounded-lg border border-slate-300 bg-white";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-3";
 const chevronStyles = "h-5 w-5 transition-transform group-open:rotate-180";
 const iconStyles = "h-5 w-5 text-[--brand-blue]";
-const pStyles = "prose px-4 pb-4 pt-0";
+const pStyles = "accordion-motion prose px-4 pb-4 pt-0";
 
 
 export default async function RepairVsReplace() {
     return (
         <>
-            <h2 className={`${scrollGuard} text-center`}>Repair vs. Replace</h2>
+            <h2 
+                className={`${scrollGuard} text-center`}
+                >
+                    <ArrowLeftRight className="h-6 w-6 mr-2 inline text-[--brand-blue]"/>
+                    Repair vs. Replace
+                </h2>
             <div className="grid md:grid-cols-2 gap-4">
-                <div className="rounded-xl border border-slate-400 bg-white p-4">
+                <div className="rounded-xl border border-slate-200 bg-white p-4">
                     <span className="flex items-center gap-2">
                         <Hammer className={iconStyles} aria-hidden="true" />
-                        <h3 className="m-0">When Repair Makes Sense</h3>
+                        <h3 className="m-0">Repair when...</h3>
                     </span>
                     <div className="mt-2 space-y-2">
                         <details className={detailsStyles}>
@@ -85,10 +90,10 @@ export default async function RepairVsReplace() {
                         </details>
                     </div>
                 </div>
-                <div className="rounded-xl border border-slate-400 bg-white p-4">
+                <div className="rounded-xl border border-slate-200 bg-white p-4">
                     <span className="flex items-center gap-2">
                         <House className={iconStyles} aria-hidden="true" />
-                        <h3 className="m-0">When Replacement is Better</h3>
+                        <h3 className="m-0">Replace when...</h3>
                     </span>
                     <div className="mt-2 space-y-2">
                         <details className={detailsStyles}>
@@ -161,4 +166,3 @@ export default async function RepairVsReplace() {
         </>
     )
 }
-

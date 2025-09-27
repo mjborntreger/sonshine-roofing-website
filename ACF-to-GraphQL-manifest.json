@@ -1,0 +1,156 @@
+{
+  "postTypes": {
+    "project": {
+      "graphqlSingleName": "project",
+      "graphqlPluralName": "projects",
+      "filterableViaTaxQuery": true,
+      "taxonomies": {
+        "material_type": {
+          "graphqlEnum": "MATERIALTYPE",
+          "filterable": true,
+          "returnShape": "AcfTermNodeConnection"
+        },
+        "roof_color": {
+          "graphqlEnum": "ROOFCOLOR",
+          "filterable": true,
+          "returnShape": "AcfTermNodeConnection"
+        },
+        "service_area": {
+          "graphqlEnum": "SERVICEAREA",
+          "filterable": true,
+          "returnShape": "AcfTermNodeConnection"
+        }
+      },
+      "acfFields": {
+        "projectDetails": {
+          "projectDescription": {
+            "type": "textarea",
+            "graphqlField": "projectDescription"
+          },
+          "productLinks": {
+            "type": "repeater",
+            "graphqlField": "productLinks",
+            "subFields": {
+              "productName": {
+                "type": "text",
+                "graphqlField": "productName"
+              },
+              "productLink": {
+                "type": "url",
+                "graphqlField": "productLink"
+              }
+            }
+          }
+        },
+        "projectFilters": {
+          "serviceArea": {
+            "type": "taxonomy",
+            "graphqlField": "serviceArea",
+            "returnShape": "AcfTermNodeConnection"
+          }
+        },
+        "projectVideoInfo": {
+          "youtube_url": {
+            "type": "url",
+            "graphqlField": "youtubeUrl"
+          }
+        },
+        "videoLibraryMetadata": {
+          "description": {
+            "type": "textarea",
+            "graphqlField": "description"
+          },
+          "roofColor": {
+            "type": "taxonomy",
+            "graphqlField": "roofColor",
+            "returnShape": "AcfTermNodeConnection"
+          },
+          "serviceArea": {
+            "type": "taxonomy",
+            "graphqlField": "serviceArea",
+            "returnShape": "AcfTermNodeConnection"
+          }
+        }
+      }
+    },
+    "video_entry": {
+      "graphqlSingleName": "videoEntry",
+      "graphqlPluralName": "videoEntries",
+      "taxonomies": {
+        "material_type": {
+          "graphqlEnum": "MATERIALTYPE",
+          "returnShape": "AcfTermNodeConnection"
+        },
+        "roof_color": {
+          "graphqlEnum": "ROOFCOLOR",
+          "returnShape": "AcfTermNodeConnection"
+        },
+        "service_area": {
+          "graphqlEnum": "SERVICEAREA",
+          "returnShape": "AcfTermNodeConnection"
+        },
+        "video_category": {
+          "graphqlEnum": "VIDEOCATEGORY",
+          "returnShape": "AcfTermNodeConnection"
+        }
+      },
+      "acfFields": {
+        "videoLibraryMetadata": {
+          "description": {
+            "type": "textarea",
+            "graphqlField": "description"
+          },
+          "roofColor": {
+            "type": "taxonomy",
+            "graphqlField": "roofColor"
+          },
+          "serviceArea": {
+            "type": "taxonomy",
+            "graphqlField": "serviceArea"
+          }
+        }
+      }
+    }
+  },
+  "queryModes": {
+    "offsetPagination": {
+      "enabled": true,
+      "via": "where.offsetPagination",
+      "returnFields": ["nodes", "pageInfo.offsetPagination.total", "hasMore"]
+    },
+    "facetCounts": {
+      "type": "customRootField",
+      "args": {
+        "postType": "String",
+        "search": "String",
+        "taxonomies": [
+          {
+            "taxonomy": "String",
+            "slugs": ["String"]
+          }
+        ]
+      },
+      "returns": {
+        "total": "Int",
+        "facets": [
+          {
+            "taxonomy": "String",
+            "buckets": [
+              {
+                "slug": "String",
+                "name": "String",
+                "count": "Int"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "fieldNamingRules": {
+    "ACF Fields": "camelCase in GraphQL (e.g., youtube_url => youtubeUrl)",
+    "Taxonomies": "use GraphQL ENUMS (e.g., SERVICEAREA) for filtering",
+    "Typename": "Taxonomy fields must be unwrapped from AcfTermNodeConnection",
+    "YouTube URL": "Always available at projectVideoInfo.youtubeUrl"
+  }
+}
