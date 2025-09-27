@@ -5,7 +5,7 @@ import { CheckCircle2, Percent, Landmark, ChevronDown, HelpCircle, ArrowRight } 
 
 type CTA = { href: string; label: string; title?: string; className?: string };
 
-export type ProgramCardProps = {
+type ProgramCardProps = {
   title: string;
   subtitle?: string;
   chips?: string[];

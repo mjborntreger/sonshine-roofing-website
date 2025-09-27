@@ -4,7 +4,7 @@ import Grid from "@/components/layout/Grid";
 
 type Mode = "overlay" | "skeleton";
 
-export type GridLoadingStateProps = Omit<React.ComponentProps<typeof Grid>, "children"> & {
+type GridLoadingStateProps = Omit<React.ComponentProps<typeof Grid>, "children"> & {
   count?: number;
   withImage?: CardSkeletonProps["withImage"];
   imageAspectClass?: CardSkeletonProps["imageAspectClass"];

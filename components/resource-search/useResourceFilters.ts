@@ -8,7 +8,7 @@ import { useEffect } from "react";
 
 export type ResourceKind = "blog" | "project" | "video" | "faq";
 
-export type ControllerIds = {
+type ControllerIds = {
     query: string;       // input[type=search]
     grid: string;        // grid/wrap that contains items or sections
     chips: string;       // active chips container
@@ -17,11 +17,11 @@ export type ControllerIds = {
     resultCount?: string; // (optional) count text node — not required for client-only filtering
 };
 
-export type UrlKeys = { q?: string } & Record<string, string>;
+type UrlKeys = { q?: string } & Record<string, string>;
 // Back-compat alias (some call sites might import this)
-export type ControllerUrlKeys = UrlKeys;
+type ControllerUrlKeys = UrlKeys;
 
-export type MountOptions = {
+type MountOptions = {
     ids?: ControllerIds;
     urlKeys?: UrlKeys;         // optional; q defaults to "q" if omitted
     minQueryLen?: number;

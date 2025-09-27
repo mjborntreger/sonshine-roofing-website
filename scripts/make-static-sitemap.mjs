@@ -1,9 +1,8 @@
 import fg from 'fast-glob';
 import { statSync, writeFileSync, mkdirSync } from 'node:fs';
-import { join, sep, dirname } from 'node:path';
+import { join, sep } from 'node:path';
 
 const ROOT = process.cwd();
-const APP = join(ROOT, 'app');
 
 const files = await fg(['app/**/page.@(tsx|jsx|mdx)'], {
   dot: false,

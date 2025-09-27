@@ -1,4 +1,4 @@
-export type FinancingProgram = {
+type FinancingProgram = {
   id: string;
   label: string;
   apr: number; // annual percentage rate in decimal form (e.g., 0.079)

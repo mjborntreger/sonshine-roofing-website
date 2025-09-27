@@ -1,5 +1,3 @@
-import { NextResponse } from "next/server";
-
 const ENDPOINT =
   process.env.NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT ||
   "https://next.sonshineroofing.com/graphql";

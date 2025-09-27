@@ -52,7 +52,7 @@ const pageSchema = z
   })
   .optional();
 
-export const feedbackSchema = z
+const feedbackSchema = z
   .object({
     name: z.preprocess(trim, z.string().min(1, "Name is required").max(MAX_NAME)),
     email: z
@@ -80,15 +80,15 @@ export const feedbackSchema = z
   // Allow unknown keys so we can add fields later without breaking old clients
   .passthrough();
 
-export type FeedbackInput = z.infer<typeof feedbackSchema> & {
+type FeedbackInput = z.infer<typeof feedbackSchema> & {
   rating: 1 | 2 | 3; // after preprocess
 };
 
-export type FieldErrors = Record<string, string[]>;
+type FieldErrors = Record<string, string[]>;
 
-export type ParseOk<T> = { ok: true; data: T };
-export type ParseErr = { ok: false; status: number; message: string; fieldErrors?: FieldErrors };
-export type ParseResult<T> = ParseOk<T> | ParseErr;
+type ParseOk<T> = { ok: true; data: T };
+type ParseErr = { ok: false; status: number; message: string; fieldErrors?: FieldErrors };
+type ParseResult<T> = ParseOk<T> | ParseErr;
 
 /**
  * Parse helper that returns a uniform result (no exceptions).
@@ -153,7 +153,7 @@ const financingMatchSchema = z.object({
   reasons: z.array(z.string().min(1).max(200)).max(3),
 });
 
-export const financingLeadSchema = z
+const financingLeadSchema = z
   .object({
     firstName: z.preprocess(trim, z.string().min(1, "First name is required").max(MAX_FINANCING_NAME)),
     lastName: z.preprocess(trim, z.string().min(1, "Last name is required").max(MAX_FINANCING_NAME)),
@@ -188,7 +188,7 @@ export const financingLeadSchema = z
   })
   .passthrough();
 
-export type FinancingLeadInput = z.infer<typeof financingLeadSchema>;
+type FinancingLeadInput = z.infer<typeof financingLeadSchema>;
 
 export function parseFinancingLead(input: unknown): ParseResult<FinancingLeadInput> {
   const result = financingLeadSchema.safeParse(input);

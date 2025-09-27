@@ -640,7 +640,7 @@ export async function listFaqSlugs(limit = 500): Promise<string[]> {
   return (data?.faqs?.nodes ?? []).map((n) => n.slug).filter(Boolean) as string[];
 }
 
-export function faqJsonLd(items: { question: string; answerHtml: string }[]) {
+function faqJsonLd(items: { question: string; answerHtml: string }[]) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -948,7 +948,7 @@ export async function listProjectVideos(limit = 100): Promise<VideoItem[]> {
 // ----- Grouping helper (future-proof for new buckets) -----
 export type VideoBucketKey = "roofing-project" | "commercials" | "accolades" | "explainers" | "other";
 
-export function groupVideosByBucket(items: VideoItem[]) {
+function groupVideosByBucket(items: VideoItem[]) {
   const buckets = { "roofing-project": [], commercials: [], accolades: [], explainers: [], other: [] } as
     Record<"roofing-project"|"commercials"|"accolades"|"explainers"|"other", VideoItem[]>;
 

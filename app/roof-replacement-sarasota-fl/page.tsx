@@ -4,7 +4,7 @@ import Image from "next/image";
 import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
-import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, ChevronDown, ArrowRight, Zap, CalendarDays, Phone } from "lucide-react";
+import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, ChevronDown } from "lucide-react";
 import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";

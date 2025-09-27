@@ -4,7 +4,7 @@ import { listPersons, listPersonsBySlugs } from '@/lib/wp';
 import PersonGrid from "./PersonGrid";
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import { HoursAndInformation } from "./HoursAndInformation";
-import { UserRoundSearch, CloudRainWind, ChevronDown, BadgeCheck, ShieldCheck, ExternalLink, ChevronRight } from "lucide-react";
+import { UserRoundSearch, CloudRainWind, ChevronDown, BadgeCheck, ExternalLink } from "lucide-react";
 import type { Metadata } from 'next';
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 

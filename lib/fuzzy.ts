@@ -32,7 +32,7 @@ export function norm(input: string): string {
  * 1 = identical, 0 = completely different.
  * Uses a compact DP buffer to keep it light for small strings.
  */
-export function similarity(a: string, b: string): number {
+function similarity(a: string, b: string): number {
   a = norm(a);
   b = norm(b);
   if (!a || !b) return 0;

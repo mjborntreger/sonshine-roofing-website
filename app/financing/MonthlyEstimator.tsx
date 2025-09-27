@@ -2,7 +2,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Calculator, Check, CheckCircle2, Lock, ArrowRight, Undo2, Wallet, X, SearchCheck, LockKeyholeOpen } from 'lucide-react';
+import { Calculator, Check, CheckCircle2, ArrowRight, Undo2, X, SearchCheck, LockKeyholeOpen } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 

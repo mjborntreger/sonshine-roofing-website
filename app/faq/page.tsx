@@ -1,5 +1,4 @@
 import Section from '@/components/layout/Section';
-import Link from 'next/link';
 import { listFaqTopics, listFaqsWithContent, faqListToJsonLd } from '@/lib/wp';
 import type { FaqFull, FaqTopic } from '@/lib/wp';
 import type { Metadata } from 'next';

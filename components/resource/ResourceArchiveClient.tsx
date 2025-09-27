@@ -20,9 +20,9 @@ function useDebouncedValue<T>(value: T, delay: number): T {
   return debounced;
 }
 
-export type ResourceFacetGroup = FacetGroup;
+type ResourceFacetGroup = FacetGroup;
 
-export type ResourceArchiveResult<Item> = PageResult<Item> & {
+type ResourceArchiveResult<Item> = PageResult<Item> & {
   total?: number;
   facets?: ResourceFacetGroup[];
 };
@@ -51,7 +51,7 @@ const areSelectionMapsEqual = (a: SelectionMap, b: SelectionMap): boolean => {
   return true;
 };
 
-export type ResourceArchiveClientProps<Item> = {
+type ResourceArchiveClientProps<Item> = {
   kind: ResourceKind;
   title: string;
   description?: string;

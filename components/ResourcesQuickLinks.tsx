@@ -1,6 +1,6 @@
 "use client";
 
-import { Image as ImageIcon, DollarSign, PlayCircle, Newspaper, BookOpen, HelpCircle, ChevronRight, Wrench } from "lucide-react";
+import { Image as ImageIcon, PlayCircle, Newspaper, BookOpen, HelpCircle, ChevronRight, Wrench } from "lucide-react";
 import SmartLink from "@/components/SmartLink";
 import { usePathname } from "next/navigation";
 

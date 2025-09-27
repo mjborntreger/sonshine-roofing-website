@@ -9,7 +9,7 @@ import UiLink from './UiLink';
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
 
 // Minimal post shape expected from wp.ts
-export type YouMayAlsoLikePost = {
+type YouMayAlsoLikePost = {
     slug: string;
     title: string;
     featuredImage?: { url: string; altText?: string | null } | null;

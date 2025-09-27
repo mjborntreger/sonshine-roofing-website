@@ -12,8 +12,6 @@ import { ArrowRight } from "lucide-react";
 import { stripHtml } from "@/lib/wp";
 import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
 import MediaFrame from "./MediaFrame";
-import BlogArchiveCard from "@/components/archive/BlogArchiveCard";
-import ProjectArchiveCard from "@/components/archive/ProjectArchiveCard";
 
 type Props<T> = {
     kind: ResourceKind;

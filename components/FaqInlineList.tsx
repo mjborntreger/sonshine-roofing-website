@@ -1,7 +1,7 @@
 import { listFaqsWithContent } from "@/lib/wp";
 import FaqInlineListClient, { type FaqInlineListClientItem } from "./FaqInlineListClient";
 
-export type FaqInlineItem = {
+type FaqInlineItem = {
   slug: string;
   title: string;
   contentHtml: string;

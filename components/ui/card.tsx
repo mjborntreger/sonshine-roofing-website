@@ -53,7 +53,7 @@ export function CardTitle({ className, children, ...props }: H3Props) {
   );
 }
 
-export function CardDescription({ className, children, ...props }: PProps) {
+function CardDescription({ className, children, ...props }: PProps) {
   return (
     <p className={cn("text-sm text-slate-600", className)} {...props}>
       {children}
