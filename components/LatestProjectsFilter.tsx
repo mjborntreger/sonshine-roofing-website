@@ -103,11 +103,10 @@ export default function LatestProjectsFilter({ projects, initial = 4, showHeader
   );
 
   return (
-    <div className="px-4 pb-24 pt-36 md:px-12">
+    <div className="px-4 py-24 md:px-12">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="text-3xl text-slate-700 md:text-5xl">Latest Projects</h2>
-          <div className={gradientDivider} />
+          <h2 className="text-3xl mb-16 text-slate-700 md:text-5xl">Latest Projects</h2>
           {renderFilterTabs()}
           <p className={pStyles}>
             Browse our latest projects and get an idea of what your new roof could look like.

@@ -103,11 +103,10 @@ export default function LatestPostsFilter({ posts, initial = 4, showHeader = tru
   );
 
   return (
-    <div className="px-4 pb-24 pt-36 md:px-12">
+    <div className="px-4 py-24 md:px-12">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="text-3xl text-slate-700 md:text-5xl">Latest Blog Posts</h2>
-          <div className={gradientDivider} />
+          <h2 className="text-3xl text-slate-700 mb-16 md:text-5xl">Latest Blog Posts</h2>
           {renderFilterTabs()}
           <p className={pStyles}>
             Enjoy these handcrafted articles from our team that discuss a wide variety of roofing topics (and a few extras, from our family to yours).
