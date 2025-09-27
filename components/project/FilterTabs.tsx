@@ -82,7 +82,7 @@ export default function FilterTabs({
       <div
         role="tablist"
         aria-label={ariaLabel}
-        className="inline-flex items-center justify-start gap-1 rounded-full border border-slate-300 bg-slate-100/70 p-1"
+        className="flex-wrap items-center justify-start gap-1 rounded-full border border-slate-300 bg-slate-100/70 p-1"
       >
         {orderedTabs.map((tab) => {
           const selected = tab.key === activeKey;
@@ -99,8 +99,8 @@ export default function FilterTabs({
           const FallbackIcon = tabIcons[tab.key as keyof typeof tabIcons] ?? Layers;
           const Icon = (tab as any).icon ?? FallbackIcon;
           const iconClass = selected
-            ? "h-4 w-4 text-white transition-colors inline-flex mr-1"
-            : "h-4 w-4 text-[--brand-orange] transition-colors inline-flex mr-1";
+            ? "h-4 w-4 text-white transition-colors flex-wrap mr-1"
+            : "h-4 w-4 text-[--brand-orange] transition-colors flex-wrap mr-1";
           return (
             <button
               key={tab.key}
