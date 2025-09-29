@@ -152,7 +152,12 @@ export async function POST(req: NextRequest) {
   });
 
   const summaryLines = Array.isArray(data.quizSummary)
-    ? data.quizSummary.map((item) => `${item.answer === 'yes' ? '✅' : '❌'} ${item.question}`)
+    ? data.quizSummary.map((item) => {
+        if (item.answerLabel) return `• ${item.answerLabel} — ${item.question}`;
+        if (item.answer === 'yes') return `✅ ${item.question}`;
+        if (item.answer === 'no') return `❌ ${item.question}`;
+        return `• ${item.question}`;
+      })
     : [];
 
   const matchLabelMap: Record<string, string> = {
@@ -168,7 +173,15 @@ export async function POST(req: NextRequest) {
     messageLines.push('', 'Quiz snapshots:', ...summaryLines);
   }
 
-  if (data.match) {
+  if (data.scores) {
+    messageLines.push(
+      '',
+      `Program fit scores: Service Finance ${Math.round(data.scores.serviceFinanceScore)}%, YGrene ${Math.round(data.scores.ygreneScore)}%`,
+    );
+    if (data.scores.isUncertain) {
+      messageLines.push('Both scores are below 50% — team follow-up recommended.');
+    }
+  } else if (data.match) {
     const matchLabel = matchLabelMap[data.match.program] || data.match.program;
     messageLines.push(
       '',
@@ -199,7 +212,9 @@ export async function POST(req: NextRequest) {
     quizSummary: summaryLines,
   };
 
-  if (data.match) {
+  if (data.scores) {
+    wpPayload.scores = data.scores;
+  } else if (data.match) {
     wpPayload.match = {
       program: data.match.program,
       label: matchLabelMap[data.match.program] || data.match.program,

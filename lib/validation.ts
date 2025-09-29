@@ -153,6 +153,12 @@ const financingMatchSchema = z.object({
   reasons: z.array(z.string().min(1).max(200)).max(3),
 });
 
+const financingScoresSchema = z.object({
+  ygreneScore: z.number().min(0).max(100),
+  serviceFinanceScore: z.number().min(0).max(100),
+  isUncertain: z.boolean(),
+});
+
 const financingLeadSchema = z
   .object({
     firstName: z.preprocess(trim, z.string().min(1, "First name is required").max(MAX_FINANCING_NAME)),
@@ -180,11 +186,14 @@ const financingLeadSchema = z
         z.object({
           id: z.string().min(1).max(100),
           question: z.string().min(1).max(500),
-          answer: z.union([z.literal('yes'), z.literal('no')]),
+          answer: z.union([z.literal('yes'), z.literal('no')]).optional(),
+          answerValue: z.string().min(1).max(200).optional(),
+          answerLabel: z.string().min(1).max(200).optional(),
         })
       )
       .optional(),
     match: financingMatchSchema.optional(),
+    scores: financingScoresSchema.optional(),
   })
   .passthrough();
 
