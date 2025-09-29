@@ -392,6 +392,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   const [submittedAmount, setSubmittedAmount] = useState<number | null>(null);
   const [persistedScores, setPersistedScores] = useState<FinancingScores | null>(null);
   const [customPulse, setCustomPulse] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [contactEditMode, setContactEditMode] = useState(false);
   const confirmTimeoutRef = useRef<number | null>(null);
   const [liveStatus, setLiveStatus] = useState('');
 
@@ -414,6 +416,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       const amt = Number(cookie.amount) || defaultAmount;
       const roundedAmount = Math.max(1000, Math.round(amt));
       setUnlocked(true);
+      setShowCalculator(true);
+      setContactEditMode(false);
       setCalculatorAmount(roundedAmount);
       setFormValues((prev) => ({ ...prev, amount: String(roundedAmount) }));
       setSubmittedAmount(roundedAmount);
@@ -458,6 +462,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         ? 'ygrene'
         : 'serviceFinance'
     : null;
+
+  const allowContactSteps = !unlocked || contactEditMode;
+  const effectiveLastStepIndex = allowContactSteps ? thirdFormStepIndex : summaryStepIndex;
 
   const stepContentRef = useRef<HTMLDivElement | null>(null);
 
@@ -526,6 +533,20 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     setQuizAnswers(next);
     setErrors({});
     setGlobalError(null);
+    if (!unlocked) {
+      setPersistedScores(null);
+    } else if (next.every((answer) => answer != null)) {
+      const nextScores = calculateFinancingScores(next as string[]);
+      setPersistedScores(nextScores);
+      const amountForCookie = submittedAmount ?? calculatorAmount ?? defaultAmount;
+      const normalizedAmount = Math.max(1000, Math.round(amountForCookie || defaultAmount));
+      const cookiePayload: FinancingCookie = {
+        unlocked: true,
+        amount: normalizedAmount,
+        scores: nextScores,
+      };
+      writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
+    }
     if (confirmTimeoutRef.current != null) {
       window.clearTimeout(confirmTimeoutRef.current);
       confirmTimeoutRef.current = null;
@@ -557,7 +578,11 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
 
     if (step === summaryStepIndex) {
-      setStep(step + 1);
+      if (allowContactSteps) {
+        setStep(step + 1);
+      } else {
+        handleShowCalculatorView();
+      }
       return;
     }
 
@@ -586,6 +611,47 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         setCustomPulse(true);
       }
     }
+  };
+
+  const handleReturnToQuiz = () => {
+    if (confirmTimeoutRef.current != null) {
+      window.clearTimeout(confirmTimeoutRef.current);
+      confirmTimeoutRef.current = null;
+    }
+    setShowCalculator(false);
+    setContactEditMode(false);
+    setErrors({});
+    setGlobalError(null);
+    setLiveStatus('');
+    setStep(0);
+  };
+
+  const handleShowCalculatorView = () => {
+    if (confirmTimeoutRef.current != null) {
+      window.clearTimeout(confirmTimeoutRef.current);
+      confirmTimeoutRef.current = null;
+    }
+    if (step > summaryStepIndex) {
+      setStep(summaryStepIndex);
+    }
+    setContactEditMode(false);
+    setErrors({});
+    setGlobalError(null);
+    setLiveStatus('');
+    setShowCalculator(true);
+  };
+
+  const handleStartContactEdit = () => {
+    if (confirmTimeoutRef.current != null) {
+      window.clearTimeout(confirmTimeoutRef.current);
+      confirmTimeoutRef.current = null;
+    }
+    setContactEditMode(true);
+    setErrors({});
+    setGlobalError(null);
+    setLiveStatus('');
+    setShowCalculator(false);
+    setStep(firstFormStepIndex);
   };
 
   const friendlyError = (raw?: unknown) => {
@@ -676,6 +742,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       if (res.ok && json?.ok) {
         setSubmission('idle');
         setUnlocked(true);
+        setShowCalculator(true);
+        setContactEditMode(false);
         const nextAmount = amountNumber || defaultAmount;
         setCalculatorAmount(nextAmount);
         setSubmittedAmount(nextAmount);
@@ -699,14 +767,13 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
   };
 
-  const lastStepIndex = thirdFormStepIndex;
-  const totalFlowSteps = lastStepIndex + 1;
-  const clampedStep = Math.min(Math.max(step, 0), lastStepIndex);
+  const totalFlowSteps = effectiveLastStepIndex + 1;
+  const clampedStep = Math.min(Math.max(step, 0), effectiveLastStepIndex);
   const progressPercent = Math.round(((clampedStep + 1) / totalFlowSteps) * 100);
 
   const isQuizStep = step < totalQuizQuestions;
-  const totalFormSteps = 4;
-  const formStepNumber = step - summaryStepIndex + 1;
+  const totalFormSteps = allowContactSteps ? 4 : 1;
+  const formStepNumber = Math.min(step - summaryStepIndex + 1, totalFormSteps);
   const stepTitle = isQuizStep
     ? `Question ${step + 1} of ${totalQuizQuestions}`
     : `Step ${formStepNumber} of ${totalFormSteps}`;
@@ -983,7 +1050,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   };
 
 
-  if (!unlocked) {
+  if (!unlocked || !showCalculator) {
     return (
       <div id="estimator" className={gradientShell}>
         <form onSubmit={handleSubmit} noValidate className={innerPanel}>
@@ -1031,6 +1098,17 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               <span className="text-slate-500 md:hidden">{stepSubtitle}</span>
               <span className={`${infoPillClass} hidden md:inline-flex`}>{stepSubtitle}</span>
             </div>
+            {unlocked && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleShowCalculatorView}
+                  className="text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+                >
+                  Back to calculator view
+                </button>
+              </div>
+            )}
 
             <LayoutGroup>
               <AnimatePresence mode="wait">
@@ -1117,6 +1195,24 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         </header>
 
         <div className="space-y-6 bg-blue-50/40 px-6 py-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={handleReturnToQuiz}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+            >
+              <Undo2 className="h-4 w-4" aria-hidden="true" />
+              Back to quiz
+            </button>
+            <button
+              type="button"
+              onClick={handleStartContactEdit}
+              className="text-xs font-medium text-slate-500 underline-offset-2 transition hover:text-[--brand-blue] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+            >
+              Update contact info
+            </button>
+          </div>
+
           <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-white/90 px-4 py-3 text-sm text-emerald-700 shadow-sm">
             <CheckCircle2 className="mt-0.5 h-6 w-6 text-emerald-500" aria-hidden="true" />
             <div>
