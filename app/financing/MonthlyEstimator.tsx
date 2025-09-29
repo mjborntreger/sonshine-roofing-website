@@ -1,8 +1,9 @@
 // Financing lead magnet with gated calculator
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { Calculator, Check, CheckCircle2, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen } from 'lucide-react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
+import { Calculator, Check, CheckCircle2, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 
@@ -391,6 +392,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   const [submittedAmount, setSubmittedAmount] = useState<number | null>(null);
   const [persistedScores, setPersistedScores] = useState<FinancingScores | null>(null);
   const [customPulse, setCustomPulse] = useState(false);
+  const confirmTimeoutRef = useRef<number | null>(null);
+  const [liveStatus, setLiveStatus] = useState('');
 
   const [formValues, setFormValues] = useState<FormValues>({
     firstName: '',
@@ -456,11 +459,39 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         : 'serviceFinance'
     : null;
 
+  const stepContentRef = useRef<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (!customPulse) return;
     const timeout = setTimeout(() => setCustomPulse(false), 800);
     return () => clearTimeout(timeout);
   }, [customPulse]);
+
+  useEffect(() => {
+    return () => {
+      if (confirmTimeoutRef.current != null) {
+        window.clearTimeout(confirmTimeoutRef.current);
+        confirmTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const raf = window.requestAnimationFrame(() => {
+      const container = stepContentRef.current;
+      if (!container) return;
+      const focusable = container.querySelector<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable) {
+        focusable.focus({ preventScroll: true });
+      } else {
+        container.focus({ preventScroll: true });
+      }
+    });
+    return () => window.cancelAnimationFrame(raf);
+  }, [step]);
 
   const validateFormStep = (currentStep: number) => {
     const nextErrors: Record<string, string> = {};
@@ -495,8 +526,21 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     setQuizAnswers(next);
     setErrors({});
     setGlobalError(null);
+    if (confirmTimeoutRef.current != null) {
+      window.clearTimeout(confirmTimeoutRef.current);
+      confirmTimeoutRef.current = null;
+    }
+    setLiveStatus('');
+    const question = quizQuestions[index];
+    const selectedOption = question.options.find((option) => option.value === value);
+    if (selectedOption) {
+      setLiveStatus(`Saved "${selectedOption.label}" for question ${index + 1}.`);
+    }
     const targetStep = index === totalQuizQuestions - 1 ? summaryStepIndex : index + 1;
-    setStep(targetStep);
+    confirmTimeoutRef.current = window.setTimeout(() => {
+      setStep(targetStep);
+      confirmTimeoutRef.current = null;
+    }, 100);
   };
 
   const handleNext = () => {
@@ -553,6 +597,11 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submission === 'submitting') return;
+
+    if (step < thirdFormStepIndex) {
+      handleNext();
+      return;
+    }
 
     const finalErrors = validateFormStep(thirdFormStepIndex);
     if (Object.keys(finalErrors).length) {
@@ -668,10 +717,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       : 'Fill out each field to continue.';
   const nextDisabled = isQuizStep && quizAnswers[step] == null;
 
-  const renderStepFields = () => {
-    if (isQuizStep) {
-      const question = quizQuestions[step];
-      const answer = quizAnswers[step];
+  const renderStepFields = (stepIndex: number) => {
+    const isQuiz = stepIndex < totalQuizQuestions;
+
+    if (isQuiz) {
+      const question = quizQuestions[stepIndex];
+      const answer = quizAnswers[stepIndex];
 
       return (
         <div className={stepCardClass} aria-live="polite">
@@ -683,7 +734,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => handleQuizAnswer(step, option.value)}
+                  onClick={() => handleQuizAnswer(stepIndex, option.value)}
                   className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
                     selected
                       ? 'border-[--brand-blue] bg-[--brand-blue]/10 text-[--brand-blue] focus-visible:ring-[--brand-blue]/40'
@@ -701,7 +752,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       );
     }
 
-    if (step === summaryStepIndex) {
+    if (stepIndex === summaryStepIndex) {
       const summaryItems = quizQuestions.map((question, idx) => ({
         id: question.id,
         prompt: question.prompt,
@@ -711,7 +762,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
       return (
         <div className={stepCardClass} aria-live="polite">
-          <p className="text-base font-semibold text-slate-900">Your answers</p>
+          <p 
+            className="text-base font-semibold text-slate-900"
+            >
+              Your answers
+              <ArrowDown className='h-4 w-4 inline ml-2' />
+          </p>
           <ul className="mt-3 space-y-2 text-sm text-slate-700">
             {summaryItems.map((item) => (
               <li key={item.id} className="rounded-xl border border-blue-100 bg-white/80 px-3 py-2">
@@ -725,7 +781,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       );
     }
 
-    if (step === firstFormStepIndex) {
+    if (stepIndex === firstFormStepIndex) {
       return (
         <div className={stepCardClass} aria-live="polite">
           <div>
@@ -761,7 +817,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="amount">Project Budget*</label>
+            <label className="block text-md font-medium text-slate-700" htmlFor="amount">Project Budget*</label>
             <div className="mt-1 flex items-center gap-2">
               <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">$</span>
               <input
@@ -787,7 +843,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       );
     }
 
-    if (step === secondFormStepIndex) {
+    if (stepIndex === secondFormStepIndex) {
       return (
         <div className={stepCardClass} aria-live="polite">
           <div>
@@ -926,10 +982,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     );
   };
 
+
   if (!unlocked) {
     return (
       <div id="estimator" className={gradientShell}>
         <form onSubmit={handleSubmit} noValidate className={innerPanel}>
+          <span className="sr-only" aria-live="polite">{liveStatus}</span>
           <input
             type="text"
             name="company"
@@ -974,7 +1032,23 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               <span className={`${infoPillClass} hidden md:inline-flex`}>{stepSubtitle}</span>
             </div>
 
-            {renderStepFields()}
+            <LayoutGroup>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={`step-${step}`}
+                  layout
+                  ref={stepContentRef}
+                  tabIndex={-1}
+                  className="focus:outline-none"
+                  initial={{opacity: 1}}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.28, ease: [0.32, 0, 0.15, 1] }}
+                >
+                  {renderStepFields(step)}
+                </motion.div>
+              </AnimatePresence>
+            </LayoutGroup>
 
             {globalError && (
               <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm" role="alert">
@@ -1218,6 +1292,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
           }
         }
+
       `}</style>
     </div>
   );
