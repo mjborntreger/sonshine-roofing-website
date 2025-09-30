@@ -1140,9 +1140,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 onClick={step > 0 ? handleBack : undefined}
                 className={`inline-flex items-center gap-1 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue] ${step === 0 ? 'cursor-not-allowed opacity-60' : ''}`}
                 disabled={step === 0}
+                data-icon-affordance="left"
               >
                 <Undo2
-                  className={`h-4 w-4 ${step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}`}
+                  className={`icon-affordance h-4 w-4 ${step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}`}
                   aria-hidden="true"
                 />
                 <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>Back</span>
@@ -1158,18 +1159,20 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   onClick={handleNext}
                   className="btn btn-brand-blue btn-md inline-flex items-center gap-2"
                   disabled={nextDisabled}
+                  data-icon-affordance="right"
                 >
                   Next
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
                 </button>
               ) : (
                 <button
                   type="submit"
                   className="btn btn-brand-orange btn-md inline-flex items-center gap-2"
                   disabled={submission === 'submitting'}
+                  data-icon-affordance={submission === 'submitting' ? undefined : 'right'}
                 >
                   {submission === 'submitting' ? 'Sending…' : 'Show my results'}
-                  {submission !== 'submitting' && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                  {submission !== 'submitting' && <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />}
                 </button>
               )}
             </div>
@@ -1200,8 +1203,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               type="button"
               onClick={handleReturnToQuiz}
               className="inline-flex items-center gap-2 text-sm font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+              data-icon-affordance="left"
             >
-              <Undo2 className="h-4 w-4" aria-hidden="true" />
+              <Undo2 className="icon-affordance h-4 w-4" aria-hidden="true" />
               Back to quiz
             </button>
             <button

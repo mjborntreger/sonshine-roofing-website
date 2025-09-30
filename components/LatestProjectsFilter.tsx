@@ -141,9 +141,14 @@ export default function LatestProjectsFilter({ projects, initial = 4, showHeader
 
       {showHeader && (
         <div className="mt-12 text-center">
-          <UiLink href="/project" className={lessFatCta} title="See All Projects">
+          <UiLink
+            href="/project"
+            className={lessFatCta}
+            title="See All Projects"
+            data-icon-affordance="right"
+          >
             See All Projects
-            <ArrowRight className="h-4 w-4 inline ml-2" />
+            <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
           </UiLink>
         </div>
       )}

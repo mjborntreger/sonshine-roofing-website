@@ -186,9 +186,10 @@ export default async function WhyHomeownersChooseUs() {
                         rel="noopener noreferrer"
                         className="btn btn-brand-orange btn-md btn-press mt-2"
                         title={pillar.cta.title}
+                        data-icon-affordance="right"
                       >
                         {pillar.cta.label}
-                        <ArrowRight className="ml-2 inline h-4 w-4" />
+                        <ArrowRight className="icon-affordance ml-2 inline h-4 w-4" />
                       </SmartLink>
                     </div>
                   ) : null}
@@ -226,9 +227,10 @@ export default async function WhyHomeownersChooseUs() {
                         rel="noopener noreferrer"
                         className="btn btn-brand-orange btn-md btn-press mt-2"
                         title={pillar.cta.title}
+                        data-icon-affordance="right"
                       >
                         {pillar.cta.label}
-                        <ArrowRight className="ml-2 inline h-4 w-4" />
+                        <ArrowRight className="icon-affordance ml-2 inline h-4 w-4" />
                       </SmartLink>
                     </div>
                   ) : null}

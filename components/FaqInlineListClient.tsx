@@ -109,9 +109,14 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
         </div>
       </div>
       <div className="mt-12 text-center md:text-right">
-        <UiLink href="/blog" className={lessFatCta} title="See All FAQs">
+        <UiLink
+          href="/blog"
+          className={lessFatCta}
+          title="See All FAQs"
+          data-icon-affordance="right"
+        >
           See All FAQs
-          <ArrowRight className="h-4 w-4 inline ml-2" />
+          <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
         </UiLink>
       </div>
     </div>

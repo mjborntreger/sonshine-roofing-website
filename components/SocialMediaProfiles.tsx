@@ -45,6 +45,7 @@ export default function SocialMediaProfiles() {
                 target="_blank"
                 rel="noopener noreferrer"
                 title={l.label}
+                data-icon-affordance="right"
                 className={baseClass}
               >
                 <span className={chipClass} aria-hidden="true">
@@ -62,10 +63,7 @@ export default function SocialMediaProfiles() {
                 {/* Label preserves platform color */}
                 <span className="flex-1" style={{ color: l.color }}>{l.label}</span>
 
-                <ChevronRight
-                  className="h-4 w-4 shrink-0 text-slate-400 transition-transform motion-safe:group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
+                <ChevronRight className="icon-affordance h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
               </SmartLink>
             </li>
           ))}

@@ -174,7 +174,7 @@ export default function InfiniteList<T>({
                         className="blog-card"
                     >
                         <template className="blog-body-src" dangerouslySetInnerHTML={{ __html: rawHtml }} />
-                        <SmartLink href={href} className="group block">
+                        <SmartLink href={href} className="group block" data-icon-affordance="right">
                             <Card className="overflow-hidden hover:shadow-lg transition">
                                 <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
                                     <CardTitle className="font-semibold">{p?.title}</CardTitle>
@@ -215,7 +215,7 @@ export default function InfiniteList<T>({
                                 <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
                                     <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
                                         Read full article
-                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 group-focus-visible:translate-x-1 group-focus-visible/card:translate-x-1" />
+                                        <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
                                     </span>
                                 </CardFooter>
                             </Card>
@@ -317,9 +317,10 @@ export default function InfiniteList<T>({
                                         onClick={handleOpen}
                                         data-video-slug={safeSlug}
                                         className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight focus-visible:outline-none"
+                                        data-icon-affordance="right"
                                     >
                                         Watch video
-                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 focus-visible:translate-x-1" />
+                                        <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
                                     </button>
                                 </CardFooter>
                             </Card>
@@ -352,7 +353,7 @@ export default function InfiniteList<T>({
 
                 return (
                     <div className="proj-item group block" data-key={key}>
-                        <SmartLink href={href} className="group block rounded-2xl focus-visible:outline-none">
+                        <SmartLink href={href} className="group block rounded-2xl focus-visible:outline-none" data-icon-affordance="right">
                             <Card
                                 className="proj-card overflow-hidden hover:shadow-lg transition"
                                 data-title={(p?.title || "").toString()}
@@ -421,7 +422,7 @@ export default function InfiniteList<T>({
                                 <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
                                     <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
                                         View project
-                                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 group-focus-visible:translate-x-1 group-focus-visible/card:translate-x-1" />
+                                        <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
                                     </span>
                                 </CardFooter>
                             </Card>

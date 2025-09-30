@@ -114,8 +114,9 @@ export default function PlanQuiz() {
             className="btn btn-brand-blue btn-sm btn-press inline-flex items-center gap-2 w-full sm:w-auto"
             onClick={() => setShowResult(true)}
             aria-haspopup="dialog"
+            data-icon-affordance="right"
           >
-            See likely fit <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            See likely fit <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>

@@ -12,10 +12,11 @@ export default function FinancingBand() {
                     href="/financing" 
                     className="btn btn-brand-blue h-11 px-5" 
                     aria-label="Explore financing options"
+                    data-icon-affordance="right"
                     >
                         <HandCoins className="h-4 w-4 inline mr-2" />
                         Explore financing
-                        <ArrowRight className="h-4 w-4 inline ml-2" />
+                        <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
                 </UiLink>
             </div>
         </div>

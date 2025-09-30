@@ -131,9 +131,14 @@ export default function YouMayAlsoLike({
                 })}
             </div>
             <div className="mt-12 text-center md:text-right">
-                <UiLink href="/blog" className={lessFatCta} title="See All Blogs">
+                <UiLink
+                    href="/blog"
+                    className={lessFatCta}
+                    title="See All Blogs"
+                    data-icon-affordance="right"
+                >
                     See All Blogs
-                    <ArrowRight className="h-4 w-4 inline ml-2" />
+                    <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
                 </UiLink>
             </div>
 

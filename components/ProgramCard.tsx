@@ -192,9 +192,10 @@ export default function ProgramCard({
               )}
               target="_blank"
               title={cta.title || cta.label}
+              data-icon-affordance="right"
             >
               {cta.label}
-              <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
+              <ArrowRight className="icon-affordance ml-2 h-4 w-4" aria-hidden />
             </a>
           </div>
           {finePrint ? (

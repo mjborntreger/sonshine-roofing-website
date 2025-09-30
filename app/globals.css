@@ -161,6 +161,68 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 }
 
 /* ---------------------------------------
+   Icon affordance helpers
+----------------------------------------*/
+@layer components {
+  [data-icon-affordance] .icon-affordance {
+    --icon-affordance-shift: 0.25rem;
+    --icon-affordance-direction: 1;
+    --icon-affordance-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 200ms var(--icon-affordance-ease);
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    pointer-events: none;
+  }
+
+  [data-icon-affordance='left'] .icon-affordance,
+  [data-icon-affordance='back'] .icon-affordance {
+    --icon-affordance-direction: -1;
+  }
+
+  [data-icon-affordance='tight'] .icon-affordance,
+  .icon-affordance--tight {
+    --icon-affordance-shift: 0.18rem;
+  }
+
+  [data-icon-affordance='loose'] .icon-affordance,
+  .icon-affordance--loose {
+    --icon-affordance-shift: 0.35rem;
+  }
+
+  [data-icon-affordance='right'] .icon-affordance,
+  [data-icon-affordance='forward'] .icon-affordance {
+    --icon-affordance-direction: 1;
+  }
+
+  [data-icon-affordance]:hover .icon-affordance,
+  [data-icon-affordance]:focus-visible .icon-affordance {
+    transform: translateX(calc(var(--icon-affordance-direction, 1) * var(--icon-affordance-shift)));
+  }
+
+  [data-icon-affordance][data-icon-affordance-active] .icon-affordance,
+  [data-icon-affordance]:active .icon-affordance {
+    transform: translateX(calc(var(--icon-affordance-direction, 1) * (var(--icon-affordance-shift) * 1.2)));
+  }
+
+  .icon-affordance {
+    --icon-affordance-shift: 0.25rem;
+    transition: transform 200ms var(--icon-affordance-ease, cubic-bezier(0.4, 0, 0.2, 1));
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-icon-affordance] .icon-affordance,
+  [data-icon-affordance]:hover .icon-affordance,
+  [data-icon-affordance]:focus-visible .icon-affordance,
+  [data-icon-affordance]:active .icon-affordance {
+    transition-duration: 0ms;
+    transform: none !important;
+  }
+}
+
+/* ---------------------------------------
    Components: BRAND BUTTONS
 ----------------------------------------*/
 @layer components {

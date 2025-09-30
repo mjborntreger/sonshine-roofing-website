@@ -3,7 +3,7 @@ import TocFromHeadings from "./TocFromHeadings"
 import UiLink from "./UiLink"
 import { CalendarDays, ArrowRight, Zap, Phone } from "lucide-react"
 
-const arrowIconStyles = "h-4 w-4 inline ml-2";
+const arrowIconStyles = "icon-affordance h-4 w-4 inline ml-2";
 const semanticIconStyles = "h-4 w-4 inline mr-2";
 const buttonStyles = "btn w-full h-11 mt-2";
 
@@ -26,6 +26,7 @@ export default function ServicesAside() {
                     href="/contact-us#book-an-appointment"
                     className={`${buttonStyles} btn-brand-blue`}
                     aria-label="Request a Free Roof Estimate"
+                    data-icon-affordance="right"
                 >
                     <CalendarDays className={semanticIconStyles} />
                     Get on the Schedule
@@ -35,6 +36,7 @@ export default function ServicesAside() {
                     href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
                     className={`${buttonStyles} btn-brand-orange`}
                     aria-label="Free 60-second Quote"
+                    data-icon-affordance="right"
                 >
                     <Zap className={semanticIconStyles} />
                     Free 60-second Quote

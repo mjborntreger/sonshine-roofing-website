@@ -1,6 +1,7 @@
 import ReviewsSliderLazy from '@/components/ReviewsSliderLazy';
 import { Button } from "@/components/ui/button";
 import SmartLink from "@/components/SmartLink";
+import { ArrowUpRight } from 'lucide-react';
 
 const RAW_REVIEWS_URL = (process.env.NEXT_PUBLIC_REVIEWS_URL ?? '').replace(/\u200B/g, '').trim();
 const REVIEWS_URL = RAW_REVIEWS_URL || 'https://next.sonshineroofing.com/wp-content/uploads/sonshine-reviews/reviews-archive.json';
@@ -79,6 +80,7 @@ export default async function ReviewsCarousel() {
                 rel="noopener noreferrer nofollow"
               >
                 See All Google Reviews
+                <ArrowUpRight className="h-4 w-4 inline ml-2" />
               </SmartLink>
             </Button>
           </div>

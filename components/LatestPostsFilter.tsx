@@ -141,9 +141,14 @@ export default function LatestPostsFilter({ posts, initial = 4, showHeader = tru
 
       {showHeader && (
         <div className="mt-12 text-center">
-          <SmartLink href="/blog" className={lessFatCta} title="See All Blog Posts">
+          <SmartLink
+            href="/blog"
+            className={lessFatCta}
+            title="See All Blog Posts"
+            data-icon-affordance="right"
+          >
             See All Blog Posts
-            <ArrowRight className="h-4 w-4 inline ml-2" />
+            <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
           </SmartLink>
         </div>
       )}

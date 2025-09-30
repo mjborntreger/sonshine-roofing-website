@@ -20,7 +20,11 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
 
   return (
     <div className={className} style={style}>
-      <SmartLink href={href} className="group block rounded-2xl focus-visible:outline-none">
+      <SmartLink
+        href={href}
+        className="group block rounded-2xl focus-visible:outline-none"
+        data-icon-affordance="right"
+      >
         <Card className="proj-card overflow-hidden hover:shadow-lg transition">
           <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
             <CardTitle className="font-semibold">{project.title}</CardTitle>
@@ -82,7 +86,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
           <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
             <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
               View project
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover/card:translate-x-1 group-focus-visible:translate-x-1 group-focus-visible/card:translate-x-1" />
+              <ArrowRight className="icon-affordance h-4 w-4" />
             </span>
           </CardFooter>
         </Card>

@@ -64,6 +64,7 @@ export default function ServicesQuickLinks() {
                 aria-label={aria}
                 aria-current={active ? "page" : undefined}
                 data-active={active ? "true" : "false"}
+                data-icon-affordance="right"
                 className={`${baseClass} ${active ? activeClass : inactiveClass}`}
               >
                 {/* Icon chip (kept gradient for consistency with brand family) */}
@@ -75,10 +76,7 @@ export default function ServicesQuickLinks() {
                 <span className="flex-1">{label}</span>
 
                 {/* Chevron affordance */}
-                <ChevronRight
-                  className="h-4 w-4 shrink-0 text-slate-400 transition-transform motion-safe:group-hover:translate-x-0.5"
-                  aria-hidden="true"
-                />
+                <ChevronRight className="icon-affordance h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
               </SmartLink>
             </li>
           );
