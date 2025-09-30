@@ -796,6 +796,35 @@ export async function listPersons(limit = 30): Promise<Person[]> {
   }));
 }
 
+/** Lightweight person list for prev/next navigation */
+export async function listPersonNav(limit = 50): Promise<Array<{ slug: string; title: string; positionTitle: string | null }>> {
+  const query = /* GraphQL */ `
+    query listPersonNav($limit: Int!) {
+      persons(
+        first: $limit
+        where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }
+      ) {
+        nodes {
+          slug
+          title
+          personAttributes { positionTitle }
+        }
+      }
+    }
+  `;
+
+  const data = await wpFetch<{ persons: { nodes: any[] } }>(query, { limit });
+  const nodes = data?.persons?.nodes || [];
+
+  return nodes
+    .map((n: any) => ({
+      slug: String(n?.slug || ""),
+      title: String(n?.title || ""),
+      positionTitle: n?.personAttributes?.positionTitle ?? null,
+    }))
+    .filter((n) => !!n.slug);
+}
+
 /** Fetch multiple Persons by slug array, preserving the given order */
 export async function listPersonsBySlugs(slugs: string[]): Promise<Person[]> {
   if (!Array.isArray(slugs) || slugs.length === 0) return [];

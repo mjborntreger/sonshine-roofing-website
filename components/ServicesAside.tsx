@@ -9,7 +9,7 @@ const buttonStyles = "btn w-full h-11 mt-2";
 
 export default function ServicesAside() {
     return (
-        <aside className="sticky top-24 self-start h-fit lg:w-[320px]">
+        <aside className="sticky top-16 self-start h-fit lg:w-[320px]">
             <ServicesQuickLinks />
 
             <TocFromHeadings

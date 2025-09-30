@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
 import ShareWhatYouThink from "@/components/ShareWhatYouThink";
 import TocFromHeadings from "@/components/TocFromHeadings";
-import SidebarCta from "@/components/SidebarCTA";
+import SidebarCta from "@/components/SidebarCta";
 
 export const revalidate = 900;
 

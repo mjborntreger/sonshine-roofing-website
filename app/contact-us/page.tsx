@@ -171,7 +171,7 @@ export default function Page() {
           </div>
 
           {/* Floating/sticky */}
-          <aside className="lg:sticky lg:top-24 self-start lg:h-fit">
+          <aside className="lg:sticky top-16 self-start lg:h-fit">
             <SocialMediaProfiles />
             <ResourcesQuickLinks />
           </aside>

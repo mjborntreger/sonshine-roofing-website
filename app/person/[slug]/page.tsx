@@ -1,6 +1,7 @@
-import { listPersons, listPersonsBySlugs } from "@/lib/wp";
-import type { Metadata } from 'next';
+import { listPersons, listPersonsBySlugs, listPersonNav } from "@/lib/wp";
+import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
 
@@ -50,6 +51,16 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
   const { slug } = await params;
   const person = await listPersonsBySlugs([slug]).then(arr => arr[0]);
   if (!person) return notFound();
+
+  let navItems: Awaited<ReturnType<typeof listPersonNav>>;
+  try {
+    navItems = await listPersonNav(50);
+  } catch {
+    navItems = [];
+  }
+  const idx = navItems.findIndex((item) => item.slug === slug);
+  const prev = idx >= 0 && idx < navItems.length - 1 ? navItems[idx + 1] : null;
+  const next = idx > 0 ? navItems[idx - 1] : null;
 
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
   const pageUrl = `${base}/person/${person.slug}`;
@@ -132,6 +143,33 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
             </header>
 
             <div className="mt-8 prose max-w-none border border-slate-300 bg-white p-5 rounded-2xl" dangerouslySetInnerHTML={{ __html: person.contentHtml }} />
+
+            {(prev || next) && (
+              <nav className="mt-8 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2">
+                {prev ? (
+                  <Link href={`/person/${prev.slug}`} className="block rounded-xl p-3 hover:bg-slate-50">
+                    <div className="text-xs uppercase tracking-wide text-slate-500">Previous</div>
+                    <div className="mt-1 font-medium text-slate-900">{prev.title}</div>
+                    {prev.positionTitle && (
+                      <div className="text-sm text-slate-600">{prev.positionTitle}</div>
+                    )}
+                  </Link>
+                ) : (
+                  <span />
+                )}
+                {next ? (
+                  <Link href={`/person/${next.slug}`} className="block rounded-xl p-3 text-right hover:bg-slate-50">
+                    <div className="text-xs uppercase tracking-wide text-slate-500">Next</div>
+                    <div className="mt-1 font-medium text-slate-900">{next.title}</div>
+                    {next.positionTitle && (
+                      <div className="text-sm text-slate-600">{next.positionTitle}</div>
+                    )}
+                  </Link>
+                ) : (
+                  <span />
+                )}
+              </nav>
+            )}
           </article>
         </div>
       </div>

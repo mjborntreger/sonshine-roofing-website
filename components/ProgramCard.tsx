@@ -190,7 +190,7 @@ export default function ProgramCard({
             <a
               href={cta.href}
               className={cn(
-                "btn btn-press btn-lg inline-flex items-center",
+                "btn btn-lg inline-flex items-center",
                 isOrange ? "bg-[--brand-orange] hover:bg-[--brand-orange]/90" : undefined,
                 cta.className,
               )}

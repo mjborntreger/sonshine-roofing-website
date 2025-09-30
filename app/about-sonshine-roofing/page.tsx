@@ -189,7 +189,7 @@ export default async function Page() {
 
             </div>
 
-            <div className="sticky hidden lg:block lg:top-24 self-start min-w-0">
+            <div className="sticky hidden lg:block top-16 self-start min-w-0">
               <SocialMediaProfiles />
               <ResourcesQuickLinks />
             </div>
