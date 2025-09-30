@@ -1,6 +1,6 @@
 import Section from '@/components/layout/Section';
 import UiLink from '@/components/UiLink';
-import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ListStart } from "lucide-react";
+import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ListStart, ChevronRight } from "lucide-react";
 import ProgramCard from '@/components/ProgramCard';
 import MonthlyEstimator from './MonthlyEstimator';
 import type { Metadata } from 'next';
@@ -201,12 +201,13 @@ export default async function FinancingPage() {
         <MonthlyEstimator />
 
         {/* Two programs (plan cards) */}
-        <h2 className={h2}>
+        <h2 className={h2} id="pick-a-plan">
           <ArrowLeftRight className={h2Icon} />
           2. Pick a Plan
         </h2>
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProgramCard
+            id="ygrene-program-card"
             theme="orange"
             title="YGrene PACE Financing (Equity‑based)"
             subtitle="House‑secured. Payments typically included in your property‑tax bill."
@@ -230,6 +231,7 @@ export default async function FinancingPage() {
           />
 
           <ProgramCard
+            id="service-finance-program-card"
             theme="cyan"
             title="Service Finance (Credit‑based)"
             subtitle="Signature loan with flexible terms. No lien on your property."
@@ -272,16 +274,33 @@ export default async function FinancingPage() {
             </ul>
           </section>
 
-          {/* What to expect */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          {/* What's Next */}
+          <section id="whats-next"className="rounded-2xl border border-slate-200 bg-white p-4">
             <h3 className={h3}>
               <ListOrdered className={sectionIcon} aria-hidden="true" />
-              What to expect
+              What's next?
             </h3>
             <ol className="mt-3 list-decimal pl-5 space-y-2 text-slate-700">
-              <li>We help you pick the best program for your situation</li>
-              <li>Quick application (phone or online)</li>
-              <li>Approval and documents</li>
+              <li>
+                <a 
+                  href="#docs"
+                  className="text-[--brand-blue]"
+                  >
+                    Know what documents you'll need
+                <ChevronRight className="h-4 w-4 inline ml-2 text-slate-600" />
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="/contact-us#book-an-appointment"
+                  className="text-[--brand-blue]"
+                  >
+                    Schedule an appointment with a Roofing Specialist
+                <ChevronRight className="h-4 w-4 inline ml-2 text-slate-600" />
+                </a>
+              </li>
+              <li>We take care of the application</li>
+              <li>Same-day Approval</li>
               <li>We schedule your project</li>
             </ol>
           </section>
