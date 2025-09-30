@@ -1,4 +1,3 @@
-import Section from '@/components/layout/Section';
 import UiLink from '@/components/UiLink';
 import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ListStart, ChevronRight } from "lucide-react";
 import ProgramCard from '@/components/ProgramCard';
@@ -64,8 +63,8 @@ const checkIconYgrene = 'mt-0.5 h-4 w-4 text-[--brand-orange] flex-none';
 const checkIconServiceFinance = 'mt-0.5 h-4 w-4 text-[--brand-cyan] flex-none';
 // Icon style for section headings (fits me / expect / questions)
 const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
-const ctaSecondary = 'btn btn-press btn-brand-blue btn-lg';
-const ctaPrimary = "btn btn-press btn-brand-orange btn-lg"
+const ctaSecondary = 'btn w-full btn-brand-blue btn-lg phone-affordance';
+const ctaPrimary = "btn btn-brand-orange btn-lg"
 const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
 const contactInfoIconStyles = "h-5 w-5 text-slate-500";
 
@@ -146,7 +145,7 @@ export default async function FinancingPage() {
   const per10kYgrene = "$124/mo per $10k";
 
   return (
-    <Section>
+    <section className="mx-auto max-w-8xl">
       <div className="container-edge py-10 md:py-16">
         {/* Hero */}
         <div className="mx-auto max-w-3xl text-center">
@@ -177,16 +176,21 @@ export default async function FinancingPage() {
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <UiLink href="#get-started" className={ctaPrimary} title="Get Started">
+            <UiLink
+              href="#get-started"
+              className={ctaPrimary}
+              title="Get Started"
+              data-icon-affordance="down"
+            >
               Get Started
-              <ArrowDown className="h-5 w-5 inline ml-2 text-white" aria-hidden="true" />
+              <ArrowDown className="icon-affordance h-5 w-5 inline ml-2 text-white" aria-hidden="true" />
             </UiLink>
             <UiLink
               href="tel:+19418664320"
-              className={contactInfoPillStyles}
+              className={`${contactInfoPillStyles} phone-affordance`}
               title="Call SonShine Roofing"
               >
-              <Phone className={contactInfoIconStyles} aria-hidden="true" />
+              <Phone className={`${contactInfoIconStyles} phone-affordance-icon`} aria-hidden="true" />
               <span className="font-semibold">(941) 866-4320</span>
               </UiLink>
           </div>
@@ -285,18 +289,20 @@ export default async function FinancingPage() {
                 <a 
                   href="#docs"
                   className="text-[--brand-blue]"
+                  data-icon-affordance="right"
                   >
                     Know what documents you'll need
-                <ChevronRight className="h-4 w-4 inline ml-2 text-slate-600" />
+                <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
                 </a>
               </li>
               <li>
                 <a 
                   href="/contact-us#book-an-appointment"
                   className="text-[--brand-blue]"
+                  data-icon-affordance="right"
                   >
                     Schedule an appointment with a Roofing Specialist
-                <ChevronRight className="h-4 w-4 inline ml-2 text-slate-600" />
+                <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
                 </a>
               </li>
               <li>We take care of the application</li>
@@ -318,10 +324,10 @@ export default async function FinancingPage() {
             <div className="pt-2">
               <UiLink
                 href="tel:19418664320"
-                className={`${ctaSecondary} w-full`}
+                className={ctaSecondary}
                 title="Call SonShine Roofing"
               >
-                <Phone className="inline mr-2 h-4 w-4" />
+                <Phone className="phone-affordance-icon inline mr-2 h-4 w-4" />
                 (941) 866‑4320
               </UiLink>
             </div>
@@ -455,6 +461,6 @@ export default async function FinancingPage() {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
         />
       </div>
-    </Section>
+    </section>
   );
 }

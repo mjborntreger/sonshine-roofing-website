@@ -1,7 +1,29 @@
 "use client";
 import SmartLink from "@/components/SmartLink";
 import { useRef, useState, useEffect } from "react";
-import { ChevronDown, Phone, Zap, BadgeCheck, ArrowUpRight } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  ChevronDown,
+  ChevronRight,
+  Phone,
+  Zap,
+  UserSearch,
+  HandCoins,
+  Hammer,
+  Wrench,
+  Search,
+  ShieldCheck,
+  PlayCircle,
+  Newspaper,
+  BookOpen,
+  HelpCircle,
+  Home as HomeIcon,
+  Image as ImageIcon,
+  HardHat,
+  Menu,
+  X,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { Route } from "next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,6 +32,78 @@ import { NAV_MAIN, ROUTES } from "@/lib/routes";
 
 type Item = NavItem;
 const NAV: Item[] = NAV_MAIN as Item[];
+
+const NAV_ICONS: Record<string, LucideIcon> = {
+  About: UserSearch,
+  Financing: HandCoins,
+  "Roofing Services": HardHat,
+  "Roof Replacement": Hammer,
+  "Roof Repair": Wrench,
+  "Roof Inspection": Search,
+  "Roof Maintenance": ShieldCheck,
+  Resources: Wrench,
+  "Project Gallery": ImageIcon,
+  "Video Library": PlayCircle,
+  Blog: Newspaper,
+  "Roofing Glossary": BookOpen,
+  FAQ: HelpCircle,
+  Home: HomeIcon,
+};
+
+const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Resources"]);
+const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-400";
+
+function MenuToggleIcon({ open }: { open: boolean }) {
+  const prefersReducedMotion = useReducedMotion();
+
+  if (prefersReducedMotion) {
+    return open ? (
+      <X className="h-4 w-4 text-white" aria-hidden="true" />
+    ) : (
+      <Menu className="h-4 w-4 text-white" aria-hidden="true" />
+    );
+  }
+
+  const transition = { duration: 0.16, ease: [0.32, 0, 0.67, 1] } as const;
+
+  return (
+    <span className="relative flex h-4 w-4 items-center justify-center" aria-hidden="true">
+      <motion.span
+        className="absolute h-[1.5px] w-full origin-center rounded-full bg-white"
+        initial={false}
+        animate={open ? { y: 0, rotate: 45 } : { y: -4, rotate: 0 }}
+        transition={transition}
+      />
+      <motion.span
+        className="absolute h-[1.5px] w-full rounded-full bg-white"
+        initial={false}
+        animate={open ? { opacity: 0, scaleX: 0.4 } : { opacity: 1, scaleX: 1 }}
+        transition={transition}
+      />
+      <motion.span
+        className="absolute h-[1.5px] w-full origin-center rounded-full bg-white"
+        initial={false}
+        animate={open ? { y: 0, rotate: -45 } : { y: 4, rotate: 0 }}
+        transition={transition}
+      />
+    </span>
+  );
+}
+
+function LabelWithIcon({ label }: { label: string }) {
+  const Icon = NAV_ICONS[label];
+  return (
+    <span className="inline-flex items-center">
+      {Icon && (
+        <Icon
+          className="h-4 w-4 inline text-[--brand-blue] mr-2"
+          aria-hidden="true"
+        />
+      )}
+      {label}
+    </span>
+  );
+}
 
 /* ===== Animation tuning knobs (edit these values to adjust speeds/delays) ===== */
 // Close-delay when the cursor leaves a menu (hover intent)
@@ -49,104 +143,106 @@ function DesktopMenu() {
   };
 
   return (
-    <ul className="hidden lg:flex items-center gap-4">
-      {NAV.map((item, i) => (
-        <li
-          key={item.label}
-          className="relative"
-          onMouseEnter={() => holdOpen(i)}
-          onMouseLeave={scheduleClose}
-        >
-          {item.href ? (
-            <SmartLink
-              href={item.href}
-              className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1"
-            >
-              {item.label}
-              {item.children && (
-                <>
-                  {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 opacity-70 transition-transform duration-200",
-                      openIndex === i ? "rotate-180" : "rotate-0"
-                    )}
-                    style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
-                    aria-hidden="true"
-                  />
-                </>
-              )}
-            </SmartLink>
-          ) : (
-            <button
-              type="button"
-              className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1 cursor-default"
-              aria-haspopup={item.children ? "menu" : undefined}
-              aria-expanded={openIndex === i || undefined}
-            >
-              {item.label}
-              {item.children && (
-                <>
-                  {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 opacity-70 transition-transform duration-200",
-                      openIndex === i ? "rotate-180" : "rotate-0"
-                    )}
-                    style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
-                    aria-hidden="true"
-                  />
-                </>
-              )}
-            </button>
-          )}
-
-          {item.children && openIndex === i && (
-            <>
-              {/* ANIM: Panel fade+lift speed — edit PANEL_DURATION_MS (and/or Tailwind 'duration-150') */}
-              <div
-                className={cn(
-                  "absolute left-0 top-full mt-2 min-w-[240px] rounded-2xl border bg-white border-slate-300 shadow-lg origin-top",
-                  "transition-all duration-150 ease-out",
-                  enteredPanel ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
-                )}
-                style={{ transitionDuration: `${PANEL_DURATION_MS}ms` }}
-                onMouseEnter={() => holdOpen(i)}
-                onMouseLeave={scheduleClose}
-              >
-                <MenuLevel items={item.children} level={1} />
-              </div>
-            </>
-          )}
-        </li>
-      ))}
-
-      <li className="pl-2">
-        <Button asChild size="sm" variant="brandOrange">
-          <SmartLink
-            href={"https://www.myquickroofquote.com/contractors/sonshine-roofing" as Route}
-            className="flex items-center gap-2"
+    <>
+      <ul className="hidden lg:flex items-center gap-4">
+        {NAV.map((item, i) => (
+          <li
+            key={item.label}
+            className="relative"
+            onMouseEnter={() => holdOpen(i)}
+            onMouseLeave={scheduleClose}
           >
-            <Zap className="h-4 w-4 text-white" aria-hidden="true" />
-            Free 60-second Quote
-          </SmartLink>
-        </Button>
-      </li>
+            {item.href ? (
+              <SmartLink
+                href={item.href}
+                className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1"
+              >
+                <LabelWithIcon label={item.label} />
+                {item.children && (
+                  <>
+                    {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 opacity-70 transition-transform duration-200",
+                        openIndex === i ? "rotate-180" : "rotate-0"
+                      )}
+                      style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
+                      aria-hidden="true"
+                    />
+                  </>
+                )}
+              </SmartLink>
+            ) : (
+              <button
+                type="button"
+                className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1 cursor-default"
+                aria-haspopup={item.children ? "menu" : undefined}
+                aria-expanded={openIndex === i || undefined}
+              >
+                <LabelWithIcon label={item.label} />
+                {item.children && (
+                  <>
+                    {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
+                    <ChevronDown
+                      className={cn(
+                        "h-4 w-4 opacity-70 transition-transform duration-200",
+                        openIndex === i ? "rotate-180" : "rotate-0"
+                      )}
+                      style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
+                      aria-hidden="true"
+                    />
+                  </>
+                )}
+              </button>
+            )}
 
-      <li className="pl-2">
+            {item.children && openIndex === i && (
+              <>
+                {/* ANIM: Panel fade+lift speed — edit PANEL_DURATION_MS (and/or Tailwind 'duration-150') */}
+                <div
+                  className={cn(
+                    "absolute left-0 top-full mt-2 min-w-[240px] rounded-2xl border bg-white border-slate-300 shadow-lg origin-top",
+                    "transition-all duration-150 ease-out",
+                    enteredPanel ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
+                  )}
+                  style={{ transitionDuration: `${PANEL_DURATION_MS}ms` }}
+                  onMouseEnter={() => holdOpen(i)}
+                  onMouseLeave={scheduleClose}
+                >
+                  <MenuLevel items={item.children} level={1} parentLabel={item.label} />
+                </div>
+              </>
+            )}
+          </li>
+        ))}
+
+        <li className="pl-2">
+          <Button asChild size="sm" variant="brandOrange">
+            <SmartLink
+              href={"https://www.myquickroofquote.com/contractors/sonshine-roofing" as Route}
+              className="flex items-center gap-2"
+            >
+              <Zap className="h-4 w-4 text-white" aria-hidden="true" />
+              Free 60-second Quote
+            </SmartLink>
+          </Button>
+        </li>
+
+        <li className="pl-2">
         <Button asChild size="sm" variant="brandBlue">
-          <SmartLink href={ROUTES.contact} className="flex items-center gap-2">
-            <Phone className="h-4 w-4 text-white" aria-hidden="true" />
+          <SmartLink href={ROUTES.contact} className="phone-affordance flex items-center gap-2">
+            <Phone className="phone-affordance-icon h-4 w-4 text-white" aria-hidden="true" />
             Contact Us
           </SmartLink>
         </Button>
       </li>
     </ul>
+    </>
   );
 }
 
 /* ===== Nested menu list (scoped hover) ===== */
-function MenuLevel({ items, level }: { items: Item[]; level: number }) {
+function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number; parentLabel?: string }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [entered, setEntered] = useState(false);
@@ -168,6 +264,7 @@ function MenuLevel({ items, level }: { items: Item[]; level: number }) {
     <ul className={cn("py-2", level > 1 && "px-2")}>
       {items.map((child, i) => {
         const hasKids = !!child.children?.length;
+        const showChevron = !hasKids && TARGET_CHILD_PARENTS.has(parentLabel ?? "");
 
         return (
           <li
@@ -183,10 +280,11 @@ function MenuLevel({ items, level }: { items: Item[]; level: number }) {
             {child.href ? (
               <SmartLink
                 href={child.href}
-                className="flex items-center justify-between gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-[#0045d7]/5 hover:text-[--brand-blue]"
+                className="flex items-center justify-between gap-2 px-3 py-2 text-md text-slate-700 hover:bg-[#0045d7]/5 hover:text-[--brand-blue]"
+                data-icon-affordance={showChevron ? "right" : undefined}
               >
-                <span>{child.label}</span>
-                {hasKids && (
+                <LabelWithIcon label={child.label} />
+                {hasKids ? (
                   <>
                     {/* ANIM: Nested caret rotation — edit CARET_DURATION_MS */}
                     <ChevronDown
@@ -198,17 +296,21 @@ function MenuLevel({ items, level }: { items: Item[]; level: number }) {
                       aria-hidden="true"
                     />
                   </>
+                ) : (
+                  showChevron ? (
+                    <ChevronRight className={CHILD_CHEVRON_CLASS} aria-hidden="true" />
+                  ) : null
                 )}
               </SmartLink>
             ) : (
               <button
                 type="button"
-                className="w-full text-left flex items-center justify-between gap-2 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-blue rounded-xl"
+                className="w-full text-left flex items-center justify-between gap-2 px-3 py-2 text-md text-slate-700 hover:bg-slate-50 hover:text-brand-blue rounded-xl"
                 aria-haspopup={hasKids ? "menu" : undefined}
                 aria-expanded={openIndex === i || undefined}
                 onClick={() => holdOpen(i)}
               >
-                <span>{child.label}</span>
+                <LabelWithIcon label={child.label} />
                 {hasKids && (
                   <>
                     {/* ANIM: Nested caret rotation — edit CARET_DURATION_MS */}
@@ -244,7 +346,7 @@ function MenuLevel({ items, level }: { items: Item[]; level: number }) {
                   {/* optional invisible bridge in case of super fast mouse moves */}
                   <div className="pointer-events-none absolute -left-2 top-0 h-full w-3" />
                   <div className="pointer-events-auto">
-                    <MenuLevel items={child.children!} level={level + 1} />
+                    <MenuLevel items={child.children!} level={level + 1} parentLabel={child.label} />
                   </div>
                 </div>
               </>
@@ -337,22 +439,16 @@ function MobileMenu() {
       <button
         type="button"
         ref={buttonRef}
-        className="text-white border rounded-lg px-3 py-2 bg-[--brand-blue]"
+        className="rounded-full border px-4 py-2 text-white bg-[--brand-blue]"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="mobile-nav"
         aria-haspopup="menu"
+        data-open={open}
       >
-        <span className="inline-flex items-center gap-1 transition-transform duration-200">
-          Menu
-          {/* ANIM: Mobile caret rotation — edit CARET_DURATION_MS */}
-          <ChevronDown
-            className={cn(
-              "h-4 w-4 transition-transform duration-300",
-              open ? "rotate-180" : "rotate-0"
-            )}
-            style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
-          />
+        <span className="inline-flex items-center gap-2">
+          <span className="font-medium">Menu</span>
+          <MenuToggleIcon open={open} />
         </span>
       </button>
 
@@ -391,7 +487,7 @@ function MobileMenu() {
                   className="flex w-full px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
                   onClick={() => setOpen(false)}
                 >
-                  Home
+                  <LabelWithIcon label="Home" />
                 </SmartLink>
               </li>
               <hr className="my-1 border-slate-200" />
@@ -414,7 +510,7 @@ function MobileMenu() {
                         className="flex w-full items-center justify-between px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
                         onClick={() => setOpen(false)}
                       >
-                        <span>{item.label}</span>
+                        <LabelWithIcon label={item.label} />
                       </SmartLink>
                     ) : (
                       <div className="flex items-center justify-between">
@@ -424,7 +520,7 @@ function MobileMenu() {
                             className="block flex-1 min-w-0 text-left px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
                             onClick={() => setOpen(false)}
                           >
-                            {item.label}
+                            <LabelWithIcon label={item.label} />
                           </SmartLink>
                         ) : (
                           <button
@@ -434,7 +530,7 @@ function MobileMenu() {
                             aria-controls={`section-${k}`}
                             className="px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50 text-left flex-1"
                           >
-                            {item.label}
+                            <LabelWithIcon label={item.label} />
                           </button>
                         )}
                         {hasChildren && (
@@ -461,6 +557,8 @@ function MobileMenu() {
                       <ul id={`section-${k}`} className="ml-2 border-l pl-3 py-1 group" data-open={!!expanded[k]}>
                         {item.children!.map((c, j) => {
                           const ck = `lv2-${i}-${j}`;
+                          const childHasKids = !!c.children?.length;
+                          const showChevron = !childHasKids && TARGET_CHILD_PARENTS.has(item.label);
                           return (
                             <li
                               key={ck}
@@ -475,12 +573,18 @@ function MobileMenu() {
                                 <SmartLink
                                   href={c.href}
                                   className="flex w-full items-center justify-between px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50"
+                                  data-icon-affordance={showChevron ? "right" : undefined}
                                   onClick={() => setOpen(false)}
                                 >
-                                  <span>{c.label}</span>
+                                  <LabelWithIcon label={c.label} />
+                                  {showChevron ? (
+                                    <ChevronRight className={CHILD_CHEVRON_CLASS} aria-hidden="true" />
+                                  ) : null}
                                 </SmartLink>
                               ) : (
-                                <span className="block px-3 py-2 text-slate-700">{c.label}</span>
+                                <span className="block px-3 py-2 text-slate-700">
+                                  <LabelWithIcon label={c.label} />
+                                </span>
                               )}
                             </li>
                           );
@@ -521,9 +625,9 @@ function MobileMenu() {
                   <SmartLink
                     href={ROUTES.contact}
                     onClick={() => setOpen(false)}
-                    className="flex items-center justify-center gap-x-2"
+                    className="phone-affordance flex items-center justify-center gap-x-2"
                   >
-                    <Phone className="w-4 h-4 shrink-0 text-white" aria-hidden="true" />
+                    <Phone className="phone-affordance-icon w-4 h-4 shrink-0 text-white" aria-hidden="true" />
                     Contact Us
                   </SmartLink>
                 </Button>
@@ -536,25 +640,9 @@ function MobileMenu() {
   );
 }
 
-function PhoneLink() {
-  return (
-    <a
-      href="tel:+19418664320"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Call SonShine Roofing"
-      className="text-xs md:text-sm font-semibold text-[--brand-blue] items-center"
-    >
-      <Phone className="mr-1 inline h-3 w-3 md:h-4 md:w-4 text-[--brand-blue] font-semibold" aria-hidden="true" />
-      <span>(941) 866-4320</span>
-    </a>
-  )
-}
-
 export function NavMenu() {
   return (
     <nav className="ml-auto flex items-center gap-3">
-      <PhoneLink />
       <DesktopMenu />
       <MobileMenu />
     </nav>

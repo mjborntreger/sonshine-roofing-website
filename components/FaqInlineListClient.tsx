@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, ChevronDown, HelpCircle } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, HelpCircle } from "lucide-react";
 import UiLink from "./UiLink";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
@@ -82,7 +82,17 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
           onClick={handleToggleAll}
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[--brand-blue] bg-white px-4 py-2 text-sm font-semibold text-[--brand-blue] transition hover:bg-[--brand-blue]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 sm:w-auto"
         >
-          {allOpen ? "Collapse all" : "Expand all"}
+          {allOpen ? (
+            <>
+            Collapse all
+            <ArrowUp className="h-4 w-4" aria-hidden="true" />
+            </>
+          ) : (
+            <>
+             Expand all
+             <ArrowDown className="h-4 w-4" aria-hidden="true" />
+            </>
+          )}
         </button>
       </div>
 

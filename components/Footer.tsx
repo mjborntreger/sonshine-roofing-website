@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { ArrowUpRight, ArrowUp } from "lucide-react";
+import { ArrowUpRight, ArrowUp, ArrowRight } from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from "@/lib/routes";
 
 const SOCIALS = [
@@ -33,9 +33,10 @@ export default function Footer() {
     <a 
       href="#page-top" 
       className="text-center"
+      data-icon-affordance="up"
       >
       Return to Top
-      <ArrowUp className="h-4 w-4 inline ml-2"/>
+      <ArrowUp className="icon-affordance h-4 w-4 inline ml-2"/>
     </a>
     <FooterBadges />
 
@@ -76,10 +77,11 @@ export default function Footer() {
                   aria-label="Florida Roofing Contractor's License Number CCC1331483"
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-icon-affordance="up-right"
                 >
                   License: #CCC1331483
                   <ArrowUpRight
-                    className="inline ml-1 h-3 w-3 align-[-0.125em] text-slate-700"
+                    className="icon-affordance inline ml-1 h-3 w-3 align-[-0.125em] text-slate-700"
                     aria-hidden="true"
                   />
                 </Link>
@@ -182,8 +184,10 @@ export default function Footer() {
                 <Link
                   href="/contact-us#book-an-appointment"
                   className="inline-block bg-[--brand-orange] rounded-md border border-[--brand-orange] px-3 py-1.5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                  data-icon-affordance="right"
                 >
                   Book an appointment
+                  <ArrowRight className="h-4 w-4 inline ml-2 icon-affordance" />
                 </Link>
               </p>
             </address>

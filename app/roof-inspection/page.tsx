@@ -8,8 +8,6 @@ import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";
 import ServicesAside from "@/components/ServicesAside";
 
-const scrollGuard = "scroll-mt-24";
-
 // ===== STATIC SEO FOR /roof-inspection (EDIT HERE) =====
 const SEO_TITLE_ROOF_INSPECTION = 'Roof Inspection in Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
 const SEO_DESCRIPTION_ROOF_INSPECTION = 'Licensed residential roofing inspections to catch hidden leaks and extend roof life. Serving Southwest Florida since 1987.';
@@ -99,7 +97,7 @@ export default async function Page() {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
           />
 
-          <h2 className={scrollGuard}>Why Do I Need a Roof Inspection?</h2>
+          <h2>Why Do I Need a Roof Inspection?</h2>
           <p>
             Believe it or not, the average roof protects your home for about 20
             years—but only if you stay on top of regular maintenance and address
@@ -119,7 +117,7 @@ export default async function Page() {
 
           <TipTopRoofCheckup />
 
-          <h2 className={scrollGuard}>Roofs Can Leak for Years Before You See Evidence</h2>
+          <h2>Roofs Can Leak for Years Before You See Evidence</h2>
           <p>
             To add years of life to your roof, the National Roofing Contractors Association
             (NRCA) recommends two roof inspections each year by a licensed roofing

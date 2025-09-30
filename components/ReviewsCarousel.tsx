@@ -78,9 +78,10 @@ export default async function ReviewsCarousel() {
                 href={GBP_URL}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
+                data-icon-affordance="up-right"
               >
                 See All Google Reviews
-                <ArrowUpRight className="h-4 w-4 inline ml-2" />
+                <ArrowUpRight className="icon-affordance h-4 w-4 inline ml-2" />
               </SmartLink>
             </Button>
           </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Hammer, Wrench, Search, ShieldCheck, ChevronRight } from "lucide-react";
+import { Hammer, Wrench, Search, ShieldCheck, ChevronRight, HardHat } from "lucide-react";
 import SmartLink from "@/components/SmartLink";
 import { usePathname } from "next/navigation";
 
@@ -44,8 +44,8 @@ export default function ServicesQuickLinks() {
 
   return (
     <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="mb-3 text-xs text-center font-semibold uppercase tracking-wide text-slate-700">
-        <Hammer className="inline h-3 w-3 mr-2 font-semibold text-[--brand-orange]" />
+      <div className="mb-3 text-sm text-center font-semibold uppercase tracking-wide text-slate-700">
+        <HardHat className="inline h-4 w-4 mr-2 font-semibold text-[--brand-orange]" />
         Roofing Services
       </div>
 

@@ -7,7 +7,9 @@ import { headers } from "next/headers";
 import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/wp";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
-import ShareWhatYouThink from "@/components/ShareWhatYouThink"
+import ShareWhatYouThink from "@/components/ShareWhatYouThink";
+import TocFromHeadings from "@/components/TocFromHeadings";
+import SidebarCta from "@/components/SidebarCTA";
 
 export const revalidate = 900;
 
@@ -39,41 +41,51 @@ function calcReadingMinutes(html: string, wpm = 225) {
   const words = stripHtml(html).split(" ").filter(Boolean).length;
   return Math.max(1, Math.round(words / wpm));
 }
-function slugify(s: string) {
-  return s
+function slugify(text: string) {
+  return text
     .toLowerCase()
-    .replace(/&amp;|&/g, "and")
+    .replace(/&/g, " and ")
     .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "");
 }
 function decodeEntities(input: string) {
   return input
-  .replace(/&nbsp;/g, " ")
-  .replace(/&lt;/g, "<")
-  .replace(/&gt;/g, ">")
-  .replace(/&quot;/g, '"')
-  .replace(/&#39;|&apos;/g, "'")
-  .replace(/&#(\d+);/g, (_, num) => String.fromCharCode(parseInt(num, 10)))
-  .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
-  .replace(/&amp;/g, "&")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&#(\d+);/g, (_, num) => String.fromCharCode(parseInt(num, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&amp;/g, "&");
 }
-type TocItem = { id: string; text: string; level: 2 | 3 };
-function addIdsAndBuildToc(html: string): { html: string; toc: TocItem[] } {
-  const toc: TocItem[] = [];
-  const out = html.replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi, (_m, lvl, attrs = "", inner) => {
-    const level = Number(lvl) as 2 | 3;
-    const hasId = /\sid=["'][^"']+["']/.test(attrs);
-    const plain = decodeEntities(stripHtml(String(inner)));
-    const text = plain
-    const id = hasId ? String(attrs.match(/\sid=["']([^"']+)["']/i)?.[1]) : slugify(text || "section");
-    if (!toc.find((t) => t.id === id)) toc.push({ id, text, level });
-    const attrStr = hasId ? String(attrs) : `${String(attrs)} id="${id}"`;
+function ensureHeadingIds(html: string) {
+  const seen = new Set<string>();
+  return html.replace(/<h([23])([^>]*)>([\s\S]*?)<\/h\1>/gi, (_m, lvl, attrs = "", inner) => {
+    const level = Number(lvl);
+    let attrStr = String(attrs);
+    const match = attrStr.match(/\sid=["']([^"']+)["']/i);
+    let id = match?.[1] ?? "";
+    if (!id) {
+      const plain = decodeEntities(stripHtml(String(inner)));
+      const base = slugify(plain || `section-${level}`);
+      const fallback = `section-${level}`;
+      let candidate = base || fallback;
+      let i = 2;
+      while (candidate && seen.has(candidate)) {
+        candidate = `${base || fallback}-${i++}`;
+      }
+      id = candidate || fallback;
+      attrStr = `${attrStr} id="${id}"`;
+    }
+    if (id) seen.add(id);
     return `<h${level}${attrStr}>${inner}</h${level}>`;
   });
-  return { html: out, toc };
 }
+
 
 async function getBaseUrlFromHeaders() {
   const h = await headers();
@@ -118,7 +130,26 @@ function injectCtaAfterNthParagraph(html: string, n = 3) {
     href="/contact-us/#book-an-appointment"
     data-button="true"
     class="${btn} mt-4 inline-flex items-center no-underline"
-  >Get started</a>
+    data-icon-affordance="right"
+  >
+    Get started
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="h-4 w-4 icon-affordance inline ml-2"
+      aria-hidden="true"
+    >
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </svg>
+  </a>
 </div>
 `.trim();
 
@@ -238,7 +269,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   // Build TOC + decorate + inject CTA (all on the server)
   const safeHtml = sanitizeHtml(post.contentHtml || "");
-  const { html: withIds, toc } = addIdsAndBuildToc(safeHtml);
+  const withIds = ensureHeadingIds(safeHtml);
   const withAnchors = decorateExternalAnchors(withIds, new URL(base).hostname);
   const htmlWithCta = injectCtaAfterNthParagraph(withAnchors, 3);
 
@@ -308,31 +339,29 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       ) : null}
 
       {/* Layout: content + TOC */}
-      <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <TocFromHeadings
+          root="#article-root"
+          levels={[2, 3]}
+          offset={100}
+          mobile
+        />
         {/* Article (single SSR block to avoid hydration mismatches) */}
         <article
-          className="prose"
+          id="article-root"
+          className="prose px-2"
           dangerouslySetInnerHTML={{ __html: htmlWithCta }}
         />
 
         {/* Sidebar (desktop, sticky) */}
-        <aside className="hidden lg:block">
-          <div className="sticky top-24 flex flex-col gap-6">
-            {/* TOC */}
-            {toc.length > 0 && (
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-                <div className="mb-3 text-sm font-semibold text-slate-900">On this page</div>
-                <ul className="space-y-2 text-sm">
-                  {toc.map((item) => (
-                    <li key={item.id} className={item.level === 3 ? "ml-3" : ""}>
-                      <a href={`#${item.id}`} className="text-slate-700 hover:text-[#0045d7]">
-                        {item.text}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+        <aside>
+          <div className="sticky top-24 grid grid-cols-1">
+            <TocFromHeadings
+              root="#article-root"
+              levels={[2, 3]}
+              offset={100}
+            />
+            <SidebarCta />
           </div>
         </aside>
       </div>

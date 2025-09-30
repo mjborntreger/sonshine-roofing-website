@@ -48,8 +48,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const scrollGuard = "scroll-mt-24";
-
 export default async function Page() {
   const pool = await listRecentPostsPool(36);
   const faqs = await listFaqsWithContent(8, "roof-maintenance").catch(() => []);
@@ -97,7 +95,7 @@ export default async function Page() {
             suppressHydrationWarning
             dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
           />
-          <h2 className={scrollGuard}>
+          <h2>
             Undoubtedly, lack of maintenance is among the top reasons why roofs fail.
           </h2>
           <p>

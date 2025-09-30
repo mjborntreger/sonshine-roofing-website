@@ -1,6 +1,5 @@
 import { Hammer, ChevronDown, House, ArrowLeftRight } from "lucide-react";
 
-const scrollGuard = "scroll-mt-24";
 const detailsStyles = "group not-prose rounded-lg border border-slate-300 bg-white";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-3";
 const chevronStyles = "h-5 w-5 transition-transform group-open:rotate-180";
@@ -12,7 +11,7 @@ export default async function RepairVsReplace() {
     return (
         <>
             <h2 
-                className={`${scrollGuard} text-center`}
+                className="text-center"
                 >
                     <ArrowLeftRight className="h-6 w-6 mr-2 inline text-[--brand-blue]"/>
                     Repair vs. Replace

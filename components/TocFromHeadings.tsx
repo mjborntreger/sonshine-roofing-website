@@ -1,8 +1,14 @@
 'use client';
 
+import { ArrowDown, ArrowRight, CornerDownRight, List } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import type { MouseEvent } from 'react';
+import styles from './styles/TocFromHeadings.module.css';
 
-type Item = { id: string; text: string };
+type TocLevel = 2 | 3;
+type Item = { id: string; text: string; level: TocLevel };
+
+type StructuredItem = Item & { children: Item[] };
 
 function slugify(s: string) {
   return s
@@ -14,36 +20,100 @@ function slugify(s: string) {
     .replace(/-+/g, '-');
 }
 
+function readStickyOffset(): number {
+  if (typeof window === 'undefined') return 0;
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--sticky-offset');
+  const value = Number.parseFloat(raw);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function normalizeLevels(levels: TocLevel[]): TocLevel[] {
+  const uniq: TocLevel[] = [];
+  for (const level of levels) {
+    if ((level === 2 || level === 3) && !uniq.includes(level)) uniq.push(level);
+  }
+  return uniq.length ? uniq.sort((a, b) => a - b) : [2];
+}
+
+function buildStructure(list: Item[]): StructuredItem[] {
+  const roots: StructuredItem[] = [];
+  let current: StructuredItem | null = null;
+
+  for (const entry of list) {
+    if (entry.level === 2) {
+      const node: StructuredItem = { ...entry, children: [] };
+      roots.push(node);
+      current = node;
+      continue;
+    }
+
+    if (entry.level === 3) {
+      if (current) {
+        current.children.push(entry);
+      } else {
+        roots.push({ ...entry, children: [] });
+      }
+    }
+  }
+
+  return roots;
+}
+
 export default function TocFromHeadings({
   root = '#article-root',
   className = 'text-sm',
-  /** px to offset scroll for sticky headers; use 0 if headings already have scroll-mt */
-  offset = 0,
+  /** px to offset scroll for sticky headers; defaults to the global --sticky-offset */
+  offset,
+  levels = [2],
+  title = 'ON THIS PAGE',
+  mobile = false,
 }: {
   root?: string; // CSS selector for the article container
   className?: string;
   offset?: number;
+  levels?: TocLevel[];
+  title?: string;
+  mobile?: boolean;
 }) {
   const [items, setItems] = useState<Item[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // Collect only H2 headings and ensure they have stable ids
+  const normalizedLevels = useMemo(() => normalizeLevels(levels), [levels]);
+  const levelSelector = useMemo(
+    () => normalizedLevels.map((lvl) => `h${lvl}`).join(', '),
+    [normalizedLevels],
+  );
+
+  // Collect headings and ensure they have stable ids
   useEffect(() => {
     const container = document.querySelector(root);
-    if (!container) return;
+    if (!container) {
+      setItems([]);
+      return;
+    }
+
+    const headingNodes = levelSelector
+      ? (Array.from(container.querySelectorAll(levelSelector)) as HTMLElement[])
+      : [];
+
+    if (!headingNodes.length) {
+      setItems([]);
+      return;
+    }
 
     const ids = new Set<string>();
 
     type Scanned = Item & {
       el: HTMLElement;
       excludedByContainer: boolean; // inside [data-toc-exclude] or .toc-exclude
-      excludedByName: boolean; // literal heading text to skip (e.g., You May Also Like)
+      excludedByName: boolean; // literal heading text to skip
     };
 
-    const scanned = Array.from(container.querySelectorAll('h2'))
-      .map((el): Scanned | null => {
-        const heading = el as HTMLElement;
+    const scanned = headingNodes
+      .map((heading): Scanned | null => {
         const text = (heading.textContent || '').trim();
+        const rawLevel = Number(heading.tagName.slice(1)) as TocLevel;
+        if (!normalizedLevels.includes(rawLevel)) return null;
 
         // Ensure a stable id
         let id = heading.id;
@@ -62,43 +132,56 @@ export default function TocFromHeadings({
         const excludedByContainer = !!heading.closest('[data-toc-exclude], .toc-exclude');
         const excludedByName = /^you\s+may\s+also\s+like$/i.test(text);
 
-        return { id, text, el: heading, excludedByContainer, excludedByName };
+        return { id, text, level: rawLevel, el: heading, excludedByContainer, excludedByName };
       })
       .filter(Boolean) as Scanned[];
 
     const found: Item[] = [];
     for (const it of scanned) {
       if (it.excludedByContainer || it.excludedByName) continue;
-      found.push({ id: it.id, text: it.text });
+      found.push({ id: it.id, text: it.text, level: it.level });
     }
 
     setItems((prev) => {
       if (
         prev.length === found.length &&
-        prev.every((p, i) => p.id === found[i].id && p.text === found[i].text)
+        prev.every((p, i) => p.id === found[i].id && p.text === found[i].text && p.level === found[i].level)
       ) {
         return prev;
       }
       return found;
     });
-  }, [root]);
+  }, [root, levelSelector, normalizedLevels]);
 
-  // Scroll-driven active heading
+  // Respect hash on load
   useEffect(() => {
-    const container = document.querySelector(root);
-    if (!container) return;
-    const headings = Array.from(container.querySelectorAll('h2')) as HTMLElement[];
+    if (!items.length) return;
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (hash) {
+      setActiveId(hash.slice(1));
+    }
+  }, [items]);
+
+  // Scroll-driven active heading (desktop / non-mobile only)
+  useEffect(() => {
+    if (!items.length || mobile) return;
+
+    const headings = items
+      .map((item) => document.getElementById(item.id))
+      .filter(Boolean) as HTMLElement[];
+
     if (!headings.length) return;
 
-    const thr = 2; // px cushion so we don't flicker at exact boundary
+    const thr = 100; // px cushion so we don't flicker at exact boundary
 
     const getActive = () => {
-      const adj = offset || 0;
-      // Choose the last heading whose top (minus offset) is above the viewport top
+      const adj = offset ?? readStickyOffset();
       let currentId = headings[0].id;
       for (let i = 0; i < headings.length; i++) {
         const t = headings[i].getBoundingClientRect().top - adj;
-        if (t <= thr) currentId = headings[i].id; else break;
+        if (t <= thr) currentId = headings[i].id;
+        else break;
       }
       return currentId;
     };
@@ -112,12 +195,8 @@ export default function TocFromHeadings({
       });
     };
 
-    // Initial state (respect hash if present)
-    if (location.hash) {
-      setActiveId(location.hash.slice(1));
-    } else {
-      setActiveId(getActive());
-    }
+    const initial = window.location.hash ? window.location.hash.slice(1) : getActive();
+    setActiveId(initial);
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
@@ -126,50 +205,100 @@ export default function TocFromHeadings({
       window.removeEventListener('resize', onScroll);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [root, offset, items.length]);
+  }, [items, offset, mobile]);
+
+
+  const visibilityClass = mobile ? 'block md:hidden' : 'hidden lg:block';
+  const navClasses = [
+    visibilityClass,
+    'rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm my-4',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const list = useMemo(() => items, [items]);
+  const structured = useMemo(() => buildStructure(list), [list]);
 
-  if (!list.length) return null;
+  if (!structured.length) return null;
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, id: string) => {
-    // Smooth-scroll; respect prefers-reduced-motion
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>, id: string) => {
     const el = document.getElementById(id);
     if (!el) return;
     e.preventDefault();
     const prefersNoMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (offset > 0) {
-      const top = window.scrollY + el.getBoundingClientRect().top - offset;
+    const resolvedOffset = offset ?? readStickyOffset();
+    if (resolvedOffset > 0) {
+      const top = window.scrollY + el.getBoundingClientRect().top - resolvedOffset;
       window.scrollTo({ top, behavior: prefersNoMotion ? 'auto' : 'smooth' });
     } else {
       el.scrollIntoView({ behavior: prefersNoMotion ? 'auto' : 'smooth', block: 'start' });
     }
-    // Update hash without big jump
-    history.replaceState(null, '', `#${id}`);
+    setActiveId(id);
+    if (typeof window !== 'undefined' && window.history?.replaceState) {
+      window.history.replaceState(null, '', `#${id}`);
+    }
+  };
+
+  const renderLink = (item: Item, active: boolean, isChild: boolean) => {
+    const linkClasses = [
+      'flex w-full items-start gap-1 transition-colors hover:text-[--brand-blue]',
+      active ? 'text-[--brand-blue] font-medium' : 'text-slate-700',
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    return (
+      <a
+        href={`#${item.id}`}
+        onClick={(e) => handleClick(e, item.id)}
+        aria-current={active ? 'true' : undefined}
+        className={linkClasses}
+      >
+        {isChild && <CornerDownRight className="h-4 w-4 inline text-[--brand-orange]" aria-hidden="true" />}
+        <span className="flex-1 leading-snug">{item.text}</span>
+      </a>
+    );
   };
 
   return (
     <nav
       aria-label="Table of contents"
-      className={['rounded-2xl border border-slate-200 bg-white p-4 shadow-sm mt-4', className].join(' ')}
+      className={navClasses}
     >
-      <div className="mb-3 text-xs text-center font-semibold text-slate-900">ON THIS PAGE</div>
-      <ul className="space-y-2 text-sm">
-        {list.map((i) => {
-          const active = i.id === activeId;
+      <div className="mb-3 text-sm text-center font-semibold tracking-wide text-slate-900">
+        <List className="h-4 w-4 inline mr-2 text-[--brand-blue]" aria-hidden="true" />
+        {title}
+        <ArrowDown className="h-4 w-4 inline ml-2 text-[--brand-blue]" aria-hidden="true" />
+      </div>
+      <ul className={[styles.tocList, styles.tocListRoot, 'space-y-2 text-md'].join(' ')}>
+        {structured.map((section) => {
+          const isH3Root = section.level === 3;
+          const active = section.id === activeId;
+
+          if (isH3Root) {
+            return (
+              <li key={section.id} className="pl-3">
+                {renderLink(section, active, true)}
+              </li>
+            );
+          }
+
           return (
-            <li key={i.id}>
-              <a
-                href={`#${i.id}`}
-                onClick={(e) => handleClick(e, i.id)}
-                aria-current={active ? 'true' : undefined}
-                className={[
-                  'block hover:text-[--brand-blue] transition-colors',
-                  active ? 'text-[--brand-blue] font-medium' : 'text-slate-700',
-                ].join(' ')}
-              >
-                {i.text}
-              </a>
+            <li key={section.id} className={styles.tocBullet}>
+              {renderLink(section, active, false)}
+              {section.children.length > 0 && (
+                <ul className={[styles.tocList, 'mt-2 space-y-1 pl-0'].join(' ')}>
+                  {section.children.map((child) => {
+                    const childActive = child.id === activeId;
+                    return (
+                      <li key={child.id} className="pl-3">
+                        {renderLink(child, childActive, true)}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </li>
           );
         })}

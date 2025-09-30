@@ -1,0 +1,17 @@
+.tocList {
+  margin: 0;
+  list-style: none;
+}
+
+.tocListRoot {
+  padding-left: 1rem;
+}
+
+.tocBullet {
+  list-style: disc;
+  list-style-position: outside;
+}
+
+.tocBullet::marker {
+  color: var(--brand-blue);
+}

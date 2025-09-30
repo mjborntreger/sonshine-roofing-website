@@ -9,7 +9,6 @@ import type { Metadata } from "next";
 import FinancingBand from "@/components/FinancingBand";
 import ServicesAside from "@/components/ServicesAside";
 
-const scrollGuard = "scroll-mt-24";
 const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white mb-4";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 const figureStyles = "not-prose py-8";
@@ -112,7 +111,7 @@ export default async function Page() {
             dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
           />
 
-          <h2 className={scrollGuard}>What Does It Cost to Repair a Roof?</h2>
+          <h2>What Does It Cost to Repair a Roof?</h2>
           <div className="my-4 rounded-xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
             <strong className="block text-slate-900 mb-1">Fact:</strong>
             <p className="m-0 text-slate-700">
@@ -137,12 +136,12 @@ export default async function Page() {
 
           <FinancingBand />
 
-          <h2 className={scrollGuard}>Common Roof Repairs</h2>
+          <h2>Common Roof Repairs</h2>
           <details className={detailsStyles}>
             <summary className={summaryStyles}>
               <span className="flex items-center gap-2">
                 <Layers className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                <h3 className={scrollGuard + " m-0"}>Curling Shingles</h3>
+                <h3 className="m-0">Curling Shingles</h3>
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
@@ -180,7 +179,7 @@ export default async function Page() {
             <summary className={summaryStyles}>
               <span className="flex items-center gap-2">
                 <Droplets className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                <h3 className={scrollGuard + " m-0"}>Water Damage</h3>
+                <h3 className="m-0">Water Damage</h3>
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
@@ -215,7 +214,7 @@ export default async function Page() {
             <summary className={summaryStyles}>
               <span className="flex items-center gap-2">
                 <Bug className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                <h3 className={scrollGuard + " m-0"}>Insect Damage</h3>
+                <h3 className="m-0">Insect Damage</h3>
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
@@ -253,7 +252,7 @@ export default async function Page() {
             <summary className={summaryStyles}>
               <span className="flex items-center gap-2">
                 <Hammer className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                <h3 className={scrollGuard + " m-0"}>Worn Out or Damaged Flashings</h3>
+                <h3 className="m-0">Worn Out or Damaged Flashings</h3>
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>
@@ -295,7 +294,7 @@ export default async function Page() {
             <summary className={summaryStyles}>
               <span className="flex items-center gap-2">
                 <PanelRight className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                <h3 className={scrollGuard + " m-0"}>Rotting Fascia</h3>
+                <h3 className="m-0">Rotting Fascia</h3>
               </span>
               <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
             </summary>

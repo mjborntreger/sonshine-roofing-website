@@ -52,9 +52,9 @@ export default function Hero() {
               <a
                 href="/contact-us"
                 aria-label="Contact SonShine Roofing"
-                className="inline-flex btn btn-brand-blue btn-lg md:btn-hero items-center"
+                className="phone-affordance inline-flex btn btn-brand-blue btn-lg md:btn-hero items-center"
               >
-                <Phone className="mr-2 h-4 w-4 md:h-6 md:w-6" aria-hidden="true" />
+                <Phone className="phone-affordance-icon mr-2 h-4 w-4 md:h-6 md:w-6" aria-hidden="true" />
                 <span>Contact Us</span>
               </a>
 

@@ -3,7 +3,7 @@
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
-import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight } from 'lucide-react';
+import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight, HandCoins, Wallet } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 
@@ -287,7 +287,9 @@ const pillBase = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-s
 const infoPillClass = `${pillBase} text-slate-400`;
 const successPillClass = `${pillBase} bg-emerald-500 text-white`;
 const gradientShell = 'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
-const innerPanel = 'rounded-3xl bg-white overflow-hidden';
+const innerPanelBase = 'rounded-3xl bg-white';
+const innerPanelLocked = `${innerPanelBase} overflow-hidden`;
+const innerPanelUnlocked = innerPanelBase;
 const stepCardClass = 'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
 const inputBaseClass = 'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
 
@@ -1120,7 +1122,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   if (!unlocked || !showCalculator) {
     return (
       <div id="estimator" className={gradientShell}>
-        <form onSubmit={handleSubmit} noValidate className={innerPanel}>
+        <form onSubmit={handleSubmit} noValidate className={innerPanelLocked}>
           <span className="sr-only" aria-live="polite">{liveStatus}</span>
           <input
             type="text"
@@ -1143,10 +1145,11 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 type="button"
                 onClick={handleShowCalculatorView}
                 className="text-sm font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+                data-icon-affordance="right"
               >
                 <Calculator className='h-4 w-4 inline mr-2 text-[--brand-blue]' />
                 To Calculator
-                <Forward className='h-5 w-5 inline ml-2 text-[--brand-blue]' />
+                <Forward className='icon-affordance h-5 w-5 inline ml-2 text-[--brand-blue]' />
               </button>
             </div>
           )}
@@ -1154,8 +1157,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           <div className="bg-blue-50/40 text-sm text-slate-600 px-8 pt-6">
             Answer a few quick questions to reveal monthly payment estimates for YGrene and Service Finance programs.
           </div>
-
-          <div className="space-y-6 bg-blue-50/40 px-6 py-6">
+          <div className="space-y-6 bg-blue-50/40 px-6 py-6 rounded-b-3xl">
             <div className="flex flex-col gap-2 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm md:flex-row md:items-center md:justify-between">
               <div className="flex flex-wrap items-center gap-3">
                 <span>{stepTitle}</span>
@@ -1255,7 +1257,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
   return (
     <div id="estimator" className={gradientShell}>
-      <section className={innerPanel}>
+      <section className={innerPanelUnlocked}>
         <header className="flex items-center justify-between gap-3 rounded-t-3xl bg-blue-50 px-6 py-4">
           <div className="flex items-center gap-2 text-slate-900">
             <SearchCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
@@ -1267,7 +1269,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           </span>
         </header>
 
-        <div className="space-y-6 bg-blue-50/40 px-6 py-6">
+        <div className="space-y-6 bg-blue-50/40 px-6 py-6 rounded-b-3xl">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <button
               type="button"
@@ -1328,9 +1330,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                           <a
                             href={detailHref}
                             className="group inline-flex items-center gap-[0.10rem] text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+                            data-icon-affordance="right"
                           >
                             see details
-                            <ChevronRight className="h-3 w-3 text-slate-600 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1" aria-hidden="true" />
+                            <ChevronRight className="h-3 w-3 text-slate-600 icon-affordance" aria-hidden="true" />
                           </a>
                         </div>
                         <span className="text-lg font-semibold text-slate-800">{displayedMatch}% match</span>
@@ -1361,8 +1364,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               htmlFor="activeAmount"
               className="block text-md font-medium text-slate-700"
             >
-
-              Est. Budget
+              <Wallet className='h-4 w-4 mr-2 inline text-[--brand-blue]' />
+              Project Budget
             </label>
             <div className="flex items-center gap-[0.35rem]">
               <DollarSign className="h-6 w-6 text-[--brand-blue]" />
@@ -1411,6 +1414,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
           <div className="rounded-2xl border border-blue-200 bg-white shadow-md">
             <div className="text-center border-b border-blue-100 p-4 text-2xl font-semibold text-[--brand-blue]">
+              <HandCoins className="h-6 w-6 mr-2 inline text-[--brand-blue]" />
               Est. Monthly Payment
               <ArrowDown className='h-6 w-6 text-[--brand-blue] inline ml-2' />
             </div>
@@ -1468,18 +1472,20 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             <a
               className="group inline-flex items-center text-md font-semibold text-[--brand-blue] hover:underline"
               href="#docs"
+              data-icon-affordance="right"
             >
               <HelpCircle className="h-5 w-4 mr-2 inline text-slate-600" />
               What documents will I need?
-              <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1" />
+              <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 icon-affordance" />
             </a>
             <a
               className="group inline-flex items-center text-md font-semibold text-[--brand-blue] hover:underline"
               href="#pick-a-plan"
+              data-icon-affordance="right"
             >
               <HelpCircle className="h-5 w-4 mr-2 inline text-slate-600" />
               What's the next step?
-              <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1" />
+              <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 icon-affordance" />
             </a>
           </div>
 

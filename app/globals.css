@@ -24,8 +24,8 @@
   --elev-1: 0 1px 2px rgba(2, 6, 23, .06), 0 1px 1px rgba(2, 6, 23, .04);
   --elev-2: 0 8px 24px rgba(2, 6, 23, .10);
 
-/* Sticky offset */
---sticky-offset: 6rem;
+  /* Sticky offset */
+  --sticky-offset: 6rem;
 
 /* Skeleton defaults */
 --skeleton-base: rgba(0, 0, 0, 0.06);
@@ -33,7 +33,7 @@
 --skeleton-radius: 0.5rem;
 }
 html { scroll-padding-top: var(--sticky-offset); }
-.prose :where(h2,h3)[id] { scroll-margin-top: var(--sticky-offset); }
+:is(h1,h2,h3,h4,h5,h6,section,article,div,main)[id] { scroll-margin-top: var(--sticky-offset); }
 /* ---------------------------------------
    Fonts
 ----------------------------------------*/
@@ -164,19 +164,24 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
    Icon affordance helpers
 ----------------------------------------*/
 @layer components {
-  [data-icon-affordance] .icon-affordance {
-    --icon-affordance-shift: 0.25rem;
-    --icon-affordance-direction: 1;
+  .icon-affordance {
+    --icon-affordance-shift: 0.125rem;
     --icon-affordance-ease: cubic-bezier(0.4, 0, 0.2, 1);
+    --icon-affordance-dir-x: 0;
+    --icon-affordance-dir-y: 0;
+    --icon-affordance-state: 0;
     transition: transform 200ms var(--icon-affordance-ease);
     transform: translate3d(0, 0, 0);
     will-change: transform;
-    pointer-events: none;
   }
 
-  [data-icon-affordance='left'] .icon-affordance,
-  [data-icon-affordance='back'] .icon-affordance {
-    --icon-affordance-direction: -1;
+  [data-icon-affordance] .icon-affordance {
+    pointer-events: none;
+    transform: translate3d(
+      calc(var(--icon-affordance-dir-x, 0) * var(--icon-affordance-shift, 0) * var(--icon-affordance-state, 0)),
+      calc(var(--icon-affordance-dir-y, 0) * var(--icon-affordance-shift, 0) * var(--icon-affordance-state, 0)),
+      0
+    );
   }
 
   [data-icon-affordance='tight'] .icon-affordance,
@@ -191,35 +196,83 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 
   [data-icon-affordance='right'] .icon-affordance,
   [data-icon-affordance='forward'] .icon-affordance {
-    --icon-affordance-direction: 1;
+    --icon-affordance-dir-x: 1;
+    --icon-affordance-dir-y: 0;
+  }
+
+  [data-icon-affordance='left'] .icon-affordance,
+  [data-icon-affordance='back'] .icon-affordance {
+    --icon-affordance-dir-x: -1;
+    --icon-affordance-dir-y: 0;
+  }
+
+  [data-icon-affordance='down'] .icon-affordance {
+    --icon-affordance-dir-x: 0;
+    --icon-affordance-dir-y: 1;
+  }
+
+  [data-icon-affordance='up'] .icon-affordance {
+    --icon-affordance-dir-x: 0;
+    --icon-affordance-dir-y: -1;
+  }
+
+  [data-icon-affordance='up-right'] .icon-affordance {
+    --icon-affordance-dir-x: 1;
+    --icon-affordance-dir-y: -1;
   }
 
   [data-icon-affordance]:hover .icon-affordance,
   [data-icon-affordance]:focus-visible .icon-affordance {
-    transform: translateX(calc(var(--icon-affordance-direction, 1) * var(--icon-affordance-shift)));
+    --icon-affordance-state: 1;
   }
 
   [data-icon-affordance][data-icon-affordance-active] .icon-affordance,
   [data-icon-affordance]:active .icon-affordance {
-    transform: translateX(calc(var(--icon-affordance-direction, 1) * (var(--icon-affordance-shift) * 1.2)));
-  }
-
-  .icon-affordance {
-    --icon-affordance-shift: 0.25rem;
-    transition: transform 200ms var(--icon-affordance-ease, cubic-bezier(0.4, 0, 0.2, 1));
-    transform: translate3d(0, 0, 0);
-    will-change: transform;
+    --icon-affordance-state: 1.2;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-icon-affordance] .icon-affordance,
+  [data-icon-affordance] .icon-affordance {
+    transition-duration: 0ms;
+  }
+
   [data-icon-affordance]:hover .icon-affordance,
   [data-icon-affordance]:focus-visible .icon-affordance,
-  [data-icon-affordance]:active .icon-affordance {
-    transition-duration: 0ms;
+  [data-icon-affordance]:active .icon-affordance,
+  [data-icon-affordance][data-icon-affordance-active] .icon-affordance {
+    --icon-affordance-state: 0;
     transform: none !important;
   }
+}
+
+/* ---------------------------------------
+   Phone jiggle affordance
+----------------------------------------*/
+@layer components {
+  .phone-affordance {
+    --phone-jiggle-duration: 0.55s;
+    --phone-jiggle-angle-large: 10deg;
+    --phone-jiggle-angle-small: 6deg;
+  }
+
+  .phone-affordance:hover .phone-affordance-icon,
+  .phone-affordance:focus-visible .phone-affordance-icon {
+    animation: phone-jiggle var(--phone-jiggle-duration) ease-in-out;
+  }
+
+  .phone-affordance-icon {
+    transform-origin: center;
+  }
+}
+
+@keyframes phone-jiggle {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(calc(var(--phone-jiggle-angle-large) * -1)); }
+  40% { transform: rotate(var(--phone-jiggle-angle-large)); }
+  60% { transform: rotate(calc(var(--phone-jiggle-angle-small) * -1)); }
+  80% { transform: rotate(var(--phone-jiggle-angle-small)); }
+  100% { transform: rotate(0deg); }
 }
 
 /* ---------------------------------------

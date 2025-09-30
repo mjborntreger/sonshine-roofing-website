@@ -199,7 +199,7 @@ export default async function Page() {
       </Section>
 
       <Section>
-        <h2 id="meet-our-team" className="text-center mb-8 meet-our-team scroll-mt-8 text-3xl lg:text-5xl">Meet Our Team</h2>
+        <h2 id="meet-our-team" className="text-center mb-8 meet-our-team text-3xl lg:text-5xl">Meet Our Team</h2>
         <div className="gradient-divider my-4" />
         <PersonGrid people={people} />
       </Section>

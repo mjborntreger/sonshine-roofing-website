@@ -41,6 +41,11 @@ export default function RevealContact(props: Props) {
   const linkClasses =
     props.linkClassName ?? 'inline-flex items-center gap-2 text-[--brand-blue] underline underline-offset-2';
   const wrapperClasses = 'block my-2';
+  const isPhoneVariant = props.variant === 'phone';
+  const buttonClassName = isPhoneVariant ? `${btnClasses} phone-affordance` : btnClasses;
+  const baseIconClass = 'h-4 w-4';
+  const iconClassName = isPhoneVariant ? `${baseIconClass} phone-affordance-icon` : baseIconClass;
+  const revealedLinkClass = isPhoneVariant ? `${linkClasses} phone-affordance` : linkClasses;
 
   function decode() {
     if (props.variant === 'email') {
@@ -118,8 +123,8 @@ export default function RevealContact(props: Props) {
     return (
       <div className={wrapperClasses}>
         <div className="flex flex-wrap items-center gap-2" id="revealed-contact">
-          <a href={href} className={linkClasses} aria-label={`${props.variant} ${displayPretty}${ext ? ' extension ' + ext : ''}`} rel="nofollow noopener">
-            <Icon className="h-4 w-4" aria-hidden="true" />
+          <a href={href} className={revealedLinkClass} aria-label={`${props.variant} ${displayPretty}${ext ? ' extension ' + ext : ''}`} rel="nofollow noopener">
+            <Icon className={iconClassName} aria-hidden="true" />
             <span>{displayPretty}</span>
           </a>
           {props.variant === 'phone' && ext ? (
@@ -150,12 +155,14 @@ export default function RevealContact(props: Props) {
     <div className={wrapperClasses}>
       <button
         type="button"
-        className={btnClasses}
+        className={buttonClassName}
         onClick={() => { decode(); setRevealed(true); }}
         aria-expanded={revealed}
         aria-controls="revealed-contact"
       >
-        {props.variant === 'email' ? <Mail className="h-4 w-4" aria-hidden="true" /> : <Phone className="h-4 w-4" aria-hidden="true" />}
+        {props.variant === 'email'
+          ? <Mail className={baseIconClass} aria-hidden="true" />
+          : <Phone className={iconClassName} aria-hidden="true" />}
         <span>{label}</span>
       </button>
     </div>

@@ -9,7 +9,6 @@ import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";
 
-const scrollGuard = "scroll-mt-24";
 const detailsStyles = "group not-prose rounded-xl border border-slate-200 bg-white mb-4";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 const figureStyles = "not-prose py-8";
@@ -133,7 +132,7 @@ export default async function Page() {
               dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
             />
 
-            <h2 className={scrollGuard}>How do you know if you need a roof replacement?</h2>
+            <h2>How do you know if you need a roof replacement?</h2>
             <p>
               The thought of replacing your roof may feel overwhelming,
               but we’re here to help. Our Roofing Specialists and Production
@@ -147,12 +146,12 @@ export default async function Page() {
 
             <FinancingBand />
 
-            <h2 className={scrollGuard}>What Should You Know Before Getting a Roof Replacement?</h2>
+            <h2>What Should You Know Before Getting a Roof Replacement?</h2>
             <details className={detailsStyles}>
               <summary className={summaryStyles}>
                 <span className="flex items-center gap-2">
                   <ShieldCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className={scrollGuard + " m-0"}>Know Your Contractor</h3>
+                  <h3 className="m-0">Know Your Contractor</h3>
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
@@ -193,7 +192,7 @@ export default async function Page() {
               <summary className={summaryStyles}>
                 <span className="flex items-center gap-2">
                   <Layers className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className={scrollGuard + " m-0"}>Know What Materials You Need</h3>
+                  <h3 className="m-0">Know What Materials You Need</h3>
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
@@ -235,7 +234,7 @@ export default async function Page() {
               <summary className={summaryStyles}>
                 <span className="flex items-center gap-2">
                   <BadgeCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className={scrollGuard + " m-0"}>Know What Warranties Come with Your New Roof</h3>
+                  <h3 className="m-0">Know What Warranties Come with Your New Roof</h3>
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
@@ -245,7 +244,7 @@ export default async function Page() {
                   <br /><br />
                 </p>
 
-                <h4 className={scrollGuard}>Workmanship Warranty</h4>
+                <h4>Workmanship Warranty</h4>
                 {/* Inline callout (#6) */}
                 <div className="my-4 rounded-xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
                   <strong className="block text-slate-900 mb-1">Fact:</strong>
@@ -266,7 +265,7 @@ export default async function Page() {
                   <br /><br />
                 </p>
 
-                <h4 className={scrollGuard}>Manufacturer Warranty</h4>
+                <h4>Manufacturer Warranty</h4>
                 <p>
                   Many roofing materials also come with warranties directly from the manufacturer
                   that protect against product defects. That being said, such defects are incredibly
@@ -278,7 +277,7 @@ export default async function Page() {
                   <br /><br />
                 </p>
 
-                <h4 className={scrollGuard}>Important Note</h4>
+                <h4>Important Note</h4>
                 <p>
                   As with any contract, always read the fine print before you sign. Be aware that
                   warranties typically do not cover anything considered beyond “normal wear and tear.”
@@ -294,7 +293,7 @@ export default async function Page() {
               <summary className={summaryStyles}>
                 <span className="flex items-center gap-2">
                   <Wrench className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className={scrollGuard + " m-0"}>Know the Importance of Roof Maintenance</h3>
+                  <h3 className="m-0">Know the Importance of Roof Maintenance</h3>
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>
@@ -344,7 +343,7 @@ export default async function Page() {
               <summary className={summaryStyles}>
                 <span className="flex items-center gap-2">
                   <ListChecks className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className={scrollGuard + " m-0"}>Know What to Expect</h3>
+                  <h3 className="m-0">Know What to Expect</h3>
                 </span>
                 <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
               </summary>

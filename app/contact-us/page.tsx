@@ -2,13 +2,14 @@ import Section from "@/components/layout/Section";
 import AcculynxLeadForm from "@/components/AcculynxLeadForm";
 import SmartLink from "@/components/SmartLink";
 import UiLink from "@/components/UiLink";
-import { Phone, Mail, MapPin, Map, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays } from "lucide-react";
+import { Phone, Mail, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays, MapPinned } from "lucide-react";
 import Image from 'next/image';
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import type { Metadata } from 'next';
 import LiteMap from "@/components/LiteMap";
 import OpenOrClosed from "@/components/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
+import FinancingBand from "@/components/FinancingBand";
 
 // ===== STATIC SEO FOR /contact-us (EDIT HERE) =====
 const SEO_TITLE_CONTACT = 'Contact SonShine Roofing | Sarasota Roofing Company';
@@ -111,10 +112,10 @@ export default function Page() {
               <div className="my-8 flex flex-wrap gap-3">
                 <UiLink
                   href="tel:+19418664320"
-                  className={`${contactInfoPillStyles} w-full`}
+                  className={`${contactInfoPillStyles} w-full phone-affordance`}
                   title="Call SonShine Roofing"
                 >
-                  <Phone className={contactInfoIconStyles} aria-hidden="true" />
+                  <Phone className={`${contactInfoIconStyles} phone-affordance-icon`} aria-hidden="true" />
                   <span className="font-semibold min-w-0 break-words">(941) 866-4320</span>
                 </UiLink>
 
@@ -149,6 +150,8 @@ export default function Page() {
               </p>
             </div>
 
+            <FinancingBand />
+
 
             <div className="mt-8">
               <h2 className="top-24 flex items-center gap-2" id="book-an-appointment">
@@ -176,8 +179,8 @@ export default function Page() {
         </div>
         <div className="my-24">
           <h2 className="text-2xl md:text-5xl mb-16 text-center flex items-center justify-center gap-3">
-            <Map className="h-6 w-6 md:h-12 md:w-12 text-[--brand-blue]" aria-hidden="true" />
             <span>Find Us on Google Maps</span>
+            <MapPinned className="h-6 w-6 md:h-12 md:w-12 inline text-[--brand-blue]" aria-hidden="true" />
           </h2>
           <LiteMap />
         </div>

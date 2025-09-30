@@ -138,7 +138,7 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
         setOpenMap((m) => ({ ...m, [id]: !m[id] }));
 
     return (
-        <div className={clsx('scroll-mt-24 mt-32', className)}>
+        <div className={clsx('mt-32', className)}>
             <header className="text-center">
                 <h2 id="tip-top-roof-checkup" className="text-3xl md:text-4xl font-semibold">Tip Top Roof Check‑up</h2>
                 <p className="mt-3 text-slate-600">

@@ -14,8 +14,8 @@ export default function ServicesAside() {
 
             <TocFromHeadings
                 root="#article-root"
-                offset={128}
-                className="hidden lg:block" 
+                offset={100}
+                levels={[2]}
             />
 
             <div className="h-[1px] w-full bg-slate-200 my-4" />
@@ -44,10 +44,10 @@ export default function ServicesAside() {
                 </UiLink>
                 <UiLink
                     href="tel:19418664320"
-                    className={`${buttonStyles} btn-outline`}
+                    className={`${buttonStyles} btn-outline phone-affordance`}
                     aria-label="Call SonShine Roofing"
                 >
-                    <Phone className={semanticIconStyles} />
+                    <Phone className={`${semanticIconStyles} phone-affordance-icon`} />
                     (941) 866-4320
                 </UiLink>
             </div>

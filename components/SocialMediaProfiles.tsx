@@ -32,8 +32,8 @@ export default function SocialMediaProfiles() {
   return (
     <div>
       <div className="rounded-2xl border border-slate-300 bg-white p-4 shadow-sm">
-        <div className="mb-2 text-xs text-center font-semibold uppercase tracking-wide text-slate-700">
-          <Share2 className="inline h-3 w-3 mr-2 font-semibold" />
+        <div className="mb-3 text-sm text-center font-semibold uppercase tracking-wide text-slate-700">
+          <Share2 className="inline h-4 w-4 mr-2 text-green-600" />
           Social Media Profiles
         </div>
 

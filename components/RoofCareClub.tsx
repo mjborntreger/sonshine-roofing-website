@@ -197,9 +197,9 @@ export default function RoofCareClub() {
   }), [base, pageUrl, providerId, offerCatalog]);
 
   return (
-    <div aria-labelledby="rcc-title" className="mt-24 py-8 not-prose">
+    <div aria-labelledby="roof-care-club" className="mt-24 py-8 not-prose">
       <div className="text-center max-w-3xl mx-auto">
-        <h2 id="rcc-title" className="text-3xl md:text-4xl font-semibold tracking-tight">
+        <h2 id="roof-care-club" className="text-3xl md:text-4xl font-semibold tracking-tight">
           Roof Care Club
         </h2>
         <p className="mt-4 text-slate-600">
