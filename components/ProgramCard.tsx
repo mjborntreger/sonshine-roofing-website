@@ -21,9 +21,11 @@ type ProgramCardProps = {
   recommended?: boolean;
   // Optional logo URL placeholders (provide real URLs later)
   logoUrl?: string;
+  id?: string;
 };
 
 export default function ProgramCard({
+  id,
   title,
   subtitle,
   chips = [],
@@ -73,7 +75,9 @@ export default function ProgramCard({
         isBluePrimary && "shadow-lg"
       )}
     >
-      <section className={cn("rounded-2xl bg-white h-full flex flex-col")}
+      <section
+        id={id}
+        className={cn("rounded-2xl bg-white h-full flex flex-col")}
         aria-label={title}
       >
         {/* Distinct header bar with motif + optional badge */}

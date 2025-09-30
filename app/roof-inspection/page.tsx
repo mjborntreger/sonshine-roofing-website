@@ -12,7 +12,7 @@ const scrollGuard = "scroll-mt-24";
 
 // ===== STATIC SEO FOR /roof-inspection (EDIT HERE) =====
 const SEO_TITLE_ROOF_INSPECTION = 'Roof Inspection in Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
-const SEO_DESCRIPTION_ROOF_INSPECTION = 'Licensed roof inspections to catch hidden leaks and extend roof life. Serving Southwest Florida since 1987.';
+const SEO_DESCRIPTION_ROOF_INSPECTION = 'Licensed residential roofing inspections to catch hidden leaks and extend roof life. Serving Southwest Florida since 1987.';
 const SEO_KEYWORDS_ROOF_INSPECTION = [
   'roof inspection',
   'roof evaluation',

@@ -2,8 +2,8 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, LayoutGroup, motion } from 'framer-motion';
-import { Calculator, Check, CheckCircle2, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown } from 'lucide-react';
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
+import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 
@@ -277,6 +277,11 @@ const MATCH_PROGRAMS: Record<FinancingProgramKey, { label: string; programIds: s
   },
 };
 
+const PROGRAM_DETAIL_ANCHORS: Record<FinancingProgramKey, string> = {
+  serviceFinance: '#service-finance-program-card',
+  ygrene: '#ygrene-program-card',
+};
+
 // ============ STYLE CONSTANTS ====================== //
 const pillBase = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-tight shadow-sm';
 const infoPillClass = `${pillBase} text-slate-400`;
@@ -396,6 +401,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   const [contactEditMode, setContactEditMode] = useState(false);
   const confirmTimeoutRef = useRef<number | null>(null);
   const [liveStatus, setLiveStatus] = useState('');
+  const [animatedScores, setAnimatedScores] = useState<Record<FinancingProgramKey, number>>({
+    serviceFinance: 0,
+    ygrene: 0,
+  });
 
   const [formValues, setFormValues] = useState<FormValues>({
     firstName: '',
@@ -455,6 +464,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   }, [paymentRows]);
 
   const displayScores = persistedScores ?? computedScores;
+  const prefersReducedMotion = useReducedMotion();
   const leadingProgram: FinancingProgramKey | null = displayScores
     ? displayScores.ygreneScore === displayScores.serviceFinanceScore
       ? null
@@ -467,6 +477,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   const effectiveLastStepIndex = allowContactSteps ? thirdFormStepIndex : summaryStepIndex;
 
   const stepContentRef = useRef<HTMLDivElement | null>(null);
+  const scoreAnimationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!customPulse) return;
@@ -499,6 +510,63 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     });
     return () => window.cancelAnimationFrame(raf);
   }, [step]);
+
+  useEffect(() => {
+    if (scoreAnimationFrameRef.current != null) {
+      cancelAnimationFrame(scoreAnimationFrameRef.current);
+      scoreAnimationFrameRef.current = null;
+    }
+
+    if (!displayScores) {
+      setAnimatedScores({ serviceFinance: 0, ygrene: 0 });
+      return;
+    }
+
+    if (!showCalculator) {
+      setAnimatedScores({ serviceFinance: 0, ygrene: 0 });
+      return;
+    }
+
+    const targetScores: Record<FinancingProgramKey, number> = {
+      serviceFinance: displayScores.serviceFinanceScore,
+      ygrene: displayScores.ygreneScore,
+    };
+
+    if (prefersReducedMotion) {
+      setAnimatedScores(targetScores);
+      return;
+    }
+
+    const durationMs = 800;
+    const startTime = performance.now();
+
+    setAnimatedScores({ serviceFinance: 0, ygrene: 0 });
+
+    const stepFrame = (now: number) => {
+      const progress = Math.min((now - startTime) / durationMs, 1);
+      const nextScores: Record<FinancingProgramKey, number> = {
+        serviceFinance: targetScores.serviceFinance * progress,
+        ygrene: targetScores.ygrene * progress,
+      };
+      setAnimatedScores(nextScores);
+
+      if (progress < 1) {
+        scoreAnimationFrameRef.current = requestAnimationFrame(stepFrame);
+      } else {
+        scoreAnimationFrameRef.current = null;
+        setAnimatedScores(targetScores);
+      }
+    };
+
+    scoreAnimationFrameRef.current = requestAnimationFrame(stepFrame);
+
+    return () => {
+      if (scoreAnimationFrameRef.current != null) {
+        cancelAnimationFrame(scoreAnimationFrameRef.current);
+        scoreAnimationFrameRef.current = null;
+      }
+    };
+  }, [displayScores, showCalculator, prefersReducedMotion]);
 
   const validateFormStep = (currentStep: number) => {
     const nextErrors: Record<string, string> = {};
@@ -756,7 +824,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         try {
           (window as any).dataLayer = (window as any).dataLayer || [];
           (window as any).dataLayer.push({ event: 'financing_calculator_submit', form: 'monthly_estimator' });
-        } catch {}
+        } catch { }
         return;
       }
       setSubmission('error');
@@ -802,11 +870,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   key={option.value}
                   type="button"
                   onClick={() => handleQuizAnswer(stepIndex, option.value)}
-                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
-                    selected
-                      ? 'border-[--brand-blue] bg-[--brand-blue]/10 text-[--brand-blue] focus-visible:ring-[--brand-blue]/40'
-                      : 'border-slate-200 bg-white text-slate-700 hover:border-[--brand-blue]/40 hover:bg-[--brand-blue]/5 focus-visible:ring-[--brand-blue]/40'
-                  }`}
+                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${selected
+                    ? 'border-[--brand-blue] bg-[--brand-blue]/10 text-[--brand-blue] focus-visible:ring-[--brand-blue]/40'
+                    : 'border-slate-200 bg-white text-slate-700 hover:border-[--brand-blue]/40 hover:bg-[--brand-blue]/5 focus-visible:ring-[--brand-blue]/40'
+                    }`}
                   aria-pressed={selected}
                 >
                   <span>{option.label}</span>
@@ -829,11 +896,11 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
       return (
         <div className={stepCardClass} aria-live="polite">
-          <p 
+          <p
             className="text-base font-semibold text-slate-900"
-            >
-              Your answers
-              <ArrowDown className='h-4 w-4 inline ml-2' />
+          >
+            Your answers
+            <ArrowDown className='h-4 w-4 inline ml-2' />
           </p>
           <ul className="mt-3 space-y-2 text-sm text-slate-700">
             {summaryItems.map((item) => (
@@ -1070,6 +1137,20 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </div>
           </header>
 
+          {unlocked && (
+            <div className="bg-blue-50/40 flex justify-end py-6 pr-6">
+              <button
+                type="button"
+                onClick={handleShowCalculatorView}
+                className="text-sm font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+              >
+                <Calculator className='h-4 w-4 inline mr-2 text-[--brand-blue]' />
+                To Calculator
+                <Forward className='h-5 w-5 inline ml-2 text-[--brand-blue]' />
+              </button>
+            </div>
+          )}
+
           <div className="bg-blue-50/40 text-sm text-slate-600 px-8 pt-6">
             Answer a few quick questions to reveal monthly payment estimates for YGrene and Service Finance programs.
           </div>
@@ -1098,17 +1179,6 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               <span className="text-slate-500 md:hidden">{stepSubtitle}</span>
               <span className={`${infoPillClass} hidden md:inline-flex`}>{stepSubtitle}</span>
             </div>
-            {unlocked && (
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={handleShowCalculatorView}
-                  className="text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
-                >
-                  Back to calculator view
-                </button>
-              </div>
-            )}
 
             <LayoutGroup>
               <AnimatePresence mode="wait">
@@ -1118,7 +1188,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   ref={stepContentRef}
                   tabIndex={-1}
                   className="focus:outline-none"
-                  initial={{opacity: 1}}
+                  initial={{ opacity: 1 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.28, ease: [0.32, 0, 0.15, 1] }}
@@ -1185,8 +1255,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       <section className={innerPanel}>
         <header className="flex items-center justify-between gap-3 rounded-t-3xl bg-blue-50 px-6 py-4">
           <div className="flex items-center gap-2 text-slate-900">
-            <Calculator className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-            <h2 className="text-lg font-semibold md:text-xl">Monthly Payment Calculator</h2>
+            <SearchCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+            <h3 className="text-lg font-semibold md:text-xl">Find the Right Financing Plan</h3>
           </div>
           <span className={successPillClass}>
             <LockKeyholeOpen className="mr-2 h-3 w-3 inline" />
@@ -1202,29 +1272,96 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               className="inline-flex items-center gap-2 text-sm font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
             >
               <Undo2 className="h-4 w-4" aria-hidden="true" />
-              Back to quiz
+              Back to Quiz
             </button>
             <button
               type="button"
               onClick={handleStartContactEdit}
               className="text-xs font-medium text-slate-500 underline-offset-2 transition hover:text-[--brand-blue] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
             >
-              Update contact info
+              Update Contact Info
+              <UserRoundPen className='h-4 w-4 ml-2 inline' />
             </button>
           </div>
 
-          <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-white/90 px-4 py-3 text-sm text-emerald-700 shadow-sm">
-            <CheckCircle2 className="mt-0.5 h-6 w-6 text-emerald-500" aria-hidden="true" />
-            <div>
-              <p className="font-semibold">Calculator unlocked.</p>
-              <p>Adjust your project total to explore updated payments for each program.</p>
+          {displayScores && (
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+                <h3
+                  className="text-xl md:text-2xl font-semibold text-emerald-700"
+                >
+                  <ChartBar className='h-5 w-5 md:h-6 md:w-6 inline text-emerald-700 mr-3' />
+                  Program Fit Snapshot
+                </h3>
+                {leadingProgram ? (
+                  <span className="text-sm font-semibold text-emerald-600">
+                    Leading Fit
+                    <ArrowRight className='inline h-4 w-4 text-emerald-600 mx-2' />
+                    {MATCH_PROGRAMS[leadingProgram].label}
+                  </span>
+                ) : (
+                  <span className="text-sm font-semibold text-emerald-600">Scores based on your answers</span>
+                )}
+              </div>
+              <div className="mt-3 space-y-3">
+                {(['serviceFinance', 'ygrene'] as FinancingProgramKey[]).map((programKey) => {
+                  const score =
+                    programKey === 'serviceFinance'
+                      ? displayScores.serviceFinanceScore
+                      : displayScores.ygreneScore;
+                  const barColor =
+                    programKey === 'serviceFinance' ? 'bg-[--brand-blue]' : 'bg-[--brand-orange]';
+                  const detailHref = PROGRAM_DETAIL_ANCHORS[programKey];
+                  const rawAnimated = animatedScores[programKey] ?? 0;
+                  const clampedAnimated = Math.min(Math.max(rawAnimated, 0), score);
+                  const displayedMatch = Math.min(Math.round(clampedAnimated), score);
+                  const barPercent = Math.min(Math.max(clampedAnimated, 0), 100);
+                  return (
+                    <div key={programKey} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-semibold text-slate-800">{MATCH_PROGRAMS[programKey].label}</span>
+                          <a
+                            href={detailHref}
+                            className="group inline-flex items-center gap-[0.10rem] text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+                          >
+                            see details
+                            <ChevronRight className="h-3 w-3 text-slate-600 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1" aria-hidden="true" />
+                          </a>
+                        </div>
+                        <span className="text-lg font-semibold text-slate-800">{displayedMatch}% match</span>
+                      </div>
+                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/70">
+                        <div className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${barPercent}%` }} />
+                      </div>
+                      <p className="text-md text-slate-500">{MATCH_PROGRAMS[programKey].description}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              {displayScores.isUncertain && (
+                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-800">
+                  <p className="font-semibold">Looks like both programs may require a closer look.</p>
+                  <p className="mt-1">Let’s chat and help you find the best fit.</p>
+                  <a className="mt-2 inline-block font-semibold text-[--brand-blue]" href="tel:+19419286964">
+                    (941) 866-4320
+                  </a>
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
-          <div className="space-y-4 rounded-2xl border border-blue-100/70 bg-white/85 px-4 py-4 shadow-sm">
-            <label htmlFor="activeAmount" className="block text-sm font-medium text-slate-700">Project Budget</label>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">$</span>
+
+          <div className="space-y-4 rounded-2xl px-4 py-4">
+            <label
+              htmlFor="activeAmount"
+              className="block text-md font-medium text-slate-700"
+            >
+
+              Est. Budget
+            </label>
+            <div className="flex items-center gap-[0.35rem]">
+              <DollarSign className="h-6 w-6 text-[--brand-blue]" />
               <input
                 id="activeAmount"
                 inputMode="numeric"
@@ -1268,51 +1405,52 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </div>
           </div>
 
-          <div className="rounded-2xl border border-blue-100 bg-white shadow-md">
-            <div className="border-b border-blue-100 px-4 py-3 text-center text-md font-medium text-slate-700">
-              Estimated Monthly Payment
+          <div className="rounded-2xl border border-blue-200 bg-white shadow-md">
+            <div className="text-center border-b border-blue-100 p-4 text-2xl font-semibold text-[--brand-blue]">
+              Est. Monthly Payment
+              <ArrowDown className='h-6 w-6 text-[--brand-blue] inline ml-2' />
             </div>
             <div className="overflow-hidden">
               <table className="w-full text-sm">
                 <tbody>
-                  <tr className="bg-blue-100/60 border-b border-blue-100 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+                  <tr className="bg-blue-100/60 border-b border-blue-100 text-md font-semibold uppercase tracking-wide text-slate-600">
                     <td className="px-4 py-2" colSpan={2}>
                       {MATCH_PROGRAMS.serviceFinance.label} Programs
                     </td>
                   </tr>
                   {groupedPayments.service.map(({ program, amount }, idx) => (
                     <tr key={program.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-blue-50/40'}>
-                      <td className="px-4 py-3 font-medium text-slate-900">
+                      <td className="text-md px-4 py-3 font-medium text-slate-900">
                         <div>{program.label}</div>
                         {program.summary && (
-                          <div className="text-xs font-normal text-slate-500">{program.summary}</div>
+                          <div className="text-sm font-normal text-slate-500">{program.summary}</div>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right font-medium text-slate-900">
                         {currency(amount)}/mo
                         {program.footnote && (
-                          <span className="ml-2 text-xs text-slate-500">{program.footnote}</span>
+                          <span className="ml-2 text-sm text-slate-500">{program.footnote}</span>
                         )}
                       </td>
                     </tr>
                   ))}
-                  <tr className="bg-amber-100/60 border-t border-b border-amber-100 text-[11px] font-semibold uppercase tracking-wide text-slate-600">
+                  <tr className="bg-amber-100/60 border-t border-b border-amber-100 text-md font-semibold uppercase tracking-wide text-slate-600">
                     <td className="px-4 py-2" colSpan={2}>
                       {MATCH_PROGRAMS.ygrene.label} Financing
                     </td>
                   </tr>
                   {groupedPayments.ygrene.map(({ program, amount }, idx) => (
                     <tr key={program.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-amber-50/40'}>
-                      <td className="px-4 py-3 font-medium text-slate-900">
+                      <td className="text-md px-4 py-3 font-medium text-slate-900">
                         <div>{program.label}</div>
                         {program.summary && (
-                          <div className="text-xs font-normal text-slate-500">{program.summary}</div>
+                          <div className="text-sm font-normal text-slate-500">{program.summary}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right font-semibold text-slate-900">
+                      <td className="text-md px-4 py-3 text-right font-semibold text-slate-900">
                         {currency(amount)}/mo
                         {program.footnote && (
-                          <span className="ml-2 text-xs text-slate-500">{program.footnote}</span>
+                          <span className="ml-2 text-sm text-slate-500">{program.footnote}</span>
                         )}
                       </td>
                     </tr>
@@ -1322,51 +1460,24 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </div>
           </div>
 
-          {displayScores && (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 px-4 py-4 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-emerald-700">Program fit snapshot</p>
-                {leadingProgram ? (
-                  <span className="text-xs font-semibold text-emerald-600">
-                    Leading fit: {MATCH_PROGRAMS[leadingProgram].label}
-                  </span>
-                ) : (
-                  <span className="text-xs font-semibold text-emerald-600">Scores based on your answers</span>
-                )}
-              </div>
-              <div className="mt-3 space-y-3">
-                {(['serviceFinance', 'ygrene'] as FinancingProgramKey[]).map((programKey) => {
-                  const score =
-                    programKey === 'serviceFinance'
-                      ? displayScores.serviceFinanceScore
-                      : displayScores.ygreneScore;
-                  const barColor =
-                    programKey === 'serviceFinance' ? 'bg-[--brand-blue]' : 'bg-[--brand-orange]';
-                  return (
-                    <div key={programKey} className="space-y-2">
-                      <div className="flex items-center justify-between text-sm font-semibold text-slate-800">
-                        <span>{MATCH_PROGRAMS[programKey].label}</span>
-                        <span>{score}%</span>
-                      </div>
-                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/70">
-                        <div className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${score}%` }} />
-                      </div>
-                      <p className="text-xs text-slate-500">{MATCH_PROGRAMS[programKey].description}</p>
-                    </div>
-                  );
-                })}
-              </div>
-              {displayScores.isUncertain && (
-                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-800">
-                  <p className="font-semibold">Looks like both programs may require a closer look.</p>
-                  <p className="mt-1">Let’s chat and help you find the best fit.</p>
-                  <a className="mt-2 inline-block font-semibold text-[--brand-blue]" href="tel:+19419286964">
-                    (941) 866-4320
-                  </a>
-                </div>
-              )}
-            </div>
-          )}
+          <div className="flex gap-6 flex-wrap justify-center">
+            <a
+              className="group inline-flex items-center text-md font-semibold text-[--brand-blue] hover:underline"
+              href="#docs"
+            >
+              <HelpCircle className="h-5 w-4 mr-2 inline text-slate-600" />
+              What documents will I need?
+              <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1" />
+            </a>
+            <a
+              className="group inline-flex items-center text-md font-semibold text-[--brand-blue] hover:underline"
+              href="#pick-a-plan"
+            >
+              <HelpCircle className="h-5 w-4 mr-2 inline text-slate-600" />
+              What's the next step?
+              <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 transition-transform duration-300 group-hover:translate-x-1 group-focus-visible:translate-x-1" />
+            </a>
+          </div>
 
           <p className="text-xs italic text-slate-500">
             Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments are set by the lender. Estimates do not include loan origination fees.
