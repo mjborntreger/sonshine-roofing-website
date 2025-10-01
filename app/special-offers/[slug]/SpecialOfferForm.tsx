@@ -259,9 +259,9 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
             <button
               type="button"
               onClick={handleCopyCode}
-              className="inline-flex items-center gap-2 rounded-full bg-[--brand-blue] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[--brand-blue]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+              className="items-center btn btn-outline"
             >
-              <Copy className="h-4 w-4" aria-hidden="true" />
+              <Copy className="inline h-4 w-4" aria-hidden="true" />
               Copy Code
             </button>
             <span
