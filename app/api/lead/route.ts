@@ -5,6 +5,7 @@ import {
   type LeadInput,
   type FinancingLeadInput,
   type FeedbackLeadInput,
+  type SpecialOfferLeadInput,
 } from '@/lib/validation';
 
 function getAllowedOrigins(): string[] {
@@ -180,6 +181,42 @@ function buildFeedbackPayload(data: FeedbackLeadInput) {
   return payload;
 }
 
+function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
+  const fullName = `${data.firstName} ${data.lastName}`.trim();
+
+  const messageLines = [
+    `Special offer claim from ${fullName}.`,
+    `Offer code: ${data.offerCode}`,
+    `Offer slug: ${data.offerSlug}`,
+  ];
+
+  if (data.offerTitle) {
+    messageLines.push(`Offer title: ${data.offerTitle}`);
+  }
+
+  if (data.message) {
+    messageLines.push('', data.message);
+  }
+
+  const payload: Record<string, unknown> = {
+    type: 'special-offer',
+    name: fullName,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    offerCode: data.offerCode,
+    offerSlug: data.offerSlug,
+    offerTitle: data.offerTitle,
+    message: messageLines.join('\n'),
+    page: data.page || `/special-offers/${data.offerSlug}`,
+  };
+
+  attachTracking(payload, data);
+
+  return payload;
+}
+
 async function forwardToWP(payload: Record<string, unknown>) {
   const url = process.env.LEAD_ENDPOINT_URL || process.env.FINANCING_LEAD_ENDPOINT_URL;
   const secret = process.env.LEAD_FORWARD_SECRET || process.env.FINANCING_LEAD_FORWARD_SECRET;
@@ -265,8 +302,10 @@ export async function POST(req: NextRequest) {
   let wpPayload: Record<string, unknown>;
   if (data.type === 'financing-calculator') {
     wpPayload = buildFinancingPayload(data);
-  } else {
+  } else if (data.type === 'feedback') {
     wpPayload = buildFeedbackPayload(data);
+  } else {
+    wpPayload = buildSpecialOfferPayload(data);
   }
 
   const forwarded = await forwardToWP(wpPayload);

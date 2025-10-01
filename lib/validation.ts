@@ -20,6 +20,7 @@ const MAX_UA = 1024;
 const MAX_TZ = 100;
 const MAX_PAGE = 2083; // typical max URL length; we also allow path-only strings
 const MAX_TRACKING = 200;
+const MAX_SPECIAL_MESSAGE = 1000;
 
 // ---- helpers --------------------------------------------------------------
 const trim = (s: unknown) => (typeof s === "string" ? s.trim() : s);
@@ -45,6 +46,15 @@ const optionalTrackingField = z
     return trimmed ? trimmed : undefined;
   }, z.string().min(1).max(MAX_TRACKING))
   .optional();
+
+const optionalTrimmedString = (max: number) =>
+  z
+    .preprocess((value) => {
+      if (typeof value !== "string") return undefined;
+      const trimmed = value.trim();
+      return trimmed ? trimmed : undefined;
+    }, z.string().min(1).max(max))
+    .optional();
 
 // rating can arrive as "1" | "2" | "3" or number
 const ratingSchema = z.preprocess((val) => {
@@ -237,11 +247,26 @@ const leadFeedbackSchema = leadBaseSchema
   })
   .passthrough();
 
-const leadSchema = z.discriminatedUnion('type', [leadFinancingSchema, leadFeedbackSchema]);
+const leadSpecialOfferSchema = leadBaseSchema
+  .extend({
+    type: z.literal('special-offer'),
+    firstName: z.preprocess(trim, z.string().min(1, 'First name is required').max(MAX_NAME)),
+    lastName: z.preprocess(trim, z.string().min(1, 'Last name is required').max(MAX_NAME)),
+    email: leadFeedbackEmailSchema,
+    phone: financingPhoneSchema,
+    offerCode: z.preprocess(trim, z.string().min(1, 'Offer code is required').max(120)),
+    offerSlug: z.preprocess(trim, z.string().min(1, 'Offer slug is required').max(160)),
+    offerTitle: optionalTrimmedString(200),
+    message: optionalTrimmedString(MAX_SPECIAL_MESSAGE),
+  })
+  .passthrough();
+
+const leadSchema = z.discriminatedUnion('type', [leadFinancingSchema, leadFeedbackSchema, leadSpecialOfferSchema]);
 
 export type LeadInput = z.infer<typeof leadSchema>;
 export type FinancingLeadInput = z.infer<typeof leadFinancingSchema>;
 export type FeedbackLeadInput = z.infer<typeof leadFeedbackSchema>;
+export type SpecialOfferLeadInput = z.infer<typeof leadSpecialOfferSchema>;
 
 export function parseLead(input: unknown): ParseResult<LeadInput> {
   const result = leadSchema.safeParse(input);
