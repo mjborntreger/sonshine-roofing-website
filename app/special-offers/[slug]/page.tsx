@@ -142,7 +142,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
                         )}
                     </article>
 
-                    <div className="space-y-6 sticky top-32">
+                    <div className="space-y-6 sticky top-24">
                         {!expired && offer.offerCode ? (
                             <SpecialOfferForm offerCode={offer.offerCode} offerSlug={offer.slug} offerTitle={offer.title} />
 
