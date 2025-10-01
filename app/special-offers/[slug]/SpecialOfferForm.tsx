@@ -242,9 +242,13 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle }: P
   }
 
   return (
-    <div className="rounded-3xl border border-blue-100 bg-white/95 p-6 shadow-lg print:hidden">
-      <h2 className="text-2xl font-semibold text-slate-900">Claim this offer</h2>
-      <p className="mt-2 text-sm text-slate-600">
+    <div className="rounded-3xl mb-12 border border-blue-100 bg-white/95 p-6 shadow-lg print:hidden">
+      <h2 
+        className="text-2xl font-semibold text-slate-800"
+        >
+          Claim this offer
+      </h2>
+      <p className="mt-4 text-sm text-slate-600">
         Fill out the quick form below and we’ll email your offer code instantly.
       </p>
 
@@ -350,7 +354,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle }: P
           className="btn btn-brand-orange btn-md w-full"
           disabled={submission === 'submitting'}
         >
-          {submission === 'submitting' ? 'Sending…' : 'Claim this offer'}
+          {submission === 'submitting' ? 'Sending…' : 'Submit'}
         </button>
       </form>
     </div>
