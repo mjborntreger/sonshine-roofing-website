@@ -1,6 +1,6 @@
 import ServicesQuickLinks from "./ServicesQuickLinks"
 import TocFromHeadings from "./TocFromHeadings"
-import UiLink from "./UiLink"
+import SmartLink from "./SmartLink"
 import { CalendarDays, ArrowRight, Zap, Phone } from "lucide-react"
 
 const arrowIconStyles = "icon-affordance h-4 w-4 inline ml-2";
@@ -22,34 +22,37 @@ export default function ServicesAside() {
 
             <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm not-prose">
                 <div className="mb-2 text-lg font-medium text-slate-900 text-center">Ready to get started?</div>
-                <UiLink
+                <SmartLink
                     href="/contact-us#book-an-appointment"
                     className={`${buttonStyles} btn-brand-blue`}
                     aria-label="Request a Free Roof Estimate"
                     data-icon-affordance="right"
+                    proseGuard
                 >
                     <CalendarDays className={semanticIconStyles} />
                     Get on the Schedule
                     <ArrowRight className={arrowIconStyles} />
-                </UiLink>
-                <UiLink
+                </SmartLink>
+                <SmartLink
                     href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
                     className={`${buttonStyles} btn-brand-orange`}
                     aria-label="Free 60-second Quote"
                     data-icon-affordance="right"
+                    proseGuard
                 >
                     <Zap className={semanticIconStyles} />
                     Free 60-second Quote
                     <ArrowRight className={arrowIconStyles} />
-                </UiLink>
-                <UiLink
+                </SmartLink>
+                <SmartLink
                     href="tel:19418664320"
                     className={`${buttonStyles} btn-outline phone-affordance`}
                     aria-label="Call SonShine Roofing"
+                    proseGuard
                 >
                     <Phone className={`${semanticIconStyles} phone-affordance-icon`} />
                     (941) 866-4320
-                </UiLink>
+                </SmartLink>
             </div>
         </aside>
     )

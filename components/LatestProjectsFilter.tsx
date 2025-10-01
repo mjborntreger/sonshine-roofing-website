@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import ProjectArchiveCard from "@/components/archive/ProjectArchiveCard";
 import FilterTabs from "@/components/project/FilterTabs";
-import UiLink from "@/components/UiLink";
+import SmartLink from "@/components/SmartLink";
 import type { ProjectSummary } from "@/lib/wp";
 import {
   ArrowRight,
@@ -141,15 +141,16 @@ export default function LatestProjectsFilter({ projects, initial = 4, showHeader
 
       {showHeader && (
         <div className="mt-12 text-center">
-          <UiLink
+          <SmartLink
             href="/project"
             className={lessFatCta}
             title="See All Projects"
             data-icon-affordance="right"
+            proseGuard
           >
             See All Projects
             <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
-          </UiLink>
+          </SmartLink>
         </div>
       )}
 

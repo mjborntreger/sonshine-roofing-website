@@ -2,7 +2,7 @@
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, HelpCircle } from "lucide-react";
-import UiLink from "./UiLink";
+import SmartLink from "./SmartLink";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
 
@@ -119,15 +119,15 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
         </div>
       </div>
       <div className="mt-12 text-center md:text-right">
-        <UiLink
-          href="/blog"
+        <SmartLink
+          href="/faq"
           className={lessFatCta}
           title="See All FAQs"
           data-icon-affordance="right"
         >
           See All FAQs
           <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
-        </UiLink>
+        </SmartLink>
       </div>
     </div>
   );

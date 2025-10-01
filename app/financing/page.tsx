@@ -1,4 +1,3 @@
-import UiLink from '@/components/UiLink';
 import SmartLink from "@/components/SmartLink";
 import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ListStart, ChevronRight } from "lucide-react";
 import ProgramCard from '@/components/ProgramCard';
@@ -177,23 +176,25 @@ export default async function FinancingPage() {
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <UiLink
+            <SmartLink
               href="#get-started"
               className={ctaPrimary}
               title="Get Started"
               data-icon-affordance="down"
+              proseGuard
             >
               Get Started
               <ArrowDown className="icon-affordance h-5 w-5 inline ml-2 text-white" aria-hidden="true" />
-            </UiLink>
-            <UiLink
+            </SmartLink>
+            <SmartLink
               href="tel:+19418664320"
               className={`${contactInfoPillStyles} phone-affordance`}
               title="Call SonShine Roofing"
+              proseGuard
               >
               <Phone className={`${contactInfoIconStyles} phone-affordance-icon`} aria-hidden="true" />
               <span className="font-semibold">(941) 866-4320</span>
-              </UiLink>
+              </SmartLink>
           </div>
         </div>
 
@@ -291,6 +292,7 @@ export default async function FinancingPage() {
                   href="#docs"
                   className="text-[--brand-blue]"
                   data-icon-affordance="right"
+                  proseGuard
                 >
                   Know what documents you'll need
                   <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
@@ -301,6 +303,7 @@ export default async function FinancingPage() {
                   href="/contact-us#book-an-appointment"
                   className="text-[--brand-blue]"
                   data-icon-affordance="right"
+                  proseGuard
                 >
                   Schedule an appointment with a Roofing Specialist
                   <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
@@ -323,14 +326,15 @@ export default async function FinancingPage() {
               through monthly payments, timelines, and total costs — candidly and clearly.
             </p>
             <div className="pt-2">
-              <UiLink
+              <SmartLink
                 href="tel:19418664320"
                 className={ctaSecondary}
                 title="Call SonShine Roofing"
+                proseGuard
               >
                 <Phone className="phone-affordance-icon inline mr-2 h-4 w-4" />
                 (941) 866‑4320
-              </UiLink>
+              </SmartLink>
             </div>
           </section>
         </div>

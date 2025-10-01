@@ -1,43 +1,108 @@
 import * as React from "react";
 import NextLink from "next/link";
+import type { Route } from "next";
+import type { UrlObject } from "url";
+import { ArrowUpRight } from "lucide-react";
+
 import { cn } from "@/lib/utils";
-import { ArrowUpRight, ExternalLink as ExternalIcon } from 'lucide-react';
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>;
+type NextLinkProps = Parameters<typeof NextLink>[0];
 
-type SmartLinkProps = Omit<AnchorProps, "href" | "children"> & {
-  href: string | URL;
-  children: React.ReactNode;
-  className?: string;
-  external?: boolean;
-  nofollow?: boolean;
-  internalHosts?: string[];
-  prefetch?: boolean;
-  scroll?: boolean;
-  showExternalIcon?: boolean;
-  externalIconClassName?: string;
-  unstyled?: boolean;
-};
+type NextRoutingProps = Partial<
+  Pick<NextLinkProps, "prefetch" | "replace" | "scroll" | "shallow" | "locale">
+>;
+
+type SmartHref = string | Route | URL | UrlObject;
+
+export type SmartLinkProps = Omit<AnchorProps, "href" | "children"> &
+  NextRoutingProps & {
+    href: SmartHref;
+    children?: React.ReactNode;
+    external?: boolean;
+    nofollow?: boolean;
+    internalHosts?: string[];
+    openInNewTab?: boolean;
+    showExternalIcon?: boolean;
+    externalIconClassName?: string;
+    unstyled?: boolean;
+    proseGuard?: boolean;
+  };
 
 function getEnvSiteHost(): string | null {
   const host = (process.env.NEXT_PUBLIC_SITE_HOST || "").trim();
   if (host) return host.toLowerCase();
   const url = (process.env.NEXT_PUBLIC_SITE_URL || "").trim();
-  try { if (url) return new URL(url).hostname.toLowerCase(); } catch {}
+  try {
+    if (url) return new URL(url).hostname.toLowerCase();
+  } catch {}
   return null;
 }
-const toStr = (href: string | URL) => (typeof href === "string" ? href : href.toString());
-const isAbs = (s: string) => /^([a-z][a-z0-9+.-]*:)?\/\//i.test(s) || /^https?:\/\//i.test(s);
-const hostOf = (s: string) => { try { const f = s.startsWith("//") ? "https:"+s : s; return new URL(f).hostname.toLowerCase(); } catch { return null; } };
 
-// ---- deterministic id (no hydration mismatch)
-function hashSeed(s: string) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; }
-  return Math.abs(h).toString(36);
+function isUrlObjectCandidate(value: unknown): value is UrlObject {
+  if (!value || typeof value !== "object") return false;
+  if (value instanceof URL) return false;
+  return "pathname" in value || "protocol" in value || "host" in value || "query" in value;
 }
 
+function formatUrlObject(input: UrlObject): string {
+  if (input.href) return input.href;
 
+  const protocol = input.protocol ? input.protocol.replace(/:?$/, ":") : "";
+  const auth = input.auth ? `${input.auth}@` : "";
+  const hostname = input.hostname || "";
+  const port = input.port ? `:${input.port}` : "";
+  const host = input.host || (hostname ? `${hostname}${port}` : "");
+  const origin = host ? `${protocol || "https:"}//${auth}${host}` : "";
+  const pathname = input.pathname || "";
+
+  let search = input.search || "";
+  if (!search && input.query && typeof input.query === "object") {
+    const params = new URLSearchParams();
+    for (const [key, raw] of Object.entries(input.query)) {
+      if (raw === undefined || raw === null) continue;
+      if (Array.isArray(raw)) {
+        raw.forEach((value) => params.append(key, String(value)));
+      } else {
+        params.append(key, String(raw));
+      }
+    }
+    const qs = params.toString();
+    if (qs) search = `?${qs}`;
+  }
+
+  const hash = input.hash || "";
+  return `${origin}${pathname}${search}${hash}` || "";
+}
+
+function hrefToString(href: SmartHref): string {
+  if (typeof href === "string") return href;
+  if (href instanceof URL) return href.toString();
+  return formatUrlObject(href);
+}
+
+function hostOf(href: string): string | null {
+  try {
+    const normalized = href.startsWith("//") ? `https:${href}` : href;
+    return new URL(normalized).hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
+function isHttpLike(href: string): boolean {
+  return /^https?:\/\//i.test(href) || href.startsWith("//");
+}
+
+function isSpecialScheme(href: string): boolean {
+  return ["mailto:", "tel:", "sms:", "data:", "blob:", "javascript:"].some((scheme) =>
+    href.toLowerCase().startsWith(scheme)
+  );
+}
+
+function ensureArray<T>(values: T[] | undefined | null): T[] {
+  return Array.isArray(values) ? values : [];
+}
 
 const SmartLink = React.forwardRef<HTMLAnchorElement, SmartLinkProps>(function SmartLink(
   {
@@ -46,86 +111,161 @@ const SmartLink = React.forwardRef<HTMLAnchorElement, SmartLinkProps>(function S
     className,
     external,
     nofollow,
-    internalHosts = [],
+    internalHosts,
     prefetch,
+    replace,
     scroll,
-    target,
-    rel,
+    shallow,
+    locale,
+    openInNewTab,
     showExternalIcon = false,
     externalIconClassName,
     unstyled = false,
-    ...anchorProps
+    proseGuard = false,
+    ...rest
   },
   ref
 ) {
-  const hrefStr = toStr(href);
+  const { rel, target, title, ...anchorProps } = rest;
+  const hrefStr = React.useMemo(() => hrefToString(href), [href]);
 
-  const special =
-    hrefStr.startsWith("mailto:") ||
-    hrefStr.startsWith("tel:") ||
-    hrefStr.startsWith("data:") ||
-    hrefStr.startsWith("blob:");
+  const special = hrefStr ? isSpecialScheme(hrefStr) : false;
   const hasDownload = "download" in anchorProps && anchorProps.download !== undefined;
 
   const envHost = getEnvSiteHost();
-  const hosts = React.useMemo(
-    () => (envHost ? Array.from(new Set([envHost, ...internalHosts])) : internalHosts),
-    [envHost, internalHosts]
-  );
+  const hostList = React.useMemo(() => {
+    const hosts = ensureArray(internalHosts);
+    const combined = envHost ? Array.from(new Set([envHost, ...hosts])) : hosts;
+    return combined.map((h) => h.toLowerCase().split(":")[0]);
+  }, [envHost, internalHosts]);
 
-  const isInternal =
-    !external &&
-    !special &&
-    !hasDownload &&
-    (hrefStr.startsWith("/") ||
-      hrefStr.startsWith("#") ||
-      hrefStr.startsWith("./") ||
-      hrefStr.startsWith("../") ||
-      (isAbs(hrefStr) && !!hostOf(hrefStr) && hosts.includes(hostOf(hrefStr)!)));
+  const inferredExternal = React.useMemo(() => {
+    if (typeof external === "boolean") return external;
+    if (!hrefStr) return false;
+    if (special || hasDownload) return false;
 
-  if (isInternal) {
+    if (isUrlObjectCandidate(href)) {
+      const candidateHost = (href.host || href.hostname || "").toLowerCase();
+      const normalizedHost = candidateHost.split(":")[0];
+      if (!candidateHost) return false;
+      if (!hostList.length) return true;
+      return !hostList.includes(normalizedHost);
+    }
+
+    if (hrefStr.startsWith("#") || hrefStr.startsWith("/") || hrefStr.startsWith("./") || hrefStr.startsWith("../")) {
+      return false;
+    }
+
+    if (isHttpLike(hrefStr)) {
+      const host = hostOf(hrefStr);
+      if (!host) return true;
+      if (!hostList.length) return true;
+      return !hostList.includes(host);
+    }
+
+    return false;
+  }, [external, href, hrefStr, special, hasDownload, hostList]);
+
+  const useNextLink = !special && !hasDownload && !inferredExternal;
+  const nextHref = React.useMemo(() => {
+    if (href instanceof URL) return href.toString();
+    return href as string | UrlObject;
+  }, [href]);
+
+  const explicitAria = anchorProps["aria-label"] as string | undefined;
+  const ariaLabel = React.useMemo(() => {
+    if (explicitAria) return explicitAria;
+    if (typeof children === "string" && children.trim().length) return undefined;
+    if (title) return title;
+    if (hrefStr) {
+      try {
+        const u = new URL(hrefStr, "http://local");
+        if (u.hostname) return u.hostname;
+        if (u.pathname && u.pathname !== "/") return u.pathname;
+      } catch {}
+    }
+    return "link";
+  }, [explicitAria, children, title, hrefStr]);
+
+  const resolvedTarget = useNextLink
+    ? target
+    : target ?? (inferredExternal ? ((openInNewTab ?? true) ? "_blank" : undefined) : undefined);
+
+  const relParts = React.useMemo(() => {
+    const parts = new Set<string>();
+    if (rel) String(rel).split(" ").forEach((part) => part && parts.add(part));
+    if (!useNextLink && (resolvedTarget === "_blank" || inferredExternal)) {
+      parts.add("noopener");
+      parts.add("noreferrer");
+      if (nofollow) parts.add("nofollow");
+    } else if (nofollow) {
+      parts.add("nofollow");
+    }
+    return Array.from(parts).join(" ") || undefined;
+  }, [rel, useNextLink, resolvedTarget, inferredExternal, nofollow]);
+
+  const dataAttrs = {
+    ...(proseGuard ? { "data-ui-link": "" } : {}),
+    ...(unstyled ? { "data-unstyled": "" } : {}),
+  } as Record<string, string | undefined>;
+
+  const mergedClassName = useNextLink
+    ? className
+    : cn(!unstyled && "inline-flex items-center group", className);
+
+  if (useNextLink) {
     return (
       <NextLink
-        href={hrefStr}
+        href={nextHref as any}
         prefetch={prefetch}
+        replace={replace}
         scroll={scroll}
+        shallow={shallow}
+        locale={locale}
+        ref={ref as React.Ref<HTMLAnchorElement>}
         className={className}
-        ref={ref as any}
-        data-unstyled={unstyled ? "" : undefined}
-        {...(anchorProps as any)}
+        title={title}
+        rel={relParts}
+        target={target}
+        {...(proseGuard ? { "data-ui-link": "" } : {})}
+        {...(unstyled ? { "data-unstyled": "" } : {})}
+        {...(ariaLabel && !explicitAria ? { "aria-label": ariaLabel } : {})}
+        {...(anchorProps as Record<string, unknown>)}
       >
         {children}
       </NextLink>
     );
   }
 
-  const openInNewTab = target ? target === "_blank" : true;
-  const relParts = new Set<string>([
-    ...(rel ? String(rel).split(" ") : []),
-    "noopener",
-    "noreferrer",
-    ...(nofollow ? ["nofollow"] : []),
-  ]);
-
   return (
     <a
-      href={hrefStr}
-      className={cn("inline-flex items-center group", className)}
-      target={openInNewTab ? "_blank" : target}
-      rel={Array.from(relParts).join(" ")}
-      ref={ref}
-      data-unstyled={unstyled ? "" : undefined}
       {...anchorProps}
+      href={hrefStr || undefined}
+      className={mergedClassName ?? undefined}
+      title={title}
+      rel={relParts}
+      target={resolvedTarget}
+      ref={ref}
+      {...dataAttrs}
+      {...(!explicitAria && ariaLabel ? { "aria-label": ariaLabel } : {})}
     >
       {children}
       {showExternalIcon && !special && !hasDownload ? (
         <>
-          <ArrowUpRight aria-hidden className={cn('ml-1 inline-block size-3 shrink-0 icon-affordance', externalIconClassName)} />
-          <span className="sr-only"> (opens in a new tab)</span>
+          <ArrowUpRight
+            aria-hidden
+            className={cn(
+              "ml-1 inline-block size-3 shrink-0 icon-affordance",
+              externalIconClassName
+            )}
+          />
+          <span className="sr-only">(opens in a new tab)</span>
         </>
       ) : null}
     </a>
   );
 });
+
+SmartLink.displayName = "SmartLink";
 
 export default SmartLink;

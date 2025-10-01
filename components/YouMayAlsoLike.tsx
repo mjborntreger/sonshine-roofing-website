@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import BlogArchiveCard from '@/components/archive/BlogArchiveCard';
 import type { PostCard } from '@/lib/wp';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import UiLink from './UiLink';
+import SmartLink from './SmartLink';
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
 
@@ -131,15 +131,16 @@ export default function YouMayAlsoLike({
                 })}
             </div>
             <div className="mt-12 text-center md:text-right">
-                <UiLink
+                <SmartLink
                     href="/blog"
                     className={lessFatCta}
                     title="See All Blogs"
                     data-icon-affordance="right"
+                    proseGuard
                 >
                     See All Blogs
                     <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
-                </UiLink>
+                </SmartLink>
             </div>
 
         </section>

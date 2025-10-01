@@ -1,7 +1,6 @@
 import Section from "@/components/layout/Section";
 import AcculynxLeadForm from "@/components/AcculynxLeadForm";
 import SmartLink from "@/components/SmartLink";
-import UiLink from "@/components/UiLink";
 import { Phone, Mail, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays, MapPinned } from "lucide-react";
 import Image from 'next/image';
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
@@ -110,36 +109,39 @@ export default function Page() {
               </div>
               {/* Phone */}
               <div className="my-8 flex flex-wrap gap-3">
-                <UiLink
+                <SmartLink
                   href="tel:+19418664320"
                   className={`${contactInfoPillStyles} w-full phone-affordance`}
                   title="Call SonShine Roofing"
+                  proseGuard
                 >
                   <Phone className={`${contactInfoIconStyles} phone-affordance-icon`} aria-hidden="true" />
                   <span className="font-semibold min-w-0 break-words">(941) 866-4320</span>
-                </UiLink>
+                </SmartLink>
 
                 {/* Email */}
-                <UiLink
+                <SmartLink
                   href="mailto:messages@sonshineroofing.com"
                   className={`${contactInfoPillStyles} w-full`}
                   title="Email SonShine Roofing"
+                  proseGuard
                 >
                   <Mail className={contactInfoIconStyles} aria-hidden="true" />
                   <span className="font-semibold min-w-0 break-words">messages@sonshineroofing.com</span>
-                </UiLink>
+                </SmartLink>
 
                 {/* Address */}
-                <UiLink
+                <SmartLink
                   href="https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`${contactInfoPillStyles} w-full`}
                   title="Open in Google Maps"
+                  proseGuard
                 >
                   <MapPin className={contactInfoIconStyles} aria-hidden="true" />
                   <span className="font-semibold min-w-0 break-words">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
-                </UiLink>
+                </SmartLink>
               </div>
 
               <h2 className={h2Styles}>Whatever you need, we've got you covered.</h2>
