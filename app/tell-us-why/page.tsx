@@ -1,8 +1,9 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
-import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
 import Turnstile from "@/components/Turnstile";
+import SmartLink from "@/components/SmartLink";
 
 function TellUsWhyForm() {
   const qs = useSearchParams();
@@ -11,6 +12,25 @@ function TellUsWhyForm() {
 
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
   const [err, setErr] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(3);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status !== "ok") return;
+
+    setCountdown(3);
+    const tick = setInterval(() =>
+      setCountdown((prev) => (prev > 0 ? prev - 1 : 0)),
+    1000);
+    const redirectTimer = setTimeout(() => {
+      router.push("/");
+    }, 3000);
+
+    return () => {
+      clearInterval(tick);
+      clearTimeout(redirectTimer);
+    };
+  }, [status, router]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -85,6 +105,10 @@ function TellUsWhyForm() {
         <p className="mt-2 text-slate-700">
           We read every note and will reach out if we need more details. Since 1987 we’ve got you covered.
         </p>
+        <p className="mt-4 text-slate-700">Redirecting in {countdown}…</p>
+        <SmartLink href="/" className="mt-2 inline-block text-brand-cyan">
+          If you are not redirected automatically, click here.
+        </SmartLink>
       </main>
     );
   }

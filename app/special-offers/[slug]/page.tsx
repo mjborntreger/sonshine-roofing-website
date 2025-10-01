@@ -97,7 +97,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   const expired = isExpired(offer.expirationDate);
   const expirationLabel = formatExpirationDate(offer.expirationDate);
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const cookieKey = `ss_offer_${offer.slug}`;
   const cookieValue = cookieStore.get(cookieKey)?.value ?? null;
 
