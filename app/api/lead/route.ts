@@ -69,6 +69,46 @@ function getClientIp(req: NextRequest): string | null {
   return null;
 }
 
+type ForwardConfig = {
+  url: string;
+  secret: string;
+};
+
+function resolveForwardConfig(type: LeadInput['type']): ForwardConfig | null {
+  const candidates: Array<ForwardConfig | null> = [];
+
+  const sharedUrl = process.env.LEAD_ENDPOINT_URL;
+  const sharedSecret = process.env.LEAD_FORWARD_SECRET;
+  if (sharedUrl && sharedSecret) {
+    candidates.push({ url: sharedUrl, secret: sharedSecret });
+  }
+
+  if (type === 'financing-calculator') {
+    const url = process.env.FINANCING_LEAD_ENDPOINT_URL;
+    const secret = process.env.FINANCING_LEAD_FORWARD_SECRET;
+    if (url && secret) candidates.push({ url, secret });
+  }
+
+  if (type === 'feedback') {
+    const url = process.env.FEEDBACK_ENDPOINT_URL;
+    const secret = process.env.FEEDBACK_FORWARD_SECRET;
+    if (url && secret) candidates.push({ url, secret });
+  }
+
+  if (type === 'special-offer') {
+    const offerUrl = process.env.SPECIAL_OFFER_ENDPOINT_URL;
+    const offerSecret = process.env.SPECIAL_OFFER_FORWARD_SECRET;
+    if (offerUrl && offerSecret) candidates.push({ url: offerUrl, secret: offerSecret });
+
+    // As a final fallback, reuse the feedback endpoint (historically handled marketing leads)
+    const feedbackUrl = process.env.FEEDBACK_ENDPOINT_URL;
+    const feedbackSecret = process.env.FEEDBACK_FORWARD_SECRET;
+    if (feedbackUrl && feedbackSecret) candidates.push({ url: feedbackUrl, secret: feedbackSecret });
+  }
+
+  return candidates.find((candidate): candidate is ForwardConfig => candidate !== null) ?? null;
+}
+
 function attachTracking(target: Record<string, unknown>, lead: LeadInput) {
   if (lead.page) target.page = lead.page;
   if (lead.utm_source) target.utm_source = lead.utm_source;
@@ -217,20 +257,21 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
   return payload;
 }
 
-async function forwardToWP(payload: Record<string, unknown>) {
-  const url = process.env.LEAD_ENDPOINT_URL || process.env.FINANCING_LEAD_ENDPOINT_URL;
-  const secret = process.env.LEAD_FORWARD_SECRET || process.env.FINANCING_LEAD_FORWARD_SECRET;
-  if (!url || !secret) return { ok: false, status: 500, error: 'Server misconfigured (lead endpoint)' } as const;
+async function forwardToWP(type: LeadInput['type'], payload: Record<string, unknown>) {
+  const resolved = resolveForwardConfig(type);
+  if (!resolved) {
+    return { ok: false, status: 500, error: 'Server misconfigured (lead endpoint)' } as const;
+  }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 7000);
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(resolved.url, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-ss-secret': secret,
+        'x-ss-secret': resolved.secret,
         origin: process.env.NEXT_PUBLIC_SITE_URL || 'https://sonshineroofing.com',
       },
       body: JSON.stringify(payload),
@@ -308,7 +349,7 @@ export async function POST(req: NextRequest) {
     wpPayload = buildSpecialOfferPayload(data);
   }
 
-  const forwarded = await forwardToWP(wpPayload);
+  const forwarded = await forwardToWP(data.type, wpPayload);
   if (!forwarded.ok) {
     return json(forwarded.status, { ok: false, error: forwarded.error });
   }
