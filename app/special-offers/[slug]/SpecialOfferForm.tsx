@@ -1,6 +1,7 @@
 'use client';
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
+import { Copy, Check } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
 
@@ -103,6 +104,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
   const [submission, setSubmission] = useState<Submission>(initialUnlock ? 'success' : 'idle');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const phoneDigits = useMemo(() => sanitizePhoneInput(values.phone), [values.phone]);
 
@@ -158,6 +160,16 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       writeOfferCookie(cookieName, stored.code, offerExpiration);
     }
   }, [submission, cookieName, offerCode, offerExpiration]);
+
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText(offerCode);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -243,6 +255,23 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
           <p className="mt-2 text-4xl font-black tracking-[0.2em] text-emerald-700 print:text-black">
             {offerCode}
           </p>
+          <div className="mt-4 flex items-center justify-center gap-3 print:hidden">
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              className="inline-flex items-center gap-2 rounded-full bg-[--brand-blue] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[--brand-blue]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+            >
+              <Copy className="h-4 w-4" aria-hidden="true" />
+              Copy Code
+            </button>
+            <span
+              aria-live="polite"
+              className={`inline-flex items-center gap-1 text-sm font-semibold text-emerald-600 transition-opacity duration-300 ${copied ? 'opacity-100' : 'opacity-0'}`}
+            >
+              <Check className="h-4 w-4" aria-hidden="true" />
+              Copied!
+            </span>
+          </div>
         </div>
 
         <p className="mt-6 text-sm text-slate-600 print:text-black">
