@@ -21,7 +21,6 @@ function TellUsWhyForm() {
 
     const first = String(fd.get("firstName") || "").trim();
     const last = String(fd.get("lastName") || "").trim();
-    const name = `${first} ${last}`.trim();
     const email = String(fd.get("email") || "").trim();
     const phone = String(fd.get("phone") || "").trim();
     const message = String(fd.get("message") || "").trim();
@@ -29,22 +28,33 @@ function TellUsWhyForm() {
     const cfToken = String(fd.get("cfToken") || ""); // provided by <Turnstile />
     const hp_field = String(fd.get("company") || ""); // honeypot
 
+    const payload: Record<string, unknown> = {
+      type: "feedback",
+      firstName: first,
+      lastName: last,
+      email,
+      phone,
+      rating: Number(rating),
+      message,
+      cfToken,
+      hp_field,
+      page: "/tell-us-why",
+      ua: typeof navigator !== "undefined" ? navigator.userAgent : "",
+      tz: typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "",
+    };
+
+    const utmSource = qs.get("utm_source");
+    const utmMedium = qs.get("utm_medium");
+    const utmCampaign = qs.get("utm_campaign");
+    if (utmSource) payload.utm_source = utmSource.trim();
+    if (utmMedium) payload.utm_medium = utmMedium.trim();
+    if (utmCampaign) payload.utm_campaign = utmCampaign.trim();
+
     try {
-      const res = await fetch("/api/feedback", {
+      const res = await fetch("/api/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          phone,
-          rating, // 1|2|3 as string
-          message,
-          cfToken,
-          hp_field,
-          page: "/tell-us-why",
-          ua: typeof navigator !== "undefined" ? navigator.userAgent : "",
-          tz: typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "",
-        }),
+        body: JSON.stringify(payload),
       });
       const json = await res.json().catch(() => ({} as any));
       if (res.ok && json?.ok) {

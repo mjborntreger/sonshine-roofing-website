@@ -780,6 +780,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     const scoresResult = computedScores ?? null;
 
     const payload: Record<string, unknown> = {
+      type: 'financing-calculator',
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
       email: formValues.email.trim(),
@@ -803,7 +804,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     setGlobalError(null);
 
     try {
-      const res = await fetch('/api/financing-lead', {
+      const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

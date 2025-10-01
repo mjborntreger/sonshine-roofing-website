@@ -19,6 +19,7 @@ const MAX_MESSAGE = 5000;
 const MAX_UA = 1024;
 const MAX_TZ = 100;
 const MAX_PAGE = 2083; // typical max URL length; we also allow path-only strings
+const MAX_TRACKING = 200;
 
 // ---- helpers --------------------------------------------------------------
 const trim = (s: unknown) => (typeof s === "string" ? s.trim() : s);
@@ -36,6 +37,14 @@ function looksLikePhone(input: string): boolean {
   const digits = input.replace(/\D/g, "");
   return digits.length === 0 || digits.length >= 7;
 }
+
+const optionalTrackingField = z
+  .preprocess((value) => {
+    if (typeof value !== "string") return undefined;
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
+  }, z.string().min(1).max(MAX_TRACKING))
+  .optional();
 
 // rating can arrive as "1" | "2" | "3" or number
 const ratingSchema = z.preprocess((val) => {
@@ -159,8 +168,18 @@ const financingScoresSchema = z.object({
   isUncertain: z.boolean(),
 });
 
-const financingLeadSchema = z
-  .object({
+const leadBaseSchema = z.object({
+  cfToken: z.string().min(10, "Turnstile token missing").max(2000),
+  hp_field: z.string().optional(),
+  page: pageSchema,
+  utm_source: optionalTrackingField,
+  utm_medium: optionalTrackingField,
+  utm_campaign: optionalTrackingField,
+});
+
+const leadFinancingSchema = leadBaseSchema
+  .extend({
+    type: z.literal('financing-calculator'),
     firstName: z.preprocess(trim, z.string().min(1, "First name is required").max(MAX_FINANCING_NAME)),
     lastName: z.preprocess(trim, z.string().min(1, "Last name is required").max(MAX_FINANCING_NAME)),
     email: financingEmailSchema,
@@ -178,9 +197,6 @@ const financingLeadSchema = z
     amount: z
       .number({ invalid_type_error: "Amount must be a number" })
       .min(1000, "Amount must be at least 1000"),
-    page: pageSchema,
-    cfToken: z.string().min(10, "Turnstile token missing").max(2000),
-    hp_field: z.string().optional(),
     quizSummary: z
       .array(
         z.object({
@@ -197,10 +213,38 @@ const financingLeadSchema = z
   })
   .passthrough();
 
-type FinancingLeadInput = z.infer<typeof financingLeadSchema>;
+const leadFeedbackEmailSchema = z
+  .preprocess(trim, z.string().min(1, "Email is required").max(MAX_EMAIL).email("Invalid email"));
 
-export function parseFinancingLead(input: unknown): ParseResult<FinancingLeadInput> {
-  const result = financingLeadSchema.safeParse(input);
+const leadFeedbackPhoneSchema = z
+  .preprocess(trim, z.string().max(MAX_PHONE))
+  .transform((value) => (value ? normalizePhone(value) : ""))
+  .refine((value) => looksLikePhone(value), {
+    message: "Invalid phone",
+  });
+
+const leadFeedbackSchema = leadBaseSchema
+  .extend({
+    type: z.literal('feedback'),
+    firstName: z.preprocess(trim, z.string().min(1, "First name is required").max(MAX_NAME)),
+    lastName: z.preprocess(trim, z.string().min(1, "Last name is required").max(MAX_NAME)),
+    email: leadFeedbackEmailSchema,
+    phone: leadFeedbackPhoneSchema,
+    rating: ratingSchema,
+    message: z.preprocess(trim, z.string().min(1, "Message is required").max(MAX_MESSAGE)),
+    ua: z.preprocess(trim, z.string().max(MAX_UA)).optional(),
+    tz: z.preprocess(trim, z.string().max(MAX_TZ)).optional(),
+  })
+  .passthrough();
+
+const leadSchema = z.discriminatedUnion('type', [leadFinancingSchema, leadFeedbackSchema]);
+
+export type LeadInput = z.infer<typeof leadSchema>;
+export type FinancingLeadInput = z.infer<typeof leadFinancingSchema>;
+export type FeedbackLeadInput = z.infer<typeof leadFeedbackSchema>;
+
+export function parseLead(input: unknown): ParseResult<LeadInput> {
+  const result = leadSchema.safeParse(input);
   if (result.success) {
     return { ok: true, data: result.data };
   }
@@ -215,6 +259,20 @@ export function parseFinancingLead(input: unknown): ParseResult<FinancingLeadInp
     message: "Validation failed",
     fieldErrors,
   };
+}
+
+export function parseFinancingLead(input: unknown): ParseResult<FinancingLeadInput> {
+  const parsed = parseLead(input);
+  if (!parsed.ok) return parsed;
+  if (parsed.data.type !== 'financing-calculator') {
+    return {
+      ok: false,
+      status: 400,
+      message: 'Expected financing-calculator lead',
+      fieldErrors: { type: ['Expected financing-calculator lead'] },
+    };
+  }
+  return { ok: true, data: parsed.data };
 }
 
 /**
