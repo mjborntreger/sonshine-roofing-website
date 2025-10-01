@@ -1,7 +1,7 @@
 import * as React from "react";
 import NextLink from "next/link";
 import { cn } from "@/lib/utils";
-import { ExternalLink as ExternalIcon } from 'lucide-react';
+import { ArrowUpRight, ExternalLink as ExternalIcon } from 'lucide-react';
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>;
 
@@ -120,7 +120,7 @@ const SmartLink = React.forwardRef<HTMLAnchorElement, SmartLinkProps>(function S
       {children}
       {showExternalIcon && !special && !hasDownload ? (
         <>
-          <ExternalIcon aria-hidden className={cn('ml-1 inline-block size-3 shrink-0', externalIconClassName)} />
+          <ArrowUpRight aria-hidden className={cn('ml-1 inline-block size-3 shrink-0 icon-affordance', externalIconClassName)} />
           <span className="sr-only"> (opens in a new tab)</span>
         </>
       ) : null}

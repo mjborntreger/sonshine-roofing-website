@@ -1,29 +1,29 @@
-import { listPersons, listPersonsBySlugs, listPersonNav } from "@/lib/wp";
+import { listPersonNav, listPersonsBySlug, stripHtml } from "@/lib/wp";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
 
-export const revalidate = 3600;
-
-
-// Pre-generate static paths for known people
-export async function generateStaticParams() {
-  const people = await listPersons(50);
-  return people.map((p) => ({ slug: p.slug }));
-}
+export const dynamic = "force-dynamic";
 
 // Dynamic metadata per person
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const person = await listPersonsBySlugs([slug]).then((arr) => arr[0]);
+  let person = null;
+  try {
+    person = await listPersonsBySlug(slug, { cache: "no-store" });
+  } catch {
+    person = null;
+  }
   const isNathan = slug === 'nathan-borntreger';
 
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
   const canonicalPath = `/person/${slug}`;
   const title = person ? `${person.title} | SonShine Roofing` : 'Team Member | SonShine Roofing';
-  const description = person ? stripHtml(person.contentHtml).slice(0, 160) : 'Meet the SonShine Roofing team serving Sarasota, Manatee, and Charlotte Counties.';
+  const description = person?.contentHtml
+    ? stripHtml(person.contentHtml).slice(0, 160)
+    : 'Meet the SonShine Roofing team serving Sarasota, Manatee, and Charlotte Counties.';
   const ogImage = person?.featuredImage?.url || '/og-default.png';
 
   return {
@@ -49,10 +49,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const person = await listPersonsBySlugs([slug]).then(arr => arr[0]);
+  const person = await listPersonsBySlug(slug, { cache: "no-store" }).catch(() => null);
   if (!person) return notFound();
 
-  let navItems: Awaited<ReturnType<typeof listPersonNav>>;
+  let navItems: Awaited<ReturnType<typeof listPersonNav>> = [];
   try {
     navItems = await listPersonNav(50);
   } catch {
@@ -175,8 +175,4 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
       </div>
     </Section>
   );
-}
-
-function stripHtml(html: string) {
-  return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }

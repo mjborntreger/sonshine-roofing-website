@@ -1,19 +1,18 @@
 import SmartLink from "@/components/SmartLink";
-import Section from "@/components/layout/Section";
 import { Clock, Tag, Users, Languages, CreditCard, Hammer, MapPin, BadgePercent, ChevronDown } from "lucide-react";
 
 const h2Styles = "mb-8 text-3xl lg:text-5xl"
 const pillarsGrid = "mt-6 grid grid-cols-1 gap-4 items-stretch";
 const pStyles = "text-md list-disc pl-5 space-y-1 marker:text-slate-400";
 const gradientDivider = "gradient-divider my-4";
-const linkStyles = "text-[--brand-blue]"
+const linkStyles = "text-[--brand-blue] icon-affordance"
 
 const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 
 export async function HoursAndInformation() {
   return (
-    <Section>
+    <div>
       <div id="hours-and-information" className="text-center">
         <h2 className={h2Styles}>Hours and Information</h2>
         <div className={gradientDivider} />
@@ -95,6 +94,7 @@ export async function HoursAndInformation() {
                   aria-label="GAF"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   GAF
                 </SmartLink>
@@ -106,6 +106,7 @@ export async function HoursAndInformation() {
                   aria-label="Eagle Tile"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Eagle Tile
                 </SmartLink>
@@ -117,6 +118,7 @@ export async function HoursAndInformation() {
                   aria-label="Westlake Royal Roofing"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Westlake Royal Roofing
                 </SmartLink>
@@ -128,6 +130,7 @@ export async function HoursAndInformation() {
                   aria-label="Crown Tile"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Crown Tile
                 </SmartLink>
@@ -139,6 +142,7 @@ export async function HoursAndInformation() {
                   aria-label="Sunshine Metal Supply"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Sunshine Metal Supply
                 </SmartLink>
@@ -150,6 +154,7 @@ export async function HoursAndInformation() {
                   aria-label="Polyglass USA"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Polyglass USA
                 </SmartLink>
@@ -176,6 +181,7 @@ export async function HoursAndInformation() {
                   aria-label="GAF Factory Certified Master Elite"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   GAF Factory Certified Master Elite
                 </SmartLink>
@@ -187,6 +193,7 @@ export async function HoursAndInformation() {
                   aria-label="Sarasota Chamber of Commerce"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Sarasota Chamber of Commerce
                 </SmartLink>
@@ -198,6 +205,7 @@ export async function HoursAndInformation() {
                   aria-label="Manatee Chamber of Commerce"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Manatee Chamber of Commerce
                 </SmartLink>
@@ -209,6 +217,7 @@ export async function HoursAndInformation() {
                   aria-label="North Port Chamber of Commerce"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   North Port Chamber of Commerce
                 </SmartLink>
@@ -220,6 +229,7 @@ export async function HoursAndInformation() {
                   aria-label="Florida Roofing and Sheet Metal Contractors' Association"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Florida Roofing and Sheet Metal Contractors' Association
                 </SmartLink>
@@ -231,6 +241,7 @@ export async function HoursAndInformation() {
                   aria-label="National Roofing Contractors' Association"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   National Roofing Contractors' Association
                 </SmartLink>
@@ -242,6 +253,7 @@ export async function HoursAndInformation() {
                   aria-label="Better Business Bureau (A+)"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   Better Business Bureau (A+)
                 </SmartLink>
@@ -253,6 +265,7 @@ export async function HoursAndInformation() {
                   aria-label="My Safe Florida Home Certified"
                   className={linkStyles}
                   showExternalIcon
+                  data-icon-affordance="up-right"
                 >
                   My Safe Florida Home Certified
                 </SmartLink>
@@ -418,6 +431,6 @@ export async function HoursAndInformation() {
           </div>
         </details>
       </div>
-    </Section>
+    </div>
   )
 }

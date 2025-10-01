@@ -226,21 +226,47 @@ function getAuthHeader(): string | null {
   return `Basic ${base64}`;
 }
 
+type WpFetchOptions = {
+  revalidateSeconds?: number;
+  cache?: RequestCache;
+};
+
 export async function wpFetch<T = Json>(
   query: string,
   variables?: Record<string, any>,
-  revalidateSeconds = 600
+  options?: number | WpFetchOptions
 ): Promise<T> {
+  let revalidateSeconds = 600;
+  let cacheMode: RequestCache | undefined;
+
+  if (typeof options === "number") {
+    revalidateSeconds = options;
+  } else if (options) {
+    if (typeof options.revalidateSeconds === "number") {
+      revalidateSeconds = options.revalidateSeconds;
+    }
+    cacheMode = options.cache;
+  }
+
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const auth = getAuthHeader();
   if (auth) headers.Authorization = auth;
 
-  const res = await fetch(WP_ENDPOINT, {
+  const fetchInit: RequestInit & { next?: { revalidate: number } } = {
     method: "POST",
     headers,
     body: JSON.stringify({ query, variables }),
-    next: { revalidate: revalidateSeconds },
-  });
+  };
+
+  if (cacheMode) {
+    fetchInit.cache = cacheMode;
+  }
+
+  if (cacheMode !== "no-store") {
+    fetchInit.next = { revalidate: revalidateSeconds };
+  }
+
+  const res = await fetch(WP_ENDPOINT, fetchInit);
 
   if (!res.ok) {
     throw new Error(`WPGraphQL HTTP ${res.status} ${res.statusText}`);
@@ -861,7 +887,10 @@ export async function listPersonsBySlugs(slugs: string[]): Promise<Person[]> {
 }
 
 /** Fetch a single Person CPT by slug */
-export async function listPersonsBySlug(slug: string): Promise<Person | null> {
+export async function listPersonsBySlug(
+  slug: string,
+  options?: WpFetchOptions
+): Promise<Person | null> {
   const query = /* GraphQL */ `
     query PersonBySlug($slug: ID!) {
       person(id: $slug, idType: SLUG) {
@@ -874,7 +903,7 @@ export async function listPersonsBySlug(slug: string): Promise<Person | null> {
     }
   `;
 
-  const data = await wpFetch<{ person: any | null }>(query, { slug });
+  const data = await wpFetch<{ person: any | null }>(query, { slug }, options);
   const n = data?.person;
   if (!n) return null;
 
