@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useCallback, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
 
@@ -8,6 +8,8 @@ type Props = {
   offerCode: string;
   offerSlug: string;
   offerTitle?: string | null;
+  offerExpiration?: string | null;
+  initialUnlock?: { offerCode: string } | null;
 };
 
 type FormValues = {
@@ -43,7 +45,33 @@ function formatPhoneDisplay(digits: string) {
   return `${useCountry ? `+${country} ` : ''}(${area}) ${mid}-${last}`;
 }
 
-export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle }: Props) {
+function parseExpirationDate(raw?: string | null): Date {
+  if (raw) {
+    const parts = raw.split('/').map((part) => Number.parseInt(part, 10));
+    if (parts.length === 3) {
+      const [month, day, year] = parts;
+      if (month && day && year) {
+        const candidate = new Date(year, month - 1, day, 23, 59, 59, 999);
+        if (!Number.isNaN(candidate.getTime())) {
+          return candidate;
+        }
+      }
+    }
+  }
+  const fallback = new Date();
+  fallback.setFullYear(fallback.getFullYear() + 1);
+  return fallback;
+}
+
+function writeOfferCookie(name: string, code: string, expiration?: string | null) {
+  if (typeof document === 'undefined') return;
+  const expiresDate = parseExpirationDate(expiration);
+  const payload = { code, exp: expiresDate.toISOString() };
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${name}=${encodeURIComponent(JSON.stringify(payload))}; expires=${expiresDate.toUTCString()}; path=/; SameSite=Lax${secure}`;
+}
+
+export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, offerExpiration, initialUnlock }: Props) {
   const searchParams = useSearchParams();
   const [values, setValues] = useState<FormValues>({
     firstName: '',
@@ -51,10 +79,9 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle }: P
     email: '',
     phone: '',
   });
-  const [submission, setSubmission] = useState<Submission>('idle');
+  const [submission, setSubmission] = useState<Submission>(initialUnlock ? 'success' : 'idle');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [submittedLead, setSubmittedLead] = useState<FormValues | null>(null);
 
   const phoneDigits = useMemo(() => sanitizePhoneInput(values.phone), [values.phone]);
 
@@ -92,6 +119,14 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle }: P
     }
     if (globalError) setGlobalError(null);
   };
+
+  const cookieName = useMemo(() => `ss_offer_${offerSlug}`, [offerSlug]);
+
+  useEffect(() => {
+    if (!initialUnlock) return;
+    // Ensure any existing cookie is respected client-side
+    writeOfferCookie(cookieName, initialUnlock.offerCode, offerExpiration);
+  }, [initialUnlock, cookieName, offerExpiration]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -145,12 +180,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle }: P
       const json = await res.json().catch(() => ({} as any));
       if (res.ok && json?.ok) {
         setSubmission('success');
-        setSubmittedLead({
-          firstName: values.firstName.trim(),
-          lastName: values.lastName.trim(),
-          email: values.email.trim(),
-          phone: sanitizePhoneInput(values.phone),
-        });
+        writeOfferCookie(cookieName, offerCode, offerExpiration);
         try {
           (window as any).dataLayer = (window as any).dataLayer || [];
           (window as any).dataLayer.push({
@@ -168,34 +198,6 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle }: P
       setGlobalError('Network error. Please try again.');
     }
   };
-
-  const handlePrint = useCallback(() => {
-    if (typeof window !== 'undefined') {
-      window.print();
-    }
-  }, []);
-
-  const handleDownload = useCallback(() => {
-    if (!submittedLead) return;
-    const lines = [
-      'SonShine Roofing Special Offer',
-      `Offer: ${offerTitle || 'Special Offer'}`,
-      `Offer Code: ${offerCode}`,
-      '',
-      `Name: ${submittedLead.firstName} ${submittedLead.lastName}`.trim(),
-      `Email: ${submittedLead.email}`,
-      `Phone: ${formatPhoneDisplay(submittedLead.phone)}`,
-    ];
-    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `sonshine-offer-${offerCode}.txt`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    setTimeout(() => URL.revokeObjectURL(url), 2000);
-  }, [offerCode, offerTitle, submittedLead]);
 
   if (submission === 'success') {
     return (
@@ -219,24 +221,6 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle }: P
             Call (941) 866-4320
           </a>
         </p>
-
-        <div className="mt-6 flex flex-wrap gap-3 print:hidden">
-          <button
-            type="button"
-            onClick={handlePrint}
-            className="btn btn-brand-blue btn-md"
-          >
-            Print offer
-          </button>
-          <button
-            type="button"
-            onClick={handleDownload}
-            className="btn btn-brand-orange btn-md"
-            disabled={!submittedLead}
-          >
-            Download offer
-          </button>
-        </div>
       </div>
     );
   }

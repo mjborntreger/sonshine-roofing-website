@@ -2,6 +2,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 
 import Section from '@/components/layout/Section';
 import Container from '@/components/layout/Container';
@@ -86,15 +87,34 @@ function formatExpirationDate(raw?: string | null) {
 }
 
 export default async function SpecialOfferPage({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params;
-    const offer = await getSpecialOfferBySlug(slug);
+  const { slug } = await params;
+  const offer = await getSpecialOfferBySlug(slug);
 
-    if (!offer) {
-        notFound();
+  if (!offer) {
+    notFound();
+  }
+
+  const expired = isExpired(offer.expirationDate);
+  const expirationLabel = formatExpirationDate(offer.expirationDate);
+
+  const cookieStore = cookies();
+  const cookieKey = `ss_offer_${offer.slug}`;
+  const cookieValue = cookieStore.get(cookieKey)?.value ?? null;
+
+  let initialUnlock: { offerCode: string } | null = null;
+  if (!expired && offer.offerCode && cookieValue) {
+    try {
+      const parsed = JSON.parse(decodeURIComponent(cookieValue));
+      const code = typeof parsed?.code === 'string' ? parsed.code : null;
+      const expValue = parsed?.exp ? new Date(parsed.exp) : null;
+      const stillValid = expValue ? expValue.getTime() >= Date.now() : true;
+      if (code === offer.offerCode && stillValid) {
+        initialUnlock = { offerCode: code };
+      }
+    } catch {
+      // ignore malformed cookie
     }
-
-    const expired = isExpired(offer.expirationDate);
-    const expirationLabel = formatExpirationDate(offer.expirationDate);
+  }
 
     return (
         <div className="bg-neutral-50">
@@ -144,21 +164,23 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
                     </article>
 
                     <div className="sticky top-24 space-y-6">
-                        {!expired && offer.offerCode ? (
-                            <Suspense
-                                fallback={
-                                    <div className="rounded-3xl border border-blue-100 bg-white p-6 text-sm text-slate-600">
-                                        Loading offer form…
-                                    </div>
-                                }
-                            >
-                                <SpecialOfferForm
-                                    offerCode={offer.offerCode}
-                                    offerSlug={offer.slug}
-                                    offerTitle={offer.title}
-                                />
-                            </Suspense>
-                        ) : (
+            {!expired && offer.offerCode ? (
+              <Suspense
+                fallback={
+                  <div className="rounded-3xl border border-blue-100 bg-white p-6 text-sm text-slate-600">
+                    Loading offer form…
+                  </div>
+                }
+              >
+                <SpecialOfferForm
+                  offerCode={offer.offerCode}
+                  offerSlug={offer.slug}
+                  offerTitle={offer.title}
+                  offerExpiration={offer.expirationDate ?? null}
+                  initialUnlock={initialUnlock}
+                />
+              </Suspense>
+            ) : (
                             <div className="rounded-3xl border border-red-200 bg-white p-6 mb-24 shadow-sm">
                                 <h2 className="text-xl font-semibold text-red-700">Offer unavailable</h2>
                                 <p className="mt-2 text-sm text-slate-600">
