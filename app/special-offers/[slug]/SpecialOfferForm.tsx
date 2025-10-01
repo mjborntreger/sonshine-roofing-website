@@ -71,6 +71,27 @@ function writeOfferCookie(name: string, code: string, expiration?: string | null
   document.cookie = `${name}=${encodeURIComponent(JSON.stringify(payload))}; expires=${expiresDate.toUTCString()}; path=/; SameSite=Lax${secure}`;
 }
 
+function readOfferCookie(name: string): { code: string; exp?: string } | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.split('; ').find((row) => row.startsWith(`${name}=`));
+  if (!match) return null;
+  const rawValue = match.split('=').slice(1).join('=');
+  try {
+    const decoded = decodeURIComponent(rawValue);
+    const parsed = JSON.parse(decoded);
+    if (!parsed || typeof parsed.code !== 'string') return null;
+    if (parsed.exp) {
+      const expDate = new Date(parsed.exp);
+      if (Number.isNaN(expDate.getTime()) || expDate.getTime() < Date.now()) {
+        return null;
+      }
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, offerExpiration, initialUnlock }: Props) {
   const searchParams = useSearchParams();
   const [values, setValues] = useState<FormValues>({
@@ -127,6 +148,16 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
     // Ensure any existing cookie is respected client-side
     writeOfferCookie(cookieName, initialUnlock.offerCode, offerExpiration);
   }, [initialUnlock, cookieName, offerExpiration]);
+
+  useEffect(() => {
+    if (submission === 'success') return;
+    const stored = readOfferCookie(cookieName);
+    if (stored && stored.code === offerCode) {
+      setSubmission('success');
+      setGlobalError(null);
+      writeOfferCookie(cookieName, stored.code, offerExpiration);
+    }
+  }, [submission, cookieName, offerCode, offerExpiration]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
