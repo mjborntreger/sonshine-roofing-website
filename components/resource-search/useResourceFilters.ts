@@ -4,7 +4,9 @@
 // Unifies search + filter logic for Blog, Projects, Videos, and FAQ pages.
 // Designed to be mounted by a tiny controller component per page.
 
-import { useEffect } from "react";
+import { createElement, useEffect } from "react";
+import { createRoot, Root } from "react-dom/client";
+import SmartLink from "@/components/SmartLink";
 
 export type ResourceKind = "blog" | "project" | "video" | "faq";
 
@@ -1268,6 +1270,22 @@ function strategyFaq(opts: MountOptions): Cleaner {
     const getExpandBtn = () => $("#faq-expand-all");
     const getCollapseBtn = () => $("#faq-collapse-all");
 
+    const suggestionEntries: Array<{ root: Root; node: HTMLElement }> = [];
+
+    const clearSuggestionEntries = (list?: HTMLElement | null) => {
+        for (const entry of suggestionEntries) {
+            try { entry.root.unmount(); } catch { }
+        }
+        suggestionEntries.length = 0;
+        if (list) {
+            if (typeof (list as any).replaceChildren === "function") {
+                (list as any).replaceChildren();
+            } else {
+                list.innerHTML = "";
+            }
+        }
+    };
+
     // Initialize from URL (q)
     try {
       const url = new URL(window.location.href);
@@ -1349,7 +1367,7 @@ function strategyFaq(opts: MountOptions): Cleaner {
         const rc = getResultCount(); if (rc) rc.textContent = String(totalVisible);
         const nr = getNoResults(); const qs = getQuerySpan();
         const sw = getSugWrap(); const sl = getSugList();
-        if (nr && qs && sw && sl) {
+        if (nr && qs && sw) {
             if (q.trim().length >= MINQ && totalVisible === 0) {
                 nr.classList.remove("hidden");
                 qs.textContent = `“${q.trim()}”`;
@@ -1357,15 +1375,37 @@ function strategyFaq(opts: MountOptions): Cleaner {
                 const sugg = buildSuggestions(getItems(), q);
                 if (sugg.length) {
                     sw.classList.remove("hidden");
-                    (sl as HTMLElement).innerHTML = "";
-                    for (const s of sugg) {
-                        const li = document.createElement("li");
-                        li.innerHTML = `<a href="${s.href}" class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-sm hover:bg-slate-50">${s.title}</a>`;
-                        sl.appendChild(li);
+                    const listEl = sl as HTMLElement | null;
+                    clearSuggestionEntries(listEl || undefined);
+                    if (listEl) {
+                        for (const s of sugg) {
+                            const li = document.createElement("li");
+                            const root = createRoot(li);
+                            root.render(
+                                createElement(
+                                    SmartLink,
+                                    {
+                                        href: s.href,
+                                        className: "inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-sm hover:bg-slate-50",
+                                    },
+                                    s.title
+                                )
+                            );
+                            suggestionEntries.push({ root, node: li });
+                            listEl.appendChild(li);
+                        }
                     }
-                } else { sw.classList.add("hidden"); (sl as HTMLElement).innerHTML = ""; }
+                } else {
+                    sw.classList.add("hidden");
+                    const listEl = sl as HTMLElement | null;
+                    clearSuggestionEntries(listEl || undefined);
+                }
             } else {
-                nr.classList.add("hidden"); qs.textContent = ""; sw.classList.add("hidden"); (sl as HTMLElement).innerHTML = "";
+                nr.classList.add("hidden");
+                qs.textContent = "";
+                sw.classList.add("hidden");
+                const listEl = sl as HTMLElement | null;
+                clearSuggestionEntries(listEl || undefined);
             }
         }
         syncQ(q);
@@ -1393,7 +1433,13 @@ function strategyFaq(opts: MountOptions): Cleaner {
     filterNow();
     applyHashOpen();
 
-    return () => { offInput(); offSubmit(); offClick(); };
+    return () => {
+        offInput();
+        offSubmit();
+        offClick();
+        const listEl = getSugList() as HTMLElement | null;
+        clearSuggestionEntries(listEl || undefined);
+    };
 }
 
 // ------------------------------------------------------------

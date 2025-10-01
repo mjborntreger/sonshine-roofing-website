@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { NavMenu } from "./NavMenu";
 import { cn } from "@/lib/utils";
 
-const HEADER_COLLAPSE_THRESHOLD = 160; // tweak this to adjust when the header compresses
+const HEADER_COLLAPSE_THRESHOLD = 140; // tweak this to adjust when the header compresses
+const HEADER_EXPAND_THRESHOLD = 60; // below this scroll position the header expands again
 const UTILITY_BREAKPOINT_CLASS = "flex"; // tweak this Tailwind breakpoint for the utility strip visibility
 
 export default function Header() {
@@ -31,8 +32,13 @@ export default function Header() {
 
   useEffect(() => {
     const onScroll = () => {
-      const nextCollapsed = window.scrollY > HEADER_COLLAPSE_THRESHOLD;
-      setCollapsed((prev) => (prev === nextCollapsed ? prev : nextCollapsed));
+      const scrollY = window.scrollY;
+      setCollapsed((prev) => {
+        if (prev) {
+          return scrollY <= HEADER_EXPAND_THRESHOLD ? false : true;
+        }
+        return scrollY >= HEADER_COLLAPSE_THRESHOLD ? true : false;
+      });
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });

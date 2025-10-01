@@ -2,6 +2,7 @@ import { listPersonNav, listPersonsBySlug, stripHtml } from "@/lib/wp";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
 
@@ -103,7 +104,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
 
           <article className="mx-auto max-w-5xl">
             <div className="my-4">
-              <a href="/about-sonshine-roofing/#meet-our-team" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← Back to Team</a>
+              <SmartLink href="/about-sonshine-roofing/#meet-our-team" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← Back to Team</SmartLink>
             </div>
             <header className="flex flex-col gap-6 p-5">
               {person.featuredImage && (

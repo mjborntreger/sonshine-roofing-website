@@ -1,5 +1,7 @@
 import Section from '@/components/layout/Section';
 import Link from 'next/link';
+import SmartLink from '@/components/SmartLink';
+import { createElement, Fragment, ReactNode } from 'react';
 import { getGlossaryTerm, listGlossaryIndex, stripHtml } from '@/lib/wp';
 import { suggest } from '@/lib/fuzzy';
 import type { Metadata } from 'next';
@@ -84,6 +86,186 @@ function autoLinkGlossary(
   }
 
   return tokens.join("");
+}
+
+type TextNode = { type: 'text'; content: string };
+type ElementNode = { type: 'element'; tag: string; attrs: Record<string, string>; children: HtmlNode[] };
+type HtmlNode = TextNode | ElementNode;
+
+const VOID_ELEMENTS = new Set([
+  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'
+]);
+
+const BOOLEAN_ATTRIBUTES = new Set([
+  'allowfullscreen', 'allowpaymentrequest', 'async', 'autofocus', 'autoplay', 'checked', 'controls', 'default',
+  'defer', 'disabled', 'formnovalidate', 'hidden', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open',
+  'playsinline', 'readonly', 'required', 'reversed', 'scoped', 'seamless', 'selected'
+]);
+
+function parseAttributes(raw: string): Record<string, string> {
+  const attrs: Record<string, string> = {};
+  const attrRegex = /([\w:-]+)(?:\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'`=<>]+)))?/g;
+  let match: RegExpExecArray | null;
+  while ((match = attrRegex.exec(raw))) {
+    const name = match[1];
+    const value = match[3] ?? match[4] ?? match[5] ?? '';
+    attrs[name] = value;
+  }
+  return attrs;
+}
+
+function parseHtmlToTree(html: string): HtmlNode[] {
+  if (!html) return [];
+  const root: ElementNode = { type: 'element', tag: '__root__', attrs: {}, children: [] };
+  const stack: ElementNode[] = [root];
+  const tokens = html.split(/(<[^>]+>)/g);
+
+  for (const token of tokens) {
+    if (!token) continue;
+    if (token.startsWith('<')) {
+      if (/^<!/.test(token)) continue; // skip comments/doctypes
+      const closing = /^<\//.test(token);
+      if (closing) {
+        const closeMatch = token.match(/^<\/([\w:-]+)>/);
+        if (!closeMatch) continue;
+        const tag = closeMatch[1].toLowerCase();
+        for (let i = stack.length - 1; i >= 0; i -= 1) {
+          const node = stack[i];
+          if (node.type === 'element' && node.tag === tag) {
+            stack.length = i;
+            break;
+          }
+        }
+        continue;
+      }
+
+      const openMatch = token.match(/^<([\w:-]+)([\s\S]*?)(\/?)>$/);
+      if (!openMatch) {
+        // treat malformed tag as text
+        const parent = stack[stack.length - 1];
+        if (parent && parent.type === 'element') {
+          parent.children.push({ type: 'text', content: token });
+        }
+        continue;
+      }
+
+      const tag = openMatch[1].toLowerCase();
+      const attrString = openMatch[2] || '';
+      const selfClosing = Boolean(openMatch[3]) || VOID_ELEMENTS.has(tag);
+      const attrs = parseAttributes(attrString);
+      const elementNode: ElementNode = { type: 'element', tag, attrs, children: [] };
+      const parent = stack[stack.length - 1];
+      parent.children.push(elementNode);
+      if (!selfClosing) {
+        stack.push(elementNode);
+      }
+      continue;
+    }
+
+    const parent = stack[stack.length - 1];
+    parent.children.push({ type: 'text', content: token });
+  }
+
+  return root.children;
+}
+
+const dashedToCamel = (prop: string) => prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
+function parseStyle(value: string) {
+  const style: Record<string, string> = {};
+  value
+    .split(';')
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+    .forEach((segment) => {
+      const [prop, rawVal] = segment.split(':');
+      if (!prop) return;
+      const formattedProp = dashedToCamel(prop.trim());
+      const val = (rawVal ?? '').trim();
+      if (formattedProp) style[formattedProp] = val;
+    });
+  return style;
+}
+
+const ATTRIBUTE_RENAME: Record<string, string> = {
+  class: 'className',
+  for: 'htmlFor',
+};
+
+function attributeNameToProp(name: string) {
+  if (ATTRIBUTE_RENAME[name]) return ATTRIBUTE_RENAME[name];
+  if (name.startsWith('data-') || name.startsWith('aria-')) return name;
+  return dashedToCamel(name);
+}
+
+function attributesToProps(attrs: Record<string, string>) {
+  const props: Record<string, any> = {};
+  for (const [name, rawValue] of Object.entries(attrs)) {
+    const propName = attributeNameToProp(name);
+    if (propName === 'style') {
+      props.style = parseStyle(rawValue);
+      continue;
+    }
+    if (BOOLEAN_ATTRIBUTES.has(name.toLowerCase()) && rawValue === '') {
+      props[propName] = true;
+      continue;
+    }
+    props[propName] = rawValue;
+  }
+  return props;
+}
+
+function isInternalHref(href: string): boolean {
+  if (!href) return false;
+  return (
+    href.startsWith('/') ||
+    href.startsWith('#') ||
+    href.startsWith('./') ||
+    href.startsWith('../')
+  );
+}
+
+function renderNodes(nodes: HtmlNode[], keyPrefix = 'glossary'):
+  ReactNode[] {
+  return nodes.map((node, idx) => renderNode(node, `${keyPrefix}-${idx}`));
+}
+
+function renderNode(node: HtmlNode, key: string): ReactNode {
+  if (node.type === 'text') {
+    return createElement(Fragment, { key }, node.content);
+  }
+
+  const props = attributesToProps(node.attrs);
+  const children = node.children.length ? renderNodes(node.children, key) : [];
+
+  if (node.tag === 'a') {
+    const { href, ...rest } = props;
+    if (typeof href === 'string' && isInternalHref(href)) {
+      return createElement(
+        SmartLink,
+        { key, href, ...rest },
+        ...children
+      );
+    }
+    return createElement('a', { key, href, ...rest }, ...children);
+  }
+
+  if (VOID_ELEMENTS.has(node.tag)) {
+    return createElement(node.tag, { key, ...props });
+  }
+
+  return createElement(node.tag, { key, ...props }, ...children);
+}
+
+function renderGlossaryHtml(
+  html: string,
+  index: { slug: string; title: string }[],
+  currentSlug: string
+): ReactNode {
+  if (!html) return null;
+  const linked = autoLinkGlossary(html, index, currentSlug);
+  const nodes = parseHtmlToTree(linked);
+  return renderNodes(nodes);
 }
 
 export const revalidate = 86400;
@@ -262,11 +444,9 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
             dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
           />
           {/* definition body from WordPress */}
-          <div
-            dangerouslySetInnerHTML={{
-              __html: autoLinkGlossary(term.contentHtml, index, term.slug),
-            }}
-          />
+          <div>
+            {renderGlossaryHtml(term.contentHtml || '', index, term.slug)}
+          </div>
         </article>
 
         {/* Prev / Next navigation */}

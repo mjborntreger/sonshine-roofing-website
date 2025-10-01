@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import SmartLink from "@/components/SmartLink";
 import { ArrowUpRight, ArrowUp, ArrowRight } from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from "@/lib/routes";
 
@@ -30,14 +31,14 @@ const FooterBadges = dynamic(() => import("./FooterBadges"), {
 export default function Footer() {
   return (
     <>
-    <a 
-      href="#page-top" 
+    <SmartLink
+      href="#page-top"
       className="text-center"
       data-icon-affordance="up"
-      >
+    >
       Return to Top
       <ArrowUp className="icon-affordance h-4 w-4 inline ml-2"/>
-    </a>
+    </SmartLink>
     <FooterBadges />
 
     <footer className="bg-slate-200 pt-20">

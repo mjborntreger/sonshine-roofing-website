@@ -1,6 +1,7 @@
 import Section from "@/components/layout/Section";
 import ServicesAside from "@/components/ServicesAside";
 import Image from "next/image";
+import SmartLink from "@/components/SmartLink";
 import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
@@ -175,7 +176,7 @@ export default async function Page() {
                     />
                   </div>
                   <figcaption className="mt-2 text-sm text-slate-600">
-                    <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #CCC1331483 | <a className="text-[--brand-blue]" href="/person/nathan-borntreger">See full bio</a>
+                    <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #CCC1331483 | <SmartLink className="text-[--brand-blue]" href="/person/nathan-borntreger">See full bio</SmartLink>
                   </figcaption>
                 </figure>
 

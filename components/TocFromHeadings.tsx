@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowDown, ArrowRight, CornerDownRight, List } from 'lucide-react';
+import { ArrowDown, CornerDownRight, List } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import type { MouseEvent } from 'react';
 import styles from './styles/TocFromHeadings.module.css';
@@ -167,43 +167,72 @@ export default function TocFromHeadings({
   useEffect(() => {
     if (!items.length || mobile) return;
 
-    const headings = items
+    const elements = items
       .map((item) => document.getElementById(item.id))
-      .filter(Boolean) as HTMLElement[];
+      .filter((node): node is HTMLElement => Boolean(node));
 
-    if (!headings.length) return;
+    if (!elements.length || typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      return;
+    }
 
-    const thr = 100; // px cushion so we don't flicker at exact boundary
+    const stickyOffset = offset ?? readStickyOffset();
+    const topMargin = -(stickyOffset + 12);
+    const visible = new Map<string, number>();
+    let fallbackId: string | null = elements[0]?.id ?? null;
 
-    const getActive = () => {
-      const adj = offset ?? readStickyOffset();
-      let currentId = headings[0].id;
-      for (let i = 0; i < headings.length; i++) {
-        const t = headings[i].getBoundingClientRect().top - adj;
-        if (t <= thr) currentId = headings[i].id;
-        else break;
+    const setActiveIfChanged = (id: string | null) => {
+      if (!id) return;
+      fallbackId = id;
+      setActiveId((prev) => (prev === id ? prev : id));
+    };
+
+    const updateFromVisible = () => {
+      if (visible.size) {
+        const next = Array.from(visible.entries()).sort((a, b) => a[1] - b[1])[0][0];
+        setActiveIfChanged(next);
+        return;
       }
-      return currentId;
+
+      if (fallbackId) {
+        const nearBottom = (() => {
+          const scrollY = window.scrollY + window.innerHeight;
+          const docHeight = document.documentElement.scrollHeight;
+          return docHeight - scrollY < 2;
+        })();
+        if (nearBottom) {
+          const last = elements[elements.length - 1];
+          setActiveIfChanged(last?.id ?? fallbackId);
+        } else {
+          setActiveIfChanged(fallbackId);
+        }
+      }
     };
 
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        setActiveId(getActive());
-      });
-    };
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.id;
+          if (!id) return;
+          if (entry.isIntersecting) {
+            visible.set(id, entry.boundingClientRect.top);
+          } else {
+            visible.delete(id);
+          }
+        });
+        updateFromVisible();
+      },
+      {
+        root: null,
+        rootMargin: `${topMargin}px 0px -72% 0px`,
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+      },
+    );
 
-    const initial = window.location.hash ? window.location.hash.slice(1) : getActive();
-    setActiveId(initial);
+    elements.forEach((node) => observer.observe(node));
+    updateFromVisible();
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll);
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', onScroll);
-      if (raf) cancelAnimationFrame(raf);
+      observer.disconnect();
     };
   }, [items, offset, mobile]);
 

@@ -34,19 +34,6 @@
 }
 html { scroll-padding-top: var(--sticky-offset); }
 :is(h1,h2,h3,h4,h5,h6,section,article,div,main)[id] { scroll-margin-top: var(--sticky-offset); }
-/* ---------------------------------------
-   Fonts
-----------------------------------------*/
-@font-face {
-  font-family: "Candara V2";
-  src: url("/fonts/CandaraV2.woff2") format("woff2"),
-       url("/fonts/CandaraV2.woff") format("woff"),
-       url("/fonts/CandaraV2.ttf") format("truetype");
-  font-weight: 400 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 html {
   font-feature-settings: "cv02","cv03","cv04","cv11";
   scroll-behavior: auto;
@@ -67,7 +54,6 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   .brand-gradient-bg {
     background-image: linear-gradient(135deg, var(--brand-blue), var(--brand-cyan));
   }
-  .font-accent { font-family: "Candara V2", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif; }
   .ring-brand { box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand-blue) 70%, white); }
   .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-none::-webkit-scrollbar { display: none; }

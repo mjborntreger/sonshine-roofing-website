@@ -1,4 +1,5 @@
 import { HelpCircle, Phone, PencilLineIcon, SquareMenu, ArrowRight } from "lucide-react";
+import SmartLink from "./SmartLink";
 
 // Style Constants //
 const titleIcon = "h-5 w-5 inline mr-2 text-[--brand-blue]";
@@ -19,13 +20,13 @@ export default function SidebarCta() {
                         Need help?
                     </h4>
                     <p className={text}>Talk to a real roofer now.</p>
-                    <a
+                    <SmartLink
                         className="mt-3 w-full btn px-4 py-2 btn-brand-blue btn-sm phone-affordance"
                         href="tel:+19418664320"
                     >
                         <Phone className={`${icon} mr-2 phone-affordance-icon`} />
                         Call (941) 866-4320
-                    </a>
+                    </SmartLink>
             </div>
 
             <div className={cardBase}>
@@ -36,7 +37,7 @@ export default function SidebarCta() {
                     <div className={text}>
                         Send us a message and we’ll follow up.
                     </div>
-                    <a
+                    <SmartLink
                         className="mt-3 w-full px-4 py-2 btn btn-sm btn-outline"
                         data-icon-affordance="right"
                         href="/contact-us#book-an-appointment"
@@ -44,7 +45,7 @@ export default function SidebarCta() {
                         <SquareMenu className={`${icon} mr-2`} />
                         Contact Form
                         <ArrowRight className={`${icon} ml-2 icon-affordance`} />
-                    </a>
+                    </SmartLink>
                 </div>
             </div>
 

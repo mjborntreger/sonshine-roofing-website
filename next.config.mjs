@@ -17,9 +17,6 @@ const csp = `
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typedRoutes: true,
-  experimental: {
-    polyfillsOptimization: true,
-  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "sonshineroofing.com" },

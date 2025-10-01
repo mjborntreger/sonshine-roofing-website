@@ -1,5 +1,6 @@
 import Section from "@/components/layout/Section";
 import Image from "next/image";
+import SmartLink from "@/components/SmartLink";
 import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
@@ -127,7 +128,7 @@ export default async function Page() {
             when addressing problem areas—these should all be considered when
             estimating the true repair cost.
             <br></br><br></br>
-            <a href="/contact-us">Contact us</a> to help identify your roofing
+            <SmartLink href="/contact-us">Contact us</SmartLink> to help identify your roofing
             issues and determine repair costs accurately.
             <br></br><br></br>
             For guidance on assessing roofing needs, see the <a href="https://www.hud.gov/program_offices/healthy_homes">
@@ -225,7 +226,7 @@ export default async function Page() {
                 birds can use these vulnerable points to access your attic or wall spaces. Once
                 inside, they can cause extensive damage to insulation, wiring, and wood framing
                 in a short period of time.
-                <a href="/roof-inspection"> Regular roof inspections </a> can help detect
+                <SmartLink href="/roof-inspection">Regular roof inspections</SmartLink> can help detect
                 these problems early, and preventive maintenance ensures your soffits stay sealed
                 and secure year-round.
               </p>
@@ -280,7 +281,7 @@ export default async function Page() {
                 </div>
               </figure>
               <p>
-                That’s why <a href="/roof-inspection">routine roof inspections</a> are
+                That’s why <SmartLink href="/roof-inspection">routine roof inspections</SmartLink> are
                 essential—they help identify vulnerable flashing areas before they fail. If damage
                 is found, our team can address it promptly through targeted roof repair or complete
                 roof replacement when necessary.
@@ -323,7 +324,7 @@ export default async function Page() {
                 If the fascia deteriorates, water can seep into the roofline and exterior walls,
                 eventually reaching the interior of the home. This not only weakens the roof structure
                 but can also lead to costly water damage inside your living
-                space. <a href="/roof-inspection">Our roof inspections</a> and <a href="/roof-care-club">maintenance services</a> include
+                space. <SmartLink href="/roof-inspection">Our roof inspections</SmartLink> and <SmartLink href="/roof-care-club">maintenance services</SmartLink> include
                 a full evaluation of fascia boards to ensure early signs of wear or damage
                 are caught before they escalate.
               </p>

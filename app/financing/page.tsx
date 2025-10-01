@@ -1,4 +1,5 @@
 import UiLink from '@/components/UiLink';
+import SmartLink from "@/components/SmartLink";
 import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ListStart, ChevronRight } from "lucide-react";
 import ProgramCard from '@/components/ProgramCard';
 import MonthlyEstimator from './MonthlyEstimator';
@@ -286,24 +287,24 @@ export default async function FinancingPage() {
             </h3>
             <ol className="mt-3 list-decimal pl-5 space-y-2 text-slate-700">
               <li>
-                <a 
+                <SmartLink
                   href="#docs"
                   className="text-[--brand-blue]"
                   data-icon-affordance="right"
-                  >
-                    Know what documents you'll need
-                <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
-                </a>
+                >
+                  Know what documents you'll need
+                  <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
+                </SmartLink>
               </li>
               <li>
-                <a 
+                <SmartLink
                   href="/contact-us#book-an-appointment"
                   className="text-[--brand-blue]"
                   data-icon-affordance="right"
-                  >
-                    Schedule an appointment with a Roofing Specialist
-                <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
-                </a>
+                >
+                  Schedule an appointment with a Roofing Specialist
+                  <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
+                </SmartLink>
               </li>
               <li>We take care of the application</li>
               <li>Same-day Approval</li>

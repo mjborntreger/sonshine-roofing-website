@@ -355,7 +355,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
         {/* Sidebar (desktop, sticky) */}
         <aside>
-          <div className="sticky top-24 grid grid-cols-1">
+          <div className="sticky top-16 grid grid-cols-1">
             <TocFromHeadings
               root="#article-root"
               levels={[2, 3]}

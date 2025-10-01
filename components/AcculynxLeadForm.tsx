@@ -191,9 +191,10 @@ export default function AcculynxLeadForm() {
           position: relative;
           padding-top: 20px;
           padding-bottom: 20px;
-          font-family: 'Roboto', Arial, Helvetica, sans-serif;
+          font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         }
-        .webLeadForm__form { margin: 0; width: 100%; }
+        .webLeadForm__form { margin: 0; width: 100%; font-family: inherit; }
+        .webLeadForm__form * { font-family: inherit; }
         .webLeadForm__fieldDiv { margin: 0 20px 15px 20px; }
         .webLeadForm__messageSentDiv {
           display: none;

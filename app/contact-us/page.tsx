@@ -103,7 +103,7 @@ export default function Page() {
                 />
                 <div>
                   <p className="text-md font-semibold text-slate-900">
-                    You’ll likely talk to <span className="text-[--brand-blue] hover:underline"><a href="/person/tara">Tara.</a></span>
+                    You’ll likely talk to <SmartLink className="text-[--brand-blue] hover:underline" href="/person/tara">Tara.</SmartLink>
                   </p>
                   <p className="text-md text-slate-600">She’s friendly, fast, and hates leaks.</p>
                 </div>

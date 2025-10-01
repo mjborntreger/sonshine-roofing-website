@@ -35,7 +35,6 @@ const config: Config = {
     },
     fontFamily: {
       sans: ["var(--font-inter)", "system-ui", "sans-serif"],
-      accent: ["var(--font-candara)", "ui-sans-serif", "system-ui"]
     }
   },
   plugins: [],
@@ -46,6 +45,5 @@ export default {
   theme: { extend: {} },
   plugins: [typography],
 }
-
 
 
