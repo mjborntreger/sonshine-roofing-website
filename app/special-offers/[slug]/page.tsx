@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 
 import Section from '@/components/layout/Section';
@@ -142,10 +143,21 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
                         )}
                     </article>
 
-                    <div className="space-y-6 sticky top-24">
+                    <div className="sticky top-24 space-y-6">
                         {!expired && offer.offerCode ? (
-                            <SpecialOfferForm offerCode={offer.offerCode} offerSlug={offer.slug} offerTitle={offer.title} />
-
+                            <Suspense
+                                fallback={
+                                    <div className="rounded-3xl border border-blue-100 bg-white p-6 text-sm text-slate-600">
+                                        Loading offer form…
+                                    </div>
+                                }
+                            >
+                                <SpecialOfferForm
+                                    offerCode={offer.offerCode}
+                                    offerSlug={offer.slug}
+                                    offerTitle={offer.title}
+                                />
+                            </Suspense>
                         ) : (
                             <div className="rounded-3xl border border-red-200 bg-white p-6 mb-24 shadow-sm">
                                 <h2 className="text-xl font-semibold text-red-700">Offer unavailable</h2>
