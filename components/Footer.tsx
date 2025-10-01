@@ -183,7 +183,7 @@ export default function Footer() {
               <p>
                 <Link
                   href="/contact-us#book-an-appointment"
-                  className="inline-block bg-[--brand-orange] rounded-md border border-[--brand-orange] px-3 py-1.5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                  className="inline-block bg-[--brand-orange] rounded-full border border-[--brand-orange] px-3 py-1.5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
                   data-icon-affordance="right"
                 >
                   Book an appointment
