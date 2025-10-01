@@ -82,6 +82,7 @@ export const NAV_COMPANY: ReadonlyArray<{ label: string; href: Route }> = [
   { label: 'Home', href: ROUTES.home },
   { label: 'About', href: ROUTES.about },
   { label: 'Contact', href: ROUTES.contact },
+  { label: 'Financing', href: ROUTES.financing },
 ];
 
 export const NAV_SERVICES: ReadonlyArray<{ label: string; href: Route }> = [
@@ -93,7 +94,6 @@ export const NAV_SERVICES: ReadonlyArray<{ label: string; href: Route }> = [
 
 export const NAV_RESOURCES: ReadonlyArray<{ label: string; href: Route }> = [
   { label: 'Project Gallery', href: ROUTES.project },
-  { label: 'Financing', href: ROUTES.financing },
   { label: 'Video Library', href: ROUTES.videoLibrary },
   { label: 'Roofing Glossary', href: ROUTES.roofingGlossary },
   { label: 'Blog', href: ROUTES.blog },

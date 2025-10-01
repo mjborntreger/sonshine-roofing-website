@@ -295,6 +295,7 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   .btn-lg { @apply h-11 px-6 text-lg; }
   .btn-md { @apply h-10 px-4 text-base; }
   .btn-sm { @apply h-9  px-3 text-sm; }
+  .btn-xs { @apply h-7 px-2 text-xs; }
 
   /* Motion */
   .btn-press { @apply transition-transform motion-safe:hover:scale-[1.03] active:scale-[0.98]; }
