@@ -1,10 +1,9 @@
 import SmartLink from "@/components/SmartLink";
-import { Clock, Tag, Users, Languages, CreditCard, Hammer, MapPin, BadgePercent, ChevronDown } from "lucide-react";
+import { Clock, Tag, Users, Languages, CreditCard, Hammer, MapPin, BadgePercent, ChevronDown, ArrowDown } from "lucide-react";
 
-const h2Styles = "mb-8 text-3xl lg:text-5xl"
+const h2Styles = "mb-8 text-2xl text-center md:text-left"
 const pillarsGrid = "mt-6 grid grid-cols-1 gap-4 items-stretch";
 const pStyles = "text-md list-disc pl-5 space-y-1 marker:text-slate-400";
-const gradientDivider = "gradient-divider my-4";
 const linkStyles = "text-[--brand-blue] icon-affordance"
 
 const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white";
@@ -13,9 +12,13 @@ const summaryStyles = "flex items-center justify-between cursor-pointer select-n
 export async function HoursAndInformation() {
   return (
     <div>
-      <div id="hours-and-information" className="text-center">
-        <h2 className={h2Styles}>Hours and Information</h2>
-        <div className={gradientDivider} />
+      <div id="hours-and-information">
+        <h2 
+          className={h2Styles}
+          >
+            Hours and Information
+            <ArrowDown className="h-6 w-6 inline ml-2 text-[--brand-blue]" />
+        </h2>
       </div>
 
       <div className={pillarsGrid}>
