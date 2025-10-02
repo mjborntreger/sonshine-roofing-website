@@ -6,6 +6,7 @@ import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-m
 import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight, HandCoins, Wallet } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
+import { normalizePhoneUS, stripToDigits } from '@/lib/phone';
 
 const COOKIE_NAME = 'ss_financing_calc';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -327,26 +328,23 @@ function sanitizeAmountInput(value: string) {
 }
 
 function sanitizePhoneInput(value: string) {
-  return value.replace(/\D/g, '').slice(0, 11);
+  return stripToDigits(value, 10);
 }
 
 function formatPhoneDisplay(digits: string) {
   const cleaned = sanitizePhoneInput(digits);
   if (!cleaned) return '';
-  const hasCountryCode = cleaned.length === 11;
-  const country = hasCountryCode ? cleaned[0] : '';
-  const core = hasCountryCode ? cleaned.slice(1) : cleaned;
-  const area = core.slice(0, 3);
-  const mid = core.slice(3, 6);
-  const last = core.slice(6, 10);
+  const area = cleaned.slice(0, 3);
+  const mid = cleaned.slice(3, 6);
+  const last = cleaned.slice(6, 10);
 
-  if (core.length <= 3) {
-    return `${hasCountryCode ? `+${country} ` : ''}(${area}`;
+  if (cleaned.length <= 3) {
+    return `(${area}`;
   }
-  if (core.length <= 6) {
-    return `${hasCountryCode ? `+${country} ` : ''}(${area}) ${mid}`;
+  if (cleaned.length <= 6) {
+    return `(${area}) ${mid}`;
   }
-  return `${hasCountryCode ? `+${country} ` : ''}(${area}) ${mid}-${last}`;
+  return `(${area}) ${mid}-${last}`;
 }
 
 function isEmailValid(email: string) {
@@ -590,8 +588,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     if (currentStep === thirdFormStepIndex) {
       if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
       const phoneDigits = sanitizePhoneInput(formValues.phone);
-      if (!(phoneDigits.length === 10 || phoneDigits.length === 11)) {
-        nextErrors.phone = 'Enter a valid phone number (10 digits, optional country code)';
+      if (phoneDigits.length !== 10) {
+        nextErrors.phone = 'Enter a valid 10-digit phone number';
       }
     }
     return nextErrors;
@@ -753,6 +751,13 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       return;
     }
 
+    const normalizedPhone = normalizePhoneUS(formValues.phone);
+    if (!normalizedPhone) {
+      setErrors({ phone: 'Enter a valid 10-digit phone number' });
+      setStep(thirdFormStepIndex);
+      return;
+    }
+
     const form = event.currentTarget;
     const fd = new FormData(form);
     const cfToken = String(fd.get('cfToken') || '');
@@ -784,7 +789,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
       email: formValues.email.trim(),
-      phone: sanitizePhoneInput(formValues.phone),
+      phone: normalizedPhone,
       address1: formValues.address1.trim(),
       address2: formValues.address2.trim(),
       city: formValues.city.trim(),

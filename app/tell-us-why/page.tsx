@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Turnstile from "@/components/Turnstile";
 import SmartLink from "@/components/SmartLink";
+import { normalizePhoneUS } from "@/lib/phone";
 
 function TellUsWhyForm() {
   const qs = useSearchParams();
@@ -42,18 +43,25 @@ function TellUsWhyForm() {
     const first = String(fd.get("firstName") || "").trim();
     const last = String(fd.get("lastName") || "").trim();
     const email = String(fd.get("email") || "").trim();
-    const phone = String(fd.get("phone") || "").trim();
+    const phoneRaw = String(fd.get("phone") || "").trim();
     const message = String(fd.get("message") || "").trim();
 
     const cfToken = String(fd.get("cfToken") || ""); // provided by <Turnstile />
     const hp_field = String(fd.get("company") || ""); // honeypot
+
+    const normalizedPhone = normalizePhoneUS(phoneRaw);
+    if (!normalizedPhone) {
+      setStatus("idle");
+      setErr("Enter a valid 10-digit phone number.");
+      return;
+    }
 
     const payload: Record<string, unknown> = {
       type: "feedback",
       firstName: first,
       lastName: last,
       email,
-      phone,
+      phone: normalizedPhone,
       rating: Number(rating),
       message,
       cfToken,

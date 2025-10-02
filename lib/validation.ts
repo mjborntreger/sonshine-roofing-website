@@ -1,6 +1,7 @@
 
 
 import { z } from "zod";
+import { normalizePhoneUS, stripToDigits } from "./phone";
 
 /**
  * Feedback form validation (Zod)
@@ -25,19 +26,7 @@ const MAX_SPECIAL_MESSAGE = 1000;
 // ---- helpers --------------------------------------------------------------
 const trim = (s: unknown) => (typeof s === "string" ? s.trim() : s);
 
-const digitsOnly = (value: string) => value.replace(/\D/g, "");
-
-function normalizePhone(input: string): string {
-  // Keep digits and common formatting characters, collapse spaces
-  const cleaned = input.replace(/[^0-9+()\-\s]/g, "").replace(/\s+/g, " ").trim();
-  return cleaned;
-}
-
-function looksLikePhone(input: string): boolean {
-  // Very permissive: at least 7 digits after stripping non-digits
-  const digits = input.replace(/\D/g, "");
-  return digits.length === 0 || digits.length >= 7;
-}
+const digitsOnly = (value: string) => stripToDigits(value);
 
 const optionalTrackingField = z
   .preprocess((value) => {
@@ -77,11 +66,11 @@ const feedbackSchema = z
     email: z
       .preprocess(trim, z.string().min(1, "Email is required").max(MAX_EMAIL).email("Invalid email")),
     phone: z
-      .preprocess(trim, z.string().max(MAX_PHONE).transform((s) => (s ? normalizePhone(s) : "")))
-      .optional()
-      .refine((s) => s === undefined || looksLikePhone(s), {
-        message: "Invalid phone",
-      }),
+      .preprocess(trim, z.string().min(1, "Phone is required").max(MAX_PHONE))
+      .refine((value) => normalizePhoneUS(value) !== null, {
+        message: "Phone must include 10 digits",
+      })
+      .transform((value) => normalizePhoneUS(value)!),
     rating: ratingSchema,
     message: z.preprocess(trim, z.string().min(1, "Message is required").max(MAX_MESSAGE)),
 
@@ -160,11 +149,11 @@ const financingEmailSchema = z
   });
 
 const financingPhoneSchema = z
-  .preprocess(trim, z.string().min(1, "Phone is required"))
-  .transform((value) => digitsOnly(value))
-  .refine((value) => value.length === 10 || value.length === 11, {
-    message: "Phone must include 10 digits (country code optional)",
-  });
+  .preprocess(trim, z.string().min(1, "Phone is required").max(MAX_PHONE))
+  .refine((value) => normalizePhoneUS(value) !== null, {
+    message: "Phone must include 10 digits",
+  })
+  .transform((value) => normalizePhoneUS(value)!);
 
 const financingMatchSchema = z.object({
   program: z.union([z.literal('serviceFinance'), z.literal('ygrene')]),
@@ -227,11 +216,11 @@ const leadFeedbackEmailSchema = z
   .preprocess(trim, z.string().min(1, "Email is required").max(MAX_EMAIL).email("Invalid email"));
 
 const leadFeedbackPhoneSchema = z
-  .preprocess(trim, z.string().max(MAX_PHONE))
-  .transform((value) => (value ? normalizePhone(value) : ""))
-  .refine((value) => looksLikePhone(value), {
-    message: "Invalid phone",
-  });
+  .preprocess(trim, z.string().min(1, "Phone is required").max(MAX_PHONE))
+  .refine((value) => normalizePhoneUS(value) !== null, {
+    message: "Phone must include 10 digits",
+  })
+  .transform((value) => normalizePhoneUS(value)!);
 
 const leadFeedbackSchema = leadBaseSchema
   .extend({

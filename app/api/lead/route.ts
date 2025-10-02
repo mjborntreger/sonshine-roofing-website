@@ -8,6 +8,7 @@ import {
   type SpecialOfferLeadInput,
 } from '@/lib/validation';
 import { formatSpecialOfferExpiration } from '@/lib/specialOfferDates';
+import { formatPhoneUSForDisplay } from '@/lib/phone';
 
 function getAllowedOrigins(): string[] {
   const raw = process.env.ALLOWED_ORIGIN || '';
@@ -124,6 +125,7 @@ function buildFinancingPayload(data: FinancingLeadInput) {
     currency: 'USD',
     maximumFractionDigits: 0,
   });
+  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
 
   const summaryLines = Array.isArray(data.quizSummary)
     ? data.quizSummary.map((item) => {
@@ -173,6 +175,7 @@ function buildFinancingPayload(data: FinancingLeadInput) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    phoneDisplay,
     address1: data.address1,
     address2: data.address2 || '',
     city: data.city,
@@ -202,6 +205,7 @@ function buildFinancingPayload(data: FinancingLeadInput) {
 
 function buildFeedbackPayload(data: FeedbackLeadInput) {
   const fullName = `${data.firstName} ${data.lastName}`.trim();
+  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
 
   const payload: Record<string, unknown> = {
     type: 'feedback',
@@ -210,6 +214,7 @@ function buildFeedbackPayload(data: FeedbackLeadInput) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    phoneDisplay,
     rating: String(data.rating),
     message: data.message,
     page: data.page || '/tell-us-why',
@@ -225,6 +230,7 @@ function buildFeedbackPayload(data: FeedbackLeadInput) {
 function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
   const fullName = `${data.firstName} ${data.lastName}`.trim();
   const formattedExpiration = formatSpecialOfferExpiration(data.offerExpiration);
+  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
 
   const messageLines = [
     `Special offer claim from ${fullName}.`,
@@ -251,6 +257,7 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    phoneDisplay,
     offerCode: data.offerCode,
     offerSlug: data.offerSlug,
     offerTitle: data.offerTitle,
