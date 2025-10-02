@@ -223,8 +223,6 @@ export default async function WhyHomeownersChooseUs() {
                     <div className="mt-6 flex justify-end">
                       <SmartLink
                         href={pillar.cta.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="btn btn-brand-orange btn-md btn-press mt-2"
                         title={pillar.cta.title}
                         data-icon-affordance="right"
