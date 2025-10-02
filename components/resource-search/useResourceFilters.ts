@@ -1267,8 +1267,6 @@ function strategyFaq(opts: MountOptions): Cleaner {
     const getQuerySpan = () => $("#faq-query");
     const getSugWrap = () => $("#faq-suggestions");
     const getSugList = () => $("#faq-suggestion-list");
-    const getExpandBtn = () => $("#faq-expand-all");
-    const getCollapseBtn = () => $("#faq-collapse-all");
 
     const suggestionEntries: Array<{ root: Root; node: HTMLElement }> = [];
 
@@ -1342,9 +1340,6 @@ function strategyFaq(opts: MountOptions): Cleaner {
         setTimeout(() => (item as HTMLElement).scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
 
-    function expandAll() { getTopics().forEach((t) => { if ((t as HTMLElement).style.display === "none") return; (t as HTMLDetailsElement).open = true; }); }
-    function collapseAll() { getTopics().forEach((t) => { if ((t as HTMLElement).style.display === "none") return; (t as HTMLDetailsElement).open = false; }); }
-
     function filterNow() {
         const q = (getSearch()?.value || "");
         const topics = getTopics();
@@ -1409,6 +1404,10 @@ function strategyFaq(opts: MountOptions): Cleaner {
             }
         }
         syncQ(q);
+
+        if (typeof window !== "undefined") {
+            try { window.dispatchEvent(new CustomEvent("faq:update")); } catch { }
+        }
     }
 
     const offInput = on('input', (e) => {
@@ -1425,8 +1424,11 @@ function strategyFaq(opts: MountOptions): Cleaner {
 
     const offClick = on("click", (e) => {
         const t = e.target as Element;
-        if (t.closest && t.closest("#faq-expand-all")) { e.preventDefault(); expandAll(); return; }
-        if (t.closest && t.closest("#faq-collapse-all")) { e.preventDefault(); collapseAll(); return; }
+        if (!t || !t.closest) return;
+        if (!t.closest("#faq-toggle-all")) return;
+        if (typeof window !== "undefined") {
+            try { window.dispatchEvent(new CustomEvent("faq:update")); } catch { }
+        }
     });
 
     // initial

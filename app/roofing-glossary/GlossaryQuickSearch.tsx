@@ -24,7 +24,7 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
 
   return (
     <div className="mt-6">
-      <div className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-md backdrop-blur md:p-6">
+      <div className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
         <div className="flex inline-flex w-full items-start">
           <label htmlFor="glossary-search" className="sr-only">
             Search glossary terms

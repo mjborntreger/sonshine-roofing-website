@@ -4,6 +4,7 @@ import type { FaqFull, FaqTopic } from '@/lib/wp';
 import type { Metadata } from 'next';
 import ResourceSearchController from '@/components/resource-search/ResourceSearchController';
 import ResourcesAside from '@/components/ResourcesAside';
+import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
 
 export const revalidate = 86400; // daily ISR
 
@@ -116,26 +117,36 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
 
             {/* Search (client-side, exact phrase like Blog) */}
             <div className="mt-6" role="search">
-              <input
-                id="faq-search"
-                type="search"
-                defaultValue={q}
-                placeholder="Search questions..."
-                aria-label="Search FAQs"
-                autoComplete="off"
-                className="w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#0045d7] focus:outline-none"
-              />
+              <div className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
+                <div className="flex inline-flex w-full items-start">
+                  <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
+                  <input
+                    id="faq-search"
+                    type="search"
+                    defaultValue={q}
+                    placeholder="Search questions..."
+                    aria-label="Search FAQs"
+                    autoComplete="off"
+                    className="w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#0045d7] focus:outline-none"
+                  />
+                </div>
+              </div>
             </div>
 
             {/* Results meta + controls */}
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <span className="text-sm text-slate-700">Showing <span id="faq-result-count" aria-live="polite">{faqs.length}</span> FAQs</span>
-              <div className="ml-auto sm:flex items-center gap-2">
-                <button id="faq-expand-all" type="button" className="rounded-md border border-slate-400 px-3 py-1.5 text-sm bg-white hover:bg-slate-50">
-                  Expand all
-                </button>
-                <button id="faq-collapse-all" type="button" className="rounded-md border border-slate-400 px-3 py-1.5 text-sm bg-white hover:bg-slate-50">
-                  Collapse all
+              <div className="ml-auto flex items-center">
+                <button
+                  id="faq-toggle-all"
+                  type="button"
+                  aria-expanded="true"
+                  className="inline-flex items-center gap-2 rounded-full border border-[--brand-blue] bg-white px-4 py-1.5 text-sm font-semibold text-[--brand-blue] transition hover:bg-[--brand-blue]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2"
+                  data-state="expanded"
+                >
+                  <span data-faq-toggle-label>Collapse all</span>
+                  <ArrowDown className="hidden h-4 w-4" data-faq-toggle-icon="down" aria-hidden />
+                  <ArrowUp className="h-4 w-4" data-faq-toggle-icon="up" aria-hidden />
                 </button>
               </div>
             </div>
@@ -160,9 +171,14 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                 if (list.length === 0) return null;
                 return (
                   <section key={slug} id={`topic-${slug}`}>
-                    <details className="faq-topic rounded-lg border border-slate-400 bg-white">
+                    <details className="faq-topic rounded-lg border border-slate-300 bg-white" open>
                       <summary className="flex items-center justify-between cursor-pointer select-none px-4 py-2 text-sm font-semibold text-slate-800 hover:translate-y-[1px] transition">
-                        <span data-topic-name={title}>{title}</span>
+                        <span
+                          data-topic-name={title}
+                        >
+                          <HelpCircle className="h-4 w-4 text-[--brand-blue] mr-2 inline" />
+                          {title}
+                        </span>
                         <span className="inline-flex items-center gap-2 text-slate-600">
                           <span className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-[#cef3ff] px-2 text-xs font-medium text-slate-700 faq-count">
                             {list.length}
@@ -219,22 +235,71 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
             const $all = (sel, ctx) => Array.from((ctx || document).querySelectorAll(sel));
 
             function wireBulkControls() {
-              const expandAllBtn = document.getElementById('faq-expand-all');
-              const collapseAllBtn = document.getElementById('faq-collapse-all');
+              const toggleBtn = document.getElementById('faq-toggle-all');
+              if (!toggleBtn) return;
 
-              if (expandAllBtn) {
-                expandAllBtn.addEventListener('click', () => {
-                  $all('details.faq-topic').forEach((t) => (t.open = true));
-                  $all('details.faq-item').forEach((d) => (d.open = true));
+              const label = toggleBtn.querySelector('[data-faq-toggle-label]');
+              const iconDown = toggleBtn.querySelector('[data-faq-toggle-icon="down"]');
+              const iconUp = toggleBtn.querySelector('[data-faq-toggle-icon="up"]');
+
+              const isVisible = (node) => {
+                if (!(node instanceof HTMLElement)) return true;
+                if (node.hidden) return false;
+                if (node.classList.contains('hidden')) return false;
+                if (node.style && node.style.display === 'none') return false;
+                return true;
+              };
+
+              const updateButton = () => {
+                const topicNodes = $all('details.faq-topic');
+                const visibleTopics = topicNodes.filter(isVisible);
+                const hasTopics = visibleTopics.length > 0;
+                const allOpen = hasTopics && visibleTopics.every((node) => node.open);
+
+                toggleBtn.dataset.state = allOpen ? 'expanded' : 'collapsed';
+                toggleBtn.setAttribute('aria-expanded', allOpen ? 'true' : 'false');
+
+                if (label) label.textContent = allOpen ? 'Collapse all' : 'Expand all';
+                if (iconDown) iconDown.classList.toggle('hidden', allOpen);
+                if (iconUp) iconUp.classList.toggle('hidden', !allOpen);
+              };
+
+              const setAll = (open) => {
+                $all('details.faq-topic').forEach((node) => (node.open = open));
+              };
+
+              const ensureListeners = () => {
+                $all('details.faq-topic').forEach((node) => {
+                  if (node.dataset.bulkToggleBound) return;
+                  node.addEventListener('toggle', updateButton);
+                  node.dataset.bulkToggleBound = '1';
                 });
+              };
+
+              toggleBtn.addEventListener('click', () => {
+                const next = toggleBtn.dataset.state !== 'expanded';
+                setAll(next);
+                updateButton();
+              });
+
+              ensureListeners();
+              updateButton();
+
+              const topicsRoot = document.getElementById('faq-topics');
+              if (topicsRoot) {
+                const observer = new MutationObserver(() => {
+                  ensureListeners();
+                  updateButton();
+                });
+                observer.observe(topicsRoot, { childList: true, subtree: true });
               }
 
-              if (collapseAllBtn) {
-                collapseAllBtn.addEventListener('click', () => {
-                  $all('details.faq-item').forEach((d) => (d.open = false));
-                  $all('details.faq-topic').forEach((t) => (t.open = false));
-                });
-              }
+              const handleExternalUpdate = () => {
+                ensureListeners();
+                updateButton();
+              };
+              window.removeEventListener('faq:update', handleExternalUpdate);
+              window.addEventListener('faq:update', handleExternalUpdate);
             }
 
             if (document.readyState === 'loading') {

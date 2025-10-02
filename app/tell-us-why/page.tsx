@@ -106,7 +106,7 @@ function TellUsWhyForm() {
           We read every note and will reach out if we need more details. Since 1987 we’ve got you covered.
         </p>
         <p className="mt-4 text-slate-700">Redirecting in {countdown}…</p>
-        <SmartLink href="/" className="mt-2 inline-block text-brand-cyan">
+        <SmartLink href="/" className="mt-2 inline-block text-[--brand-blue]">
           If you are not redirected automatically, click here.
         </SmartLink>
       </main>
