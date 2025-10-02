@@ -1,4 +1,5 @@
-import { Phone, Zap } from "lucide-react"
+import { ArrowDown, Phone, Zap } from "lucide-react"
+import SmartLink from "./SmartLink";
 
 export default function Hero() {
   return (
@@ -38,25 +39,15 @@ export default function Hero() {
 
             <div className="mt-16 flex flex-wrap gap-3 justify-center">
 
-              <a
-                href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Get a free 60-second quote"
-                className="btn btn-brand-orange btn-lg md:btn-hero items-center mb-4"
+              <SmartLink
+                href="#get-started"
+                aria-label="Get started"
+                className="inline-flex btn btn-brand-orange btn-lg md:btn-hero items-center"
+                data-icon-affordance="down"
               >
-                <Zap className="mr-2 h-4 w-4 md:h-6 md:w-6" aria-hidden="true" />
-                <span>Free 60-second Quote</span>
-              </a>
-
-              <a
-                href="/contact-us"
-                aria-label="Contact SonShine Roofing"
-                className="phone-affordance inline-flex btn btn-brand-blue btn-lg md:btn-hero items-center"
-              >
-                <Phone className="phone-affordance-icon mr-2 h-4 w-4 md:h-6 md:w-6" aria-hidden="true" />
-                <span>Contact Us</span>
-              </a>
+                Get Started
+                <ArrowDown className="icon-affordance ml-2 h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
+              </SmartLink>
 
             </div>
           </div>

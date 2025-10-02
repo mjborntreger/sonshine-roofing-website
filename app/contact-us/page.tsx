@@ -1,5 +1,6 @@
 import Section from "@/components/layout/Section";
 import AcculynxLeadForm from "@/components/AcculynxLeadForm";
+import LeadForm from "@/components/LeadForm";
 import SmartLink from "@/components/SmartLink";
 import { Phone, Mail, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays, MapPinned } from "lucide-react";
 import Image from 'next/image';

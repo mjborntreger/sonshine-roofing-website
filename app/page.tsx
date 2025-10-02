@@ -12,6 +12,10 @@ import Section from "@/components/layout/Section";
 import type { Metadata } from 'next';
 import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
+import LeadForm from "@/components/LeadForm";
+
+// ===== STYLE CONSTANTS ===== //
+const landingLayout = "mx-auto w-full max-w-[1600px]";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
@@ -78,8 +82,13 @@ export default async function Page() {
   return (
     <>
       <Hero />
-      <div className="bg-neutral-50">
-        <div className="grid gap-1 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+      <div className={landingLayout}>
+        <div className="mx-2">
+        <LeadForm />
+        </div>
+      </div>
+      <div className={landingLayout}>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
             <Section>
               <WhyHomeownersChooseUs />
@@ -99,36 +108,37 @@ export default async function Page() {
             <ServicesQuickLinks />
             <ResourcesQuickLinks />
           </div>
-        </div>
-        <div className="bg-orange-50/90">
-          <ReviewsCarousel />
-        </div>
 
-        
-          <div className="mx-auto w-full max-w-[1600px]">
-            <LatestProjectsFilter projects={projects} initial={4} />
-            <LatestPostsFilters posts={posts} initial={4} />
-          </div>
-        
-
-        {/* General FAQs at bottom of the landing page */}
-        <Section>
-          <FaqInlineList
-            heading="General FAQs"
-            topicSlug="general"
-            limit={8}
-            initialItems={generalFaqs}
-            seeMoreHref="/faq"
-          />
-          {/* JSON-LD for FAQs on the home page */}
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-          />
-        </Section>
+        </div>
       </div>
 
+      <div className="bg-orange-50/90">
+        <ReviewsCarousel />
+      </div>
+
+
+      <div className={landingLayout}>
+        <LatestProjectsFilter projects={projects} initial={4} />
+        <LatestPostsFilters posts={posts} initial={4} />
+      </div>
+
+
+      {/* General FAQs at bottom of the landing page */}
+      <Section>
+        <FaqInlineList
+          heading="General FAQs"
+          topicSlug="general"
+          limit={8}
+          initialItems={generalFaqs}
+          seeMoreHref="/faq"
+        />
+        {/* JSON-LD for FAQs on the home page */}
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      </Section>
     </>
   );
 }

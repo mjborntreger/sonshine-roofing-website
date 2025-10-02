@@ -15,7 +15,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-const SECTION_CONTAINER = "mt-6 px-2";
+const SECTION_CONTAINER = "px-2";
 const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
 const DIVIDER_CLASS = "gradient-divider my-8";
 const FEATURE_PILL_CLASS = "badge badge--accent";
