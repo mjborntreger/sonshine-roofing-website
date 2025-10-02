@@ -257,6 +257,7 @@ const leadSpecialOfferSchema = leadBaseSchema
     offerCode: z.preprocess(trim, z.string().min(1, 'Offer code is required').max(120)),
     offerSlug: z.preprocess(trim, z.string().min(1, 'Offer slug is required').max(160)),
     offerTitle: optionalTrimmedString(200),
+    offerExpiration: optionalTrimmedString(40),
     message: optionalTrimmedString(MAX_SPECIAL_MESSAGE),
   })
   .passthrough();

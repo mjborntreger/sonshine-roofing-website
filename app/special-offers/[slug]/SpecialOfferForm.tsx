@@ -1,9 +1,9 @@
 'use client';
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
-import { Copy, Check } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
+import { endOfDay, parseSpecialOfferDate } from '@/lib/specialOfferDates';
 
 type Props = {
   offerCode: string;
@@ -46,19 +46,9 @@ function formatPhoneDisplay(digits: string) {
   return `${useCountry ? `+${country} ` : ''}(${area}) ${mid}-${last}`;
 }
 
-function parseExpirationDate(raw?: string | null): Date {
-  if (raw) {
-    const parts = raw.split('/').map((part) => Number.parseInt(part, 10));
-    if (parts.length === 3) {
-      const [month, day, year] = parts;
-      if (month && day && year) {
-        const candidate = new Date(year, month - 1, day, 23, 59, 59, 999);
-        if (!Number.isNaN(candidate.getTime())) {
-          return candidate;
-        }
-      }
-    }
-  }
+function resolveCookieExpiration(expiration?: string | null): Date {
+  const parsed = parseSpecialOfferDate(expiration);
+  if (parsed) return endOfDay(parsed);
   const fallback = new Date();
   fallback.setFullYear(fallback.getFullYear() + 1);
   return fallback;
@@ -66,7 +56,7 @@ function parseExpirationDate(raw?: string | null): Date {
 
 function writeOfferCookie(name: string, code: string, expiration?: string | null) {
   if (typeof document === 'undefined') return;
-  const expiresDate = parseExpirationDate(expiration);
+  const expiresDate = resolveCookieExpiration(expiration);
   const payload = { code, exp: expiresDate.toISOString() };
   const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
   document.cookie = `${name}=${encodeURIComponent(JSON.stringify(payload))}; expires=${expiresDate.toUTCString()}; path=/; SameSite=Lax${secure}`;
@@ -200,6 +190,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       offerCode,
       offerSlug,
       offerTitle: offerTitle ?? undefined,
+      offerExpiration: offerExpiration ?? undefined,
       cfToken,
       hp_field: honeypot,
       page: `/special-offers/${offerSlug}`,

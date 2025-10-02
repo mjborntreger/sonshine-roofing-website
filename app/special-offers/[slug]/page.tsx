@@ -9,6 +9,7 @@ import Container from '@/components/layout/Container';
 import SpecialOfferForm from './SpecialOfferForm';
 import { getSpecialOfferBySlug, listSpecialOfferSlugs, stripHtml } from '@/lib/wp';
 import isExpired from '@/lib/isExpired';
+import { formatSpecialOfferExpiration } from '@/lib/specialOfferDates';
 
 export const revalidate = 900;
 
@@ -72,20 +73,6 @@ export async function generateMetadata({
     };
 }
 
-function formatExpirationDate(raw?: string | null) {
-    if (!raw) return null;
-    // Field is stored as m/d/Y (e.g., 10/01/2025)
-    const [month, day, year] = raw.split('/').map((part) => Number.parseInt(part, 10));
-    if (!year || !month || !day) return null;
-    const date = new Date(year, month - 1, day);
-    if (Number.isNaN(date.getTime())) return null;
-    return new Intl.DateTimeFormat('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    }).format(date);
-}
-
 export default async function SpecialOfferPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const offer = await getSpecialOfferBySlug(slug);
@@ -95,7 +82,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   }
 
   const expired = isExpired(offer.expirationDate);
-  const expirationLabel = formatExpirationDate(offer.expirationDate);
+  const expirationLabel = formatSpecialOfferExpiration(offer.expirationDate);
 
   const cookieStore = await cookies();
   const cookieKey = `ss_offer_${offer.slug}`;

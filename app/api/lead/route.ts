@@ -7,6 +7,7 @@ import {
   type FeedbackLeadInput,
   type SpecialOfferLeadInput,
 } from '@/lib/validation';
+import { formatSpecialOfferExpiration } from '@/lib/specialOfferDates';
 
 function getAllowedOrigins(): string[] {
   const raw = process.env.ALLOWED_ORIGIN || '';
@@ -223,6 +224,7 @@ function buildFeedbackPayload(data: FeedbackLeadInput) {
 
 function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
   const fullName = `${data.firstName} ${data.lastName}`.trim();
+  const formattedExpiration = formatSpecialOfferExpiration(data.offerExpiration);
 
   const messageLines = [
     `Special offer claim from ${fullName}.`,
@@ -232,6 +234,10 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
 
   if (data.offerTitle) {
     messageLines.push(`Offer title: ${data.offerTitle}`);
+  }
+
+  if (formattedExpiration) {
+    messageLines.push(`Offer expiration: ${formattedExpiration}`);
   }
 
   if (data.message) {
@@ -248,6 +254,8 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
     offerCode: data.offerCode,
     offerSlug: data.offerSlug,
     offerTitle: data.offerTitle,
+    offerExpiration: data.offerExpiration,
+    offerExpirationLabel: formattedExpiration ?? undefined,
     message: messageLines.join('\n'),
     page: data.page || `/special-offers/${data.offerSlug}`,
   };
