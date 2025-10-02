@@ -255,23 +255,6 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
           <p className="mt-2 text-4xl font-black tracking-[0.2em] text-emerald-700 print:text-black">
             {offerCode}
           </p>
-          <div className="mt-4 flex-col items-center justify-center gap-3 print:hidden">
-            <button
-              type="button"
-              onClick={handleCopyCode}
-              className="items-center p-2 btn btn-sm btn-outline"
-            >
-              <Copy className="inline h-4 w-4" aria-hidden="true" />
-              Copy Code
-            </button>
-            <span
-              aria-live="polite"
-              className={`items-center gap-1 text-sm font-semibold text-emerald-600 transition-opacity duration-300 ${copied ? 'opacity-100' : 'opacity-0'}`}
-            >
-              <Check className="h-4 w-4" aria-hidden="true" />
-              Copied!
-            </span>
-          </div>
         </div>
 
         <p className="mt-6 text-sm text-slate-600 print:text-black">

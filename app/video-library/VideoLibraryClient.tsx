@@ -92,7 +92,7 @@ export default function VideoLibraryClient({
     <ResourceArchiveClient
       kind="video"
       title="Video Library"
-      description="Highlights from our projects, commercials, and accolades."
+      description="Highlights from our projects, commercials, and short video explainers."
       apiPath="/api/resources/video"
       pageSize={pageSize}
       initialResult={initialResult}

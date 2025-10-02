@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 export const revalidate = 900;
 
 const SEO_TITLE = "Video Library | SonShine Roofing";
-const SEO_DESCRIPTION = "Highlights from our projects, commercials, and accolades.";
+const SEO_DESCRIPTION = "Highlights from our projects, commercials, and short video explainers.";
 const CANONICAL = "/video-library";
 const OG_IMAGE = "/og-default.png";
 const PAGE_SIZE = 8;
@@ -27,7 +27,7 @@ const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
   { slug: "commercials", label: "Commercials" },
   { slug: "explainers", label: "Explainers" },
   { slug: "roofing-project", label: "Roofing Projects" },
-  { slug: "accolades", label: "Accolades" },
+  { slug: "in-the-field", label: "In the field" },
   { slug: "other", label: "Other" },
 ];
 
