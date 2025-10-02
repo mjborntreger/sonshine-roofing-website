@@ -233,6 +233,38 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 }
 
 /* ---------------------------------------
+   Hero arrow nudge animation
+----------------------------------------*/
+.hero-arrow {
+  --hero-arrow-shift: clamp(0.10rem, 0.8vw, 0.30rem);
+  position: relative;
+  display: inline-flex;
+}
+
+.hero-arrow-animate {
+  animation: hero-arrow-nudge 1.8s cubic-bezier(0.33, 1, 0.68, 1) 2;
+}
+
+@keyframes hero-arrow-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  42% {
+    transform: translateY(var(--hero-arrow-shift));
+  }
+  68% {
+    transform: translateY(calc(var(--hero-arrow-shift) * 0.35));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-arrow-animate {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------
    Phone jiggle affordance
 ----------------------------------------*/
 @layer components {

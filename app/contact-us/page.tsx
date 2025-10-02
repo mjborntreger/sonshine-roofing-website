@@ -10,6 +10,7 @@ import LiteMap from "@/components/LiteMap";
 import OpenOrClosed from "@/components/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 import FinancingBand from "@/components/FinancingBand";
+import { Suspense } from 'react';
 
 // ===== STATIC SEO FOR /contact-us (EDIT HERE) =====
 const SEO_TITLE_CONTACT = 'Contact SonShine Roofing | Sarasota Roofing Company';
@@ -165,6 +166,15 @@ export default function Page() {
                 We respond within 30 minutes during business hours
               </p>
               <AcculynxLeadForm />
+              <Suspense
+                fallback={(
+                  <div className="mt-8 min-h-[420px] rounded-3xl border border-blue-100 bg-white/70 p-8 shadow-sm" aria-busy="true" aria-live="polite">
+                    <p className="text-sm font-semibold text-slate-500">Loading your guided request form…</p>
+                  </div>
+                )}
+              >
+                <LeadForm />
+              </Suspense>
               <div className="text-xs text-slate-500 py-4 italic">
                 By submitting this form, you agree to receive SMS messages from Sonshine Roofing
                 and its agents. Message frequency may vary. Message and data rates may apply.

@@ -1,7 +1,17 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { ArrowDown, Phone, Zap } from "lucide-react"
 import SmartLink from "./SmartLink";
 
 export default function Hero() {
+  const [shouldAnimateArrow, setShouldAnimateArrow] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShouldAnimateArrow(true), 800);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   return (
     <>
       <section className="relative isolate text-white min-h-[50svh] lg:min-h-[80svh] h-auto">
@@ -46,7 +56,12 @@ export default function Hero() {
                 data-icon-affordance="down"
               >
                 Get Started
-                <ArrowDown className="icon-affordance ml-2 h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
+                <span
+                  className={`ml-2 inline-flex hero-arrow transition-transform ${shouldAnimateArrow ? "hero-arrow-animate" : ""}`}
+                  aria-hidden="true"
+                >
+                  <ArrowDown className="icon-affordance h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
+                </span>
               </SmartLink>
 
             </div>
