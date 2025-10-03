@@ -6,12 +6,21 @@ const ZAPIER_WEBHOOK_URL = process.env.ZAPIER_LEAD_WEBHOOK_URL || 'https://hooks
 const trim = (value: unknown) => (typeof value === 'string' ? value.trim() : value);
 const digitsOnly = (value: string) => value.replace(/\D/g, '');
 
+const optionalTrimmedString = (max: number) =>
+  z
+    .preprocess((value) => {
+      if (typeof value !== 'string') return undefined;
+      const trimmed = value.trim();
+      return trimmed ? trimmed : undefined;
+    }, z.string().max(max))
+    .optional();
+
 const RequestSchema = z.object({
   type: z.literal('contact-lead'),
   projectType: z.preprocess(trim, z.string().min(1).max(80)),
-  roofSituation: z.preprocess(trim, z.string().min(1).max(80)),
-  timeline: z.preprocess(trim, z.string().min(1).max(120)),
-  notes: z.preprocess(trim, z.string().max(2000)).optional(),
+  helpTopics: optionalTrimmedString(400),
+  timeline: optionalTrimmedString(120),
+  notes: optionalTrimmedString(2000),
   firstName: z.preprocess(trim, z.string().min(1).max(120)),
   lastName: z.preprocess(trim, z.string().min(1).max(120)),
   email: z
@@ -86,18 +95,9 @@ function getClientIp(req: NextRequest): string | null {
 
 const PROJECT_LABELS: Record<string, string> = {
   'emergency-leak': 'Emergency leak help',
-  'storm-damage': 'Storm or hurricane damage',
   replacement: 'Plan a roof replacement',
-  maintenance: 'Maintenance or inspection',
+  maintenance: 'Maintenance & inspection',
   'something-else': 'Something else',
-};
-
-const SITUATION_LABELS: Record<string, string> = {
-  'active-leak': 'Active leak',
-  'visible-damage': 'Visible roof damage',
-  'aging-out': 'Roof aging out',
-  'inspection-needed': 'Inspection needed',
-  'just-researching': 'Just researching',
 };
 
 export async function POST(req: NextRequest) {
@@ -143,11 +143,8 @@ export async function POST(req: NextRequest) {
       value: data.projectType,
       label: PROJECT_LABELS[data.projectType] || data.projectType,
     },
-    roofSituation: {
-      value: data.roofSituation,
-      label: SITUATION_LABELS[data.roofSituation] || data.roofSituation,
-    },
-    timeline: data.timeline,
+    helpSummary: data.helpTopics || '',
+    timeline: data.timeline || '',
     notes: data.notes || '',
     contact: {
       firstName: data.firstName,

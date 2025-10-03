@@ -16,8 +16,7 @@ import {
 } from "lucide-react";
 
 const SECTION_CONTAINER = "px-2";
-const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
-const DIVIDER_CLASS = "gradient-divider my-8";
+const SECTION_HEADING = "text-3xl md:text-5xl mb-12 text-slate-700";
 const FEATURE_PILL_CLASS = "badge badge--accent";
 const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
 const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
@@ -125,7 +124,7 @@ export default async function WhyHomeownersChooseUs() {
     <div className={SECTION_CONTAINER}>
       <div className="text-center">
         <h2 className={SECTION_HEADING}>Why Homeowners Choose Us</h2>
-        <div className={DIVIDER_CLASS} />
+        
         <div className={FEATURE_LIST_CLASS}>
           <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
             <Award className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />

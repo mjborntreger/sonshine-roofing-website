@@ -7,7 +7,7 @@ const imageClasses = "transition-transform duration-200 ease-out group-hover:tra
 
 export default async function bestOfTheBest() {
   return (
-    <div className="px-4">
+    <div className="px-4 my-24">
       <div 
         aria-label="botb-title" 
         id="botb-title"

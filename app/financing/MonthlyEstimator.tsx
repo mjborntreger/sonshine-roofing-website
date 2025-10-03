@@ -6,9 +6,11 @@ import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-m
 import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight, HandCoins, Wallet } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
+import { readCookie, writeCookie } from '@/lib/client-cookies';
 
 const COOKIE_NAME = 'ss_financing_calc';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+const CONTACT_READY_COOKIE = 'ss_lead_contact_ready';
 const EMAIL_DOMAINS = ['.com', '.net', '.org', '.edu', '.gov', '.co', '.us', '.io', '.info', '.biz'];
 
 const US_STATES = [
@@ -362,18 +364,6 @@ function isZipValid(zip: string) {
   return cleaned.length === 5;
 }
 
-function readCookie(name: string) {
-  if (typeof document === 'undefined') return null;
-  const parts = document.cookie.split('; ').find((row) => row.startsWith(`${name}=`));
-  return parts ? parts.split('=').slice(1).join('=') : null;
-}
-
-function writeCookie(name: string, value: string, maxAgeSeconds: number) {
-  if (typeof document === 'undefined') return;
-  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAgeSeconds}; Path=/; SameSite=Lax${secure}`;
-}
-
 function parseCookie(raw: string | null): FinancingCookie | null {
   if (!raw) return null;
   try {
@@ -422,6 +412,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   });
 
   useEffect(() => {
+    const contactReady = Boolean(readCookie(CONTACT_READY_COOKIE));
+
     const cookie = parseCookie(readCookie(COOKIE_NAME));
     if (cookie?.unlocked) {
       const amt = Number(cookie.amount) || defaultAmount;
@@ -433,8 +425,18 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       setFormValues((prev) => ({ ...prev, amount: String(roundedAmount) }));
       setSubmittedAmount(roundedAmount);
       setPersistedScores(cookie.scores ?? null);
+      setStep((prev) => (prev < summaryStepIndex ? summaryStepIndex : prev));
+      return;
     }
-  }, [defaultAmount]);
+
+    if (contactReady) {
+      setUnlocked(true);
+      setShowCalculator(true);
+      setContactEditMode(false);
+      setPersistedScores(null);
+      setStep((prev) => (prev < summaryStepIndex ? summaryStepIndex : prev));
+    }
+  }, [defaultAmount, summaryStepIndex]);
 
   const [quizAnswers, setQuizAnswers] = useState<(string | null)[]>(() => Array(totalQuizQuestions).fill(null));
   const computedScores = useMemo(() => {
@@ -824,6 +826,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         }
         setPersistedScores(scoresResult);
         writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
+        writeCookie(CONTACT_READY_COOKIE, '1', COOKIE_MAX_AGE);
         try {
           (window as any).dataLayer = (window as any).dataLayer || [];
           (window as any).dataLayer.push({ event: 'financing_calculator_submit', form: 'monthly_estimator' });
@@ -1291,16 +1294,14 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </button>
           </div>
 
-          {displayScores && (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
-                <h3
-                  className="text-xl md:text-2xl font-semibold text-emerald-700"
-                >
-                  <ChartBar className='h-5 w-5 md:h-6 md:w-6 inline text-emerald-700 mr-3' />
-                  Program Fit Snapshot
-                </h3>
-                {leadingProgram ? (
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+              <h3 className="text-xl md:text-2xl font-semibold text-emerald-700">
+                <ChartBar className='h-5 w-5 md:h-6 md:w-6 inline text-emerald-700 mr-3' />
+                Program Fit Snapshot
+              </h3>
+              {displayScores ? (
+                leadingProgram ? (
                   <span className="text-sm font-semibold text-emerald-600">
                     Leading Fit
                     <ArrowRight className='inline h-4 w-4 text-emerald-600 mx-2' />
@@ -1308,56 +1309,66 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   </span>
                 ) : (
                   <span className="text-sm font-semibold text-emerald-600">Scores based on your answers</span>
-                )}
-              </div>
-              <div className="mt-3 space-y-3">
-                {(['serviceFinance', 'ygrene'] as FinancingProgramKey[]).map((programKey) => {
-                  const score =
-                    programKey === 'serviceFinance'
-                      ? displayScores.serviceFinanceScore
-                      : displayScores.ygreneScore;
-                  const barColor =
-                    programKey === 'serviceFinance' ? 'bg-[--brand-blue]' : 'bg-[--brand-orange]';
-                  const detailHref = PROGRAM_DETAIL_ANCHORS[programKey];
-                  const rawAnimated = animatedScores[programKey] ?? 0;
-                  const clampedAnimated = Math.min(Math.max(rawAnimated, 0), score);
-                  const displayedMatch = Math.min(Math.round(clampedAnimated), score);
-                  const barPercent = Math.min(Math.max(clampedAnimated, 0), 100);
-                  return (
-                    <div key={programKey} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg font-semibold text-slate-800">{MATCH_PROGRAMS[programKey].label}</span>
-                          <a
-                            href={detailHref}
-                            className="group inline-flex items-center gap-[0.10rem] text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
-                            data-icon-affordance="right"
-                          >
-                            see details
-                            <ChevronRight className="h-3 w-3 text-slate-600 icon-affordance" aria-hidden="true" />
-                          </a>
-                        </div>
-                        <span className="text-lg font-semibold text-slate-800">{displayedMatch}% match</span>
-                      </div>
-                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/70">
-                        <div className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${barPercent}%` }} />
-                      </div>
-                      <p className="text-md text-slate-500">{MATCH_PROGRAMS[programKey].description}</p>
-                    </div>
-                  );
-                })}
-              </div>
-              {displayScores.isUncertain && (
-                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-800">
-                  <p className="font-semibold">Looks like both programs may require a closer look.</p>
-                  <p className="mt-1">Let’s chat and help you find the best fit.</p>
-                  <a className="mt-2 inline-block font-semibold text-[--brand-blue]" href="tel:+19419286964">
-                    (941) 866-4320
-                  </a>
-                </div>
+                )
+              ) : (
+                <span className="text-sm font-semibold text-amber-600">Take the quiz to personalise your results</span>
               )}
             </div>
-          )}
+            <div className="mt-3 space-y-3">
+              {(['serviceFinance', 'ygrene'] as FinancingProgramKey[]).map((programKey) => {
+                const baseScore = displayScores
+                  ? programKey === 'serviceFinance'
+                    ? displayScores.serviceFinanceScore
+                    : displayScores.ygreneScore
+                  : 0;
+                const barColor =
+                  programKey === 'serviceFinance' ? 'bg-[--brand-blue]' : 'bg-[--brand-orange]';
+                const detailHref = PROGRAM_DETAIL_ANCHORS[programKey];
+                const rawAnimated = animatedScores[programKey] ?? 0;
+                const clampedAnimated = displayScores
+                  ? Math.min(Math.max(rawAnimated, 0), baseScore)
+                  : 0;
+                const displayedMatch = displayScores ? Math.min(Math.round(clampedAnimated), baseScore) : 0;
+                const barPercent = displayScores ? Math.min(Math.max(clampedAnimated, 0), 100) : 0;
+                return (
+                  <div key={programKey} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg font-semibold text-slate-800">{MATCH_PROGRAMS[programKey].label}</span>
+                        <a
+                          href={detailHref}
+                          className="group inline-flex items-center gap-[0.10rem] text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+                          data-icon-affordance="right"
+                        >
+                          see details
+                          <ChevronRight className="h-3 w-3 text-slate-600 icon-affordance" aria-hidden="true" />
+                        </a>
+                      </div>
+                      <span className="text-lg font-semibold text-slate-800">{displayedMatch}% match</span>
+                    </div>
+                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/70">
+                      <div className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${barPercent}%` }} />
+                    </div>
+                    <p className="text-md text-slate-500">{MATCH_PROGRAMS[programKey].description}</p>
+                  </div>
+                );
+              })}
+            </div>
+            {displayScores?.isUncertain && (
+              <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-800">
+                <p className="font-semibold">Looks like both programs may require a closer look.</p>
+                <p className="mt-1">Let’s chat and help you find the best fit.</p>
+                <a className="mt-2 inline-block font-semibold text-[--brand-blue]" href="tel:+19419286964">
+                  (941) 866-4320
+                </a>
+              </div>
+            )}
+            {!displayScores && (
+              <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-3 py-3 text-xs text-slate-600">
+                Take the quiz to find your financing program match.
+              </div>
+            )}
+          </div>
 
 
           <div className="space-y-4 rounded-2xl px-4 py-4">

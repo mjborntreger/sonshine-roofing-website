@@ -16,7 +16,8 @@ import LeadForm from "@/components/LeadForm";
 import { Suspense } from 'react';
 
 // ===== STYLE CONSTANTS ===== //
-const landingLayout = "mx-auto w-full max-w-[1600px]";
+const landingLayout = "mx-auto w-full max-w-[1280px]";
+const reviewsLayout = "mx-auto w-full max-w-[1600px]";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
@@ -84,7 +85,7 @@ export default async function Page() {
     <>
       <Hero />
       <div className={landingLayout}>
-        <div className="mx-2">
+        <div className="mx-2 mt-16">
           <Suspense
             fallback={(
               <div className="mt-8 min-h-[420px] rounded-3xl border border-blue-100 bg-white/70 p-8 shadow-sm" aria-busy="true" aria-live="polite">
@@ -96,20 +97,23 @@ export default async function Page() {
           </Suspense>
         </div>
       </div>
+      <div className={reviewsLayout}>
+        <ReviewsCarousel />
+      </div>
       <div className={landingLayout}>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
-            <Section>
+            <div className="mx-2">
               <WhyHomeownersChooseUs />
-            </Section>
+            </div>
             {/* Quick Links | Mobile Only */}
             <div className="block px-4 md:hidden">
               <ServicesQuickLinks />
               <ResourcesQuickLinks />
             </div>
-            <Section>
+            <div className="mx-2">
               <BestOfTheBest />
-            </Section>
+            </div>
           </div>
 
           {/* Sticky Section */}
@@ -121,9 +125,6 @@ export default async function Page() {
         </div>
       </div>
 
-      <div className="bg-orange-50/90">
-        <ReviewsCarousel />
-      </div>
 
 
       <div className={landingLayout}>
