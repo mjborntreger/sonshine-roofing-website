@@ -460,6 +460,7 @@ export default function LeadForm() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const reduceMotion = useReducedMotion();
   const prevStepRef = useRef(0);
+  const delayScrollTimeoutRef = useRef<number | null>(null);
 
   const activeStepId = STEP_ORDER[activeStepIndex];
   const totalSteps = STEP_ORDER.length;
@@ -531,18 +532,40 @@ export default function LeadForm() {
   useEffect(() => {
     const previous = prevStepRef.current;
     prevStepRef.current = activeStepIndex;
-    if (activeStepIndex <= previous) return;
+    if (activeStepIndex === previous) return;
     if (typeof window === 'undefined') return;
     const container = formRef.current;
     if (!container) return;
-    const behavior = reduceMotion ? 'auto' : 'smooth';
-    window.requestAnimationFrame(() => {
-      const rect = container.getBoundingClientRect();
-      const offset = 96;
-      const target = Math.max(rect.top + window.scrollY - offset, 0);
-      window.scrollTo({ top: target, behavior });
-    });
+
+    const performScroll = () => {
+      const behavior = reduceMotion ? 'auto' : 'smooth';
+      window.requestAnimationFrame(() => {
+        const rect = container.getBoundingClientRect();
+        const offset = 96;
+        const target = Math.max(rect.top + window.scrollY - offset, 0);
+        window.scrollTo({ top: target, behavior });
+      });
+    };
+
+    if (activeStepIndex < previous && !reduceMotion) {
+      if (delayScrollTimeoutRef.current != null) {
+        window.clearTimeout(delayScrollTimeoutRef.current);
+        delayScrollTimeoutRef.current = null;
+      }
+      delayScrollTimeoutRef.current = window.setTimeout(performScroll, 300);
+    } else {
+      performScroll();
+    }
   }, [activeStepIndex, reduceMotion]);
+
+  useEffect(() => {
+    return () => {
+      if (delayScrollTimeoutRef.current != null) {
+        window.clearTimeout(delayScrollTimeoutRef.current);
+        delayScrollTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   const handleBack = () => {
     setErrors({});
@@ -758,7 +781,7 @@ export default function LeadForm() {
             <div>
               <p className="text-xs uppercase tracking-wide text-[--brand-blue]">Step {activeStepIndex + 1} of {totalSteps}</p>
               <h3 className="mt-3 mb-4 text-2xl md:text-5xl font-semibold text-slate-900">{title}</h3>
-              <p className="mt-2 text-sm text-slate-600">{description}</p>
+              <p className="mt-3 text-sm text-slate-600">{description}</p>
             </div>
             <div className="relative-aspect-[21/9] h-[128px] w-[125px] mb-4 relative">
               <Image
