@@ -611,12 +611,25 @@ export default function LeadForm() {
     setStatus('submitting');
     setGlobalError(null);
 
+    const timelineLabel = form.timeline
+      ? journey?.timelineOptions.find((option) => option.value === form.timeline)?.label || form.timeline
+      : '';
+    const bestTimeLabel = form.bestTime
+      ? BEST_TIME_OPTIONS.find((option) => option.value === form.bestTime)?.label || form.bestTime
+      : '';
+    const notesText = form.notes.trim();
+    const contextSummaryParts: string[] = [];
+    if (notesText) contextSummaryParts.push(`Note from the customer: ${notesText}.`);
+    if (bestTimeLabel) contextSummaryParts.push(`Best time to contact: ${bestTimeLabel}.`);
+    if (timelineLabel) contextSummaryParts.push(`Project timeline: ${timelineLabel}.`);
+    const contextSummary = contextSummaryParts.join(' ');
+
     const payload: Record<string, unknown> = {
       type: 'contact-lead',
       projectType: form.projectType,
       helpTopics: helpSummary || undefined,
-      timeline: form.timeline || undefined,
-      notes: form.notes.trim() || undefined,
+      timeline: timelineLabel || undefined,
+      notes: notesText || undefined,
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
       email: form.email.trim(),
@@ -627,13 +640,15 @@ export default function LeadForm() {
       state: form.state.trim(),
       zip: form.zip.trim(),
       preferredContact: form.preferredContact,
-      bestTime: form.bestTime || undefined,
+      bestTime: bestTimeLabel || undefined,
       consentSms: form.consentSms,
       cfToken,
       hp_field: honeypot,
       page: '/contact-us',
       submittedAt: new Date().toISOString(),
     };
+
+    if (contextSummary) payload.contextSummary = contextSummary;
 
     if (utm.source) payload.utm_source = utm.source;
     if (utm.medium) payload.utm_medium = utm.medium;

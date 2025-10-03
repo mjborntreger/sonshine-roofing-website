@@ -173,7 +173,6 @@ export default function Page() {
                   </div>
                 )}
               >
-                <LeadForm />
               </Suspense>
               <div className="text-xs text-slate-500 py-4 italic">
                 By submitting this form, you agree to receive SMS messages from Sonshine Roofing
