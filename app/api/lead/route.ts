@@ -281,6 +281,12 @@ function buildContactPayload(data: ContactLeadInput) {
     state: data.state,
     zip: data.zip,
     page: data.page || '/contact-us',
+    resourceLinks: (data.resourceLinks || []).map((link) => ({
+      label: link.label,
+      description: link.description || '',
+      href: link.href,
+      external: Boolean(link.external),
+    })),
   };
 
   attachTracking(payload, data);

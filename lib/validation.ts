@@ -25,6 +25,9 @@ const MAX_CONTACT_NOTES = 2000;
 const MAX_CONTACT_HELP = 400;
 const MAX_CONTACT_TIMELINE = 120;
 const MAX_CONTACT_PREF = 60;
+const MAX_CONTACT_RESOURCE_LABEL = 160;
+const MAX_CONTACT_RESOURCE_DESC = 240;
+const MAX_CONTACT_RESOURCE_HREF = 400;
 
 // ---- helpers --------------------------------------------------------------
 const trim = (s: unknown) => (typeof s === "string" ? s.trim() : s);
@@ -59,6 +62,7 @@ const optionalTrimmedString = (max: number) =>
       return trimmed ? trimmed : undefined;
     }, z.string().min(1).max(max))
     .optional();
+
 
 // rating can arrive as "1" | "2" | "3" or number
 const ratingSchema = z.preprocess((val) => {
@@ -265,6 +269,21 @@ const leadSpecialOfferSchema = leadBaseSchema
   })
   .passthrough();
 
+const contactResourceLinkSchema = z
+  .object({
+    label: z.preprocess(trim, z.string().min(1, 'Resource label is required').max(MAX_CONTACT_RESOURCE_LABEL)),
+    description: optionalTrimmedString(MAX_CONTACT_RESOURCE_DESC),
+    href: z
+      .preprocess(trim, z.string().min(1, 'Resource link is required').max(MAX_CONTACT_RESOURCE_HREF))
+      .refine(
+        (value) =>
+          typeof value === 'string' && (value.startsWith('/') || /^(https?:)?\/\//i.test(value)),
+        { message: 'Resource link must be a path or URL' }
+      ),
+    external: z.boolean().optional(),
+  })
+  .passthrough();
+
 const leadContactSchema = leadBaseSchema
   .extend({
     type: z.literal('contact-lead'),
@@ -288,6 +307,7 @@ const leadContactSchema = leadBaseSchema
     zip: z
       .preprocess(trim, z.string().min(1, 'ZIP is required').max(MAX_FINANCING_ZIP))
       .refine((value) => digitsOnly(value).length === 5, { message: 'ZIP must be 5 digits' }),
+    resourceLinks: z.array(contactResourceLinkSchema).max(10).optional(),
   })
   .passthrough();
 

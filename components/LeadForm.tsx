@@ -81,6 +81,8 @@ type ResourceLink = {
   external?: boolean;
 };
 
+type ResourceLinkPayload = Pick<ResourceLink, 'label' | 'description' | 'href' | 'external'>;
+
 const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'repair',
@@ -655,6 +657,15 @@ export default function LeadForm() {
     if (timelineLabel) contextSummaryParts.push(`Project timeline: ${timelineLabel}.`);
     const contextSummary = contextSummaryParts.join(' ');
 
+    const resourceLinksForPayload: ResourceLinkPayload[] = getSuccessLinks(form.projectType).map(
+      ({ label, description, href, external }) => ({
+        label,
+        description,
+        href,
+        external,
+      })
+    );
+
     const payload: Record<string, unknown> = {
       type: 'contact-lead',
       projectType: form.projectType,
@@ -680,6 +691,7 @@ export default function LeadForm() {
     };
 
     if (contextSummary) payload.contextSummary = contextSummary;
+    if (resourceLinksForPayload.length) payload.resourceLinks = resourceLinksForPayload;
 
     if (utm.source) payload.utm_source = utm.source;
     if (utm.medium) payload.utm_medium = utm.medium;
