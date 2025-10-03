@@ -21,6 +21,10 @@ const MAX_TZ = 100;
 const MAX_PAGE = 2083; // typical max URL length; we also allow path-only strings
 const MAX_TRACKING = 200;
 const MAX_SPECIAL_MESSAGE = 1000;
+const MAX_CONTACT_NOTES = 2000;
+const MAX_CONTACT_HELP = 400;
+const MAX_CONTACT_TIMELINE = 120;
+const MAX_CONTACT_PREF = 60;
 
 // ---- helpers --------------------------------------------------------------
 const trim = (s: unknown) => (typeof s === "string" ? s.trim() : s);
@@ -261,12 +265,39 @@ const leadSpecialOfferSchema = leadBaseSchema
   })
   .passthrough();
 
-const leadSchema = z.discriminatedUnion('type', [leadFinancingSchema, leadFeedbackSchema, leadSpecialOfferSchema]);
+const leadContactSchema = leadBaseSchema
+  .extend({
+    type: z.literal('contact-lead'),
+    firstName: z.preprocess(trim, z.string().min(1, 'First name is required').max(MAX_NAME)),
+    lastName: z.preprocess(trim, z.string().min(1, 'Last name is required').max(MAX_NAME)),
+    email: leadFeedbackEmailSchema,
+    phone: financingPhoneSchema,
+    projectType: z.preprocess(trim, z.string().min(1, 'Project type is required').max(80)),
+    helpTopics: optionalTrimmedString(MAX_CONTACT_HELP),
+    timeline: optionalTrimmedString(MAX_CONTACT_TIMELINE),
+    notes: optionalTrimmedString(MAX_CONTACT_NOTES),
+    preferredContact: z.preprocess(trim, z.string().min(1, 'Preferred contact method is required').max(MAX_CONTACT_PREF)),
+    bestTime: optionalTrimmedString(MAX_CONTACT_PREF),
+    consentSms: z.boolean().optional(),
+    address1: z.preprocess(trim, z.string().min(1, 'Street address is required').max(MAX_FINANCING_ADDRESS)),
+    address2: z.preprocess(trim, z.string().max(MAX_FINANCING_ADDRESS)).optional(),
+    city: z.preprocess(trim, z.string().min(1, 'City is required').max(MAX_FINANCING_CITY)),
+    state: z
+      .preprocess(trim, z.string().min(2, 'State is required').max(MAX_FINANCING_STATE))
+      .refine((value) => /^[A-Za-z]{2}$/.test(String(value)), { message: 'State must be two letters' }),
+    zip: z
+      .preprocess(trim, z.string().min(1, 'ZIP is required').max(MAX_FINANCING_ZIP))
+      .refine((value) => digitsOnly(value).length === 5, { message: 'ZIP must be 5 digits' }),
+  })
+  .passthrough();
+
+const leadSchema = z.discriminatedUnion('type', [leadFinancingSchema, leadFeedbackSchema, leadSpecialOfferSchema, leadContactSchema]);
 
 export type LeadInput = z.infer<typeof leadSchema>;
 export type FinancingLeadInput = z.infer<typeof leadFinancingSchema>;
 export type FeedbackLeadInput = z.infer<typeof leadFeedbackSchema>;
 export type SpecialOfferLeadInput = z.infer<typeof leadSpecialOfferSchema>;
+export type ContactLeadInput = z.infer<typeof leadContactSchema>;
 
 export function parseLead(input: unknown): ParseResult<LeadInput> {
   const result = leadSchema.safeParse(input);

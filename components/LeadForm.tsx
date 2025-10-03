@@ -627,7 +627,7 @@ export default function LeadForm() {
       state: form.state.trim(),
       zip: form.zip.trim(),
       preferredContact: form.preferredContact,
-      bestTime: form.bestTime,
+      bestTime: form.bestTime || undefined,
       consentSms: form.consentSms,
       cfToken,
       hp_field: honeypot,
@@ -640,7 +640,7 @@ export default function LeadForm() {
     if (utm.campaign) payload.utm_campaign = utm.campaign;
 
     try {
-      const res = await fetch('/api/zapier-lead', {
+      const res = await fetch('/api/lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

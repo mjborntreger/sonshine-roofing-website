@@ -6,6 +6,7 @@ import {
   type FinancingLeadInput,
   type FeedbackLeadInput,
   type SpecialOfferLeadInput,
+  type ContactLeadInput,
 } from '@/lib/validation';
 
 function getAllowedOrigins(): string[] {
@@ -257,6 +258,36 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
   return payload;
 }
 
+function buildContactPayload(data: ContactLeadInput) {
+  const fullName = `${data.firstName} ${data.lastName}`.trim();
+
+  const payload: Record<string, unknown> = {
+    type: 'contact-lead',
+    name: fullName,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    projectType: data.projectType,
+    helpTopics: data.helpTopics || '',
+    timeline: data.timeline || '',
+    notes: data.notes || '',
+    preferredContact: data.preferredContact,
+    bestTime: data.bestTime || '',
+    consentSms: Boolean(data.consentSms),
+    address1: data.address1,
+    address2: data.address2 || '',
+    city: data.city,
+    state: data.state,
+    zip: data.zip,
+    page: data.page || '/contact-us',
+  };
+
+  attachTracking(payload, data);
+
+  return payload;
+}
+
 async function forwardToWP(type: LeadInput['type'], payload: Record<string, unknown>) {
   const resolved = resolveForwardConfig(type);
   if (!resolved) {
@@ -345,8 +376,10 @@ export async function POST(req: NextRequest) {
     wpPayload = buildFinancingPayload(data);
   } else if (data.type === 'feedback') {
     wpPayload = buildFeedbackPayload(data);
-  } else {
+  } else if (data.type === 'special-offer') {
     wpPayload = buildSpecialOfferPayload(data);
+  } else {
+    wpPayload = buildContactPayload(data);
   }
 
   const forwarded = await forwardToWP(data.type, wpPayload);
