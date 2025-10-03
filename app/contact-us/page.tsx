@@ -160,7 +160,7 @@ export default function Page() {
             <div className="mt-8">
               <h2 className="top-24 flex items-center gap-2" id="book-an-appointment">
                 <CalendarDays className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                <span>Book an Appointment</span>
+                <span>Contact Our Office</span>
               </h2>
               <p className="text-slate-700 text-sm pb-2">
                 We respond within 30 minutes during business hours

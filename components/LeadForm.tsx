@@ -38,7 +38,7 @@ import { writeCookie } from '@/lib/client-cookies';
 const CONTACT_READY_COOKIE = 'ss_lead_contact_ready';
 const CONTACT_READY_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
-type JourneyKey = 'emergency-leak' | 'replacement' | 'maintenance' | 'something-else';
+type JourneyKey = 'repair' | 'retail' | 'maintenance' | 'something-else';
 
 type ProjectOption = {
   value: JourneyKey | 'financing-link' | 'project-gallery';
@@ -77,12 +77,13 @@ type ResourceLink = {
   label: string;
   description: string;
   href: string;
+  icon: LucideIcon;
   external?: boolean;
 };
 
 const PROJECT_OPTIONS: ProjectOption[] = [
   {
-    value: 'emergency-leak',
+    value: 'repair',
     label: 'Emergency leak help',
     description: 'Water coming in or ceiling damage right now',
     icon: Droplets,
@@ -90,7 +91,7 @@ const PROJECT_OPTIONS: ProjectOption[] = [
     action: 'advance',
   },
   {
-    value: 'replacement',
+    value: 'retail',
     label: 'Plan a roof replacement',
     description: 'Ready to compare options for a new roofing system',
     icon: Hammer,
@@ -117,7 +118,7 @@ const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'project-gallery',
     label: 'See our past work',
-    description: 'Browse our project gallery, learn more about your aesthetic options',
+    description: 'Browse our project gallery, learn more about material and color options',
     icon: Star,
     accent: 'border-purple-200 bg-purple-50 text-purple-600',
     action: 'link',
@@ -203,7 +204,7 @@ const MAINTENANCE_HELP: HelpOption[] = [
 ];
 
 const JOURNEY_CONFIG: Record<JourneyKey, JourneyConfig> = {
-  'emergency-leak': {
+  'repair': {
     helpOptions: EMERGENCY_REPLACEMENT_HELP,
     timelineOptions: STANDARD_TIMELINE_OPTIONS,
     showHelpMulti: true,
@@ -213,7 +214,7 @@ const JOURNEY_CONFIG: Record<JourneyKey, JourneyConfig> = {
     notesLabel: 'Anything else you’d like us to know?',
     notesPlaceholder: 'Example: We already have tarps down, or insurance adjuster scheduled Friday.',
   },
-  replacement: {
+  retail: {
     helpOptions: EMERGENCY_REPLACEMENT_HELP,
     timelineOptions: STANDARD_TIMELINE_OPTIONS,
     showHelpMulti: true,
@@ -246,23 +247,26 @@ const JOURNEY_CONFIG: Record<JourneyKey, JourneyConfig> = {
 };
 
 const JOURNEY_RESOURCES: Partial<Record<JourneyKey, ResourceLink[]>> = {
-  'emergency-leak': [
+  'repair': [
     {
       label: 'Learn about roof repair',
       description: 'Costs, common issues, repair vs. replace',
       href: '/roof-repair',
+      icon: Wrench,
     },
   ],
-  replacement: [
+  retail: [
     {
       label: 'Learn about roof replacement',
       description: 'Warranties, materials, what to expect',
       href: '/roof-replacement-sarasota-fl',
+      icon: Hammer,
     },
     {
-      label: 'Get a free instant estimate',
+      label: 'Get a 60-second estimate',
       description: 'Satellite measurements, select materials',
       href: 'https://www.myquickroofquote.com/contractors/sonshine-roofing',
+      icon: ClipboardList,
       external: true,
     },
   ],
@@ -271,11 +275,13 @@ const JOURNEY_RESOURCES: Partial<Record<JourneyKey, ResourceLink[]>> = {
       label: 'Learn about roof inspection',
       description: 'Tip Top Roof Check-up',
       href: '/roof-inspection',
+      icon: ClipboardList,
     },
     {
       label: 'Learn about roof maintenance',
       description: 'Roof Care Club',
       href: '/roof-maintenance',
+      icon: Sparkles,
     },
   ],
   'something-else': [],
@@ -286,11 +292,13 @@ const UNIVERSAL_RESOURCES: ResourceLink[] = [
     label: 'Explore financing options',
     description: 'Payment deferrals, low APR, fast approval',
     href: '/financing',
+    icon: HandCoins,
   },
   {
     label: 'See our past work',
     description: 'Browse our project gallery, learn more about your aesthetic options',
     href: '/project',
+    icon: Star,
   },
 ];
 
@@ -305,6 +313,29 @@ const BEST_TIME_OPTIONS = [
   { value: 'afternoon', label: 'Afternoon (2–5pm)' },
   { value: 'no-preference', label: 'No preference' },
 ] as const;
+
+const INPUT_BASE_CLASS =
+  'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
+const INPUT_DEFAULT_CLASS = 'border-slate-200';
+const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
+
+const SELECTION_PILL_BASE_CLASS =
+  'rounded-full border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+const SELECTION_PILL_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue] text-white shadow';
+const SELECTION_PILL_UNSELECTED_CLASS = 'border-slate-200 bg-white text-slate-700 hover:border-slate-300';
+
+const HELP_BUTTON_BASE_CLASS =
+  'flex items-start gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+const HELP_BUTTON_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]';
+const HELP_BUTTON_UNSELECTED_CLASS =
+  'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md';
+
+const SUCCESS_LINK_CARD_CLASS =
+  'group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[--brand-blue] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]';
+const SUCCESS_LINK_ICON_WRAPPER_CLASS =
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[--brand-blue]/10 text-[--brand-blue]';
+
+const INFO_BADGE_CLASS = 'inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1';
 
 function isJourneyKey(value: string | null | undefined): value is JourneyKey {
   if (!value) return false;
@@ -726,23 +757,23 @@ export default function LeadForm() {
   if (status === 'success') {
     const successLinks = getSuccessLinks(form.projectType);
     return (
-      <div className="mt-8 rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-xl">
+      <div className="mt-8 w-fit rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-xl">
         <div className="flex flex-col items-center text-center">
           <CheckCircle2 className="h-12 w-12 text-emerald-500" aria-hidden="true" />
-          <h3 className="mt-4 text-2xl font-semibold text-slate-900">We’ve got it — thank you!</h3>
+          <h3 className="mt-4 text-3xl md:4xl font-semibold text-slate-900">We’ve got it — thank you!</h3>
           <p className="mt-3 max-w-xl text-sm text-slate-600">
             Your message is already on the way to our project support team. We’ll reach out shortly with next steps.
             If a storm is moving in or water is coming inside, call us right now at{' '}
             <a className="font-semibold text-[--brand-blue]" href="tel:+19418664320">(941) 866-4320</a>.
           </p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1">
+            <span className={INFO_BADGE_CLASS}>
               <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Licensed &amp; insured
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1">
+            <span className={INFO_BADGE_CLASS}>
               <Clock4 className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Typical response under 30 minutes
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1">
+            <span className={INFO_BADGE_CLASS}>
               <Star className="h-4 w-4 text-amber-500" aria-hidden="true" /> 4.8 rating on Google
             </span>
           </div>
@@ -750,17 +781,22 @@ export default function LeadForm() {
             <div className="mt-10 w-full max-w-3xl text-left">
               <h4 className="text-lg font-semibold text-slate-900">What to do next</h4>
               <div className="mt-4 grid gap-3 md:grid-cols-2">
-                {successLinks.map(({ label, description, href, external }) => (
+                {successLinks.map(({ label, description, href, external, icon: Icon }) => (
                   <a
                     key={`${label}-${href}`}
                     href={href}
                     target={external ? '_blank' : undefined}
                     rel={external ? 'noopener noreferrer' : undefined}
-                    className="group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[--brand-blue] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+                    className={SUCCESS_LINK_CARD_CLASS}
                   >
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">{label}</p>
-                      <p className="mt-1 text-xs text-slate-500">{description}</p>
+                    <div className="flex gap-3">
+                      <span className={SUCCESS_LINK_ICON_WRAPPER_CLASS}>
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900">{label}</p>
+                        <p className="mt-1 text-xs text-slate-500">{description}</p>
+                      </div>
                     </div>
                     <span className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[--brand-blue]">
                       {external ? 'Open link' : 'Continue'}
@@ -886,10 +922,8 @@ export default function LeadForm() {
                                 type="button"
                                 onClick={() => handleHelpToggle(value)}
                                 className={cn(
-                                  'flex items-start gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                                  selected
-                                    ? 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]'
-                                    : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md'
+                                  HELP_BUTTON_BASE_CLASS,
+                                  selected ? HELP_BUTTON_SELECTED_CLASS : HELP_BUTTON_UNSELECTED_CLASS
                                 )}
                                 aria-pressed={selected}
                               >
@@ -923,10 +957,9 @@ export default function LeadForm() {
                                 type="button"
                                 onClick={() => handleTimelineSelect(value)}
                                 className={cn(
-                                  'rounded-full border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                                  selected
-                                    ? 'border-[--brand-blue] bg-[--brand-blue] text-white shadow'
-                                    : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-900'
+                                  SELECTION_PILL_BASE_CLASS,
+                                  selected ? SELECTION_PILL_SELECTED_CLASS : SELECTION_PILL_UNSELECTED_CLASS,
+                                  !selected && 'hover:text-slate-900'
                                 )}
                                 aria-pressed={selected}
                               >
@@ -997,8 +1030,8 @@ export default function LeadForm() {
                       value={form.firstName}
                       onChange={(event) => onSelect('firstName', event.target.value)}
                       className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        errors.firstName ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-slate-200'
+                        INPUT_BASE_CLASS,
+                        errors.firstName ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
                       )}
                       aria-invalid={Boolean(errors.firstName)}
                     />
@@ -1014,8 +1047,8 @@ export default function LeadForm() {
                       value={form.lastName}
                       onChange={(event) => onSelect('lastName', event.target.value)}
                       className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        errors.lastName ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-slate-200'
+                        INPUT_BASE_CLASS,
+                        errors.lastName ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
                       )}
                       aria-invalid={Boolean(errors.lastName)}
                     />
@@ -1031,8 +1064,8 @@ export default function LeadForm() {
                       value={form.email}
                       onChange={(event) => onSelect('email', event.target.value)}
                       className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        errors.email ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-slate-200'
+                        INPUT_BASE_CLASS,
+                        errors.email ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
                       )}
                       aria-invalid={Boolean(errors.email)}
                     />
@@ -1049,8 +1082,8 @@ export default function LeadForm() {
                       value={form.phone}
                       onChange={(event) => onSelect('phone', event.target.value)}
                       className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        errors.phone ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-slate-200'
+                        INPUT_BASE_CLASS,
+                        errors.phone ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
                       )}
                       aria-invalid={Boolean(errors.phone)}
                     />
@@ -1069,8 +1102,9 @@ export default function LeadForm() {
                             type="button"
                             onClick={() => onSelect('preferredContact', value)}
                             className={cn(
-                              'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                              selected ? 'border-[--brand-blue] bg-[--brand-blue] text-white shadow' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                              'inline-flex items-center gap-2',
+                              SELECTION_PILL_BASE_CLASS,
+                              selected ? SELECTION_PILL_SELECTED_CLASS : SELECTION_PILL_UNSELECTED_CLASS
                             )}
                             aria-pressed={selected}
                           >
@@ -1095,8 +1129,8 @@ export default function LeadForm() {
                       value={form.address1}
                       onChange={(event) => onSelect('address1', event.target.value)}
                       className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        errors.address1 ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-slate-200'
+                        INPUT_BASE_CLASS,
+                        errors.address1 ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
                       )}
                       aria-invalid={Boolean(errors.address1)}
                     />
@@ -1111,7 +1145,7 @@ export default function LeadForm() {
                       autoComplete="address-line2"
                       value={form.address2}
                       onChange={(event) => onSelect('address2', event.target.value)}
-                      className="mt-2 w-full rounded-full border border-slate-200 px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
+                      className={cn(INPUT_BASE_CLASS, INPUT_DEFAULT_CLASS)}
                     />
                   </label>
 
@@ -1124,8 +1158,8 @@ export default function LeadForm() {
                       value={form.city}
                       onChange={(event) => onSelect('city', event.target.value)}
                       className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        errors.city ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-slate-200'
+                        INPUT_BASE_CLASS,
+                        errors.city ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
                       )}
                       aria-invalid={Boolean(errors.city)}
                     />
@@ -1141,8 +1175,9 @@ export default function LeadForm() {
                       value={form.state}
                       onChange={(event) => onSelect('state', event.target.value.toUpperCase().slice(0, 2))}
                       className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm uppercase shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        errors.state ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-slate-200'
+                        INPUT_BASE_CLASS,
+                        'uppercase',
+                        errors.state ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
                       )}
                       aria-invalid={Boolean(errors.state)}
                     />
@@ -1160,8 +1195,8 @@ export default function LeadForm() {
                       value={form.zip}
                       onChange={(event) => onSelect('zip', event.target.value.replace(/[^0-9]/g, '').slice(0, 5))}
                       className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        errors.zip ? 'border-red-300 focus:border-red-400 focus:ring-red-200' : 'border-slate-200'
+                        INPUT_BASE_CLASS,
+                        errors.zip ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
                       )}
                       aria-invalid={Boolean(errors.zip)}
                     />
@@ -1179,10 +1214,8 @@ export default function LeadForm() {
                             type="button"
                             onClick={() => onSelect('bestTime', value)}
                             className={cn(
-                              'rounded-full border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                              selected
-                                ? 'border-[--brand-blue] bg-[--brand-blue] text-white shadow'
-                                : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                              SELECTION_PILL_BASE_CLASS,
+                              selected ? SELECTION_PILL_SELECTED_CLASS : SELECTION_PILL_UNSELECTED_CLASS
                             )}
                             aria-pressed={selected}
                           >
@@ -1227,11 +1260,11 @@ export default function LeadForm() {
 
         <div className="flex flex-col gap-4 border-t border-blue-50 px-6 py-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1">
+            <span className={INFO_BADGE_CLASS}>
               <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
               Trusted locally since 1987
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1">
+            <span className={INFO_BADGE_CLASS}>
               <UserRound className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
               Roof advisors, not call center scripts
             </span>
