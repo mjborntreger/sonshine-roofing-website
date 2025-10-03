@@ -68,7 +68,7 @@ const ORDER: string[] = [
   'jose'
 ];
 
-const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white mb-4";
+const detailsStyles = "group not-prose rounded-2xl border border-slate-200 bg-white mb-4";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 
 export default async function Page() {
@@ -102,11 +102,11 @@ export default async function Page() {
   return (
     <>
       <Section>
-        <div className="px-2">
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+        <div className="container-edge py-4">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
 
             {/* About us */}
-            <div className="py-4 prose w-full">
+            <div className="prose max-w-full min-w-0">
               <h1>About SonShine Roofing</h1>
 
               {/* JSON-LD: Breadcrumbs + WebPage */}
@@ -188,10 +188,10 @@ export default async function Page() {
 
             </div>
 
-            <div className="sticky hidden lg:block top-16 self-start min-w-0">
+            <aside className="lg:sticky top-16 self-start lg:h-fit">
               <SocialMediaProfiles />
               <ResourcesQuickLinks />
-            </div>
+            </aside>
 
           </div>
         </div>

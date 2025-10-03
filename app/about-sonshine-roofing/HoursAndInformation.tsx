@@ -6,7 +6,7 @@ const pillarsGrid = "mt-6 grid grid-cols-1 gap-4 items-stretch";
 const pStyles = "text-md list-disc pl-5 space-y-1 marker:text-slate-400";
 const linkStyles = "text-[--brand-blue] icon-affordance"
 
-const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white";
+const detailsStyles = "group not-prose rounded-2xl border border-slate-200 bg-white";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 
 export async function HoursAndInformation() {

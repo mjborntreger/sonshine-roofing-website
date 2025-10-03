@@ -6,7 +6,7 @@ export function AboutVideo() {
       <LazyYoutubeEmbed
         videoId="Xla6_QBrJ_U"
         title="About SonShine Roofing"
-        className="border border-[--brand-blue]"
+        className="border border-slate-200 shadow-md"
       />
     </div>
   );

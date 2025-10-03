@@ -148,7 +148,7 @@ export default async function FinancingPage() {
     <section className="mx-auto max-w-8xl">
       <div className="container-edge py-10 md:py-16">
         {/* Hero */}
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-3xl mt-12 text-center">
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">
             Roof Financing Made Simple
             <HandCoins className="h-7 w-7 md:h-12 md:w-12 text-[--brand-blue] inline ml-4"/>

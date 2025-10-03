@@ -16,8 +16,8 @@ import LeadForm from "@/components/LeadForm";
 import { Suspense } from 'react';
 
 // ===== STYLE CONSTANTS ===== //
-const landingLayout = "mx-auto w-full max-w-[1280px]";
-const reviewsLayout = "mx-auto w-full max-w-[1600px]";
+const layout = "mx-auto w-full max-w-[1280px]";
+const layoutWide = "mx-auto w-full max-w-[1600px]";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
@@ -84,7 +84,7 @@ export default async function Page() {
   return (
     <>
       <Hero />
-      <div className={landingLayout}>
+      <div className={layout}>
         <div className="mx-2 mt-16">
           <Suspense
             fallback={(
@@ -97,10 +97,10 @@ export default async function Page() {
           </Suspense>
         </div>
       </div>
-      <div className={reviewsLayout}>
+      <div className={layoutWide}>
         <ReviewsCarousel />
       </div>
-      <div className={landingLayout}>
+      <div className={layout}>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
             <div className="mx-2">
@@ -127,7 +127,7 @@ export default async function Page() {
 
 
 
-      <div className={landingLayout}>
+      <div className={layoutWide}>
         <LatestProjectsFilter projects={projects} initial={4} />
         <LatestPostsFilters posts={posts} initial={4} />
       </div>

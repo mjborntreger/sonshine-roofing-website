@@ -103,7 +103,7 @@ export default function LatestPostsFilter({ posts, initial = 4, showHeader = tru
   );
 
   return (
-    <div className="px-4 py-24 md:px-12">
+    <div className="px-4 py-16 md:px-12">
       {showHeader ? (
         <div className="text-center">
           <h2 className="text-3xl text-slate-700 mb-16 md:text-5xl">Latest Blog Posts</h2>

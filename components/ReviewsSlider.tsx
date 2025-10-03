@@ -222,7 +222,7 @@ export default function ReviewsSlider({
                 aria-label={`Open full review by ${r.author_name}`}
                 className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_80%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none bg-transparent p-0 m-0 text-left cursor-pointer"
               >
-                <article className="h-full rounded-2xl border border-slate-400 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
+                <article className="h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
                     <h3 className="m-0 font-bold text-lg text-slate-900">{r.author_name}</h3>
                     <div className="mt-1 flex items-center gap-1 text-[#fb9216]">

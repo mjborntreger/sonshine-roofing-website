@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useMemo, useReducer, useRef, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -26,6 +26,7 @@ import {
   TrendingUp,
   UserRound,
   ExternalLink,
+  Wrench,
 } from 'lucide-react';
 import type { Route } from 'next';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -98,9 +99,9 @@ const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'maintenance',
-    label: 'Maintenance & inspection',
+    label: 'Light repairs, inspections, maintenance',
     description: 'Annual checkups, prepare for hurricane season, real estate',
-    icon: Sparkles,
+    icon: Wrench,
     accent: 'border-emerald-200 bg-emerald-50 text-emerald-600',
     action: 'advance',
   },
@@ -156,7 +157,7 @@ const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
   },
   {
     value: 'just-researching',
-    label: 'Mostly researching options',
+    label: 'Researching options',
     description: 'Gathering ideas, timelines, and investment ranges',
     icon: TrendingUp,
   },
@@ -458,6 +459,7 @@ export default function LeadForm() {
   const searchParams = useSearchParams();
   const formRef = useRef<HTMLFormElement | null>(null);
   const reduceMotion = useReducedMotion();
+  const prevStepRef = useRef(0);
 
   const activeStepId = STEP_ORDER[activeStepIndex];
   const totalSteps = STEP_ORDER.length;
@@ -525,6 +527,22 @@ export default function LeadForm() {
   const handleTimelineSelect = (value: string) => {
     onSelect('timeline', value);
   };
+
+  useEffect(() => {
+    const previous = prevStepRef.current;
+    prevStepRef.current = activeStepIndex;
+    if (activeStepIndex <= previous) return;
+    if (typeof window === 'undefined') return;
+    const container = formRef.current;
+    if (!container) return;
+    const behavior = reduceMotion ? 'auto' : 'smooth';
+    window.requestAnimationFrame(() => {
+      const rect = container.getBoundingClientRect();
+      const offset = 96;
+      const target = Math.max(rect.top + window.scrollY - offset, 0);
+      window.scrollTo({ top: target, behavior });
+    });
+  }, [activeStepIndex, reduceMotion]);
 
   const handleBack = () => {
     setErrors({});
@@ -630,8 +648,8 @@ export default function LeadForm() {
     switch (stepId) {
       case 'need':
         return {
-          title: 'Let’s get started',
-          description: 'We’ll tailor the next few questions so we can route you to the right specialist.',
+          title: 'Let’s get you squared away',
+          description: 'We’ll tailor the next few questions so we can route you to the right spot.',
         };
       case 'context':
         return {
@@ -734,21 +752,21 @@ export default function LeadForm() {
       <input type="hidden" name="bestTime" value={form.bestTime} />
       <input type="hidden" name="notes" value={form.notes} />
 
-      <div id="get-started" className="overflow-hidden mx-4 rounded-3xl border border-blue-100 bg-white/95 shadow-xl">
-        <div className="border-b border-blue-50 bg-gradient-to-r from-sky-50 via-white to-amber-50 px-6 py-5">
+      <div id="get-started" className="overflow-hidden mx-2 rounded-3xl border border-blue-100 bg-white shadow-xl">
+        <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 px-12 py-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-wide text-[--brand-blue]">Step {activeStepIndex + 1} of {totalSteps}</p>
-              <h3 className="mt-3 mb-8 text-4xl md:text-5xl font-semibold text-slate-900">{title}</h3>
+              <h3 className="mt-3 mb-4 text-2xl md:text-5xl font-semibold text-slate-900">{title}</h3>
               <p className="mt-2 text-sm text-slate-600">{description}</p>
             </div>
-            <div className="relative-aspect-[21/9] relative">
-              <Image 
-                src="https://next.sonshineroofing.com/wp-content/uploads/cropped-runningman-update-e1751376711567.webp"
+            <div className="relative-aspect-[21/9] h-[128px] w-[125px] mb-4 relative">
+              <Image
+                src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
                 alt="sonshine logo, no swoosh"
-                width={125}
-                height={128}
-                className="absolute top-1 right-1"
+                width={158.5}
+                height={54.5}
+                className="absolute top-[20px] right-0"
               />
             </div>
           </div>
@@ -767,7 +785,7 @@ export default function LeadForm() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={activeStepId} {...stepTransition}>
               {activeStepId === 'need' && (
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="px-4 py-2 grid gap-4 md:grid-cols-2">
                   {PROJECT_OPTIONS.map((option) => {
                     const { value, label, description, icon: Icon, accent, action } = option;
                     const selectable = action === 'advance' && isJourneyKey(value);
@@ -790,8 +808,8 @@ export default function LeadForm() {
                             <Icon className="h-4 w-4" aria-hidden="true" />
                             {selectable ? (selected ? 'Selected' : 'Tap to select') : 'Opens a new page'}
                           </div>
-                          <h4 className="mt-4 text-lg font-semibold text-slate-900">{label}</h4>
-                          <p className="mt-2 text-sm text-slate-600">{description}</p>
+                          <h4 className="mt-4 text-lg md:text-xl font-semibold text-slate-900">{label}</h4>
+                          <p className="mt-2 text-sm md:text-md text-slate-600">{description}</p>
                         </div>
                         <div className="mt-4 flex items-center justify-between text-xs font-semibold text-slate-500">
                           <span>{selectable ? 'Guided resources included' : 'Takes you right there'}</span>
@@ -807,7 +825,7 @@ export default function LeadForm() {
               )}
 
               {activeStepId === 'context' && (
-                <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+                <div className="px-4 py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
                   <div className="space-y-4">
                     {!journey && (
                       <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
@@ -837,10 +855,15 @@ export default function LeadForm() {
                                 )}
                                 aria-pressed={selected}
                               >
-                                <Icon className={cn('h-6 w-6 shrink-0', selected ? 'text-[--brand-blue]' : 'text-slate-400')} aria-hidden="true" />
-                                <div>
-                                  <p className="text-sm font-semibold text-slate-900">{label}</p>
-                                  <p className="mt-1 text-xs text-slate-500">{description}</p>
+                                <div className="flex justify-between">
+                                  <div className="inline-flex flex-wrap">
+                                    <Icon className={cn('h-6 w-6 mr-3 shrink-0', selected ? 'text-[--brand-blue]' : 'text-slate-400')} aria-hidden="true" />
+                                    <p className="text-sm font-semibold text-slate-900">{label}</p>
+                                    <p className="mt-1 ml-9 text-xs text-slate-500">{description}</p>
+                                  </div>
+                                  <div className="">
+                                    <Check className={cn("h-5 w-5 ml-6 mr-1", selected ? "text-[--brand-blue]" : "text-white")} />
+                                  </div>
                                 </div>
                               </button>
                             );
@@ -898,7 +921,7 @@ export default function LeadForm() {
                       </div>
                     )}
                   </div>
-                  <aside className="flex flex-col gap-4 rounded-2xl border border-blue-100 bg-blue-50/60 px-4 py-4 text-sm text-slate-600">
+                  <aside className="flex flex-col h-fit gap-4 rounded-2xl border border-blue-100 bg-blue-50/60 px-4 py-4 text-sm text-slate-600">
                     <div className="flex items-start gap-3">
                       <CalendarClock className="mt-1 h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
                       <div>
@@ -913,12 +936,20 @@ export default function LeadForm() {
                         <p className="mt-1">Based on your answers we’ll send links, FAQs, or financing options that fit.</p>
                       </div>
                     </div>
+                    <div className="p-4 hidden md:flex h-[250px] w-[256px]">
+                      <Image
+                        src="https://next.sonshineroofing.com/wp-content/uploads/cropped-runningman-update-e1751376711567.webp"
+                        alt="sonshine roofing running man"
+                        width={250}
+                        height={256}
+                      />
+                    </div>
                   </aside>
                 </div>
               )}
 
               {activeStepId === 'contact' && (
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="px-4 py-2 grid gap-4 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700">
                     First name*
                     <input
@@ -1016,7 +1047,7 @@ export default function LeadForm() {
               )}
 
               {activeStepId === 'schedule' && (
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="px-4 py-2 grid gap-4 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700 md:col-span-2">
                     Street address*
                     <input
@@ -1156,7 +1187,7 @@ export default function LeadForm() {
           </AnimatePresence>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-blue-50 bg-slate-50/80 px-6 py-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 border-t border-blue-50 px-6 py-4 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
             <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1">
               <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />

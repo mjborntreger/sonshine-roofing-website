@@ -20,7 +20,7 @@ export default function Header() {
     const root = document.documentElement;
     const setVar = () => {
       const headerHeight = el.offsetHeight;
-      const anchorPadding = Math.max(headerHeight - 12, 0);
+      const anchorPadding = Math.max(headerHeight - 24, 0);
       root.style.setProperty("--header-h", `${headerHeight}px`);
       root.style.setProperty("--sticky-offset", `${anchorPadding}px`);
     };

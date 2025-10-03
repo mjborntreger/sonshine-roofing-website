@@ -112,7 +112,7 @@ const pillars: Pillar[] = [
     theme: "orange",
     defaultOpen: true,
     cta: {
-      href: "/financing",
+      href: "/financing#get-started",
       label: "Get started",
       title: "Get started with financing",
     },

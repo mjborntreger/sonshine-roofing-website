@@ -6,6 +6,15 @@ import SmartLink from "./SmartLink";
 
 export default function Hero() {
   const [shouldAnimateArrow, setShouldAnimateArrow] = useState(false);
+  const handleScrollToGetStarted = () => {
+    document.getElementById("get-started")?.scrollIntoView({ behavior: "smooth" });
+  };
+  const handleKeyDown: React.KeyboardEventHandler<HTMLElement> = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleScrollToGetStarted();
+    }
+  };
 
   useEffect(() => {
     const timer = window.setTimeout(() => setShouldAnimateArrow(true), 800);
@@ -14,7 +23,12 @@ export default function Hero() {
 
   return (
     <>
-      <section className="relative isolate text-white min-h-[50svh] lg:min-h-[80svh] h-auto">
+      <section 
+        role="link" 
+        tabIndex={0} 
+        onClick={handleScrollToGetStarted} 
+        onKeyDown={handleKeyDown}
+        className="cursor-pointer relative isolate text-white min-h-[50svh] lg:min-h-[80svh] h-auto">
         {/* Background video */}
         <video
           className="absolute inset-0 -z-10 h-full w-full object-cover pointer-events-none motion-safe:opacity-100 motion-reduce:hidden"
