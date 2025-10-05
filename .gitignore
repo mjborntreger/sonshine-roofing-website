@@ -36,5 +36,9 @@ yarn-error.log*
 next-env.d.ts
 acf-export-2025-09-17.json
 
-# WP mu-plugin
+# WP plugins
 ss-lead-endpoint.php
+ss-lead-endpoint.php
+
+# ACF JSON Manifest
+ACF-to-GraphQL-manifest.json

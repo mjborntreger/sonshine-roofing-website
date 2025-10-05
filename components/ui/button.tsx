@@ -13,8 +13,8 @@ const buttonVariants = cva(
         outline: "border border-slate-300 text-slate-900 hover:bg-slate-50",
         ghost: "hover:bg-slate-100 text-slate-900",
         link: "text-brand-blue underline-offset-4 hover:underline",
-        brandBlue: "bg-[var(--brand-blue)] text-white hover:opacity-90 focus-visible:ring-[var(--brand-blue)] transition duration=500 ease-in-out",
-        brandOrange: "bg-[var(--brand-orange)] text-white hover:opacity-90 focus-visible:ring-[var(--brand-orange) transition duration=500 ease-in-out]",
+        brandBlue: "bg-[var(--brand-blue)] text-white hover:opacity-90 focus-visible:ring-[var(--brand-blue)] transition duration-500 ease-in-out",
+        brandOrange: "bg-[var(--brand-orange)] text-white hover:opacity-90 focus-visible:ring-[var(--brand-orange)] transition duration-500 ease-in-out",
       },
       size: {
         default: "h-10 px-4 py-2",

@@ -846,7 +846,7 @@ export default function LeadForm() {
               <h3 className="mt-3 mb-4 text-2xl md:text-5xl font-semibold text-slate-900">{title}</h3>
               <p className="mt-3 text-sm text-slate-600">{description}</p>
             </div>
-            <div className="relative-aspect-[21/9] h-[128px] w-[125px] mb-4 relative">
+            <div className="relative aspect-[21/9] h-[128px] w-[125px] mb-4">
               <Image
                 src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
                 alt="sonshine logo, no swoosh"

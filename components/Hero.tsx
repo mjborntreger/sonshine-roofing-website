@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDown, Phone, Zap } from "lucide-react"
+import { ArrowDown } from "lucide-react"
 import SmartLink from "./SmartLink";
+import ShinyText from './ShinyText';
 
 export default function Hero() {
   const [shouldAnimateArrow, setShouldAnimateArrow] = useState(false);
@@ -50,16 +51,23 @@ export default function Hero() {
         />
 
         {/* Content */}
-        <div className="max-w-7xl mx-auto px-4 text-center not-prose py-16 md:py-36">
+        <div className="text-white max-w-7xl mx-auto px-4 text-center not-prose py-16 md:py-36">
           <h1 className="text-4xl md:text-8xl font-bold text-white">
-            Your Trusted Local Roofing Contractor in Sarasota, Manatee, and Charlotte Counties for 38+ Years
+            <ShinyText
+              text="Your Trusted Local Roofing Contractor in Sarasota, Manatee, and Charlotte Counties for 38+ Years"
+              disabled={false}
+              speed={3}
+              className='custom-class'
+            />
           </h1>
 
-          <p className="mt-5 text-white text-md md:text-2xl max-w-7xl">
-            We prioritize extending the lifespan of your current roof.
+          <p className="mt-5 text-slate-100 text-md md:text-2xl max-w-7xl">
+            We prioritize extending the lifespan of your roof.
+            <br />
+            Get in touch today to find out more.
           </p>
 
-          <div className="mt-12 flex justify-center">
+          <div className="mt-12 flex flex-wrap justify-center">
 
             <SmartLink
               href="#get-started"

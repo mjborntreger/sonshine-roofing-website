@@ -340,7 +340,7 @@ export default async function Page() {
               </div>
             </details>
 
-            <details className="group not-prose rounded-xl border border-slate200 bg-white mb-6">
+            <details className="group not-prose rounded-xl border border-slate-200 bg-white mb-6">
               <summary className={summaryStyles}>
                 <span className="flex items-center gap-2">
                   <ListChecks className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
