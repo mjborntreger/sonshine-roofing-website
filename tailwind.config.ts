@@ -79,10 +79,16 @@ const config: Config = {
           "0%": { backgroundPosition: "100%" },
           "100%": { backgroundPosition: "-100%" },
         },
+        "hero-cue": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "40%": { transform: "translateY(10px)" },
+          "65%": { transform: "translateY(14px)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 250ms ease-out both",
         shine: "shine 5s linear infinite",
+        "hero-cue": "hero-cue 1.8s ease-in-out 2",
       },
       backgroundImage: {
         "brand-gradient": "linear-gradient(90deg, #0045d7 0%, #00e3fe 100%)",
@@ -90,10 +96,10 @@ const config: Config = {
     },
     fontFamily: {
       sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+      accent: ["var(--font-inter)", "system-ui", "sans-serif"],
     },
   },
   plugins: [tailwindcssAnimate, typography],
 };
 
 export default config;
-

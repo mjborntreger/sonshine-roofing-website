@@ -53,7 +53,7 @@ export default function ServicesQuickLinks() {
         {LINKS.map(({ href, label, aria, Icon }) => {
           const active = isActivePath(pathname, href);
           const baseClass =
-            "group flex items-center gap-3 rounded-lg border bg-white px-3 py-2 text-sm font-medium transition hover:border-[--brand-orange] hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-orange] motion-reduce:transition-none";
+            "group flex items-center gap-3 rounded-lg border bg-white px-3 py-2 text-sm font-medium transition hover:border-[--brand-orange] hover:bg-slate-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-orange] motion-reduce:transition-none";
           const inactiveClass = "border-slate-200 text-slate-800";
           const activeClass = "border-[--brand-orange] text-slate-900";
 

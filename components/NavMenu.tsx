@@ -90,13 +90,13 @@ function MenuToggleIcon({ open }: { open: boolean }) {
   );
 }
 
-function LabelWithIcon({ label }: { label: string }) {
+function LabelWithIcon({ label, iconClassName }: { label: string; iconClassName?: string }) {
   const Icon = NAV_ICONS[label];
   return (
     <span className="inline-flex items-center">
       {Icon && (
         <Icon
-          className="h-4 w-4 inline text-[--brand-blue] mr-2"
+          className={cn("h-4 w-4 inline mr-2", iconClassName ?? "text-[--brand-blue]")}
           aria-hidden="true"
         />
       )}
@@ -122,7 +122,7 @@ const MOBILE_CTA1_DELAY_MS = 70;  // "Free 60-second Quote"
 const MOBILE_CTA2_DELAY_MS = 100; // "Contact Us"
 
 /* ===== Desktop (fixed) ===== */
-function DesktopMenu() {
+function DesktopMenu({ transparent }: { transparent: boolean }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [enteredPanel, setEnteredPanel] = useState(false);
@@ -155,16 +155,23 @@ function DesktopMenu() {
             {item.href ? (
               <SmartLink
                 href={item.href}
-                className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1"
+                className={cn(
+                  "px-2 py-2 whitespace-nowrap flex items-center gap-1 transition-colors duration-200",
+                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]"
+                )}
               >
-                <LabelWithIcon label={item.label} />
+                <LabelWithIcon
+                  label={item.label}
+                  iconClassName={transparent ? "text-[--brand-orange]" : "text-[--brand-blue]"}
+                />
                 {item.children && (
                   <>
                     {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
                     <ChevronDown
                       className={cn(
                         "h-4 w-4 opacity-70 transition-transform duration-200",
-                        openIndex === i ? "rotate-180" : "rotate-0"
+                        openIndex === i ? "rotate-180" : "rotate-0",
+                        transparent ? "text-white" : "text-slate-400"
                       )}
                       style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
                       aria-hidden="true"
@@ -175,18 +182,25 @@ function DesktopMenu() {
             ) : (
               <button
                 type="button"
-                className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1 cursor-default"
+                className={cn(
+                  "px-2 py-2 whitespace-nowrap flex items-center gap-1 cursor-default transition-colors duration-200",
+                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]"
+                )}
                 aria-haspopup={item.children ? "menu" : undefined}
                 aria-expanded={openIndex === i || undefined}
               >
-                <LabelWithIcon label={item.label} />
+                <LabelWithIcon
+                  label={item.label}
+                  iconClassName={transparent ? "text-[--brand-orange]" : "text-[--brand-blue]"}
+                />
                 {item.children && (
                   <>
                     {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
                     <ChevronDown
                       className={cn(
                         "h-4 w-4 opacity-70 transition-transform duration-200",
-                        openIndex === i ? "rotate-180" : "rotate-0"
+                        openIndex === i ? "rotate-180" : "rotate-0",
+                        transparent ? "text-white" : "text-slate-400"
                       )}
                       style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
                       aria-hidden="true"
@@ -229,14 +243,14 @@ function DesktopMenu() {
         </li>
 
         <li className="pl-2">
-        <Button asChild size="sm" variant="brandBlue">
-          <SmartLink href={ROUTES.contact} className="phone-affordance flex items-center gap-2">
-            <Phone className="phone-affordance-icon h-4 w-4 text-white" aria-hidden="true" />
-            Contact Us
-          </SmartLink>
-        </Button>
-      </li>
-    </ul>
+          <Button asChild size="sm" variant="brandBlue">
+            <SmartLink href={ROUTES.contact} className="phone-affordance flex items-center gap-2">
+              <Phone className="phone-affordance-icon h-4 w-4 text-white" aria-hidden="true" />
+              Contact Us
+            </SmartLink>
+          </Button>
+        </li>
+      </ul>
     </>
   );
 }
@@ -346,7 +360,11 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
                   {/* optional invisible bridge in case of super fast mouse moves */}
                   <div className="pointer-events-none absolute -left-2 top-0 h-full w-3" />
                   <div className="pointer-events-auto">
-                    <MenuLevel items={child.children!} level={level + 1} parentLabel={child.label} />
+                    <MenuLevel
+                      items={child.children!}
+                      level={level + 1}
+                      parentLabel={child.label}
+                    />
                   </div>
                 </div>
               </>
@@ -640,10 +658,14 @@ function MobileMenu() {
   );
 }
 
-export function NavMenu() {
+type NavMenuProps = {
+  transparent: boolean;
+};
+
+export function NavMenu({ transparent }: NavMenuProps) {
   return (
     <nav className="ml-auto flex items-center gap-3">
-      <DesktopMenu />
+      <DesktopMenu transparent={transparent} />
       <MobileMenu />
     </nav>
   );

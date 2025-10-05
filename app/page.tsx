@@ -12,8 +12,7 @@ import Section from "@/components/layout/Section";
 import type { Metadata } from 'next';
 import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
-import LeadForm from "@/components/LeadForm";
-import { Suspense } from 'react';
+import LeadFormSection from "@/components/LeadFormSection";
 
 // ===== STYLE CONSTANTS ===== //
 const layout = "mx-auto w-full max-w-[1280px]";
@@ -86,15 +85,7 @@ export default async function Page() {
       <Hero />
       <div className={layout}>
         <div className="mx-2 mt-16">
-          <Suspense
-            fallback={(
-              <div className="mt-8 min-h-[420px] rounded-3xl border border-blue-100 bg-white/70 p-8 shadow-sm" aria-busy="true" aria-live="polite">
-                <p className="text-sm font-semibold text-slate-500">Loading your guided request form…</p>
-              </div>
-            )}
-          >
-            <LeadForm />
-          </Suspense>
+          <LeadFormSection />
         </div>
       </div>
       <div className={layoutWide}>
