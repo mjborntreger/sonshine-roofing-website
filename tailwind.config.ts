@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 import tailwindcssAnimate from "tailwindcss-animate";
 import typography from "@tailwindcss/typography";
+import lineClamp from "@tailwindcss/line-clamp";
 
 const config: Config = {
   darkMode: ["class"],
@@ -100,7 +101,7 @@ const config: Config = {
       script: ["var(--font-allura)", "cursive"],
     },
   },
-  plugins: [tailwindcssAnimate, typography],
+  plugins: [lineClamp, tailwindcssAnimate, typography],
 };
 
 export default config;

@@ -103,7 +103,7 @@ export default function LatestProjectsFilter({ projects, initial = 4, showHeader
   );
 
   return (
-    <div className="px-4 py-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="px-4 pt-12 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
           <h2 className="text-3xl mb-16 text-slate-700 md:text-5xl">Latest Projects</h2>

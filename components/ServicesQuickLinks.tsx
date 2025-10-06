@@ -7,15 +7,40 @@ import { usePathname } from "next/navigation";
 type LinkItem = {
   href: string;
   label: string;
+  description: string;
   aria: string;
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
 const LINKS: LinkItem[] = [
-  { href: "/roof-replacement-sarasota-fl", label: "Roof Replacement", aria: "Roof Replacement", Icon: Hammer },
-  { href: "/roof-repair",                  label: "Roof Repair",      aria: "Roof Repair",      Icon: Wrench },
-  { href: "/roof-inspection",              label: "Roof Inspection",  aria: "Roof Inspection",  Icon: Search },
-  { href: "/roof-maintenance",             label: "Roof Maintenance", aria: "Roof Maintenance", Icon: ShieldCheck },
+  {
+    href: "/roof-replacement-sarasota-fl",
+    label: "Roof Replacement",
+    description: "Guided replacements tailored to Gulf Coast weather and HOA rules.",
+    aria: "Roof Replacement",
+    Icon: Hammer,
+  },
+  {
+    href: "/roof-repair",
+    label: "Roof Repair",
+    description: "Fast fixes for leaks, missing shingles, and storm-battered spots.",
+    aria: "Roof Repair",
+    Icon: Wrench,
+  },
+  {
+    href: "/roof-inspection",
+    label: "Roof Inspection",
+    description: "Detailed assessments that surface issues before they become costly.",
+    aria: "Roof Inspection",
+    Icon: Search,
+  },
+  {
+    href: "/roof-maintenance",
+    label: "Roof Maintenance",
+    description: "Seasonal upkeep plans that extend your roof's lifespan with care.",
+    aria: "Roof Maintenance",
+    Icon: ShieldCheck,
+  },
 ];
 
 // Normalize pathnames for robust matching across nested routes
@@ -50,7 +75,7 @@ export default function ServicesQuickLinks() {
       </div>
 
       <ul className="space-y-2">
-        {LINKS.map(({ href, label, aria, Icon }) => {
+        {LINKS.map(({ href, label, description, aria, Icon }) => {
           const active = isActivePath(pathname, href);
           const baseClass =
             "group flex items-center gap-3 rounded-2xl border bg-white px-3 py-2 text-sm font-medium transition hover:border-[--brand-orange] hover:bg-orange-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-orange] motion-reduce:transition-none";
@@ -72,8 +97,11 @@ export default function ServicesQuickLinks() {
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
 
-                {/* Label */}
-                <span className="flex-1">{label}</span>
+                {/* Label and description */}
+                <div className="flex-1 min-w-0 text-left">
+                  <span className="block truncate">{label}</span>
+                  <p className="mt-0.5 text-xs text-slate-500 line-clamp-1">{description}</p>
+                </div>
 
                 {/* Chevron affordance */}
                 <ChevronRight className="icon-affordance h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />

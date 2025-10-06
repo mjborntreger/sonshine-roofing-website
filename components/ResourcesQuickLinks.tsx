@@ -7,16 +7,47 @@ import { usePathname } from "next/navigation";
 type LinkItem = {
   href: string;
   label: string;
+  description: string;
   aria: string;
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
 const LINKS: LinkItem[] = [
-  { href: "/project",          label: "Project Gallery",   aria: "Project Gallery",   Icon: ImageIcon },
-  { href: "/video-library",    label: "Video Library",     aria: "Video Library",     Icon: PlayCircle },
-  { href: "/blog",             label: "Blog",              aria: "Blog",              Icon: Newspaper },
-  { href: "/roofing-glossary", label: "Roofing Glossary",  aria: "Roofing Glossary",  Icon: BookOpen },
-  { href: "/faq",              label: "FAQ",               aria: "FAQ",               Icon: HelpCircle },
+  {
+    href: "/project",
+    label: "Project Gallery",
+    description: "Browse real installations and customer transformations across Sarasota.",
+    aria: "Project Gallery",
+    Icon: ImageIcon,
+  },
+  {
+    href: "/video-library",
+    label: "Video Library",
+    description: "Watch quick explainers and behind-the-scenes footage from our team.",
+    aria: "Video Library",
+    Icon: PlayCircle,
+  },
+  {
+    href: "/blog",
+    label: "Blog",
+    description: "Stay current with expert roofing tips, trends, and neighborhood news.",
+    aria: "Blog",
+    Icon: Newspaper,
+  },
+  {
+    href: "/roofing-glossary",
+    label: "Roofing Glossary",
+    description: "Get plain-language definitions for the roofing terms that matter most.",
+    aria: "Roofing Glossary",
+    Icon: BookOpen,
+  },
+  {
+    href: "/faq",
+    label: "FAQ",
+    description: "Find answers to the questions Sarasota homeowners ask most often.",
+    aria: "FAQ",
+    Icon: HelpCircle,
+  },
 ];
 
 // Normalize pathnames for robust matching across service pages, blogs, and nested routes
@@ -54,7 +85,7 @@ export default function ResourcesQuickLinks() {
       </div>
 
       <ul className="space-y-2">
-        {LINKS.map(({ href, label, aria, Icon }) => {
+        {LINKS.map(({ href, label, description, aria, Icon }) => {
           const active = isActivePath(pathname, href);
           const baseClass =
             "group flex items-center gap-3 rounded-2xl border bg-white px-3 py-2 text-sm font-medium transition hover:border-[--brand-blue] hover:bg-blue-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-orange] motion-reduce:transition-none";
@@ -76,8 +107,11 @@ export default function ResourcesQuickLinks() {
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
 
-                {/* Label */}
-                <span className="flex-1">{label}</span>
+                {/* Label and description */}
+                <div className="flex-1 min-w-0 text-left">
+                  <span className="block truncate">{label}</span>
+                  <p className="mt-0.5 text-xs text-slate-500 line-clamp-1">{description}</p>
+                </div>
 
                 {/* Chevron affordance */}
                 <ChevronRight className="icon-affordance h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />

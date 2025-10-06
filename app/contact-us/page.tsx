@@ -1,8 +1,7 @@
 import Section from "@/components/layout/Section";
-import AcculynxLeadForm from "@/components/AcculynxLeadForm";
-import LeadForm from "@/components/LeadForm";
+import SimpleLeadForm from "@/components/SimpleLeadForm";
 import SmartLink from "@/components/SmartLink";
-import { Phone, Mail, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays, MapPinned } from "lucide-react";
+import { Phone, Mail, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays, MapPinned, ArrowUpRight } from "lucide-react";
 import Image from 'next/image';
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import type { Metadata } from 'next';
@@ -10,7 +9,8 @@ import LiteMap from "@/components/LiteMap";
 import OpenOrClosed from "@/components/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 import FinancingBand from "@/components/FinancingBand";
-import { Suspense } from 'react';
+import { cookies } from 'next/headers';
+import { LEAD_SUCCESS_COOKIE } from '@/lib/contact-lead';
 
 // ===== STATIC SEO FOR /contact-us (EDIT HERE) =====
 const SEO_TITLE_CONTACT = 'Contact SonShine Roofing | Sarasota Roofing Company';
@@ -53,14 +53,17 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-slate-400 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal break-words overflow-hidden";
+const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal break-words overflow-hidden";
 const contactInfoIconStyles = "h-5 w-5 shrink-0 text-[--brand-blue]";
 const h1Styles = "text-3xl md:text-5xl text-slate-900";
 const h2Styles = "text-xl md:text-2xl text-slate-800";
 const pStyles = "text-md py-2 text-slate-700";
 const badgeStyles = "badge badge--accent inline-flex items-center gap-2";
 
-export default function Page() {
+export default async function Page() {
+  const cookieStore = await cookies();
+  const leadSuccessCookie = cookieStore.get(LEAD_SUCCESS_COOKIE)?.value ?? null;
+
   return (
     <Section>
       <div className="container-edge py-4">
@@ -91,7 +94,7 @@ export default function Page() {
             </div>
 
             {/* “You'll talk to…” human tile */}
-            <div className="mt-6 not-prose rounded-3xl border border-slate-300 bg-white p-6 shadow-md max-w-full">
+            <div className="mt-6 not-prose rounded-3xl border border-slate-200 bg-white p-6 shadow-sm max-w-full">
               <OpenOrClosed />
               <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr] mt-8 gap-4 items-center min-w-0">
                 <Image
@@ -104,7 +107,14 @@ export default function Page() {
                 />
                 <div>
                   <p className="text-md font-semibold text-slate-900">
-                    You’ll likely talk to <SmartLink className="text-[--brand-blue] hover:underline" href="/person/tara">Tara.</SmartLink>
+                    You’ll likely talk to 
+                    <SmartLink 
+                      className="text-[--brand-blue] hover:underline" 
+                      href="/person/tara"
+                      data-icon-affordance="up-right"
+                      > Tara
+                      <ArrowUpRight className="icon-affordance h-4 w-4 inline ml-1" />
+                    </SmartLink>
                   </p>
                   <p className="text-md text-slate-600">She’s friendly, fast, and hates leaks.</p>
                 </div>
@@ -119,17 +129,6 @@ export default function Page() {
                 >
                   <Phone className={`${contactInfoIconStyles} phone-affordance-icon`} aria-hidden="true" />
                   <span className="font-semibold min-w-0 break-words">(941) 866-4320</span>
-                </SmartLink>
-
-                {/* Email */}
-                <SmartLink
-                  href="mailto:messages@sonshineroofing.com"
-                  className={`${contactInfoPillStyles} w-full`}
-                  title="Email SonShine Roofing"
-                  proseGuard
-                >
-                  <Mail className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-semibold min-w-0 break-words">messages@sonshineroofing.com</span>
                 </SmartLink>
 
                 {/* Address */}
@@ -158,27 +157,7 @@ export default function Page() {
 
 
             <div className="mt-8">
-              <h2 className="top-24 flex items-center gap-2" id="book-an-appointment">
-                <CalendarDays className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                <span>Contact Our Office</span>
-              </h2>
-              <p className="text-slate-700 text-sm pb-2">
-                We respond within 30 minutes during business hours
-              </p>
-              <AcculynxLeadForm />
-              <Suspense
-                fallback={(
-                  <div className="mt-8 min-h-[420px] rounded-3xl border border-blue-100 bg-white/70 p-8 shadow-sm" aria-busy="true" aria-live="polite">
-                    <p className="text-sm font-semibold text-slate-500">Loading your guided request form…</p>
-                  </div>
-                )}
-              >
-              </Suspense>
-              <div className="text-xs text-slate-500 py-4 italic">
-                By submitting this form, you agree to receive SMS messages from Sonshine Roofing
-                and its agents. Message frequency may vary. Message and data rates may apply.
-                Reply STOP to opt out at any time. For more information, <SmartLink href="/privacy-policy">view our privacy policy.</SmartLink>
-              </div>
+              <SimpleLeadForm initialSuccessCookie={leadSuccessCookie} />
             </div>
           </div>
 

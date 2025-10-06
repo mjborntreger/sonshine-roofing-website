@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 const SECTION_CONTAINER = "px-2";
-const SECTION_HEADING = "text-3xl md:text-5xl mb-12 text-slate-700";
+const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
+const SECTION_SUBTITLE = "mt-2 mb-8 text-sm text-slate-500"
 const FEATURE_PILL_CLASS = "badge badge--accent";
 const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
 const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
@@ -124,6 +125,7 @@ export default async function WhyHomeownersChooseUs() {
     <div className={SECTION_CONTAINER}>
       <div className="text-center">
         <h2 className={SECTION_HEADING}>Why Homeowners Choose Us</h2>
+        <p className={SECTION_SUBTITLE}>(It's because we're awesome)</p>
         
         <div className={FEATURE_LIST_CLASS}>
           <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
@@ -181,8 +183,6 @@ export default async function WhyHomeownersChooseUs() {
                     <div className="mt-6 flex justify-end">
                       <SmartLink
                         href={pillar.cta.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="btn btn-brand-orange btn-md btn-press mt-2"
                         title={pillar.cta.title}
                         data-icon-affordance="right"

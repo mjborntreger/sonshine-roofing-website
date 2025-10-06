@@ -27,38 +27,31 @@ import {
   UserRound,
   ExternalLink,
   Wrench,
+  ArrowUpRight,
 } from 'lucide-react';
 import type { Route } from 'next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { readCookie, writeCookie, deleteCookie } from '@/lib/client-cookies';
-
-const CONTACT_READY_COOKIE = 'ss_lead_contact_ready';
-const CONTACT_READY_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-const LEAD_SUCCESS_COOKIE = 'ss_lead_form_success';
-const LEAD_SUCCESS_MAX_AGE = 60 * 60 * 24 * 30;
-
-type LeadSuccessCookiePayload = {
-  projectType: string;
-  helpTopics?: string[];
-  helpTopicLabels?: string[];
-  timeline?: string;
-  timelineLabel?: string;
-  timestamp?: string;
-};
+import { writeCookie, deleteCookie } from '@/lib/client-cookies';
+import {
+  CONTACT_READY_COOKIE,
+  CONTACT_READY_MAX_AGE,
+  LEAD_SUCCESS_COOKIE,
+  LeadSuccessCookiePayload,
+  SuccessMeta,
+  parseLeadSuccessCookie,
+  persistLeadSuccessCookie,
+  sanitizePhoneInput,
+  validateEmail,
+} from '@/lib/contact-lead';
+import SmartLink from './SmartLink';
 
 type LeadSuccessRestore = {
   formPreset: Partial<FormState>;
   meta: SuccessMeta;
 };
-
-interface SuccessMeta {
-  projectType: string;
-  helpTopicLabels: string[];
-  timelineLabel: string | null;
-}
 
 type JourneyKey = 'repair' | 'retail' | 'maintenance' | 'something-else';
 
@@ -414,7 +407,7 @@ const INITIAL_STATE: FormState = {
   zip: '',
   preferredContact: 'phone-call',
   bestTime: '',
-  consentSms: true,
+  consentSms: false,
 };
 
 interface FieldErrors {
@@ -423,10 +416,6 @@ interface FieldErrors {
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
-function sanitizePhoneInput(value: string): string {
-  return value.replace(/\D/g, '').slice(0, 15);
-}
-
 function formatPhoneExample(phone: string): string {
   const digits = sanitizePhoneInput(phone || '9415551234');
   if (digits.length < 10) return '(941) 555-1234';
@@ -434,12 +423,6 @@ function formatPhoneExample(phone: string): string {
   const mid = digits.slice(3, 6);
   const last = digits.slice(6, 10);
   return `(${area}) ${mid}-${last}`;
-}
-
-function validateEmail(email: string): boolean {
-  if (!email) return false;
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email.trim().toLowerCase());
 }
 
 function formatFallbackLabel(value: string | null | undefined): string {
@@ -468,48 +451,36 @@ function getTimelineLabelForDisplay(projectType: string, timeline: string): stri
 }
 
 function restoreLeadSuccessState(rawCookie?: string | null): LeadSuccessRestore | null {
-  const source = rawCookie ?? (typeof document !== 'undefined' ? readCookie(LEAD_SUCCESS_COOKIE) : null);
-  if (!source) return null;
+  const parsed = parseLeadSuccessCookie(rawCookie);
+  if (!parsed) return null;
 
-  try {
-    const parsed = JSON.parse(decodeURIComponent(source)) as LeadSuccessCookiePayload;
-    const projectType = typeof parsed.projectType === 'string' ? parsed.projectType : '';
-    if (!projectType) return null;
+  const projectType = parsed.projectType || '';
+  if (!projectType) return null;
 
-    const helpTopics = Array.isArray(parsed.helpTopics)
-      ? parsed.helpTopics.filter((topic): topic is string => typeof topic === 'string')
-      : [];
-    const timeline = typeof parsed.timeline === 'string' ? parsed.timeline : '';
+  const helpTopics = Array.isArray(parsed.helpTopics)
+    ? parsed.helpTopics.filter((topic): topic is string => typeof topic === 'string')
+    : [];
+  const timeline = typeof parsed.timeline === 'string' ? parsed.timeline : '';
 
-    const helpTopicLabels = Array.isArray(parsed.helpTopicLabels) && parsed.helpTopicLabels.every((label) => typeof label === 'string')
-      ? (parsed.helpTopicLabels as string[])
-      : getHelpTopicLabelsForDisplay(projectType, helpTopics);
-    const timelineLabel = typeof parsed.timelineLabel === 'string' && parsed.timelineLabel
-      ? parsed.timelineLabel
-      : getTimelineLabelForDisplay(projectType, timeline);
+  const helpTopicLabels = Array.isArray(parsed.helpTopicLabels) && parsed.helpTopicLabels.every((label) => typeof label === 'string')
+    ? (parsed.helpTopicLabels as string[])
+    : getHelpTopicLabelsForDisplay(projectType, helpTopics);
+  const timelineLabel = typeof parsed.timelineLabel === 'string' && parsed.timelineLabel
+    ? parsed.timelineLabel
+    : getTimelineLabelForDisplay(projectType, timeline);
 
-    return {
-      formPreset: {
-        projectType,
-        helpTopics,
-        timeline,
-      },
-      meta: {
-        projectType,
-        helpTopicLabels,
-        timelineLabel: timelineLabel || null,
-      },
-    };
-  } catch {
-    if (typeof document !== 'undefined') deleteCookie(LEAD_SUCCESS_COOKIE);
-    return null;
-  }
-}
-
-function persistLeadSuccessCookie(payload: LeadSuccessCookiePayload) {
-  try {
-    writeCookie(LEAD_SUCCESS_COOKIE, JSON.stringify(payload), LEAD_SUCCESS_MAX_AGE);
-  } catch { }
+  return {
+    formPreset: {
+      projectType,
+      helpTopics,
+      timeline,
+    },
+    meta: {
+      projectType,
+      helpTopicLabels,
+      timelineLabel: timelineLabel || null,
+    },
+  };
 }
 
 type Action =
@@ -895,16 +866,16 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
 
   const stepMotionProps = reduceMotion
     ? {
-        initial: false,
-        animate: { x: 0 },
-        exit: { x: 0 },
-      }
+      initial: false,
+      animate: { x: 0 },
+      exit: { x: 0 },
+    }
     : {
-        initial: isInitialRender ? false : { x: 40 },
-        animate: { x: 0 },
-        exit: { x: -30 },
-        transition: { duration: 0.3, ease: 'easeOut' as const },
-      };
+      initial: isInitialRender ? false : { x: 40 },
+      animate: { x: 0 },
+      exit: { x: -30 },
+      transition: { duration: 0.3, ease: 'easeOut' as const },
+    };
 
   if (status === 'success') {
     const successLinks = getSuccessLinks(form.projectType);
@@ -1414,16 +1385,20 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
                       className="h-4 w-4 rounded border-slate-300 text-[--brand-blue] focus:ring-[--brand-blue]"
                     />
                     <span>
-                      By submitting this form, I agree to receive transactional and marketing communications from SonShine Roofing Inc.
+                      <div className="text-xs text-slate-500">
+                        By submitting this form, you agree to receive transactional and promotional
+                        communications from Sonshine Roofing. Message frequency may vary. Message and
+                        data rates may apply. Reply STOP to opt out at any time.
+                      </div>
                     </span>
                   </label>
 
                   <p className="md:col-span-2 text-xs text-slate-500">
                     For more information,{' '}
-                    <a href="/privacy-policy" className="font-semibold text-[--brand-blue] hover:underline">
+                    <SmartLink href="/privacy-policy" className="font-semibold text-[--brand-blue] hover:underline">
                       view our privacy policy
-                    </a>
-                    .
+                      <ArrowUpRight className="h-3 w-3 ml-1 inline" />
+                    </SmartLink>
                   </p>
 
                   <div className="md:col-span-2">
