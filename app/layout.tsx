@@ -224,7 +224,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         id="page-top"
         className="
           min-h-svh flex flex-col
-          bg-neutral-50 text-slate-900 antialiased
+          bg-neutral-100 text-slate-900 antialiased
           selection:bg-[#0045d7] selection:text-white
         "
       >

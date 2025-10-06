@@ -116,7 +116,7 @@ export default function LatestProjectsFilter({ projects, initial = 4, showHeader
         renderFilterTabs()
       )}
 
-      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2">
         {filtered.length > 0 ? (
           filtered.map((project, index) => (
             <ProjectArchiveCard

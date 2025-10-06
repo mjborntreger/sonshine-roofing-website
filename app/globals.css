@@ -332,9 +332,9 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 .hero-cta-glow::before {
   content: "";
   position: absolute;
-  inset: -20%;
+  inset: -10% ;
   border-radius: inherit;
-  background: radial-gradient(circle at 50% 50%, #00e3fe90, transparent 75%);
+  background: radial-gradient(circle at 50% 50%, #00e3fe90, transparent 60%);
   filter: blur(16px);
   opacity: 0.75;
   transition: opacity 0.3s ease;
@@ -394,7 +394,7 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   .btn-brand-blue   { @apply bg-[var(--brand-blue)]   text-white hover:opacity-95 focus-visible:ring-[var(--brand-blue)]; }
   .btn-brand-orange { @apply bg-[var(--brand-orange)] text-white hover:opacity-95 focus-visible:ring-[var(--brand-orange)]; }
   .btn-secondary    { @apply bg-white text-slate-700 border border-slate-100 hover:bg-slate-50 focus-visible:ring-slate-200; }
-  .btn-outline      { @apply bg-transparent text-slate-900 border border-slate-300 hover:bg-slate-50; }
+  .btn-outline      { @apply bg-transparent text-slate-900 border border-slate-300 hover:bg-slate-800; }
   .btn-ghost        { @apply bg-transparent text-slate-900 hover:bg-slate-100; }
 
   /* Ensure anchors inside buttons inherit the button text color and remove underline */

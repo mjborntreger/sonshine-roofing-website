@@ -487,7 +487,7 @@ function MobileMenu() {
             role="menu"
             aria-label="Main"
             className="fixed left-2 right-2 z-[61]
-                       rounded-2xl border bg-white shadow-xl p-2
+                       rounded-3xl border bg-neutral-100 shadow-xl p-2
                        top-[calc(var(--header-h,56px)+8px)]
                        max-h-[calc(100vh-var(--header-h,56px)-24px)] overflow-auto"
           >
@@ -502,7 +502,7 @@ function MobileMenu() {
               >
                 <SmartLink
                   href={ROUTES.home}
-                  className="flex w-full px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
+                  className="flex w-full px-3 py-2 rounded-2xl text-slate-800 hover:bg-neutral-200"
                   onClick={() => setOpen(false)}
                 >
                   <LabelWithIcon label="Home" />
@@ -525,7 +525,7 @@ function MobileMenu() {
                     {!hasChildren && item.href ? (
                       <SmartLink
                         href={item.href}
-                        className="flex w-full items-center justify-between px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
+                        className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-800 hover:bg-neutral-200"
                         onClick={() => setOpen(false)}
                       >
                         <LabelWithIcon label={item.label} />
@@ -535,7 +535,7 @@ function MobileMenu() {
                         {item.href ? (
                           <SmartLink
                             href={item.href}
-                            className="block flex-1 min-w-0 text-left px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
+                            className="block flex-1 min-w-0 text-left px-3 py-2 rounded-2xl text-slate-800 hover:bg-neutral-200"
                             onClick={() => setOpen(false)}
                           >
                             <LabelWithIcon label={item.label} />
@@ -546,7 +546,7 @@ function MobileMenu() {
                             onClick={() => toggle(k)}
                             aria-expanded={!!expanded[k]}
                             aria-controls={`section-${k}`}
-                            className="px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50 text-left flex-1"
+                            className="px-3 py-2 rounded-2xl text-slate-800 hover:bg-neutral-200 text-left flex-1"
                           >
                             <LabelWithIcon label={item.label} />
                           </button>
@@ -590,7 +590,7 @@ function MobileMenu() {
                               {c.href ? (
                                 <SmartLink
                                   href={c.href}
-                                  className="flex w-full items-center justify-between px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50"
+                                  className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-700 hover:bg-neutral-200"
                                   data-icon-affordance={showChevron ? "right" : undefined}
                                   onClick={() => setOpen(false)}
                                 >
@@ -620,13 +620,13 @@ function MobileMenu() {
                 // ANIM: Mobile CTA1 stagger — base + NAV length step
                 style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
               >
-                <Button asChild className="w-full h-8 mt-4" variant="brandOrange">
+                <Button asChild className="w-full h-8 mt-4" variant="brandOrange" size="lg">
                   <SmartLink
                     href={"https://www.myquickroofquote.com/contractors/sonshine-roofing" as Route}
                     onClick={() => setOpen(false)}
                     className="flex items-center justify-center gap-x-2"
                   >
-                    <Zap className="w-4 h-4 shrink-0 text-white" aria-hidden="true" />
+                    <Zap className="w-4 h-4 text-white" aria-hidden="true" />
                     Free 60-second Quote
                   </SmartLink>
                 </Button>

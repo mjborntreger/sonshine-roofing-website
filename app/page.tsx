@@ -15,8 +15,10 @@ import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import LeadFormSection from "@/components/LeadFormSection";
 
 // ===== STYLE CONSTANTS ===== //
-const layout = "mx-auto w-full max-w-[1280px]";
-const layoutWide = "mx-auto w-full bg-slate-100";
+const leadFormLayout = "mx-auto w-full bg-slate-100";
+const reviewsLayout = "mx-auto w-full bg-[#cef3ff]"
+const narrowLayout = "mx-auto w-full max-w-[1280px]";
+const layoutWide = "mx-auto w-full";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
@@ -83,44 +85,32 @@ export default async function Page() {
   return (
     <>
       <Hero />
-      <div className={layout}>
-        <div className="mx-2 mt-16">
+      <div className={leadFormLayout}>
+        <div className="max-w-[1600px] mx-auto py-16">
           <LeadFormSection />
         </div>
       </div>
-      <div className={layoutWide}>
+      <div className={reviewsLayout}>
         <ReviewsCarousel />
       </div>
-      <div className={layout}>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
+      <div className={narrowLayout}>
+        <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
             <div className="mx-2">
               <WhyHomeownersChooseUs />
-            </div>
-            {/* Quick Links | Mobile Only */}
-            <div className="block px-4 md:hidden">
-              <ServicesQuickLinks />
-              <ResourcesQuickLinks />
-            </div>
-            <div className="mx-2">
               <BestOfTheBest />
+              <LatestProjectsFilter projects={projects} initial={4} />
+              <LatestPostsFilters posts={posts} initial={4} />
             </div>
           </div>
 
           {/* Sticky Section */}
-          <div className="hidden lg:block min-w-0 lg:sticky lg:top-16 self-start px-4">
+          <div className="hidden lg:block min-w-0 lg:sticky lg:top-48 self-start px-4">
             <ServicesQuickLinks />
             <ResourcesQuickLinks />
           </div>
 
         </div>
-      </div>
-
-
-
-      <div className={layoutWide}>
-        <LatestProjectsFilter projects={projects} initial={4} />
-        <LatestPostsFilters posts={posts} initial={4} />
       </div>
 
 

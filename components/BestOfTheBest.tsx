@@ -7,7 +7,7 @@ const imageClasses = "transition-transform duration-200 ease-out group-hover:tra
 
 export default async function bestOfTheBest() {
   return (
-    <div className="px-4 my-24">
+    <div className="px-4 py-32">
       <div 
         aria-label="botb-title" 
         id="botb-title"
@@ -19,7 +19,7 @@ export default async function bestOfTheBest() {
 
 
       {/* Badges: responsive, semantic list with subtle hover affordances */}
-      <ul className="mt-10 grid grid-cols-5 place-items-center justify-center gap-4">
+      <ul className="my-16 grid grid-cols-5 place-items-center justify-center gap-4">
         <li className="group relative">
           <Image
             src="https://next.sonshineroofing.com/wp-content/uploads/2021-Best-of-the-Best-award-icon.bak-175x175.webp"

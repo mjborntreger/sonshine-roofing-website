@@ -5,6 +5,7 @@ const summaryStyles = "flex items-center justify-between cursor-pointer select-n
 const chevronStyles = "h-5 w-5 transition-transform group-open:rotate-180";
 const iconStyles = "h-5 w-5 text-[--brand-blue]";
 const pStyles = "accordion-motion prose px-4 pb-4 pt-0";
+const cardStyles = "rounded-3xl border border-slate-200 bg-white p-4 h-fit";
 
 
 export default async function RepairVsReplace() {
@@ -17,7 +18,7 @@ export default async function RepairVsReplace() {
                     Repair vs. Replace
                 </h2>
             <div className="grid md:grid-cols-2 gap-4">
-                <div className="rounded-xl border border-slate-200 bg-white p-4">
+                <div className={cardStyles}>
                     <span className="flex items-center gap-2">
                         <Hammer className={iconStyles} aria-hidden="true" />
                         <h3 className="m-0">Repair when...</h3>
@@ -89,7 +90,7 @@ export default async function RepairVsReplace() {
                         </details>
                     </div>
                 </div>
-                <div className="rounded-xl border border-slate-200 bg-white p-4">
+                <div className={cardStyles}>
                     <span className="flex items-center gap-2">
                         <House className={iconStyles} aria-hidden="true" />
                         <h3 className="m-0">Replace when...</h3>

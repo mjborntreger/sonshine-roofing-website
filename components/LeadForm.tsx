@@ -574,7 +574,7 @@ export default function LeadForm() {
       const behavior = reduceMotion ? 'auto' : 'smooth';
       window.requestAnimationFrame(() => {
         const rect = container.getBoundingClientRect();
-        const offset = 96;
+        const offset = 28;
         const target = Math.max(rect.top + window.scrollY - offset, 0);
         window.scrollTo({ top: target, behavior });
       });
@@ -758,11 +758,11 @@ export default function LeadForm() {
   const progressPercent = ((activeStepIndex + 1) / totalSteps) * 100;
 
   const stepTransition = reduceMotion
-    ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
+    ? { initial: { x: 0 }, animate: { x: 0 }, exit: { x: 0 } }
     : {
-      initial: { opacity: 0, x: 40 },
-      animate: { opacity: 1, x: 0 },
-      exit: { opacity: 0, x: -30 },
+      initial: { x: 40 },
+      animate: { x: 0 },
+      exit: { x: -30 },
       transition: { duration: 0.3, ease: 'easeOut' as const },
     };
 
@@ -829,7 +829,7 @@ export default function LeadForm() {
   }
 
   return (
-    <form ref={formRef} className="mt-8 mb-24" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="md:pt-8 pb-24" onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <input type="hidden" name="projectType" value={form.projectType} />
       <input type="hidden" name="helpTopics" value={helpSummary} />

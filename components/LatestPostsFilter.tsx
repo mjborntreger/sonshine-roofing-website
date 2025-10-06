@@ -116,7 +116,7 @@ export default function LatestPostsFilter({ posts, initial = 4, showHeader = tru
         renderFilterTabs()
       )}
 
-      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2">
         {filtered.length > 0 ? (
           filtered.map((post, index) => (
             <BlogArchiveCard
