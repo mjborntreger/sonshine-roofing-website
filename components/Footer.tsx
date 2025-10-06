@@ -166,9 +166,9 @@ export default function Footer() {
               data-icon-affordance="up-right"
               target="_blank"
             >
-              <Star className="h-3 w-3 mr-2 text-white" />
+              <Star className="h-3 w-3 md:h-4 md:w-4 mr-2 text-white" />
               Leave a Review
-              <ArrowUpRight className="inline h-3 w-3 ml-1 text-white icon-affordance" />
+              <ArrowUpRight className="inline h-3 w-3 md:h-4 md:w-4 ml-1 text-white icon-affordance" />
             </SmartLink>
 
             {/* Socials Badges Row */}

@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { Suspense } from "react";
 import LeadForm from "@/components/LeadForm";
 
 function LeadFormFallback() {
@@ -17,22 +16,11 @@ function LeadFormFallback() {
 }
 
 export default function LeadFormSection() {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const isInView = useInView(containerRef, {
-    once: true,
-    margin: "-20% 0px",
-  });
-
   return (
-    <motion.div
-      ref={containerRef}
-      initial={{ opacity: 0, y: 48 }}
-      animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 48 }}
-      transition={{ duration: 0.65, ease: [0.25, 0.8, 0.25, 1] }}
-    >
+    <div>
       <Suspense fallback={<LeadFormFallback />}>
         <LeadForm />
       </Suspense>
-    </motion.div>
+    </div>
   );
 }

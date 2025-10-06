@@ -22,7 +22,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
     <div className={className} style={style}>
       <SmartLink
         href={href}
-        className="group block rounded-2xl focus-visible:outline-none"
+        className="group block rounded-3xl focus-visible:outline-none"
         data-icon-affordance="right"
       >
         <Card className="proj-card overflow-hidden hover:shadow-lg transition">

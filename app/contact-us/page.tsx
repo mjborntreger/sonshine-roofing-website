@@ -91,7 +91,7 @@ export default function Page() {
             </div>
 
             {/* “You'll talk to…” human tile */}
-            <div className="mt-6 not-prose rounded-xl border border-slate-300 bg-white p-6 shadow-md max-w-full">
+            <div className="mt-6 not-prose rounded-3xl border border-slate-300 bg-white p-6 shadow-md max-w-full">
               <OpenOrClosed />
               <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr] mt-8 gap-4 items-center min-w-0">
                 <Image

@@ -494,6 +494,7 @@ export default function LeadForm() {
   const reduceMotion = useReducedMotion();
   const prevStepRef = useRef(0);
   const delayScrollTimeoutRef = useRef<number | null>(null);
+  const hasMountedRef = useRef(false);
 
   const activeStepId = STEP_ORDER[activeStepIndex];
   const totalSteps = STEP_ORDER.length;
@@ -506,6 +507,10 @@ export default function LeadForm() {
     const campaign = searchParams?.get('utm_campaign') || undefined;
     return { source, medium, campaign };
   }, [searchParams]);
+
+  useEffect(() => {
+    hasMountedRef.current = true;
+  }, []);
 
   const onSelect = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     dispatch({ type: 'update', field, value });
@@ -757,14 +762,20 @@ export default function LeadForm() {
   const { title, description } = getStepMeta(activeStepId);
   const progressPercent = ((activeStepIndex + 1) / totalSteps) * 100;
 
-  const stepTransition = reduceMotion
-    ? { initial: { x: 0 }, animate: { x: 0 }, exit: { x: 0 } }
+  const isInitialRender = !hasMountedRef.current;
+
+  const stepMotionProps = reduceMotion
+    ? {
+        initial: false,
+        animate: { x: 0 },
+        exit: { x: 0 },
+      }
     : {
-      initial: { x: 40 },
-      animate: { x: 0 },
-      exit: { x: -30 },
-      transition: { duration: 0.3, ease: 'easeOut' as const },
-    };
+        initial: isInitialRender ? false : { x: 40 },
+        animate: { x: 0 },
+        exit: { x: -30 },
+        transition: { duration: 0.3, ease: 'easeOut' as const },
+      };
 
   if (status === 'success') {
     const successLinks = getSuccessLinks(form.projectType);
@@ -869,7 +880,7 @@ export default function LeadForm() {
           )}
 
           <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={activeStepId} {...stepTransition}>
+            <motion.div key={activeStepId} {...stepMotionProps}>
               {activeStepId === 'need' && (
                 <div className="grid gap-4 md:grid-cols-2">
                   {PROJECT_OPTIONS.map((option) => {

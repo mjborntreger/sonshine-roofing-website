@@ -166,8 +166,8 @@ export default function AcculynxLeadForm() {
         />
 
         <div className="webLeadForm__submitDiv">
-          <input id="LeadFormSubmit" className="webLeadForm__submit" type="submit" value="Submit" name="submit" />
           <span className="webLeadForm__label webLeadForm__requiredLabel"> * Required </span>
+          <input id="LeadFormSubmit" className="webLeadForm__submit" type="submit" value="Submit" name="submit" />
         </div>
       </form>
 
@@ -185,7 +185,7 @@ export default function AcculynxLeadForm() {
           width: 100%;
           background-color: #CEF3FF;
           border: 1px solid #0045d7;
-          border-radius: 8px;
+          border-radius: 24px;
           box-shadow: 0 1px 2px rgba(0,0,0,.06);
           color: #000000;
           position: relative;
@@ -227,8 +227,8 @@ export default function AcculynxLeadForm() {
         .webLeadForm__stateZipDiv .webLeadForm__fieldDiv:first-child { margin: 0 10px 0 0; width: 50%; }
         .webLeadForm__stateZipDiv .webLeadForm__fieldDiv:last-child { margin: 0 0 0 10px; width: 50%; }
         .webLeadForm__submitDiv { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: nowrap; }
-        .webLeadForm__submit { background-color: #FB9216; color: #FFFFFF; margin-left: 20px; padding: 8px 20px; font-size: 13px; font-weight: 600; border-radius: 6px; border: none; cursor: pointer; text-transform: uppercase; }
-        .webLeadForm__requiredLabel { font-size: 11px; padding: 0; margin-right: 20px; }
+        .webLeadForm__submit { background-color: #FB9216; color: #FFFFFF; margin-right: 20px; padding: 8px 20px; font-size: 13px; font-weight: 600; border-radius: 24px; border: none; cursor: pointer; text-transform: uppercase; }
+        .webLeadForm__requiredLabel { font-size: 11px; padding: 0; margin-left: 20px; }
       `}</style>
     </div>
   );

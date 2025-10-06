@@ -7,6 +7,8 @@ import EmblaCarousel, {
 } from 'embla-carousel';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import SmartLink from './SmartLink';
+import { ArrowUpRight } from 'lucide-react';
 
 type Review = {
   author_name: string;
@@ -222,7 +224,7 @@ export default function ReviewsSlider({
                 aria-label={`Open full review by ${r.author_name}`}
                 className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_80%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none bg-transparent p-0 m-0 text-left cursor-pointer"
               >
-                <article className="h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
+                <article className="h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
                     <h3 className="m-0 font-bold text-lg text-slate-900">{r.author_name}</h3>
                     <div className="mt-1 flex items-center gap-1 text-[#fb9216]">
@@ -260,7 +262,7 @@ export default function ReviewsSlider({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="review-title"
-                className="relative w-full max-w-[720px] overflow-hidden rounded-2xl border border-slate-300 bg-white shadow-2xl"
+                className="relative w-full max-w-[720px] overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
@@ -293,14 +295,15 @@ export default function ReviewsSlider({
                   <p className="m-0 text-base leading-7 text-slate-700 whitespace-pre-wrap">{r.text || ''}</p>
                 </div>
                 <div className="flex justify-end gap-2 border-t border-slate-300 px-5 py-3">
-                  <a
+                  <SmartLink
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer nofollow"
-                    className="inline-flex items-center rounded-md bg-[#0045d7] px-3 py-2 font-semibold text-white hover:opacity-90"
+                    className="inline-flex items-center rounded-full bg-[#0045d7] px-4 py-2 font-semibold text-white hover:opacity-90"
                   >
                     View on Google
-                  </a>
+                    <ArrowUpRight className="h-4 w-4 inline ml-2" />
+                  </SmartLink>
                 </div>
               </div>
             </div>
