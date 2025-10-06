@@ -119,7 +119,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
             {/* Search (client-side, exact phrase like Blog) */}
             <div className="mt-6" role="search">
               <div className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
-                <div className="flex inline-flex w-full items-start">
+                <div className="inline-flex w-full items-start">
                   <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
                   <input
                     id="faq-search"

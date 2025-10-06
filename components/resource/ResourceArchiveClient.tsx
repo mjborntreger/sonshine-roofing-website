@@ -417,7 +417,7 @@ export default function ResourceArchiveClient<Item>({
         role="search"
       >
         <div className="flex flex-col gap-4">
-          <div className="flex inline-flex w-full items-start">
+          <div className="inline-flex w-full items-start">
             <label htmlFor={`${kind}-search`} className="sr-only">Search {labels.itemPlural}</label>
             <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
             <input

@@ -18,6 +18,8 @@ import {
   ExternalLink,
   ArrowUpRight,
   CalendarDays,
+  Menu,
+  SquareMenu,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
@@ -467,15 +469,15 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
   }
 
   return (
-    <form className="mt-8" onSubmit={handleSubmit} noValidate>
+    <form className="not-prose mt-8" onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <div className="mx-auto w-full max-w-3xl rounded-3xl border border-blue-100 bg-white shadow-md">
         <div className="border-b rounded-t-3xl border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
-          <h2 className="top-24 flex items-center gap-2" id="book-an-appointment">
-            <CalendarDays className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+          <h2 className="flex items-center text-xl md:text-2xl font-bold gap-2" id="book-an-appointment">
+            <SquareMenu className="h-5 w-5 md:h-6 md:w-6 text-[--brand-blue]" aria-hidden="true" />
             <span>Contact Our Office</span>
           </h2>
-          <p className="text-slate-700 text-sm pb-2">
+          <p className="text-slate-500 mt-1 text-xs pb-2">
             We respond within 30 minutes during business hours
           </p>
         </div>
@@ -511,7 +513,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
                           <Icon className="h-4 w-4" aria-hidden="true" />
                           {selected ? 'Selected' : 'Tap to select'}
                         </div>
-                        <h4 className="mt-4 text-md md:text-xl font-semibold text-slate-900">{label}</h4>
+                        <h4 className="mt-4 text-md md:text-lg font-semibold text-slate-900">{label}</h4>
                         <div className="mt-1 text-xs text-slate-500">{description}</div>
                       </div>
                     </button>
@@ -522,7 +524,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
             </section>
 
             <section>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">When would you like help?</p>
+              <p className="text-xs mt-2 font-semibold uppercase tracking-wide text-slate-500">When would you like help?</p>
               <div className="mt-3 flex flex-wrap gap-3">
                 {STANDARD_TIMELINE_OPTIONS.map(({ value, label }) => {
                   const selected = form.timeline === value;
@@ -546,7 +548,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
             </section>
 
             <section>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">How can we reach you?</p>
+              <p className="text-xs mt-2 font-semibold uppercase tracking-wide text-slate-500">How can we reach you?</p>
               <div className="mt-3 grid gap-4 md:grid-cols-2">
                 <label className="block text-sm font-medium text-slate-700">
                   First name
@@ -600,7 +602,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
             </section>
 
             <section>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Where is the project?</p>
+              <p className="text-xs mt-2 font-semibold uppercase tracking-wide text-slate-500">Where are you located?</p>
               <div className="mt-3 grid gap-4 md:grid-cols-2">
                 <label className="md:col-span-2 block text-sm font-medium text-slate-700">
                   Street address
@@ -668,7 +670,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
             </section>
 
             <section>
-              <label className="block text-sm font-medium text-slate-700">
+              <label className="block mt-2 text-md font-medium text-slate-700">
                 Anything else you’d like us to know?
                 <textarea
                   name="notes"

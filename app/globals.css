@@ -5,43 +5,51 @@
 /* ---------------------------------------
    Brand Tokens
 ----------------------------------------*/
-:root {
-  --radius: 1rem;
+@layer base {
+  :root {
+    --radius: 1rem;
 
-  /* Brand palette */
-  --brand-blue:  #0045d7; /* primary */
-  --brand-cyan:  #00e3fe; /* gradient partner */
-  --brand-orange:#fb9216; /* accent/CTA */
+    /* Brand palette */
+    --brand-blue:  #0045d7; /* primary */
+    --brand-cyan:  #00e3fe; /* gradient partner */
+    --brand-orange: #fb9216; /* accent/CTA */
 
-  /* Neutrals */
-  --ink-900: #0b1220;
-  --ink-700: #334155;
-  --ink-600: #475569;
-  --ink-500: #64748b;
-  --paper:   #ffffff;
+    /* Neutrals */
+    --ink-900: #0b1220;
+    --ink-700: #334155;
+    --ink-600: #475569;
+    --ink-500: #64748b;
+    --paper:   #ffffff;
 
-  /* Shadows */
-  --elev-1: 0 1px 2px rgba(2, 6, 23, .06), 0 1px 1px rgba(2, 6, 23, .04);
-  --elev-2: 0 8px 24px rgba(2, 6, 23, .10);
+    /* Shadows */
+    --elev-1: 0 1px 2px rgba(2, 6, 23, .06), 0 1px 1px rgba(2, 6, 23, .04);
+    --elev-2: 0 8px 24px rgba(2, 6, 23, .10);
 
-  /* Sticky offset */
-  --sticky-offset: 6rem;
+    /* Sticky offset */
+    --sticky-offset: 6rem;
 
-/* Skeleton defaults */
---skeleton-base: rgba(0, 0, 0, 0.06);
---skeleton-highlight: rgba(255, 255, 255, 0.35);
---skeleton-radius: 0.5rem;
+    /* Skeleton defaults */
+    --skeleton-base: rgba(0, 0, 0, 0.06);
+    --skeleton-highlight: rgba(255, 255, 255, 0.35);
+    --skeleton-radius: 0.5rem;
+  }
+
+  html {
+    scroll-padding-top: var(--sticky-offset);
+    font-feature-settings: "cv02","cv03","cv04","cv11";
+    scroll-behavior: auto;
+    background: var(--paper);
+    color: var(--ink-900);
+  }
+
+  :is(h1,h2,h3,h4,h5,h6,section,article,div,main)[id] {
+    scroll-margin-top: var(--sticky-offset);
+  }
+
+  html[data-scroll-behavior="smooth"] {
+    scroll-behavior: smooth;
+  }
 }
-html { scroll-padding-top: var(--sticky-offset); }
-:is(h1,h2,h3,h4,h5,h6,section,article,div,main)[id] { scroll-margin-top: var(--sticky-offset); }
-html {
-  font-feature-settings: "cv02","cv03","cv04","cv11";
-  scroll-behavior: auto;
-  background: var(--paper);
-  color: var(--ink-900);
-}
-
-html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 
 /* ---------------------------------------
    Utilities
@@ -292,15 +300,25 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 .bounce {
   transform: scale(1);
   transition: transform 0.5s cubic-bezier(0.8, -0.5, 0.2, 1.8);
-  
-  &:active {
-    transform:scale(1.2);
+}
+
+.bounce:active {
+  transform: scale(1.2);
+}
+
+.bounce:hover {
+  transform: scale(1.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bounce {
+    transition-duration: 0ms;
   }
-  &:hover {
-    transform:scale(1.1);
-  }
-  @media prefers-reduced-motion{
-    transform:scale(1)
+
+  .bounce,
+  .bounce:active,
+  .bounce:hover {
+    transform: scale(1);
   }
 }
 
@@ -406,8 +424,8 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
   }
 
   /* Sizes */
-  .btn-hero { @apply h-16 px-8 text-3xl}
-  .btn-xl { @apply h-14 px-6 text-2xl }
+  .btn-hero { @apply h-16 px-8 text-3xl; }
+  .btn-xl { @apply h-14 px-6 text-2xl; }
   .btn-lg { @apply h-11 px-6 text-lg; }
   .btn-md { @apply h-10 px-4 text-base; }
   .btn-sm { @apply h-9  px-3 text-sm; }

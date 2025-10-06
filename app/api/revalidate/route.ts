@@ -10,12 +10,25 @@ const ok = (data: unknown, init: ResponseInit = {}) =>
     headers: { "Cache-Control": "no-store", ...(init.headers || {}) },
   });
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 function ensureLeadingSlash(p: string) {
   return p.startsWith("/") ? p : `/${p}`;
 }
 function uniq<T>(xs: T[]) {
   return Array.from(new Set(xs.filter(Boolean)));
 }
+
+const toStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item));
+  }
+  if (value === undefined || value === null) {
+    return [];
+  }
+  return [String(value)];
+};
 function authorized(req: Request) {
   const url = new URL(req.url);
   const incoming =
@@ -33,19 +46,21 @@ function authorized(req: Request) {
 export async function POST(req: Request) {
   if (!authorized(req)) return ok({ error: "Unauthorized" }, { status: 401 });
 
-  let body: any = {};
+  let rawBody: unknown = {};
   try {
     if (req.headers.get("content-type")?.includes("application/json")) {
-      body = await req.json();
+      rawBody = await req.json();
     }
   } catch {
     // ignore bad JSON; we'll just treat as empty body
   }
 
+  const body = isRecord(rawBody) ? rawBody : {};
+
   const paths = uniq<string>(
-    (body.paths ?? (body.path ? [body.path] : [])).map(String).map(ensureLeadingSlash)
+    [...toStringArray(body.paths), ...toStringArray(body.path)].map(ensureLeadingSlash)
   );
-  const tags = uniq<string>((body.tags ?? (body.tag ? [body.tag] : [])).map(String));
+  const tags = uniq<string>([...toStringArray(body.tags), ...toStringArray(body.tag)]);
 
   const revalidated = { paths: [] as string[], tags: [] as string[] };
 

@@ -9,6 +9,11 @@ import {
   type ContactLeadInput,
 } from '@/lib/validation';
 
+type UnknownRecord = Record<string, unknown>;
+
+const isRecord = (value: unknown): value is UnknownRecord =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
 function getAllowedOrigins(): string[] {
   const raw = process.env.ALLOWED_ORIGIN || '';
   return raw
@@ -36,6 +41,8 @@ function json(status: number, body: unknown, headers: Record<string, string> = {
   });
 }
 
+type TurnstileResponse = { success: boolean; 'error-codes'?: string[] };
+
 async function verifyTurnstile(token: string, remoteip?: string | null) {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) return { ok: false, error: 'Server misconfigured (Turnstile secret)' } as const;
@@ -53,7 +60,14 @@ async function verifyTurnstile(token: string, remoteip?: string | null) {
   });
 
   if (!res.ok) return { ok: false, error: `Turnstile verify failed (${res.status})` } as const;
-  const data = (await res.json()) as { success: boolean; 'error-codes'?: string[] };
+
+  let data: TurnstileResponse;
+  try {
+    data = (await res.json()) as TurnstileResponse;
+  } catch {
+    return { ok: false, error: 'Turnstile: invalid response' } as const;
+  }
+
   if (!data.success) {
     return { ok: false, error: `Turnstile: ${data['error-codes']?.join(', ') || 'unknown'}` } as const;
   }
@@ -317,15 +331,29 @@ async function forwardToWP(type: LeadInput['type'], payload: Record<string, unkn
     });
     clearTimeout(timeout);
 
-    const data = await res.json().catch(() => ({} as any));
-    if (!res.ok || !data?.ok) {
-      return { ok: false, status: res.status || 502, error: data?.error || 'Upstream send failed' } as const;
+    let data: unknown;
+    try {
+      data = await res.json();
+    } catch {
+      data = null;
+    }
+
+    const dataRecord = isRecord(data) ? data : {};
+    const upstreamOk = dataRecord.ok === true;
+    const errorMessage = typeof dataRecord.error === 'string' ? dataRecord.error : 'Upstream send failed';
+
+    if (!res.ok || !upstreamOk) {
+      return { ok: false, status: res.status || 502, error: errorMessage } as const;
     }
     return { ok: true } as const;
-  } catch (err: any) {
+  } catch (err: unknown) {
     clearTimeout(timeout);
-    if (err?.name === 'AbortError') return { ok: false, status: 504, error: 'Upstream timeout' } as const;
-    if (process.env.NODE_ENV !== 'production') console.error('Lead forward error', err);
+    if (err instanceof Error && err.name === 'AbortError') {
+      return { ok: false, status: 504, error: 'Upstream timeout' } as const;
+    }
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Lead forward error', err);
+    }
     return { ok: false, status: 502, error: 'Upstream error' } as const;
   }
 }
@@ -355,14 +383,14 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let raw: any;
+  let raw: unknown;
   try {
     raw = await req.json();
   } catch {
     return json(400, { ok: false, error: 'Invalid JSON' });
   }
 
-  if (raw && isHoneypotTripped(raw)) {
+  if (isRecord(raw) && isHoneypotTripped(raw)) {
     return json(200, { ok: true });
   }
 

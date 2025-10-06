@@ -38,7 +38,7 @@ export default function Hero() {
         />
 
         {/* Transparent gradient overlay for legibility */}
-        <div className="pointer-events-none absolute bottom-8 rounded-t-[192px] inset-x-0 h-[125%] top-[-180px] overflow-hidden bottom-8 -z-10 bg-gradient-to-b from-black/80 via-black/40 to-transparent" />
+        <div className="pointer-events-none absolute rounded-t-[192px] inset-x-0 h-[125%] top-[-180px] overflow-hidden bottom-8 -z-10 bg-gradient-to-b from-black/80 via-black/40 to-transparent" />
 
 
 
@@ -58,7 +58,7 @@ export default function Hero() {
           </h1>
         </div>
         <SmartLink
-          className="hero-cta-glow relative mt-16 md:mt-32 lg:mt-32 flex w-full flex-col items-center border-t border-[--brand-cyan] bg-[--brand-blue] py-4 md:py-8 px-6 md:px-12 text-center shadow-sm hover:shadow-lg no-underline transition-shadow hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--brand-cyan] md:p-6"
+          className="hero-cta-glow relative mt-16 md:mt-32 lg:mt-32 flex w-full flex-col items-center bg-[--brand-blue] py-4 md:py-8 px-6 md:px-12 text-center shadow-sm no-underline transition-shadow hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--brand-cyan] md:p-6"
           href="#get-started"
           onKeyDown={handleCtaKeyDown}
           aria-label="Scroll to the quick roofing quiz"
