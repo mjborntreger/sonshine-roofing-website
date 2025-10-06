@@ -839,19 +839,19 @@ export default function LeadForm() {
       <input type="hidden" name="notes" value={form.notes} />
 
       <div id="get-started" className="overflow-hidden mx-2 rounded-3xl border border-blue-100 bg-white shadow-xl">
-        <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 px-12 py-6">
+        <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-wide text-[--brand-blue]">Step {activeStepIndex + 1} of {totalSteps}</p>
-              <h3 className="mt-3 mb-4 text-2xl md:text-5xl font-semibold text-slate-900">{title}</h3>
-              <p className="mt-3 text-sm text-slate-600">{description}</p>
+              <h3 className="mt-3 mb-4 text-xl md:text-3xl font-semibold text-slate-900">{title}</h3>
+              <p className="mt-3 text-xs md:text-sm text-slate-600">{description}</p>
             </div>
-            <div className="relative aspect-[21/9] h-[128px] w-[125px] mb-4">
+            <div className="relative aspect-[21/9] h-[54px] w-[158px] mb-4">
               <Image
                 src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
                 alt="sonshine logo, no swoosh"
-                width={158.5}
-                height={54.5}
+                width={158}
+                height={54}
                 className="absolute top-[20px] right-0"
               />
             </div>
@@ -861,7 +861,7 @@ export default function LeadForm() {
           </div>
         </div>
 
-        <div className="px-6 py-6">
+        <div className="p-6">
           {globalError && (
             <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {globalError}
@@ -871,7 +871,7 @@ export default function LeadForm() {
           <AnimatePresence mode="wait" initial={false}>
             <motion.div key={activeStepId} {...stepTransition}>
               {activeStepId === 'need' && (
-                <div className="px-4 py-2 grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-2">
                   {PROJECT_OPTIONS.map((option) => {
                     const { value, label, description, icon: Icon, accent, action } = option;
                     const selectable = action === 'advance' && isJourneyKey(value);
@@ -882,7 +882,7 @@ export default function LeadForm() {
                         type="button"
                         onClick={() => handleProjectOption(option)}
                         className={cn(
-                          'group flex h-full flex-col justify-between rounded-2xl border bg-white px-4 py-5 text-left shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                          'group flex h-full flex-col justify-between rounded-3xl border bg-white px-4 py-5 text-left shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                           selected
                             ? 'border-[--brand-blue] shadow-[0_10px_25px_rgba(15,76,129,0.12)]'
                             : 'border-slate-200 hover:-translate-y-0.5 hover:shadow-lg'
@@ -894,12 +894,11 @@ export default function LeadForm() {
                             <Icon className="h-4 w-4" aria-hidden="true" />
                             {selectable ? (selected ? 'Selected' : 'Tap to select') : 'Opens a new page'}
                           </div>
-                          <h4 className="mt-4 text-lg md:text-xl font-semibold text-slate-900">{label}</h4>
-                          <p className="mt-2 text-sm md:text-md text-slate-600">{description}</p>
-                        </div>
-                        <div className="mt-4 flex items-center justify-between text-xs font-semibold text-slate-500">
-                          <span>{selectable ? 'Guided resources included' : 'Takes you right there'}</span>
-                          <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1" aria-hidden="true" />
+                          <h4 className="mt-4 text-md md:text-xl font-semibold text-slate-900">{label}</h4>
+                          <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                            <p className="text-xs md:text-md text-slate-500">{description}</p>
+                            <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1" aria-hidden="true" />
+                          </div>
                         </div>
                       </button>
                     );

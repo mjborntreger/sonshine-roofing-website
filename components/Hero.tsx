@@ -56,9 +56,6 @@ export default function Hero() {
           <h1 className="max-w-6xl mx-auto text-4xl md:text-5xl lg:text-6xl justify-center font-bold md:leading-[5rem] lg:leading-[5rem] mb-4 text-white">
             Your Trusted Local Roofing Contractor in Sarasota, Manatee, and Charlotte Counties for Over 38 Years
           </h1>
-          <span className="text-white text-neutral-100 shadow-sm border rounded-full backdrop-blur bg-black/20 border-white py-2 px-4">
-            We extend the lifespan of your roof above all else.
-          </span>
         </div>
         <SmartLink
           className="hero-cta-glow relative mt-16 md:mt-32 lg:mt-32 flex w-full flex-col items-center border-t border-[--brand-cyan] bg-[--brand-blue] py-4 md:py-8 px-6 md:px-12 text-center shadow-sm hover:shadow-lg no-underline transition-shadow hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--brand-cyan] md:p-6"
