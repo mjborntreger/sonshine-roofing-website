@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AnalyticsScripts from "@/lib/analytics";
-import { inter } from "@/lib/fonts";
+import { inter, allura } from "@/lib/fonts";
 import Script from "next/script";
 import { Suspense } from "react";
 import GtmRouteChange from "@/lib/gtm-route-change";
@@ -205,7 +205,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={inter.variable}
+      className={`${inter.variable} ${allura.variable}`}
     >
       <head>
         {/* Preconnects for faster YouTube thumbs & embeds */}

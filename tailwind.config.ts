@@ -97,6 +97,7 @@ const config: Config = {
     fontFamily: {
       sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       accent: ["var(--font-inter)", "system-ui", "sans-serif"],
+      script: ["var(--font-allura)", "cursive"],
     },
   },
   plugins: [tailwindcssAnimate, typography],

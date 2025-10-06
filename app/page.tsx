@@ -16,7 +16,7 @@ import LeadFormSection from "@/components/LeadFormSection";
 
 // ===== STYLE CONSTANTS ===== //
 const layout = "mx-auto w-full max-w-[1280px]";
-const layoutWide = "mx-auto w-full max-w-[1600px]";
+const layoutWide = "mx-auto w-full bg-slate-100";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';

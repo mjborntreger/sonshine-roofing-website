@@ -286,35 +286,65 @@ html[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
 }
 
 /* ---------------------------------------
-   Hero arrow nudge animation
+   Bounce animation
 ----------------------------------------*/
-.hero-arrow {
-  --hero-arrow-shift: clamp(0.10rem, 0.8vw, 0.30rem);
-  position: relative;
-  display: inline-flex;
+
+.bounce {
+  transform: scale(1);
+  transition: transform 0.5s cubic-bezier(0.8, -0.5, 0.2, 1.8);
+  
+  &:active {
+    transform:scale(1.2);
+  }
+  &:hover {
+    transform:scale(1.1);
+  }
+  @media prefers-reduced-motion{
+    transform:scale(1)
+  }
 }
 
-.hero-arrow-animate {
-  animation: hero-arrow-nudge 1.8s cubic-bezier(0.33, 1, 0.68, 1) 2;
+.chevron-bob {
+  animation: hero-chevron-bob 1.7s ease-in-out infinite;
 }
 
-@keyframes hero-arrow-nudge {
+@keyframes hero-chevron-bob {
   0%,
   100% {
     transform: translateY(0);
   }
-  42% {
-    transform: translateY(var(--hero-arrow-shift));
-  }
-  68% {
-    transform: translateY(calc(var(--hero-arrow-shift) * 0.35));
+  50% {
+    transform: translateY(6px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-arrow-animate {
+  .chevron-bob {
     animation: none;
   }
+}
+
+.hero-cta-glow {
+  position: relative;
+  z-index: 0;
+}
+
+.hero-cta-glow::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 50%, #00e3fe90, transparent 75%);
+  filter: blur(16px);
+  opacity: 0.75;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.hero-cta-glow:hover::before,
+.hero-cta-glow:focus-visible::before {
+  opacity: 1;
 }
 
 /* ---------------------------------------

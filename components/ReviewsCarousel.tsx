@@ -50,7 +50,7 @@ export default async function ReviewsCarousel() {
 
   return (
     <>
-      <div className="py-16 mb-16">
+      <div className="py-16 mb-16 max-w-[1600px] mx-auto overflow-hidden">
         <h2 className="text-center text-slate-700 text-3xl md:text-5xl mx-2">What Our Customers Say</h2>
         <div className="not-prose text-center mt-8">
           {data?.avg_rating && (
