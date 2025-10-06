@@ -33,10 +33,32 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { writeCookie } from '@/lib/client-cookies';
+import { readCookie, writeCookie, deleteCookie } from '@/lib/client-cookies';
 
 const CONTACT_READY_COOKIE = 'ss_lead_contact_ready';
 const CONTACT_READY_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
+const LEAD_SUCCESS_COOKIE = 'ss_lead_form_success';
+const LEAD_SUCCESS_MAX_AGE = 60 * 60 * 24 * 30;
+
+type LeadSuccessCookiePayload = {
+  projectType: string;
+  helpTopics?: string[];
+  helpTopicLabels?: string[];
+  timeline?: string;
+  timelineLabel?: string;
+  timestamp?: string;
+};
+
+type LeadSuccessRestore = {
+  formPreset: Partial<FormState>;
+  meta: SuccessMeta;
+};
+
+interface SuccessMeta {
+  projectType: string;
+  helpTopicLabels: string[];
+  timelineLabel: string | null;
+}
 
 type JourneyKey = 'repair' | 'retail' | 'maintenance' | 'something-else';
 
@@ -420,6 +442,76 @@ function validateEmail(email: string): boolean {
   return regex.test(email.trim().toLowerCase());
 }
 
+function formatFallbackLabel(value: string | null | undefined): string {
+  if (!value) return '';
+  return value
+    .split(/[-_\s]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+function getHelpTopicLabelsForDisplay(projectType: string, helpTopics: string[]): string[] {
+  if (!helpTopics.length) return [];
+  const journey = getJourneyConfig(projectType);
+  if (!journey) return helpTopics.map((topic) => formatFallbackLabel(topic));
+  const lookup = new Map(journey.helpOptions.map((option) => [option.value, option.label]));
+  return helpTopics.map((topic) => lookup.get(topic) ?? formatFallbackLabel(topic));
+}
+
+function getTimelineLabelForDisplay(projectType: string, timeline: string): string | null {
+  if (!timeline) return null;
+  const journey = getJourneyConfig(projectType);
+  const option = journey?.timelineOptions.find((item) => item.value === timeline);
+  if (option) return option.label;
+  return formatFallbackLabel(timeline) || null;
+}
+
+function restoreLeadSuccessState(rawCookie?: string | null): LeadSuccessRestore | null {
+  const source = rawCookie ?? (typeof document !== 'undefined' ? readCookie(LEAD_SUCCESS_COOKIE) : null);
+  if (!source) return null;
+
+  try {
+    const parsed = JSON.parse(decodeURIComponent(source)) as LeadSuccessCookiePayload;
+    const projectType = typeof parsed.projectType === 'string' ? parsed.projectType : '';
+    if (!projectType) return null;
+
+    const helpTopics = Array.isArray(parsed.helpTopics)
+      ? parsed.helpTopics.filter((topic): topic is string => typeof topic === 'string')
+      : [];
+    const timeline = typeof parsed.timeline === 'string' ? parsed.timeline : '';
+
+    const helpTopicLabels = Array.isArray(parsed.helpTopicLabels) && parsed.helpTopicLabels.every((label) => typeof label === 'string')
+      ? (parsed.helpTopicLabels as string[])
+      : getHelpTopicLabelsForDisplay(projectType, helpTopics);
+    const timelineLabel = typeof parsed.timelineLabel === 'string' && parsed.timelineLabel
+      ? parsed.timelineLabel
+      : getTimelineLabelForDisplay(projectType, timeline);
+
+    return {
+      formPreset: {
+        projectType,
+        helpTopics,
+        timeline,
+      },
+      meta: {
+        projectType,
+        helpTopicLabels,
+        timelineLabel: timelineLabel || null,
+      },
+    };
+  } catch {
+    if (typeof document !== 'undefined') deleteCookie(LEAD_SUCCESS_COOKIE);
+    return null;
+  }
+}
+
+function persistLeadSuccessCookie(payload: LeadSuccessCookiePayload) {
+  try {
+    writeCookie(LEAD_SUCCESS_COOKIE, JSON.stringify(payload), LEAD_SUCCESS_MAX_AGE);
+  } catch { }
+}
+
 type Action =
   | { type: 'update'; field: keyof FormState; value: FormState[keyof FormState] }
   | { type: 'reset' }
@@ -482,12 +574,17 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
   return errors;
 }
 
-export default function LeadForm() {
+export default function LeadForm({ initialSuccessCookie }: { initialSuccessCookie?: string | null } = {}) {
   const router = useRouter();
-  const [form, dispatch] = useReducer(formReducer, INITIAL_STATE);
-  const [activeStepIndex, setActiveStepIndex] = useState(0);
+  const restoredSuccess = useMemo(() => restoreLeadSuccessState(initialSuccessCookie), [initialSuccessCookie]);
+  const [form, dispatch] = useReducer(
+    formReducer,
+    INITIAL_STATE,
+    (initial) => (restoredSuccess ? { ...initial, ...restoredSuccess.formPreset } : initial)
+  );
+  const [activeStepIndex, setActiveStepIndex] = useState(restoredSuccess ? STEP_ORDER.length - 1 : 0);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [status, setStatus] = useState<Status>('idle');
+  const [status, setStatus] = useState<Status>(restoredSuccess ? 'success' : 'idle');
   const [globalError, setGlobalError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -495,6 +592,7 @@ export default function LeadForm() {
   const prevStepRef = useRef(0);
   const delayScrollTimeoutRef = useRef<number | null>(null);
   const hasMountedRef = useRef(false);
+  const [successMeta, setSuccessMeta] = useState<SuccessMeta | null>(restoredSuccess?.meta ?? null);
 
   const activeStepId = STEP_ORDER[activeStepIndex];
   const totalSteps = STEP_ORDER.length;
@@ -565,6 +663,21 @@ export default function LeadForm() {
 
   const handleTimelineSelect = (value: string) => {
     onSelect('timeline', value);
+  };
+
+  const handleResetSuccess = () => {
+    deleteCookie(LEAD_SUCCESS_COOKIE);
+    setSuccessMeta(null);
+    setStatus('idle');
+    setErrors({});
+    setGlobalError(null);
+    setActiveStepIndex(0);
+    dispatch({ type: 'reset' });
+    if (typeof window !== 'undefined') {
+      window.requestAnimationFrame(() => {
+        formRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+      });
+    }
   };
 
   useEffect(() => {
@@ -715,6 +828,22 @@ export default function LeadForm() {
       setStatus('success');
       setErrors({});
       writeCookie(CONTACT_READY_COOKIE, '1', CONTACT_READY_MAX_AGE);
+      const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
+      const timelineLabelDisplay = timelineLabel || getTimelineLabelForDisplay(form.projectType, form.timeline) || null;
+      const successPayload: LeadSuccessCookiePayload = {
+        projectType: form.projectType,
+        helpTopics: form.helpTopics,
+        helpTopicLabels,
+        timeline: form.timeline,
+        timelineLabel: timelineLabelDisplay || undefined,
+        timestamp: new Date().toISOString(),
+      };
+      persistLeadSuccessCookie(successPayload);
+      setSuccessMeta({
+        projectType: form.projectType,
+        helpTopicLabels,
+        timelineLabel: timelineLabelDisplay,
+      });
       try {
         (window as any).dataLayer = (window as any).dataLayer || [];
         (window as any).dataLayer.push({
@@ -780,28 +909,50 @@ export default function LeadForm() {
   if (status === 'success') {
     const successLinks = getSuccessLinks(form.projectType);
     return (
-      <div className="mt-8 w-fit rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-xl">
-        <div className="flex flex-col items-center text-center">
-          <CheckCircle2 className="h-12 w-12 text-emerald-500" aria-hidden="true" />
-          <h3 className="mt-4 text-3xl md:4xl font-semibold text-slate-900">We’ve got it — thank you!</h3>
-          <p className="mt-3 max-w-xl text-sm text-slate-600">
-            Your message is already on the way to our project support team. We’ll reach out shortly with next steps.
-            If a storm is moving in or water is coming inside, call us right now at{' '}
-            <a className="font-semibold text-[--brand-blue]" href="tel:+19418664320">(941) 866-4320</a>.
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">
-            <span className={INFO_BADGE_CLASS}>
-              <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Licensed &amp; insured
-            </span>
-            <span className={INFO_BADGE_CLASS}>
-              <Clock4 className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Typical response under 30 minutes
-            </span>
-            <span className={INFO_BADGE_CLASS}>
-              <Star className="h-4 w-4 text-amber-500" aria-hidden="true" /> 4.8 rating on Google
-            </span>
+      <div className="mt-8 flex justify-center px-4">
+        <div className="w-full max-w-3xl rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-md">
+          <div className="flex flex-col items-center text-center">
+            <CheckCircle2 className="h-12 w-12 text-emerald-500" aria-hidden="true" />
+            <h3 className="mt-4 text-3xl md:4xl font-semibold text-slate-900">We’ve got it — thank you!</h3>
+            <p className="mt-3 max-w-xl text-sm text-slate-600">
+              Your message is already on the way to our project support team. We’ll reach out shortly with next steps.
+              If a storm is moving in or water is coming inside, call us right now at{' '}
+              <a className="font-semibold text-[--brand-blue]" href="tel:+19418664320">(941) 866-4320</a>.
+            </p>
+            {(successMeta?.helpTopicLabels.length || successMeta?.timelineLabel) && (
+              <div className="mt-6 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-left">
+                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-600">What you shared</h4>
+                {successMeta?.timelineLabel && (
+                  <p className="mt-3 text-sm text-slate-600">
+                    <span className="font-semibold text-slate-700">Timeline:</span> {successMeta.timelineLabel}
+                  </p>
+                )}
+                {successMeta?.helpTopicLabels.length ? (
+                  <div className="mt-3">
+                    <p className="text-sm font-semibold text-slate-700">Your priorities:</p>
+                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+                      {successMeta.helpTopicLabels.map((label) => (
+                        <li key={label}>{label}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            )}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">
+              <span className={INFO_BADGE_CLASS}>
+                <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Licensed &amp; insured
+              </span>
+              <span className={INFO_BADGE_CLASS}>
+                <Clock4 className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Typical response under 30 minutes
+              </span>
+              <span className={INFO_BADGE_CLASS}>
+                <Star className="h-4 w-4 text-amber-500" aria-hidden="true" /> 4.8 rating on Google
+              </span>
+            </div>
           </div>
           {successLinks.length > 0 && (
-            <div className="mt-10 w-full max-w-3xl text-left">
+            <div className="mt-10">
               <h4 className="text-lg font-semibold text-slate-900">What to do next</h4>
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 {successLinks.map(({ label, description, href, external, icon: Icon }) => (
@@ -834,6 +985,11 @@ export default function LeadForm() {
               </div>
             </div>
           )}
+          <div className="mt-10 flex justify-center">
+            <Button type="button" variant="brandBlue" onClick={handleResetSuccess}>
+              Start a new request
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -849,7 +1005,7 @@ export default function LeadForm() {
       <input type="hidden" name="bestTime" value={form.bestTime} />
       <input type="hidden" name="notes" value={form.notes} />
 
-      <div id="get-started" className="overflow-hidden mx-2 rounded-3xl border border-blue-100 bg-white shadow-xl">
+      <div id="get-started" className="overflow-hidden mx-2 rounded-3xl border border-blue-100 bg-white shadow-md">
         <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
@@ -921,7 +1077,7 @@ export default function LeadForm() {
               )}
 
               {activeStepId === 'context' && (
-                <div className="px-4 py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+                <div className="py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
                   <div className="space-y-4">
                     {!journey && (
                       <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
@@ -1042,7 +1198,7 @@ export default function LeadForm() {
               )}
 
               {activeStepId === 'contact' && (
-                <div className="px-4 py-2 grid gap-4 md:grid-cols-2">
+                <div className="py-2 grid gap-4 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700">
                     First name*
                     <input
@@ -1141,7 +1297,7 @@ export default function LeadForm() {
               )}
 
               {activeStepId === 'schedule' && (
-                <div className="px-4 py-2 grid gap-4 md:grid-cols-2">
+                <div className="py-2 grid gap-4 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700 md:col-span-2">
                     Street address*
                     <input

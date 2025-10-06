@@ -66,7 +66,7 @@ export default function Hero() {
           <div className="mb-3 px-6 text-xs uppercase text-neutral-300 md:text-md">
             Step 1: Let's get you squared away
           </div>
-          <div className="shadow-sm py-2 text-2xl font-bold md:text-4xl">
+          <div className="py-2 text-2xl font-bold md:text-4xl">
             Get Started
           </div>
           <div className="mt-4 text-sm text-slate-200 md:text-lg">

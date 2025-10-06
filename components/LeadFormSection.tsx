@@ -15,11 +15,11 @@ function LeadFormFallback() {
   );
 }
 
-export default function LeadFormSection() {
+export default function LeadFormSection({ initialSuccessCookie }: { initialSuccessCookie?: string | null }) {
   return (
     <div>
       <Suspense fallback={<LeadFormFallback />}>
-        <LeadForm />
+        <LeadForm initialSuccessCookie={initialSuccessCookie} />
       </Suspense>
     </div>
   );

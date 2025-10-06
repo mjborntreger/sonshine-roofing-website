@@ -13,6 +13,7 @@ import type { Metadata } from 'next';
 import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import LeadFormSection from "@/components/LeadFormSection";
+import { cookies } from 'next/headers';
 
 // ===== STYLE CONSTANTS ===== //
 const leadFormLayout = "mx-auto w-full bg-slate-100";
@@ -74,6 +75,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
+  const cookieStore = await cookies();
+  const leadSuccessCookie = cookieStore.get('ss_lead_form_success')?.value ?? null;
   const projects = await listRecentProjectsPoolForFilters(4, 8);
   const posts = await listRecentPostsPoolForFilters(4, 4);
   const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
@@ -86,8 +89,8 @@ export default async function Page() {
     <>
       <Hero />
       <div className={leadFormLayout}>
-        <div className="max-w-[1600px] mx-auto py-16">
-          <LeadFormSection />
+        <div className="max-w-[1280px] mx-auto py-16">
+          <LeadFormSection initialSuccessCookie={leadSuccessCookie} />
         </div>
       </div>
       <div className={reviewsLayout}>
