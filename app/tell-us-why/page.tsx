@@ -13,10 +13,24 @@ import {
   type FeedbackLeadInput,
 } from "@/lib/contact-lead";
 
+const RATING_VALUES = ["1", "2", "3"] as const;
+type RatingString = (typeof RATING_VALUES)[number];
+
+const ratingLookup: Record<RatingString, 1 | 2 | 3> = {
+  "1": 1,
+  "2": 2,
+  "3": 3,
+};
+
+function isRatingString(value: string): value is RatingString {
+  return (RATING_VALUES as readonly string[]).includes(value);
+}
+
 function TellUsWhyForm() {
   const qs = useSearchParams();
   const ratingParam = qs.get("rating");
-  const rating = ratingParam && ["1", "2", "3"].includes(ratingParam) ? ratingParam : "3"; // default to 3 if missing
+  const rating: RatingString = ratingParam && isRatingString(ratingParam) ? ratingParam : "3"; // default to 3 if missing
+  const ratingValue = ratingLookup[rating];
 
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
   const [err, setErr] = useState<string | null>(null);
@@ -75,7 +89,7 @@ function TellUsWhyForm() {
       lastName: last,
       email,
       phone: normalizedPhone,
-      rating: Number(rating),
+      rating: ratingValue,
       message,
       cfToken,
       hp_field: hp_field || undefined,
@@ -95,7 +109,7 @@ function TellUsWhyForm() {
     const result = await submitLead(payload, {
       gtmEvent: {
         event: "feedback_submitted",
-        rating,
+        rating: ratingValue,
         page: "/tell-us-why",
       },
       contactReadyCookie: false,
