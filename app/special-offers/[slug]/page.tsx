@@ -133,7 +133,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   }
 
     return (
-        <div className="bg-neutral-50">
+        <div>
             <section>
                 <Container>
                     <div className="max-w-3xl space-y-6 rounded-2xl mt-24">
