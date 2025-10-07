@@ -24,7 +24,6 @@ import {
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { Route } from "next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/lib/routes";
@@ -58,9 +57,9 @@ function MenuToggleIcon({ open }: { open: boolean }) {
 
   if (prefersReducedMotion) {
     return open ? (
-      <X className="h-4 w-4 text-white" aria-hidden="true" />
+      <X className="h-3 w-3 text-white" aria-hidden="true" />
     ) : (
-      <Menu className="h-4 w-4 text-white" aria-hidden="true" />
+      <Menu className="h-3 w-3 text-white" aria-hidden="true" />
     );
   }
 
@@ -90,13 +89,13 @@ function MenuToggleIcon({ open }: { open: boolean }) {
   );
 }
 
-function LabelWithIcon({ label }: { label: string }) {
+function LabelWithIcon({ label, iconClassName }: { label: string; iconClassName?: string }) {
   const Icon = NAV_ICONS[label];
   return (
     <span className="inline-flex items-center">
       {Icon && (
         <Icon
-          className="h-4 w-4 inline text-[--brand-blue] mr-2"
+          className={cn("h-4 w-4 inline mr-2", iconClassName ?? "text-[--brand-blue]")}
           aria-hidden="true"
         />
       )}
@@ -122,7 +121,7 @@ const MOBILE_CTA1_DELAY_MS = 70;  // "Free 60-second Quote"
 const MOBILE_CTA2_DELAY_MS = 100; // "Contact Us"
 
 /* ===== Desktop (fixed) ===== */
-function DesktopMenu() {
+function DesktopMenu({ transparent }: { transparent: boolean }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [enteredPanel, setEnteredPanel] = useState(false);
@@ -155,16 +154,23 @@ function DesktopMenu() {
             {item.href ? (
               <SmartLink
                 href={item.href}
-                className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1"
+                className={cn(
+                  "px-2 py-2 whitespace-nowrap flex items-center gap-1 transition-colors duration-200",
+                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]"
+                )}
               >
-                <LabelWithIcon label={item.label} />
+                <LabelWithIcon
+                  label={item.label}
+                  iconClassName={transparent ? "text-[--brand-orange]" : "text-[--brand-blue]"}
+                />
                 {item.children && (
                   <>
                     {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
                     <ChevronDown
                       className={cn(
                         "h-4 w-4 opacity-70 transition-transform duration-200",
-                        openIndex === i ? "rotate-180" : "rotate-0"
+                        openIndex === i ? "rotate-180" : "rotate-0",
+                        transparent ? "text-white" : "text-slate-400"
                       )}
                       style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
                       aria-hidden="true"
@@ -175,18 +181,25 @@ function DesktopMenu() {
             ) : (
               <button
                 type="button"
-                className="px-2 py-2 text-slate-700 hover:text-[--brand-blue] whitespace-nowrap flex items-center gap-1 cursor-default"
+                className={cn(
+                  "px-2 py-2 whitespace-nowrap flex items-center gap-1 cursor-default transition-colors duration-200",
+                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]"
+                )}
                 aria-haspopup={item.children ? "menu" : undefined}
                 aria-expanded={openIndex === i || undefined}
               >
-                <LabelWithIcon label={item.label} />
+                <LabelWithIcon
+                  label={item.label}
+                  iconClassName={transparent ? "text-[--brand-orange]" : "text-[--brand-blue]"}
+                />
                 {item.children && (
                   <>
                     {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
                     <ChevronDown
                       className={cn(
                         "h-4 w-4 opacity-70 transition-transform duration-200",
-                        openIndex === i ? "rotate-180" : "rotate-0"
+                        openIndex === i ? "rotate-180" : "rotate-0",
+                        transparent ? "text-white" : "text-slate-400"
                       )}
                       style={{ transitionDuration: `${CARET_DURATION_MS}ms` }}
                       aria-hidden="true"
@@ -201,7 +214,7 @@ function DesktopMenu() {
                 {/* ANIM: Panel fade+lift speed — edit PANEL_DURATION_MS (and/or Tailwind 'duration-150') */}
                 <div
                   className={cn(
-                    "absolute left-0 top-full mt-2 min-w-[240px] rounded-2xl border bg-white border-slate-300 shadow-lg origin-top",
+                    "absolute left-0 top-full mt-2 min-w-[240px] rounded-3xl border bg-white border-slate-300 shadow-lg origin-top",
                     "transition-all duration-150 ease-out",
                     enteredPanel ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
                   )}
@@ -219,7 +232,7 @@ function DesktopMenu() {
         <li className="pl-2">
           <Button asChild size="sm" variant="brandOrange">
             <SmartLink
-              href={"https://www.myquickroofquote.com/contractors/sonshine-roofing" as Route}
+              href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
               className="flex items-center gap-2"
             >
               <Zap className="h-4 w-4 text-white" aria-hidden="true" />
@@ -229,14 +242,14 @@ function DesktopMenu() {
         </li>
 
         <li className="pl-2">
-        <Button asChild size="sm" variant="brandBlue">
-          <SmartLink href={ROUTES.contact} className="phone-affordance flex items-center gap-2">
-            <Phone className="phone-affordance-icon h-4 w-4 text-white" aria-hidden="true" />
-            Contact Us
-          </SmartLink>
-        </Button>
-      </li>
-    </ul>
+          <Button asChild size="sm" variant="brandBlue">
+            <SmartLink href={ROUTES.contact} className="phone-affordance flex items-center gap-2">
+              <Phone className="phone-affordance-icon h-4 w-4 text-white" aria-hidden="true" />
+              Contact Us
+            </SmartLink>
+          </Button>
+        </li>
+      </ul>
     </>
   );
 }
@@ -248,7 +261,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
   const [entered, setEntered] = useState(false);
   useEffect(() => {
     const id = requestAnimationFrame(() => setEntered(true));
-    return () => cancelAnimationFrame(id as any);
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const holdOpen = (i: number) => {
@@ -337,7 +350,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
                   className={cn(
                     "md:absolute md:left-full md:top-0",
                     "md:pl-2",
-                    "min-w-[240px] rounded-2xl border bg-white shadow-lg origin-top-left",
+                    "min-w-[240px] rounded3xl border bg-white shadow-lg origin-top-left",
                     "transition-all duration-150 ease-out",
                     entered ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
                   )}
@@ -346,7 +359,11 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
                   {/* optional invisible bridge in case of super fast mouse moves */}
                   <div className="pointer-events-none absolute -left-2 top-0 h-full w-3" />
                   <div className="pointer-events-auto">
-                    <MenuLevel items={child.children!} level={level + 1} parentLabel={child.label} />
+                    <MenuLevel
+                      items={child.children!}
+                      level={level + 1}
+                      parentLabel={child.label}
+                    />
                   </div>
                 </div>
               </>
@@ -411,7 +428,7 @@ function MobileMenu() {
     if (open) {
       setEnteredTop(false);
       const id = requestAnimationFrame(() => setEnteredTop(true));
-      return () => cancelAnimationFrame(id as any);
+      return () => cancelAnimationFrame(id);
     }
     setEnteredTop(false);
   }, [open]);
@@ -427,7 +444,8 @@ function MobileMenu() {
       if (s[key]) {
         // collapsing: remove entered to allow re-animate next time
         setEntered((e) => {
-          const { [key]: _, ...rest } = e;
+          const { [key]: removedEntry, ...rest } = e;
+          void removedEntry;
           return rest;
         });
       }
@@ -439,17 +457,15 @@ function MobileMenu() {
       <button
         type="button"
         ref={buttonRef}
-        className="rounded-full border px-4 py-2 text-white bg-[--brand-blue]"
+        className="flex items-center gap-2 rounded-full border px-4 py-2 text-white bg-[--brand-blue]"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="mobile-nav"
         aria-haspopup="menu"
         data-open={open}
       >
-        <span className="inline-flex items-center gap-2">
-          <span className="font-medium">Menu</span>
-          <MenuToggleIcon open={open} />
-        </span>
+        <span className="font-display text-xl font-bold leading-none">Menu</span>
+        <MenuToggleIcon open={open} />
       </button>
 
       {open && (
@@ -469,7 +485,7 @@ function MobileMenu() {
             role="menu"
             aria-label="Main"
             className="fixed left-2 right-2 z-[61]
-                       rounded-2xl border bg-white shadow-xl p-2
+                       rounded-3xl border bg-slate-100 shadow-xl p-2
                        top-[calc(var(--header-h,56px)+8px)]
                        max-h-[calc(100vh-var(--header-h,56px)-24px)] overflow-auto"
           >
@@ -484,7 +500,7 @@ function MobileMenu() {
               >
                 <SmartLink
                   href={ROUTES.home}
-                  className="flex w-full px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
+                  className="flex w-full px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
                   onClick={() => setOpen(false)}
                 >
                   <LabelWithIcon label="Home" />
@@ -507,7 +523,7 @@ function MobileMenu() {
                     {!hasChildren && item.href ? (
                       <SmartLink
                         href={item.href}
-                        className="flex w-full items-center justify-between px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
+                        className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
                         onClick={() => setOpen(false)}
                       >
                         <LabelWithIcon label={item.label} />
@@ -517,7 +533,7 @@ function MobileMenu() {
                         {item.href ? (
                           <SmartLink
                             href={item.href}
-                            className="block flex-1 min-w-0 text-left px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50"
+                            className="block flex-1 min-w-0 text-left px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
                             onClick={() => setOpen(false)}
                           >
                             <LabelWithIcon label={item.label} />
@@ -528,7 +544,7 @@ function MobileMenu() {
                             onClick={() => toggle(k)}
                             aria-expanded={!!expanded[k]}
                             aria-controls={`section-${k}`}
-                            className="px-3 py-2 rounded-xl text-slate-800 hover:bg-slate-50 text-left flex-1"
+                            className="px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200 text-left flex-1"
                           >
                             <LabelWithIcon label={item.label} />
                           </button>
@@ -572,7 +588,7 @@ function MobileMenu() {
                               {c.href ? (
                                 <SmartLink
                                   href={c.href}
-                                  className="flex w-full items-center justify-between px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50"
+                                  className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-700 hover:bg-slate-200"
                                   data-icon-affordance={showChevron ? "right" : undefined}
                                   onClick={() => setOpen(false)}
                                 >
@@ -602,13 +618,13 @@ function MobileMenu() {
                 // ANIM: Mobile CTA1 stagger — base + NAV length step
                 style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
               >
-                <Button asChild className="w-full h-8 mt-4" variant="brandOrange">
+                <Button asChild className="w-full h-8 mt-4" variant="brandOrange" size="lg">
                   <SmartLink
-                    href={"https://www.myquickroofquote.com/contractors/sonshine-roofing" as Route}
+                    href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
                     onClick={() => setOpen(false)}
                     className="flex items-center justify-center gap-x-2"
                   >
-                    <Zap className="w-4 h-4 shrink-0 text-white" aria-hidden="true" />
+                    <Zap className="w-4 h-4 text-white" aria-hidden="true" />
                     Free 60-second Quote
                   </SmartLink>
                 </Button>
@@ -640,10 +656,14 @@ function MobileMenu() {
   );
 }
 
-export function NavMenu() {
+type NavMenuProps = {
+  transparent: boolean;
+};
+
+export function NavMenu({ transparent }: NavMenuProps) {
   return (
     <nav className="ml-auto flex items-center gap-3">
-      <DesktopMenu />
+      <DesktopMenu transparent={transparent} />
       <MobileMenu />
     </nav>
   );

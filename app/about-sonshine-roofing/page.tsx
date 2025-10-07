@@ -68,7 +68,7 @@ const ORDER: string[] = [
   'jose'
 ];
 
-const detailsStyles = "group not-prose rounded-xl border border-slate-400 bg-white mb-4";
+const detailsStyles = "group not-prose rounded-2xl border border-slate-200 bg-white mb-4";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 
 export default async function Page() {
@@ -102,11 +102,11 @@ export default async function Page() {
   return (
     <>
       <Section>
-        <div className="px-2">
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+        <div className="py-4">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
 
             {/* About us */}
-            <div className="py-4 prose w-full">
+            <div className="prose max-w-full min-w-0">
               <h1>About SonShine Roofing</h1>
 
               {/* JSON-LD: Breadcrumbs + WebPage */}
@@ -149,10 +149,10 @@ export default async function Page() {
                     SonShine Roofing is a family-owned roofing company based in Sarasota, Florida,
                     serving Sarasota, Manatee, and Charlotte County residents with 38+ years of experience.
                     We specialize in residential roofing services, including roof repair, roof replacement,
-                    inspections, and our Roof Care Club, which is our preventative maintenance program designed
+                    inspections, and our Roof Care Club, which is our preventative maintenance program designed
                     for the unique weather conditions of Southwest Florida.
                     <br /><br />
-                    We’ve learned that superior customer service and honesty with clients are the only way to
+                    We’ve learned that superior customer service and honesty with clients are the only way to
                     stay in business. When you ask us to inspect your roof, we’ll tell you the flat-out truth
                     and give you our best recommendation based on our 38+ years of professional experience.
                     We’d be more than pleased to have you look through our client referrals.
@@ -188,10 +188,10 @@ export default async function Page() {
 
             </div>
 
-            <div className="sticky hidden lg:block top-16 self-start min-w-0">
+            <aside className="lg:sticky top-16 self-start lg:h-fit">
               <SocialMediaProfiles />
               <ResourcesQuickLinks />
-            </div>
+            </aside>
 
           </div>
         </div>

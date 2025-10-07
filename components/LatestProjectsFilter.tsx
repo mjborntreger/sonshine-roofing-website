@@ -15,16 +15,14 @@ import {
   ArrowRight,
   Grid3x3,
   Hammer,
-  Layers,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const gradientDivider = "gradient-divider my-8";
-const pStyles = "my-8 text-center justify-center text-lg";
+const pStyles = "my-8 text-slate-500 text-center justify-center text-sm md:text-md";
 
-type MaterialKey = "all" | "shingle" | "metal" | "tile";
+type MaterialKey = "tile" | "shingle" | "metal";
 
 type Props = {
   /** Server-fetched list of recent projects (include materialTypes in wp.ts) */
@@ -40,31 +38,31 @@ const TAB_CONFIG: Array<{
   label: string;
   icon: LucideIcon;
 }> = [
-  { key: "all", label: "All", icon: Layers },
+  { key: "tile", label: "Tile", icon: Grid3x3 },
   { key: "shingle", label: "Shingle", icon: Hammer },
   { key: "metal", label: "Metal", icon: Wrench },
-  { key: "tile", label: "Tile", icon: Grid3x3 },
 ];
 
 export default function LatestProjectsFilter({ projects, initial = 4, showHeader = true }: Props) {
-  const [selected, setSelected] = useState<MaterialKey>("all");
+  const [selected, setSelected] = useState<MaterialKey>("tile");
 
   const projectsByMaterial = useMemo(() => {
     const normalized = Array.isArray(projects) ? projects : [];
-    const map: Record<MaterialKey, ProjectSummary[]> = {
-      all: normalized,
-      shingle: [],
-      metal: [],
-      tile: [],
-    };
+    const map = TAB_CONFIG.reduce(
+      (acc, tab) => {
+        acc[tab.key] = [];
+        return acc;
+      },
+      {} as Record<MaterialKey, ProjectSummary[]>,
+    );
 
     for (const project of normalized) {
       const slugs = (project.materialTypes ?? [])
         .map((term) => String(term?.slug ?? "").toLowerCase())
         .filter(Boolean);
+      if (slugs.includes("tile")) map.tile.push(project);
       if (slugs.includes("shingle")) map.shingle.push(project);
       if (slugs.includes("metal")) map.metal.push(project);
-      if (slugs.includes("tile")) map.tile.push(project);
     }
 
     return map;
@@ -103,10 +101,10 @@ export default function LatestProjectsFilter({ projects, initial = 4, showHeader
   );
 
   return (
-    <div className="px-4 py-24 md:px-12">
+    <div className="px-4 pt-12 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="text-3xl mb-16 text-slate-700 md:text-5xl">Latest Projects</h2>
+          <h2 className="text-3xl text-slate-700 md:text-5xl mb-3 md:mb-4">Latest Projects</h2>
           {renderFilterTabs()}
           <p className={pStyles}>
             Browse our latest projects and get an idea of what your new roof could look like.
@@ -116,7 +114,7 @@ export default function LatestProjectsFilter({ projects, initial = 4, showHeader
         renderFilterTabs()
       )}
 
-      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2">
         {filtered.length > 0 ? (
           filtered.map((project, index) => (
             <ProjectArchiveCard

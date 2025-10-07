@@ -2,6 +2,7 @@
 import SmartLink from "./SmartLink";
 import { Star } from "lucide-react";
 import React from "react";
+import { buildTellUsWhyRatingHref } from "@/lib/routes";
 
 /**
  * ReviewsCatcher
@@ -12,14 +13,13 @@ import React from "react";
  * - Uses brand color via CSS var --brand-orange (fallback to #fb9216)
  */
 
-const INTERNAL_FEEDBACK_SLUG = "/tell-us-why?rating=${rating}" as const;
 const GOOGLE_REVIEW_URL = "https://g.page/r/CVjpdbFPWRhTEAE/review" as const;
 
 const STAR_LABELS: Record<number, string> = {
   1: "poor",
   2: "fair",
-  3: "good",
-  4: "very good",
+  3: "average",
+  4: "good",
   5: "excellent",
 };
 
@@ -30,31 +30,52 @@ export default function ReviewsCatcher() {
 
   return (
     <section className="w-full py-10 text-center">
-      <div className="mx-auto max-w-3xl">
-        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
+      <div className="mx-auto md:max-w-8xl">
+        <h1 className="text-slate-500 font-semibold tracking-tight text-xl md:text-2xl">
           Reviews
         </h1>
-        <h2 className="mt-2 text-xl text-slate-700 md:text-2xl">
+        <h2 className="mt-2 md:mt-4 text-slate-700 text-5xl md:text-8xl">
           How did we do?
         </h2>
+        <div
+          aria-hidden="true"
+          className="mx-auto mt-8 h-[3px] w-36 rounded-full bg-gradient-to-r from-[#fb9216] via-[#ffb347] to-[#fb9216] md:mt-8 md:h-1 md:w-96"
+        />
 
-        <div className="mt-8">
+        <div className="my-8 md:my-12">
           {/* Stars row */}
-          <div className="rc-stars mx-auto flex w-fit items-center justify-center gap-2 md:gap-3">
+          <div className="rc-stars mx-auto flex w-fit items-center justify-center">
             {/* We list 5..1 in DOM and flip visually with flex-row-reverse */}
-            <div className="flex flex-row-reverse items-center gap-2 md:gap-3">
+            <div className="flex flex-row-reverse items-center">
               {stars
                 .slice()
                 .reverse()
                 .map((rating) => {
+                  const label = STAR_LABELS[rating];
                   const isExternal = rating >= 4;
-                  const aria = `Rate ${rating} out of 5 — ${STAR_LABELS[rating]}`;
+                  const aria = `Rate ${rating} out of 5 — ${label}`;
 
                   const StarSvg = (
                     <Star
-                      className="h-10 w-10 md:h-12 md:w-12"
+                      className="h-12 w-12 md:h-36 md:w-36"
                       // stroke uses currentColor; fill toggled via CSS
                     />
+                  );
+
+                  const linkClasses =
+                    "inline-flex flex-col items-center justify-center gap-2 text-slate-300 focus:outline-none md:gap-4";
+
+                  const linkContent = (
+                    <>
+                      {StarSvg}
+                      <span className="sr-only">{aria}</span>
+                      <span
+                        aria-hidden="true"
+                        className="rc-star-label text-xs font-semibold uppercase tracking-widest text-slate-500 md:text-base"
+                      >
+                        {label.toUpperCase()}
+                      </span>
+                    </>
                   );
 
                   return (
@@ -66,34 +87,25 @@ export default function ReviewsCatcher() {
                           rel="noopener noreferrer"
                           aria-label={aria}
                           title={aria}
-                          className="inline-flex items-center justify-center text-slate-300 focus:outline-none"
+                          className={linkClasses}
                         >
-                          {StarSvg}
-                          <span className="sr-only">{aria}</span>
+                          {linkContent}
                         </a>
                       ) : (
                         <SmartLink
                           prefetch={false}
-                          href={INTERNAL_FEEDBACK_SLUG}
+                          href={buildTellUsWhyRatingHref(rating)}
                           aria-label={aria}
                           title={aria}
-                          className="inline-flex items-center justify-center text-slate-300 focus:outline-none"
+                          className={linkClasses}
                         >
-                          {StarSvg}
-                          <span className="sr-only">{aria}</span>
+                          {linkContent}
                         </SmartLink>
                       )}
                     </span>
                   );
                 })}
             </div>
-
-            {/* Labels under ends */}
-          </div>
-
-          <div className="mx-auto mt-2 grid w-[min(420px,90vw)] grid-cols-2 text-sm text-slate-500 md:mt-3">
-            <span className="justify-self-start">poor</span>
-            <span className="justify-self-end">excellent</span>
           </div>
         </div>
       </div>
@@ -106,7 +118,7 @@ export default function ReviewsCatcher() {
         }
         .rc-stars .flex {
           display: flex;
-          gap: 0.25rem;
+          gap: 2rem;
         }
         .rc-stars .flex > span a {
           text-decoration: none;
@@ -124,6 +136,15 @@ export default function ReviewsCatcher() {
         .rc-stars .flex > span:hover ~ span :global(a),
         .rc-stars .flex > span:focus-within :global(a),
         .rc-stars .flex > span:focus-within ~ span :global(a) {
+          color: var(--brand-orange, #fb9216);
+        }
+        .rc-star :global(.rc-star-label) {
+          transition: color 160ms ease;
+        }
+        .rc-stars .flex > span:hover :global(.rc-star-label),
+        .rc-stars .flex > span:hover ~ span :global(.rc-star-label),
+        .rc-stars .flex > span:focus-within :global(.rc-star-label),
+        .rc-stars .flex > span:focus-within ~ span :global(.rc-star-label) {
           color: var(--brand-orange, #fb9216);
         }
         .rc-stars .flex > span:hover :global(svg *),

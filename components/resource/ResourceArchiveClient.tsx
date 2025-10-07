@@ -184,7 +184,7 @@ export default function ResourceArchiveClient<Item>({
 
   const facetMap = useMemo(() => {
     const map = new Map<string, Map<string, number>>();
-    const facets = (result as any).facets as ResourceFacetGroup[] | undefined;
+    const facets = result.facets;
     if (Array.isArray(facets)) {
       for (const facet of facets) {
         const bucketMap = new Map<string, number>();
@@ -320,8 +320,8 @@ export default function ResourceArchiveClient<Item>({
       .then((json) => {
         setResult(json as ResourceArchiveResult<Item>);
       })
-      .catch((err: any) => {
-        if (err?.name === "AbortError") return;
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === "AbortError") return;
         setError("Unable to load results for the selected filters. Please try again.");
         console.error("[ResourceArchive] fetch failed", err);
       })
@@ -417,7 +417,7 @@ export default function ResourceArchiveClient<Item>({
         role="search"
       >
         <div className="flex flex-col gap-4">
-          <div className="flex inline-flex w-full items-start">
+          <div className="inline-flex w-full items-start">
             <label htmlFor={`${kind}-search`} className="sr-only">Search {labels.itemPlural}</label>
             <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
             <input

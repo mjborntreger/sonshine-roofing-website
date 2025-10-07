@@ -33,12 +33,15 @@ const IGNORE_QS = new Set([
   "_ga",
 ]);
 
-declare global {
-  interface Window {
-    dataLayer?: any[];
-    __pvSigSent?: Set<string>; // global cache of signatures that already pushed
-  }
-}
+type DataLayerEvent = {
+  event: string;
+  [key: string]: unknown;
+};
+
+type GtmWindow = Window & {
+  dataLayer?: DataLayerEvent[];
+  __pvSigSent?: Set<string>;
+};
 
 const ENABLED =
   process.env.NEXT_PUBLIC_ENV === "production" ||
@@ -69,21 +72,25 @@ export default function GtmRouteChange() {
 
     const sig = buildSignature(pathname, searchParams);
 
+    const win = window as GtmWindow;
+
     // Ensure global Set exists and check idempotency across remounts/effects.
-    window.__pvSigSent ??= new Set<string>();
-    if (window.__pvSigSent.has(sig)) return;
-    window.__pvSigSent.add(sig);
+    win.__pvSigSent ??= new Set<string>();
+    if (win.__pvSigSent.has(sig)) return;
+    win.__pvSigSent.add(sig);
 
     // Ensure dataLayer exists and push after paint so title is accurate.
-    window.dataLayer = window.dataLayer || [];
+    win.dataLayer = win.dataLayer ?? [];
     requestAnimationFrame(() => {
-      window.dataLayer!.push({
+      const layer = win.dataLayer ?? [];
+      layer.push({
         event: "page_view",
         source: "react-client", // use this to whitelist in GTM
         page_location: window.location.href,
         page_path: pathname || "/",
         page_title: document.title || undefined,
       });
+      win.dataLayer = layer;
     });
   }, [pathname, searchParams]);
 

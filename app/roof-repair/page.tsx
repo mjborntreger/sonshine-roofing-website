@@ -346,21 +346,21 @@ export default async function Page() {
         />
       </div>
 
-        {/* FAQs (dynamic) */}
-        <FaqInlineList
-          heading="Roof Repair FAQs"
-          topicSlug="roof-repair"
-          limit={8}
-          initialItems={faqs}
-          seeMoreHref="/faq"
-        />
+      {/* FAQs (dynamic) */}
+      <FaqInlineList
+        heading="Roof Repair FAQs"
+        topicSlug="roof-repair"
+        limit={8}
+        initialItems={faqs}
+        seeMoreHref="/faq"
+      />
 
-        {/* FAQ Schema */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-        />
+      {/* FAQ Schema */}
+      <script
+        type="application/ld+json"
+        suppressHydrationWarning
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+      />
     </Section>
   );
 }

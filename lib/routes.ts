@@ -99,3 +99,139 @@ export const NAV_RESOURCES: ReadonlyArray<{ label: string; href: Route }> = [
   { label: 'Blog', href: ROUTES.blog },
   { label: 'FAQ', href: ROUTES.faq },
 ];
+
+type Primitive = string | number | boolean;
+type QueryValue = Primitive | Primitive[] | null | undefined;
+
+const APP_PATHS = {
+  blogPost: "/",
+  project: "/project",
+  person: "/person",
+  faq: "/faq",
+  roofingGlossary: "/roofing-glossary",
+  specialOffer: "/special-offers",
+  tellUsWhy: "/tell-us-why",
+};
+
+const trimSlashes = (value: string) => value.replace(/^\/+|\/+$/g, "");
+
+const stripSearchAndHash = (value: string) => value.split(/[?#]/)[0] || "";
+
+const lastSegment = (value: string) => {
+  const trimmed = trimSlashes(stripSearchAndHash(value));
+  if (!trimmed) return null;
+  const segments = trimmed.split("/");
+  return segments.pop() || null;
+};
+
+const normalizeSlug = (value: string | null | undefined) => {
+  if (!value) return null;
+  const slug = trimSlashes(stripSearchAndHash(String(value))).trim();
+  return slug ? slug : null;
+};
+
+const serializeQuery = (query?: Record<string, QueryValue>) => {
+  if (!query) return "";
+  const params = new URLSearchParams();
+  for (const [key, raw] of Object.entries(query)) {
+    if (raw === null || raw === undefined) continue;
+    const appendValue = (value: Primitive) => params.append(key, String(value));
+    if (Array.isArray(raw)) {
+      raw.forEach((value) => appendValue(value));
+    } else {
+      appendValue(raw);
+    }
+  }
+  const qs = params.toString();
+  return qs ? `?${qs}` : "";
+};
+
+const appendHash = (hash?: string) => {
+  if (!hash) return "";
+  return hash.startsWith("#") ? hash : `#${hash}`;
+};
+
+const buildPath = (segments: string[], suffix?: string) => {
+  const leading = segments.map((segment) => trimSlashes(segment)).filter(Boolean);
+  const path = `/${leading.join("/")}`;
+  if (!suffix) return path;
+  const normalized = trimSlashes(suffix);
+  return `${path}/${normalized}`;
+};
+
+export const buildBlogPostHref = (slug: string | null | undefined): string | null => {
+  const safe = normalizeSlug(slug);
+  return safe ? buildPath([APP_PATHS.blogPost, safe]) : null;
+};
+
+export const buildProjectHref = (
+  slug: string | null | undefined,
+  options?: { hash?: string; query?: Record<string, QueryValue> }
+): string | null => {
+  const safe = normalizeSlug(slug);
+  if (!safe) return null;
+  const base = buildPath([APP_PATHS.project], safe);
+  return `${base}${serializeQuery(options?.query)}${appendHash(options?.hash)}`;
+};
+
+export const buildProjectHrefFromUri = (
+  uri: string | null | undefined,
+  options?: { hash?: string; query?: Record<string, QueryValue> }
+): string | null => {
+  const slug = uri ? lastSegment(uri) : null;
+  return buildProjectHref(slug, options);
+};
+
+export const buildPersonHref = (
+  slug: string | null | undefined,
+  options?: { hash?: string; query?: Record<string, QueryValue> }
+): string | null => {
+  const safe = normalizeSlug(slug);
+  if (!safe) return null;
+  const base = buildPath([APP_PATHS.person], safe);
+  return `${base}${serializeQuery(options?.query)}${appendHash(options?.hash)}`;
+};
+
+export const buildFaqHref = (
+  slug: string | null | undefined,
+  options?: { hash?: string; query?: Record<string, QueryValue> }
+): string | null => {
+  const safe = normalizeSlug(slug);
+  if (!safe) return null;
+  const base = buildPath([APP_PATHS.faq], safe);
+  return `${base}${serializeQuery(options?.query)}${appendHash(options?.hash)}`;
+};
+
+export const buildRoofingGlossaryHref = (
+  slug: string | null | undefined,
+  options?: { hash?: string; query?: Record<string, QueryValue> }
+): string | null => {
+  const safe = normalizeSlug(slug);
+  if (!safe) return null;
+  const base = buildPath([APP_PATHS.roofingGlossary], safe);
+  return `${base}${serializeQuery(options?.query)}${appendHash(options?.hash)}`;
+};
+
+export const buildSpecialOfferHref = (
+  slug: string | null | undefined,
+  options?: { hash?: string; query?: Record<string, QueryValue> }
+): string | null => {
+  const safe = normalizeSlug(slug);
+  if (!safe) return null;
+  const base = buildPath([APP_PATHS.specialOffer], safe);
+  return `${base}${serializeQuery(options?.query)}${appendHash(options?.hash)}`;
+};
+
+export const buildTellUsWhyRatingHref = (
+  rating: number | string | null | undefined,
+  options?: { hash?: string; query?: Record<string, QueryValue> }
+): string => {
+  const value = typeof rating === "number" ? rating : Number(rating);
+  const normalized = Number.isFinite(value) && value > 0 ? String(value) : undefined;
+  const base = buildPath([APP_PATHS.tellUsWhy]);
+  const mergedQuery = {
+    ...(options?.query ?? {}),
+    ...(normalized ? { rating: normalized } : {}),
+  };
+  return `${base}${serializeQuery(mergedQuery)}${appendHash(options?.hash)}`;
+};

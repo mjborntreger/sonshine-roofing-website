@@ -12,6 +12,13 @@ import Section from "@/components/layout/Section";
 import type { Metadata } from 'next';
 import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
+import LeadFormSection from "@/components/LeadFormSection";
+import { cookies } from 'next/headers';
+
+// ===== STYLE CONSTANTS ===== //
+const leadFormLayout = "mx-auto w-full";
+const reviewsLayout = "mx-auto w-full bg-[#cef3ff]"
+const narrowLayout = "mx-auto w-full max-w-[1280px]";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
@@ -67,6 +74,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
+  const cookieStore = await cookies();
+  const leadSuccessCookie = cookieStore.get('ss_lead_form_success')?.value ?? null;
   const projects = await listRecentProjectsPoolForFilters(4, 8);
   const posts = await listRecentPostsPoolForFilters(4, 4);
   const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
@@ -78,57 +87,51 @@ export default async function Page() {
   return (
     <>
       <Hero />
-      <div className="bg-neutral-50">
-        <div className="grid gap-1 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+      <div className={leadFormLayout}>
+        <div className="max-w-[1280px] mx-auto py-16">
+          <LeadFormSection initialSuccessCookie={leadSuccessCookie} />
+        </div>
+      </div>
+      <div className={reviewsLayout}>
+        <ReviewsCarousel />
+      </div>
+      <div className={narrowLayout}>
+        <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
-            <Section>
+            <div className="mx-2">
               <WhyHomeownersChooseUs />
-            </Section>
-            {/* Quick Links | Mobile Only */}
-            <div className="block px-4 md:hidden">
-              <ServicesQuickLinks />
-              <ResourcesQuickLinks />
-            </div>
-            <Section>
               <BestOfTheBest />
-            </Section>
+              <LatestProjectsFilter projects={projects} initial={4} />
+              <LatestPostsFilters posts={posts} initial={4} />
+            </div>
           </div>
 
           {/* Sticky Section */}
-          <div className="hidden lg:block min-w-0 lg:sticky lg:top-16 self-start px-4">
+          <div className="hidden lg:block min-w-0 lg:sticky lg:top-24 self-start px-4">
             <ServicesQuickLinks />
             <ResourcesQuickLinks />
           </div>
-        </div>
-        <div className="bg-orange-50/90">
-          <ReviewsCarousel />
-        </div>
 
-        
-          <div className="mx-auto w-full max-w-[1600px]">
-            <LatestProjectsFilter projects={projects} initial={4} />
-            <LatestPostsFilters posts={posts} initial={4} />
-          </div>
-        
-
-        {/* General FAQs at bottom of the landing page */}
-        <Section>
-          <FaqInlineList
-            heading="General FAQs"
-            topicSlug="general"
-            limit={8}
-            initialItems={generalFaqs}
-            seeMoreHref="/faq"
-          />
-          {/* JSON-LD for FAQs on the home page */}
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-          />
-        </Section>
+        </div>
       </div>
 
+
+      {/* General FAQs at bottom of the landing page */}
+      <Section>
+        <FaqInlineList
+          heading="General FAQs"
+          topicSlug="general"
+          limit={8}
+          initialItems={generalFaqs}
+          seeMoreHref="/faq"
+        />
+        {/* JSON-LD for FAQs on the home page */}
+        <script
+          type="application/ld+json"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      </Section>
     </>
   );
 }

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { ResourceQuery, PageResult } from "@/lib/pagination";
+import type { ResourceQuery } from "@/lib/pagination";
 import {
   // BLOG
   listPostsPaged,
@@ -7,66 +7,109 @@ import {
   listProjectsPaged,
   type ProjectsArchiveFilters,
   type ProjectSearchResult,
+  type PostsFiltersInput,
+  type VideoFiltersInput,
   // VIDEOS
   listVideoItemsPaged, // small adapter; see note below
 } from "@/lib/wp";
 
+type RouteContext = { params: Promise<{ kind: string }> };
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
+const toSlugArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map((v) => (typeof v === "string" ? v : String(v ?? ""))).map((v) => v.trim()).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    return value
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
+const clampPageSize = (value: unknown, fallback: number, max = 50, min = 1): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return Math.max(min, Math.min(value, max));
+  }
+  if (typeof value === "string") {
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isFinite(parsed)) {
+      return Math.max(min, Math.min(parsed, max));
+    }
+  }
+  return Math.max(min, Math.min(fallback, max));
+};
+
 export async function POST(
   req: Request,
-  ctx: any
+  context: RouteContext
 ) {
-  const { params } = ctx as { params: { kind: string } };
   try {
-    const { kind } = params;
-    const body = (await req.json()) as ResourceQuery;
-    const first = Math.max(1, Math.min( body.first ?? 24, 50 ));
-    const after = body.after ?? null;
-    const filters = body.filters ?? {};
+    const { kind } = await context.params;
 
-    let result: PageResult<any>;
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      rawBody = null;
+    }
+
+    if (!isRecord(rawBody)) {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+
+    const firstInput =
+      typeof rawBody.first === "number"
+        ? rawBody.first
+        : typeof rawBody.first === "string"
+        ? Number.parseInt(rawBody.first, 10)
+        : undefined;
+
+    const normalizedFirst =
+      typeof firstInput === "number" && Number.isFinite(firstInput) ? firstInput : undefined;
+
+    const body: ResourceQuery = {
+      first: normalizedFirst,
+      after: typeof rawBody.after === "string" || rawBody.after === null ? rawBody.after : undefined,
+      filters: isRecord(rawBody.filters) ? rawBody.filters : undefined,
+    };
+
+    const first = clampPageSize(body.first ?? 24, 24);
+    const after = typeof body.after === "string" ? body.after : null;
+    const filters = (body.filters && isRecord(body.filters) ? body.filters : {}) as Record<string, unknown>;
 
     if (kind === "project") {
-      const toSlugArray = (value: unknown): string[] => {
-        if (Array.isArray(value)) {
-          return value
-            .map((v) => (typeof v === 'string' ? v : String(v ?? '')).trim())
-            .filter(Boolean);
-        }
-        if (typeof value === 'string') {
-          return value
-            .split(',')
-            .map((v) => v.trim())
-            .filter(Boolean);
-        }
-        return [];
-      };
-
       const projectFilters: ProjectsArchiveFilters = {
         search:
-          typeof (filters as any)?.search === 'string'
-            ? (filters as any).search
-            : typeof (filters as any)?.q === 'string'
-            ? (filters as any).q
+          typeof filters.search === "string"
+            ? filters.search
+            : typeof filters.q === "string"
+            ? filters.q
             : undefined,
-        materialTypeSlugs: toSlugArray((filters as any)?.materialTypeSlugs ?? (filters as any)?.mt),
-        roofColorSlugs: toSlugArray((filters as any)?.roofColorSlugs ?? (filters as any)?.rc),
-        serviceAreaSlugs: toSlugArray((filters as any)?.serviceAreaSlugs ?? (filters as any)?.sa),
+        materialTypeSlugs: toSlugArray(filters.materialTypeSlugs ?? filters.mt),
+        roofColorSlugs: toSlugArray(filters.roofColorSlugs ?? filters.rc),
+        serviceAreaSlugs: toSlugArray(filters.serviceAreaSlugs ?? filters.sa),
       };
 
       const projectResult: ProjectSearchResult = await listProjectsPaged({ first, after, filters: projectFilters });
       return NextResponse.json(projectResult);
     } else if (kind === "video") {
       // Merge entries + project videos; paginate client-side
-      result = await listVideoItemsPaged({ first, after, filters });
+      const videoResult = await listVideoItemsPaged({ first, after, filters: filters as VideoFiltersInput });
+      return NextResponse.json(videoResult);
     } else if (kind === "blog") {
       // Cursor-based blog pagination with optional search/categories
-      result = await listPostsPaged({ first, after, filters });
+      const blogResult = await listPostsPaged({ first, after, filters: filters as PostsFiltersInput });
+      return NextResponse.json(blogResult);
     } else {
       return NextResponse.json({ error: "Unknown resource kind" }, { status: 400 });
     }
-
-    return NextResponse.json(result);
-  } catch (err: any) {
-    return NextResponse.json({ error: err?.message || "Server error" }, { status: 500 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Server error";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

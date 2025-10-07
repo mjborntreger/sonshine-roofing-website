@@ -1,6 +1,35 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 
+type TurnstileCallback = (token: string) => void;
+
+type TurnstileRenderOptions = {
+  sitekey: string;
+  theme?: "auto" | "light" | "dark";
+  size?: "normal" | "compact";
+  action?: string;
+  cData?: string;
+  callback?: TurnstileCallback;
+  "expired-callback"?: () => void;
+  "error-callback"?: () => void;
+};
+
+type TurnstileId = string | number | null | undefined;
+
+interface TurnstileAPI {
+  render?: (container: HTMLElement, options: TurnstileRenderOptions) => string | number;
+  reset?: (id?: TurnstileId) => void;
+  remove?: (id?: TurnstileId) => void;
+  execute?: (id?: TurnstileId) => void;
+}
+
+type TurnstileWindow = Window & {
+  turnstile?: TurnstileAPI;
+  __turnstileScriptLoaded?: boolean;
+} & Record<string, TurnstileCallback>;
+
+const asTurnstileWindow = (): TurnstileWindow => window as unknown as TurnstileWindow;
+
 /**
  * Cloudflare Turnstile wrapper (TS-safe with existing global types)
  * - Avoids redeclaring window.turnstile (conflicts with other components)
@@ -42,12 +71,13 @@ export default function Turnstile({
     if (typeof window === "undefined") return;
 
     const markReady = () => {
-      (window as any).__turnstileScriptLoaded = true;
+      const win = asTurnstileWindow();
+      win.__turnstileScriptLoaded = true;
       setScriptReady(true);
     };
 
     // If API already present, we're good
-    if ((window as any).turnstile) {
+    if (asTurnstileWindow().turnstile) {
       markReady();
       return;
     }
@@ -83,7 +113,8 @@ export default function Turnstile({
       return;
     }
 
-    const ts: any = (typeof window !== "undefined" ? (window as any).turnstile : undefined);
+    const win = asTurnstileWindow();
+    const ts = win.turnstile;
     if (!ts) return; // still not ready
 
     // Clear previous instance if any
@@ -92,9 +123,12 @@ export default function Turnstile({
       widgetIdRef.current = null;
     }
 
+    const containerEl = containerRef.current;
+    if (!containerEl) return;
+
     if (typeof ts.render === "function") {
       // Explicit render path
-      widgetIdRef.current = ts.render(containerRef.current, {
+      widgetIdRef.current = ts.render(containerEl, {
         sitekey: siteKey,
         theme,
         size,
@@ -135,18 +169,18 @@ export default function Turnstile({
 
       // Temporary global callback to capture token
       const cbName = `ts_cb_${Math.random().toString(36).slice(2)}`;
-      (window as any)[cbName] = (tok: string) => setToken(tok);
+      win[cbName] = (tok: string) => setToken(tok);
       el.setAttribute("data-callback", cbName);
 
-      containerRef.current.innerHTML = "";
-      containerRef.current.appendChild(el);
+      containerEl.innerHTML = "";
+      containerEl.appendChild(el);
 
       // Some builds expose execute() to trigger auto render
       try { ts.execute?.(); } catch {}
 
       return () => {
-        try { delete (window as any)[cbName]; } catch {}
-        if (containerRef.current) containerRef.current.innerHTML = "";
+        try { delete win[cbName]; } catch {}
+        containerEl.innerHTML = "";
       };
     }
   }, [scriptReady, siteKey, theme, size, action, cdata, autoRefreshOnExpire, autoRetryOnError]);

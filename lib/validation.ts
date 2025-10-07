@@ -1,7 +1,7 @@
 
 
 import { z } from "zod";
-import { normalizePhoneUS, stripToDigits } from "./phone";
+import { sanitizePhoneInput, isUsPhoneComplete, normalizePhoneForSubmit } from "./phone";
 
 /**
  * Feedback form validation (Zod)
@@ -22,11 +22,18 @@ const MAX_TZ = 100;
 const MAX_PAGE = 2083; // typical max URL length; we also allow path-only strings
 const MAX_TRACKING = 200;
 const MAX_SPECIAL_MESSAGE = 1000;
+const MAX_CONTACT_NOTES = 2000;
+const MAX_CONTACT_HELP = 400;
+const MAX_CONTACT_TIMELINE = 120;
+const MAX_CONTACT_PREF = 60;
+const MAX_CONTACT_RESOURCE_LABEL = 160;
+const MAX_CONTACT_RESOURCE_DESC = 240;
+const MAX_CONTACT_RESOURCE_HREF = 400;
 
 // ---- helpers --------------------------------------------------------------
 const trim = (s: unknown) => (typeof s === "string" ? s.trim() : s);
 
-const digitsOnly = (value: string) => stripToDigits(value);
+const digitsOnly = (value: string) => value.replace(/\D/g, "");
 
 const optionalTrackingField = z
   .preprocess((value) => {
@@ -44,6 +51,7 @@ const optionalTrimmedString = (max: number) =>
       return trimmed ? trimmed : undefined;
     }, z.string().min(1).max(max))
     .optional();
+
 
 // rating can arrive as "1" | "2" | "3" or number
 const ratingSchema = z.preprocess((val) => {
@@ -66,11 +74,20 @@ const feedbackSchema = z
     email: z
       .preprocess(trim, z.string().min(1, "Email is required").max(MAX_EMAIL).email("Invalid email")),
     phone: z
-      .preprocess(trim, z.string().min(1, "Phone is required").max(MAX_PHONE))
-      .refine((value) => normalizePhoneUS(value) !== null, {
-        message: "Phone must include 10 digits",
+      .preprocess((value) => {
+        if (typeof value !== "string") return value;
+        const trimmed = value.trim();
+        return trimmed.length ? trimmed : undefined;
+      }, z.string().max(MAX_PHONE).optional())
+      .transform((value) => {
+        if (typeof value !== "string") return value;
+        const digits = sanitizePhoneInput(value);
+        return digits || undefined;
       })
-      .transform((value) => normalizePhoneUS(value)!),
+      .refine((value) => value === undefined || isUsPhoneComplete(value), {
+        message: "Invalid phone",
+      })
+      .transform((value) => (value ? normalizePhoneForSubmit(value) : value)),
     rating: ratingSchema,
     message: z.preprocess(trim, z.string().min(1, "Message is required").max(MAX_MESSAGE)),
 
@@ -150,10 +167,11 @@ const financingEmailSchema = z
 
 const financingPhoneSchema = z
   .preprocess(trim, z.string().min(1, "Phone is required").max(MAX_PHONE))
-  .refine((value) => normalizePhoneUS(value) !== null, {
-    message: "Phone must include 10 digits",
+  .transform((value) => sanitizePhoneInput(value))
+  .refine((value) => isUsPhoneComplete(value), {
+    message: "Phone must include 10 digits (US only)",
   })
-  .transform((value) => normalizePhoneUS(value)!);
+  .transform((value) => normalizePhoneForSubmit(value));
 
 const financingMatchSchema = z.object({
   program: z.union([z.literal('serviceFinance'), z.literal('ygrene')]),
@@ -217,10 +235,11 @@ const leadFeedbackEmailSchema = z
 
 const leadFeedbackPhoneSchema = z
   .preprocess(trim, z.string().min(1, "Phone is required").max(MAX_PHONE))
-  .refine((value) => normalizePhoneUS(value) !== null, {
-    message: "Phone must include 10 digits",
+  .transform((value) => sanitizePhoneInput(value))
+  .refine((value) => isUsPhoneComplete(value), {
+    message: "Invalid phone",
   })
-  .transform((value) => normalizePhoneUS(value)!);
+  .transform((value) => normalizePhoneForSubmit(value));
 
 const leadFeedbackSchema = leadBaseSchema
   .extend({
@@ -246,17 +265,59 @@ const leadSpecialOfferSchema = leadBaseSchema
     offerCode: z.preprocess(trim, z.string().min(1, 'Offer code is required').max(120)),
     offerSlug: z.preprocess(trim, z.string().min(1, 'Offer slug is required').max(160)),
     offerTitle: optionalTrimmedString(200),
-    offerExpiration: optionalTrimmedString(40),
     message: optionalTrimmedString(MAX_SPECIAL_MESSAGE),
   })
   .passthrough();
 
-const leadSchema = z.discriminatedUnion('type', [leadFinancingSchema, leadFeedbackSchema, leadSpecialOfferSchema]);
+const contactResourceLinkSchema = z
+  .object({
+    label: z.preprocess(trim, z.string().min(1, 'Resource label is required').max(MAX_CONTACT_RESOURCE_LABEL)),
+    description: optionalTrimmedString(MAX_CONTACT_RESOURCE_DESC),
+    href: z
+      .preprocess(trim, z.string().min(1, 'Resource link is required').max(MAX_CONTACT_RESOURCE_HREF))
+      .refine(
+        (value) =>
+          typeof value === 'string' && (value.startsWith('/') || /^(https?:)?\/\//i.test(value)),
+        { message: 'Resource link must be a path or URL' }
+      ),
+    external: z.boolean().optional(),
+  })
+  .passthrough();
+
+const leadContactSchema = leadBaseSchema
+  .extend({
+    type: z.literal('contact-lead'),
+    firstName: z.preprocess(trim, z.string().min(1, 'First name is required').max(MAX_NAME)),
+    lastName: z.preprocess(trim, z.string().min(1, 'Last name is required').max(MAX_NAME)),
+    email: leadFeedbackEmailSchema,
+    phone: financingPhoneSchema,
+    projectType: z.preprocess(trim, z.string().min(1, 'Project type is required').max(80)),
+    helpTopics: optionalTrimmedString(MAX_CONTACT_HELP),
+    timeline: optionalTrimmedString(MAX_CONTACT_TIMELINE),
+    notes: optionalTrimmedString(MAX_CONTACT_NOTES),
+    preferredContact: z.preprocess(trim, z.string().min(1, 'Preferred contact method is required').max(MAX_CONTACT_PREF)),
+    bestTime: optionalTrimmedString(MAX_CONTACT_PREF),
+    consentSms: z.boolean().optional(),
+    address1: z.preprocess(trim, z.string().min(1, 'Street address is required').max(MAX_FINANCING_ADDRESS)),
+    address2: z.preprocess(trim, z.string().max(MAX_FINANCING_ADDRESS)).optional(),
+    city: z.preprocess(trim, z.string().min(1, 'City is required').max(MAX_FINANCING_CITY)),
+    state: z
+      .preprocess(trim, z.string().min(2, 'State is required').max(MAX_FINANCING_STATE))
+      .refine((value) => /^[A-Za-z]{2}$/.test(String(value)), { message: 'State must be two letters' }),
+    zip: z
+      .preprocess(trim, z.string().min(1, 'ZIP is required').max(MAX_FINANCING_ZIP))
+      .refine((value) => digitsOnly(value).length === 5, { message: 'ZIP must be 5 digits' }),
+    resourceLinks: z.array(contactResourceLinkSchema).max(10).optional(),
+  })
+  .passthrough();
+
+const leadSchema = z.discriminatedUnion('type', [leadFinancingSchema, leadFeedbackSchema, leadSpecialOfferSchema, leadContactSchema]);
 
 export type LeadInput = z.infer<typeof leadSchema>;
 export type FinancingLeadInput = z.infer<typeof leadFinancingSchema>;
 export type FeedbackLeadInput = z.infer<typeof leadFeedbackSchema>;
 export type SpecialOfferLeadInput = z.infer<typeof leadSpecialOfferSchema>;
+export type ContactLeadInput = z.infer<typeof leadContactSchema>;
 
 export function parseLead(input: unknown): ParseResult<LeadInput> {
   const result = leadSchema.safeParse(input);

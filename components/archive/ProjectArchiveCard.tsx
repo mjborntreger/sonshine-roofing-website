@@ -7,6 +7,7 @@ import MediaFrame from "@/components/MediaFrame";
 import type { ProjectSummary } from "@/lib/wp";
 import { stripHtml } from "@/lib/wp";
 import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
+import { buildProjectHref, buildProjectHrefFromUri, ROUTES } from "@/lib/routes";
 
 type Props = {
   project: ProjectSummary;
@@ -14,15 +15,23 @@ type Props = {
   className?: string;
 };
 
+const pillClass =
+  "inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm";
+const pillLabelClass = "block max-w-full truncate";
+
 export default function ProjectArchiveCard({ project, style, className }: Props) {
-  const href = project.uri || (project.slug ? `/project/${project.slug}` : "#");
+  const href =
+    buildProjectHref(project.slug) ??
+    buildProjectHrefFromUri(project.uri) ??
+    project.uri ??
+    ROUTES.project;
   const summary = truncateText(stripHtml(project.projectDescription ?? ""), 260);
 
   return (
     <div className={className} style={style}>
       <SmartLink
         href={href}
-        className="group block rounded-2xl focus-visible:outline-none"
+        className="group block rounded-3xl focus-visible:outline-none"
         data-icon-affordance="right"
       >
         <Card className="proj-card overflow-hidden hover:shadow-lg transition">
@@ -55,25 +64,25 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
                   {(project.materialTypes ?? []).map((t) => (
                     <span
                       key={`mat-${project.slug}-${t.slug}`}
-                      className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                      className={pillClass}
                     >
-                      {t.name}
+                      <span className={pillLabelClass}>{t.name}</span>
                     </span>
                   ))}
                   {(project.serviceAreas ?? []).map((t) => (
                     <span
                       key={`sa-${project.slug}-${t.slug}`}
-                      className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                      className={pillClass}
                     >
-                      {t.name}
+                      <span className={pillLabelClass}>{t.name}</span>
                     </span>
                   ))}
                   {(project.roofColors ?? []).map((t) => (
                     <span
                       key={`rc-${project.slug}-${t.slug}`}
-                      className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                      className={pillClass}
                     >
-                      {t.name}
+                      <span className={pillLabelClass}>{t.name}</span>
                     </span>
                   ))}
                 </div>

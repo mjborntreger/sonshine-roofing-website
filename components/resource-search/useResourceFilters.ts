@@ -21,7 +21,7 @@ type ControllerIds = {
 
 type UrlKeys = { q?: string } & Record<string, string>;
 // Back-compat alias (some call sites might import this)
-type ControllerUrlKeys = UrlKeys;
+export type ControllerUrlKeys = UrlKeys;
 
 type MountOptions = {
     ids?: ControllerIds;
@@ -51,8 +51,8 @@ export function mountResourceFilters(kind: ResourceKind, opts: MountOptions): Cl
 
     const shouldDefer = opts.defer !== false;
 
-    if (shouldDefer && "requestIdleCallback" in window) {
-        idleId = (window as any).requestIdleCallback(run, { timeout: 1200 });
+    if (shouldDefer && typeof window.requestIdleCallback === "function") {
+        idleId = window.requestIdleCallback(run, { timeout: 1200 });
     } else if (shouldDefer) {
         timerId = window.setTimeout(run, 0);
     } else {
@@ -60,8 +60,8 @@ export function mountResourceFilters(kind: ResourceKind, opts: MountOptions): Cl
     }
 
     return () => {
-        if (idleId != null && (window as any).cancelIdleCallback) {
-            try { (window as any).cancelIdleCallback(idleId); } catch { }
+        if (idleId != null && typeof window.cancelIdleCallback === "function") {
+            try { window.cancelIdleCallback(idleId); } catch { }
         }
         if (timerId != null) {
             clearTimeout(timerId);
@@ -76,7 +76,7 @@ export function useResourceFilters(kind: ResourceKind, opts: MountOptions) {
     useEffect(() => {
         const dispose = mountResourceFilters(kind, opts);
         return () => { try { dispose?.(); } catch { } };
-    }, [kind, JSON.stringify(opts)]);
+    }, [kind, opts]);
 }
 
 // ------------------------------------------------------------
@@ -273,13 +273,27 @@ function setPillDisabled(btn: Element, disabled: boolean, reason?: string) {
     }
 }
 
+type QueryRoot = Document | Element | DocumentFragment;
+
+function isQueryRoot(value: unknown): value is QueryRoot {
+    if (!value || typeof value !== "object") return false;
+    const maybe = value as { querySelector?: unknown };
+    return typeof maybe.querySelector === "function";
+}
+
 function $(sel: string, root?: ParentNode | Document | Element | null): Element | null {
-    const scope: ParentNode | Document | Element = (root ?? document);
-    return (scope as any).querySelector(sel);
+    const scope = root ?? document;
+    if (isQueryRoot(scope)) {
+        return scope.querySelector(sel);
+    }
+    return null;
 }
 function $$(sel: string, root?: ParentNode | Document | Element | null): Element[] {
-    const scope: ParentNode | Document | Element = (root ?? document);
-    return Array.from((scope as any).querySelectorAll(sel));
+    const scope = root ?? document;
+    if (isQueryRoot(scope)) {
+        return Array.from(scope.querySelectorAll(sel));
+    }
+    return [];
 }
 
 function normSel(s?: string | null): string {
@@ -294,7 +308,7 @@ function normSel(s?: string | null): string {
 
 function on<K extends keyof DocumentEventMap>(
     type: K,
-    handler: (ev: DocumentEventMap[K]) => any,
+    handler: (ev: DocumentEventMap[K]) => void,
     // default to bubble phase; avoid interfering with link navigation
     opts?: AddEventListenerOptions
 ): Cleaner {
@@ -366,7 +380,7 @@ function syncUrl(params: Record<string, string | null | undefined>) {
 }
 
 // Utility: robustly test if an input event came from a given selector or id
-function isOurInput(el: any, selectorOrId: string): el is HTMLInputElement {
+function isOurInput(el: unknown, selectorOrId: string): el is HTMLInputElement {
     if (!(el instanceof HTMLInputElement)) return false;
     const sel = selectorOrId || '';
     let ok = false;
@@ -391,7 +405,7 @@ function strategyBlog(opts: MountOptions): Cleaner {
         noResults: normSel(ids.noResults),
         resultCount: normSel(ids.resultCount),
     };
-    const urlKeys = (opts.urlKeys || {}) as Record<string, string>;
+    const urlKeys = opts.urlKeys ?? {};
     const keys = { q: urlKeys.q ?? "q", cat: urlKeys.cat ?? "cat" };
     const MINQ = opts.minQueryLen ?? MIN_Q;
 
@@ -500,10 +514,11 @@ function strategyBlog(opts: MountOptions): Cleaner {
             setHidden(getNoResults(), visible !== 0);
         });
         // URL sync (q + categories as CSV)
-        syncUrl({
-            [keys.q]: queryForUrl(q, MINQ) as any,
-            [keys.cat]: csvFromSet(selected) || null,
-        } as any);
+        const params: Record<string, string | null> = {
+            [keys.q]: queryForUrl(q, MINQ),
+            [keys.cat]: selected.size > 0 ? csvFromSet(selected) : null,
+        };
+        syncUrl(params);
     }
     const scheduleFilter = makeScheduler(filterNow);
 
@@ -525,17 +540,20 @@ function strategyBlog(opts: MountOptions): Cleaner {
     } catch { }
     try {
         const run = () => prewarmBlogBodies(getGrid());
-        if ("requestIdleCallback" in window) { (window as any).requestIdleCallback(run, { timeout: 600 }); }
-        else { setTimeout(run, 0); }
+        if (typeof window.requestIdleCallback === "function") {
+            window.requestIdleCallback(run, { timeout: 600 });
+        } else {
+            window.setTimeout(run, 0);
+        }
     } catch { }
 
     // Robust input handler: read from event target (the actual node that fired)
     const offInput = on(
         'input',
         (ev) => {
-            const t = ev.target as any;
-            if (!isOurInput(t, sel.query)) return;
-            const next = t.value ?? '';
+            const target = ev.target;
+            if (!isOurInput(target, sel.query)) return;
+            const next = target.value ?? '';
             if (next === q) return;
             q = next;
             filterNow();
@@ -544,10 +562,11 @@ function strategyBlog(opts: MountOptions): Cleaner {
     );
 
     const offClick = on("click", (e) => {
-        const t = e.target as Element;
+        const target = e.target;
+        if (!(target instanceof Element)) return;
 
         // Reset buttons
-        if ((t as HTMLElement).id === "blog-clear" || (t as HTMLElement).id === "blog-clear-2") {
+        if (target instanceof HTMLElement && (target.id === "blog-clear" || target.id === "blog-clear-2")) {
             e.preventDefault();
             q = "";
             const si = getSearch(); if (si) si.value = "";
@@ -562,7 +581,7 @@ function strategyBlog(opts: MountOptions): Cleaner {
         }
 
         // Category pills
-        const btn = t.closest?.("button[data-cat]");
+        const btn = target.closest<HTMLButtonElement>("button[data-cat]");
         if (!btn) return;
         const cat = btn.getAttribute("data-cat") || "";
         if (cat === "__all__") {
@@ -624,7 +643,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
         noResults: normSel(ids.noResults),
         resultCount: normSel(ids.resultCount),
     };
-    const urlKeys = (opts.urlKeys || {}) as Record<string, string>;
+    const urlKeys = opts.urlKeys ?? {};
     const keys = {
         q: urlKeys.q ?? "q",
         mt: urlKeys.mt ?? "mt",
@@ -655,8 +674,8 @@ function strategyProjects(opts: MountOptions): Cleaner {
     const disabledMessage = "No projects match this combination yet.";
 
     function ensureTitleTaxesNorm(card: Element) {
-        let v = card.getAttribute("data-titlecats-norm");
-        if (v != null) return v;
+        const existing = card.getAttribute("data-titlecats-norm");
+        if (existing != null) return existing;
         const tc = norm(((card.getAttribute("data-title") || "") + " " + (card.getAttribute("data-taxes") || "")));
         card.setAttribute("data-titlecats-norm", tc);
         return tc;
@@ -679,7 +698,7 @@ function strategyProjects(opts: MountOptions): Cleaner {
         return ex;
     }
     function readProjectCard(card: Element): Record<ProjectGroup, string[]> {
-        let cached = cardDataCache.get(card);
+        const cached = cardDataCache.get(card);
         if (cached) return cached;
         const read = (key: ProjectGroup) =>
             (card.getAttribute(`data-${key}`) || "")
@@ -763,9 +782,9 @@ function strategyProjects(opts: MountOptions): Cleaner {
         }
 
         renderChipList(getChips(), chips, ({ group, slug }) => {
-            if (!group) return;
-            const set = selected[group as keyof typeof selected];
-            set?.delete(slug);
+            if (group !== "mt" && group !== "rc" && group !== "sa") return;
+            const set = selected[group];
+            set.delete(slug);
             const pill = document.querySelector(`button[data-group="${group}"][data-slug="${cssEscape(slug)}"]`);
             if (pill) setPillPressed(pill, false);
             filterNow();
@@ -795,12 +814,13 @@ function strategyProjects(opts: MountOptions): Cleaner {
                 else { nr.classList.add("hidden"); qs.textContent = ""; }
             }
             // URL sync
-            syncUrl({
-                [keys.q]: queryForUrl(q, MINQ) as any,
-                [keys.mt]: csvFromSet(selected.mt) || null,
-                [keys.rc]: csvFromSet(selected.rc) || null,
-                [keys.sa]: csvFromSet(selected.sa) || null,
-            } as any);
+            const urlParams: Record<string, string | null> = {
+                [keys.q]: queryForUrl(q, MINQ),
+                [keys.mt]: selected.mt.size > 0 ? csvFromSet(selected.mt) : null,
+                [keys.rc]: selected.rc.size > 0 ? csvFromSet(selected.rc) : null,
+                [keys.sa]: selected.sa.size > 0 ? csvFromSet(selected.sa) : null,
+            };
+            syncUrl(urlParams);
             applyProjectDisabledState();
         });
     }
@@ -824,15 +844,16 @@ function strategyProjects(opts: MountOptions): Cleaner {
     } catch { }
 
     const offInput = on('input', (ev) => {
-        const t = ev.target as any;
-        if (!isOurInput(t, sel.query)) return;
-        q = t.value || '';
+        const target = ev.target;
+        if (!isOurInput(target, sel.query)) return;
+        q = target.value || '';
         filterNow();
     }, { capture: true });
 
     const offClick = on("click", (ev) => {
-        const el = ev.target as Element;
-        if ((el as HTMLElement).id === "project-clear") {
+        const el = ev.target;
+        if (!(el instanceof Element)) return;
+        if (el instanceof HTMLElement && el.id === "project-clear") {
             ev.preventDefault();
             q = ""; const si = getSearch(); if (si) si.value = "";
             selected.mt.clear(); selected.rc.clear(); selected.sa.clear();
@@ -841,10 +862,12 @@ function strategyProjects(opts: MountOptions): Cleaner {
             filterNow();
             return;
         }
-        const btn = el.closest?.("button[data-group][data-slug]");
+        const btn = el.closest<HTMLButtonElement>("button[data-group][data-slug]");
         if (!btn) return;
         ev.preventDefault();
-        const group = (btn.getAttribute("data-group") || "") as keyof typeof selected;
+        const groupAttr = btn.getAttribute("data-group");
+        if (groupAttr !== "mt" && groupAttr !== "rc" && groupAttr !== "sa") return;
+        const group: ProjectGroup = groupAttr;
         const slug = btn.getAttribute("data-slug") || "";
         const set = selected[group];
         if (!set) return;
@@ -890,7 +913,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
         noResults: normSel(ids.noResults),
         resultCount: normSel(ids.resultCount),
     };
-    const urlKeys = (opts.urlKeys || {}) as Record<string, string>;
+    const urlKeys = opts.urlKeys ?? {};
     const keys = {
         q: urlKeys.q ?? "q",
         bk: urlKeys.bk ?? "bk",
@@ -921,14 +944,14 @@ function strategyVideos(opts: MountOptions): Cleaner {
     let q = "";
 
     function ensureTitleCatsNorm(card: Element, section?: Element | null) {
-        let v = card.getAttribute("data-titlecats-norm");
-        if (v != null) return v;
+        const existing = card.getAttribute("data-titlecats-norm");
+        if (existing != null) return existing;
         const title = card.getAttribute("data-title") || "";
         const cats = card.getAttribute("data-cats") || "";
         const bucketName = section?.getAttribute("data-section-title") || "";
-        v = norm([title, cats, bucketName].join(" "));
-        card.setAttribute("data-titlecats-norm", v);
-        return v;
+        const normalized = norm([title, cats, bucketName].join(" "));
+        card.setAttribute("data-titlecats-norm", normalized);
+        return normalized;
     }
     function ensureExcerptNorm(card: Element) {
         if (card.getAttribute("data-excerpt-norm-ready") === "1")
@@ -953,7 +976,7 @@ function strategyVideos(opts: MountOptions): Cleaner {
         });
     }
     function readVideoCard(card: Element): Record<VideoGroup, string[]> {
-        let cached = cardDataCache.get(card);
+        const cached = cardDataCache.get(card);
         if (cached) return cached;
         const read = (attr: string) =>
             (card.getAttribute(attr) || "")
@@ -1067,11 +1090,11 @@ function strategyVideos(opts: MountOptions): Cleaner {
         });
 
         renderChipList(getChips(), chips, ({ group, slug }) => {
-            if (!group) return;
+            if (group !== "bk" && group !== "mt" && group !== "sa") return;
             const btn = document.querySelector(`button[data-group="${group}"][data-slug="${cssEscape(slug)}"]`);
             if (btn) { btn.setAttribute("aria-pressed", "false"); setPillPressed(btn, false); }
-            const set = selected[group as keyof typeof selected];
-            set?.delete(slug);
+            const set = selected[group];
+            set.delete(slug);
             if (group === "bk") updateProjectOnlyGroupsVisibility();
             filterNow();
             updateChips();
@@ -1109,12 +1132,13 @@ function strategyVideos(opts: MountOptions): Cleaner {
                 else { nr.classList.add("hidden"); qs.textContent = ""; }
             }
             // URL sync
-            syncUrl({
-                [keys.q]: queryForUrl(q, MINQ) as any,
-                [keys.bk]: csvFromSet(selected.bk) || null,
-                [keys.mt]: csvFromSet(selected.mt) || null,
-                [keys.sa]: csvFromSet(selected.sa) || null,
-            } as any);
+            const urlParams: Record<string, string | null> = {
+                [keys.q]: queryForUrl(q, MINQ),
+                [keys.bk]: selected.bk.size > 0 ? csvFromSet(selected.bk) : null,
+                [keys.mt]: selected.mt.size > 0 ? csvFromSet(selected.mt) : null,
+                [keys.sa]: selected.sa.size > 0 ? csvFromSet(selected.sa) : null,
+            };
+            syncUrl(urlParams);
             applyVideoDisabledState();
         });
     }
@@ -1142,22 +1166,23 @@ function strategyVideos(opts: MountOptions): Cleaner {
             const group = b.getAttribute("data-group") as "bk" | "mt" | "sa" | null;
             const slug = b.getAttribute("data-slug") || "";
             if (!group) return;
-            setPillPressed(b, (selected as any)[group].has(slug));
+            setPillPressed(b, selected[group].has(slug));
         });
 
         updateProjectOnlyGroupsVisibility();
     } catch { }
 
     const offInput = on('input', (e) => {
-        const t = e.target as any;
-        if (!isOurInput(t, sel.query)) return;
-        q = t.value || '';
+        const target = e.target;
+        if (!isOurInput(target, sel.query)) return;
+        q = target.value || '';
         filterNow();
     }, { capture: true });
 
     const offClick = on("click", (e) => {
-        const t = e.target as Element;
-        if ((t as HTMLElement).id === "video-clear") {
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        if (target instanceof HTMLElement && target.id === "video-clear") {
             e.preventDefault();
             q = ""; const si = getSearch(); if (si) si.value = "";
             selected.bk.clear(); selected.mt.clear(); selected.sa.clear();
@@ -1168,15 +1193,16 @@ function strategyVideos(opts: MountOptions): Cleaner {
             return;
         }
 
-        const btn = t.closest?.("button[data-group][data-slug]");
+        const btn = target.closest<HTMLButtonElement>("button[data-group][data-slug]");
         if (!btn) return;
         e.preventDefault();
-        const group = btn.getAttribute("data-group") as "bk" | "mt" | "sa" | null;
+        const groupAttr = btn.getAttribute("data-group");
+        if (groupAttr !== "bk" && groupAttr !== "mt" && groupAttr !== "sa") return;
+        const group: VideoGroup = groupAttr;
         const slug = btn.getAttribute("data-slug") || "";
-        if (!group) return;
 
         // Toggle
-        const set = (selected as any)[group] as Set<string>;
+        const set = selected[group];
         const next = !(btn.getAttribute("aria-pressed") === "true");
         btn.setAttribute("aria-pressed", next ? "true" : "false");
         setPillPressed(btn, next);
@@ -1255,7 +1281,7 @@ function strategyFaq(opts: MountOptions): Cleaner {
         noResults: normSel(ids.noResults),
         resultCount: normSel(ids.resultCount),
     };
-    const urlKeys = (opts.urlKeys || {}) as Record<string, string>;
+    const urlKeys = opts.urlKeys ?? {};
     const keys = { q: urlKeys.q ?? "q" };
     const MINQ = opts.minQueryLen ?? MIN_Q;
 
@@ -1266,7 +1292,10 @@ function strategyFaq(opts: MountOptions): Cleaner {
     const getNoResults = () => (sel.noResults ? $(sel.noResults) : $("#faq-no-results"));
     const getQuerySpan = () => $("#faq-query");
     const getSugWrap = () => $("#faq-suggestions");
-    const getSugList = () => $("#faq-suggestion-list");
+    const getSugList = () => {
+        const el = $("#faq-suggestion-list");
+        return el instanceof HTMLElement ? el : null;
+    };
 
     const suggestionEntries: Array<{ root: Root; node: HTMLElement }> = [];
 
@@ -1276,8 +1305,8 @@ function strategyFaq(opts: MountOptions): Cleaner {
         }
         suggestionEntries.length = 0;
         if (list) {
-            if (typeof (list as any).replaceChildren === "function") {
-                (list as any).replaceChildren();
+            if (typeof list.replaceChildren === "function") {
+                list.replaceChildren();
             } else {
                 list.innerHTML = "";
             }
@@ -1292,9 +1321,27 @@ function strategyFaq(opts: MountOptions): Cleaner {
       if (si) si.value = q0;
     } catch {}
 
-    function ensureTitleNorm(el: Element) { let v = el.getAttribute("data-title-norm"); if (v != null) return v; v = norm(el.getAttribute("data-title") || ""); el.setAttribute("data-title-norm", v); return v; }
-    function ensureTopicNorm(el: Element) { let v = el.getAttribute("data-topic-norm"); if (v != null) return v; v = norm(el.getAttribute("data-topic") || ""); el.setAttribute("data-topic-norm", v); return v; }
-    function ensureExcerptNorm(el: Element) { let v = el.getAttribute("data-excerpt-norm"); if (v != null) return v; v = norm(el.getAttribute("data-excerpt") || ""); el.setAttribute("data-excerpt-norm", v); return v; }
+    function ensureTitleNorm(el: Element) {
+        const existing = el.getAttribute("data-title-norm");
+        if (existing != null) return existing;
+        const normalized = norm(el.getAttribute("data-title") || "");
+        el.setAttribute("data-title-norm", normalized);
+        return normalized;
+    }
+    function ensureTopicNorm(el: Element) {
+        const existing = el.getAttribute("data-topic-norm");
+        if (existing != null) return existing;
+        const normalized = norm(el.getAttribute("data-topic") || "");
+        el.setAttribute("data-topic-norm", normalized);
+        return normalized;
+    }
+    function ensureExcerptNorm(el: Element) {
+        const existing = el.getAttribute("data-excerpt-norm");
+        if (existing != null) return existing;
+        const normalized = norm(el.getAttribute("data-excerpt") || "");
+        el.setAttribute("data-excerpt-norm", normalized);
+        return normalized;
+    }
 
     function matches(el: Element, q: string) {
         const phrase = norm(q);
@@ -1307,9 +1354,9 @@ function strategyFaq(opts: MountOptions): Cleaner {
 
     function buildSuggestions(all: Element[], phrase: string) {
         const tokens = norm(phrase).split(/\s+/).filter((t) => t.length >= 3);
-        if (!tokens.length) return [] as { title: string; href: string }[];
+        if (!tokens.length) return [];
         const seen = new Set<string>();
-        const out: { title: string; href: string }[] = [];
+        const out: Array<{ title: string; href: string }> = [];
         for (const el of all) {
             const title = el.getAttribute("data-title") || "";
             const tNorm = ensureTitleNorm(el);
@@ -1327,7 +1374,11 @@ function strategyFaq(opts: MountOptions): Cleaner {
     }
 
     function syncQ(q: string) {
-        syncUrl({ [keys.q]: (q.trim().length >= MINQ ? q.trim() : null) as any } as any);
+        const trimmed = q.trim();
+        const params: Record<string, string | null> = {
+            [keys.q]: trimmed.length >= MINQ ? trimmed : null,
+        };
+        syncUrl(params);
     }
 
     function applyHashOpen() {
@@ -1370,8 +1421,8 @@ function strategyFaq(opts: MountOptions): Cleaner {
                 const sugg = buildSuggestions(getItems(), q);
                 if (sugg.length) {
                     sw.classList.remove("hidden");
-                    const listEl = sl as HTMLElement | null;
-                    clearSuggestionEntries(listEl || undefined);
+                    const listEl = sl;
+                    clearSuggestionEntries(listEl ?? undefined);
                     if (listEl) {
                         for (const s of sugg) {
                             const li = document.createElement("li");
@@ -1381,9 +1432,9 @@ function strategyFaq(opts: MountOptions): Cleaner {
                                     SmartLink,
                                     {
                                         href: s.href,
-                                        className: "inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-sm hover:bg-slate-50",
+                                        className: "inline-flex min-w-0 max-w-full items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-sm hover:bg-slate-50",
                                     },
-                                    s.title
+                                    createElement("span", { className: "block max-w-full truncate" }, s.title)
                                 )
                             );
                             suggestionEntries.push({ root, node: li });
@@ -1392,15 +1443,15 @@ function strategyFaq(opts: MountOptions): Cleaner {
                     }
                 } else {
                     sw.classList.add("hidden");
-                    const listEl = sl as HTMLElement | null;
-                    clearSuggestionEntries(listEl || undefined);
+                    const listEl = getSugList();
+                    clearSuggestionEntries(listEl ?? undefined);
                 }
             } else {
                 nr.classList.add("hidden");
                 qs.textContent = "";
                 sw.classList.add("hidden");
-                const listEl = sl as HTMLElement | null;
-                clearSuggestionEntries(listEl || undefined);
+                const listEl = getSugList();
+                clearSuggestionEntries(listEl ?? undefined);
             }
         }
         syncQ(q);
@@ -1411,21 +1462,21 @@ function strategyFaq(opts: MountOptions): Cleaner {
     }
 
     const offInput = on('input', (e) => {
-        const t = e.target as any;
-        if (!isOurInput(t, sel.query)) return;
+        const target = e.target;
+        if (!isOurInput(target, sel.query)) return;
         filterNow();
     }, { capture: true });
 
     const offSubmit = on("submit", (e) => {
-        const form = e.target as HTMLElement;
+        const form = e.target;
         if (!(form instanceof HTMLFormElement)) return;
         if ($("#faq-search", form)) e.preventDefault();
     });
 
     const offClick = on("click", (e) => {
-        const t = e.target as Element;
-        if (!t || !t.closest) return;
-        if (!t.closest("#faq-toggle-all")) return;
+        const target = e.target;
+        if (!(target instanceof Element)) return;
+        if (!target.closest("#faq-toggle-all")) return;
         if (typeof window !== "undefined") {
             try { window.dispatchEvent(new CustomEvent("faq:update")); } catch { }
         }
@@ -1439,8 +1490,8 @@ function strategyFaq(opts: MountOptions): Cleaner {
         offInput();
         offSubmit();
         offClick();
-        const listEl = getSugList() as HTMLElement | null;
-        clearSuggestionEntries(listEl || undefined);
+        const listEl = getSugList();
+        clearSuggestionEntries(listEl ?? undefined);
     };
 }
 
@@ -1458,7 +1509,12 @@ const STRATEGIES: Record<ResourceKind, (opts: MountOptions) => Cleaner> = {
 // Small util: CSS.escape polyfill wrapper
 // ------------------------------------------------------------
 function cssEscape(s: string) {
-    try { return (window as any).CSS?.escape ? (window as any).CSS.escape(s) : s; } catch { return s; }
+    try {
+        const cssApi = typeof window !== "undefined" ? window.CSS : undefined;
+        return cssApi && typeof cssApi.escape === "function" ? cssApi.escape(s) : s;
+    } catch {
+        return s;
+    }
 }
 
 export default useResourceFilters;

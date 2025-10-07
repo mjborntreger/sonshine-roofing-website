@@ -35,5 +35,7 @@ export const config = {
     '/know-about-tile-roof-repair/:path*',
     '/seven-ways-to-make-sure-your-roofing-contractor-will-rip-you-off/:path*',
     '/about/kris-marszalek/:path*',
+    '/the-right-place/:path*',
+    '/sonshine-roofing/:path*',
   ],
 };

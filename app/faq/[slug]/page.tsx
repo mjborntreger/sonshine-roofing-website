@@ -90,9 +90,9 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
                 <Link
                   key={t}
                   href={{ pathname: '/faq', query: { topic: t } }}
-                  className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
+                  className="inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700 hover:bg-slate-200"
                 >
-                  {t}
+                  <span className="block max-w-full truncate">{t}</span>
                 </Link>
               ))}
             </div>
@@ -100,7 +100,6 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
         </header>
 
         <div className="prose prose-slate lg:prose-lg leading-relaxed mt-6 max-w-none">
-          {/* eslint-disable-next-line react/no-danger */}
           <div dangerouslySetInnerHTML={{ __html: faq.contentHtml }} />
         </div>
 
@@ -143,7 +142,6 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
         {/* JSON-LD for a single FAQ */}
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',

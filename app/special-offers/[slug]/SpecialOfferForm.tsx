@@ -3,8 +3,14 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
-import { formatPhoneUSForDisplay, normalizePhoneUS, stripToDigits } from '@/lib/phone';
-import { endOfDay, parseSpecialOfferDate } from '@/lib/specialOfferDates';
+import {
+  sanitizePhoneInput,
+  isUsPhoneComplete,
+  normalizePhoneForSubmit,
+  formatPhoneExample,
+  submitLead,
+  type SpecialOfferLeadInput,
+} from '@/lib/contact-lead';
 
 type Props = {
   offerCode: string;
@@ -25,9 +31,19 @@ type Submission = 'idle' | 'submitting' | 'success' | 'error';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-function resolveCookieExpiration(expiration?: string | null): Date {
-  const parsed = parseSpecialOfferDate(expiration);
-  if (parsed) return endOfDay(parsed);
+function parseExpirationDate(raw?: string | null): Date {
+  if (raw) {
+    const parts = raw.split('/').map((part) => Number.parseInt(part, 10));
+    if (parts.length === 3) {
+      const [month, day, year] = parts;
+      if (month && day && year) {
+        const candidate = new Date(year, month - 1, day, 23, 59, 59, 999);
+        if (!Number.isNaN(candidate.getTime())) {
+          return candidate;
+        }
+      }
+    }
+  }
   const fallback = new Date();
   fallback.setFullYear(fallback.getFullYear() + 1);
   return fallback;
@@ -35,7 +51,7 @@ function resolveCookieExpiration(expiration?: string | null): Date {
 
 function writeOfferCookie(name: string, code: string, expiration?: string | null) {
   if (typeof document === 'undefined') return;
-  const expiresDate = resolveCookieExpiration(expiration);
+  const expiresDate = parseExpirationDate(expiration);
   const payload = { code, exp: expiresDate.toISOString() };
   const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
   document.cookie = `${name}=${encodeURIComponent(JSON.stringify(payload))}; expires=${expiresDate.toUTCString()}; path=/; SameSite=Lax${secure}`;
@@ -73,8 +89,6 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
   const [submission, setSubmission] = useState<Submission>(initialUnlock ? 'success' : 'idle');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-
 
   const resetErrors = () => {
     setFieldErrors({});
@@ -91,16 +105,16 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
     } else if (!emailRegex.test(email)) {
       next.email = 'Enter a valid email (example@domain.com)';
     }
-    if (!normalizePhoneUS(values.phone)) {
-      next.phone = 'Enter a valid 10-digit phone number';
+    if (!isUsPhoneComplete(values.phone)) {
+      next.phone = 'Enter a valid US phone number (10 digits).';
     }
     return next;
   };
 
   const handleChange = (key: keyof FormValues) => (event: ChangeEvent<HTMLInputElement>) => {
-    const rawValue = event.target.value;
-    const value = key === 'phone' ? stripToDigits(rawValue, 10) : rawValue;
-    setValues((prev) => ({ ...prev, [key]: value }));
+    const value = event.target.value;
+    const nextValue = key === 'phone' ? sanitizePhoneInput(value) : value;
+    setValues((prev) => ({ ...prev, [key]: nextValue }));
     if (fieldErrors[key]) {
       setFieldErrors((prev) => {
         const clone = { ...prev };
@@ -129,16 +143,6 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
     }
   }, [submission, cookieName, offerCode, offerExpiration]);
 
-  const handleCopyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(offerCode);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
-    }
-  };
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submission === 'submitting') return;
@@ -159,26 +163,19 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       return;
     }
 
-    const normalizedPhone = normalizePhoneUS(values.phone);
-    if (!normalizedPhone) {
-      setSubmission('error');
-      setGlobalError('Enter a valid 10-digit phone number');
-      return;
-    }
-
-    const payload: Record<string, unknown> = {
+    const payload: SpecialOfferLeadInput & { submittedAt: string } = {
       type: 'special-offer',
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
       email: values.email.trim(),
-      phone: normalizedPhone,
+      phone: normalizePhoneForSubmit(values.phone),
       offerCode,
       offerSlug,
       offerTitle: offerTitle ?? undefined,
-      offerExpiration: offerExpiration ?? undefined,
       cfToken,
-      hp_field: honeypot,
+      hp_field: honeypot || undefined,
       page: `/special-offers/${offerSlug}`,
+      submittedAt: new Date().toISOString(),
     };
 
     const utmSource = searchParams.get('utm_source');
@@ -190,45 +187,48 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
 
     setSubmission('submitting');
 
-    try {
-      const res = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json().catch(() => ({} as any));
-      if (res.ok && json?.ok) {
-        setSubmission('success');
-        writeOfferCookie(cookieName, offerCode, offerExpiration);
-        try {
-          (window as any).dataLayer = (window as any).dataLayer || [];
-          (window as any).dataLayer.push({
-            event: 'special_offer_claimed',
-            offer_slug: offerSlug,
-            offer_code: offerCode,
-          });
-        } catch {}
-        return;
+    const result = await submitLead(payload, {
+      gtmEvent: {
+        event: 'special_offer_claimed',
+        offer_slug: offerSlug,
+        offer_code: offerCode,
+      },
+      contactReadyCookie: false,
+    });
+
+    if (!result.ok) {
+      setSubmission('error');
+      setGlobalError(result.error || 'We could not send your request. Please try again.');
+      if (result.fieldErrors) {
+        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
+          if (Array.isArray(messages) && messages.length) {
+            acc[key] = String(messages[0]);
+          }
+          return acc;
+        }, {});
+        if (Object.keys(serverErrors).length) {
+          setFieldErrors(serverErrors);
+        }
       }
-      setSubmission('error');
-      setGlobalError(json?.error || 'We could not send your request. Please try again.');
-    } catch (err) {
-      setSubmission('error');
-      setGlobalError('Network error. Please try again.');
+      return;
     }
+
+    setSubmission('success');
+    setGlobalError(null);
+    writeOfferCookie(cookieName, offerCode, offerExpiration);
   };
 
   if (submission === 'success') {
     return (
       <div className="rounded-3xl border border-emerald-200 bg-white/95 p-6 shadow-lg print:border-neutral-700 print:bg-white">
-        <h2 className="text-2xl font-semibold text-emerald-700">You're all set!</h2>
+        <h2 className="text-2xl font-semibold text-emerald-700">You&rsquo;re all set!</h2>
         <p className="mt-2 text-sm text-slate-600 print:text-black">
           Thanks! Your offer code is below. We’ve also emailed it to you so you can keep it handy.
         </p>
 
         <div className="mt-6 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50 p-6 text-center text-slate-900 print:border-solid print:border-black print:bg-white">
           <p className="text-sm uppercase tracking-widest text-emerald-600">Your Offer Code</p>
-          <p className="mt-2 text-4xl font-black tracking-[0.2em] text-emerald-700 print:text-black">
+          <p className="mt-2 text-4xl font-bold tracking-[0.2em] text-emerald-700 print:text-black">
             {offerCode}
           </p>
         </div>
@@ -337,7 +337,9 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
               {fieldErrors.phone}
             </span>
           )}
-          <p className="mt-1 text-xs text-slate-500">Digits only please. Example: {formatPhoneUSForDisplay('+19415551234')}</p>
+          <p className="mt-1 text-xs text-slate-500">
+            Digits only, US numbers. Example: {formatPhoneExample(values.phone)}
+          </p>
         </label>
 
         <div className="pt-2">

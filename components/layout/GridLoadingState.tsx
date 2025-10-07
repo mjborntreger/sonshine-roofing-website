@@ -34,18 +34,6 @@ export default function GridLoadingState({
   message = "Loading…",
   ...gridProps
 }: GridLoadingStateProps) {
-  if (mode === "overlay") {
-    return (
-      <div
-        role="status"
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-white/70 backdrop-blur-sm"
-      >
-        <span className="inline-flex h-3 w-3 animate-pulse rounded-full bg-[--brand-blue]" aria-hidden />
-        <span className="text-sm font-medium text-slate-700">{message}</span>
-      </div>
-    );
-  }
-
   const resolvedAspect = React.useMemo(() => {
     if (imageAspectClass) return imageAspectClass;
     switch (variant) {
@@ -59,6 +47,18 @@ export default function GridLoadingState({
   }, [imageAspectClass, variant]);
 
   const items = React.useMemo(() => Array.from({ length: Math.max(0, count | 0) }), [count]);
+
+  if (mode === "overlay") {
+    return (
+      <div
+        role="status"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-white/70 backdrop-blur-sm"
+      >
+        <span className="inline-flex h-3 w-3 animate-pulse rounded-full bg-[--brand-blue]" aria-hidden />
+        <span className="text-sm font-medium text-slate-700">{message}</span>
+      </div>
+    );
+  }
 
   return (
     <Grid className={className} {...gridProps}>

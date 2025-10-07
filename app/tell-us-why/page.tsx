@@ -4,12 +4,33 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Turnstile from "@/components/Turnstile";
 import SmartLink from "@/components/SmartLink";
-import { normalizePhoneUS } from "@/lib/phone";
+import {
+  sanitizePhoneInput,
+  isUsPhoneComplete,
+  normalizePhoneForSubmit,
+  formatPhoneExample,
+  submitLead,
+  type FeedbackLeadInput,
+} from "@/lib/contact-lead";
+
+const RATING_VALUES = ["1", "2", "3"] as const;
+type RatingString = (typeof RATING_VALUES)[number];
+
+const ratingLookup: Record<RatingString, 1 | 2 | 3> = {
+  "1": 1,
+  "2": 2,
+  "3": 3,
+};
+
+function isRatingString(value: string): value is RatingString {
+  return (RATING_VALUES as readonly string[]).includes(value);
+}
 
 function TellUsWhyForm() {
   const qs = useSearchParams();
   const ratingParam = qs.get("rating");
-  const rating = ratingParam && ["1", "2", "3"].includes(ratingParam) ? ratingParam : "3"; // default to 3 if missing
+  const rating: RatingString = ratingParam && isRatingString(ratingParam) ? ratingParam : "3"; // default to 3 if missing
+  const ratingValue = ratingLookup[rating];
 
   const [status, setStatus] = useState<"idle" | "sending" | "ok" | "err">("idle");
   const [err, setErr] = useState<string | null>(null);
@@ -43,32 +64,39 @@ function TellUsWhyForm() {
     const first = String(fd.get("firstName") || "").trim();
     const last = String(fd.get("lastName") || "").trim();
     const email = String(fd.get("email") || "").trim();
-    const phoneRaw = String(fd.get("phone") || "").trim();
+    const phone = String(fd.get("phone") || "").trim();
     const message = String(fd.get("message") || "").trim();
 
     const cfToken = String(fd.get("cfToken") || ""); // provided by <Turnstile />
     const hp_field = String(fd.get("company") || ""); // honeypot
 
-    const normalizedPhone = normalizePhoneUS(phoneRaw);
+    const phoneDigits = sanitizePhoneInput(phone);
+    if (!isUsPhoneComplete(phoneDigits)) {
+      setStatus("err");
+      setErr("Enter a valid US phone number (10 digits).");
+      return;
+    }
+    const normalizedPhone = normalizePhoneForSubmit(phoneDigits);
     if (!normalizedPhone) {
-      setStatus("idle");
-      setErr("Enter a valid 10-digit phone number.");
+      setStatus("err");
+      setErr("Enter a valid US phone number (10 digits).");
       return;
     }
 
-    const payload: Record<string, unknown> = {
+    const payload: FeedbackLeadInput & { submittedAt: string } = {
       type: "feedback",
       firstName: first,
       lastName: last,
       email,
       phone: normalizedPhone,
-      rating: Number(rating),
+      rating: ratingValue,
       message,
       cfToken,
-      hp_field,
+      hp_field: hp_field || undefined,
       page: "/tell-us-why",
       ua: typeof navigator !== "undefined" ? navigator.userAgent : "",
       tz: typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "",
+      submittedAt: new Date().toISOString(),
     };
 
     const utmSource = qs.get("utm_source");
@@ -78,32 +106,22 @@ function TellUsWhyForm() {
     if (utmMedium) payload.utm_medium = utmMedium.trim();
     if (utmCampaign) payload.utm_campaign = utmCampaign.trim();
 
-    try {
-      const res = await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json().catch(() => ({} as any));
-      if (res.ok && json?.ok) {
-        setStatus("ok");
-        // GTM event
-        try {
-          (window as any).dataLayer = (window as any).dataLayer || [];
-          (window as any).dataLayer.push({
-            event: "feedback_submitted",
-            rating,
-            page: "/tell-us-why",
-          });
-        } catch {}
-      } else {
-        setStatus("err");
-        setErr(json?.error || "Something went wrong. Please try again.");
-      }
-    } catch (e) {
+    const result = await submitLead(payload, {
+      gtmEvent: {
+        event: "feedback_submitted",
+        rating: ratingValue,
+        page: "/tell-us-why",
+      },
+      contactReadyCookie: false,
+    });
+
+    if (!result.ok) {
       setStatus("err");
-      setErr("Network error. Please try again.");
+      setErr(result.error || "Something went wrong. Please try again.");
+      return;
     }
+
+    setStatus("ok");
   }
 
   if (status === "ok") {
@@ -171,8 +189,13 @@ function TellUsWhyForm() {
             name="phone"
             required
             autoComplete="tel"
+            inputMode="tel"
+            aria-describedby="phone-hint"
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]"
           />
+          <p id="phone-hint" className="mt-1 text-xs text-slate-500">
+            Digits only, US numbers. Example: {formatPhoneExample()}
+          </p>
         </label>
 
         <label className="block">

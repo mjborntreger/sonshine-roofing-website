@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Percent, Landmark, ChevronDown, HelpCircle, ArrowRight } from "lucide-react";
 
@@ -89,7 +91,13 @@ export default function ProgramCard({
           <div className="flex items-center gap-2">
             {/* Optional logo placeholder — add real URL if available */}
             {logoUrl ? (
-              <img src={logoUrl} alt="Program logo" className="h-8 w-auto opacity-70" />
+              <Image
+                src={logoUrl}
+                alt="Program logo"
+                width={96}
+                height={32}
+                className="h-8 w-auto opacity-70"
+              />
             ) : null}
             {recommended && (
               <span className="inline-flex items-center rounded-full bg-[--brand-orange] px-2 py-0.5 text-xs font-semibold text-white whitespace-nowrap shrink-0">
@@ -106,7 +114,7 @@ export default function ProgramCard({
             isBluePrimary ? "bg-blue-50" : isOrange ? "bg-orange-50" : "bg-cyan-50",
             "animate-pulse",
           )}
-          style={{ animationIterationCount: 1 as any }}
+          style={{ animationIterationCount: 1 }}
         >
           <div className="flex flex-wrap items-center gap-3">
             {keyFigures.map((k, i) => (

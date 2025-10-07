@@ -120,7 +120,7 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
       </div>
       <div className="mt-12 text-center md:text-right">
         <SmartLink
-          href="/faq"
+          href={seeMoreHref}
           className={lessFatCta}
           title="See All FAQs"
           data-icon-affordance="right"

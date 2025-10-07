@@ -10,7 +10,7 @@ import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";
 
-const detailsStyles = "group not-prose rounded-xl border border-slate-200 bg-white mb-4";
+const detailsStyles = "group not-prose rounded-3xl border border-slate-200 bg-white mb-4";
 const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
@@ -165,7 +165,7 @@ export default async function Page() {
                 </p>
 
                 <figure className={figureStyles}>
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
                     <Image
                       src="https://next.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
                       alt="Nathan Borntreger, owner of SonShine Roofing"
@@ -175,8 +175,8 @@ export default async function Page() {
                       loading="lazy"
                     />
                   </div>
-                  <figcaption className="mt-2 text-sm text-slate-600">
-                    <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #CCC1331483 | <SmartLink className="text-[--brand-blue]" href="/person/nathan-borntreger">See full bio</SmartLink>
+                  <figcaption className="mt-3 mx-2 text-xs text-slate-500">
+                    <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #CCC1331483 | <SmartLink className="hover:underline no-italic text-[--brand-blue]" href="/person/nathan-borntreger">See full bio</SmartLink>
                   </figcaption>
                 </figure>
 
@@ -211,7 +211,7 @@ export default async function Page() {
                 </p>
 
                 <figure className={figureStyles}>
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
                     <Image
                       src="https://next.sonshineroofing.com/wp-content/uploads/difference-between-tile-vs-metal-vs-shingle-roofs.jpg"
                       alt="Roof replacement choices"
@@ -247,7 +247,7 @@ export default async function Page() {
 
                 <h4>Workmanship Warranty</h4>
                 {/* Inline callout (#6) */}
-                <div className="my-4 rounded-xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
+                <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
                   <strong className="block text-slate-900 mb-1">Fact:</strong>
                   <p className="m-0 text-slate-700">
                     The vast majority of roof failures are caused by poor workmanship, and
@@ -309,7 +309,7 @@ export default async function Page() {
                 </p>
 
                 <figure className={figureStyles}>
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                  <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
                     <Image
                       src="https://next.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
                       alt="The importance of roof maintenance"
@@ -333,14 +333,14 @@ export default async function Page() {
                 </p>
 
                 {/* Inline callout (#6) */}
-                <div className="my-4 rounded-xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Pro tip">
+                <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Pro tip">
                   <strong className="block text-slate-900 mb-1">Pro tip</strong>
                   <p className="m-0 text-slate-700">Annual inspections keep warranties valid and catch small issues before they become leaks.</p>
                 </div>
               </div>
             </details>
 
-            <details className="group not-prose rounded-xl border border-slate200 bg-white mb-6">
+            <details className="group not-prose rounded-3xl border border-slate-200 bg-white mb-6">
               <summary className={summaryStyles}>
                 <span className="flex items-center gap-2">
                   <ListChecks className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />

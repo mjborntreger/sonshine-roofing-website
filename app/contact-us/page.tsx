@@ -1,7 +1,7 @@
 import Section from "@/components/layout/Section";
-import AcculynxLeadForm from "@/components/AcculynxLeadForm";
+import SimpleLeadForm from "@/components/SimpleLeadForm";
 import SmartLink from "@/components/SmartLink";
-import { Phone, Mail, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays, MapPinned } from "lucide-react";
+import { Phone, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, ArrowUpRight } from "lucide-react";
 import Image from 'next/image';
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import type { Metadata } from 'next';
@@ -9,6 +9,8 @@ import LiteMap from "@/components/LiteMap";
 import OpenOrClosed from "@/components/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 import FinancingBand from "@/components/FinancingBand";
+import { cookies } from 'next/headers';
+import { LEAD_SUCCESS_COOKIE } from '@/lib/contact-lead';
 
 // ===== STATIC SEO FOR /contact-us (EDIT HERE) =====
 const SEO_TITLE_CONTACT = 'Contact SonShine Roofing | Sarasota Roofing Company';
@@ -51,17 +53,20 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-slate-400 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal break-words overflow-hidden";
+const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal break-words overflow-hidden";
 const contactInfoIconStyles = "h-5 w-5 shrink-0 text-[--brand-blue]";
 const h1Styles = "text-3xl md:text-5xl text-slate-900";
 const h2Styles = "text-xl md:text-2xl text-slate-800";
 const pStyles = "text-md py-2 text-slate-700";
 const badgeStyles = "badge badge--accent inline-flex items-center gap-2";
 
-export default function Page() {
+export default async function Page() {
+  const cookieStore = await cookies();
+  const leadSuccessCookie = cookieStore.get(LEAD_SUCCESS_COOKIE)?.value ?? null;
+
   return (
     <Section>
-      <div className="container-edge py-4">
+      <div className="py-4">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           {/* Main content */}
           <div className="prose max-w-full min-w-0">
@@ -89,7 +94,7 @@ export default function Page() {
             </div>
 
             {/* “You'll talk to…” human tile */}
-            <div className="mt-6 not-prose rounded-xl border border-slate-300 bg-white p-6 shadow-md max-w-full">
+            <div className="mt-6 not-prose rounded-3xl border border-slate-200 bg-white p-6 shadow-sm max-w-full">
               <OpenOrClosed />
               <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr] mt-8 gap-4 items-center min-w-0">
                 <Image
@@ -102,7 +107,14 @@ export default function Page() {
                 />
                 <div>
                   <p className="text-md font-semibold text-slate-900">
-                    You’ll likely talk to <SmartLink className="text-[--brand-blue] hover:underline" href="/person/tara">Tara.</SmartLink>
+                    You’ll likely talk to 
+                    <SmartLink 
+                      className="text-[--brand-blue] hover:underline" 
+                      href="/person/tara"
+                      data-icon-affordance="up-right"
+                      > Tara
+                      <ArrowUpRight className="icon-affordance h-4 w-4 inline ml-1" />
+                    </SmartLink>
                   </p>
                   <p className="text-md text-slate-600">She’s friendly, fast, and hates leaks.</p>
                 </div>
@@ -119,17 +131,6 @@ export default function Page() {
                   <span className="font-semibold min-w-0 break-words">(941) 866-4320</span>
                 </SmartLink>
 
-                {/* Email */}
-                <SmartLink
-                  href="mailto:messages@sonshineroofing.com"
-                  className={`${contactInfoPillStyles} w-full`}
-                  title="Email SonShine Roofing"
-                  proseGuard
-                >
-                  <Mail className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-semibold min-w-0 break-words">messages@sonshineroofing.com</span>
-                </SmartLink>
-
                 {/* Address */}
                 <SmartLink
                   href="https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM"
@@ -144,10 +145,10 @@ export default function Page() {
                 </SmartLink>
               </div>
 
-              <h2 className={h2Styles}>Whatever you need, we've got you covered.</h2>
+              <h2 className={h2Styles}>Whatever you need, we&rsquo;ve got you covered.</h2>
               <p className={pStyles}>Whether you need to schedule an appointment with one our
                 expert Roofing Specialists to come to your home, or if you
-                just have a few questions, we’re here to help! Give us a call
+                just have a few questions, we&rsquo;re here to help! Give us a call
                 or complete the form below to contact our office.
               </p>
             </div>
@@ -156,19 +157,7 @@ export default function Page() {
 
 
             <div className="mt-8">
-              <h2 className="top-24 flex items-center gap-2" id="book-an-appointment">
-                <CalendarDays className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                <span>Book an Appointment</span>
-              </h2>
-              <p className="text-slate-700 text-sm pb-2">
-                We respond within 30 minutes during business hours
-              </p>
-              <AcculynxLeadForm />
-              <div className="text-xs text-slate-500 py-4 italic">
-                By submitting this form, you agree to receive SMS messages from Sonshine Roofing
-                and its agents. Message frequency may vary. Message and data rates may apply.
-                Reply STOP to opt out at any time. For more information, <SmartLink href="/privacy-policy">view our privacy policy.</SmartLink>
-              </div>
+              <SimpleLeadForm initialSuccessCookie={leadSuccessCookie} />
             </div>
           </div>
 
@@ -182,7 +171,13 @@ export default function Page() {
         <div className="my-24">
           <h2 className="text-2xl md:text-5xl mb-16 text-center flex items-center justify-center gap-3">
             <span>Find Us on Google Maps</span>
-            <MapPinned className="h-6 w-6 md:h-12 md:w-12 inline text-[--brand-blue]" aria-hidden="true" />
+            <Image
+              src="https://next.sonshineroofing.com/wp-content/uploads/Maps_Pin_FullColor-x1000-1.webp"
+              alt="SonShine Roofing map pin"
+              width={48}
+              height={48}
+              className="inline h-6 w-6 md:h-12 md:w-12"
+            />
           </h2>
           <LiteMap />
         </div>

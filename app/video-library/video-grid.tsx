@@ -1,7 +1,7 @@
 // app/video-library/video-grid.tsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
@@ -31,21 +31,34 @@ export default function VideoGrid({
   const scrollYRef = useRef(0);
   const [mounted, setMounted] = useState(false);
 
-  const announceOpen = (slug?: string | null) => {
-    try { window.dispatchEvent(new CustomEvent('video:open', { detail: { slug } })); } catch {}
-  };
-  const announceClose = () => {
-    try { window.dispatchEvent(new Event('video:close')); } catch {}
-  };
-  const openModal = (v: VideoItem) => {
-    setActive(v);
-    const s = (v as any)?.slug || (v as any)?.id || null;
-    if (s) announceOpen(String(s));
-  };
-  const closeModal = () => {
+  const announceOpen = useCallback((slug?: string | null) => {
+    try {
+      window.dispatchEvent(new CustomEvent('video:open', { detail: { slug } }));
+    } catch {
+      // swallow errors triggered by restricted dispatch environments
+    }
+  }, []);
+  const announceClose = useCallback(() => {
+    try {
+      window.dispatchEvent(new Event('video:close'));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const openModal = useCallback(
+    (v: VideoItem) => {
+      setActive(v);
+      const s = v.slug || v.id || null;
+      if (s) announceOpen(String(s));
+    },
+    [announceOpen]
+  );
+
+  const closeModal = useCallback(() => {
     setActive(null);
     announceClose();
-  };
+  }, [announceClose]);
 
   // Normalize initial page data for InfiniteList
   const initialPage: PageResult<VideoItem> = initial ?? {
@@ -59,10 +72,12 @@ export default function VideoGrid({
       const sp = new URLSearchParams(window.location.search);
       const v = sp.get('v');
       if (!v) return;
-      const found = (initialPage.items || []).find((it: any) => it?.slug === v || it?.id === v);
+      const found = initialPage.items?.find((it) => it.slug === v || it.id === v) ?? null;
       if (found) setActive(found);
-    } catch {}
-  }, []);
+    } catch {
+      // ignore parsing errors
+    }
+  }, [initialPage.items]);
 
   // Focus trap refs
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -88,7 +103,7 @@ export default function VideoGrid({
       }
     };
 
-    const body = document.body;
+      const body = document.body;
 
     if (active) {
       previouslyFocused.current = document.activeElement as HTMLElement | null;
@@ -120,8 +135,11 @@ export default function VideoGrid({
       requestAnimationFrame(() => {
         window.scrollTo({ top: y, left: 0 });
         html.style.scrollBehavior = prevBehavior;
-        const el = previouslyFocused.current as any;
-        try { el?.focus?.({ preventScroll: true }); } catch { el?.focus?.(); }
+        const el = previouslyFocused.current;
+        try { el?.focus?.({ preventScroll: true }); }
+        catch {
+          try { el?.focus?.(); } catch { /* ignore */ }
+        }
         previouslyFocused.current = null;
       });
     }
@@ -135,7 +153,7 @@ export default function VideoGrid({
       body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
     };
-  }, [active]);
+  }, [active, closeModal]);
 
   // springPop animation
   const A = {
@@ -160,7 +178,7 @@ export default function VideoGrid({
         filters={filters}
         pageSize={pageSize}
         gridClass="mt-4 grid gap-6 grid-cols-1 md:grid-cols-2"
-        onVideoOpen={(v) => openModal(v as VideoItem)}
+        onVideoOpen={openModal}
       />
 
       {mounted &&

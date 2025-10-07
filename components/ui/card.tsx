@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 // ---- Helpers for proper children handling ----
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode };
 type H3Props = React.HTMLAttributes<HTMLHeadingElement> & { children?: React.ReactNode };
-type PProps  = React.HTMLAttributes<HTMLParagraphElement> & { children?: React.ReactNode };
 
 export function Card({ className, children, ...props }: DivProps) {
   return (
@@ -50,14 +49,6 @@ export function CardTitle({ className, children, ...props }: H3Props) {
     >
       {children}
     </h3>
-  );
-}
-
-function CardDescription({ className, children, ...props }: PProps) {
-  return (
-    <p className={cn("text-sm text-slate-600", className)} {...props}>
-      {children}
-    </p>
   );
 }
 

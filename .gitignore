@@ -35,4 +35,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 acf-export-2025-09-17.json
+<<<<<<< Updated upstream
+
+# WP plugins
+ss-lead-endpoint.php
+ss-lead-endpoint.php
+
+# ACF JSON Manifest
+ACF-to-GraphQL-manifest.json
+=======
 *.php
+ss-lead-endpoint.php
+>>>>>>> Stashed changes

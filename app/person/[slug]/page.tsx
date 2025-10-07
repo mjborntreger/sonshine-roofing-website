@@ -19,7 +19,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   const isNathan = slug === 'nathan-borntreger';
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
   const canonicalPath = `/person/${slug}`;
   const title = person ? `${person.title} | SonShine Roofing` : 'Team Member | SonShine Roofing';
   const description = person?.contentHtml

@@ -5,19 +5,20 @@ import SmartLink from "@/components/SmartLink";
 import MediaFrame from "@/components/MediaFrame";
 import { ArrowRight } from "lucide-react";
 import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
+import { buildPersonHref, ROUTES } from "@/lib/routes";
 
 export default function PersonGrid({ people }: { people: Person[] }) {
   if (!people?.length) return null;
 
   return (
     <div className="pb-16">
-      <ul className="grid grid-cols-1 lg:grid-cols-4 gap-4 min-w-0 px-2 py-4">
+      <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 min-w-0 px-2 py-4">
         {people.map((p) => {
           const summary = getSummary(p.contentHtml);
           return (
             <li key={p.slug} className="min-w-0">
               <SmartLink
-                href={`/person/${p.slug}`}
+                href={buildPersonHref(p.slug) ?? ROUTES.about}
                 className="group block rounded-2xl focus-visible:outline-none"
                 data-icon-affordance="right"
               >

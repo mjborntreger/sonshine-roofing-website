@@ -4,7 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AnalyticsScripts from "@/lib/analytics";
-import { inter } from "@/lib/fonts";
+import { inter, allura, candara } from "@/lib/fonts";
 import Script from "next/script";
 import { Suspense } from "react";
 import GtmRouteChange from "@/lib/gtm-route-change";
@@ -205,12 +205,35 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={inter.variable}
+      className={`${inter.variable} ${allura.variable} ${candara.variable}`}
     >
       <head>
         {/* Preconnects for faster YouTube thumbs & embeds */}
         <link rel="preconnect" href="https://i.ytimg.com" crossOrigin="" />
         <link rel="preconnect" href="https://www.youtube-nocookie.com" crossOrigin="" />
+
+        {/* Self-hosted font preloads */}
+        <link
+          rel="preload"
+          href="/fonts/inter-v20-latin-regular.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/inter-v20-latin-600.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/candara-bold.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
 
         {/* Facebook Share Button Attribution */}
         <meta property="fb:app_id" content="1087269253041713" />
@@ -224,7 +247,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         id="page-top"
         className="
           min-h-svh flex flex-col
-          bg-neutral-50 text-slate-900 antialiased
+          bg-slate-100 text-slate-900 antialiased
           selection:bg-[#0045d7] selection:text-white
         "
       >

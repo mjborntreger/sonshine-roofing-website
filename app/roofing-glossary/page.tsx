@@ -4,6 +4,7 @@ import { listGlossaryIndex, stripHtml } from '@/lib/wp';
 import GlossaryQuickSearch from './GlossaryQuickSearch';
 import ResourcesAside from '@/components/ResourcesAside';
 import type { Metadata } from 'next';
+import SmartLink from '@/components/SmartLink';
 
 export const revalidate = 86400; // daily ISR
 
@@ -33,7 +34,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GlossaryArchivePage() {
-  const terms = await listGlossaryIndex(500);
+  let terms: Awaited<ReturnType<typeof listGlossaryIndex>> = [];
+  try {
+    terms = await listGlossaryIndex(500);
+  } catch (error) {
+    console.error("[roofing-glossary] Failed to load glossary index:", error);
+    terms = [];
+  }
 
   // Group by first letter (A-Z, then # for non-letters)
   const groups = new Map<string, { title: string; slug: string }[]>();
@@ -51,7 +58,7 @@ export default async function GlossaryArchivePage() {
   const definedTerms = terms.map((t) => ({
     '@type': 'DefinedTerm',
     name: t.title,
-    description: stripHtml((t as any).excerpt || '').slice(0, 200),
+    description: stripHtml(t.excerpt ?? '').slice(0, 200),
     url: `${base}/roofing-glossary/${t.slug}`,
     inDefinedTermSet: `${base}/roofing-glossary`,
   }));
@@ -103,13 +110,13 @@ export default async function GlossaryArchivePage() {
             {/* A–Z nav */}
             <nav className="mt-6 flex flex-wrap gap-2 text-sm" aria-label="Glossary letters">
               {letters.map((l) => (
-                <a
+                <SmartLink
                   key={l}
                   href={`#glossary-${l === '#' ? 'num' : l}`}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white hover:bg-slate-50"
                 >
                   {l}
-                </a>
+                </SmartLink>
               ))}
             </nav>
 

@@ -6,7 +6,22 @@ import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-m
 import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight, HandCoins, Wallet } from 'lucide-react';
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
-import { normalizePhoneUS, stripToDigits } from '@/lib/phone';
+import { readCookie, writeCookie } from '@/lib/client-cookies';
+import {
+  CONTACT_READY_COOKIE,
+  CONTACT_READY_MAX_AGE,
+  sanitizePhoneInput,
+  isUsPhoneComplete,
+  normalizePhoneForSubmit,
+  formatPhoneExample,
+  normalizeState,
+  normalizeZip,
+  isValidState,
+  isValidZip,
+  submitLead,
+  type FinancingLeadInput,
+} from '@/lib/contact-lead';
+import { formatPhoneForDisplay } from '@/lib/phone';
 
 const COOKIE_NAME = 'ss_financing_calc';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -290,7 +305,7 @@ const successPillClass = `${pillBase} bg-emerald-500 text-white`;
 const gradientShell = 'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
 const innerPanelBase = 'rounded-3xl bg-white';
 const innerPanelLocked = `${innerPanelBase} overflow-hidden`;
-const innerPanelUnlocked = innerPanelBase;
+const innerPanelUnlocked = `${innerPanelBase} overflow-hidden`;
 const stepCardClass = 'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
 const inputBaseClass = 'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
 
@@ -327,49 +342,12 @@ function sanitizeAmountInput(value: string) {
   return value.replace(/[^\d]/g, '').slice(0, 7);
 }
 
-function sanitizePhoneInput(value: string) {
-  return stripToDigits(value, 10);
-}
-
-function formatPhoneDisplay(digits: string) {
-  const cleaned = sanitizePhoneInput(digits);
-  if (!cleaned) return '';
-  const area = cleaned.slice(0, 3);
-  const mid = cleaned.slice(3, 6);
-  const last = cleaned.slice(6, 10);
-
-  if (cleaned.length <= 3) {
-    return `(${area}`;
-  }
-  if (cleaned.length <= 6) {
-    return `(${area}) ${mid}`;
-  }
-  return `(${area}) ${mid}-${last}`;
-}
-
 function isEmailValid(email: string) {
   const trimmed = email.trim().toLowerCase();
   if (!trimmed) return false;
   const basic = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
   if (!basic) return false;
   return EMAIL_DOMAINS.some((suffix) => trimmed.endsWith(suffix));
-}
-
-function isZipValid(zip: string) {
-  const cleaned = zip.replace(/\D/g, '');
-  return cleaned.length === 5;
-}
-
-function readCookie(name: string) {
-  if (typeof document === 'undefined') return null;
-  const parts = document.cookie.split('; ').find((row) => row.startsWith(`${name}=`));
-  return parts ? parts.split('=').slice(1).join('=') : null;
-}
-
-function writeCookie(name: string, value: string, maxAgeSeconds: number) {
-  if (typeof document === 'undefined') return;
-  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAgeSeconds}; Path=/; SameSite=Lax${secure}`;
 }
 
 function parseCookie(raw: string | null): FinancingCookie | null {
@@ -420,6 +398,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   });
 
   useEffect(() => {
+    const contactReady = Boolean(readCookie(CONTACT_READY_COOKIE));
+
     const cookie = parseCookie(readCookie(COOKIE_NAME));
     if (cookie?.unlocked) {
       const amt = Number(cookie.amount) || defaultAmount;
@@ -431,8 +411,18 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       setFormValues((prev) => ({ ...prev, amount: String(roundedAmount) }));
       setSubmittedAmount(roundedAmount);
       setPersistedScores(cookie.scores ?? null);
+      setStep((prev) => (prev < summaryStepIndex ? summaryStepIndex : prev));
+      return;
     }
-  }, [defaultAmount]);
+
+    if (contactReady) {
+      setUnlocked(true);
+      setShowCalculator(true);
+      setContactEditMode(false);
+      setPersistedScores(null);
+      setStep((prev) => (prev < summaryStepIndex ? summaryStepIndex : prev));
+    }
+  }, [defaultAmount, summaryStepIndex]);
 
   const [quizAnswers, setQuizAnswers] = useState<(string | null)[]>(() => Array(totalQuizQuestions).fill(null));
   const computedScores = useMemo(() => {
@@ -582,14 +572,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     if (currentStep === secondFormStepIndex) {
       if (!formValues.address1.trim()) nextErrors.address1 = 'Enter the property address';
       if (!formValues.city.trim()) nextErrors.city = 'City is required';
-      if (!formValues.state.trim()) nextErrors.state = 'Select a state';
-      if (!isZipValid(formValues.zip)) nextErrors.zip = 'Enter 5-digit ZIP';
+      const stateValue = normalizeState(formValues.state);
+      if (!isValidState(stateValue)) nextErrors.state = 'Select a state';
+      const zipValue = normalizeZip(formValues.zip);
+      if (!isValidZip(zipValue)) nextErrors.zip = 'Enter 5-digit ZIP';
     }
     if (currentStep === thirdFormStepIndex) {
       if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
-      const phoneDigits = sanitizePhoneInput(formValues.phone);
-      if (phoneDigits.length !== 10) {
-        nextErrors.phone = 'Enter a valid 10-digit phone number';
+      if (!isUsPhoneComplete(formValues.phone)) {
+        nextErrors.phone = 'Enter a valid phone number (10 digits, optional country code).';
       }
     }
     return nextErrors;
@@ -751,13 +742,6 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       return;
     }
 
-    const normalizedPhone = normalizePhoneUS(formValues.phone);
-    if (!normalizedPhone) {
-      setErrors({ phone: 'Enter a valid 10-digit phone number' });
-      setStep(thirdFormStepIndex);
-      return;
-    }
-
     const form = event.currentTarget;
     const fd = new FormData(form);
     const cfToken = String(fd.get('cfToken') || '');
@@ -777,29 +761,36 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       return {
         id: question.id,
         question: question.prompt,
-        answerValue,
-        answerLabel: option?.label ?? null,
+        answerValue: answerValue ?? undefined,
+        answerLabel: option?.label,
       };
     });
 
     const scoresResult = computedScores ?? null;
 
-    const payload: Record<string, unknown> = {
+    const stateValue = normalizeState(formValues.state);
+    const zipValue = normalizeZip(formValues.zip);
+
+    const payload: FinancingLeadInput & {
+      quizSummary: typeof quizSummary;
+      submittedAt: string;
+    } = {
       type: 'financing-calculator',
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
       email: formValues.email.trim(),
-      phone: normalizedPhone,
+      phone: normalizePhoneForSubmit(formValues.phone),
       address1: formValues.address1.trim(),
-      address2: formValues.address2.trim(),
+      address2: formValues.address2.trim() || undefined,
       city: formValues.city.trim(),
-      state: formValues.state.trim(),
-      zip: formValues.zip.trim(),
+      state: stateValue,
+      zip: zipValue,
       amount: amountNumber,
       page: '/financing',
       cfToken,
-      hp_field: honeypot,
+      hp_field: honeypot || undefined,
       quizSummary,
+      submittedAt: new Date().toISOString(),
     };
     if (scoresResult) {
       payload.scores = scoresResult;
@@ -808,39 +799,42 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     setSubmission('submitting');
     setGlobalError(null);
 
-    try {
-      const res = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const json = await res.json().catch(() => ({} as any));
-      if (res.ok && json?.ok) {
-        setSubmission('idle');
-        setUnlocked(true);
-        setShowCalculator(true);
-        setContactEditMode(false);
-        const nextAmount = amountNumber || defaultAmount;
-        setCalculatorAmount(nextAmount);
-        setSubmittedAmount(nextAmount);
-        const cookiePayload: FinancingCookie = { unlocked: true, amount: nextAmount };
-        if (scoresResult) {
-          cookiePayload.scores = scoresResult;
+    const result = await submitLead(payload, {
+      gtmEvent: { event: 'financing_calculator_submit', form: 'monthly_estimator' },
+      contactReadyCookieMaxAge: CONTACT_READY_MAX_AGE,
+    });
+
+    if (!result.ok) {
+      setSubmission('error');
+      setGlobalError(friendlyError(result.error));
+      if (result.fieldErrors) {
+        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
+          if (Array.isArray(messages) && messages.length) {
+            acc[key] = String(messages[0]);
+          }
+          return acc;
+        }, {});
+        if (Object.keys(serverErrors).length) {
+          setErrors(serverErrors);
+          setStep(thirdFormStepIndex);
         }
-        setPersistedScores(scoresResult);
-        writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
-        try {
-          (window as any).dataLayer = (window as any).dataLayer || [];
-          (window as any).dataLayer.push({ event: 'financing_calculator_submit', form: 'monthly_estimator' });
-        } catch { }
-        return;
       }
-      setSubmission('error');
-      setGlobalError(friendlyError(json?.error));
-    } catch {
-      setSubmission('error');
-      setGlobalError('Network error. Please try again.');
+      return;
     }
+
+    setSubmission('idle');
+    setUnlocked(true);
+    setShowCalculator(true);
+    setContactEditMode(false);
+    const nextAmount = amountNumber || defaultAmount;
+    setCalculatorAmount(nextAmount);
+    setSubmittedAmount(nextAmount);
+    const cookiePayload: FinancingCookie = { unlocked: true, amount: nextAmount };
+    if (scoresResult) {
+      cookiePayload.scores = scoresResult;
+    }
+    setPersistedScores(scoresResult);
+    writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
   };
 
   const totalFlowSteps = effectiveLastStepIndex + 1;
@@ -1064,7 +1058,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 className={inputBaseClass}
                 value={formValues.zip}
                 onChange={(e) => {
-                  const digits = e.target.value.replace(/\D/g, '').slice(0, 5);
+                  const digits = normalizeZip(e.target.value);
                   setFormValues((prev) => ({ ...prev, zip: digits }));
                 }}
                 aria-invalid={Boolean(errors.zip)}
@@ -1107,14 +1101,17 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             inputMode="numeric"
             autoComplete="tel"
             className={inputBaseClass}
-            value={formatPhoneDisplay(formValues.phone)}
+            value={formatPhoneForDisplay(formValues.phone)}
             onChange={(e) => setFormValues((prev) => ({ ...prev, phone: sanitizePhoneInput(e.target.value) }))}
             aria-invalid={Boolean(errors.phone)}
-            aria-describedby={errors.phone ? 'phone-error' : undefined}
+            aria-describedby={errors.phone ? 'phone-error phone-example' : 'phone-example'}
           />
           {errors.phone && (
             <p id="phone-error" className="mt-1 text-sm text-red-600">{errors.phone}</p>
           )}
+          <p id="phone-example" className="mt-1 text-xs text-slate-500">
+            Digits only, US numbers. Example: {formatPhoneExample(formValues.phone)}
+          </p>
         </div>
         <p className="mt-3 text-xs italic text-slate-500">Quick verification keeps spam away. It never impacts your credit.</p>
         <div className="pt-2">
@@ -1296,16 +1293,14 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             </button>
           </div>
 
-          {displayScores && (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
-                <h3
-                  className="text-xl md:text-2xl font-semibold text-emerald-700"
-                >
-                  <ChartBar className='h-5 w-5 md:h-6 md:w-6 inline text-emerald-700 mr-3' />
-                  Program Fit Snapshot
-                </h3>
-                {leadingProgram ? (
+          <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
+              <h3 className="text-xl md:text-2xl font-semibold text-emerald-700">
+                <ChartBar className='h-5 w-5 md:h-6 md:w-6 inline text-emerald-700 mr-3' />
+                Program Fit Snapshot
+              </h3>
+              {displayScores ? (
+                leadingProgram ? (
                   <span className="text-sm font-semibold text-emerald-600">
                     Leading Fit
                     <ArrowRight className='inline h-4 w-4 text-emerald-600 mx-2' />
@@ -1313,56 +1308,66 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   </span>
                 ) : (
                   <span className="text-sm font-semibold text-emerald-600">Scores based on your answers</span>
-                )}
-              </div>
-              <div className="mt-3 space-y-3">
-                {(['serviceFinance', 'ygrene'] as FinancingProgramKey[]).map((programKey) => {
-                  const score =
-                    programKey === 'serviceFinance'
-                      ? displayScores.serviceFinanceScore
-                      : displayScores.ygreneScore;
-                  const barColor =
-                    programKey === 'serviceFinance' ? 'bg-[--brand-blue]' : 'bg-[--brand-orange]';
-                  const detailHref = PROGRAM_DETAIL_ANCHORS[programKey];
-                  const rawAnimated = animatedScores[programKey] ?? 0;
-                  const clampedAnimated = Math.min(Math.max(rawAnimated, 0), score);
-                  const displayedMatch = Math.min(Math.round(clampedAnimated), score);
-                  const barPercent = Math.min(Math.max(clampedAnimated, 0), 100);
-                  return (
-                    <div key={programKey} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-lg font-semibold text-slate-800">{MATCH_PROGRAMS[programKey].label}</span>
-                          <a
-                            href={detailHref}
-                            className="group inline-flex items-center gap-[0.10rem] text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
-                            data-icon-affordance="right"
-                          >
-                            see details
-                            <ChevronRight className="h-3 w-3 text-slate-600 icon-affordance" aria-hidden="true" />
-                          </a>
-                        </div>
-                        <span className="text-lg font-semibold text-slate-800">{displayedMatch}% match</span>
-                      </div>
-                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/70">
-                        <div className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${barPercent}%` }} />
-                      </div>
-                      <p className="text-md text-slate-500">{MATCH_PROGRAMS[programKey].description}</p>
-                    </div>
-                  );
-                })}
-              </div>
-              {displayScores.isUncertain && (
-                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-800">
-                  <p className="font-semibold">Looks like both programs may require a closer look.</p>
-                  <p className="mt-1">Let’s chat and help you find the best fit.</p>
-                  <a className="mt-2 inline-block font-semibold text-[--brand-blue]" href="tel:+19419286964">
-                    (941) 866-4320
-                  </a>
-                </div>
+                )
+              ) : (
+                <span className="text-sm font-semibold text-amber-600">Take the quiz to personalise your results</span>
               )}
             </div>
-          )}
+            <div className="mt-3 space-y-3">
+              {(['serviceFinance', 'ygrene'] as FinancingProgramKey[]).map((programKey) => {
+                const baseScore = displayScores
+                  ? programKey === 'serviceFinance'
+                    ? displayScores.serviceFinanceScore
+                    : displayScores.ygreneScore
+                  : 0;
+                const barColor =
+                  programKey === 'serviceFinance' ? 'bg-[--brand-blue]' : 'bg-[--brand-orange]';
+                const detailHref = PROGRAM_DETAIL_ANCHORS[programKey];
+                const rawAnimated = animatedScores[programKey] ?? 0;
+                const clampedAnimated = displayScores
+                  ? Math.min(Math.max(rawAnimated, 0), baseScore)
+                  : 0;
+                const displayedMatch = displayScores ? Math.min(Math.round(clampedAnimated), baseScore) : 0;
+                const barPercent = displayScores ? Math.min(Math.max(clampedAnimated, 0), 100) : 0;
+                return (
+                  <div key={programKey} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="text-lg font-semibold text-slate-800">{MATCH_PROGRAMS[programKey].label}</span>
+                        <a
+                          href={detailHref}
+                          className="group inline-flex items-center gap-[0.10rem] text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
+                          data-icon-affordance="right"
+                        >
+                          see details
+                          <ChevronRight className="h-3 w-3 text-slate-600 icon-affordance" aria-hidden="true" />
+                        </a>
+                      </div>
+                      <span className="text-lg font-semibold text-slate-800">{displayedMatch}% match</span>
+                    </div>
+                    <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/70">
+                      <div className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${barPercent}%` }} />
+                    </div>
+                    <p className="text-md text-slate-500">{MATCH_PROGRAMS[programKey].description}</p>
+                  </div>
+                );
+              })}
+            </div>
+            {displayScores?.isUncertain && (
+              <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-800">
+                <p className="font-semibold">Looks like both programs may require a closer look.</p>
+                <p className="mt-1">Let’s chat and help you find the best fit.</p>
+                <a className="mt-2 inline-block font-semibold text-[--brand-blue]" href="tel:+19419286964">
+                  (941) 866-4320
+                </a>
+              </div>
+            )}
+            {!displayScores && (
+              <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-3 py-3 text-xs text-slate-600">
+                Take the quiz to find your financing program match.
+              </div>
+            )}
+          </div>
 
 
           <div className="space-y-4 rounded-2xl px-4 py-4">
@@ -1490,7 +1495,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               data-icon-affordance="right"
             >
               <HelpCircle className="h-5 w-4 mr-2 inline text-slate-600" />
-              What's the next step?
+              What&rsquo;s the next step?
               <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 icon-affordance" />
             </a>
           </div>

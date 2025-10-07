@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import ResourceSearchController from '@/components/resource-search/ResourceSearchController';
 import ResourcesAside from '@/components/ResourcesAside';
 import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
+import FaqBulkToggleClient from './FaqBulkToggleClient';
 
 export const revalidate = 86400; // daily ISR
 
@@ -59,8 +60,8 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
 
   // Sort topics: featured topics first (if available), then alphabetically
   const topicsSorted = [...topics].sort((a, b) => {
-    const af = (a as any).featured ? 1 : 0;
-    const bf = (b as any).featured ? 1 : 0;
+    const af = a.featured ? 1 : 0;
+    const bf = b.featured ? 1 : 0;
     if (af !== bf) return bf - af; // featured first
     return a.name.localeCompare(b.name);
   });
@@ -118,7 +119,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
             {/* Search (client-side, exact phrase like Blog) */}
             <div className="mt-6" role="search">
               <div className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
-                <div className="flex inline-flex w-full items-start">
+                <div className="inline-flex w-full items-start">
                   <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
                   <input
                     id="faq-search"
@@ -210,7 +211,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                               </summary>
                               <div
                                 className="accordion-motion prose prose-sm px-4 pb-4 mt-1"
-                                dangerouslySetInnerHTML={{ __html: (f as any).contentHtml || '' }}
+                                dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }}
                               />
                             </details>
                           );
@@ -227,89 +228,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
         </div>
       </div>
 
-      {/* Expand/Collapse controls */}
-      <script
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: `(() => {
-            const $all = (sel, ctx) => Array.from((ctx || document).querySelectorAll(sel));
-
-            function wireBulkControls() {
-              const toggleBtn = document.getElementById('faq-toggle-all');
-              if (!toggleBtn) return;
-
-              const label = toggleBtn.querySelector('[data-faq-toggle-label]');
-              const iconDown = toggleBtn.querySelector('[data-faq-toggle-icon="down"]');
-              const iconUp = toggleBtn.querySelector('[data-faq-toggle-icon="up"]');
-
-              const isVisible = (node) => {
-                if (!(node instanceof HTMLElement)) return true;
-                if (node.hidden) return false;
-                if (node.classList.contains('hidden')) return false;
-                if (node.style && node.style.display === 'none') return false;
-                return true;
-              };
-
-              const updateButton = () => {
-                const topicNodes = $all('details.faq-topic');
-                const visibleTopics = topicNodes.filter(isVisible);
-                const hasTopics = visibleTopics.length > 0;
-                const allOpen = hasTopics && visibleTopics.every((node) => node.open);
-
-                toggleBtn.dataset.state = allOpen ? 'expanded' : 'collapsed';
-                toggleBtn.setAttribute('aria-expanded', allOpen ? 'true' : 'false');
-
-                if (label) label.textContent = allOpen ? 'Collapse all' : 'Expand all';
-                if (iconDown) iconDown.classList.toggle('hidden', allOpen);
-                if (iconUp) iconUp.classList.toggle('hidden', !allOpen);
-              };
-
-              const setAll = (open) => {
-                $all('details.faq-topic').forEach((node) => (node.open = open));
-              };
-
-              const ensureListeners = () => {
-                $all('details.faq-topic').forEach((node) => {
-                  if (node.dataset.bulkToggleBound) return;
-                  node.addEventListener('toggle', updateButton);
-                  node.dataset.bulkToggleBound = '1';
-                });
-              };
-
-              toggleBtn.addEventListener('click', () => {
-                const next = toggleBtn.dataset.state !== 'expanded';
-                setAll(next);
-                updateButton();
-              });
-
-              ensureListeners();
-              updateButton();
-
-              const topicsRoot = document.getElementById('faq-topics');
-              if (topicsRoot) {
-                const observer = new MutationObserver(() => {
-                  ensureListeners();
-                  updateButton();
-                });
-                observer.observe(topicsRoot, { childList: true, subtree: true });
-              }
-
-              const handleExternalUpdate = () => {
-                ensureListeners();
-                updateButton();
-              };
-              window.removeEventListener('faq:update', handleExternalUpdate);
-              window.addEventListener('faq:update', handleExternalUpdate);
-            }
-
-            if (document.readyState === 'loading') {
-              document.addEventListener('DOMContentLoaded', wireBulkControls);
-            } else {
-              wireBulkControls();
-            }
-          })();`,
-        }}
-      />
+      <FaqBulkToggleClient />
       <ResourceSearchController
         kind="faq"
         ids={{

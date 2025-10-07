@@ -1,7 +1,7 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import SmartLink from "@/components/SmartLink";
-import { ArrowUpRight, ArrowUp, ArrowRight, Phone, Calendar } from "lucide-react";
+import { ArrowUpRight, ArrowUp, Star } from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from "@/lib/routes";
 
 const SOCIALS = [
@@ -15,8 +15,11 @@ const SOCIALS = [
   { href: "https://x.com/ssroofinginc", label: "X (Twitter)", domain: "x.com" },
 ];
 
-const linkStyles = "text-sm text-slate-600 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]";
-const h3Styles = "text-xs font-semibold uppercase tracking-wider text-slate-700";
+const linkStyles = "text-xs md:text-sm text-slate-600 hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]";
+const h3Styles = "text-sm md:text-md font-bold uppercase tracking-wider text-[--brand-blue]";
+const hoursStyles = "text-xs md:text-sm text-slate-600"
+
+const logoSrc = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp";
 
 const FooterBadges = dynamic(() => import("./FooterBadges"), {
   loading: () => (
@@ -32,8 +35,9 @@ export default function Footer() {
     <>
       <SmartLink
         href="#page-top"
-        className="text-center"
+        className="text-center hover:text-slate-600"
         data-icon-affordance="up"
+        aria-label="return to top of page"
       >
         Return to Top
         <ArrowUp className="icon-affordance h-4 w-4 inline ml-2" />
@@ -41,7 +45,7 @@ export default function Footer() {
 
       <FooterBadges />
 
-      <footer className="bg-slate-200 pt-20">
+      <footer className="bg-[#cef3ff] pt-20">
         <div className="mx-auto max-w-6xl px-10">
           <h2 className="sr-only">Footer</h2>
 
@@ -58,14 +62,15 @@ export default function Footer() {
                 title="SonShine Roofing Logo"
               >
                 <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
+                  src={logoSrc}
                   alt="SonShine Roofing Logo"
-                  width={158.5}
-                  height={66}
-                  sizes="(max-width: 158.5px) 33vw 366px"
+                  aria-label="SonShine Roofing Logo"
+                  width={180}
+                  height={75}
+                  sizes="(max-width: 120px) 20vw, 768px"
                   loading="lazy"
                   fetchPriority="low"
-                  className="mb-5"
+                  className="mb-4"
                 />
               </SmartLink>
               <ul className="mt-3 space-y-3 text-sm">
@@ -73,7 +78,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <SmartLink
-                    className={linkStyles}
+                    className="font-display text-sm md:text-md uppercase font-bold text-[--brand-blue] hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
                     href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
                     aria-label="Florida Roofing Contractor's License Number CCC1331483"
                     target="_blank"
@@ -82,7 +87,7 @@ export default function Footer() {
                   >
                     License: #CCC1331483
                     <ArrowUpRight
-                      className="icon-affordance inline ml-1 h-3 w-3 align-[-0.125em] text-slate-700"
+                      className="icon-affordance inline ml-1 h-3 w-3 md:h-4 md:w-4 align-[-0.125em] text-[--brand-blue]"
                       aria-hidden="true"
                     />
                   </SmartLink>
@@ -135,20 +140,20 @@ export default function Footer() {
                 Hours of Operation
               </h3>
               <dl className="mt-4 grid grid-cols-2 text-sm gap-x-1 gap-y-3 pr-8">
-                <dt className="text-slate-600">Mon.</dt>
-                <dd className="text-right text-slate-600 whitespace-nowrap">7:00a – 5:30p</dd>
-                <dt className="text-slate-600">Tues.</dt>
-                <dd className="text-right text-slate-600 whitespace-nowrap">7:00a – 5:30p</dd>
-                <dt className="text-slate-600">Wed.</dt>
-                <dd className="text-right text-slate-600 whitespace-nowrap">7:00a – 5:30p</dd>
-                <dt className="text-slate-600">Thurs.</dt>
-                <dd className="text-right text-slate-600 whitespace-nowrap">7:00a – 5:30p</dd>
-                <dt className="text-slate-600">Fri.</dt>
-                <dd className="text-right text-slate-600 whitespace-nowrap">7:00a – 5:30p</dd>
-                <dt className="text-slate-600">Sat.</dt>
-                <dd className="text-right text-slate-600 whitespace-nowrap">Closed</dd>
-                <dt className="text-slate-600">Sun.</dt>
-                <dd className="text-right text-slate-600 whitespace-nowrap">Closed</dd>
+                <dt className={hoursStyles}>Mon.</dt>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dt className={hoursStyles}>Tues.</dt>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dt className={hoursStyles}>Wed.</dt>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dt className={hoursStyles}>Thurs.</dt>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dt className={hoursStyles}>Fri.</dt>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dt className={hoursStyles}>Sat.</dt>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>Closed</dd>
+                <dt className={hoursStyles}>Sun.</dt>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>Closed</dd>
               </dl>
             </div>
 
@@ -156,13 +161,14 @@ export default function Footer() {
 
           <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
             <SmartLink
-              href="/contact-us#book-an-appointment"
-              className="text-xs btn btn-secondary px-3 py-2"
+              href="/reviews"
+              className="text-sm md:text-md text-white btn btn-brand-orange px-3 py-2"
               data-icon-affordance="up-right"
+              target="_blank"
             >
-              <Calendar className="inline h-3 w-3 mr-1" />
-              Book an Appointment
-              <ArrowUpRight className="inline h-3 w-3 ml-1 icon-affordance" />
+              <Star className="h-3 w-3 md:h-4 md:w-4 mr-2 text-white" />
+              Leave a Review
+              <ArrowUpRight className="inline h-3 w-3 md:h-4 md:w-4 ml-1 text-white icon-affordance" />
             </SmartLink>
 
             {/* Socials Badges Row */}
