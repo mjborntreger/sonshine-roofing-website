@@ -48,7 +48,7 @@ import {
   normalizeState,
   normalizeZip,
   submitLead,
-  type ContactLeadCorePayload,
+  type ContactLeadInput,
   buildContactLeadPayload,
   type ContactLeadResourceLink,
   validateContactIdentityDraft,
@@ -783,20 +783,20 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
       page: '/contact-us',
     });
 
-    const payload: ContactLeadCorePayload & {
-      cfToken: string;
-      hp_field?: string;
-      submittedAt: string;
-    } = {
+    const contactPayload: ContactLeadInput = {
       ...basePayload,
       cfToken,
       hp_field: honeypot || undefined,
-      submittedAt: new Date().toISOString(),
     };
 
-    if (utm.source) payload.utm_source = utm.source;
-    if (utm.medium) payload.utm_medium = utm.medium;
-    if (utm.campaign) payload.utm_campaign = utm.campaign;
+    if (utm.source) contactPayload.utm_source = utm.source;
+    if (utm.medium) contactPayload.utm_medium = utm.medium;
+    if (utm.campaign) contactPayload.utm_campaign = utm.campaign;
+
+    const payload: ContactLeadInput & { submittedAt: string } = {
+      ...contactPayload,
+      submittedAt: new Date().toISOString(),
+    };
 
     const result = await submitLead(payload, {
       gtmEvent: {

@@ -40,6 +40,15 @@ export interface SuccessMeta {
 
 export type ContactLeadResourceLink = NonNullable<ContactLeadInput['resourceLinks']>[number];
 
+type StripIndexSignature<T> = {
+  [K in keyof T as K extends string
+    ? (string extends K ? never : number extends K ? never : K)
+    : K extends number
+      ? never
+      : K
+  ]: T[K];
+};
+
 const STATE_REGEX = /^[A-Za-z]{2}$/;
 const ZIP_REGEX = /^\d{5}$/;
 
@@ -125,9 +134,7 @@ export function validateContactAddressDraft(draft: ContactAddressDraft): Record<
   return errors;
 }
 
-type ContactLeadCorePayload = Omit<ContactLeadInput, 'cfToken' | 'hp_field'> & {
-  resourceLinks?: ContactLeadResourceLink[];
-};
+type ContactLeadCorePayload = Omit<StripIndexSignature<ContactLeadInput>, 'cfToken' | 'hp_field'>;
 
 export type { ContactLeadCorePayload };
 
@@ -170,11 +177,11 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
 
   if (resourceLinks && resourceLinks.length) {
     payload.resourceLinks = resourceLinks.map((link) => ({
-      label: link.label,
+      label: link.label.trim(),
       description: link.description?.trim() || undefined,
       href: link.href,
       external: link.external,
-    }));
+    })) as ContactLeadResourceLink[];
   }
 
   return payload;
