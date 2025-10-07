@@ -1,12 +1,6 @@
 import { deleteCookie, readCookie, writeCookie } from '@/lib/client-cookies';
 import { normalizePhoneForSubmit, isUsPhoneComplete } from '@/lib/phone';
-import type {
-  ContactLeadInput,
-  FeedbackLeadInput,
-  FinancingLeadInput,
-  LeadInput,
-  SpecialOfferLeadInput,
-} from '@/lib/validation';
+import type { ContactLeadInput, LeadInput } from '@/lib/validation';
 
 export {
   stripToPhoneDigits as sanitizePhoneInput,
@@ -44,12 +38,7 @@ export interface SuccessMeta {
   timelineLabel: string | null;
 }
 
-export type ContactLeadResourceLink = {
-  label: string;
-  description?: string;
-  href: string;
-  external?: boolean;
-};
+export type ContactLeadResourceLink = NonNullable<ContactLeadInput['resourceLinks']>[number];
 
 const STATE_REGEX = /^[A-Za-z]{2}$/;
 const ZIP_REGEX = /^\d{5}$/;
