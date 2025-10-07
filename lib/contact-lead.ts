@@ -1,5 +1,5 @@
 import { deleteCookie, readCookie, writeCookie } from '@/lib/client-cookies';
-import { normalizePhoneForSubmit } from '@/lib/phone';
+import { normalizePhoneForSubmit, isUsPhoneComplete } from '@/lib/phone';
 import type { ContactLeadInput } from '@/lib/validation';
 
 export {
