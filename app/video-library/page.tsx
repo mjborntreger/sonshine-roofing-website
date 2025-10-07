@@ -35,16 +35,13 @@ const heroImageUrl = (item: VideoItem): string | undefined => {
   return undefined;
 };
 
-type VideoModule = {
-  getVideoEntryBySlug?: (slug: string) => Promise<VideoItem | null>;
-  videoJsonLd?: (video: VideoItem, base: string) => Record<string, unknown>;
-};
+type VideoModule = Pick<typeof import("@/lib/wp"), "getVideoEntryBySlug" | "videoJsonLd">;
 
 const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
   { slug: "commercials", label: "Commercials" },
   { slug: "explainers", label: "Explainers" },
   { slug: "roofing-project", label: "Roofing Projects" },
-  { slug: "in-the-field", label: "In the field" },
+  { slug: "accolades", label: "Accolades" },
   { slug: "other", label: "Other" },
 ];
 

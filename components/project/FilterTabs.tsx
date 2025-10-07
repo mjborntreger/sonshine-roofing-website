@@ -99,8 +99,8 @@ export default function FilterTabs({
           const fallbackIcon = tabIcons[tab.key as keyof typeof tabIcons] ?? Layers;
           const Icon = tab.icon ?? fallbackIcon;
           const iconClass = selected
-            ? "h-4 w-4 text-white transition-colors flex-wrap mr-1"
-            : "h-4 w-4 text-[--brand-orange] transition-colors flex-wrap mr-1";
+            ? "h-3 w-3 text-white transition-colors flex-wrap mr-1"
+            : "h-3 w-3 text-[--brand-orange] transition-colors flex-wrap mr-1";
           return (
             <button
               key={tab.key}
@@ -110,7 +110,7 @@ export default function FilterTabs({
               data-tab={tab.key}
               onClick={() => onTabChange(tab.key)}
               aria-label={`${tab.label} tab. ${totalMessage}. ${selectionMessage}.`}
-              className={`relative rounded-full px-2 py-1.5 text-sm font-semibold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[--brand-orange] ${
+              className={`relative rounded-full px-2 py-1.5 text-sm font-display font-bold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[--brand-orange] ${
                 selected
                   ? "border-[--brand-orange] bg-[--brand-orange] text-white shadow-sm"
                   : "border-[--brand-orange]/40 bg-[--brand-orange]/10 text-slate-500 hover:bg-[--brand-orange]/20"

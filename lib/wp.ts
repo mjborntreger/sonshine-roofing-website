@@ -1577,6 +1577,10 @@ export async function listVideoItemsPaged({
     accolades: "Accolades",
     other: "Other",
   };
+  const isVideoBucketKey = (value: string): value is VideoBucketKey =>
+    Object.prototype.hasOwnProperty.call(BUCKET_LABELS, value);
+  const bucketLabelFor = (slug: string, fallback?: string): string =>
+    isVideoBucketKey(slug) ? BUCKET_LABELS[slug] : fallback ?? slug;
 
   const countBuckets = <T extends string>(itemsToCount: VideoItem[], getKeys: (v: VideoItem) => { slug: T; name: string }[]): Map<T, { name: string; count: number }> => {
     const map = new Map<T, { name: string; count: number }>();
@@ -1594,7 +1598,32 @@ export async function listVideoItemsPaged({
   };
 
   const bucketFacetItems = all.filter((v) => matchesFilters(v, 'bucket'));
-  const bucketCounts = countBuckets(bucketFacetItems, (v) => [{ slug: bucketOf(v), name: BUCKET_LABELS[bucketOf(v)] }]);
+  const bucketCountsRaw = countBuckets(bucketFacetItems, (v) => [
+    { slug: bucketOf(v) as string, name: bucketLabelFor(bucketOf(v)) },
+  ]);
+  const bucketOrder: string[] = [...(Object.keys(BUCKET_LABELS) as VideoBucketKey[])];
+  const bucketCounts = new Map<string, { name: string; count: number }>();
+  for (const slug of bucketOrder) {
+    const key = String(slug).toLowerCase();
+    bucketCounts.set(key, { name: bucketLabelFor(key, bucketLabelFor(String(slug))), count: 0 });
+  }
+  bucketCountsRaw.forEach((info, slug) => {
+    const key = String(slug).toLowerCase();
+    const label = bucketLabelFor(key, info.name ?? key);
+    const prev = bucketCounts.get(key);
+    bucketCounts.set(key, { name: label, count: (prev?.count ?? 0) + info.count });
+    if (!bucketOrder.includes(key)) bucketOrder.push(key);
+  });
+  if (Array.isArray(bucketsList) && bucketsList.length) {
+    for (const value of bucketsList) {
+      const key = String(value).toLowerCase();
+      if (!bucketOrder.includes(key)) bucketOrder.push(key);
+      if (!bucketCounts.has(key)) {
+        const label = bucketLabelFor(key);
+        bucketCounts.set(key, { name: label, count: 0 });
+      }
+    }
+  }
 
   const materialFacetItems = all.filter((v) => matchesFilters(v, 'material_type'));
   const materialCounts = countBuckets(materialFacetItems, (v) =>
@@ -1622,11 +1651,17 @@ export async function listVideoItemsPaged({
   const facets: FacetGroup[] = [
     {
       taxonomy: 'bucket',
-      buckets: (Object.keys(BUCKET_LABELS) as VideoBucketKey[]).map((slug) => ({
-        slug,
-        name: BUCKET_LABELS[slug],
-        count: bucketCounts.get(slug)?.count ?? 0,
-      })),
+      buckets: bucketOrder
+        .map((slug) => {
+          const info = bucketCounts.get(slug);
+          if (!info) return null;
+          return {
+            slug,
+            name: info.name,
+            count: info.count,
+          };
+        })
+        .filter((bucket): bucket is FacetGroup["buckets"][number] => bucket !== null),
     },
     {
       taxonomy: 'material_type',
@@ -1957,23 +1992,7 @@ export async function listPostsPaged({
     endCursor: hasMore ? String(nextOffset) : null,
   };
 
-  const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
-    ? data.facetCounts.facets.map((facetNode) => {
-        const facetRecord = asRecord(facetNode);
-        const bucketsRaw = extractNodes(facetRecord?.buckets);
-        return {
-          taxonomy: toStringSafe(facetRecord?.taxonomy),
-          buckets: bucketsRaw.map((bucketNode) => {
-            const bucketRecord = asRecord(bucketNode);
-            return {
-              slug: toStringSafe(bucketRecord?.slug),
-              name: toStringSafe(bucketRecord?.name),
-              count: typeof bucketRecord?.count === 'number' ? bucketRecord.count : 0,
-            };
-          }),
-        } satisfies FacetGroup;
-      })
-    : [];
+  const facetGroups = mapFacetGroupsFromWp(data?.facetCounts?.facets);
 
   const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
 
@@ -2203,6 +2222,34 @@ export type ProjectSearchResult = {
   facets: FacetGroup[];
   meta?: Record<string, unknown>;
 };
+
+export function mapFacetBucketsFromWp(rawBuckets: unknown): FacetGroup["buckets"] {
+  const bucketArray = Array.isArray(rawBuckets) ? rawBuckets : extractNodes(rawBuckets);
+  const buckets: FacetGroup["buckets"] = [];
+  for (const bucketNode of bucketArray) {
+    const bucketRecord = asRecord(bucketNode);
+    if (!bucketRecord) continue;
+    const slug = toStringSafe(bucketRecord.slug).trim();
+    const name = toStringSafe(bucketRecord.name);
+    const count = typeof bucketRecord.count === "number" ? bucketRecord.count : 0;
+    if (!slug && !name) continue;
+    buckets.push({ slug, name, count });
+  }
+  return buckets;
+}
+
+export function mapFacetGroupsFromWp(rawFacets: unknown): FacetGroup[] {
+  if (!Array.isArray(rawFacets)) return [];
+  return rawFacets
+    .map((facetNode) => {
+      const facetRecord = asRecord(facetNode);
+      if (!facetRecord) return null;
+      const taxonomy = toStringSafe(facetRecord.taxonomy);
+      const buckets = mapFacetBucketsFromWp(facetRecord.buckets);
+      return { taxonomy, buckets } satisfies FacetGroup;
+    })
+    .filter((facet): facet is FacetGroup => facet !== null);
+}
 
 /**
  * Cursor-based project pagination for archives.

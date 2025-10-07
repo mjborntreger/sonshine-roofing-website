@@ -58,7 +58,7 @@ export default function Hero() {
           </h1>
         </div>
         <SmartLink
-          className="hero-cta-glow relative mt-16 md:mt-32 lg:mt-32 flex w-full flex-col items-center bg-[--brand-blue] py-4 md:py-8 px-6 md:px-12 text-center shadow-sm no-underline transition-shadow hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--brand-cyan] md:p-6"
+          className="hero-cta-glow relative mt-16 md:mt-32 lg:mt-32 flex w-full flex-col items-center bg-[--brand-blue] py-4 md:py-8 px-6 md:px-12 text-center shadow-sm no-underline transition-colors duration-700 hover:shadow-lg hover:bg-[#003EC1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--brand-cyan] md:p-6"
           href="#get-started"
           onKeyDown={handleCtaKeyDown}
           aria-label="Scroll to the quick roofing quiz"
