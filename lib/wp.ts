@@ -529,7 +529,7 @@ function youtubeThumb(id: string) {
 // Internal: WPGraphQL response shape for glossary index pagination
 type GlossaryIndexResponse = {
   glossaryTerms: {
-    nodes: Array<{ slug: string; title: string; excerpt?: string | null }>;
+    nodes: Array<{ slug: string; title: string; content?: string | null }>;
     pageInfo: { hasNextPage: boolean; endCursor: string | null };
   };
 };
@@ -956,11 +956,7 @@ export async function listGlossaryIndex(limit = 500): Promise<GlossarySummary[]>
         after: $after,
         where: { status: PUBLISH, orderby: { field: TITLE, order: ASC } }
       ) {
-        nodes {
-          slug
-          title
-          excerpt
-        }
+        nodes { slug title content(format: RENDERED) }
         pageInfo {
           hasNextPage
           endCursor
@@ -982,10 +978,12 @@ export async function listGlossaryIndex(limit = 500): Promise<GlossarySummary[]>
 
     const nodes: GlossaryIndexResponse['glossaryTerms']['nodes'] = resp?.glossaryTerms?.nodes ?? [];
     for (const n of nodes) {
+      const raw = typeof n.content === 'string' ? n.content : '';
+      const text = raw ? stripHtml(raw) : '';
       out.push({
         slug: String(n.slug || ''),
         title: String(n.title || ''),
-        excerpt: typeof n.excerpt === 'string' ? n.excerpt : null,
+        excerpt: text || null,
       });
       if (out.length >= limit) break;
     }

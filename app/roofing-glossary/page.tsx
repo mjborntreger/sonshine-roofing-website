@@ -34,7 +34,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GlossaryArchivePage() {
-  const terms = await listGlossaryIndex(500);
+  let terms: Awaited<ReturnType<typeof listGlossaryIndex>> = [];
+  try {
+    terms = await listGlossaryIndex(500);
+  } catch (error) {
+    console.error("[roofing-glossary] Failed to load glossary index:", error);
+    terms = [];
+  }
 
   // Group by first letter (A-Z, then # for non-letters)
   const groups = new Map<string, { title: string; slug: string }[]>();
