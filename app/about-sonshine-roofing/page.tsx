@@ -102,7 +102,7 @@ export default async function Page() {
   return (
     <>
       <Section>
-        <div className="container-edge py-4">
+        <div className="py-4">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
 
             {/* About us */}
