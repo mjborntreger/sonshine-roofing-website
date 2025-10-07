@@ -1,6 +1,12 @@
 import { deleteCookie, readCookie, writeCookie } from '@/lib/client-cookies';
 import { normalizePhoneForSubmit, isUsPhoneComplete } from '@/lib/phone';
-import type { ContactLeadInput } from '@/lib/validation';
+import type {
+  ContactLeadInput,
+  FeedbackLeadInput,
+  FinancingLeadInput,
+  LeadInput,
+  SpecialOfferLeadInput,
+} from '@/lib/validation';
 
 export {
   stripToPhoneDigits as sanitizePhoneInput,
