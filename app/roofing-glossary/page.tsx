@@ -52,7 +52,7 @@ export default async function GlossaryArchivePage() {
   const definedTerms = terms.map((t) => ({
     '@type': 'DefinedTerm',
     name: t.title,
-    description: stripHtml((t as any).excerpt || '').slice(0, 200),
+    description: stripHtml(t.excerpt ?? '').slice(0, 200),
     url: `${base}/roofing-glossary/${t.slug}`,
     inDefinedTermSet: `${base}/roofing-glossary`,
   }));

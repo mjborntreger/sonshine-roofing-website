@@ -76,8 +76,14 @@ export default function ProjectVideo({ title, videoId, className }: Props) {
       requestAnimationFrame(() => {
         window.scrollTo({ top: y, left: 0 });
         html.style.scrollBehavior = prevBehavior;
-        const el = previouslyFocused.current as any;
-        try { el?.focus?.({ preventScroll: true }); } catch { el?.focus?.(); }
+        const el = previouslyFocused.current;
+        if (el) {
+          try {
+            el.focus({ preventScroll: true });
+          } catch {
+            el.focus();
+          }
+        }
         previouslyFocused.current = null;
       });
     }

@@ -1513,7 +1513,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               data-icon-affordance="right"
             >
               <HelpCircle className="h-5 w-4 mr-2 inline text-slate-600" />
-              What's the next step?
+              What&rsquo;s the next step?
               <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 icon-affordance" />
             </a>
           </div>

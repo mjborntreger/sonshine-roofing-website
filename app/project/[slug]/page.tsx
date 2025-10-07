@@ -7,6 +7,16 @@ import ShareWhatYouThink from "@/components/ShareWhatYouThink";
 
 import type { Metadata } from "next";
 
+type OgImageRecord = {
+  url?: unknown;
+  secureUrl?: unknown;
+  width?: unknown;
+  height?: unknown;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 // Static paths
 export async function generateStaticParams() {
   const slugs = await listProjectSlugs(200).catch(() => []);
@@ -31,10 +41,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const title = (seo.title || og.title || project.title || "Project · SonShine Roofing").trim();
   const description = (seo.description || og.description || project.projectDescription || "").trim().slice(0, 160);
 
-  const rmImg = (og.image || {}) as any;
-  const ogUrl: string = rmImg.secureUrl || rmImg.url || project.heroImage?.url || "/og-default.png";
-  const ogWidth: number = rmImg.width || 1200;
-  const ogHeight: number = rmImg.height || 630;
+  const ogImageRecord = isRecord(og.image) ? (og.image as OgImageRecord) : null;
+  const ogUrl: string =
+    (ogImageRecord && typeof ogImageRecord.secureUrl === "string" && ogImageRecord.secureUrl) ||
+    (ogImageRecord && typeof ogImageRecord.url === "string" && ogImageRecord.url) ||
+    project.heroImage?.url ||
+    "/og-default.png";
+  const ogWidth: number =
+    (ogImageRecord && typeof ogImageRecord.width === "number" && ogImageRecord.width) || 1200;
+  const ogHeight: number =
+    (ogImageRecord && typeof ogImageRecord.height === "number" && ogImageRecord.height) || 630;
 
   return {
     title,
@@ -114,8 +130,14 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
   const base = process.env.NEXT_PUBLIC_BASE_URL || "https://sonshineroofing.com";
   const shareUrl = `${base}/project/${slug}`;
 
-  const rmImg2 = (project.seo?.openGraph?.image || {}) as any;
-  const ogImgMaybe = rmImg2.secureUrl || rmImg2.url || project.heroImage?.url || "/og-default.png";
+  const ogImageSecondary = isRecord(project.seo?.openGraph?.image)
+    ? (project.seo?.openGraph?.image as OgImageRecord)
+    : null;
+  const ogImgMaybe =
+    (ogImageSecondary && typeof ogImageSecondary.secureUrl === "string" && ogImageSecondary.secureUrl) ||
+    (ogImageSecondary && typeof ogImageSecondary.url === "string" && ogImageSecondary.url) ||
+    project.heroImage?.url ||
+    "/og-default.png";
   const ogImgAbs = ogImgMaybe.startsWith("http") ? ogImgMaybe : `${base}${ogImgMaybe}`;
 
   const areaServed = (project.serviceAreas || []).map((t) => ({ "@type": "AdministrativeArea", name: t.name }));

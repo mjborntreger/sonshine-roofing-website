@@ -199,7 +199,7 @@ function attributeNameToProp(name: string) {
 }
 
 function attributesToProps(attrs: Record<string, string>) {
-  const props: Record<string, any> = {};
+  const props: Record<string, unknown> = {};
   for (const [name, rawValue] of Object.entries(attrs)) {
     const propName = attributeNameToProp(name);
     if (propName === 'style') {

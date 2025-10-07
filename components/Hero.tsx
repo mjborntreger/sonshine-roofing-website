@@ -64,11 +64,11 @@ export default function Hero() {
           aria-label="Scroll to the quick roofing quiz"
         >
           <div className="mb-3 px-6 text-xs uppercase text-neutral-300 md:text-md">
-            Step 1: Let's get you squared away
+            Step 1: Let&rsquo;s get you squared away
           </div>
-          <div className="py-2 text-2xl font-bold md:text-4xl">
+          <h2 className="text-white py-2 text-3xl md:text-6xl">
             Get Started
-          </div>
+          </h2>
           <div className="mt-4 text-sm text-slate-200 md:text-lg">
             Just takes one minute. No commitment required.
           </div>

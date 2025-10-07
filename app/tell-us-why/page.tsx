@@ -48,7 +48,7 @@ function TellUsWhyForm() {
     const cfToken = String(fd.get("cfToken") || ""); // provided by <Turnstile />
     const hp_field = String(fd.get("company") || ""); // honeypot
 
-    const payload: Record<string, unknown> = {
+  const payload: Record<string, unknown> = {
       type: "feedback",
       firstName: first,
       lastName: last,
@@ -76,13 +76,15 @@ function TellUsWhyForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const json = await res.json().catch(() => ({} as any));
+      const json: { ok?: boolean; error?: string } | null = await res.json().catch(() => null);
       if (res.ok && json?.ok) {
         setStatus("ok");
         // GTM event
         try {
-          (window as any).dataLayer = (window as any).dataLayer || [];
-          (window as any).dataLayer.push({
+          type DataLayerWindow = Window & { dataLayer?: Array<Record<string, unknown>> };
+          const dlWindow = window as DataLayerWindow;
+          dlWindow.dataLayer = dlWindow.dataLayer || [];
+          dlWindow.dataLayer.push({
             event: "feedback_submitted",
             rating,
             page: "/tell-us-why",
@@ -92,7 +94,7 @@ function TellUsWhyForm() {
         setStatus("err");
         setErr(json?.error || "Something went wrong. Please try again.");
       }
-    } catch (e) {
+    } catch {
       setStatus("err");
       setErr("Network error. Please try again.");
     }

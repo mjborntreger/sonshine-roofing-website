@@ -1,7 +1,7 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import SmartLink from "@/components/SmartLink";
-import { ArrowUpRight, ArrowUp, ArrowRight, Phone, Calendar, Star } from "lucide-react";
+import { ArrowUpRight, ArrowUp, Star } from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from "@/lib/routes";
 
 const SOCIALS = [

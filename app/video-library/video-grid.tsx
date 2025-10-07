@@ -1,7 +1,7 @@
 // app/video-library/video-grid.tsx
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
@@ -31,31 +31,34 @@ export default function VideoGrid({
   const scrollYRef = useRef(0);
   const [mounted, setMounted] = useState(false);
 
-  const announceOpen = (slug?: string | null) => {
+  const announceOpen = useCallback((slug?: string | null) => {
     try {
       window.dispatchEvent(new CustomEvent('video:open', { detail: { slug } }));
     } catch {
       // swallow errors triggered by restricted dispatch environments
     }
-  };
-  const announceClose = () => {
+  }, []);
+  const announceClose = useCallback(() => {
     try {
       window.dispatchEvent(new Event('video:close'));
     } catch {
       // ignore
     }
-  };
+  }, []);
 
-  const openModal = (v: VideoItem) => {
-    setActive(v);
-    const s = v.slug || v.id || null;
-    if (s) announceOpen(String(s));
-  };
+  const openModal = useCallback(
+    (v: VideoItem) => {
+      setActive(v);
+      const s = v.slug || v.id || null;
+      if (s) announceOpen(String(s));
+    },
+    [announceOpen]
+  );
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setActive(null);
     announceClose();
-  };
+  }, [announceClose]);
 
   // Normalize initial page data for InfiniteList
   const initialPage: PageResult<VideoItem> = initial ?? {

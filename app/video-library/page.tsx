@@ -23,6 +23,23 @@ type SearchParamsRecord = Record<string, string | string[] | undefined>;
 type SearchParamsPromise = Promise<SearchParamsRecord>;
 const EMPTY_SEARCH_PARAMS: SearchParamsRecord = {};
 
+type VideoWithHeroImage = VideoItem & {
+  heroImage?: { url?: string | null } | null;
+};
+
+const heroImageUrl = (item: VideoItem): string | undefined => {
+  if ("heroImage" in item) {
+    const hero = (item as VideoWithHeroImage).heroImage;
+    if (hero && typeof hero.url === "string") return hero.url;
+  }
+  return undefined;
+};
+
+type VideoModule = {
+  getVideoEntryBySlug?: (slug: string) => Promise<VideoItem | null>;
+  videoJsonLd?: (video: VideoItem, base: string) => Record<string, unknown>;
+};
+
 const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
   { slug: "commercials", label: "Commercials" },
   { slug: "explainers", label: "Explainers" },
@@ -62,8 +79,8 @@ export async function generateMetadata({
   if (!v) return defaultMeta;
 
   try {
-    const mod: any = await import("@/lib/wp");
-    const fn = mod?.getVideoEntryBySlug as undefined | ((slug: string) => Promise<any>);
+    const mod: VideoModule = await import("@/lib/wp");
+    const fn = mod.getVideoEntryBySlug;
     if (typeof fn !== "function") return defaultMeta;
     const video = await fn(v).catch(() => null);
     if (!video) return defaultMeta;
@@ -71,8 +88,12 @@ export async function generateMetadata({
     const og = video.seo?.openGraph ?? {};
     const title = (video.seo?.title || og.title || video.title || SEO_TITLE).trim();
     const description = (video.seo?.description || og.description || SEO_DESCRIPTION).trim().slice(0, 160);
-    const img = (og.image as any) || {};
-    const ogUrl: string = img.secureUrl || img.url || video.featuredImage?.url || OG_IMAGE;
+    const ogImage = og.image && typeof og.image === "object" ? og.image : null;
+    const ogUrl =
+      (ogImage && typeof ogImage.secureUrl === "string" && ogImage.secureUrl) ||
+      (ogImage && typeof ogImage.url === "string" && ogImage.url) ||
+      video.featuredImage?.url ||
+      OG_IMAGE;
 
     return {
       title,
@@ -92,7 +113,7 @@ export async function generateMetadata({
         images: [ogUrl],
       },
     };
-  } catch (e) {
+  } catch {
     return defaultMeta;
   }
 }
@@ -125,7 +146,7 @@ const toSlugArray = (value: string | string[] | undefined): string[] => {
 function uniqueTermsFromVideos(items: VideoItem[], key: "materialTypes" | "serviceAreas"): TermLite[] {
   const map = new Map<string, TermLite>();
   for (const v of items) {
-    const arr = (v as any)[key] as TermLite[] | undefined;
+    const arr = v[key];
     if (!arr) continue;
     for (const t of arr) {
       const slug = String(t.slug || "").trim();
@@ -176,7 +197,7 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
     const slug = (item.slug || "").trim();
     const url = slug ? `${collectionUrl}?v=${encodeURIComponent(slug)}` : collectionUrl;
     const name = (item.title || "").trim();
-    const imageUrl = item.thumbnailUrl || (item as VideoItem & { heroImage?: { url?: string } }).heroImage?.url;
+    const imageUrl = item.thumbnailUrl || heroImageUrl(item);
     return {
       "@type": "ListItem",
       position: index + 1,
@@ -197,16 +218,16 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
   let selectedVideoLd: Record<string, unknown> | null = null;
   if (videoSlug) {
     try {
-      const mod = await import("@/lib/wp");
-      const getOne = mod?.getVideoEntryBySlug as undefined | ((slug: string) => Promise<VideoItem | null>);
-      const toJsonLd = mod?.videoJsonLd as undefined | ((v: VideoItem, base: string) => Record<string, unknown>);
+      const mod: VideoModule = await import("@/lib/wp");
+      const getOne = mod.getVideoEntryBySlug;
+      const toJsonLd = mod.videoJsonLd;
       if (typeof getOne === "function") {
         const selected = await getOne(videoSlug).catch(() => null);
         if (selected && typeof toJsonLd === "function") {
           selectedVideoLd = toJsonLd(selected, base);
         }
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
   }

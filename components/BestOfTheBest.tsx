@@ -105,9 +105,9 @@ export default async function bestOfTheBest() {
         <figure className="text-slate-900">
           <blockquote className="italic text-md">
             <p>
-              "You found one of the most <strong>positively reviewed</strong> roofing companies anywhere,
+              &ldquo;You found one of the most <strong>positively reviewed</strong> roofing companies anywhere,
               SonShine Roofing in Florida, which is now a 5-time winner of our national
-              Best of the Best award."
+              Best of the Best award.&rdquo;
             </p>
           </blockquote>
           <figcaption className="mt-6 text-md text-right not-italic">—Rich Noonan, Best of the Best TV</figcaption>

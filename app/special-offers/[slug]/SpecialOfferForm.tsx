@@ -1,7 +1,6 @@
 'use client';
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
-import { Copy, Check } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
 
@@ -21,6 +20,11 @@ type FormValues = {
 };
 
 type Submission = 'idle' | 'submitting' | 'success' | 'error';
+
+type LeadResponse = {
+  ok?: boolean;
+  error?: string;
+};
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -104,7 +108,6 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
   const [submission, setSubmission] = useState<Submission>(initialUnlock ? 'success' : 'idle');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
 
   const phoneDigits = useMemo(() => sanitizePhoneInput(values.phone), [values.phone]);
 
@@ -161,16 +164,6 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
     }
   }, [submission, cookieName, offerCode, offerExpiration]);
 
-  const handleCopyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(offerCode);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
-    } catch {
-      setCopied(false);
-    }
-  };
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submission === 'submitting') return;
@@ -220,13 +213,15 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const json = await res.json().catch(() => ({} as any));
+      const json: LeadResponse | null = await res.json().catch(() => null);
       if (res.ok && json?.ok) {
         setSubmission('success');
         writeOfferCookie(cookieName, offerCode, offerExpiration);
         try {
-          (window as any).dataLayer = (window as any).dataLayer || [];
-          (window as any).dataLayer.push({
+          type DataLayerWindow = Window & { dataLayer?: Array<Record<string, unknown>> };
+          const dlWindow = window as DataLayerWindow;
+          dlWindow.dataLayer = dlWindow.dataLayer || [];
+          dlWindow.dataLayer.push({
             event: 'special_offer_claimed',
             offer_slug: offerSlug,
             offer_code: offerCode,
@@ -236,7 +231,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       }
       setSubmission('error');
       setGlobalError(json?.error || 'We could not send your request. Please try again.');
-    } catch (err) {
+    } catch {
       setSubmission('error');
       setGlobalError('Network error. Please try again.');
     }
@@ -245,7 +240,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
   if (submission === 'success') {
     return (
       <div className="rounded-3xl border border-emerald-200 bg-white/95 p-6 shadow-lg print:border-neutral-700 print:bg-white">
-        <h2 className="text-2xl font-semibold text-emerald-700">You're all set!</h2>
+        <h2 className="text-2xl font-semibold text-emerald-700">You&rsquo;re all set!</h2>
         <p className="mt-2 text-sm text-slate-600 print:text-black">
           Thanks! Your offer code is below. We’ve also emailed it to you so you can keep it handy.
         </p>

@@ -157,6 +157,7 @@ export default function Header() {
             loading="eager"
             priority
             fetchPriority="high"
+            className="h-[50px]"
           />
         </SmartLink>
         <NavMenu transparent={isTransparent} />

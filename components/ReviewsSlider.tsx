@@ -255,10 +255,10 @@ export default function ReviewsSlider({
                           <div className="mt-1 text-xs text-slate-500">{r.relative_time_description}</div>
                         )}
                       </div>
-                      <Quote className="mt-1 h-7 w-7 flex-none text-slate-300" aria-hidden />
+                      <Quote className="mt-1 h-10 w-10 flex-none text-slate-300" aria-hidden />
                     </div>
                   </header>
-                  <p className="text-md md:text-lg leading-7 text-slate-700">{text}</p>
+                  <p className="text-sm md:text-md leading-7 text-slate-700">{text}</p>
                 </article>
               </button>
             );

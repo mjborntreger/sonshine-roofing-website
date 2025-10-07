@@ -100,7 +100,7 @@ const pillars: Pillar[] = [
     id: "durable-materials",
     title: "Durable Materials",
     description:
-      "Salty air, blistering heat, and devastating storms? We use materials tough enough to take it all. As a certified GAF Master Elite roofer, we have the materials and know-how to give you the most durable and energy-efficient roof you&rsquo;ll ever buy.",
+      "Salty air, blistering heat, and devastating storms? We use materials tough enough to take it all. As a certified GAF Master Elite roofer, we have the materials and know-how to give you the most durable and energy-efficient roof you will ever buy.",
     icon: Shield,
     theme: "blue",
   },

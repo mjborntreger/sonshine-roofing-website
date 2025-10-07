@@ -3,6 +3,7 @@ import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer
 import ProgramCard from '@/components/ProgramCard';
 import MonthlyEstimator from './MonthlyEstimator';
 import type { Metadata } from 'next';
+import Image from "next/image";
 import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 
@@ -280,11 +281,11 @@ export default async function FinancingPage() {
             </ul>
           </section>
 
-          {/* What's Next */}
-          <section id="whats-next"className="rounded-2xl border border-slate-200 bg-white p-4">
+          {/* What&rsquo;s Next */}
+          <section id="whats-next" className="rounded-2xl border border-slate-200 bg-white p-4">
             <h3 className={h3}>
               <ListOrdered className={sectionIcon} aria-hidden="true" />
-              What's next?
+              What&rsquo;s next?
             </h3>
             <ol className="mt-3 list-decimal pl-5 space-y-2 text-slate-700">
               <li>
@@ -294,7 +295,7 @@ export default async function FinancingPage() {
                   data-icon-affordance="right"
                   proseGuard
                 >
-                  Know what documents you'll need
+                  Know what documents you&rsquo;ll need
                   <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
                 </SmartLink>
               </li>
@@ -353,12 +354,14 @@ export default async function FinancingPage() {
                   id="ygrene-docs" 
                   className="text-xl font-semibold text-slate-900">YGrene PACE Financing (Equity‑based)
                 </h3>
-                <img
+                <Image
                   src="https://next.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
                   title="Ygrene Financing Logo"
                   alt="Ygrene Financing Logo"
                   className="h-6 w-auto opacity-70"
-                  />
+                  width={160}
+                  height={48}
+                />
               </div>
               <ul className="mt-3 space-y-2 text-slate-700">
                 <li className={checkList}>
@@ -394,12 +397,14 @@ export default async function FinancingPage() {
                 >
                 Service Finance (Credit‑based)
               </h3>
-              <img
+              <Image
                   src="https://next.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
                   title="Service Finance Logo"
                   alt="Service Finance Logo"
                   className="h-8 w-auto opacity-70"
-                  />
+                  width={180}
+                  height={64}
+              />
               </div>
               <ul className="mt-3 space-y-2 text-slate-700">
                 <li className={checkList}>

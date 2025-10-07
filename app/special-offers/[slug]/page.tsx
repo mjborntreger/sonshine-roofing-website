@@ -10,6 +10,16 @@ import SpecialOfferForm from './SpecialOfferForm';
 import { getSpecialOfferBySlug, listSpecialOfferSlugs, stripHtml } from '@/lib/wp';
 import isExpired from '@/lib/isExpired';
 
+type OgImageRecord = {
+    url?: unknown;
+    secureUrl?: unknown;
+    width?: unknown;
+    height?: unknown;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+
 export const revalidate = 900;
 
 export async function generateStaticParams() {
@@ -48,10 +58,16 @@ export async function generateMetadata({
     const descriptionSource = seo.description || og.description || stripHtml(offer.contentHtml || '') || '';
     const description = descriptionSource.slice(0, 160);
 
-    const rmImg = (og.image || {}) as any;
-    const ogUrl: string = rmImg.secureUrl || rmImg.url || offer.featuredImage?.url || '/og-default.png';
-    const ogWidth: number = rmImg.width || 1200;
-    const ogHeight: number = rmImg.height || 630;
+    const ogImageRecord = isRecord(og.image) ? (og.image as OgImageRecord) : null;
+    const ogUrl =
+        (ogImageRecord && typeof ogImageRecord.secureUrl === 'string' && ogImageRecord.secureUrl) ||
+        (ogImageRecord && typeof ogImageRecord.url === 'string' && ogImageRecord.url) ||
+        offer.featuredImage?.url ||
+        '/og-default.png';
+    const ogWidth =
+        (ogImageRecord && typeof ogImageRecord.width === 'number' && ogImageRecord.width) || 1200;
+    const ogHeight =
+        (ogImageRecord && typeof ogImageRecord.height === 'number' && ogImageRecord.height) || 630;
 
     return {
         title,

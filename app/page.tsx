@@ -16,10 +16,9 @@ import LeadFormSection from "@/components/LeadFormSection";
 import { cookies } from 'next/headers';
 
 // ===== STYLE CONSTANTS ===== //
-const leadFormLayout = "mx-auto w-full bg-slate-100";
+const leadFormLayout = "mx-auto w-full";
 const reviewsLayout = "mx-auto w-full bg-[#cef3ff]"
 const narrowLayout = "mx-auto w-full max-w-[1280px]";
-const layoutWide = "mx-auto w-full";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
