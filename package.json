@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' tests/verify-facets.ts"
+    "test:phone": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' tests/phone-helpers.test.ts",
+    "test:forms": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' tests/form-phone-integration.test.ts",
+    "test:facets": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' tests/verify-facets.ts",
+    "test": "npm run test:phone && npm run test:forms && npm run test:facets"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.0.5",

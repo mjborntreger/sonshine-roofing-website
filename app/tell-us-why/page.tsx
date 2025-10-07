@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Turnstile from "@/components/Turnstile";
 import SmartLink from "@/components/SmartLink";
+import { sanitizePhoneInput, isUsPhoneComplete, normalizePhoneForSubmit, formatPhoneExample } from "@/lib/phone";
 
 function TellUsWhyForm() {
   const qs = useSearchParams();
@@ -48,12 +49,25 @@ function TellUsWhyForm() {
     const cfToken = String(fd.get("cfToken") || ""); // provided by <Turnstile />
     const hp_field = String(fd.get("company") || ""); // honeypot
 
-  const payload: Record<string, unknown> = {
+    const phoneDigits = sanitizePhoneInput(phone);
+    if (!isUsPhoneComplete(phoneDigits)) {
+      setStatus("err");
+      setErr("Enter a valid US phone number (10 digits).");
+      return;
+    }
+    const normalizedPhone = normalizePhoneForSubmit(phoneDigits);
+    if (!normalizedPhone) {
+      setStatus("err");
+      setErr("Enter a valid US phone number (10 digits).");
+      return;
+    }
+
+    const payload: Record<string, unknown> = {
       type: "feedback",
       firstName: first,
       lastName: last,
       email,
-      phone,
+      phone: normalizedPhone,
       rating: Number(rating),
       message,
       cfToken,
@@ -165,8 +179,13 @@ function TellUsWhyForm() {
             name="phone"
             required
             autoComplete="tel"
+            inputMode="tel"
+            aria-describedby="phone-hint"
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]"
           />
+          <p id="phone-hint" className="mt-1 text-xs text-slate-500">
+            Digits only, US numbers. Example: {formatPhoneExample()}
+          </p>
         </label>
 
         <label className="block">

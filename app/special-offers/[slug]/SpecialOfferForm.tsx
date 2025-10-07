@@ -3,6 +3,12 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
+import {
+  sanitizePhoneInput,
+  isUsPhoneComplete,
+  normalizePhoneForSubmit,
+  formatPhoneExample,
+} from '@/lib/phone';
 
 type Props = {
   offerCode: string;
@@ -27,28 +33,6 @@ type LeadResponse = {
 };
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-function sanitizePhoneInput(value: string) {
-  return value.replace(/\D/g, '').slice(0, 11);
-}
-
-function formatPhoneDisplay(digits: string) {
-  const cleaned = sanitizePhoneInput(digits);
-  if (!cleaned) return '';
-  const useCountry = cleaned.length === 11;
-  const country = useCountry ? cleaned[0] : '';
-  const local = useCountry ? cleaned.slice(1) : cleaned;
-  const area = local.slice(0, 3);
-  const mid = local.slice(3, 6);
-  const last = local.slice(6, 10);
-  if (local.length <= 3) {
-    return `${useCountry ? `+${country} ` : ''}(${area}`;
-  }
-  if (local.length <= 6) {
-    return `${useCountry ? `+${country} ` : ''}(${area}) ${mid}`;
-  }
-  return `${useCountry ? `+${country} ` : ''}(${area}) ${mid}-${last}`;
-}
 
 function parseExpirationDate(raw?: string | null): Date {
   if (raw) {
@@ -109,8 +93,6 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  const phoneDigits = useMemo(() => sanitizePhoneInput(values.phone), [values.phone]);
-
   const resetErrors = () => {
     setFieldErrors({});
     setGlobalError(null);
@@ -126,16 +108,16 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
     } else if (!emailRegex.test(email)) {
       next.email = 'Enter a valid email (example@domain.com)';
     }
-    const phone = sanitizePhoneInput(values.phone);
-    if (!(phone.length === 10 || phone.length === 11)) {
-      next.phone = 'Enter a valid phone number (10 digits, optional country code)';
+    if (!isUsPhoneComplete(values.phone)) {
+      next.phone = 'Enter a valid US phone number (10 digits).';
     }
     return next;
   };
 
   const handleChange = (key: keyof FormValues) => (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setValues((prev) => ({ ...prev, [key]: key === 'phone' ? value : value }));
+    const nextValue = key === 'phone' ? sanitizePhoneInput(value) : value;
+    setValues((prev) => ({ ...prev, [key]: nextValue }));
     if (fieldErrors[key]) {
       setFieldErrors((prev) => {
         const clone = { ...prev };
@@ -189,7 +171,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
       email: values.email.trim(),
-      phone: sanitizePhoneInput(values.phone),
+      phone: normalizePhoneForSubmit(values.phone),
       offerCode,
       offerSlug,
       offerTitle: offerTitle ?? undefined,
@@ -357,7 +339,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
             </span>
           )}
           <p className="mt-1 text-xs text-slate-500">
-            Digits only please. Example: {formatPhoneDisplay(phoneDigits || '9415551234')}
+            Digits only, US numbers. Example: {formatPhoneExample(values.phone)}
           </p>
         </label>
 

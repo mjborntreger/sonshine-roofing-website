@@ -33,6 +33,9 @@ import {
   parseLeadSuccessCookie,
   persistLeadSuccessCookie,
   sanitizePhoneInput,
+  normalizePhoneForSubmit,
+  isUsPhoneComplete,
+  formatPhoneExample,
   validateEmail,
 } from '@/lib/contact-lead';
 import { cn } from '@/lib/utils';
@@ -273,9 +276,8 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
     if (!form.lastName.trim()) validation.lastName = 'Enter your last name.';
     if (!validateEmail(form.email)) validation.email = 'Enter a valid email (example@domain.com).';
 
-    const phoneDigits = sanitizePhoneInput(form.phone);
-    if (!(phoneDigits.length === 10 || phoneDigits.length === 11)) {
-      validation.phone = 'Enter a 10-digit phone number (add country code if needed).';
+    if (!isUsPhoneComplete(form.phone)) {
+      validation.phone = 'Enter a valid US phone number (10 digits).';
     }
 
     if (!form.address1.trim()) validation.address1 = 'Enter your street address.';
@@ -317,7 +319,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
       email: form.email.trim(),
-      phone: phoneDigits,
+      phone: normalizePhoneForSubmit(form.phone),
       address1: form.address1.trim(),
       address2: form.address2.trim() || undefined,
       city: form.city.trim(),
@@ -581,11 +583,15 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
                     type="tel"
                     name="phone"
                     autoComplete="tel"
+                    inputMode="tel"
                     value={form.phone}
-                    onChange={(event) => setField('phone', event.target.value)}
+                    onChange={(event) => setField('phone', sanitizePhoneInput(event.target.value))}
                     className={cn(INPUT_BASE_CLASS, INPUT_DEFAULT_CLASS, errors.phone && INPUT_ERROR_CLASS)}
                   />
                   {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
+                  <p className="mt-1 text-xs text-slate-500">
+                    Digits only, US numbers. Example: {formatPhoneExample(form.phone)}
+                  </p>
                 </label>
                 <label className="block text-sm font-medium text-slate-700">
                   Email

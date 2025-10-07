@@ -1,5 +1,12 @@
 import { deleteCookie, readCookie, writeCookie } from '@/lib/client-cookies';
 
+export {
+  stripToPhoneDigits as sanitizePhoneInput,
+  normalizePhoneForSubmit,
+  formatPhoneExample,
+  isUsPhoneComplete,
+} from '@/lib/phone';
+
 export const CONTACT_READY_COOKIE = 'ss_lead_contact_ready';
 export const CONTACT_READY_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
@@ -19,10 +26,6 @@ export interface SuccessMeta {
   projectType: string;
   helpTopicLabels: string[];
   timelineLabel: string | null;
-}
-
-export function sanitizePhoneInput(value: string): string {
-  return value.replace(/\D/g, '').slice(0, 15);
 }
 
 export function validateEmail(email: string): boolean {

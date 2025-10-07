@@ -44,6 +44,9 @@ import {
   parseLeadSuccessCookie,
   persistLeadSuccessCookie,
   sanitizePhoneInput,
+  normalizePhoneForSubmit,
+  isUsPhoneComplete,
+  formatPhoneExample,
   validateEmail,
 } from '@/lib/contact-lead';
 import SmartLink from './SmartLink';
@@ -425,15 +428,6 @@ interface FieldErrors {
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
-function formatPhoneExample(phone: string): string {
-  const digits = sanitizePhoneInput(phone || '9415551234');
-  if (digits.length < 10) return '(941) 555-1234';
-  const area = digits.slice(0, 3);
-  const mid = digits.slice(3, 6);
-  const last = digits.slice(6, 10);
-  return `(${area}) ${mid}-${last}`;
-}
-
 function formatFallbackLabel(value: string | null | undefined): string {
   if (!value) return '';
   return value
@@ -537,9 +531,8 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
     if (!data.firstName.trim()) errors.firstName = 'Enter your first name.';
     if (!data.lastName.trim()) errors.lastName = 'Enter your last name.';
     if (!validateEmail(data.email)) errors.email = 'Enter a valid email (example@domain.com).';
-    const digits = sanitizePhoneInput(data.phone);
-    if (!(digits.length === 10 || digits.length === 11)) {
-      errors.phone = 'Enter a 10-digit phone number (add country code if needed).';
+    if (!isUsPhoneComplete(data.phone)) {
+      errors.phone = 'Enter a valid US phone number (10 digits).';
     }
   }
   if (step === 'schedule') {
@@ -773,7 +766,7 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
       firstName: form.firstName.trim(),
       lastName: form.lastName.trim(),
       email: form.email.trim(),
-      phone: sanitizePhoneInput(form.phone),
+      phone: normalizePhoneForSubmit(form.phone),
       address1: form.address1.trim(),
       address2: form.address2.trim() || undefined,
       city: form.city.trim(),
@@ -1247,7 +1240,7 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
                       autoComplete="tel"
                       inputMode="tel"
                       value={form.phone}
-                      onChange={(event) => onSelect('phone', event.target.value)}
+                      onChange={(event) => onSelect('phone', sanitizePhoneInput(event.target.value))}
                       className={cn(
                         INPUT_BASE_CLASS,
                         errors.phone ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
@@ -1255,7 +1248,9 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
                       aria-invalid={Boolean(errors.phone)}
                     />
                     {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
-                    <p className="mt-1 text-xs text-slate-500">Digits only is great. Example: {formatPhoneExample(form.phone)}</p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Digits only, US numbers. Example: {formatPhoneExample(form.phone)}
+                    </p>
                   </label>
 
                   <div className="md:col-span-2">

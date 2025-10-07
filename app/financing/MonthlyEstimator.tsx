@@ -7,6 +7,13 @@ import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, Arr
 import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 import { readCookie, writeCookie } from '@/lib/client-cookies';
+import {
+  sanitizePhoneInput,
+  isUsPhoneComplete,
+  normalizePhoneForSubmit,
+  formatPhoneForDisplay,
+  formatPhoneExample,
+} from '@/lib/phone';
 
 const COOKIE_NAME = 'ss_financing_calc';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -337,29 +344,6 @@ function sanitizeAmountInput(value: string) {
   return value.replace(/[^\d]/g, '').slice(0, 7);
 }
 
-function sanitizePhoneInput(value: string) {
-  return value.replace(/\D/g, '').slice(0, 11);
-}
-
-function formatPhoneDisplay(digits: string) {
-  const cleaned = sanitizePhoneInput(digits);
-  if (!cleaned) return '';
-  const hasCountryCode = cleaned.length === 11;
-  const country = hasCountryCode ? cleaned[0] : '';
-  const core = hasCountryCode ? cleaned.slice(1) : cleaned;
-  const area = core.slice(0, 3);
-  const mid = core.slice(3, 6);
-  const last = core.slice(6, 10);
-
-  if (core.length <= 3) {
-    return `${hasCountryCode ? `+${country} ` : ''}(${area}`;
-  }
-  if (core.length <= 6) {
-    return `${hasCountryCode ? `+${country} ` : ''}(${area}) ${mid}`;
-  }
-  return `${hasCountryCode ? `+${country} ` : ''}(${area}) ${mid}-${last}`;
-}
-
 function isEmailValid(email: string) {
   const trimmed = email.trim().toLowerCase();
   if (!trimmed) return false;
@@ -600,9 +584,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
     if (currentStep === thirdFormStepIndex) {
       if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
-      const phoneDigits = sanitizePhoneInput(formValues.phone);
-      if (!(phoneDigits.length === 10 || phoneDigits.length === 11)) {
-        nextErrors.phone = 'Enter a valid phone number (10 digits, optional country code)';
+      if (!isUsPhoneComplete(formValues.phone)) {
+        nextErrors.phone = 'Enter a valid US phone number (10 digits).';
       }
     }
     return nextErrors;
@@ -795,7 +778,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
       email: formValues.email.trim(),
-      phone: sanitizePhoneInput(formValues.phone),
+      phone: normalizePhoneForSubmit(formValues.phone),
       address1: formValues.address1.trim(),
       address2: formValues.address2.trim(),
       city: formValues.city.trim(),
@@ -1122,14 +1105,17 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             inputMode="numeric"
             autoComplete="tel"
             className={inputBaseClass}
-            value={formatPhoneDisplay(formValues.phone)}
+            value={formatPhoneForDisplay(formValues.phone)}
             onChange={(e) => setFormValues((prev) => ({ ...prev, phone: sanitizePhoneInput(e.target.value) }))}
             aria-invalid={Boolean(errors.phone)}
-            aria-describedby={errors.phone ? 'phone-error' : undefined}
+            aria-describedby={errors.phone ? 'phone-error phone-example' : 'phone-example'}
           />
           {errors.phone && (
             <p id="phone-error" className="mt-1 text-sm text-red-600">{errors.phone}</p>
           )}
+          <p id="phone-example" className="mt-1 text-xs text-slate-500">
+            Digits only, US numbers. Example: {formatPhoneExample(formValues.phone)}
+          </p>
         </div>
         <p className="mt-3 text-xs italic text-slate-500">Quick verification keeps spam away. It never impacts your credit.</p>
         <div className="pt-2">

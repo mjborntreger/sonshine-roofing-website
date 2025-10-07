@@ -12,7 +12,7 @@ export default function PersonGrid({ people }: { people: Person[] }) {
 
   return (
     <div className="pb-16">
-      <ul className="grid grid-cols-1 lg:grid-cols-4 gap-4 min-w-0 px-2 py-4">
+      <ul className="grid grid-cols-2 lg:grid-cols-4 gap-4 min-w-0 px-2 py-4">
         {people.map((p) => {
           const summary = getSummary(p.contentHtml);
           return (
