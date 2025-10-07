@@ -228,25 +228,25 @@ export async function HoursAndInformation() {
               <li>
                 <SmartLink
                   href="https://www.floridaroof.com/SONSHINE-ROOFING-INC-10-1104.html"
-                  title="Florida Roofing and Sheet Metal Contractors' Association"
-                  aria-label="Florida Roofing and Sheet Metal Contractors' Association"
+                  title="Florida Roofing and Sheet Metal Contractors&rsquo; Association"
+                  aria-label="Florida Roofing and Sheet Metal Contractors&rsquo; Association"
                   className={linkStyles}
                   showExternalIcon
                   data-icon-affordance="up-right"
                 >
-                  Florida Roofing and Sheet Metal Contractors' Association
+                  Florida Roofing and Sheet Metal Contractors&rsquo; Association
                 </SmartLink>
               </li>
               <li>
                 <SmartLink
                   href="https://www.nrca.net/Members/Members/Detail/26f0eca5-8397-4524-8ea3-807a1735e028#"
-                  title="National Roofing Contractors' Association"
-                  aria-label="National Roofing Contractors' Association"
+                  title="National Roofing Contractors&rsquo; Association"
+                  aria-label="National Roofing Contractors&rsquo; Association"
                   className={linkStyles}
                   showExternalIcon
                   data-icon-affordance="up-right"
                 >
-                  National Roofing Contractors' Association
+                  National Roofing Contractors&rsquo; Association
                 </SmartLink>
               </li>
               <li>

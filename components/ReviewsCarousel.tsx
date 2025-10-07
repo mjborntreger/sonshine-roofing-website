@@ -52,7 +52,7 @@ export default async function ReviewsCarousel() {
     <>
       <div className="py-32 mb-16 max-w-[1600px] mx-auto overflow-hidden">
         <h2 className="text-center text-slate-700 text-3xl md:text-5xl mx-2">What Our Customers Say</h2>
-        <p className="text-center mt-3 text-slate-500 text-sm">Tap to a card read it's full contents</p>
+        <p className="text-center mt-3 text-slate-500 text-sm">View our Business Profile on Google</p>
         <div className="not-prose text-center mt-6">
           {data?.avg_rating && (
             <SmartLink
@@ -61,10 +61,11 @@ export default async function ReviewsCarousel() {
               rel="noopener noreferrer nofollow"
               aria-label={`Average Google rating ${Number(data.avg_rating).toFixed(1)} out of 5`}
               className="inline-flex items-center px-4 py-2 btn btn-brand-orange"
+              data-icon-affordance="up-right"
             >
               <span className="text-3xl mr-2">{Number(data.avg_rating).toFixed(1)}</span>
               <span aria-hidden="true">★</span>&nbsp;on Google
-              <ArrowUpRight className="h-5 w-5 ml-2" />
+              <ArrowUpRight className="icon-affordance h-5 w-5 ml-2" />
             </SmartLink>
           )}
           <ReviewsSliderLazy reviews={filtered} gbpUrl={GBP_URL} />

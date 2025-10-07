@@ -84,7 +84,7 @@ const pillars: Pillar[] = [
     id: "local-expertise",
     title: "Local Expertise",
     description:
-      "We're not some out-of-town outfit. We know the codes, the weather, the quirks of Florida homes—and how to roof them right.",
+      "We&rsquo;re not some out-of-town outfit. We know the codes, the weather, the quirks of Florida homes—and how to roof them right.",
     icon: MapPin,
     theme: "blue",
   },
@@ -100,7 +100,7 @@ const pillars: Pillar[] = [
     id: "durable-materials",
     title: "Durable Materials",
     description:
-      "Salty air, blistering heat, and devastating storms? We use materials tough enough to take it all. As a certified GAF Master Elite roofer, we have the materials and know-how to give you the most durable and energy-efficient roof you'll ever buy.",
+      "Salty air, blistering heat, and devastating storms? We use materials tough enough to take it all. As a certified GAF Master Elite roofer, we have the materials and know-how to give you the most durable and energy-efficient roof you&rsquo;ll ever buy.",
     icon: Shield,
     theme: "blue",
   },
@@ -125,7 +125,7 @@ export default async function WhyHomeownersChooseUs() {
     <div className={SECTION_CONTAINER}>
       <div className="text-center">
         <h2 className={SECTION_HEADING}>Why Homeowners Choose Us</h2>
-        <p className={SECTION_SUBTITLE}>(It's because we're awesome)</p>
+        <p className={SECTION_SUBTITLE}>(It's because we&rsquo;re awesome)</p>
         
         <div className={FEATURE_LIST_CLASS}>
           <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>

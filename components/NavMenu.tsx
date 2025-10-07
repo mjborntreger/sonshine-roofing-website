@@ -262,7 +262,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
   const [entered, setEntered] = useState(false);
   useEffect(() => {
     const id = requestAnimationFrame(() => setEntered(true));
-    return () => cancelAnimationFrame(id as any);
+    return () => cancelAnimationFrame(id);
   }, []);
 
   const holdOpen = (i: number) => {
@@ -429,7 +429,7 @@ function MobileMenu() {
     if (open) {
       setEnteredTop(false);
       const id = requestAnimationFrame(() => setEnteredTop(true));
-      return () => cancelAnimationFrame(id as any);
+      return () => cancelAnimationFrame(id);
     }
     setEnteredTop(false);
   }, [open]);
@@ -445,7 +445,8 @@ function MobileMenu() {
       if (s[key]) {
         // collapsing: remove entered to allow re-animate next time
         setEntered((e) => {
-          const { [key]: _, ...rest } = e;
+          const { [key]: removedEntry, ...rest } = e;
+          void removedEntry;
           return rest;
         });
       }

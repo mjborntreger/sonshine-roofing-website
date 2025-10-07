@@ -32,17 +32,17 @@ export default function LiteMap() {
     }
 
     // Fallback for very old browsers
-    const g: any = globalThis as any;
     const onScroll = () => {
       const rect = el.getBoundingClientRect();
-      if (rect.top < (g?.innerHeight ?? 0) + 200) {
+      const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
+      if (rect.top < viewportHeight + 200) {
         setActive(true);
-        g?.removeEventListener?.('scroll', onScroll);
+        window.removeEventListener('scroll', onScroll);
       }
     };
     onScroll();
-    g?.addEventListener?.('scroll', onScroll);
-    return () => g?.removeEventListener?.('scroll', onScroll);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, [active]);
 
   // Prefer the official Maps Embed API (requires key+billing) using Place ID.

@@ -179,16 +179,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const seo = post.seo ?? {};
   const og = seo.openGraph ?? {};
+  const ogImage = og.image ?? null;
 
   const rawExcerpt = stripHtml(sanitizeHtml(post.excerpt || ""));
   const title = (seo.title || og.title || post.title || "Article · SonShine Roofing").trim();
   const description = (seo.description || og.description || rawExcerpt).slice(0, 160);
 
   // Best-image selection: RankMath OG > featured image > site default
-  const rmImg = (og.image || {}) as any;
-  const ogUrl: string = rmImg.secureUrl || rmImg.url || post.featuredImage?.url || "/og-default.png";
-  const ogWidth: number = rmImg.width || 1200;
-  const ogHeight: number = rmImg.height || 630;
+  const ogUrl =
+    (ogImage && typeof ogImage.secureUrl === "string" && ogImage.secureUrl) ||
+    (ogImage && typeof ogImage.url === "string" && ogImage.url) ||
+    post.featuredImage?.url ||
+    "/og-default.png";
+  const ogWidth = ogImage && typeof ogImage.width === "number" ? ogImage.width : 1200;
+  const ogHeight = ogImage && typeof ogImage.height === "number" ? ogImage.height : 630;
 
   return {
     title,
@@ -245,8 +249,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   // JSON-LD (BlogPosting) using the same post object
   const descSeo = (post.seo?.description || post.seo?.openGraph?.description || stripHtml(sanitizeHtml(post.excerpt || ""))).slice(0, 160);
-  const rmImg2 = (post.seo?.openGraph?.image || {}) as any;
-  const ogImgAbs = rmImg2.secureUrl || rmImg2.url || post.featuredImage?.url || `${base}/og-default.png`;
+  const ogImageJsonLd = post.seo?.openGraph?.image ?? null;
+  const ogImgAbs =
+    (ogImageJsonLd && typeof ogImageJsonLd.secureUrl === "string" && ogImageJsonLd.secureUrl) ||
+    (ogImageJsonLd && typeof ogImageJsonLd.url === "string" && ogImageJsonLd.url) ||
+    post.featuredImage?.url ||
+    `${base}/og-default.png`;
   const authorObj = post.authorName ? { "@type": "Person", name: post.authorName } : { "@type": "Organization", name: "SonShine Roofing" };
 
   const jsonLd = {

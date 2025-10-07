@@ -1,7 +1,7 @@
 import Section from "@/components/layout/Section";
 import SimpleLeadForm from "@/components/SimpleLeadForm";
 import SmartLink from "@/components/SmartLink";
-import { Phone, Mail, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, CalendarDays, MapPinned, ArrowUpRight } from "lucide-react";
+import { Phone, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, MapPinned, ArrowUpRight } from "lucide-react";
 import Image from 'next/image';
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import type { Metadata } from 'next';
@@ -145,10 +145,10 @@ export default async function Page() {
                 </SmartLink>
               </div>
 
-              <h2 className={h2Styles}>Whatever you need, we've got you covered.</h2>
+              <h2 className={h2Styles}>Whatever you need, we&rsquo;ve got you covered.</h2>
               <p className={pStyles}>Whether you need to schedule an appointment with one our
                 expert Roofing Specialists to come to your home, or if you
-                just have a few questions, we’re here to help! Give us a call
+                just have a few questions, we&rsquo;re here to help! Give us a call
                 or complete the form below to contact our office.
               </p>
             </div>

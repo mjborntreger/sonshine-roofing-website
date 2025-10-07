@@ -1610,15 +1610,15 @@ export async function listRecentPostsPool(limit = 36): Promise<PostLite[]> {
   const data = await wpFetch<{ posts: { nodes: UnknownRecord[] } }>(query, { limit });
   const nodes = data?.posts?.nodes || [];
 
-  return nodes.map((n: any): PostLite => {
-    const contentHtml = typeof n.content === 'string' ? n.content : null;
-    const excerptHtml = typeof n.excerpt === 'string' ? n.excerpt : null;
+  return nodes.map((node: UnknownRecord): PostLite => {
+    const contentHtml = typeof node.content === 'string' ? node.content : null;
+    const excerptHtml = typeof node.excerpt === 'string' ? node.excerpt : null;
     return {
-      slug: String(n.slug || ""),
-      title: String(n.title || ""),
-      date: n.date || null,
-      featuredImage: pickImageFrom(n.featuredImage),
-      categories: mapTermNodes(n.categories),
+      slug: toStringSafe(node.slug),
+      title: toStringSafe(node.title),
+      date: typeof node.date === 'string' ? node.date : null,
+      featuredImage: pickImageFrom(node.featuredImage),
+      categories: mapTermNodes(node.categories),
       excerpt: toTrimmedExcerpt(excerptHtml) ?? null,
       contentPlain: (() => {
         const html = contentHtml?.length ? contentHtml : excerptHtml;
@@ -1648,11 +1648,12 @@ export async function listPostsPaged({
   const size = Math.max(1, Math.min(first, 50));
   const offset = after ? Math.max(0, parseInt(String(after), 10) || 0) : 0;
 
-  const searchRaw = typeof filters?.q === 'string'
-    ? filters.q
-    : typeof (filters as any)?.search === 'string'
-    ? (filters as any).search
-    : '';
+  const filtersRecord = asRecord(filters);
+
+  let searchRaw = typeof filters?.q === 'string' ? filters.q : '';
+  if (!searchRaw && filtersRecord && typeof filtersRecord.search === 'string') {
+    searchRaw = filtersRecord.search;
+  }
   const search = searchRaw.trim().length ? searchRaw.trim() : null;
 
   const includeCats = Array.isArray(filters?.categorySlugs)
@@ -1721,14 +1722,25 @@ export async function listPostsPaged({
     }
   `;
 
-  const variables: Record<string, any> = {
+  const variables: Record<string, unknown> = {
     offsetPagination: { offset, size },
     search: search ?? undefined,
     taxQuery: taxArray.length ? { relation: 'AND', taxArray } : undefined,
     facetTaxonomies: [{ taxonomy: 'category' }],
   };
 
-  const data = await wpFetch<any>(query, variables);
+  type BlogArchiveResponse = {
+    posts: {
+      nodes?: UnknownRecord[];
+      pageInfo?: { offsetPagination?: { total?: number; hasMore?: boolean } | null };
+    };
+    facetCounts?: {
+      total?: number;
+      facets?: UnknownRecord[];
+    };
+  };
+
+  const data = await wpFetch<BlogArchiveResponse>(query, variables);
 
   const nodes: UnknownRecord[] = data?.posts?.nodes ?? [];
   const offsetInfo = data?.posts?.pageInfo?.offsetPagination ?? null;
@@ -1737,21 +1749,42 @@ export async function listPostsPaged({
     : Math.max(offset + nodes.length, 0);
   const hasMore = Boolean(offsetInfo?.hasMore) || offset + nodes.length < total;
 
-  const items: PostCard[] = nodes.map((n: any) => ({
-    slug: String(n.slug || ''),
-    title: String(n.title || ''),
-    date: String(n.date || ''),
-    featuredImage: n.featuredImage?.node
-      ? { url: String(n.featuredImage.node.sourceUrl || ''), altText: n.featuredImage.node.altText }
-      : undefined,
-    categories: (n.categories?.nodes || []).map((c: any) => String(c?.name || '')),
-    categoryTerms: (n.categories?.nodes || []).map((c: any) => ({
-      name: String(c?.name || ''),
-      slug: String(c?.slug || ''),
-    })) as TermLite[],
-    excerpt: toTrimmedExcerpt(n.excerpt),
-    contentPlain: stripHtml(String(n.content || '')),
-  }));
+  const items: PostCard[] = nodes.map((node) => {
+    const featuredImageNode = extractNode(node.featuredImage);
+    const featuredImageRecord = asRecord(featuredImageNode);
+    const categoriesNodes = extractNodes(node.categories);
+
+    const categories = categoriesNodes
+      .map((item) => toStringSafe(asRecord(item)?.name))
+      .filter((name) => name.length > 0);
+
+    const categoryTerms: TermLite[] = categoriesNodes
+      .map((item) => {
+        const record = asRecord(item);
+        if (!record) return null;
+        const name = toStringSafe(record.name);
+        const slug = toStringSafe(record.slug);
+        return { name, slug } satisfies TermLite;
+      })
+      .filter((term): term is TermLite => term !== null);
+
+    return {
+      slug: toStringSafe(node.slug),
+      title: toStringSafe(node.title),
+      date: toStringSafe(node.date),
+      featuredImage:
+        featuredImageRecord && typeof featuredImageRecord.sourceUrl === 'string'
+          ? {
+              url: String(featuredImageRecord.sourceUrl || ''),
+              altText: featuredImageRecord.altText ? String(featuredImageRecord.altText) : undefined,
+            }
+          : undefined,
+      categories,
+      categoryTerms,
+      excerpt: toTrimmedExcerpt(typeof node.excerpt === 'string' ? node.excerpt : undefined),
+      contentPlain: stripHtml(String(node.content ?? '')),
+    } satisfies PostCard;
+  });
 
   const nextOffset = offset + items.length;
   const pageInfo: PageInfo = {
@@ -1760,16 +1793,21 @@ export async function listPostsPaged({
   };
 
   const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
-    ? data.facetCounts.facets.map((facet: any) => ({
-        taxonomy: String(facet?.taxonomy || ''),
-        buckets: Array.isArray(facet?.buckets)
-          ? facet.buckets.map((bucket: any) => ({
-              slug: String(bucket?.slug || ''),
-              name: String(bucket?.name || ''),
-              count: typeof bucket?.count === 'number' ? bucket.count : 0,
-            }))
-          : [],
-      }))
+    ? data.facetCounts.facets.map((facetNode) => {
+        const facetRecord = asRecord(facetNode);
+        const bucketsRaw = extractNodes(facetRecord?.buckets);
+        return {
+          taxonomy: toStringSafe(facetRecord?.taxonomy),
+          buckets: bucketsRaw.map((bucketNode) => {
+            const bucketRecord = asRecord(bucketNode);
+            return {
+              slug: toStringSafe(bucketRecord?.slug),
+              name: toStringSafe(bucketRecord?.name),
+              count: typeof bucketRecord?.count === 'number' ? bucketRecord.count : 0,
+            };
+          }),
+        } satisfies FacetGroup;
+      })
     : [];
 
   const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
@@ -1782,7 +1820,7 @@ export async function listPostsPaged({
     meta: {
       overallTotal: facetTotal,
     },
-  } as PageResult<PostCard> & { facets: FacetGroup[] };
+  } satisfies PageResult<PostCard> & { facets: FacetGroup[] };
 }
 
 /**
@@ -1806,7 +1844,9 @@ export async function listRecentPostsPoolForFilters(
 
   const byCat = (slug: string) =>
     recent
-      .filter((p: any) => Array.isArray(p.categoryTerms) && p.categoryTerms.some((t: any) => t.slug === slug))
+      .filter((post) =>
+        Array.isArray(post.categoryTerms) && post.categoryTerms.some((term) => term.slug === slug)
+      )
       .slice(0, perType);
 
   const allLatest = recent.slice(0, allCount);
@@ -1898,23 +1938,32 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
       }
     }
   `;
-  const data = await wpFetch<{ post: any | null }>(query, { slug });
-  const p = data.post;
+  const data = await wpFetch<{ post: UnknownRecord | null }>(query, { slug });
+  const p = asRecord(data.post);
   if (!p) return null;
+
+  const featuredImageNode = extractNode(p.featuredImage);
+  const featuredImageRecord = asRecord(featuredImageNode);
+  const categories = extractNodes(p.categories).map((node) => toStringSafe(asRecord(node)?.name)).filter(Boolean);
+
   return {
-    slug: p.slug,
-    title: p.title,
-    contentHtml: p.content ?? "",
-    date: p.date,
-    modified: p.modified,
-    authorName: p?.author?.node?.name ?? null,
-    featuredImage: p.featuredImage?.node
-      ? { url: p.featuredImage.node.sourceUrl, altText: p.featuredImage.node.altText }
-      : undefined,
-    categories: (p.categories?.nodes || []).map((c: any) => c.name),
-    excerpt: p.excerpt ? String(p.excerpt) : undefined,
-    seo: p.seo ?? undefined,
-  };
+    slug: toStringSafe(p.slug) || slug,
+    title: toStringSafe(p.title),
+    contentHtml: typeof p.content === 'string' ? p.content : '',
+    date: toStringSafe(p.date),
+    modified: toStringSafe(p.modified),
+    authorName: toStringSafe(asRecord(p.author)?.node?.name) || null,
+    featuredImage:
+      featuredImageRecord && typeof featuredImageRecord.sourceUrl === 'string'
+        ? {
+            url: String(featuredImageRecord.sourceUrl),
+            altText: featuredImageRecord.altText ? String(featuredImageRecord.altText) : undefined,
+          }
+        : undefined,
+    categories,
+    excerpt: typeof p.excerpt === 'string' ? p.excerpt : undefined,
+    seo: isRecord(p.seo) ? (p.seo as Post['seo']) : undefined,
+  } satisfies Post;
 }
 
 /**
@@ -1926,6 +1975,7 @@ export async function listRecentProjects(
   limit = 6,
   _opts?: { material?: string | null }
 ): Promise<ProjectSummary[]> {
+  void _opts;
   const query = /* GraphQL */ `
     query RecentProjects($limit: Int!) {
       projects(first: $limit, where: { orderby: { field: DATE, order: DESC } }) {
@@ -1945,19 +1995,22 @@ export async function listRecentProjects(
       }
     }
   `;
-  const data = await wpFetch<any>(query, { limit });
+  const data = await wpFetch<{ projects: { nodes?: UnknownRecord[] } }>(query, { limit });
   const nodes = data?.projects?.nodes ?? [];
-  return nodes.map((p: any): ProjectSummary => ({
-    slug: p.slug,
-    uri: p.uri,
-    title: String(p.title || ''),
-    year: pickYear(p.date),
-    heroImage: pickImage(toImageNode(extractNode(p.featuredImage))),
-    projectDescription: p?.projectDetails?.projectDescription ?? null,
-    materialTypes: mapTermNodes(p.projectFilters?.materialType),
-    roofColors: mapTermNodes(p.projectFilters?.roofColor),
-    serviceAreas: mapTermNodes(p.projectFilters?.serviceArea),
-  }));
+  return nodes.map((entry) => {
+    const filters = asRecord(entry.projectFilters);
+    return {
+      slug: toStringSafe(entry.slug),
+      uri: toStringSafe(entry.uri),
+      title: toStringSafe(entry.title),
+      year: pickYear(entry.date),
+      heroImage: pickImageFrom(entry.featuredImage),
+      projectDescription: asRecord(entry.projectDetails)?.projectDescription ?? null,
+      materialTypes: mapTermNodes(filters?.materialType),
+      roofColors: mapTermNodes(filters?.roofColor),
+      serviceAreas: mapTermNodes(filters?.serviceArea),
+    } satisfies ProjectSummary;
+  });
 }
 
 export type ProjectsArchiveFilters = {
@@ -2073,7 +2126,7 @@ export async function listProjectsPaged({
     }
   `;
 
-  const variables: Record<string, any> = {
+  const variables: Record<string, unknown> = {
     offsetPagination: { offset, size },
     search: search ?? undefined,
     taxQuery: { relation: 'AND', taxArray },
@@ -2084,7 +2137,18 @@ export async function listProjectsPaged({
     ],
   };
 
-  const data = await wpFetch<any>(query, variables);
+  type ProjectArchiveResponse = {
+    projects: {
+      nodes?: UnknownRecord[];
+      pageInfo?: { offsetPagination?: { total?: number; hasMore?: boolean } | null };
+    };
+    facetCounts?: {
+      total?: number;
+      facets?: UnknownRecord[];
+    };
+  };
+
+  const data = await wpFetch<ProjectArchiveResponse>(query, variables);
 
   const nodes: UnknownRecord[] = data?.projects?.nodes ?? [];
   const offsetInfo = data?.projects?.pageInfo?.offsetPagination ?? null;
@@ -2093,17 +2157,20 @@ export async function listProjectsPaged({
     : Math.max(offset + nodes.length, 0);
   const hasMore = Boolean(offsetInfo?.hasMore) || offset + nodes.length < total;
 
-  const items: ProjectSummary[] = nodes.map((p: any): ProjectSummary => ({
-    slug: String(p.slug || ''),
-    uri: String(p.uri || ''),
-    title: String(p.title || ''),
-    year: pickYear(p.date),
-    heroImage: pickImage(toImageNode(extractNode(p.featuredImage))),
-    projectDescription: p?.projectDetails?.projectDescription ?? null,
-    materialTypes: mapTermNodes(p.projectFilters?.materialType),
-    roofColors: mapTermNodes(p.projectFilters?.roofColor),
-    serviceAreas: mapTermNodes(p.projectFilters?.serviceArea),
-  }));
+  const items: ProjectSummary[] = nodes.map((node) => {
+    const filtersRecord = asRecord(node.projectFilters);
+    return {
+      slug: toStringSafe(node.slug),
+      uri: toStringSafe(node.uri),
+      title: toStringSafe(node.title),
+      year: pickYear(node.date),
+      heroImage: pickImageFrom(node.featuredImage),
+      projectDescription: asRecord(node.projectDetails)?.projectDescription ?? null,
+      materialTypes: mapTermNodes(filtersRecord?.materialType),
+      roofColors: mapTermNodes(filtersRecord?.roofColor),
+      serviceAreas: mapTermNodes(filtersRecord?.serviceArea),
+    } satisfies ProjectSummary;
+  });
 
   const nextOffset = offset + items.length;
   const pageInfo: PageInfo = {
@@ -2112,16 +2179,21 @@ export async function listProjectsPaged({
   };
 
   const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
-    ? data.facetCounts.facets.map((f: any) => ({
-        taxonomy: String(f?.taxonomy || ''),
-        buckets: Array.isArray(f?.buckets)
-          ? f.buckets.map((b: any) => ({
-              slug: String(b?.slug || ''),
-              name: String(b?.name || ''),
-              count: typeof b?.count === 'number' ? b.count : 0,
-            }))
-          : [],
-      }))
+    ? data.facetCounts.facets.map((facetNode) => {
+        const facetRecord = asRecord(facetNode);
+        const bucketsNodes = extractNodes(facetRecord?.buckets);
+        return {
+          taxonomy: toStringSafe(facetRecord?.taxonomy),
+          buckets: bucketsNodes.map((bucketNode) => {
+            const bucketRecord = asRecord(bucketNode);
+            return {
+              slug: toStringSafe(bucketRecord?.slug),
+              name: toStringSafe(bucketRecord?.name),
+              count: typeof bucketRecord?.count === 'number' ? bucketRecord.count : 0,
+            };
+          }),
+        } satisfies FacetGroup;
+      })
     : [];
 
   const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
@@ -2173,19 +2245,22 @@ export async function listRecentProjectsByMaterial(
     }
   `;
 
-  const data = await wpFetch<any>(query, { limit, slugs: [material] });
+  const data = await wpFetch<{ projects: { nodes?: UnknownRecord[] } }>(query, { limit, slugs: [material] });
   const nodes = data?.projects?.nodes ?? [];
-  return nodes.map((p: any): ProjectSummary => ({
-    slug: p.slug,
-    uri: p.uri,
-    title: String(p.title || ''),
-    year: pickYear(p.date),
-    heroImage: pickImage(toImageNode(extractNode(p.featuredImage))),
-    projectDescription: p?.projectDetails?.projectDescription ?? null,
-    materialTypes: mapTermNodes(p.projectFilters?.materialType),
-    roofColors: mapTermNodes(p.projectFilters?.roofColor),
-    serviceAreas: mapTermNodes(p.projectFilters?.serviceArea),
-  }));
+  return nodes.map((node) => {
+    const filtersRecord = asRecord(node.projectFilters);
+    return {
+      slug: toStringSafe(node.slug),
+      uri: toStringSafe(node.uri),
+      title: toStringSafe(node.title),
+      year: pickYear(node.date),
+      heroImage: pickImageFrom(node.featuredImage),
+      projectDescription: asRecord(node.projectDetails)?.projectDescription ?? null,
+      materialTypes: mapTermNodes(filtersRecord?.materialType),
+      roofColors: mapTermNodes(filtersRecord?.roofColor),
+      serviceAreas: mapTermNodes(filtersRecord?.serviceArea),
+    } satisfies ProjectSummary;
+  });
 }
 
 /**
@@ -2244,8 +2319,10 @@ export async function listProjectSlugs(limit = 500): Promise<string[]> {
       }
     }
   `;
-  const data = await wpFetch<any>(query, { limit });
-  return (data?.projects?.nodes ?? []).map((n: any) => String(n.slug)).filter(Boolean);
+  const data = await wpFetch<{ projects: { nodes?: UnknownRecord[] } }>(query, { limit });
+  return (data?.projects?.nodes ?? [])
+    .map((node) => toStringSafe(node?.slug))
+    .filter((slug): slug is string => slug.length > 0);
 }
 
 /** Single project by slug – uses URI so it works regardless of idType enum */
@@ -2299,30 +2376,34 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
     }
   `;
 
-  const data = await wpFetch<any>(query, { uri });
-  const p = data?.project;
+  const data = await wpFetch<{ project: UnknownRecord | null }>(query, { uri });
+  const p = asRecord(data?.project);
   if (!p) return null;
 
+  const projectFilters = asRecord(p.projectFilters);
+  const projectDetails = asRecord(p.projectDetails);
+  const videoInfo = asRecord(p.projectVideoInfo);
+
   return {
-    slug: String(p.slug || slug),
-    uri: String(p.uri || uri),
-    title: String(p.title || ""),
+    slug: toStringSafe(p.slug) || slug,
+    uri: toStringSafe(p.uri) || uri,
+    title: toStringSafe(p.title),
     year: pickYear(p.date),
-    date: p.date ?? null,
-    modified: p.modified ?? null,
-    contentHtml: String(p.content || ""),
-    heroImage: pickImage(toImageNode(extractNode(p.featuredImage))),
+    date: toStringSafe(p.date) || null,
+    modified: toStringSafe(p.modified) || null,
+    contentHtml: typeof p.content === 'string' ? p.content : '',
+    heroImage: pickImageFrom(p.featuredImage),
 
-    projectDescription: p.projectDetails?.projectDescription ?? null,
-    productLinks: mapProductLinks(p.projectDetails?.productLinks),
+    projectDescription: projectDetails?.projectDescription ?? null,
+    productLinks: mapProductLinks(projectDetails?.productLinks),
 
-    materialTypes: mapTermNodes(p.projectFilters?.materialType),
-    roofColors: mapTermNodes(p.projectFilters?.roofColor),
-    serviceAreas: mapTermNodes(p.projectFilters?.serviceArea),
+    materialTypes: mapTermNodes(projectFilters?.materialType),
+    roofColors: mapTermNodes(projectFilters?.roofColor),
+    serviceAreas: mapTermNodes(projectFilters?.serviceArea),
 
-    youtubeUrl: p.projectVideoInfo?.youtubeUrl ?? null,
-    seo: p.seo ?? undefined,
-  };
+    youtubeUrl: typeof videoInfo?.youtubeUrl === 'string' ? videoInfo.youtubeUrl : null,
+    seo: isRecord(p.seo) ? (p.seo as ProjectFull['seo']) : undefined,
+  } satisfies ProjectFull;
 }
 
 /** Filter projects by taxonomy term slugs (works whether terms come from ACF taxonomy fields or normal term assignments) */
@@ -2389,7 +2470,14 @@ export async function filterProjects({
       }
     }
   `;
-  const data = await wpFetch<any>(query, {
+  type FilterProjectsResponse = {
+    projects: {
+      pageInfo?: { hasNextPage?: boolean; endCursor?: string | null };
+      nodes?: UnknownRecord[];
+    };
+  };
+
+  const data = await wpFetch<FilterProjectsResponse>(query, {
     first,
     after,
     mt: materialTypeSlugs.length ? materialTypeSlugs : null,
@@ -2483,8 +2571,8 @@ export async function getSiteMeta() {
       generalSettings { title url description }
     }
   `;
-  const data = await wpFetch<any>(query, undefined, 60);
-  return data?.generalSettings ?? null;
+  const data = await wpFetch<{ generalSettings?: UnknownRecord | null }>(query, undefined, 60);
+  return asRecord(data?.generalSettings) ?? null;
 }
 
 /** Debug route helper: simple round-trip to check connectivity */
@@ -2492,7 +2580,8 @@ export async function pingWP() {
   try {
     const meta = await getSiteMeta();
     return { ok: true, meta };
-  } catch (e: any) {
-    return { ok: false, error: e?.message || "WPGraphQL error" };
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : null;
+    return { ok: false, error: message || "WPGraphQL error" };
   }
 }

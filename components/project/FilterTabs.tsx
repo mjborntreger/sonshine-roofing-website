@@ -96,8 +96,8 @@ export default function FilterTabs({
             tab.totalCount > 0
               ? `${formattedTotal} result${tab.totalCount === 1 ? "" : "s"} available`
               : "No results available";
-          const FallbackIcon = tabIcons[tab.key as keyof typeof tabIcons] ?? Layers;
-          const Icon = (tab as any).icon ?? FallbackIcon;
+          const fallbackIcon = tabIcons[tab.key as keyof typeof tabIcons] ?? Layers;
+          const Icon = tab.icon ?? fallbackIcon;
           const iconClass = selected
             ? "h-4 w-4 text-white transition-colors flex-wrap mr-1"
             : "h-4 w-4 text-[--brand-orange] transition-colors flex-wrap mr-1";

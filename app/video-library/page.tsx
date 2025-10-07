@@ -176,14 +176,14 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
     const slug = (item.slug || "").trim();
     const url = slug ? `${collectionUrl}?v=${encodeURIComponent(slug)}` : collectionUrl;
     const name = (item.title || "").trim();
-    const img = (item as any)?.thumbnailUrl || (item as any)?.heroImage?.url || undefined;
+    const imageUrl = item.thumbnailUrl || (item as VideoItem & { heroImage?: { url?: string } }).heroImage?.url;
     return {
       "@type": "ListItem",
       position: index + 1,
       url,
       name,
-      ...(img ? { image: img } : {}),
-    };
+      ...(imageUrl ? { image: imageUrl } : {}),
+    } satisfies Record<string, unknown>;
   });
 
   const collectionLd = {
@@ -194,12 +194,12 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
     hasPart: { "@type": "ItemList", itemListElement },
   };
 
-  let selectedVideoLd: any = null;
+  let selectedVideoLd: Record<string, unknown> | null = null;
   if (videoSlug) {
     try {
-      const mod: any = await import("@/lib/wp");
-      const getOne = mod?.getVideoEntryBySlug as undefined | ((slug: string) => Promise<any>);
-      const toJsonLd = mod?.videoJsonLd as undefined | ((v: any, base: string) => any);
+      const mod = await import("@/lib/wp");
+      const getOne = mod?.getVideoEntryBySlug as undefined | ((slug: string) => Promise<VideoItem | null>);
+      const toJsonLd = mod?.videoJsonLd as undefined | ((v: VideoItem, base: string) => Record<string, unknown>);
       if (typeof getOne === "function") {
         const selected = await getOne(videoSlug).catch(() => null);
         if (selected && typeof toJsonLd === "function") {

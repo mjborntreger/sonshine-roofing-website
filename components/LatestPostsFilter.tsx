@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const gradientDivider = "gradient-divider my-8";
 const pStyles = "my-8 text-center justify-center text-lg";
 
 type CategoryKey = "all" | "education" | "hurricane-preparation" | "energy-efficient-roofing";
@@ -59,8 +58,8 @@ export default function LatestPostsFilter({ posts, initial = 4, showHeader = tru
     };
 
     for (const post of normalized) {
-      const slugs = ((post as any).categoryTerms ?? [])
-        .map((t: any) => String(t?.slug ?? "").toLowerCase())
+      const slugs = (post.categoryTerms ?? [])
+        .map((term) => term?.slug?.toLowerCase() ?? "")
         .filter(Boolean);
       if (slugs.includes("education")) map.education.push(post);
       if (slugs.includes("hurricane-preparation")) map["hurricane-preparation"].push(post);

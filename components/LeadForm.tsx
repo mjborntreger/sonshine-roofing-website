@@ -48,6 +48,15 @@ import {
 } from '@/lib/contact-lead';
 import SmartLink from './SmartLink';
 
+type LeadApiResponse = {
+  ok?: boolean;
+  error?: string;
+};
+
+type DataLayerWindow = Window & {
+  dataLayer?: Array<Record<string, unknown>>;
+};
+
 type LeadSuccessRestore = {
   formPreset: Partial<FormState>;
   meta: SuccessMeta;
@@ -792,9 +801,14 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const json = await res.json().catch(() => ({} as any));
-      if (!res.ok || !json?.ok) {
-        throw new Error(json?.error || 'Unable to send your request.');
+      let json: LeadApiResponse = {};
+      try {
+        json = (await res.json()) as LeadApiResponse;
+      } catch {
+        json = {};
+      }
+      if (!res.ok || !json.ok) {
+        throw new Error(json.error || 'Unable to send your request.');
       }
       setStatus('success');
       setErrors({});
@@ -816,17 +830,21 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
         timelineLabel: timelineLabelDisplay,
       });
       try {
-        (window as any).dataLayer = (window as any).dataLayer || [];
-        (window as any).dataLayer.push({
+        const win = window as DataLayerWindow;
+        win.dataLayer = win.dataLayer || [];
+        win.dataLayer.push({
           event: 'lead_form_submitted',
           projectType: form.projectType,
           helpTopics: helpSummary,
         });
-      } catch { }
-    } catch (error: any) {
+      } catch {
+        // swallow GTM errors
+      }
+    } catch (error: unknown) {
       console.error('Lead submission failed', error);
       setStatus('error');
-      setGlobalError(error?.message || 'We could not send your message. Please call us at (941) 866-4320.');
+      const message = error instanceof Error ? error.message : null;
+      setGlobalError(message || 'We could not send your message. Please call us at (941) 866-4320.');
     }
   };
 
@@ -1052,14 +1070,14 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
                   <div className="space-y-4">
                     {!journey && (
                       <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-                        Pick an option to get started above and we’ll guide you from there.
+                        Pick an option to get started above and we&rsquo;ll guide you from there.
                       </p>
                     )}
 
                     {journey?.showHelpMulti && (
                       <div>
                         <div className="flex-col items-baseline justify-start">
-                          <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-600">What's the situation?</h4>
+                          <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-600">What&rsquo;s the situation?</h4>
                           <p className="text-xs mt-2 mb-1 font-medium text-slate-500">Select all that apply</p>
                         </div>
                         <div className="mt-3 grid gap-3 md:grid-cols-2">

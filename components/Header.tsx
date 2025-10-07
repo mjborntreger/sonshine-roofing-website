@@ -48,8 +48,27 @@ export default function Header() {
   }, []);
 
   useIsomorphicLayoutEffect(() => {
+    const getEffectiveScrollY = () => {
+      const native = window.scrollY;
+      if (native > 0) return native;
+
+      const bodyStyleTop = document.body.style.top;
+      if (document.body.style.position === "fixed" && bodyStyleTop) {
+        const locked = Math.abs(parseFloat(bodyStyleTop));
+        if (!Number.isNaN(locked)) return locked;
+      }
+
+      const computedBody = window.getComputedStyle(document.body);
+      if (computedBody.position === "fixed") {
+        const locked = Math.abs(parseFloat(computedBody.top || "0"));
+        if (!Number.isNaN(locked)) return locked;
+      }
+
+      return native;
+    };
+
     const handleScroll = () => {
-      const scrollY = window.scrollY;
+      const scrollY = getEffectiveScrollY();
       const prev = stateRef.current;
 
       let nextCollapsed = prev.collapsed;
@@ -106,6 +125,7 @@ export default function Header() {
         WebkitBackdropFilter: backdropBlur,
       }}
       data-collapsed={collapsed}
+      data-scroll-lock-aware="true"
     >
       <div
         className={cn(

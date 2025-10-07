@@ -122,14 +122,6 @@ const BADGE_LABEL: Record<BadgeKey, string> = {
 const currency = (n: number) =>
   n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
-const perMonth = (yearly: number) =>
-  (yearly / 12).toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-
 function savingsVsOneYear(plan: Plan, term: Term) {
   if (term === 1) return null;
   const base = plan.prices[1];

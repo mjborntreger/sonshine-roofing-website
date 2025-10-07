@@ -19,7 +19,7 @@ export default function CalendlyTestPage() {
               Schedule with SonShine Roofing
             </h1>
             <p className="text-base text-slate-600 md:text-lg">
-              Choose a time that works best for you and we'll confirm the details right away.
+              Choose a time that works best for you and we&rsquo;ll confirm the details right away.
             </p>
           </header>
           <div className="flex w-full justify-center">

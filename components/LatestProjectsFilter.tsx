@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const gradientDivider = "gradient-divider my-8";
 const pStyles = "my-8 text-center justify-center text-lg";
 
 type MaterialKey = "all" | "shingle" | "metal" | "tile";

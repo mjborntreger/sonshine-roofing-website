@@ -32,6 +32,7 @@
     --skeleton-base: rgba(0, 0, 0, 0.06);
     --skeleton-highlight: rgba(255, 255, 255, 0.35);
     --skeleton-radius: 0.5rem;
+    --scroll-lock-offset: 0px;
   }
 
   html {
@@ -48,6 +49,11 @@
 
   html[data-scroll-behavior="smooth"] {
     scroll-behavior: smooth;
+  }
+
+  html[data-scroll-lock="true"] [data-scroll-lock-aware="true"] {
+    padding-right: var(--scroll-lock-offset);
+    margin-right: calc(-1 * var(--scroll-lock-offset));
   }
 }
 
