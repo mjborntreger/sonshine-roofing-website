@@ -49,6 +49,7 @@ import {
   normalizeZip,
   submitLead,
   type ContactLeadInput,
+  type ContactLeadCorePayload,
   buildContactLeadPayload,
   type ContactLeadResourceLink,
   validateContactIdentityDraft,
@@ -783,9 +784,10 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
       page: '/contact-us',
     });
 
-    const payload: ContactLeadInput & {
+    const payload: ContactLeadCorePayload & {
+      cfToken: string;
+      hp_field?: string;
       submittedAt: string;
-      resourceLinks?: ContactLeadResourceLink[];
     } = {
       ...basePayload,
       cfToken,

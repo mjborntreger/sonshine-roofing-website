@@ -37,6 +37,7 @@ import {
   normalizeZip,
   submitLead,
   type ContactLeadInput,
+  type ContactLeadCorePayload,
   buildContactLeadPayload,
   validateContactIdentityDraft,
   validateContactAddressDraft,
@@ -336,7 +337,11 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
       page: '/contact-us',
     });
 
-    const payload: ContactLeadInput & { submittedAt: string } = {
+    const payload: ContactLeadCorePayload & {
+      cfToken: string;
+      hp_field?: string;
+      submittedAt: string;
+    } = {
       ...basePayload,
       cfToken,
       hp_field: honeypot || undefined,

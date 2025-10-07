@@ -134,6 +134,8 @@ type ContactLeadCorePayload = Omit<ContactLeadInput, 'cfToken' | 'hp_field'> & {
   resourceLinks?: ContactLeadResourceLink[];
 };
 
+export type { ContactLeadCorePayload };
+
 export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): ContactLeadCorePayload {
   const {
     projectType,
