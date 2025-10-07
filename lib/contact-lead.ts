@@ -130,9 +130,11 @@ export function validateContactAddressDraft(draft: ContactAddressDraft): Record<
   return errors;
 }
 
-export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): ContactLeadInput & {
+type ContactLeadCorePayload = Omit<ContactLeadInput, 'cfToken' | 'hp_field'> & {
   resourceLinks?: ContactLeadResourceLink[];
-} {
+};
+
+export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): ContactLeadCorePayload {
   const {
     projectType,
     helpSummary,
@@ -148,7 +150,7 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
   } = draft;
 
   const trimmedNotes = notes?.trim();
-  const payload: ContactLeadInput & { resourceLinks?: ContactLeadResourceLink[] } = {
+  const payload: ContactLeadCorePayload = {
     type: 'contact-lead',
     projectType: projectType.trim(),
     helpTopics: helpSummary?.trim() || undefined,
