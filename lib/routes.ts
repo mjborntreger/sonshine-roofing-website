@@ -100,6 +100,26 @@ export const NAV_RESOURCES: ReadonlyArray<{ label: string; href: Route }> = [
   { label: 'FAQ', href: ROUTES.faq },
 ];
 
+export const normalizePathname = (input: string): string => {
+  try {
+    const url = new URL(input, "https://example.com");
+    let pathname = url.pathname;
+    if (pathname.length > 1 && pathname.endsWith("/")) {
+      pathname = pathname.slice(0, -1);
+    }
+    return pathname;
+  } catch {
+    let pathname = input.split("?")[0].split("#")[0] || "/";
+    if (!pathname.startsWith("/")) {
+      pathname = `/${pathname}`;
+    }
+    if (pathname.length > 1 && pathname.endsWith("/")) {
+      pathname = pathname.slice(0, -1);
+    }
+    return pathname;
+  }
+};
+
 type Primitive = string | number | boolean;
 type QueryValue = Primitive | Primitive[] | null | undefined;
 

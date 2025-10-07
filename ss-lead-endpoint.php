@@ -26,6 +26,11 @@ if (!defined('SS_LEAD_RETRY_DELAYS')) {
 
 add_action('ss_lead_forward_retry', 'ss_lead_handle_scheduled_retry', 10, 1);
 
+define('SS_CONTACT_TO', 'messages@sonshineroofing.com');
+define('SS_FEEDBACK_TO', 'messages@sonshineroofing.com');
+define('SS_FINANCING_TO', 'messages@sonshineroofing.com');
+define('SS_SPECIAL_TO', 'messages@sonshineroofing.com');
+
 /**
  * Ensure logging directory exists.
  */
@@ -326,16 +331,21 @@ function ss_lead_send_cors_headers(\WP_REST_Request $req): void {
  * Pick recipient per type (internal notification)
  */
 function ss_lead_recipient(string $type): string {
-  $envMap = [
-    'financing-calculator' => getenv('SS_FINANCING_TO'),
-    'feedback'             => getenv('SS_FEEDBACK_TO'),
-    'special-offer'        => getenv('SS_SPECIAL_TO'),
-    'contact-lead'         => getenv('SS_CONTACT_TO'),
+  $default = 'marketing@sonshineroofing.com';
+  $constantMap = [
+    'financing-calculator' => defined('SS_FINANCING_TO') ? SS_FINANCING_TO : null,
+    'feedback'             => defined('SS_FEEDBACK_TO') ? SS_FEEDBACK_TO : null,
+    'special-offer'        => defined('SS_SPECIAL_TO') ? SS_SPECIAL_TO : null,
+    'contact-lead'         => defined('SS_CONTACT_TO') ? SS_CONTACT_TO : null,
   ];
 
-  $default = 'marketing@sonshineroofing.com';
-  $value = $envMap[$type] ?? null;
-  if ($value) return sanitize_email($value);
+  $value = $constantMap[$type] ?? null;
+  if ($value) {
+    $sanitized = sanitize_email((string) $value);
+    if ($sanitized !== '') {
+      return $sanitized;
+    }
+  }
 
   return $default;
 }
@@ -498,6 +508,7 @@ function ss_lead_prepare_notification(string $type, array $payload): array {
   $baseHeaders = [
     'Content-Type: text/html; charset=UTF-8',
     'From: SonShine Roofing <marketing@sonshineroofing.com>',
+    'Cc: Marketing <marketing@sonshineroofing.com>',
   ];
   if ($email) {
     $baseHeaders[] = sprintf('Reply-To: %s <%s>', $fullName !== '' ? $fullName : 'Lead', $email);
@@ -1094,4 +1105,3 @@ function ss_lead_handler(\WP_REST_Request $req) {
     'requestId' => $request_id,
   ], 200);
 }
-

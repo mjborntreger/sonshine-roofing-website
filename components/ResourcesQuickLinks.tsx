@@ -1,18 +1,10 @@
 "use client";
 
-import { Image as ImageIcon, PlayCircle, Newspaper, BookOpen, HelpCircle, ChevronRight, Wrench } from "lucide-react";
-import SmartLink from "@/components/SmartLink";
-import { usePathname } from "next/navigation";
+import { Image as ImageIcon, PlayCircle, Newspaper, BookOpen, HelpCircle, Wrench } from "lucide-react";
 
-type LinkItem = {
-  href: string;
-  label: string;
-  description: string;
-  aria: string;
-  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-};
+import QuickLinksPanel, { type QuickLinkItem, type QuickLinksPalette } from "@/components/QuickLinksPanel";
 
-const LINKS: LinkItem[] = [
+const LINKS: QuickLinkItem[] = [
   {
     href: "/project",
     label: "Project Gallery",
@@ -50,76 +42,24 @@ const LINKS: LinkItem[] = [
   },
 ];
 
-// Normalize pathnames for robust matching across service pages, blogs, and nested routes
-function normalizePath(p: string) {
-  try {
-    // ensure leading slash, remove query/hash and trailing slash (except root)
-    const url = new URL(p, "https://example.com");
-    let out = url.pathname;
-    if (out.length > 1 && out.endsWith("/")) out = out.slice(0, -1);
-    return out;
-  } catch {
-    // plain path (no scheme)
-    let out = p.split("?")[0].split("#")[0] || "/";
-    if (out.length > 1 && out.endsWith("/")) out = out.slice(0, -1);
-    if (!out.startsWith("/")) out = "/" + out;
-    return out;
-  }
-}
-
-function isActivePath(current: string, href: string) {
-  const cur = normalizePath(current);
-  const base = normalizePath(href);
-  if (base === "/") return cur === "/";
-  return cur === base || cur.startsWith(base + "/");
-}
+const PALETTE: QuickLinksPalette = {
+  activeBorderClass: "border-[--brand-blue]",
+  hoverBorderClass: "hover:border-[--brand-blue]",
+  hoverBackgroundClass: "hover:bg-blue-50",
+  focusRingClass: "focus-visible:ring-[--brand-blue]",
+  titleIconClassName: "text-[--brand-blue]",
+  iconGradientFromClass: "from-[#0045d7]",
+  iconGradientToClass: "to-[#00e3fe]",
+};
 
 export default function ResourcesQuickLinks() {
-  const pathname = usePathname() || "/";
-
   return (
-    <div className="my-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="mb-3 text-sm text-center font-semibold uppercase tracking-wide text-slate-700">
-        <Wrench className="h-4 w-4 inline mr-2 font-semibold text-[--brand-blue]" />
-        Resources
-      </div>
-
-      <ul className="space-y-2">
-        {LINKS.map(({ href, label, description, aria, Icon }) => {
-          const active = isActivePath(pathname, href);
-          const baseClass =
-            "group flex items-center gap-3 rounded-2xl border bg-white px-3 py-2 text-sm font-medium transition hover:border-[--brand-blue] hover:bg-blue-50 hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-orange] motion-reduce:transition-none";
-          const inactiveClass = "border-slate-200 text-slate-800";
-          const activeClass = "border-[--brand-blue] text-slate-900";
-
-          return (
-            <li key={href}>
-              <SmartLink
-                href={href}
-                aria-label={aria}
-                aria-current={active ? "page" : undefined}
-                data-active={active ? "true" : "false"}
-                data-icon-affordance="right"
-                className={`${baseClass} ${active ? activeClass : inactiveClass}`}
-              >
-                {/* Icon chip with brand gradient */}
-                <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-gradient-to-br from-[#0045d7] to-[#00e3fe] text-white shadow-sm">
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-
-                {/* Label and description */}
-                <div className="flex-1 min-w-0 text-left">
-                  <span className="font-display font-bold text-md block truncate">{label}</span>
-                  <p className="mt-0.5 text-xs text-slate-500 line-clamp-1">{description}</p>
-                </div>
-
-                {/* Chevron affordance */}
-                <ChevronRight className="icon-affordance h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
-              </SmartLink>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <QuickLinksPanel
+      className="my-4"
+      title="Resources"
+      titleIcon={Wrench}
+      links={LINKS}
+      palette={PALETTE}
+    />
   );
 }
