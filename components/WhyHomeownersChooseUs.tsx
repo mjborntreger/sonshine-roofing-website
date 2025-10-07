@@ -84,7 +84,7 @@ const pillars: Pillar[] = [
     id: "local-expertise",
     title: "Local Expertise",
     description:
-      "We&rsquo;re not some out-of-town outfit. We know the codes, the weather, the quirks of Florida homes—and how to roof them right.",
+      "We are not some out-of-town outfit. We know the codes, the weather, the quirks of Florida homes—and how to roof them right.",
     icon: MapPin,
     theme: "blue",
   },
@@ -125,7 +125,7 @@ export default async function WhyHomeownersChooseUs() {
     <div className={SECTION_CONTAINER}>
       <div className="text-center">
         <h2 className={SECTION_HEADING}>Why Homeowners Choose Us</h2>
-        <p className={SECTION_SUBTITLE}>(It's because we&rsquo;re awesome)</p>
+        <p className={SECTION_SUBTITLE}>(because we&rsquo;re awesome)</p>
         
         <div className={FEATURE_LIST_CLASS}>
           <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
@@ -173,7 +173,7 @@ export default async function WhyHomeownersChooseUs() {
                     <span className={`${ICON_BASE} ${theme.icon}`}>
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </span>
-                    <span className={`${TITLE_BASE} ${theme.titleAccent}`}>{pillar.title}</span>
+                    <h3 className={`${TITLE_BASE} ${theme.titleAccent}`}>{pillar.title}</h3>
                   </span>
                   <ChevronDown className={CHEVRON_BASE} aria-hidden="true" />
                 </summary>
@@ -213,7 +213,7 @@ export default async function WhyHomeownersChooseUs() {
                     <span className={`${ICON_BASE} ${theme.icon}`}>
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </span>
-                    <span className={`${TITLE_BASE} ${theme.titleAccent}`}>{pillar.title}</span>
+                    <h3 className={`${TITLE_BASE} ${theme.titleAccent}`}>{pillar.title}</h3>
                   </span>
                 </div>
                 <div className={`${CARD_BODY_BASE} ${theme.body}`}>

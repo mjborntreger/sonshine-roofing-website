@@ -1,11 +1,8 @@
 'use client';
 
 import AutoScroll from 'embla-carousel-auto-scroll';
-import EmblaCarousel, {
-  type EmblaCarouselType,
-  type EmblaOptionsType,
-} from 'embla-carousel';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import EmblaCarousel, { type EmblaOptionsType } from 'embla-carousel';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import SmartLink from './SmartLink';
 import { ArrowUpRight, Quote } from 'lucide-react';
@@ -39,27 +36,24 @@ export default function ReviewsSlider({
   );
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
-  const [embla, setEmbla] = useState<EmblaCarouselType | null>(null);
+  const autoScrollPluginRef = useRef<ReturnType<typeof AutoScroll> | null>(null);
 
   useEffect(() => {
     if (!viewportRef.current) return;
 
+    const autoScrollPlugin = AutoScroll(autoScrollOptions);
+    autoScrollPluginRef.current = autoScrollPlugin;
     const emblaInstance = EmblaCarousel(
       viewportRef.current,
       emblaOptions,
-      [AutoScroll(autoScrollOptions)]
+      [autoScrollPlugin]
     );
 
-    setEmbla(emblaInstance);
-
     return () => {
+      autoScrollPluginRef.current = null;
       emblaInstance.destroy();
     };
   }, [autoScrollOptions, emblaOptions]);
-
-  // Pagination state (use actual snap count)
-  const [selected, setSelected] = useState(0);
-  const [dotCount, setDotCount] = useState(0);
 
   // Modal state
   const [modalIndex, setModalIndex] = useState<number | null>(null);
@@ -68,29 +62,26 @@ export default function ReviewsSlider({
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  // Embla events
-  useEffect(() => {
-    if (!embla) return;
-    const onSelect = () => setSelected(embla.selectedScrollSnap());
-    const onReInit = () => setDotCount(embla.scrollSnapList().length);
-    embla.on('select', onSelect);
-    embla.on('reInit', onReInit);
-    onSelect();
-    onReInit();
-    return () => {
-      embla.off('select', onSelect);
-      embla.off('reInit', onReInit);
+  const fadeOverlayStyle = useMemo(() => {
+    type FadeStyle = CSSProperties & {
+      "--reviews-fade-color": string;
+      "--reviews-fade-width": string;
     };
-  }, [embla]);
+    return {
+      "--reviews-fade-color": "var(--reviews-fade-color, #00e3fe)",
+      "--reviews-fade-width": "24px",
+    } as FadeStyle;
+  }, []);
 
-  const openModal = (i: number) => {
+  const openModal = useCallback((i: number) => {
     setModalIndex(i);
-    embla?.plugins()?.autoScroll?.stop();
-  };
-  const closeModal = () => {
+    autoScrollPluginRef.current?.stop();
+  }, []);
+
+  const closeModal = useCallback(() => {
     setModalIndex(null);
-    embla?.plugins()?.autoScroll?.play();
-  };
+    autoScrollPluginRef.current?.play();
+  }, []);
 
   // Body scroll lock + focus + ESC + modal left/right nav
   useEffect(() => {
@@ -174,7 +165,7 @@ export default function ReviewsSlider({
       }
       htmlEl.style.scrollBehavior = prevHtml.scrollBehavior;
     };
-  }, [modalIndex, reviews.length]);
+  }, [closeModal, modalIndex, reviews.length]);
 
   return (
     <div className="embla relative w-full isolate py-6 md:py-8">
@@ -195,12 +186,7 @@ export default function ReviewsSlider({
       <div
         aria-hidden
         className="pointer-events-none absolute left-1/2 top-0 z-10 h-full w-screen -translate-x-1/2"
-        style={{
-          // Customize the fade color here to match the section background
-          ['--reviews-fade-color' as any]: 'var(--reviews-fade-color, #00e3fe)',
-          // Customize fade width here
-          ['--reviews-fade-width' as any]: '24px',
-        }}
+        style={fadeOverlayStyle}
       >
         {/* Left overlay: solid bg color at the extreme edge -> transparent toward content */}
         <div
@@ -272,7 +258,7 @@ export default function ReviewsSlider({
                       <Quote className="mt-1 h-7 w-7 flex-none text-slate-300" aria-hidden />
                     </div>
                   </header>
-                  <p className="text-lg leading-7 text-slate-700">{text}</p>
+                  <p className="text-md md:text-lg leading-7 text-slate-700">{text}</p>
                 </article>
               </button>
             );
@@ -331,13 +317,13 @@ export default function ReviewsSlider({
                         ))}
                       </div>
                       {r.relative_time_description && (
-                        <div className="mt-1 text-sm text-slate-500">{r.relative_time_description}</div>
+                        <div className="mt-1 text-xs md:text-sm text-slate-500">{r.relative_time_description}</div>
                       )}
                     </div>
                   </div>
                 </header>
                 <div className="max-h-[60vh] overflow-auto px-5 pb-4 pt-1">
-                  <p className="m-0 text-lg leading-7 text-slate-700 whitespace-pre-wrap">{r.text || ''}</p>
+                  <p className="m-0 text-md md:text-lg leading-7 text-slate-700 whitespace-pre-wrap">{r.text || ''}</p>
                 </div>
                 <div className="flex justify-end gap-2 border-t border-slate-300 p-4">
                   <SmartLink

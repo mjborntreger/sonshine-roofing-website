@@ -1,29 +1,32 @@
 'use client';
 
-import { useState } from 'react';
-import { Mail, Phone, Copy, Check } from 'lucide-react';
+import { useState } from "react";
+import { Mail, Phone, Copy, Check } from "lucide-react";
 
-type Variant = 'email' | 'phone';
-
-type CommonProps = {
-  variant: Variant;
-  label?: string;           // button label before reveal
-  className?: string;       // button class
-  linkClassName?: string;   // revealed link class
+type BaseCommonProps = {
+  label?: string;
+  className?: string;
+  linkClassName?: string;
 };
 
-// Email input: pass parts OR base64
-type EmailInput =
-  | { variant: 'email'; user: string; host: string; encoded?: never }
-  | { variant: 'email'; encoded: string; user?: never; host?: never };
+type EmailProps =
+  | (BaseCommonProps & { variant: "email"; user: string; host: string; encoded?: never })
+  | (BaseCommonProps & { variant: "email"; encoded: string; user?: never; host?: never });
 
-// Phone input: pass e164 OR parts OR base64; optional display text and sms body
-type PhoneInput =
-  | { variant: 'phone'; e164: string; display?: string; parts?: never[]; encoded?: never; smsBody?: string }
-  | { variant: 'phone'; parts: string[]; display?: string; e164?: never; encoded?: never; smsBody?: string }
-  | { variant: 'phone'; encoded: string; display?: string; e164?: never; parts?: never[]; smsBody?: string };
+type PhoneBaseProps = BaseCommonProps & {
+  variant: "phone";
+  display?: string;
+  smsBody?: string;
+  ext?: string | number;
+  extension?: string | number;
+};
 
-type Props = (EmailInput | PhoneInput) & CommonProps;
+type PhoneProps =
+  | (PhoneBaseProps & { e164: string; parts?: never; encoded?: never })
+  | (PhoneBaseProps & { parts: string[]; e164?: never; encoded?: never })
+  | (PhoneBaseProps & { encoded: string; e164?: never; parts?: never });
+
+type Props = EmailProps | PhoneProps;
 
 function formatDisplayPhone(e164: string) {
   // very simple US pretty printer: +1XXXXXXXXXX -> (XXX) XXX-XXXX
@@ -47,31 +50,50 @@ export default function RevealContact(props: Props) {
   const iconClassName = isPhoneVariant ? `${baseIconClass} phone-affordance-icon` : baseIconClass;
   const revealedLinkClass = isPhoneVariant ? `${linkClasses} phone-affordance` : linkClasses;
 
+  const resolveExtension = (input: string | number | undefined): string | undefined => {
+    if (input === undefined || input === null) return undefined;
+    return String(input);
+  };
+
   function decode() {
     if (props.variant === 'email') {
-      const encoded = (props as any).encoded as string | undefined;
-      if (encoded) {
+      if ('encoded' in props && props.encoded) {
         try {
-          setValue(typeof window !== 'undefined' && window.atob ? window.atob(encoded) : encoded);
-        } catch { setValue(null); }
+          const decoded = typeof window !== 'undefined' && window.atob ? window.atob(props.encoded) : props.encoded;
+          setValue(decoded);
+        } catch {
+          setValue(null);
+        }
         return;
       }
-      setValue(`${(props as any).user}@${(props as any).host}`);
+      if ('user' in props && 'host' in props) {
+        setValue(`${props.user}@${props.host}`);
+        return;
+      }
+      setValue(null);
       return;
     }
 
     // phone
-    const p = props as any;
-    const ext = p.ext ?? p.extension ?? undefined;
-    if (p.encoded) {
+    const extensionValue = resolveExtension(props.extension ?? props.ext);
+    if ('encoded' in props && props.encoded) {
       try {
-        const raw = typeof window !== 'undefined' && window.atob ? window.atob(p.encoded) : p.encoded;
-        setValue(ext ? raw + '|' + String(ext) : raw);
-      } catch { setValue(null); }
+        const raw = typeof window !== 'undefined' && window.atob ? window.atob(props.encoded) : props.encoded;
+        setValue(extensionValue ? `${raw}|${extensionValue}` : raw);
+      } catch {
+        setValue(null);
+      }
       return;
     }
-    if (p.e164) { setValue(ext ? p.e164 + '|' + String(ext) : p.e164); return; }
-    if (Array.isArray(p.parts)) { setValue(ext ? p.parts.join('') + '|' + String(ext) : p.parts.join('')); return; }
+    if ('e164' in props && props.e164) {
+      setValue(extensionValue ? `${props.e164}|${extensionValue}` : props.e164);
+      return;
+    }
+    if ('parts' in props && Array.isArray(props.parts)) {
+      const joined = props.parts.join('');
+      setValue(extensionValue ? `${joined}|${extensionValue}` : joined);
+      return;
+    }
     setValue(null);
   }
 
@@ -118,7 +140,7 @@ export default function RevealContact(props: Props) {
     const displayPretty =
       props.variant === 'email'
         ? primary
-        : ((props as any).display ?? formatDisplayPhone(primary));
+        : (props.display ?? formatDisplayPhone(primary));
 
     return (
       <div className={wrapperClasses}>

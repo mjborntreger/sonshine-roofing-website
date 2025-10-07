@@ -4,6 +4,7 @@ import { listGlossaryIndex, stripHtml } from '@/lib/wp';
 import GlossaryQuickSearch from './GlossaryQuickSearch';
 import ResourcesAside from '@/components/ResourcesAside';
 import type { Metadata } from 'next';
+import SmartLink from '@/components/SmartLink';
 
 export const revalidate = 86400; // daily ISR
 
@@ -103,13 +104,13 @@ export default async function GlossaryArchivePage() {
             {/* A–Z nav */}
             <nav className="mt-6 flex flex-wrap gap-2 text-sm" aria-label="Glossary letters">
               {letters.map((l) => (
-                <a
+                <SmartLink
                   key={l}
                   href={`#glossary-${l === '#' ? 'num' : l}`}
                   className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white hover:bg-slate-50"
                 >
                   {l}
-                </a>
+                </SmartLink>
               ))}
             </nav>
 

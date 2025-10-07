@@ -75,7 +75,7 @@ export default function FaqBulkToggleClient() {
       observer.observe(topicsRoot, { childList: true, subtree: true });
     }
 
-    const handleExternalUpdate = (_event: Event) => {
+    const handleExternalUpdate = () => {
       ensureListeners();
       updateButton();
     };

@@ -49,6 +49,21 @@ const toStringSafe = (value: unknown, fallback = ""): string => {
   return fallback;
 };
 
+const stringOrNull = (value: unknown): string | null =>
+  typeof value === "string" ? value : null;
+
+const readProjectDescription = (details: unknown): string | null => {
+  const record = asRecord(details);
+  const raw = record?.projectDescription;
+  return typeof raw === "string" ? raw : null;
+};
+
+const readRecordString = (record: UnknownRecord | null, key: string): string | null => {
+  if (!record) return null;
+  const value = record[key];
+  return typeof value === "string" ? value : null;
+};
+
 // ----- Endpoint & Auth -----
 const WP_ENDPOINT =
   process.env.NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT ||
@@ -190,6 +205,8 @@ export type VideoItem = {
   materialTypes?: TermLite[];
   serviceAreas?: TermLite[];
 };
+
+export type VideoBucketKey = "roofing-project" | "commercials" | "accolades" | "explainers" | "other";
 
 export type Person = {
   slug: string;
@@ -874,21 +891,6 @@ export async function listFaqSlugs(limit = 500): Promise<string[]> {
   return (data?.faqs?.nodes ?? []).map((n) => n.slug).filter(Boolean) as string[];
 }
 
-function faqJsonLd(items: { question: string; answerHtml: string }[]) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": items.map(i => ({
-      "@type": "Question",
-      "name": i.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": i.answerHtml, // must match visible content
-      }
-    }))
-  };
-}
-
 /**
  * Build a FAQPage JSON-LD object from question/answer items with optional per-question URLs.
  * Google only requires name + acceptedAnswer.text; extra properties are safe but may be ignored.
@@ -1191,7 +1193,7 @@ export async function listRecentVideoEntries(limit = 50): Promise<VideoItem[]> {
   return items;
 }
 
-// ----- PROJECTS WITH YOUTUBE (Roofing Projects bucket) -----
+// ----- PROJECTS WITH YOUTUBE (Roofing Projects bucket) ----- //
 export async function listProjectVideos(limit = 100): Promise<VideoItem[]> {
   const query = /* GraphQL */ `
     query ListProjectVideos($limit: Int!) {
@@ -1222,7 +1224,7 @@ export async function listProjectVideos(limit = 100): Promise<VideoItem[]> {
     const id = url ? extractYouTubeId(url) : null;
     if (!id) continue;
 
-    const excerptSource = asRecord(entry.projectDetails)?.projectDescription;
+    const excerptSource = readProjectDescription(entry.projectDetails);
     const materialTypes = mapTermNodes(asRecord(entry.projectFilters)?.materialType);
     const serviceAreas = mapTermNodes(asRecord(entry.projectFilters)?.serviceArea);
 
@@ -1235,7 +1237,7 @@ export async function listProjectVideos(limit = 100): Promise<VideoItem[]> {
       source: 'project',
       slug: toStringSafe(entry.slug) || undefined,
       date: typeof entry.date === 'string' ? entry.date : undefined,
-      excerpt: typeof excerptSource === 'string' ? excerptSource : null,
+      excerpt: excerptSource,
       materialTypes,
       serviceAreas,
       categories: [{ name: 'Roofing Projects', slug: 'roofing-project' }],
@@ -1243,32 +1245,6 @@ export async function listProjectVideos(limit = 100): Promise<VideoItem[]> {
   }
 
   return items;
-}
-
-// ----- Grouping helper (future-proof for new buckets) -----
-export type VideoBucketKey = "roofing-project" | "commercials" | "accolades" | "explainers" | "other";
-
-function groupVideosByBucket(items: VideoItem[]) {
-  const buckets = { "roofing-project": [], commercials: [], accolades: [], explainers: [], other: [] } as
-    Record<"roofing-project"|"commercials"|"accolades"|"explainers"|"other", VideoItem[]>;
-
-  const is = (v: VideoItem, names: string[]) => {
-    const slugs = v.categories.map(c => (c.slug || c.name || "").toLowerCase());
-    return slugs.some(s => names.includes(s));
-  };
-
-  for (const v of items) {
-    if (v.source === "project") { buckets["roofing-project"].push(v); continue; }
-    if (is(v, ["commercials","tv","ads"]))        buckets.commercials.push(v);
-    else if (is(v, ["accolades","awards","press"])) buckets.accolades.push(v);
-    else if (is(v, ["explainers","how-to","tips"]))  buckets.explainers.push(v);
-    else buckets.other.push(v);
-  }
-
-  for (const k of Object.keys(buckets) as (keyof typeof buckets)[]) {
-    buckets[k].sort((a,b) => (b.date||"").localeCompare(a.date||""));
-  }
-  return buckets;
 }
 
 // --- Paged videos (merge video entries + project videos) -----------------
@@ -1944,7 +1920,9 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 
   const featuredImageNode = extractNode(p.featuredImage);
   const featuredImageRecord = asRecord(featuredImageNode);
-  const categories = extractNodes(p.categories).map((node) => toStringSafe(asRecord(node)?.name)).filter(Boolean);
+  const categories = extractNodes(p.categories)
+    .map((node) => toStringSafe(readRecordString(asRecord(node), "name")))
+    .filter((name) => name.length > 0);
 
   return {
     slug: toStringSafe(p.slug) || slug,
@@ -1952,7 +1930,11 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     contentHtml: typeof p.content === 'string' ? p.content : '',
     date: toStringSafe(p.date),
     modified: toStringSafe(p.modified),
-    authorName: toStringSafe(asRecord(p.author)?.node?.name) || null,
+    authorName: (() => {
+      const authorRecord = asRecord(p.author);
+      const authorNode = asRecord(authorRecord?.node);
+      return readRecordString(authorNode, "name");
+    })(),
     featuredImage:
       featuredImageRecord && typeof featuredImageRecord.sourceUrl === 'string'
         ? {
@@ -1999,13 +1981,15 @@ export async function listRecentProjects(
   const nodes = data?.projects?.nodes ?? [];
   return nodes.map((entry) => {
     const filters = asRecord(entry.projectFilters);
+    const projectDetails = asRecord(entry.projectDetails);
+    const isoDate = stringOrNull(entry.date);
     return {
       slug: toStringSafe(entry.slug),
       uri: toStringSafe(entry.uri),
       title: toStringSafe(entry.title),
-      year: pickYear(entry.date),
+      year: pickYear(isoDate),
       heroImage: pickImageFrom(entry.featuredImage),
-      projectDescription: asRecord(entry.projectDetails)?.projectDescription ?? null,
+      projectDescription: readProjectDescription(projectDetails),
       materialTypes: mapTermNodes(filters?.materialType),
       roofColors: mapTermNodes(filters?.roofColor),
       serviceAreas: mapTermNodes(filters?.serviceArea),
@@ -2159,13 +2143,15 @@ export async function listProjectsPaged({
 
   const items: ProjectSummary[] = nodes.map((node) => {
     const filtersRecord = asRecord(node.projectFilters);
+    const detailsRecord = asRecord(node.projectDetails);
+    const isoDate = stringOrNull(node.date);
     return {
       slug: toStringSafe(node.slug),
       uri: toStringSafe(node.uri),
       title: toStringSafe(node.title),
-      year: pickYear(node.date),
+      year: pickYear(isoDate),
       heroImage: pickImageFrom(node.featuredImage),
-      projectDescription: asRecord(node.projectDetails)?.projectDescription ?? null,
+      projectDescription: readProjectDescription(detailsRecord),
       materialTypes: mapTermNodes(filtersRecord?.materialType),
       roofColors: mapTermNodes(filtersRecord?.roofColor),
       serviceAreas: mapTermNodes(filtersRecord?.serviceArea),
@@ -2249,13 +2235,15 @@ export async function listRecentProjectsByMaterial(
   const nodes = data?.projects?.nodes ?? [];
   return nodes.map((node) => {
     const filtersRecord = asRecord(node.projectFilters);
+    const detailsRecord = asRecord(node.projectDetails);
+    const isoDate = stringOrNull(node.date);
     return {
       slug: toStringSafe(node.slug),
       uri: toStringSafe(node.uri),
       title: toStringSafe(node.title),
-      year: pickYear(node.date),
+      year: pickYear(isoDate),
       heroImage: pickImageFrom(node.featuredImage),
-      projectDescription: asRecord(node.projectDetails)?.projectDescription ?? null,
+      projectDescription: readProjectDescription(detailsRecord),
       materialTypes: mapTermNodes(filtersRecord?.materialType),
       roofColors: mapTermNodes(filtersRecord?.roofColor),
       serviceAreas: mapTermNodes(filtersRecord?.serviceArea),
@@ -2384,18 +2372,20 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
   const projectDetails = asRecord(p.projectDetails);
   const videoInfo = asRecord(p.projectVideoInfo);
 
+  const isoDate = stringOrNull(p.date);
+
   return {
     slug: toStringSafe(p.slug) || slug,
     uri: toStringSafe(p.uri) || uri,
     title: toStringSafe(p.title),
-    year: pickYear(p.date),
-    date: toStringSafe(p.date) || null,
+    year: pickYear(isoDate),
+    date: isoDate,
     modified: toStringSafe(p.modified) || null,
     contentHtml: typeof p.content === 'string' ? p.content : '',
     heroImage: pickImageFrom(p.featuredImage),
 
-    projectDescription: projectDetails?.projectDescription ?? null,
-    productLinks: mapProductLinks(projectDetails?.productLinks),
+    projectDescription: readProjectDescription(projectDetails),
+    productLinks: mapProductLinks(asArray<Maybe<ProductLinkNode>>(projectDetails?.productLinks)),
 
     materialTypes: mapTermNodes(projectFilters?.materialType),
     roofColors: mapTermNodes(projectFilters?.roofColor),

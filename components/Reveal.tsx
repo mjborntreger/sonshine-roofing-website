@@ -1,7 +1,7 @@
 // components/Reveal.tsx
-'use client';
+"use client";
 
-import { useEffect, useRef, type HTMLAttributes } from 'react';
+import { createElement, useEffect, useRef, type HTMLAttributes } from "react";
 
 type Props = HTMLAttributes<HTMLElement> & {
   /** Render as a different tag (e.g., 'li', 'section', 'article') */
@@ -26,7 +26,7 @@ export default function Reveal({
   children,
   ...rest
 }: Props) {
-  const Tag = as as any;
+  const tagName = as ?? "div";
   const ref = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -56,9 +56,9 @@ export default function Reveal({
     return () => io.disconnect();
   }, [delay, threshold, rootMargin, once]);
 
-  return (
-    <Tag ref={ref} className={className} {...rest}>
-      {children}
-    </Tag>
+  return createElement(
+    tagName,
+    { ref, className, ...rest },
+    children,
   );
 }

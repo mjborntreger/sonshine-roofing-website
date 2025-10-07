@@ -27,8 +27,8 @@ export default async function ReviewsCarousel() {
   try {
     new URL(REVIEWS_URL);
     new URL(GBP_URL);
-  } catch (e) {
-    console.error('[ReviewsCarousel] Invalid URL:', { REVIEWS_URL, GBP_URL });
+  } catch (error) {
+    console.error('[ReviewsCarousel] Invalid URL:', { REVIEWS_URL, GBP_URL, error });
     return null;
   }
 

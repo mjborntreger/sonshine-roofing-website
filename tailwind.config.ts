@@ -98,6 +98,7 @@ const config: Config = {
       sans: ["var(--font-inter)", "system-ui", "sans-serif"],
       accent: ["var(--font-inter)", "system-ui", "sans-serif"],
       script: ["var(--font-allura)", "cursive"],
+      display: ["var(--font-candara)", "var(--font-inter)", "system-ui", "sans-serif"],
     },
   },
   plugins: [tailwindcssAnimate, typography],

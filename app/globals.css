@@ -137,7 +137,11 @@
 
 
   /* Headings */
-  h1, h2, h3, h4 { @apply font-semibold text-slate-900; }
+  h1, h2, h3, h4 {
+    font-family: var(--font-candara), system-ui, sans-serif;
+    font-weight: 700;
+    @apply text-slate-900;
+  }
   h1 { @apply text-3xl md:text-4xl tracking-tight leading-loose; }
   h2 { @apply text-2xl md:text-3xl leading-relaxed; }
   h3 { @apply text-xl md:text-2xl leading-relaxed; }
@@ -299,34 +303,7 @@
   }
 }
 
-/* ---------------------------------------
-   Bounce animation
-----------------------------------------*/
-
-.bounce {
-  transform: scale(1);
-  transition: transform 0.5s cubic-bezier(0.8, -0.5, 0.2, 1.8);
-}
-
-.bounce:active {
-  transform: scale(1.2);
-}
-
-.bounce:hover {
-  transform: scale(1.1);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bounce {
-    transition-duration: 0ms;
-  }
-
-  .bounce,
-  .bounce:active,
-  .bounce:hover {
-    transform: scale(1);
-  }
-}
+/* ============== CHEVRON INFINITE BOB + HERO CTA GLOW ==================== */
 
 .chevron-bob {
   animation: hero-chevron-bob 1.7s ease-in-out infinite;
@@ -358,7 +335,7 @@
   position: absolute;
   inset: -10% ;
   border-radius: inherit;
-  background: radial-gradient(circle at 50% 50%, #00e3fe90, transparent 60%);
+  background: radial-gradient(circle at 50% 50%, #00e3fe90, transparent 50%);
   filter: blur(16px);
   opacity: 0.75;
   transition: opacity 0.3s ease;
@@ -418,7 +395,7 @@
   .btn-brand-blue   { @apply bg-[var(--brand-blue)]   text-white hover:opacity-95 focus-visible:ring-[var(--brand-blue)]; }
   .btn-brand-orange { @apply bg-[var(--brand-orange)] text-white hover:opacity-95 focus-visible:ring-[var(--brand-orange)]; }
   .btn-secondary    { @apply bg-white text-slate-700 border border-slate-100 hover:bg-slate-50 focus-visible:ring-slate-200; }
-  .btn-outline      { @apply bg-transparent text-slate-900 border border-slate-300 hover:bg-slate-800; }
+  .btn-outline      { @apply bg-transparent text-slate-900 border border-slate-300 hover:bg-slate-50; }
   .btn-ghost        { @apply bg-transparent text-slate-900 hover:bg-slate-100; }
 
   /* Ensure anchors inside buttons inherit the button text color and remove underline */

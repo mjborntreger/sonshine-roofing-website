@@ -1,7 +1,7 @@
 import Section from "@/components/layout/Section";
 import SimpleLeadForm from "@/components/SimpleLeadForm";
 import SmartLink from "@/components/SmartLink";
-import { Phone, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, MapPinned, ArrowUpRight } from "lucide-react";
+import { Phone, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, ArrowUpRight } from "lucide-react";
 import Image from 'next/image';
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import type { Metadata } from 'next';
@@ -171,7 +171,13 @@ export default async function Page() {
         <div className="my-24">
           <h2 className="text-2xl md:text-5xl mb-16 text-center flex items-center justify-center gap-3">
             <span>Find Us on Google Maps</span>
-            <MapPinned className="h-6 w-6 md:h-12 md:w-12 inline text-[--brand-blue]" aria-hidden="true" />
+            <Image
+              src="https://next.sonshineroofing.com/wp-content/uploads/Maps_Pin_FullColor-x1000-1.webp"
+              alt="SonShine Roofing map pin"
+              width={48}
+              height={48}
+              className="inline h-6 w-6 md:h-12 md:w-12"
+            />
           </h2>
           <LiteMap />
         </div>

@@ -316,6 +316,15 @@ type FinancingCookie = {
   scores?: FinancingScores;
 };
 
+type LeadSubmitResponse = {
+  ok?: boolean;
+  error?: string;
+};
+
+type GtmWindow = Window & {
+  dataLayer?: Array<Record<string, unknown>>;
+};
+
 function currency(n: number) {
   return n.toLocaleString(undefined, {
     style: 'currency',
@@ -811,8 +820,13 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const json = await res.json().catch(() => ({} as any));
-      if (res.ok && json?.ok) {
+      let json: LeadSubmitResponse = {};
+      try {
+        json = (await res.json()) as LeadSubmitResponse;
+      } catch {
+        json = {};
+      }
+      if (res.ok && json.ok) {
         setSubmission('idle');
         setUnlocked(true);
         setShowCalculator(true);
@@ -828,13 +842,16 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
         writeCookie(CONTACT_READY_COOKIE, '1', COOKIE_MAX_AGE);
         try {
-          (window as any).dataLayer = (window as any).dataLayer || [];
-          (window as any).dataLayer.push({ event: 'financing_calculator_submit', form: 'monthly_estimator' });
-        } catch { }
+          const win = window as GtmWindow;
+          win.dataLayer = win.dataLayer || [];
+          win.dataLayer.push({ event: 'financing_calculator_submit', form: 'monthly_estimator' });
+        } catch {
+          // ignore GTM issues
+        }
         return;
       }
       setSubmission('error');
-      setGlobalError(friendlyError(json?.error));
+      setGlobalError(friendlyError(json.error));
     } catch {
       setSubmission('error');
       setGlobalError('Network error. Please try again.');

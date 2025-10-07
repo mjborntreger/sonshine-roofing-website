@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { ChevronDown } from 'lucide-react';
 
@@ -73,10 +73,6 @@ const PILLS: { key: GroupKey; label: string }[] = [
 export default function TipTopRoofCheckup({ className }: { className?: string }) {
     const [tab, setTab] = useState<GroupKey>('interior');
     const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
-    const rootRef = useRef<HTMLDivElement | null>(null);
-    const [showSticky, setShowSticky] = useState(false);
-
-    const current = useMemo(() => CHECKLIST[tab], [tab]);
 
     // JSON-LD (client-side): HowTo + page-specific Service for Tip Top Roof Check‑up
     const base = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://sonshineroofing.com');
@@ -119,20 +115,6 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
             { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
         ],
     }), [base, pageUrl, providerId]);
-
-    useEffect(() => {
-        const el = rootRef.current;
-        if (!el || typeof window === 'undefined') return;
-        const io = new IntersectionObserver(
-            (entries) => {
-                const e = entries[0];
-                setShowSticky(e.isIntersecting);
-            },
-            { rootMargin: '0px 0px -60%' }
-        );
-        io.observe(el);
-        return () => io.disconnect();
-    }, []);
 
     const toggle = (id: string) =>
         setOpenMap((m) => ({ ...m, [id]: !m[id] }));
@@ -202,7 +184,7 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
                 })}
             </div>
 
-            <div ref={rootRef} className="mx-auto mt-6 max-w-4xl">
+            <div className="mx-auto mt-6 max-w-4xl">
                 {PILLS.map(({ key }) => (
                     <div
                         key={key}

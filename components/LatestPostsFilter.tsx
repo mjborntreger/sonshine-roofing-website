@@ -14,16 +14,15 @@ import type { PostCard } from "@/lib/wp";
 import {
   ArrowRight,
   GraduationCap,
-  Newspaper,
   Sun,
   Wind,
   type LucideIcon,
 } from "lucide-react";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const pStyles = "my-8 text-center justify-center text-lg";
+const pStyles = "my-8 text-center text-slate-500 justify-center text-sm md:text-md";
 
-type CategoryKey = "all" | "education" | "hurricane-preparation" | "energy-efficient-roofing";
+type CategoryKey = "education" | "hurricane-preparation" | "energy-efficient-roofing";
 
 type Props = {
   /** Server-fetched list of recent posts (include categoryTerms in wp.ts) */
@@ -39,23 +38,23 @@ const TAB_CONFIG: Array<{
   label: string;
   icon: LucideIcon;
 }> = [
-  { key: "all", label: "All", icon: Newspaper },
   { key: "education", label: "Education", icon: GraduationCap },
   { key: "hurricane-preparation", label: "Hurricane Preparation", icon: Wind },
   { key: "energy-efficient-roofing", label: "Energy-Efficient Roofing", icon: Sun },
 ];
 
 export default function LatestPostsFilter({ posts, initial = 4, showHeader = true }: Props) {
-  const [selected, setSelected] = useState<CategoryKey>("all");
+  const [selected, setSelected] = useState<CategoryKey>("education");
 
   const postsByCategory = useMemo(() => {
     const normalized = Array.isArray(posts) ? posts : [];
-    const map: Record<CategoryKey, PostCard[]> = {
-      all: normalized,
-      education: [],
-      "hurricane-preparation": [],
-      "energy-efficient-roofing": [],
-    };
+    const map = TAB_CONFIG.reduce(
+      (acc, tab) => {
+        acc[tab.key] = [];
+        return acc;
+      },
+      {} as Record<CategoryKey, PostCard[]>,
+    );
 
     for (const post of normalized) {
       const slugs = (post.categoryTerms ?? [])
@@ -105,7 +104,7 @@ export default function LatestPostsFilter({ posts, initial = 4, showHeader = tru
     <div className="px-4 py-16 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="text-3xl text-slate-700 mb-16 md:text-5xl">Latest Blog Posts</h2>
+          <h2 className="text-3xl text-slate-700 md:text-5xl mb-3 md:mb-4">Latest Blog Posts</h2>
           {renderFilterTabs()}
           <p className={pStyles}>
             Enjoy these handcrafted articles from our team that discuss a wide variety of roofing topics (and a few extras, from our family to yours).

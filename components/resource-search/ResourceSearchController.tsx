@@ -46,7 +46,7 @@ export default function ResourceSearchController({ kind, ids, urlKeys, minQueryL
       cancelled = true;
       try { cleanup?.(); } catch {}
     };
-  }, [kind]);
+  }, [ids, kind, minQueryLen, urlKeys]);
 
   return null;
 }

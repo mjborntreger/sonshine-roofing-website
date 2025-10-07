@@ -167,9 +167,9 @@ const SmartLink = React.forwardRef<HTMLAnchorElement, SmartLinkProps>(function S
   }, [external, href, hrefStr, special, hasDownload, hostList]);
 
   const useNextLink = !special && !hasDownload && !inferredExternal;
-  const nextHref = React.useMemo(() => {
+  const nextHref = React.useMemo<NextLinkProps["href"]>(() => {
     if (href instanceof URL) return href.toString();
-    return href as string | UrlObject;
+    return href as NextLinkProps["href"];
   }, [href]);
 
   const explicitAria = anchorProps["aria-label"] as string | undefined;
@@ -216,7 +216,7 @@ const SmartLink = React.forwardRef<HTMLAnchorElement, SmartLinkProps>(function S
   if (useNextLink) {
     return (
       <NextLink
-        href={nextHref as any}
+        href={nextHref}
         prefetch={prefetch}
         replace={replace}
         scroll={scroll}

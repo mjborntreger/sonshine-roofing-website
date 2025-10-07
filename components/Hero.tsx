@@ -38,7 +38,7 @@ export default function Hero() {
         />
 
         {/* Transparent gradient overlay for legibility */}
-        <div className="pointer-events-none absolute rounded-t-[192px] inset-x-0 h-[125%] top-[-180px] overflow-hidden bottom-8 -z-10 bg-gradient-to-b from-black/80 via-black/40 to-transparent" />
+        <div className="pointer-events-none absolute rounded-t-[192px] inset-x-0 h-[125%] top-[-180px] overflow-hidden bottom-8 -z-10 bg-gradient-to-b from-black/95 via-black/70 to-black/40" />
 
 
 
@@ -53,7 +53,7 @@ export default function Hero() {
           >
           </ShinyText>
 
-          <h1 className="max-w-6xl mx-auto text-4xl md:text-5xl lg:text-6xl justify-center font-bold md:leading-[5rem] lg:leading-[5rem] mb-4 text-white">
+          <h1 className="max-w-6xl mx-auto text-4xl md:text-5xl lg:text-6xl justify-center font-display font-bold md:leading-[5rem] lg:leading-[5rem] mb-4 text-white">
             Your Trusted Local Roofing Contractor in Sarasota, Manatee, and Charlotte Counties for Over 38 Years
           </h1>
         </div>

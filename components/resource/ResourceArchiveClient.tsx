@@ -184,7 +184,7 @@ export default function ResourceArchiveClient<Item>({
 
   const facetMap = useMemo(() => {
     const map = new Map<string, Map<string, number>>();
-    const facets = (result as any).facets as ResourceFacetGroup[] | undefined;
+    const facets = result.facets;
     if (Array.isArray(facets)) {
       for (const facet of facets) {
         const bucketMap = new Map<string, number>();
@@ -320,8 +320,8 @@ export default function ResourceArchiveClient<Item>({
       .then((json) => {
         setResult(json as ResourceArchiveResult<Item>);
       })
-      .catch((err: any) => {
-        if (err?.name === "AbortError") return;
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === "AbortError") return;
         setError("Unable to load results for the selected filters. Please try again.");
         console.error("[ResourceArchive] fetch failed", err);
       })

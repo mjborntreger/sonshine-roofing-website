@@ -17,8 +17,6 @@ import {
   Wrench,
   ExternalLink,
   ArrowUpRight,
-  CalendarDays,
-  Menu,
   SquareMenu,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -344,7 +342,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const json = await res.json().catch(() => ({} as any));
+      const json: LeadApiResponse | null = await res.json().catch(() => null);
       if (!res.ok || !json?.ok) {
         throw new Error(json?.error || 'Unable to send your request.');
       }
@@ -363,8 +361,10 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
       setSuccessMeta(buildSuccessMetaFromPayload(successPayload));
 
       try {
-        (window as any).dataLayer = (window as any).dataLayer || [];
-        (window as any).dataLayer.push({
+        type GtmWindow = Window & { dataLayer?: Array<Record<string, unknown>> };
+        const gtmWindow = window as GtmWindow;
+        gtmWindow.dataLayer = gtmWindow.dataLayer || [];
+        gtmWindow.dataLayer.push({
           event: 'lead_form_submitted',
           projectType: form.projectType,
           helpTopics: '',
@@ -376,10 +376,11 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
       setForm(INITIAL_STATE);
       setErrors({});
       setStatus('success');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Lead submission failed', error);
       setStatus('error');
-      setGlobalError(error?.message || 'We could not send your message. Please call us at (941) 866-4320.');
+      const message = error instanceof Error ? error.message : null;
+      setGlobalError(message || 'We could not send your message. Please call us at (941) 866-4320.');
     }
   };
 
@@ -722,3 +723,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
     </form>
   );
 }
+type LeadApiResponse = {
+  ok?: boolean;
+  error?: string;
+};

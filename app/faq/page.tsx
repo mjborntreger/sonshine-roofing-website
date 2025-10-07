@@ -60,8 +60,8 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
 
   // Sort topics: featured topics first (if available), then alphabetically
   const topicsSorted = [...topics].sort((a, b) => {
-    const af = (a as any).featured ? 1 : 0;
-    const bf = (b as any).featured ? 1 : 0;
+    const af = a.featured ? 1 : 0;
+    const bf = b.featured ? 1 : 0;
     if (af !== bf) return bf - af; // featured first
     return a.name.localeCompare(b.name);
   });
@@ -211,7 +211,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                               </summary>
                               <div
                                 className="accordion-motion prose prose-sm px-4 pb-4 mt-1"
-                                dangerouslySetInnerHTML={{ __html: (f as any).contentHtml || '' }}
+                                dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }}
                               />
                             </details>
                           );

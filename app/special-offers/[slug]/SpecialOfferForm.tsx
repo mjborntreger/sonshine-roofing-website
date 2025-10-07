@@ -252,7 +252,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
 
         <div className="mt-6 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50 p-6 text-center text-slate-900 print:border-solid print:border-black print:bg-white">
           <p className="text-sm uppercase tracking-widest text-emerald-600">Your Offer Code</p>
-          <p className="mt-2 text-4xl font-black tracking-[0.2em] text-emerald-700 print:text-black">
+          <p className="mt-2 text-4xl font-bold tracking-[0.2em] text-emerald-700 print:text-black">
             {offerCode}
           </p>
         </div>
