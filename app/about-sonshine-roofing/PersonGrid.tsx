@@ -5,6 +5,7 @@ import SmartLink from "@/components/SmartLink";
 import MediaFrame from "@/components/MediaFrame";
 import { ArrowRight } from "lucide-react";
 import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
+import { buildPersonHref, ROUTES } from "@/lib/routes";
 
 export default function PersonGrid({ people }: { people: Person[] }) {
   if (!people?.length) return null;
@@ -17,7 +18,7 @@ export default function PersonGrid({ people }: { people: Person[] }) {
           return (
             <li key={p.slug} className="min-w-0">
               <SmartLink
-                href={`/person/${p.slug}`}
+                href={buildPersonHref(p.slug) ?? ROUTES.about}
                 className="group block rounded-2xl focus-visible:outline-none"
                 data-icon-affordance="right"
               >

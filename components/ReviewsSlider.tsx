@@ -275,14 +275,14 @@ export default function ReviewsSlider({
           const href = r.author_url || gbpUrl;
           return (
             <div
-              className="fixed inset-0 z-[2147483647] grid place-items-center bg-black/45 p-16"
+              className="fixed inset-0 z-[2147483647] grid place-items-center bg-black/45 py-16 md:p-16"
               onClick={closeModal}
             >
               <div
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="review-title"
-                className="relative w-full max-w-[720px] overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-2xl"
+                className="relative w-full max-w-[720px] mx-4 md:mx-0 overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button

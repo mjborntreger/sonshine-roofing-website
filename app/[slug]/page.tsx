@@ -320,9 +320,9 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               {post.categories.map((c) => (
                 <span
                   key={c}
-                  className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                  className="inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
                 >
-                  {c}
+                  <span className="block max-w-full truncate">{c}</span>
                 </span>
               ))}
             </div>

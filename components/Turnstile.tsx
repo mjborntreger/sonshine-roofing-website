@@ -28,6 +28,8 @@ type TurnstileWindow = Window & {
   __turnstileScriptLoaded?: boolean;
 } & Record<string, TurnstileCallback>;
 
+const asTurnstileWindow = (): TurnstileWindow => window as unknown as TurnstileWindow;
+
 /**
  * Cloudflare Turnstile wrapper (TS-safe with existing global types)
  * - Avoids redeclaring window.turnstile (conflicts with other components)
@@ -69,13 +71,13 @@ export default function Turnstile({
     if (typeof window === "undefined") return;
 
     const markReady = () => {
-      const win = window as TurnstileWindow;
+      const win = asTurnstileWindow();
       win.__turnstileScriptLoaded = true;
       setScriptReady(true);
     };
 
     // If API already present, we're good
-    if ((window as TurnstileWindow).turnstile) {
+    if (asTurnstileWindow().turnstile) {
       markReady();
       return;
     }
@@ -111,7 +113,7 @@ export default function Turnstile({
       return;
     }
 
-    const win = window as TurnstileWindow;
+    const win = asTurnstileWindow();
     const ts = win.turnstile;
     if (!ts) return; // still not ready
 

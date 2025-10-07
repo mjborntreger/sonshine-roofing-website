@@ -71,9 +71,9 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
                       <li key={s.slug}>
                         <Link
                           href={`/roofing-glossary/${s.slug}`}
-                          className="inline-flex items-center rounded-full border border-slate-400 bg-white px-3 py-1 text-sm hover:bg-slate-50"
+                          className="inline-flex min-w-0 max-w-full items-center rounded-full border border-slate-400 bg-white px-3 py-1 text-sm hover:bg-slate-50"
                         >
-                          {s.title}
+                          <span className="block max-w-full truncate">{s.title}</span>
                         </Link>
                       </li>
                     ))}

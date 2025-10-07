@@ -383,9 +383,9 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
                   <li key={t.slug}>
                     <Link
                       href={`/roofing-glossary/${t.slug}`}
-                      className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-sm hover:bg-slate-50"
+                      className="inline-flex min-w-0 max-w-full items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-sm hover:bg-slate-50"
                     >
-                      {t.title}
+                      <span className="block max-w-full truncate">{t.title}</span>
                     </Link>
                   </li>
                 ))}

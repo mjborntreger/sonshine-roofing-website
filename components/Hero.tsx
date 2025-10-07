@@ -47,13 +47,13 @@ export default function Hero() {
 
           <ShinyText
             text="Since 1987 we've got you covered"
-            className="mt-6 mb-16 lg:mb-24 font-script text-2xl md:text-3xl lg:text-4xl"
+            className="mt-16 mb-16 lg:mb-24 font-script text-3xl md:text-3xl lg:text-7xl"
             disabled={false}
             speed={2.5}
           >
           </ShinyText>
 
-          <h1 className="max-w-6xl mx-auto text-4xl md:text-5xl lg:text-6xl justify-center font-display font-bold md:leading-[5rem] lg:leading-[5rem] mb-4 text-white">
+          <h1 className="max-w-6xl mx-auto text-4xl md:text-5xl lg:text-7xl justify-center font-display font-bold md:leading-[5rem] lg:leading-[6rem] mb-4 text-white">
             Your Trusted Local Roofing Contractor in Sarasota, Manatee, and Charlotte Counties for Over 38 Years
           </h1>
         </div>

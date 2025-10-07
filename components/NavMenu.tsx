@@ -24,7 +24,6 @@ import {
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import type { Route } from "next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/lib/routes";
@@ -58,9 +57,9 @@ function MenuToggleIcon({ open }: { open: boolean }) {
 
   if (prefersReducedMotion) {
     return open ? (
-      <X className="h-4 w-4 text-white" aria-hidden="true" />
+      <X className="h-3 w-3 text-white" aria-hidden="true" />
     ) : (
-      <Menu className="h-4 w-4 text-white" aria-hidden="true" />
+      <Menu className="h-3 w-3 text-white" aria-hidden="true" />
     );
   }
 
@@ -233,7 +232,7 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
         <li className="pl-2">
           <Button asChild size="sm" variant="brandOrange">
             <SmartLink
-              href={"https://www.myquickroofquote.com/contractors/sonshine-roofing" as Route}
+              href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
               className="flex items-center gap-2"
             >
               <Zap className="h-4 w-4 text-white" aria-hidden="true" />
@@ -458,17 +457,15 @@ function MobileMenu() {
       <button
         type="button"
         ref={buttonRef}
-        className="rounded-full border px-4 py-2 text-white bg-[--brand-blue]"
+        className="flex items-center gap-2 rounded-full border px-4 py-2 text-white bg-[--brand-blue]"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="mobile-nav"
         aria-haspopup="menu"
         data-open={open}
       >
-        <span className="inline-flex items-center gap-2">
-          <span className="font-medium">Menu</span>
-          <MenuToggleIcon open={open} />
-        </span>
+        <span className="font-display text-xl font-bold leading-none">Menu</span>
+        <MenuToggleIcon open={open} />
       </button>
 
       {open && (
@@ -623,7 +620,7 @@ function MobileMenu() {
               >
                 <Button asChild className="w-full h-8 mt-4" variant="brandOrange" size="lg">
                   <SmartLink
-                    href={"https://www.myquickroofquote.com/contractors/sonshine-roofing" as Route}
+                    href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
                     onClick={() => setOpen(false)}
                     className="flex items-center justify-center gap-x-2"
                   >

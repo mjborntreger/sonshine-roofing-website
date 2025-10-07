@@ -14,6 +14,13 @@ import { ArrowRight } from "lucide-react";
 import { stripHtml } from "@/lib/wp";
 import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
 import MediaFrame from "./MediaFrame";
+import { buildBlogPostHref, buildProjectHref, buildProjectHrefFromUri, ROUTES } from "@/lib/routes";
+
+const smallPillClass =
+    "inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700";
+const largePillClass =
+    "inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm";
+const pillLabelClass = "block max-w-full truncate";
 
 type Props<T> = {
     kind: ResourceKind;
@@ -56,7 +63,7 @@ const renderBlogItem = (post: PostCard): ReactNode => {
     const dateLabel = date && !Number.isNaN(date.getTime())
         ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(date)
         : "";
-    const href = `/${post.slug}`;
+    const href = buildBlogPostHref(post.slug) ?? ROUTES.blog;
     const rawHtml = String(post.excerpt ?? "");
     const categories = post.categories ?? [];
     const catList = categories.join(", ");
@@ -102,9 +109,9 @@ const renderBlogItem = (post: PostCard): ReactNode => {
                                 {categories.map((category) => (
                                     <span
                                         key={category}
-                                        className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                                        className={smallPillClass}
                                     >
-                                        {category}
+                                        <span className={pillLabelClass}>{category}</span>
                                     </span>
                                 ))}
                             </div>
@@ -206,9 +213,9 @@ const renderVideoItem = (
                         {categories.map((category) => (
                             <span
                                 key={`${safeKey}-${category.slug ?? category.name}`}
-                                className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                                className={smallPillClass}
                             >
-                                {category.name}
+                                <span className={pillLabelClass}>{category.name}</span>
                             </span>
                         ))}
                     </div>
@@ -216,7 +223,7 @@ const renderVideoItem = (
                     {video.source === "project" && video.slug ? (
                         <div className="mt-3">
                             <SmartLink
-                                href={`/project/${video.slug}`}
+                                href={buildProjectHref(video.slug) ?? ROUTES.project}
                                 className="text-sm font-medium text-[#0045d7] hover:underline"
                             >
                                 See full project details
@@ -259,7 +266,11 @@ const renderProjectItem = (project: ProjectSummary, index: number): ReactNode =>
     const roofSlugs = roofColors.map((term) => term?.slug ?? "").filter(Boolean).join(",");
     const searchBody = project.projectDescription ?? "";
     const projectSummary = truncateText(stripHtml(searchBody), 260);
-    const href = project.uri || (project.slug ? `/project/${project.slug}` : "#");
+    const href =
+        buildProjectHref(project.slug) ??
+        buildProjectHrefFromUri(project.uri) ??
+        project.uri ??
+        ROUTES.project;
     const heroImage = project.heroImage;
 
     return (
@@ -302,25 +313,25 @@ const renderProjectItem = (project: ProjectSummary, index: number): ReactNode =>
                                     {materialTypes.map((term) => (
                                         <span
                                             key={`mtb-${key}-${term.slug}`}
-                                            className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                            className={largePillClass}
                                         >
-                                            {term.name}
+                                            <span className={pillLabelClass}>{term.name}</span>
                                         </span>
                                     ))}
                                     {serviceAreas.map((term) => (
                                         <span
                                             key={`sab-${key}-${term.slug}`}
-                                            className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                            className={largePillClass}
                                         >
-                                            {term.name}
+                                            <span className={pillLabelClass}>{term.name}</span>
                                         </span>
                                     ))}
                                     {roofColors.map((term) => (
                                         <span
                                             key={`rcb-${key}-${term.slug}`}
-                                            className="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm"
+                                            className={largePillClass}
                                         >
-                                            {term.name}
+                                            <span className={pillLabelClass}>{term.name}</span>
                                         </span>
                                     ))}
                                 </div>
@@ -452,7 +463,12 @@ export default function InfiniteList<T>({
             case "blog":
                 return (item) => renderBlogItem(item as unknown as PostCard);
             case "video":
-                return (item, index) => renderVideoItem(item as unknown as VideoItem, index, onVideoOpen);
+                return (item, index) =>
+                    renderVideoItem(
+                        item as unknown as VideoItem,
+                        index,
+                        onVideoOpen as ((video: VideoItem) => void) | undefined
+                    );
             case "project":
                 return (item, index) => renderProjectItem(item as unknown as ProjectSummary, index);
             default:

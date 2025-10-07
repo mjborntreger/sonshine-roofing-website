@@ -204,6 +204,24 @@ export type VideoItem = {
   /** Optional taxonomy terms (for project-sourced videos) */
   materialTypes?: TermLite[];
   serviceAreas?: TermLite[];
+  featuredImage?: { url?: string | null } | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    canonicalUrl?: string | null;
+    openGraph?: {
+      title?: string | null;
+      description?: string | null;
+      type?: string | null;
+      image?: {
+        url?: string | null;
+        secureUrl?: string | null;
+        width?: number | null;
+        height?: number | null;
+        type?: string | null;
+      } | null;
+    } | null;
+  };
 };
 
 export type VideoBucketKey = "roofing-project" | "commercials" | "accolades" | "explainers" | "other";
@@ -1199,6 +1217,171 @@ export async function listRecentVideoEntries(limit = 50): Promise<VideoItem[]> {
   return items;
 }
 
+export async function getVideoEntryBySlug(slug: string): Promise<VideoItem | null> {
+  const trimmed = slug.trim();
+  if (!trimmed) return null;
+
+  const query = /* GraphQL */ `
+    query VideoEntryBySlug($slug: ID!, $taxLimit: Int!) {
+      videoEntry(id: $slug, idType: SLUG) {
+        id
+        slug
+        title
+        date(format: "c")
+        videoCategories(first: $taxLimit) {
+          nodes { name slug }
+        }
+        videoLibraryMetadata {
+          youtubeUrl
+          description
+          materialType { nodes { name slug } }
+          serviceArea  { nodes { name slug } }
+        }
+        seo {
+          title
+          description
+          canonicalUrl
+          openGraph {
+            title
+            description
+            type
+            image { url secureUrl width height type }
+          }
+        }
+      }
+    }
+  `;
+
+  type VideoEntryResponse = { videoEntry: UnknownRecord | null };
+
+  const data = await wpFetch<VideoEntryResponse>(query, { slug: trimmed, taxLimit: 10 }, 900);
+  const node = asRecord(data?.videoEntry);
+  if (!node) return null;
+
+  const metadata = asRecord(node.videoLibraryMetadata);
+  const youtubeUrl = readRecordString(metadata, "youtubeUrl");
+  const youtubeId = youtubeUrl ? extractYouTubeId(youtubeUrl) : null;
+  if (!youtubeUrl || !youtubeId) return null;
+
+  const categories = extractNodes(node.videoCategories)
+    .map((value) => asRecord(value))
+    .filter((value): value is UnknownRecord => value !== null)
+    .map((value) => ({
+      name: toStringSafe(value.name),
+      slug: toStringSafe(value.slug) || undefined,
+    }))
+    .filter((cat) => cat.name.length > 0 || (cat.slug && cat.slug.length > 0));
+
+  const materialTypes = mapTermNodes(metadata?.materialType);
+  const serviceAreas = mapTermNodes(metadata?.serviceArea);
+  const description = readRecordString(metadata, "description");
+  const seo = isRecord(node.seo) ? (node.seo as VideoItem["seo"]) : undefined;
+
+  return {
+    id: toStringSafe(node.id) || youtubeId,
+    slug: toStringSafe(node.slug) || undefined,
+    title: toStringSafe(node.title),
+    youtubeUrl,
+    youtubeId,
+    thumbnailUrl: youtubeThumb(youtubeId),
+    source: "video_entry",
+    date: typeof node.date === "string" ? node.date : undefined,
+    categories,
+    excerpt: description,
+    materialTypes,
+    serviceAreas,
+    seo,
+  };
+}
+
+export function videoJsonLd(video: VideoItem, base: string): Record<string, unknown> {
+  const baseUrl = typeof base === "string" ? base.trim().replace(/\/$/, "") : "";
+  const seo = video.seo;
+  const openGraph = isRecord(seo?.openGraph) ? (seo?.openGraph as UnknownRecord) : undefined;
+  const ogImage = isRecord(openGraph?.image) ? (openGraph?.image as UnknownRecord) : null;
+
+  const titleSource =
+    (typeof seo?.title === "string" && seo.title) ||
+    (typeof openGraph?.title === "string" && openGraph.title) ||
+    video.title;
+  const name = titleSource ? titleSource.trim() : undefined;
+
+  const descriptionSource =
+    (typeof seo?.description === "string" && seo.description) ||
+    (typeof openGraph?.description === "string" && openGraph.description) ||
+    (video.excerpt ? stripHtml(String(video.excerpt)) : "");
+  const description = descriptionSource ? descriptionSource.trim() : undefined;
+
+  const thumbnailCandidates: string[] = [];
+  if (ogImage) {
+    const secure = ogImage.secureUrl;
+    const url = ogImage.url;
+    if (typeof secure === "string" && secure.trim()) thumbnailCandidates.push(secure.trim());
+    if (typeof url === "string" && url.trim()) thumbnailCandidates.push(url.trim());
+  }
+  if (video.thumbnailUrl) thumbnailCandidates.push(video.thumbnailUrl);
+  const thumbnailUrl = Array.from(new Set(thumbnailCandidates.filter(Boolean)));
+
+  const uploadDate =
+    video.date && !Number.isNaN(Date.parse(video.date)) ? new Date(video.date).toISOString() : undefined;
+
+  const slugOrId = video.slug || video.youtubeId || video.id;
+  const defaultLanding =
+    slugOrId && baseUrl ? `${baseUrl}/video-library?v=${encodeURIComponent(slugOrId)}` : undefined;
+  const canonical =
+    (typeof seo?.canonicalUrl === "string" && seo.canonicalUrl.trim()) || defaultLanding || undefined;
+
+  const embedUrl = video.youtubeId
+    ? `https://www.youtube-nocookie.com/embed/${video.youtubeId}`
+    : video.youtubeUrl;
+
+  const result: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name,
+    description,
+    thumbnailUrl: thumbnailUrl.length ? thumbnailUrl : undefined,
+    uploadDate,
+    url: canonical,
+    contentUrl: video.youtubeUrl,
+    embedUrl,
+    isFamilyFriendly: true,
+    potentialAction: video.youtubeUrl
+      ? {
+          "@type": "WatchAction",
+          target: video.youtubeUrl,
+        }
+      : undefined,
+    publisher: {
+      "@type": "Organization",
+      name: "SonShine Roofing",
+    },
+  };
+
+  for (const key of Object.keys(result)) {
+    const value = result[key];
+    if (
+      value === undefined ||
+      value === null ||
+      (Array.isArray(value) && value.length === 0) ||
+      (typeof value === "string" && value.trim().length === 0)
+    ) {
+      delete result[key];
+    }
+  }
+
+  if (
+    !("publisher" in result) ||
+    !isRecord(result.publisher) ||
+    typeof result.publisher.name !== "string" ||
+    result.publisher.name.trim().length === 0
+  ) {
+    delete result.publisher;
+  }
+
+  return result;
+}
+
 // ----- PROJECTS WITH YOUTUBE (Roofing Projects bucket) ----- //
 export async function listProjectVideos(limit = 100): Promise<VideoItem[]> {
   const query = /* GraphQL */ `
@@ -2061,6 +2244,8 @@ export async function listProjectsPaged({
     taxArray.push({ taxonomy: 'SERVICEAREA', terms: saSlugs, field: 'SLUG', operator: 'IN' });
   }
 
+  const taxQuery = taxArray.length ? { relation: 'AND', taxArray } : undefined;
+
   const query = /* GraphQL */ `
     query ProjectArchive(
       $offsetPagination: OffsetPagination
@@ -2119,7 +2304,7 @@ export async function listProjectsPaged({
   const variables: Record<string, unknown> = {
     offsetPagination: { offset, size },
     search: search ?? undefined,
-    taxQuery: { relation: 'AND', taxArray },
+    taxQuery,
     facetTaxonomies: [
       mtSlugs.length ? { taxonomy: 'material_type', slugs: mtSlugs } : { taxonomy: 'material_type' },
       rcSlugs.length ? { taxonomy: 'roof_color', slugs: rcSlugs } : { taxonomy: 'roof_color' },
@@ -2173,17 +2358,21 @@ export async function listProjectsPaged({
   const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
     ? data.facetCounts.facets.map((facetNode) => {
         const facetRecord = asRecord(facetNode);
-        const bucketsNodes = extractNodes(facetRecord?.buckets);
+        const bucketsSource = facetRecord?.buckets;
+        const bucketsNodes = Array.isArray(bucketsSource) ? bucketsSource : extractNodes(bucketsSource);
+
+        const buckets = bucketsNodes
+          .map((bucketNode) => asRecord(bucketNode))
+          .filter((bucketRecord): bucketRecord is UnknownRecord => Boolean(bucketRecord))
+          .map((bucketRecord) => ({
+            slug: toStringSafe(bucketRecord.slug),
+            name: toStringSafe(bucketRecord.name),
+            count: typeof bucketRecord.count === 'number' ? bucketRecord.count : 0,
+          }));
+
         return {
           taxonomy: toStringSafe(facetRecord?.taxonomy),
-          buckets: bucketsNodes.map((bucketNode) => {
-            const bucketRecord = asRecord(bucketNode);
-            return {
-              slug: toStringSafe(bucketRecord?.slug),
-              name: toStringSafe(bucketRecord?.name),
-              count: typeof bucketRecord?.count === 'number' ? bucketRecord.count : 0,
-            };
-          }),
+          buckets,
         } satisfies FacetGroup;
       })
     : [];

@@ -99,7 +99,7 @@ export default function ServicesQuickLinks() {
 
                 {/* Label and description */}
                 <div className="flex-1 min-w-0 text-left">
-                  <span className="block truncate">{label}</span>
+                  <span className="font-display font-bold text-md block truncate">{label}</span>
                   <p className="mt-0.5 text-xs text-slate-500 line-clamp-1">{description}</p>
                 </div>
 

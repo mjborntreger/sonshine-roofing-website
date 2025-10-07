@@ -118,7 +118,7 @@ export default function FilterTabs({
             >
               <span className="flex whitespace-normal text-pretty leading-tight tracking-tight flex-row items-center gap-1">
                 <Icon aria-hidden="true" className={iconClass} />
-                <span className="max-w-[140px] whitespace-normal">{tab.label}</span>
+                <span className="w-auto whitespace-normal">{tab.label}</span>
               </span>
               {tab.selectedCount > 0 && (
                 <span

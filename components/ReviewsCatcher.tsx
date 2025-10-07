@@ -2,6 +2,7 @@
 import SmartLink from "./SmartLink";
 import { Star } from "lucide-react";
 import React from "react";
+import { buildTellUsWhyRatingHref } from "@/lib/routes";
 
 /**
  * ReviewsCatcher
@@ -12,7 +13,6 @@ import React from "react";
  * - Uses brand color via CSS var --brand-orange (fallback to #fb9216)
  */
 
-const INTERNAL_FEEDBACK_SLUG = "/tell-us-why?rating=${rating}" as const;
 const GOOGLE_REVIEW_URL = "https://g.page/r/CVjpdbFPWRhTEAE/review" as const;
 
 const STAR_LABELS: Record<number, string> = {
@@ -94,7 +94,7 @@ export default function ReviewsCatcher() {
                       ) : (
                         <SmartLink
                           prefetch={false}
-                          href={INTERNAL_FEEDBACK_SLUG}
+                          href={buildTellUsWhyRatingHref(rating)}
                           aria-label={aria}
                           title={aria}
                           className={linkClasses}

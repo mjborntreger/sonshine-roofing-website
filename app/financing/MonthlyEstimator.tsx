@@ -291,7 +291,7 @@ const successPillClass = `${pillBase} bg-emerald-500 text-white`;
 const gradientShell = 'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
 const innerPanelBase = 'rounded-3xl bg-white';
 const innerPanelLocked = `${innerPanelBase} overflow-hidden`;
-const innerPanelUnlocked = innerPanelBase;
+const innerPanelUnlocked = `${innerPanelBase} overflow-hidden`;
 const stepCardClass = 'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
 const inputBaseClass = 'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
 
