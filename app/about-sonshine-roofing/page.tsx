@@ -149,10 +149,10 @@ export default async function Page() {
                     SonShine Roofing is a family-owned roofing company based in Sarasota, Florida,
                     serving Sarasota, Manatee, and Charlotte County residents with 38+ years of experience.
                     We specialize in residential roofing services, including roof repair, roof replacement,
-                    inspections, and our Roof Care Club, which is our preventative maintenance program designed
+                    inspections, and our Roof Care Club, which is our preventative maintenance program designed
                     for the unique weather conditions of Southwest Florida.
                     <br /><br />
-                    We’ve learned that superior customer service and honesty with clients are the only way to
+                    We’ve learned that superior customer service and honesty with clients are the only way to
                     stay in business. When you ask us to inspect your roof, we’ll tell you the flat-out truth
                     and give you our best recommendation based on our 38+ years of professional experience.
                     We’d be more than pleased to have you look through our client referrals.

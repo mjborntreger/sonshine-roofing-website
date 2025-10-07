@@ -449,7 +449,6 @@ export default async function FinancingPage() {
         {/* FAQ Schema */}
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
         />
         {/* Service Schema */}

@@ -98,7 +98,7 @@ export default function Header() {
   const backgroundOpacity = isLanding ? progress : 1;
   const isTransparent = isLanding && backgroundOpacity === 0;
   const isOverlay = isLanding;
-  const headerBackground = `rgba(245, 245, 245, ${backgroundOpacity})`;
+  const headerBackground = `rgba(241, 245, 249, ${backgroundOpacity})`;
   const headerBorder = `rgba(226, 232, 240, ${backgroundOpacity})`;
   const backdropBlur = backgroundOpacity > 0 ? `blur(${6 + backgroundOpacity * 6}px)` : "blur(0px)";
   const expandedLogo = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-final-1.webp";

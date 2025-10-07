@@ -220,6 +220,7 @@ export type Person = {
 export type GlossarySummary = {
   slug: string;
   title: string;
+  excerpt?: string | null;
 };
 
 export type GlossaryTerm = {
@@ -510,7 +511,7 @@ function youtubeThumb(id: string) {
 // Internal: WPGraphQL response shape for glossary index pagination
 type GlossaryIndexResponse = {
   glossaryTerms: {
-    nodes: Array<{ slug: string; title: string }>;
+    nodes: Array<{ slug: string; title: string; excerpt?: string | null }>;
     pageInfo: { hasNextPage: boolean; endCursor: string | null };
   };
 };
@@ -940,6 +941,7 @@ export async function listGlossaryIndex(limit = 500): Promise<GlossarySummary[]>
         nodes {
           slug
           title
+          excerpt
         }
         pageInfo {
           hasNextPage
@@ -962,7 +964,11 @@ export async function listGlossaryIndex(limit = 500): Promise<GlossarySummary[]>
 
     const nodes: GlossaryIndexResponse['glossaryTerms']['nodes'] = resp?.glossaryTerms?.nodes ?? [];
     for (const n of nodes) {
-      out.push({ slug: String(n.slug || ''), title: String(n.title || '') });
+      out.push({
+        slug: String(n.slug || ''),
+        title: String(n.title || ''),
+        excerpt: typeof n.excerpt === 'string' ? n.excerpt : null,
+      });
       if (out.length >= limit) break;
     }
 

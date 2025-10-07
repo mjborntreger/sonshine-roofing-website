@@ -100,7 +100,6 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
         </header>
 
         <div className="prose prose-slate lg:prose-lg leading-relaxed mt-6 max-w-none">
-          {/* eslint-disable-next-line react/no-danger */}
           <div dangerouslySetInnerHTML={{ __html: faq.contentHtml }} />
         </div>
 
@@ -143,7 +142,6 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
         {/* JSON-LD for a single FAQ */}
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               '@context': 'https://schema.org',
