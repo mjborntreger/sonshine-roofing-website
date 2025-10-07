@@ -8,7 +8,9 @@ import {
   isUsPhoneComplete,
   normalizePhoneForSubmit,
   formatPhoneExample,
-} from '@/lib/phone';
+  submitLead,
+  type SpecialOfferLeadInput,
+} from '@/lib/contact-lead';
 
 type Props = {
   offerCode: string;
@@ -26,11 +28,6 @@ type FormValues = {
 };
 
 type Submission = 'idle' | 'submitting' | 'success' | 'error';
-
-type LeadResponse = {
-  ok?: boolean;
-  error?: string;
-};
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -166,7 +163,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       return;
     }
 
-    const payload: Record<string, unknown> = {
+    const payload: SpecialOfferLeadInput & { submittedAt: string } = {
       type: 'special-offer',
       firstName: values.firstName.trim(),
       lastName: values.lastName.trim(),
@@ -176,8 +173,9 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       offerSlug,
       offerTitle: offerTitle ?? undefined,
       cfToken,
-      hp_field: honeypot,
+      hp_field: honeypot || undefined,
       page: `/special-offers/${offerSlug}`,
+      submittedAt: new Date().toISOString(),
     };
 
     const utmSource = searchParams.get('utm_source');
@@ -189,34 +187,35 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
 
     setSubmission('submitting');
 
-    try {
-      const res = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const json: LeadResponse | null = await res.json().catch(() => null);
-      if (res.ok && json?.ok) {
-        setSubmission('success');
-        writeOfferCookie(cookieName, offerCode, offerExpiration);
-        try {
-          type DataLayerWindow = Window & { dataLayer?: Array<Record<string, unknown>> };
-          const dlWindow = window as DataLayerWindow;
-          dlWindow.dataLayer = dlWindow.dataLayer || [];
-          dlWindow.dataLayer.push({
-            event: 'special_offer_claimed',
-            offer_slug: offerSlug,
-            offer_code: offerCode,
-          });
-        } catch {}
-        return;
+    const result = await submitLead(payload, {
+      gtmEvent: {
+        event: 'special_offer_claimed',
+        offer_slug: offerSlug,
+        offer_code: offerCode,
+      },
+      contactReadyCookie: false,
+    });
+
+    if (!result.ok) {
+      setSubmission('error');
+      setGlobalError(result.error || 'We could not send your request. Please try again.');
+      if (result.fieldErrors) {
+        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
+          if (Array.isArray(messages) && messages.length) {
+            acc[key] = String(messages[0]);
+          }
+          return acc;
+        }, {});
+        if (Object.keys(serverErrors).length) {
+          setFieldErrors(serverErrors);
+        }
       }
-      setSubmission('error');
-      setGlobalError(json?.error || 'We could not send your request. Please try again.');
-    } catch {
-      setSubmission('error');
-      setGlobalError('Network error. Please try again.');
+      return;
     }
+
+    setSubmission('success');
+    setGlobalError(null);
+    writeOfferCookie(cookieName, offerCode, offerExpiration);
   };
 
   if (submission === 'success') {

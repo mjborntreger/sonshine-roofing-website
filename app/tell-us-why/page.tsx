@@ -4,7 +4,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import Turnstile from "@/components/Turnstile";
 import SmartLink from "@/components/SmartLink";
-import { sanitizePhoneInput, isUsPhoneComplete, normalizePhoneForSubmit, formatPhoneExample } from "@/lib/phone";
+import {
+  sanitizePhoneInput,
+  isUsPhoneComplete,
+  normalizePhoneForSubmit,
+  formatPhoneExample,
+  submitLead,
+  type FeedbackLeadInput,
+} from "@/lib/contact-lead";
 
 function TellUsWhyForm() {
   const qs = useSearchParams();
@@ -62,7 +69,7 @@ function TellUsWhyForm() {
       return;
     }
 
-    const payload: Record<string, unknown> = {
+    const payload: FeedbackLeadInput & { submittedAt: string } = {
       type: "feedback",
       firstName: first,
       lastName: last,
@@ -71,10 +78,11 @@ function TellUsWhyForm() {
       rating: Number(rating),
       message,
       cfToken,
-      hp_field,
+      hp_field: hp_field || undefined,
       page: "/tell-us-why",
       ua: typeof navigator !== "undefined" ? navigator.userAgent : "",
       tz: typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "",
+      submittedAt: new Date().toISOString(),
     };
 
     const utmSource = qs.get("utm_source");
@@ -84,34 +92,22 @@ function TellUsWhyForm() {
     if (utmMedium) payload.utm_medium = utmMedium.trim();
     if (utmCampaign) payload.utm_campaign = utmCampaign.trim();
 
-    try {
-      const res = await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const json: { ok?: boolean; error?: string } | null = await res.json().catch(() => null);
-      if (res.ok && json?.ok) {
-        setStatus("ok");
-        // GTM event
-        try {
-          type DataLayerWindow = Window & { dataLayer?: Array<Record<string, unknown>> };
-          const dlWindow = window as DataLayerWindow;
-          dlWindow.dataLayer = dlWindow.dataLayer || [];
-          dlWindow.dataLayer.push({
-            event: "feedback_submitted",
-            rating,
-            page: "/tell-us-why",
-          });
-        } catch {}
-      } else {
-        setStatus("err");
-        setErr(json?.error || "Something went wrong. Please try again.");
-      }
-    } catch {
+    const result = await submitLead(payload, {
+      gtmEvent: {
+        event: "feedback_submitted",
+        rating,
+        page: "/tell-us-why",
+      },
+      contactReadyCookie: false,
+    });
+
+    if (!result.ok) {
       setStatus("err");
-      setErr("Network error. Please try again.");
+      setErr(result.error || "Something went wrong. Please try again.");
+      return;
     }
+
+    setStatus("ok");
   }
 
   if (status === "ok") {

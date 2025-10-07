@@ -23,20 +23,23 @@ import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
 import SmartLink from '@/components/SmartLink';
 import { Button } from '@/components/ui/button';
-import { writeCookie, deleteCookie } from '@/lib/client-cookies';
+import { deleteCookie } from '@/lib/client-cookies';
 import {
-  CONTACT_READY_COOKIE,
-  CONTACT_READY_MAX_AGE,
   LEAD_SUCCESS_COOKIE,
   LeadSuccessCookiePayload,
   SuccessMeta,
   parseLeadSuccessCookie,
   persistLeadSuccessCookie,
   sanitizePhoneInput,
-  normalizePhoneForSubmit,
-  isUsPhoneComplete,
   formatPhoneExample,
-  validateEmail,
+  DEFAULT_PREFERRED_CONTACT,
+  normalizeState,
+  normalizeZip,
+  submitLead,
+  type ContactLeadInput,
+  buildContactLeadPayload,
+  validateContactIdentityDraft,
+  validateContactAddressDraft,
 } from '@/lib/contact-lead';
 import { cn } from '@/lib/utils';
 
@@ -272,22 +275,21 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
     const validation: Record<string, string> = {};
     if (!form.projectType) validation.projectType = 'Pick the option that fits best.';
     if (!form.timeline) validation.timeline = 'Choose when you’d like help.';
-    if (!form.firstName.trim()) validation.firstName = 'Enter your first name.';
-    if (!form.lastName.trim()) validation.lastName = 'Enter your last name.';
-    if (!validateEmail(form.email)) validation.email = 'Enter a valid email (example@domain.com).';
+    const identityErrors = validateContactIdentityDraft({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+    });
+    const addressErrors = validateContactAddressDraft({
+      address1: form.address1,
+      address2: form.address2,
+      city: form.city,
+      state: form.state,
+      zip: form.zip,
+    });
 
-    if (!isUsPhoneComplete(form.phone)) {
-      validation.phone = 'Enter a valid US phone number (10 digits).';
-    }
-
-    if (!form.address1.trim()) validation.address1 = 'Enter your street address.';
-    if (!form.city.trim()) validation.city = 'City is required.';
-
-    const stateValue = form.state.trim().toUpperCase();
-    if (stateValue.length !== 2) validation.state = 'Use the two-letter state code.';
-
-    const zipDigits = sanitizePhoneInput(form.zip);
-    if (zipDigits.length !== 5) validation.zip = 'ZIP should be 5 digits.';
+    Object.assign(validation, identityErrors, addressErrors);
 
     if (Object.keys(validation).length) {
       setErrors(validation);
@@ -311,26 +313,33 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
     const timelineLabel = getTimelineLabel(form.timeline) || form.timeline;
     const notes = form.notes.trim();
 
-    const payload: Record<string, unknown> = {
-      type: 'contact-lead',
+    const basePayload = buildContactLeadPayload({
       projectType: form.projectType,
-      timeline: timelineLabel || undefined,
+      timelineLabel: timelineLabel || undefined,
       notes: notes || undefined,
-      firstName: form.firstName.trim(),
-      lastName: form.lastName.trim(),
-      email: form.email.trim(),
-      phone: normalizePhoneForSubmit(form.phone),
-      address1: form.address1.trim(),
-      address2: form.address2.trim() || undefined,
-      city: form.city.trim(),
-      state: stateValue,
-      zip: form.zip.trim(),
-      preferredContact: 'phone',
-      bestTime: 'no-preference',
+      preferredContact: DEFAULT_PREFERRED_CONTACT,
+      bestTimeLabel: 'No preference',
       consentSms: form.consentSms,
-      cfToken,
-      hp_field: honeypot,
+      identity: {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+      },
+      address: {
+        address1: form.address1,
+        address2: form.address2,
+        city: form.city,
+        state: form.state,
+        zip: form.zip,
+      },
       page: '/contact-us',
+    });
+
+    const payload: ContactLeadInput & { submittedAt: string } = {
+      ...basePayload,
+      cfToken,
+      hp_field: honeypot || undefined,
       submittedAt: new Date().toISOString(),
     };
 
@@ -338,52 +347,49 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
     if (utm.medium) payload.utm_medium = utm.medium;
     if (utm.campaign) payload.utm_campaign = utm.campaign;
 
-    try {
-      const res = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const json: LeadApiResponse | null = await res.json().catch(() => null);
-      if (!res.ok || !json?.ok) {
-        throw new Error(json?.error || 'Unable to send your request.');
-      }
-
-      writeCookie(CONTACT_READY_COOKIE, '1', CONTACT_READY_MAX_AGE);
-
-      const successPayload: LeadSuccessCookiePayload = {
+    const result = await submitLead(payload, {
+      gtmEvent: {
+        event: 'lead_form_submitted',
         projectType: form.projectType,
-        helpTopics: [],
-        helpTopicLabels: [],
-        timeline: form.timeline,
-        timelineLabel: timelineLabel || undefined,
-        timestamp: new Date().toISOString(),
-      };
-      persistLeadSuccessCookie(successPayload);
-      setSuccessMeta(buildSuccessMetaFromPayload(successPayload));
+        helpTopics: '',
+      },
+    });
 
-      try {
-        type GtmWindow = Window & { dataLayer?: Array<Record<string, unknown>> };
-        const gtmWindow = window as GtmWindow;
-        gtmWindow.dataLayer = gtmWindow.dataLayer || [];
-        gtmWindow.dataLayer.push({
-          event: 'lead_form_submitted',
-          projectType: form.projectType,
-          helpTopics: '',
-        });
-      } catch {
-        // ignore GTM errors
+    if (!result.ok) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Lead submission failed', result);
       }
-
-      setForm(INITIAL_STATE);
-      setErrors({});
-      setStatus('success');
-    } catch (error: unknown) {
-      console.error('Lead submission failed', error);
       setStatus('error');
-      const message = error instanceof Error ? error.message : null;
-      setGlobalError(message || 'We could not send your message. Please call us at (941) 866-4320.');
+      setGlobalError(result.error || 'We could not send your message. Please call us at (941) 866-4320.');
+      if (result.fieldErrors) {
+        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
+          if (Array.isArray(messages) && messages.length) {
+            acc[key] = String(messages[0]);
+          }
+          return acc;
+        }, {});
+        if (Object.keys(serverErrors).length) {
+          setErrors(serverErrors);
+        }
+      }
+      return;
     }
+
+    const successPayload: LeadSuccessCookiePayload = {
+      projectType: form.projectType,
+      helpTopics: [],
+      helpTopicLabels: [],
+      timeline: form.timeline,
+      timelineLabel: timelineLabel || undefined,
+      timestamp: new Date().toISOString(),
+    };
+    persistLeadSuccessCookie(successPayload);
+    setSuccessMeta(buildSuccessMetaFromPayload(successPayload));
+
+    setForm(INITIAL_STATE);
+    setErrors({});
+    setGlobalError(null);
+    setStatus('success');
   };
 
   const handleResetSuccess = () => {
@@ -653,7 +659,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
                     name="state"
                     autoComplete="address-level1"
                     value={form.state}
-                    onChange={(event) => setField('state', event.target.value.toUpperCase())}
+                    onChange={(event) => setField('state', normalizeState(event.target.value))}
                     className={cn(INPUT_BASE_CLASS, INPUT_DEFAULT_CLASS, errors.state && INPUT_ERROR_CLASS)}
                     maxLength={2}
                   />
@@ -666,7 +672,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
                     name="zip"
                     autoComplete="postal-code"
                     value={form.zip}
-                    onChange={(event) => setField('zip', event.target.value)}
+                    onChange={(event) => setField('zip', normalizeZip(event.target.value))}
                     className={cn(INPUT_BASE_CLASS, INPUT_DEFAULT_CLASS, errors.zip && INPUT_ERROR_CLASS)}
                     inputMode="numeric"
                     maxLength={10}
@@ -729,7 +735,3 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
     </form>
   );
 }
-type LeadApiResponse = {
-  ok?: boolean;
-  error?: string;
-};

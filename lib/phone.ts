@@ -1,8 +1,17 @@
 const NON_DIGIT_REGEX = /\D/g;
 
-export function stripToPhoneDigits(value: string): string {
+export function stripToDigits(value: string, maxDigits?: number): string {
   if (!value) return '';
   const digits = value.replace(NON_DIGIT_REGEX, '');
+  if (typeof maxDigits === 'number') {
+    return digits.slice(0, maxDigits);
+  }
+  return digits;
+}
+
+export function stripToPhoneDigits(value: string): string {
+  const digits = stripToDigits(value);
+  if (!digits) return '';
   if (digits.startsWith('1')) {
     return digits.slice(0, 11);
   }
@@ -17,18 +26,35 @@ export function isUsPhoneComplete(value: string): boolean {
   return digits.length === 10;
 }
 
+export function normalizePhoneUS(input: string): string | null {
+  const digits = stripToDigits(input);
+  if (digits.length >= 10) {
+    const core = digits.slice(-10);
+    return `+1${core}`;
+  }
+  return null;
+}
+
 export function normalizePhoneForSubmit(value: string): string {
-  const digits = stripToPhoneDigits(value);
-  if (digits.length === 11 && digits.startsWith('1')) {
-    return digits;
+  const digits = stripToDigits(value);
+  if (!digits) return '';
+  if (digits.startsWith('1')) {
+    return digits.slice(0, 11);
   }
-  if (digits.length === 10) {
-    return `1${digits}`;
-  }
-  if (digits.length === 11) {
-    return `1${digits.slice(0, 10)}`;
+  if (digits.length >= 10) {
+    return `1${digits.slice(-10)}`;
   }
   return '';
+}
+
+export function formatPhoneUSForDisplay(value: string): string {
+  const normalized = normalizePhoneUS(value);
+  if (!normalized) return value;
+  const core = normalized.slice(2); // drop "+1"
+  const area = core.slice(0, 3);
+  const mid = core.slice(3, 6);
+  const last = core.slice(6, 10);
+  return `+1 (${area}) ${mid}${last ? `-${last}` : ''}`;
 }
 
 export function formatPhoneForDisplay(value: string): string {

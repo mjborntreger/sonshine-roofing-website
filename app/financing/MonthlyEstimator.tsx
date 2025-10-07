@@ -8,16 +8,23 @@ import Turnstile from '@/components/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/lib/financing-programs';
 import { readCookie, writeCookie } from '@/lib/client-cookies';
 import {
+  CONTACT_READY_COOKIE,
+  CONTACT_READY_MAX_AGE,
   sanitizePhoneInput,
   isUsPhoneComplete,
   normalizePhoneForSubmit,
-  formatPhoneForDisplay,
   formatPhoneExample,
-} from '@/lib/phone';
+  normalizeState,
+  normalizeZip,
+  isValidState,
+  isValidZip,
+  submitLead,
+  type FinancingLeadInput,
+} from '@/lib/contact-lead';
+import { formatPhoneForDisplay } from '@/lib/phone';
 
 const COOKIE_NAME = 'ss_financing_calc';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-const CONTACT_READY_COOKIE = 'ss_lead_contact_ready';
 const EMAIL_DOMAINS = ['.com', '.net', '.org', '.edu', '.gov', '.co', '.us', '.io', '.info', '.biz'];
 
 const US_STATES = [
@@ -323,15 +330,6 @@ type FinancingCookie = {
   scores?: FinancingScores;
 };
 
-type LeadSubmitResponse = {
-  ok?: boolean;
-  error?: string;
-};
-
-type GtmWindow = Window & {
-  dataLayer?: Array<Record<string, unknown>>;
-};
-
 function currency(n: number) {
   return n.toLocaleString(undefined, {
     style: 'currency',
@@ -350,11 +348,6 @@ function isEmailValid(email: string) {
   const basic = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
   if (!basic) return false;
   return EMAIL_DOMAINS.some((suffix) => trimmed.endsWith(suffix));
-}
-
-function isZipValid(zip: string) {
-  const cleaned = zip.replace(/\D/g, '');
-  return cleaned.length === 5;
 }
 
 function parseCookie(raw: string | null): FinancingCookie | null {
@@ -579,13 +572,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     if (currentStep === secondFormStepIndex) {
       if (!formValues.address1.trim()) nextErrors.address1 = 'Enter the property address';
       if (!formValues.city.trim()) nextErrors.city = 'City is required';
-      if (!formValues.state.trim()) nextErrors.state = 'Select a state';
-      if (!isZipValid(formValues.zip)) nextErrors.zip = 'Enter 5-digit ZIP';
+      const stateValue = normalizeState(formValues.state);
+      if (!isValidState(stateValue)) nextErrors.state = 'Select a state';
+      const zipValue = normalizeZip(formValues.zip);
+      if (!isValidZip(zipValue)) nextErrors.zip = 'Enter 5-digit ZIP';
     }
     if (currentStep === thirdFormStepIndex) {
       if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
       if (!isUsPhoneComplete(formValues.phone)) {
-        nextErrors.phone = 'Enter a valid US phone number (10 digits).';
+        nextErrors.phone = 'Enter a valid phone number (10 digits, optional country code).';
       }
     }
     return nextErrors;
@@ -766,29 +761,36 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       return {
         id: question.id,
         question: question.prompt,
-        answerValue,
-        answerLabel: option?.label ?? null,
+        answerValue: answerValue ?? undefined,
+        answerLabel: option?.label,
       };
     });
 
     const scoresResult = computedScores ?? null;
 
-    const payload: Record<string, unknown> = {
+    const stateValue = normalizeState(formValues.state);
+    const zipValue = normalizeZip(formValues.zip);
+
+    const payload: FinancingLeadInput & {
+      quizSummary: typeof quizSummary;
+      submittedAt: string;
+    } = {
       type: 'financing-calculator',
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
       email: formValues.email.trim(),
       phone: normalizePhoneForSubmit(formValues.phone),
       address1: formValues.address1.trim(),
-      address2: formValues.address2.trim(),
+      address2: formValues.address2.trim() || undefined,
       city: formValues.city.trim(),
-      state: formValues.state.trim(),
-      zip: formValues.zip.trim(),
+      state: stateValue,
+      zip: zipValue,
       amount: amountNumber,
       page: '/financing',
       cfToken,
-      hp_field: honeypot,
+      hp_field: honeypot || undefined,
       quizSummary,
+      submittedAt: new Date().toISOString(),
     };
     if (scoresResult) {
       payload.scores = scoresResult;
@@ -797,48 +799,42 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     setSubmission('submitting');
     setGlobalError(null);
 
-    try {
-      const res = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      let json: LeadSubmitResponse = {};
-      try {
-        json = (await res.json()) as LeadSubmitResponse;
-      } catch {
-        json = {};
-      }
-      if (res.ok && json.ok) {
-        setSubmission('idle');
-        setUnlocked(true);
-        setShowCalculator(true);
-        setContactEditMode(false);
-        const nextAmount = amountNumber || defaultAmount;
-        setCalculatorAmount(nextAmount);
-        setSubmittedAmount(nextAmount);
-        const cookiePayload: FinancingCookie = { unlocked: true, amount: nextAmount };
-        if (scoresResult) {
-          cookiePayload.scores = scoresResult;
-        }
-        setPersistedScores(scoresResult);
-        writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
-        writeCookie(CONTACT_READY_COOKIE, '1', COOKIE_MAX_AGE);
-        try {
-          const win = window as GtmWindow;
-          win.dataLayer = win.dataLayer || [];
-          win.dataLayer.push({ event: 'financing_calculator_submit', form: 'monthly_estimator' });
-        } catch {
-          // ignore GTM issues
-        }
-        return;
-      }
+    const result = await submitLead(payload, {
+      gtmEvent: { event: 'financing_calculator_submit', form: 'monthly_estimator' },
+      contactReadyCookieMaxAge: CONTACT_READY_MAX_AGE,
+    });
+
+    if (!result.ok) {
       setSubmission('error');
-      setGlobalError(friendlyError(json.error));
-    } catch {
-      setSubmission('error');
-      setGlobalError('Network error. Please try again.');
+      setGlobalError(friendlyError(result.error));
+      if (result.fieldErrors) {
+        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
+          if (Array.isArray(messages) && messages.length) {
+            acc[key] = String(messages[0]);
+          }
+          return acc;
+        }, {});
+        if (Object.keys(serverErrors).length) {
+          setErrors(serverErrors);
+          setStep(thirdFormStepIndex);
+        }
+      }
+      return;
     }
+
+    setSubmission('idle');
+    setUnlocked(true);
+    setShowCalculator(true);
+    setContactEditMode(false);
+    const nextAmount = amountNumber || defaultAmount;
+    setCalculatorAmount(nextAmount);
+    setSubmittedAmount(nextAmount);
+    const cookiePayload: FinancingCookie = { unlocked: true, amount: nextAmount };
+    if (scoresResult) {
+      cookiePayload.scores = scoresResult;
+    }
+    setPersistedScores(scoresResult);
+    writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
   };
 
   const totalFlowSteps = effectiveLastStepIndex + 1;
@@ -1062,7 +1058,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 className={inputBaseClass}
                 value={formValues.zip}
                 onChange={(e) => {
-                  const digits = e.target.value.replace(/\D/g, '').slice(0, 5);
+                  const digits = normalizeZip(e.target.value);
                   setFormValues((prev) => ({ ...prev, zip: digits }));
                 }}
                 aria-invalid={Boolean(errors.zip)}

@@ -34,31 +34,28 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { writeCookie, deleteCookie } from '@/lib/client-cookies';
+import { deleteCookie } from '@/lib/client-cookies';
 import {
-  CONTACT_READY_COOKIE,
-  CONTACT_READY_MAX_AGE,
   LEAD_SUCCESS_COOKIE,
   LeadSuccessCookiePayload,
   SuccessMeta,
   parseLeadSuccessCookie,
   persistLeadSuccessCookie,
   sanitizePhoneInput,
-  normalizePhoneForSubmit,
-  isUsPhoneComplete,
   formatPhoneExample,
-  validateEmail,
+  DEFAULT_PREFERRED_CONTACT,
+  type PreferredContactValue,
+  normalizeState,
+  normalizeZip,
+  submitLead,
+  type ContactLeadInput,
+  buildContactLeadPayload,
+  type ContactLeadResourceLink,
+  validateContactIdentityDraft,
+  validateContactAddressDraft,
 } from '@/lib/contact-lead';
 import SmartLink from './SmartLink';
 
-type LeadApiResponse = {
-  ok?: boolean;
-  error?: string;
-};
-
-type DataLayerWindow = Window & {
-  dataLayer?: Array<Record<string, unknown>>;
-};
 
 type LeadSuccessRestore = {
   formPreset: Partial<FormState>;
@@ -107,8 +104,6 @@ type ResourceLink = {
   icon: LucideIcon;
   external?: boolean;
 };
-
-type ResourceLinkPayload = Pick<ResourceLink, 'label' | 'description' | 'href' | 'external'>;
 
 const PROJECT_OPTIONS: ProjectOption[] = [
   {
@@ -398,7 +393,7 @@ interface FormState {
   city: string;
   state: string;
   zip: string;
-  preferredContact: string;
+  preferredContact: PreferredContactValue;
   bestTime: string;
   consentSms: boolean;
 }
@@ -417,7 +412,7 @@ const INITIAL_STATE: FormState = {
   city: '',
   state: 'FL',
   zip: '',
-  preferredContact: 'phone-call',
+  preferredContact: DEFAULT_PREFERRED_CONTACT,
   bestTime: '',
   consentSms: false,
 };
@@ -506,6 +501,13 @@ function formReducer(state: FormState, action: Action): FormState {
 
 const STEP_ORDER: StepId[] = ['need', 'context', 'contact', 'schedule'];
 
+const STEP_FIELD_KEYS: Record<StepId, ReadonlyArray<keyof FormState>> = {
+  need: ['projectType'],
+  context: ['helpTopics', 'timeline', 'notes'],
+  contact: ['firstName', 'lastName', 'email', 'phone'],
+  schedule: ['address1', 'city', 'state', 'zip', 'bestTime'],
+};
+
 function validateStep(step: StepId, data: FormState): FieldErrors {
   const errors: FieldErrors = {};
   if (step === 'need') {
@@ -530,18 +532,23 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
   if (step === 'contact') {
     if (!data.firstName.trim()) errors.firstName = 'Enter your first name.';
     if (!data.lastName.trim()) errors.lastName = 'Enter your last name.';
-    if (!validateEmail(data.email)) errors.email = 'Enter a valid email (example@domain.com).';
-    if (!isUsPhoneComplete(data.phone)) {
-      errors.phone = 'Enter a valid US phone number (10 digits).';
-    }
+    const identityErrors = validateContactIdentityDraft({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+    });
+    Object.assign(errors, identityErrors);
   }
   if (step === 'schedule') {
-    if (!data.address1.trim()) errors.address1 = 'Enter your street address.';
-    if (!data.city.trim()) errors.city = 'City is required.';
-    if (!data.state.trim()) errors.state = 'State is required.';
-    if (sanitizePhoneInput(data.zip).length !== 5 && data.zip.trim().length !== 5) {
-      errors.zip = 'ZIP should be 5 digits.';
-    }
+    const addressErrors = validateContactAddressDraft({
+      address1: data.address1,
+      address2: data.address2,
+      city: data.city,
+      state: data.state,
+      zip: data.zip,
+    });
+    Object.assign(errors, addressErrors);
     if (!data.bestTime) errors.bestTime = 'Pick the time that works best.';
   }
   return errors;
@@ -742,13 +749,7 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
       ? BEST_TIME_OPTIONS.find((option) => option.value === form.bestTime)?.label || form.bestTime
       : '';
     const notesText = form.notes.trim();
-    const contextSummaryParts: string[] = [];
-    if (notesText) contextSummaryParts.push(`Note from the customer: ${notesText}.`);
-    if (bestTimeLabel) contextSummaryParts.push(`Best time to contact: ${bestTimeLabel}.`);
-    if (timelineLabel) contextSummaryParts.push(`Project timeline: ${timelineLabel}.`);
-    const contextSummary = contextSummaryParts.join(' ');
-
-    const resourceLinksForPayload: ResourceLinkPayload[] = getSuccessLinks(form.projectType).map(
+    const resourceLinksForPayload: ContactLeadResourceLink[] = getSuccessLinks(form.projectType).map(
       ({ label, description, href, external }) => ({
         label,
         description,
@@ -757,88 +758,98 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
       })
     );
 
-    const payload: Record<string, unknown> = {
-      type: 'contact-lead',
+    const basePayload = buildContactLeadPayload({
       projectType: form.projectType,
-      helpTopics: helpSummary || undefined,
-      timeline: timelineLabel || undefined,
+      helpSummary: helpSummary || undefined,
+      timelineLabel: timelineLabel || undefined,
       notes: notesText || undefined,
-      firstName: form.firstName.trim(),
-      lastName: form.lastName.trim(),
-      email: form.email.trim(),
-      phone: normalizePhoneForSubmit(form.phone),
-      address1: form.address1.trim(),
-      address2: form.address2.trim() || undefined,
-      city: form.city.trim(),
-      state: form.state.trim(),
-      zip: form.zip.trim(),
       preferredContact: form.preferredContact,
-      bestTime: bestTimeLabel || undefined,
+      bestTimeLabel: bestTimeLabel || undefined,
       consentSms: form.consentSms,
-      cfToken,
-      hp_field: honeypot,
+      identity: {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+      },
+      address: {
+        address1: form.address1,
+        address2: form.address2,
+        city: form.city,
+        state: form.state,
+        zip: form.zip,
+      },
+      resourceLinks: resourceLinksForPayload,
       page: '/contact-us',
+    });
+
+    const payload: ContactLeadInput & {
+      submittedAt: string;
+      resourceLinks?: ContactLeadResourceLink[];
+    } = {
+      ...basePayload,
+      cfToken,
+      hp_field: honeypot || undefined,
       submittedAt: new Date().toISOString(),
     };
-
-    if (contextSummary) payload.contextSummary = contextSummary;
-    if (resourceLinksForPayload.length) payload.resourceLinks = resourceLinksForPayload;
 
     if (utm.source) payload.utm_source = utm.source;
     if (utm.medium) payload.utm_medium = utm.medium;
     if (utm.campaign) payload.utm_campaign = utm.campaign;
 
-    try {
-      const res = await fetch('/api/lead', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      let json: LeadApiResponse = {};
-      try {
-        json = (await res.json()) as LeadApiResponse;
-      } catch {
-        json = {};
-      }
-      if (!res.ok || !json.ok) {
-        throw new Error(json.error || 'Unable to send your request.');
-      }
-      setStatus('success');
-      setErrors({});
-      writeCookie(CONTACT_READY_COOKIE, '1', CONTACT_READY_MAX_AGE);
-      const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
-      const timelineLabelDisplay = timelineLabel || getTimelineLabelForDisplay(form.projectType, form.timeline) || null;
-      const successPayload: LeadSuccessCookiePayload = {
+    const result = await submitLead(payload, {
+      gtmEvent: {
+        event: 'lead_form_submitted',
         projectType: form.projectType,
-        helpTopics: form.helpTopics,
-        helpTopicLabels,
-        timeline: form.timeline,
-        timelineLabel: timelineLabelDisplay || undefined,
-        timestamp: new Date().toISOString(),
-      };
-      persistLeadSuccessCookie(successPayload);
-      setSuccessMeta({
-        projectType: form.projectType,
-        helpTopicLabels,
-        timelineLabel: timelineLabelDisplay,
-      });
-      try {
-        const win = window as DataLayerWindow;
-        win.dataLayer = win.dataLayer || [];
-        win.dataLayer.push({
-          event: 'lead_form_submitted',
-          projectType: form.projectType,
-          helpTopics: helpSummary,
-        });
-      } catch {
-        // swallow GTM errors
+        helpTopics: helpSummary,
+      },
+    });
+
+    if (!result.ok) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('Lead submission failed', result);
       }
-    } catch (error: unknown) {
-      console.error('Lead submission failed', error);
       setStatus('error');
-      const message = error instanceof Error ? error.message : null;
-      setGlobalError(message || 'We could not send your message. Please call us at (941) 866-4320.');
+      setGlobalError(result.error || 'We could not send your message. Please call us at (941) 866-4320.');
+      if (result.fieldErrors) {
+        const serverErrors = Object.entries(result.fieldErrors).reduce<FieldErrors>((acc, [key, messages]) => {
+          if (Array.isArray(messages) && messages.length) {
+            acc[key] = String(messages[0]);
+          }
+          return acc;
+        }, {});
+        if (Object.keys(serverErrors).length) {
+          setErrors(serverErrors);
+          const firstErrorStepIndex = STEP_ORDER.findIndex((step) =>
+            STEP_FIELD_KEYS[step].some((field) => field in serverErrors)
+          );
+          if (firstErrorStepIndex >= 0) {
+            setActiveStepIndex(firstErrorStepIndex);
+          }
+        }
+      }
+      return;
     }
+
+    setStatus('success');
+    setErrors({});
+    setGlobalError(null);
+    const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
+    const timelineLabelDisplay = timelineLabel || getTimelineLabelForDisplay(form.projectType, form.timeline) || null;
+    const successPayload: LeadSuccessCookiePayload = {
+      projectType: form.projectType,
+      helpTopics: form.helpTopics,
+      helpTopicLabels,
+      timeline: form.timeline,
+      timelineLabel: timelineLabelDisplay || undefined,
+      timestamp: new Date().toISOString(),
+    };
+    persistLeadSuccessCookie(successPayload);
+    setSuccessMeta({
+      projectType: form.projectType,
+      helpTopicLabels,
+      timelineLabel: timelineLabelDisplay,
+    });
   };
 
   const getStepMeta = (stepId: StepId) => {
@@ -1335,7 +1346,7 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
                       name="state"
                       autoComplete="address-level1"
                       value={form.state}
-                      onChange={(event) => onSelect('state', event.target.value.toUpperCase().slice(0, 2))}
+                      onChange={(event) => onSelect('state', normalizeState(event.target.value))}
                       className={cn(
                         INPUT_BASE_CLASS,
                         'uppercase',
@@ -1355,7 +1366,7 @@ export default function LeadForm({ initialSuccessCookie }: { initialSuccessCooki
                       maxLength={5}
                       autoComplete="postal-code"
                       value={form.zip}
-                      onChange={(event) => onSelect('zip', event.target.value.replace(/[^0-9]/g, '').slice(0, 5))}
+                      onChange={(event) => onSelect('zip', normalizeZip(event.target.value))}
                       className={cn(
                         INPUT_BASE_CLASS,
                         errors.zip ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS

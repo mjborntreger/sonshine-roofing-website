@@ -8,6 +8,7 @@ import {
   type SpecialOfferLeadInput,
   type ContactLeadInput,
 } from '@/lib/validation';
+import { formatPhoneUSForDisplay } from '@/lib/phone';
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -90,38 +91,35 @@ type ForwardConfig = {
 };
 
 function resolveForwardConfig(type: LeadInput['type']): ForwardConfig | null {
-  const candidates: Array<ForwardConfig | null> = [];
-
   const sharedUrl = process.env.LEAD_ENDPOINT_URL;
   const sharedSecret = process.env.LEAD_FORWARD_SECRET;
   if (sharedUrl && sharedSecret) {
-    candidates.push({ url: sharedUrl, secret: sharedSecret });
+    return { url: sharedUrl, secret: sharedSecret };
   }
 
-  if (type === 'financing-calculator') {
-    const url = process.env.FINANCING_LEAD_ENDPOINT_URL;
-    const secret = process.env.FINANCING_LEAD_FORWARD_SECRET;
-    if (url && secret) candidates.push({ url, secret });
+  const typeSpecific: Partial<Record<LeadInput['type'], ForwardConfig | null>> = {
+    'financing-calculator':
+      process.env.FINANCING_LEAD_ENDPOINT_URL && process.env.FINANCING_LEAD_FORWARD_SECRET
+        ? { url: process.env.FINANCING_LEAD_ENDPOINT_URL, secret: process.env.FINANCING_LEAD_FORWARD_SECRET }
+        : null,
+    feedback:
+      process.env.FEEDBACK_ENDPOINT_URL && process.env.FEEDBACK_FORWARD_SECRET
+        ? { url: process.env.FEEDBACK_ENDPOINT_URL, secret: process.env.FEEDBACK_FORWARD_SECRET }
+        : null,
+    'special-offer':
+      process.env.SPECIAL_OFFER_ENDPOINT_URL && process.env.SPECIAL_OFFER_FORWARD_SECRET
+        ? { url: process.env.SPECIAL_OFFER_ENDPOINT_URL, secret: process.env.SPECIAL_OFFER_FORWARD_SECRET }
+        : process.env.FEEDBACK_ENDPOINT_URL && process.env.FEEDBACK_FORWARD_SECRET
+          ? { url: process.env.FEEDBACK_ENDPOINT_URL, secret: process.env.FEEDBACK_FORWARD_SECRET }
+          : null,
+    'contact-lead': null,
+  };
+
+  const resolved = typeSpecific[type] ?? null;
+  if (!resolved && process.env.NODE_ENV !== 'production') {
+    console.warn(`Lead forward config missing for type "${type}". Check environment variables.`);
   }
-
-  if (type === 'feedback') {
-    const url = process.env.FEEDBACK_ENDPOINT_URL;
-    const secret = process.env.FEEDBACK_FORWARD_SECRET;
-    if (url && secret) candidates.push({ url, secret });
-  }
-
-  if (type === 'special-offer') {
-    const offerUrl = process.env.SPECIAL_OFFER_ENDPOINT_URL;
-    const offerSecret = process.env.SPECIAL_OFFER_FORWARD_SECRET;
-    if (offerUrl && offerSecret) candidates.push({ url: offerUrl, secret: offerSecret });
-
-    // As a final fallback, reuse the feedback endpoint (historically handled marketing leads)
-    const feedbackUrl = process.env.FEEDBACK_ENDPOINT_URL;
-    const feedbackSecret = process.env.FEEDBACK_FORWARD_SECRET;
-    if (feedbackUrl && feedbackSecret) candidates.push({ url: feedbackUrl, secret: feedbackSecret });
-  }
-
-  return candidates.find((candidate): candidate is ForwardConfig => candidate !== null) ?? null;
+  return resolved;
 }
 
 function attachTracking(target: Record<string, unknown>, lead: LeadInput) {
@@ -138,14 +136,16 @@ function buildFinancingPayload(data: FinancingLeadInput) {
     currency: 'USD',
     maximumFractionDigits: 0,
   });
+  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
 
-  const summaryLines = Array.isArray(data.quizSummary)
-    ? data.quizSummary.map((item) => {
-        if (item.answerLabel) return `• ${item.answerLabel} — ${item.question}`;
-        if (item.answer === 'yes') return `✅ ${item.question}`;
-        if (item.answer === 'no') return `❌ ${item.question}`;
-        return `• ${item.question}`;
-      })
+  const quizSummary = Array.isArray(data.quizSummary)
+    ? data.quizSummary.map((item) => ({
+        id: item.id,
+        question: item.question,
+        answerLabel: item.answerLabel,
+        answerValue: item.answerValue,
+        answer: item.answer,
+      }))
     : [];
 
   const matchLabelMap: Record<string, string> = {
@@ -157,29 +157,6 @@ function buildFinancingPayload(data: FinancingLeadInput) {
     `Financing calculator unlock request from ${fullName} for ${data.address1}, ${data.city}, ${data.state} ${data.zip}. Estimated project total: ${formattedAmount}.`,
   ];
 
-  if (summaryLines.length) {
-    messageLines.push('', 'Quiz snapshots:', ...summaryLines);
-  }
-
-  if (data.scores) {
-    messageLines.push(
-      '',
-      `Program fit scores: Service Finance ${Math.round(data.scores.serviceFinanceScore)}%, YGrene ${Math.round(data.scores.ygreneScore)}%`,
-    );
-    if (data.scores.isUncertain) {
-      messageLines.push('Both scores are below 50% — team follow-up recommended.');
-    }
-  } else if (data.match) {
-    const matchLabel = matchLabelMap[data.match.program] || data.match.program;
-    messageLines.push(
-      '',
-      `Likely fit: ${matchLabel} (${Math.round(data.match.score)}% match)`,
-    );
-    if (Array.isArray(data.match.reasons) && data.match.reasons.length) {
-      messageLines.push(...data.match.reasons.map((reason) => `• ${reason}`));
-    }
-  }
-
   const payload: Record<string, unknown> = {
     type: 'financing-calculator',
     name: fullName,
@@ -187,6 +164,7 @@ function buildFinancingPayload(data: FinancingLeadInput) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    phoneDisplay,
     address1: data.address1,
     address2: data.address2 || '',
     city: data.city,
@@ -195,7 +173,7 @@ function buildFinancingPayload(data: FinancingLeadInput) {
     amount: data.amount,
     page: data.page || '/financing',
     message: messageLines.join('\n'),
-    quizSummary: summaryLines,
+    quizSummary,
   };
 
   attachTracking(payload, data);
@@ -216,6 +194,7 @@ function buildFinancingPayload(data: FinancingLeadInput) {
 
 function buildFeedbackPayload(data: FeedbackLeadInput) {
   const fullName = `${data.firstName} ${data.lastName}`.trim();
+  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
 
   const payload: Record<string, unknown> = {
     type: 'feedback',
@@ -224,6 +203,7 @@ function buildFeedbackPayload(data: FeedbackLeadInput) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    phoneDisplay,
     rating: String(data.rating),
     message: data.message,
     page: data.page || '/tell-us-why',
@@ -238,6 +218,7 @@ function buildFeedbackPayload(data: FeedbackLeadInput) {
 
 function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
   const fullName = `${data.firstName} ${data.lastName}`.trim();
+  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
 
   const messageLines = [
     `Special offer claim from ${fullName}.`,
@@ -260,6 +241,7 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    phoneDisplay,
     offerCode: data.offerCode,
     offerSlug: data.offerSlug,
     offerTitle: data.offerTitle,
@@ -274,6 +256,7 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
 
 function buildContactPayload(data: ContactLeadInput) {
   const fullName = `${data.firstName} ${data.lastName}`.trim();
+  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
 
   const payload: Record<string, unknown> = {
     type: 'contact-lead',
@@ -282,6 +265,7 @@ function buildContactPayload(data: ContactLeadInput) {
     lastName: data.lastName,
     email: data.email,
     phone: data.phone,
+    phoneDisplay,
     projectType: data.projectType,
     helpTopics: data.helpTopics || '',
     timeline: data.timeline || '',
@@ -311,6 +295,7 @@ function buildContactPayload(data: ContactLeadInput) {
 async function forwardToWP(type: LeadInput['type'], payload: Record<string, unknown>) {
   const resolved = resolveForwardConfig(type);
   if (!resolved) {
+    console.error('forwardToWP: missing forward configuration', { type });
     return { ok: false, status: 500, error: 'Server misconfigured (lead endpoint)' } as const;
   }
 
@@ -343,17 +328,28 @@ async function forwardToWP(type: LeadInput['type'], payload: Record<string, unkn
     const errorMessage = typeof dataRecord.error === 'string' ? dataRecord.error : 'Upstream send failed';
 
     if (!res.ok || !upstreamOk) {
+      console.error('forwardToWP: upstream rejected lead', {
+        type,
+        status: res.status,
+        upstreamOk,
+        error: errorMessage,
+      });
       return { ok: false, status: res.status || 502, error: errorMessage } as const;
     }
     return { ok: true } as const;
   } catch (err: unknown) {
     clearTimeout(timeout);
     if (err instanceof Error && err.name === 'AbortError') {
+      console.error('forwardToWP: upstream timeout', { type });
       return { ok: false, status: 504, error: 'Upstream timeout' } as const;
     }
     if (process.env.NODE_ENV !== 'production') {
       console.error('Lead forward error', err);
     }
+    console.error('forwardToWP: upstream error', {
+      type,
+      error: err instanceof Error ? err.message : String(err),
+    });
     return { ok: false, status: 502, error: 'Upstream error' } as const;
   }
 }
