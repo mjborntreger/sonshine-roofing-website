@@ -167,7 +167,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
       <ShareWhatYouThink />
 
       {/* Two-column layout */}
-      <div className="mt-6 grid grid-cols-1 items-start gap-8 lg:grid-cols-[4fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 items-start gap-8 lg:grid-cols-[4fr_2fr]">
         {/* Left column: Video facade (fallback to image) + badges */}
         <div>
           {videoId ? (
@@ -204,7 +204,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
         </div>
 
         {/* Right column: Project Details + Products */}
-        <div className="prose">
+        <div className="prose rounded-3xl border-slate-200 p-6 bg-white shadow-md">
           {project.projectDescription && (
             <>
               <h3>Project Details</h3>
