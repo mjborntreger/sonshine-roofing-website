@@ -2,6 +2,7 @@ import Image from "next/image";
 import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { getProjectBySlug, listProjectSlugs } from "@/lib/wp";
 import ProjectVideo from "./ProjectVideo";
 import ShareWhatYouThink from "@/components/ShareWhatYouThink";
@@ -32,13 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
 
   const project = await getProjectBySlug(slug).catch(() => null);
-  if (!project) {
-    return buildArticleMetadata({
-      title: "Project Not Found · SonShine Roofing",
-      description: "This project could not be found.",
-      path: `/project/${slug}`,
-    });
-  }
+  if (!project) notFound();
 
   const seo = project.seo ?? {};
   const og = seo.openGraph ?? {};
@@ -98,20 +93,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
   const { slug } = await props.params;
   const project = await getProjectBySlug(slug);
 
-  if (!project) {
-    return (
-      <Section>
-        <h1>Project Not Found</h1>
-        <p>
-          Try our{" "}
-          <SmartLink className="text-brand-blue underline" href="/project">
-            Project Gallery
-          </SmartLink>
-          .
-        </p>
-      </Section>
-    );
-  }
+  if (!project) notFound();
 
   const videoId = getYouTubeId(project.youtubeUrl);
   const hasAnyBadges =

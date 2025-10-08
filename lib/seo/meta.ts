@@ -8,6 +8,20 @@ export type OgImageInput = {
 };
 
 type OpenGraphMetadata = NonNullable<Metadata["openGraph"]>;
+type OpenGraphWithType = Extract<OpenGraphMetadata, { type: string }>;
+type OpenGraphType = OpenGraphWithType["type"];
+type TypedOpenGraph<TType extends OpenGraphType> = Extract<OpenGraphWithType, { type: TType }>;
+
+function ensureOpenGraphType<TType extends OpenGraphType>(
+  openGraph: Metadata["openGraph"],
+  type: TType,
+): TypedOpenGraph<TType> {
+  return {
+    ...(openGraph ?? {}),
+    type,
+  } as TypedOpenGraph<TType>;
+}
+
 export const DEFAULT_OG_IMAGE: Required<Omit<OgImageInput, "alt">> & { alt?: string } = {
   url: "/og-default.png",
   width: 1200,
@@ -31,7 +45,7 @@ export type BasicMetadataInput = {
   keywords?: string[];
   image?: OgImageInput;
   robots?: Metadata["robots"];
-  openGraphType?: OpenGraphMetadata["type"];
+  openGraphType?: OpenGraphType;
 };
 
 export function buildBasicMetadata({
@@ -91,25 +105,15 @@ export function buildArticleMetadata({
     openGraphType: "article",
   });
 
-  metadata.openGraph = metadata.openGraph ?? {};
-  metadata.openGraph.type = "article";
+  const openGraph = ensureOpenGraphType(metadata.openGraph, "article");
 
-  if (publishedTime || modifiedTime || authors?.length || section || tags?.length) {
-    metadata.openGraph.article = {
-      publishedTime: publishedTime ?? undefined,
-      modifiedTime: modifiedTime ?? undefined,
-      authors,
-      section: section ?? undefined,
-      tags,
-    };
-  }
+  if (publishedTime) openGraph.publishedTime = publishedTime;
+  if (modifiedTime) openGraph.modifiedTime = modifiedTime;
+  if (authors?.length) openGraph.authors = authors;
+  if (section) openGraph.section = section;
+  if (tags?.length) openGraph.tags = tags;
 
-  if (authors?.length) {
-    metadata.openGraph = {
-      ...metadata.openGraph,
-      authors,
-    };
-  }
+  metadata.openGraph = openGraph;
 
   return metadata;
 }
@@ -144,17 +148,16 @@ export function buildProfileMetadata({
     openGraphType: "profile",
   });
 
-  metadata.openGraph = metadata.openGraph ?? {};
-  metadata.openGraph.type = "profile";
+  const openGraph = ensureOpenGraphType(metadata.openGraph, "profile");
 
   if (profile) {
-    metadata.openGraph.profile = {
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      username: profile.username,
-      gender: profile.gender,
-    };
+    openGraph.firstName = profile.firstName ?? undefined;
+    openGraph.lastName = profile.lastName ?? undefined;
+    openGraph.username = profile.username ?? undefined;
+    openGraph.gender = profile.gender ?? undefined;
   }
+
+  metadata.openGraph = openGraph;
 
   return metadata;
 }

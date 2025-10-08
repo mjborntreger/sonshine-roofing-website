@@ -10,6 +10,7 @@ import ShareWhatYouThink from "@/components/ShareWhatYouThink";
 import TocFromHeadings from "@/components/TocFromHeadings";
 import SidebarCta from "@/components/SidebarCta";
 import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { blogPostingSchema } from "@/lib/seo/schema";
@@ -167,16 +168,11 @@ export async function generateStaticParams() {
 // -------- Metadata (SEO) --------
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  if (slug.startsWith("_")) notFound();
 
   // Use unified post fetcher (deduped with page) that now includes RankMath SEO
   const post = await getPostBySlug(slug);
-  if (!post) {
-    return buildArticleMetadata({
-      title: "Post Not Found | SonShine Roofing",
-      description: "This article could not be found.",
-      path: `/${slug}`,
-    });
-  }
+  if (!post) notFound();
 
   const seo = post.seo ?? {};
   const og = seo.openGraph ?? {};
@@ -209,22 +205,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 // -------- Page --------
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (slug.startsWith("_")) notFound();
   const post = await getPostBySlug(slug);
 
-  if (!post) {
-    return (
-      <Section>
-        <h1>Post Not Found</h1>
-        <p>
-          Try our{" "}
-          <Link className="text-[#0045d7] underline" href="/blog">
-            Blog
-          </Link>
-          .
-        </p>
-      </Section>
-    );
-  }
+  if (!post) notFound();
 
   const origin = await getBaseUrlFromHeaders();
   const shareUrl = `${origin}/${slug}`;

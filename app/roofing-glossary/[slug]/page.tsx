@@ -3,8 +3,8 @@ import Link from 'next/link';
 import SmartLink from '@/components/SmartLink';
 import { createElement, Fragment, ReactNode } from 'react';
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { getGlossaryTerm, listGlossaryIndex, stripHtml } from '@/lib/wp';
-import { suggest } from '@/lib/fuzzy';
 import type { Metadata } from 'next';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
@@ -276,22 +276,11 @@ function renderGlossaryHtml(
 export const revalidate = 86400;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  // Defaults if a term is missing (EDIT if you want different fallbacks)
-  const fallbackTitle = 'Roofing Glossary | SonShine Roofing';
-  const fallbackDesc = 'Plain-English definitions of common roofing terms used across Sarasota, Manatee, and Charlotte Counties.';
-
   const { slug } = await params;
-  const fallbackMetadata = buildBasicMetadata({
-    title: fallbackTitle,
-    description: fallbackDesc,
-    path: '/roofing-glossary',
-    image: { url: '/og-default.png', width: 1200, height: 630 },
-  });
-  fallbackMetadata.robots = { index: true, follow: true };
 
   try {
     const term = await getGlossaryTerm(slug);
-    if (!term) return fallbackMetadata;
+    if (!term) notFound();
 
     const title = `${term.title} | Roofing Glossary`;
     const description = stripHtml(term.contentHtml || '').slice(0, 160);
@@ -305,7 +294,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     metadata.robots = { index: true, follow: true };
     return metadata;
   } catch {
-    return fallbackMetadata;
+    notFound();
   }
 }
 
@@ -322,44 +311,7 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
     getGlossaryTerm(slug),
   ]);
 
-  // If not found, show a friendly suggestion list ("Did you mean …")
-  if (!term) {
-    const q = slug || '';
-    const scored = suggest(q, index, 5).map((t) => ({ t }));
-
-    return (
-      <Section>
-        <div className="container-edge py-12">
-          <nav className="mb-6 text-sm text-slate-600">
-            <Link href="/roofing-glossary" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← Back to Glossary</Link>
-          </nav>
-
-          <h1 className="text-2xl font-semibold">We couldn’t find that term</h1>
-          <p className="mt-2 text-slate-700">
-            No glossary entry for <span className="font-semibold">“{decodeURIComponent(q)}”</span>.
-          </p>
-
-          {scored.length > 0 && (
-            <div className="mt-6">
-              <p className="text-sm text-slate-600">Did you mean:</p>
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {scored.map(({ t }) => (
-                  <li key={t.slug}>
-                    <Link
-                      href={`/roofing-glossary/${t.slug}`}
-                      className="inline-flex min-w-0 max-w-full items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-sm hover:bg-slate-50"
-                    >
-                      <span className="block max-w-full truncate">{t.title}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </Section>
-    );
-  }
+  if (!term) notFound();
 
   // Compute prev/next from the index
   const pos = index.findIndex((t) => t.slug === slug);

@@ -2,9 +2,9 @@ import Section from '@/components/layout/Section';
 import Link from 'next/link';
 import type { Route } from 'next';
 import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
 import { getFaq, listFaqIndex, listFaqSlugs } from '@/lib/wp';
 import type { FaqSummary } from '@/lib/wp';
-import { suggest } from '@/lib/fuzzy';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, faqSchema } from '@/lib/seo/schema';
@@ -24,6 +24,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const faq = await getFaq(slug).catch(() => null);
+  if (!faq) notFound();
   const title = faq?.title ? `${faq.title} – FAQ` : 'FAQ';
   const desc = faq?.contentHtml ? stripTags(faq.contentHtml).slice(0, 155) : 'Common roofing questions answered by SonShine Roofing.';
   const metadata = buildBasicMetadata({
@@ -39,40 +40,7 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const faq = await getFaq(slug).catch(() => null);
 
-  if (!faq) {
-    // Build quick suggestions from the index
-    const pool: FaqSummary[] = await listFaqIndex(600).catch(() => []);
-    const suggestions = suggest(slug.replace(/[-_]+/g, ' '), pool.map((p) => ({ title: p.title, slug: p.slug })), 5);
-
-    return (
-      <Section>
-        <div className="container-edge py-8">
-          <h1 className="text-2xl font-semibold">We couldn’t find that FAQ</h1>
-          <p className="mt-2 text-slate-600">Try one of these related questions or browse the full FAQ archive.</p>
-
-          {suggestions.length > 0 ? (
-            <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-              {suggestions.map((s) => {
-                const href = (`/faq/${s.slug}`) as Route;
-                return (
-                  <li key={s.slug}>
-                    <Link href={href} className="block rounded-lg border border-slate-200 bg-white p-4 hover:bg-slate-50">
-                      {s.title}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : null}
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/faq" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← All FAQs</Link>
-            <Link href={{ pathname: '/contact-us', hash: 'book-an-appointment' }} className="rounded-md bg-[#0045d7] px-4 py-2 text-sm font-semibold text-white hover:brightness-110">Still stuck? Contact us</Link>
-          </div>
-        </div>
-      </Section>
-    );
-  }
+  if (!faq) notFound();
 
   // Build prev/next from index (alphabetical by title)
   const index = await listFaqIndex(1000).catch(() => [] as FaqSummary[]);
