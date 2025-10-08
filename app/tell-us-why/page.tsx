@@ -10,8 +10,10 @@ const ratingValueLookup: Record<RatingString, 1 | 2 | 3> = {
   '3': 3,
 };
 
+type TellUsWhySearchParams = Record<string, string | string[] | undefined>;
+
 type TellUsWhyPageProps = {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<TellUsWhySearchParams>;
 };
 
 function toRatingString(input: string | string[] | undefined): RatingString {
@@ -24,8 +26,9 @@ function toRatingString(input: string | string[] | undefined): RatingString {
   return '3';
 }
 
-export default function TellUsWhyPage({ searchParams }: TellUsWhyPageProps) {
-  const ratingParam = searchParams?.rating;
+export default async function TellUsWhyPage({ searchParams }: TellUsWhyPageProps) {
+  const params = searchParams ? await searchParams : ({} as TellUsWhySearchParams);
+  const ratingParam = params.rating;
   const rating = toRatingString(ratingParam);
   const ratingValue = ratingValueLookup[rating];
 
