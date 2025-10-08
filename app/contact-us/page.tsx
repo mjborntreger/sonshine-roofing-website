@@ -60,13 +60,14 @@ const extractUtm = (params: Record<string, string | string[] | undefined>): Lead
 });
 
 export default async function Page({
-  searchParams = {},
+  searchParams,
 }: {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const resolvedSearchParams = (await searchParams) ?? {};
   const cookieStore = await cookies();
   const leadSuccessCookie = cookieStore.get(LEAD_SUCCESS_COOKIE)?.value ?? null;
-  const utm = extractUtm(searchParams ?? {});
+  const utm = extractUtm(resolvedSearchParams);
   const origin = resolveSiteOrigin(await headers());
   const config = SERVICE_CONFIG;
   const breadcrumbsConfig =

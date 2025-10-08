@@ -86,13 +86,14 @@ const extractUtm = (params: Record<string, string | string[] | undefined>): Lead
 });
 
 export default async function Page({
-  searchParams = {},
+  searchParams,
 }: {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const resolvedSearchParams = (await searchParams) ?? {};
   const cookieStore = await cookies();
   const leadSuccessCookie = cookieStore.get('ss_lead_form_success')?.value ?? null;
-  const utm = extractUtm(searchParams ?? {});
+  const utm = extractUtm(resolvedSearchParams);
   const projects = await listRecentProjectsPoolForFilters(4, 8);
   const posts = await listRecentPostsPoolForFilters(4, 4);
   const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
