@@ -1,3 +1,5 @@
+import { faqSchema, videoObjectSchema } from "@/lib/seo/schema";
+import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
 import type { PageInfo, PageResult } from "./pagination";
 
 type Json = Record<string, unknown>;
@@ -918,18 +920,27 @@ export function faqItemsToJsonLd(
   items: Array<{ question: string; answerHtml: string; url?: string }>,
   pageUrl?: string
 ) {
-  const mainEntity = items.map((i) => {
-    const q: UnknownRecord = {
-      "@type": "Question",
-      name: i.question,
-      acceptedAnswer: { "@type": "Answer", text: i.answerHtml },
-    };
-    if (i.url) q.url = i.url;
-    return q;
-  });
-  const out: UnknownRecord = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity };
-  if (pageUrl) out.url = pageUrl;
-  return out;
+  const origin =
+    pageUrl && pageUrl.startsWith("http")
+      ? (() => {
+          try {
+            return new URL(pageUrl).origin;
+          } catch {
+            return SITE_ORIGIN;
+          }
+        })()
+      : SITE_ORIGIN;
+  return faqSchema(
+    items.map((item) => ({
+      question: item.question,
+      answerHtml: item.answerHtml,
+      url: item.url,
+    })),
+    {
+      url: pageUrl,
+      origin: origin ?? SITE_ORIGIN,
+    },
+  );
 }
 
 /**
@@ -1293,7 +1304,16 @@ export async function getVideoEntryBySlug(slug: string): Promise<VideoItem | nul
 }
 
 export function videoJsonLd(video: VideoItem, base: string): Record<string, unknown> {
-  const baseUrl = typeof base === "string" ? base.trim().replace(/\/$/, "") : "";
+  const origin =
+    base && base.startsWith("http")
+      ? (() => {
+          try {
+            return new URL(base).origin;
+          } catch {
+            return SITE_ORIGIN;
+          }
+        })()
+      : SITE_ORIGIN;
   const seo = video.seo;
   const openGraph = isRecord(seo?.openGraph) ? (seo?.openGraph as UnknownRecord) : undefined;
   const ogImage = isRecord(openGraph?.image) ? (openGraph?.image as UnknownRecord) : null;
@@ -1320,29 +1340,27 @@ export function videoJsonLd(video: VideoItem, base: string): Record<string, unkn
   if (video.thumbnailUrl) thumbnailCandidates.push(video.thumbnailUrl);
   const thumbnailUrl = Array.from(new Set(thumbnailCandidates.filter(Boolean)));
 
-  const uploadDate =
-    video.date && !Number.isNaN(Date.parse(video.date)) ? new Date(video.date).toISOString() : undefined;
-
   const slugOrId = video.slug || video.youtubeId || video.id;
-  const defaultLanding =
-    slugOrId && baseUrl ? `${baseUrl}/video-library?v=${encodeURIComponent(slugOrId)}` : undefined;
-  const canonical =
-    (typeof seo?.canonicalUrl === "string" && seo.canonicalUrl.trim()) || defaultLanding || undefined;
+  const defaultLanding = slugOrId
+    ? ensureAbsoluteUrl(`/video-library?v=${encodeURIComponent(slugOrId)}`, origin)
+    : undefined;
+  const canonical = typeof seo?.canonicalUrl === "string" && seo.canonicalUrl.trim()
+    ? ensureAbsoluteUrl(seo.canonicalUrl.trim(), origin)
+    : defaultLanding;
 
   const embedUrl = video.youtubeId
     ? `https://www.youtube-nocookie.com/embed/${video.youtubeId}`
     : video.youtubeUrl;
 
-  const result: Record<string, unknown> = {
-    "@context": "https://schema.org",
-    "@type": "VideoObject",
+  return videoObjectSchema({
     name,
     description,
-    thumbnailUrl: thumbnailUrl.length ? thumbnailUrl : undefined,
-    uploadDate,
-    url: canonical,
+    canonicalUrl: canonical,
     contentUrl: video.youtubeUrl,
     embedUrl,
+    uploadDate: video.date,
+    thumbnailUrls: thumbnailUrl,
+    origin,
     isFamilyFriendly: true,
     potentialAction: video.youtubeUrl
       ? {
@@ -1350,34 +1368,7 @@ export function videoJsonLd(video: VideoItem, base: string): Record<string, unkn
           target: video.youtubeUrl,
         }
       : undefined,
-    publisher: {
-      "@type": "Organization",
-      name: "SonShine Roofing",
-    },
-  };
-
-  for (const key of Object.keys(result)) {
-    const value = result[key];
-    if (
-      value === undefined ||
-      value === null ||
-      (Array.isArray(value) && value.length === 0) ||
-      (typeof value === "string" && value.trim().length === 0)
-    ) {
-      delete result[key];
-    }
-  }
-
-  if (
-    !("publisher" in result) ||
-    !isRecord(result.publisher) ||
-    typeof result.publisher.name !== "string" ||
-    result.publisher.name.trim().length === 0
-  ) {
-    delete result.publisher;
-  }
-
-  return result;
+  });
 }
 
 // ----- PROJECTS WITH YOUTUBE (Roofing Projects bucket) ----- //

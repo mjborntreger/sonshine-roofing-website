@@ -1,85 +1,71 @@
 import Section from "@/components/layout/Section";
 import Image from "next/image";
 import SmartLink from "@/components/SmartLink";
-import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
+import { headers } from "next/headers";
+import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import TipTopRoofCheckup from "@/components/TipTopRoofCheckup";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";
 import ServicesAside from "@/components/ServicesAside";
+import { buildBasicMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
+import { getServicePageConfig } from "@/lib/seo/service-pages";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
-// ===== STATIC SEO FOR /roof-inspection (EDIT HERE) =====
-const SEO_TITLE_ROOF_INSPECTION = 'Roof Inspection in Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
-const SEO_DESCRIPTION_ROOF_INSPECTION = 'Licensed residential roofing inspections to catch hidden leaks and extend roof life. Serving Southwest Florida since 1987.';
-const SEO_KEYWORDS_ROOF_INSPECTION = [
-  'roof inspection',
-  'roof evaluation',
-  'leak detection',
-  'roof checkup',
-  'why do I need a roof inspection',
-  'tip top roof checkup',
-  'Sarasota roofing',
-  'North Port Roofing',
-  'Venice Roofing',
-  'Manatee County roofing',
-  'Charlotte County roofing'
-];
-const SEO_CANONICAL_ROOF_INSPECTION = '/roof-inspection';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
+const SERVICE_PATH = "/roof-inspection";
+const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: SEO_TITLE_ROOF_INSPECTION,
-    description: SEO_DESCRIPTION_ROOF_INSPECTION,
-    keywords: SEO_KEYWORDS_ROOF_INSPECTION,
-    alternates: { canonical: SEO_CANONICAL_ROOF_INSPECTION },
-    openGraph: {
-      type: 'website',
-      title: SEO_TITLE_ROOF_INSPECTION,
-      description: SEO_DESCRIPTION_ROOF_INSPECTION,
-      url: SEO_CANONICAL_ROOF_INSPECTION,
-      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: SEO_TITLE_ROOF_INSPECTION,
-      description: SEO_DESCRIPTION_ROOF_INSPECTION,
-      images: [SEO_OG_IMAGE_DEFAULT],
-    },
-  };
+  const config = SERVICE_CONFIG;
+
+  if (!config) {
+    return buildBasicMetadata({
+      title: "Roof Inspection | SonShine Roofing",
+      description: "Roof inspection services from SonShine Roofing.",
+      path: SERVICE_PATH,
+    });
+  }
+
+  return buildBasicMetadata({
+    title: config.title,
+    description: config.description,
+    path: SERVICE_PATH,
+    keywords: config.keywords,
+    image: config.image,
+  });
 }
 
 export default async function Page() {
   const pool = await listRecentPostsPool(36);
   const faqs = await listFaqsWithContent(8, "roof-inspection").catch(() => []);
 
-  // JSON-LD: WebPage + BreadcrumbList (HowTo will live in TipTopRoofCheckup component)
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const pageUrl = `${base}${SEO_CANONICAL_ROOF_INSPECTION}`;
+  const origin = resolveSiteOrigin(await headers());
+  const config = SERVICE_CONFIG;
+  const breadcrumbsConfig =
+    config?.breadcrumbs ?? [
+      { name: "Home", path: "/" },
+      { name: "Roof Inspection", path: SERVICE_PATH },
+    ];
 
-  const webPageLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: SEO_TITLE_ROOF_INSPECTION,
-    description: SEO_DESCRIPTION_ROOF_INSPECTION,
-    url: pageUrl,
-    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
-    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
-  } as const;
-  const faqLd = faqItemsToJsonLd(
-    faqs.map((f) => ({ question: f.title, answerHtml: f.contentHtml, url: `${base}/faq/${f.slug}` })),
-    pageUrl
+  const webPageLd = webPageSchema({
+    name: config?.title ?? "Roof Inspection",
+    description: config?.description,
+    url: SERVICE_PATH,
+    origin,
+    primaryImage: config?.image?.url ?? "/og-default.png",
+    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
+  });
+
+  const breadcrumbsLd = breadcrumbSchema(
+    breadcrumbsConfig.map((crumb) => ({
+      name: crumb.name,
+      item: crumb.path,
+    })),
+    { origin },
   );
-
-  const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'Roof Inspection', item: pageUrl },
-    ],
-  } as const;
 
   return (
     <Section>
@@ -87,16 +73,8 @@ export default async function Page() {
         <div id="article-root" className="prose min-w-0">
           <h1>Roof Inspection</h1>
           {/* JSON-LD: WebPage + BreadcrumbList */}
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
-          />
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-          />
+          <JsonLd data={webPageLd} />
+          <JsonLd data={breadcrumbsLd} />
 
           <h2>Why Do I Need a Roof Inspection?</h2>
           <p>
@@ -116,7 +94,7 @@ export default async function Page() {
 
           <FinancingBand />
 
-          <TipTopRoofCheckup />
+          <TipTopRoofCheckup origin={origin} />
 
           <h2>Roofs Can Leak for Years Before You See Evidence</h2>
           <p>
@@ -186,13 +164,6 @@ export default async function Page() {
         limit={8}
         initialItems={faqs}
         seeMoreHref="/faq"
-      />
-
-      {/* FAQ Schema */}
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
       />
     </Section>
   );

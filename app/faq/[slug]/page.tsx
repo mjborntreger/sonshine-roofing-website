@@ -1,9 +1,14 @@
 import Section from '@/components/layout/Section';
 import Link from 'next/link';
 import type { Route } from 'next';
+import { headers } from 'next/headers';
 import { getFaq, listFaqIndex, listFaqSlugs } from '@/lib/wp';
 import type { FaqSummary } from '@/lib/wp';
 import { suggest } from '@/lib/fuzzy';
+import { buildBasicMetadata } from '@/lib/seo/meta';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema, faqSchema } from '@/lib/seo/schema';
+import { resolveSiteOrigin } from '@/lib/seo/site';
 
 export const revalidate = 3600; // 1h
 
@@ -21,12 +26,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const faq = await getFaq(slug).catch(() => null);
   const title = faq?.title ? `${faq.title} – FAQ` : 'FAQ';
   const desc = faq?.contentHtml ? stripTags(faq.contentHtml).slice(0, 155) : 'Common roofing questions answered by SonShine Roofing.';
-  return {
+  const metadata = buildBasicMetadata({
     title,
     description: desc,
-    alternates: { canonical: `/faq/${slug}` },
-    robots: { index: false, follow: true },
-  };
+    path: `/faq/${slug}`,
+  });
+  metadata.robots = { index: false, follow: true };
+  return metadata;
 }
 
 export default async function FAQSlugPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -74,6 +80,27 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
   const i = ordered.findIndex((x) => x.slug === slug);
   const prev = i > 0 ? ordered[i - 1] : null;
   const next = i >= 0 && i < ordered.length - 1 ? ordered[i + 1] : null;
+
+  const origin = resolveSiteOrigin(await headers());
+  const pagePath = `/faq/${faq.slug}`;
+  const breadcrumbsLd = breadcrumbSchema(
+    [
+      { name: 'Home', item: '/' },
+      { name: 'FAQ', item: '/faq' },
+      { name: faq.title, item: pagePath },
+    ],
+    { origin },
+  );
+  const faqSchemaData = faqSchema(
+    [
+      {
+        question: faq.title,
+        answerHtml: faq.contentHtml,
+        url: pagePath,
+      },
+    ],
+    { origin, url: pagePath },
+  );
 
   return (
     <Section>
@@ -139,23 +166,8 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
           </Link>
         </div>
 
-        {/* JSON-LD for a single FAQ */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'FAQPage',
-              mainEntity: [
-                {
-                  '@type': 'Question',
-                  name: faq.title,
-                  acceptedAnswer: { '@type': 'Answer', text: stripTags(faq.contentHtml) },
-                },
-              ],
-            }),
-          }}
-        />
+        <JsonLd data={breadcrumbsLd} />
+        <JsonLd data={faqSchemaData} />
       </article>
     </Section>
   );

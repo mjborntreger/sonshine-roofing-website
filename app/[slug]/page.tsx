@@ -3,13 +3,17 @@ import Image from "next/image";
 import Link from "next/link";
 import Section from "@/components/layout/Section";
 import SmartLink from "@/components/SmartLink";
-import { headers } from "next/headers";
 import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/wp";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
 import ShareWhatYouThink from "@/components/ShareWhatYouThink";
 import TocFromHeadings from "@/components/TocFromHeadings";
 import SidebarCta from "@/components/SidebarCta";
+import { headers } from "next/headers";
+import { buildArticleMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { blogPostingSchema } from "@/lib/seo/schema";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
 export const revalidate = 900;
 
@@ -88,10 +92,7 @@ function ensureHeadingIds(html: string) {
 
 
 async function getBaseUrlFromHeaders() {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") || h.get("host") || "localhost:3000";
-  const proto = h.get("x-forwarded-proto") || "https";
-  return `${proto}://${host}`;
+  return resolveSiteOrigin(await headers());
 }
 
 function isExternalHref(href: string, baseHost: string) {
@@ -170,11 +171,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Use unified post fetcher (deduped with page) that now includes RankMath SEO
   const post = await getPostBySlug(slug);
   if (!post) {
-    return {
+    return buildArticleMetadata({
       title: "Post Not Found | SonShine Roofing",
       description: "This article could not be found.",
-      alternates: { canonical: `/${slug}` },
-    };
+      path: `/${slug}`,
+    });
   }
 
   const seo = post.seo ?? {};
@@ -194,27 +195,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const ogWidth = ogImage && typeof ogImage.width === "number" ? ogImage.width : 1200;
   const ogHeight = ogImage && typeof ogImage.height === "number" ? ogImage.height : 630;
 
-  return {
+  return buildArticleMetadata({
     title,
     description,
-    // Relative canonical so metadataBase resolves to production
-    alternates: { canonical: `/${slug}` },
-    openGraph: {
-      type: "article" as const,
-      title,
-      description,
-      images: [{ url: ogUrl, width: ogWidth, height: ogHeight }],
-      publishedTime: post.date ?? undefined,
-      modifiedTime: post.modified ?? undefined,
-      authors: post.authorName ? [post.authorName] : undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogUrl],
-    },
-  };
+    path: `/${slug}`,
+    image: { url: ogUrl, width: ogWidth, height: ogHeight },
+    publishedTime: post.date ?? undefined,
+    modifiedTime: post.modified ?? undefined,
+    authors: post.authorName ? [post.authorName] : undefined,
+  });
 }
 
 // -------- Page --------
@@ -237,8 +226,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     );
   }
 
-  const base = await getBaseUrlFromHeaders();
-  const shareUrl = `${base}/${slug}`;
+  const origin = await getBaseUrlFromHeaders();
+  const shareUrl = `${origin}/${slug}`;
   const dateStr = new Date(post.date).toLocaleDateString("en-US", {
     timeZone: "America/New_York",
     year: "numeric",
@@ -250,35 +239,33 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   // JSON-LD (BlogPosting) using the same post object
   const descSeo = (post.seo?.description || post.seo?.openGraph?.description || stripHtml(sanitizeHtml(post.excerpt || ""))).slice(0, 160);
   const ogImageJsonLd = post.seo?.openGraph?.image ?? null;
-  const ogImgAbs =
+  const ogImgCandidate =
     (ogImageJsonLd && typeof ogImageJsonLd.secureUrl === "string" && ogImageJsonLd.secureUrl) ||
     (ogImageJsonLd && typeof ogImageJsonLd.url === "string" && ogImageJsonLd.url) ||
     post.featuredImage?.url ||
-    `${base}/og-default.png`;
-  const authorObj = post.authorName ? { "@type": "Person", name: post.authorName } : { "@type": "Organization", name: "SonShine Roofing" };
+    "/og-default.png";
+  const ogImgAbs = ogImgCandidate.startsWith("http") ? ogImgCandidate : `${origin}${ogImgCandidate}`;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
+  const postSchema = blogPostingSchema({
     headline: post.seo?.title || post.title,
     description: descSeo,
+    url: shareUrl,
+    image: ogImgAbs,
     datePublished: post.date,
     dateModified: post.modified,
-    mainEntityOfPage: { "@type": "WebPage", "@id": shareUrl },
-    image: ogImgAbs,
-    url: shareUrl,
-    author: authorObj,
+    author: post.authorName ? { "@type": "Person", name: post.authorName } : { "@type": "Organization", name: "SonShine Roofing" },
     publisher: {
       "@type": "Organization",
       name: "SonShine Roofing",
-      logo: { "@type": "ImageObject", url: `${base}/icon.png` }
-    }
-  };
+      logo: { "@type": "ImageObject", url: `${origin}/icon.png` },
+    },
+    origin,
+  });
 
   // Build TOC + decorate + inject CTA (all on the server)
   const safeHtml = sanitizeHtml(post.contentHtml || "");
   const withIds = ensureHeadingIds(safeHtml);
-  const withAnchors = decorateExternalAnchors(withIds, new URL(base).hostname);
+  const withAnchors = decorateExternalAnchors(withIds, new URL(origin).hostname);
   const htmlWithCta = injectCtaAfterNthParagraph(withAnchors, 3);
 
   // prev/next using lightweight nav list (slug + title + date)
@@ -289,12 +276,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <Section>
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={postSchema} />
       {/* Back link */}
       <div className="mb-3">
         <SmartLink href="/blog" className="text-sm text-slate-600 no-underline hover:underline">

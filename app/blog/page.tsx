@@ -7,46 +7,37 @@ import {
   type PostsFiltersInput,
 } from "@/lib/wp";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { buildBasicMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
 export const revalidate = 900;
 
-// ===== STATIC SEO FOR /blog (EDIT HERE) =====
-const SEO_TITLE_BLOG = "Roofing Blog for Sarasota, Manatee & Charlotte Counties | SonShine Roofing";
-const SEO_DESCRIPTION_BLOG = "Practical roofing tips, how‑tos, and local insights from our Sarasota team. Serving SW Florida since 1987.";
-const SEO_KEYWORDS_BLOG = [
-  "roofing blog",
-  "roofing tips",
-  "roof repair advice",
-  "roof replacement guide",
-  "Sarasota roofing",
-  "Manatee County roofing",
-  "Charlotte County roofing",
-];
-const SEO_CANONICAL_BLOG = "/blog";
-const SEO_OG_IMAGE_DEFAULT = "/og-default.png";
+const PAGE_PATH = "/blog";
+const PAGE_TITLE = "Roofing Blog for Sarasota, Manatee & Charlotte Counties | SonShine Roofing";
+const PAGE_DESCRIPTION = "Practical roofing tips, how‑tos, and local insights from our Sarasota team. Serving SW Florida since 1987.";
+const PAGE_IMAGE = "/og-default.png";
 const PAGE_SIZE = 6;
 const MIN_SEARCH_LENGTH = 2;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: SEO_TITLE_BLOG,
-    description: SEO_DESCRIPTION_BLOG,
-    keywords: SEO_KEYWORDS_BLOG,
-    alternates: { canonical: SEO_CANONICAL_BLOG },
-    openGraph: {
-      type: "website",
-      title: SEO_TITLE_BLOG,
-      description: SEO_DESCRIPTION_BLOG,
-      url: SEO_CANONICAL_BLOG,
-      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: SEO_TITLE_BLOG,
-      description: SEO_DESCRIPTION_BLOG,
-      images: [SEO_OG_IMAGE_DEFAULT],
-    },
-  };
+  return buildBasicMetadata({
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    path: PAGE_PATH,
+    keywords: [
+      "roofing blog",
+      "roofing tips",
+      "roof repair advice",
+      "roof replacement guide",
+      "Sarasota roofing",
+      "Manatee County roofing",
+      "Charlotte County roofing",
+    ],
+    image: { url: PAGE_IMAGE, width: 1200, height: 630 },
+  });
 }
 
 type PageProps = {
@@ -98,43 +89,32 @@ export default async function BlogArchivePage({ searchParams }: PageProps) {
     categorySlugs,
   };
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || "https://sonshineroofing.com";
-  const pageUrl = `${base}${SEO_CANONICAL_BLOG}`;
+  const origin = resolveSiteOrigin(await headers());
 
-  const collectionLd = {
-    "@context": "https://schema.org",
-    "@type": ["WebPage", "CollectionPage"],
-    name: SEO_TITLE_BLOG,
-    description: SEO_DESCRIPTION_BLOG,
-    url: pageUrl,
-    primaryImageOfPage: { "@type": "ImageObject", url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
-    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: base },
-  } as const;
+  const collectionLd = collectionPageSchema({
+    name: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    url: PAGE_PATH,
+    origin,
+    primaryImage: PAGE_IMAGE,
+    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
+  });
 
-  const breadcrumbsLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${base}/` },
-      { "@type": "ListItem", position: 2, name: "Blog", item: pageUrl },
+  const breadcrumbsLd = breadcrumbSchema(
+    [
+      { name: "Home", item: "/" },
+      { name: "Blog", item: PAGE_PATH },
     ],
-  } as const;
+    { origin },
+  );
 
   return (
     <Section>
       <div className="container-edge py-8">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           <div>
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
-            />
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-            />
+            <JsonLd data={collectionLd} />
+            <JsonLd data={breadcrumbsLd} />
 
             <BlogArchiveClient
               initialResult={initialResult}

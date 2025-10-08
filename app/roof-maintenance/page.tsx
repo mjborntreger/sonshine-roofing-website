@@ -1,83 +1,70 @@
 import Section from "@/components/layout/Section";
 import Image from "next/image";
-import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
+import { headers } from "next/headers";
+import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import RoofCareClub from "@/components/RoofCareClub";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";
 import ServicesAside from "@/components/ServicesAside";
+import { buildBasicMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
+import { getServicePageConfig } from "@/lib/seo/service-pages";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
-// ===== STATIC SEO FOR /roof-maintenance (EDIT HERE) =====
-const SEO_TITLE_ROOF_MAINT = 'Roof Maintenance in Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
-const SEO_DESCRIPTION_ROOF_MAINT = 'Prevent leaks, catch issues early, and extend roof life with scheduled inspections and upkeep. Serving Southwest Florida since 1987.';
-const SEO_KEYWORDS_ROOF_MAINT = [
-  'roof maintenance',
-  'roof upkeep',
-  'roof inspection',
-  'preventative roof maintenance',
-  'roof care club',
-  'Sarasota roofing',
-  'North Port Roofing',
-  'Venice Roofing',
-  'Manatee County roofing',
-  'Charlotte County roofing'
-];
-const SEO_CANONICAL_ROOF_MAINT = '/roof-maintenance';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
+const SERVICE_PATH = "/roof-maintenance";
+const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: SEO_TITLE_ROOF_MAINT,
-    description: SEO_DESCRIPTION_ROOF_MAINT,
-    keywords: SEO_KEYWORDS_ROOF_MAINT,
-    alternates: { canonical: SEO_CANONICAL_ROOF_MAINT },
-    openGraph: {
-      type: 'website',
-      title: SEO_TITLE_ROOF_MAINT,
-      description: SEO_DESCRIPTION_ROOF_MAINT,
-      url: SEO_CANONICAL_ROOF_MAINT,
-      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: SEO_TITLE_ROOF_MAINT,
-      description: SEO_DESCRIPTION_ROOF_MAINT,
-      images: [SEO_OG_IMAGE_DEFAULT],
-    },
-  };
+  const config = SERVICE_CONFIG;
+
+  if (!config) {
+    return buildBasicMetadata({
+      title: "Roof Maintenance | SonShine Roofing",
+      description: "Roof maintenance services from SonShine Roofing.",
+      path: SERVICE_PATH,
+    });
+  }
+
+  return buildBasicMetadata({
+    title: config.title,
+    description: config.description,
+    path: SERVICE_PATH,
+    keywords: config.keywords,
+    image: config.image,
+  });
 }
 
 export default async function Page() {
   const pool = await listRecentPostsPool(36);
   const faqs = await listFaqsWithContent(8, "roof-maintenance").catch(() => []);
 
-  // JSON-LD: WebPage + BreadcrumbList (page-specific Service will live in RoofCareClub component)
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const pageUrl = `${base}${SEO_CANONICAL_ROOF_MAINT}`;
+  const origin = resolveSiteOrigin(await headers());
+  const config = SERVICE_CONFIG;
+  const breadcrumbsConfig =
+    config?.breadcrumbs ?? [
+      { name: "Home", path: "/" },
+      { name: "Roof Maintenance", path: SERVICE_PATH },
+    ];
 
-  const webPageLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: SEO_TITLE_ROOF_MAINT,
-    description: SEO_DESCRIPTION_ROOF_MAINT,
-    url: pageUrl,
-    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
-    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
-  } as const;
-  const faqLd = faqItemsToJsonLd(
-    faqs.map((f) => ({ question: f.title, answerHtml: f.contentHtml, url: `${base}/faq/${f.slug}` })),
-    pageUrl
+  const webPageLd = webPageSchema({
+    name: config?.title ?? "Roof Maintenance",
+    description: config?.description,
+    url: SERVICE_PATH,
+    origin,
+    primaryImage: config?.image?.url ?? "/og-default.png",
+    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
+  });
+
+  const breadcrumbsLd = breadcrumbSchema(
+    breadcrumbsConfig.map((crumb) => ({
+      name: crumb.name,
+      item: crumb.path,
+    })),
+    { origin },
   );
-
-  const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'Roof Maintenance', item: pageUrl },
-    ],
-  } as const;
 
   return (
     <Section>
@@ -85,16 +72,8 @@ export default async function Page() {
         <div id="article-root" className="prose min-w-0">
           <h1>Roof Maintenance</h1>
           {/* JSON-LD: WebPage + BreadcrumbList */}
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
-          />
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-          />
+          <JsonLd data={webPageLd} />
+          <JsonLd data={breadcrumbsLd} />
           <h2>
             Undoubtedly, lack of maintenance is among the top reasons why roofs fail.
           </h2>
@@ -134,7 +113,7 @@ export default async function Page() {
 
           <FinancingBand />
 
-          <RoofCareClub />
+          <RoofCareClub origin={origin} />
 
         </div>
 
@@ -156,13 +135,6 @@ export default async function Page() {
         limit={8}
         initialItems={faqs}
         seeMoreHref="/faq"
-      />
-
-      {/* FAQ Schema */}
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
       />
     </Section>
   );

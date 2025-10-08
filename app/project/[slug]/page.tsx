@@ -1,11 +1,16 @@
 import Image from "next/image";
 import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
+import { headers } from "next/headers";
 import { getProjectBySlug, listProjectSlugs } from "@/lib/wp";
 import ProjectVideo from "./ProjectVideo";
 import ShareWhatYouThink from "@/components/ShareWhatYouThink";
 
 import type { Metadata } from "next";
+import { buildArticleMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { creativeWorkSchema, videoObjectSchema } from "@/lib/seo/schema";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
 type OgImageRecord = {
   url?: unknown;
@@ -28,11 +33,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const project = await getProjectBySlug(slug).catch(() => null);
   if (!project) {
-    return {
+    return buildArticleMetadata({
       title: "Project Not Found · SonShine Roofing",
       description: "This project could not be found.",
-      alternates: { canonical: `/project/${slug}` },
-    };
+      path: `/project/${slug}`,
+    });
   }
 
   const seo = project.seo ?? {};
@@ -52,25 +57,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const ogHeight: number =
     (ogImageRecord && typeof ogImageRecord.height === "number" && ogImageRecord.height) || 630;
 
-  return {
+  return buildArticleMetadata({
     title,
     description,
-    alternates: { canonical: `/project/${slug}` },
-    openGraph: {
-      type: "article" as const,
-      title,
-      description,
-      images: [{ url: ogUrl, width: ogWidth, height: ogHeight }],
-      publishedTime: project.date ?? undefined,
-      modifiedTime: project.modified ?? undefined,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [ogUrl],
-    },
-  };
+    path: `/project/${slug}`,
+    image: { url: ogUrl, width: ogWidth, height: ogHeight },
+    publishedTime: project.date ?? undefined,
+    modifiedTime: project.modified ?? undefined,
+  });
 }
 
 // Extract YouTube ID from various URL formats
@@ -126,9 +120,8 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
       (project.serviceAreas?.length ?? 0) >
     0;
 
-  // Build absolute URLs and JSON-LD using the unified project object
-  const base = process.env.NEXT_PUBLIC_BASE_URL || "https://sonshineroofing.com";
-  const shareUrl = `${base}/project/${slug}`;
+  const origin = resolveSiteOrigin(await headers());
+  const shareUrl = `${origin}/project/${slug}`;
 
   const ogImageSecondary = isRecord(project.seo?.openGraph?.image)
     ? (project.seo?.openGraph?.image as OgImageRecord)
@@ -138,51 +131,48 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
     (ogImageSecondary && typeof ogImageSecondary.url === "string" && ogImageSecondary.url) ||
     project.heroImage?.url ||
     "/og-default.png";
-  const ogImgAbs = ogImgMaybe.startsWith("http") ? ogImgMaybe : `${base}${ogImgMaybe}`;
+  const ogImgAbs = ogImgMaybe.startsWith("http") ? ogImgMaybe : `${origin}${ogImgMaybe}`;
 
-  const areaServed = (project.serviceAreas || []).map((t) => ({ "@type": "AdministrativeArea", name: t.name }));
+  const areaServed = (project.serviceAreas || []).map((t) => t.name);
   const materials = (project.materialTypes || []).map((t) => t.name);
   const colors = (project.roofColors || []).map((t) => t.name);
 
-  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : undefined;
-  const videoObj = videoId
-    ? {
-        "@type": "VideoObject",
+  const videoSchema = videoId
+    ? videoObjectSchema({
         name: project.title,
         description: (project.seo?.description || project.projectDescription || "").slice(0, 160),
-        embedUrl,
-        thumbnailUrl: ogImgAbs,
+        canonicalUrl: `/project/${slug}`,
+        embedUrl: `https://www.youtube.com/embed/${videoId}`,
+        contentUrl: project.youtubeUrl ?? undefined,
+        thumbnailUrls: [ogImgAbs],
         uploadDate: project.date || undefined,
-      }
+        origin,
+      })
     : undefined;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CreativeWork",
+  const projectSchema = creativeWorkSchema({
     name: project.title,
     description: (project.seo?.description || project.projectDescription || "").slice(0, 160),
     url: shareUrl,
     image: ogImgAbs,
-    thumbnailUrl: ogImgAbs,
     datePublished: project.date || undefined,
     dateModified: project.modified || undefined,
-    inLanguage: "en-US",
-    material: materials.length ? materials : undefined,
-    about: colors.length ? colors : undefined,
-    areaServed: areaServed.length ? areaServed : undefined,
-    isPartOf: { "@type": "CollectionPage", "@id": `${base}/project`, name: "Project Gallery" },
-    publisher: { "@type": "Organization", name: "SonShine Roofing", logo: { "@type": "ImageObject", url: `${base}/icon.png` } },
-    ...(videoObj ? { video: videoObj } : {}),
-  } as const;
+    material: materials,
+    about: colors,
+    areaServed,
+    origin,
+    isPartOf: { "@type": "CollectionPage", "@id": `${origin}/project`, name: "Project Gallery" },
+    publisher: {
+      "@type": "Organization",
+      name: "SonShine Roofing",
+      logo: { "@type": "ImageObject", url: `${origin}/icon.png` },
+    },
+    additionalProperties: videoSchema ? { video: videoSchema } : undefined,
+  });
 
   return (
     <Section>
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={projectSchema} />
       <SmartLink href="/project" className="no-underline hover:underline text-sm text-slate-600">
         ← Back to projects
       </SmartLink>

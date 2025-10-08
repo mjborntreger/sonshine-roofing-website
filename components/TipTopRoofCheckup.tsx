@@ -3,6 +3,9 @@
 import { useMemo, useState } from 'react';
 import clsx from 'clsx';
 import { Accordion } from '@/components/Accordion';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { howToSchema, serviceSchema } from '@/lib/seo/schema';
+import { SITE_ORIGIN } from '@/lib/seo/site';
 
 type Item = { label: string; why: string };
 
@@ -70,50 +73,58 @@ const PILLS: { key: GroupKey; label: string }[] = [
     { key: 'exterior', label: 'Exterior' },
 ];
 
-export default function TipTopRoofCheckup({ className }: { className?: string }) {
+type TipTopRoofCheckupProps = {
+    className?: string;
+    origin?: string;
+};
+
+export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheckupProps) {
     const [tab, setTab] = useState<GroupKey>('interior');
 
-    // JSON-LD (client-side): HowTo + page-specific Service for Tip Top Roof Check‑up
-    const base = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://sonshineroofing.com');
-    const pageUrl = `${base}/roof-inspection`;
-    const providerId = `${base}/#roofingcontractor`;
+    const resolvedOrigin = origin ?? SITE_ORIGIN;
 
-    const howToSections = useMemo(() => {
-        return (Object.values(CHECKLIST) as { title: string; blurb: string; items: Item[] }[]).map((group) => ({
-            '@type': 'HowToSection',
-            name: group.title,
-            itemListElement: group.items.map((it) => ({
-                '@type': 'HowToStep',
-                name: it.label,
-                text: it.why,
+    const sections = useMemo(
+        () =>
+            (Object.values(CHECKLIST) as { title: string; blurb: string; items: Item[] }[]).map((group) => ({
+                name: group.title,
+                steps: group.items.map((it) => ({
+                    name: it.label,
+                    text: it.why,
+                })),
             })),
-        }));
-    }, []);
+        [],
+    );
 
-    const howToLd = useMemo(() => ({
-        '@context': 'https://schema.org',
-        '@type': 'HowTo',
-        name: 'Tip Top Roof Check‑up',
-        description: 'What we inspect during a roof check‑up to catch issues early and extend roof life.',
-        step: howToSections,
-        url: pageUrl,
-    }), [howToSections, pageUrl]);
+    const howToLd = useMemo(
+        () =>
+            howToSchema({
+                name: 'Tip Top Roof Check‑up',
+                description: 'What we inspect during a roof check‑up to catch issues early and extend roof life.',
+                sections,
+                url: '/roof-inspection',
+                origin: resolvedOrigin,
+            }),
+        [resolvedOrigin, sections],
+    );
 
-    const serviceLd = useMemo(() => ({
-        '@context': 'https://schema.org',
-        '@type': 'Service',
-        '@id': `${base}/#roof-checkup`,
-        name: 'Tip Top Roof Check‑up',
-        serviceType: 'Roof Inspection',
-        description: 'An in‑depth multi‑point inspection covering interior, attic, and exterior roof systems.',
-        url: pageUrl,
-        provider: { '@id': providerId },
-        areaServed: [
-            { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
-            { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
-            { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
-        ],
-    }), [base, pageUrl, providerId]);
+    const serviceLd = useMemo(
+        () =>
+            serviceSchema({
+                name: 'Tip Top Roof Check‑up',
+                description: 'An in‑depth multi‑point inspection covering interior, attic, and exterior roof systems.',
+                url: '/roof-inspection',
+                origin: resolvedOrigin,
+                provider: `${resolvedOrigin}/#roofingcontractor`,
+                areaServed: [
+                    'Sarasota County, FL',
+                    'Manatee County, FL',
+                    'Charlotte County, FL',
+                ],
+                serviceType: 'Roof Inspection',
+                id: `${resolvedOrigin}/#roof-checkup`,
+            }),
+        [resolvedOrigin],
+    );
 
     return (
         <div className={clsx('mt-32', className)}>
@@ -127,16 +138,8 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
             </header>
 
             {/* JSON-LD: HowTo + Service for Tip Top Roof Check‑up */}
-            <script
-                type="application/ld+json"
-                suppressHydrationWarning
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
-            />
-            <script
-                type="application/ld+json"
-                suppressHydrationWarning
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
-            />
+            <JsonLd data={howToLd} />
+            <JsonLd data={serviceLd} />
 
             <div className="mx-auto mt-4 max-w-3xl rounded-3xl border border-slate-200 bg-white p-4 text-center shadow-sm">
                 <p className="text-sm text-slate-700">

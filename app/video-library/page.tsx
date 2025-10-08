@@ -9,6 +9,10 @@ import {
   type TermLite,
 } from "@/lib/wp";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
 export const revalidate = 900;
 
@@ -187,7 +191,8 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
   const allVideos: VideoItem[] = [...entries, ...projectVideos];
 
   const base = process.env.NEXT_PUBLIC_BASE_URL || "https://sonshineroofing.com";
-  const collectionUrl = `${base}${CANONICAL}`;
+  const origin = resolveSiteOrigin(await headers());
+  const collectionUrl = `${origin}${CANONICAL}`;
 
   const topList = allVideos.slice(0, 12);
   const itemListElement = topList.map((item, index) => {
@@ -204,13 +209,21 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
     } satisfies Record<string, unknown>;
   });
 
-  const collectionLd = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
+  const collectionLd = collectionPageSchema({
     name: "Video Library",
-    url: collectionUrl,
-    hasPart: { "@type": "ItemList", itemListElement },
-  };
+    description: SEO_DESCRIPTION,
+    url: CANONICAL,
+    origin,
+    itemList: { "@type": "ItemList", itemListElement },
+  });
+
+  const breadcrumbsLd = breadcrumbSchema(
+    [
+      { name: "Home", item: "/" },
+      { name: "Video Library", item: CANONICAL },
+    ],
+    { origin },
+  );
 
   let selectedVideoLd: Record<string, unknown> | null = null;
   if (videoSlug) {
@@ -244,18 +257,9 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
       <div className="container-edge py-4">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           <div>
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionLd) }}
-            />
-            {selectedVideoLd ? (
-              <script
-                type="application/ld+json"
-                suppressHydrationWarning
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(selectedVideoLd) }}
-              />
-            ) : null}
+            <JsonLd data={collectionLd} />
+            <JsonLd data={breadcrumbsLd} />
+            {selectedVideoLd ? <JsonLd data={selectedVideoLd} /> : null}
 
             {videoSlug ? (
               <div className="mb-6 rounded-md border border-slate-300 bg-white p-3">

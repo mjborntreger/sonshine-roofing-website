@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import { Accordion } from '@/components/Accordion';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { serviceSchema } from '@/lib/seo/schema';
+import { SITE_ORIGIN } from '@/lib/seo/site';
 
 // -----------------------------
 // Types & Data
@@ -136,11 +139,17 @@ function savingsVsOneYear(plan: Plan, term: Term) {
 // Component
 // -----------------------------
 
-export default function RoofCareClub() {
+type RoofCareClubProps = {
+  origin?: string;
+};
+
+export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
   // Default term: 1 year, per request
   const [term, setTerm] = useState<Term>(1);
   // Pricing display toggle
   const [mode, setMode] = useState<'year' | 'month'>('year');
+
+  const resolvedOrigin = origin ?? SITE_ORIGIN;
 
   // Feature lookup for quick access
   const featureById = useMemo(() => {
@@ -149,45 +158,46 @@ export default function RoofCareClub() {
     return map;
   }, []);
 
-  // JSON-LD (client-side): Service details for Roof Care Club (membership)
-  const base = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://sonshineroofing.com');
-  const pageUrl = `${base}/roof-maintenance`;
-  const providerId = `${base}/#roofingcontractor`;
+  const providerId = `${resolvedOrigin}/#roofingcontractor`;
 
-  const offerCatalog = useMemo(() => ({
-    '@type': 'OfferCatalog',
-    name: 'Roof Care Club Plans',
-    itemListElement: PLANS.map((plan) => ({
-      '@type': 'Offer',
-      name: plan.name,
-      category: plan.id,
-      priceCurrency: 'USD',
-      offeredBy: { '@id': providerId },
-      itemOffered: { '@type': 'Service', name: 'Roof Maintenance (Membership)' },
-      additionalProperty: [
-        { '@type': 'PropertyValue', name: '1-year', value: plan.prices[1] },
-        { '@type': 'PropertyValue', name: '2-year', value: plan.prices[2] },
-        { '@type': 'PropertyValue', name: '3-year', value: plan.prices[3] },
-      ],
-    })),
-  }), [providerId]);
+  const offerItems = useMemo(
+    () =>
+      PLANS.map((plan) => ({
+        "@type": "Offer" as const,
+        name: plan.name,
+        category: plan.id,
+        priceCurrency: "USD",
+        offeredBy: { "@id": providerId },
+        itemOffered: { "@type": "Service", name: "Roof Maintenance (Membership)" },
+        additionalProperty: [
+          { "@type": "PropertyValue", name: "1-year", value: plan.prices[1] },
+          { "@type": "PropertyValue", name: "2-year", value: plan.prices[2] },
+          { "@type": "PropertyValue", name: "3-year", value: plan.prices[3] },
+        ],
+      })),
+    [providerId],
+  );
 
-  const serviceLd = useMemo(() => ({
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    '@id': `${base}/#roof-care-club`,
-    name: 'Roof Care Club',
-    serviceType: 'Roof Maintenance',
-    description: 'Membership maintenance plan with scheduled inspections, discounts, and member benefits.',
-    url: pageUrl,
-    provider: { '@id': providerId },
-    areaServed: [
-      { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
-      { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
-      { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
-    ],
-    hasOfferCatalog: offerCatalog,
-  }), [base, pageUrl, providerId, offerCatalog]);
+  const serviceLd = useMemo(
+    () =>
+      serviceSchema({
+        name: "Roof Care Club",
+        description:
+          "Membership maintenance plan with scheduled inspections, discounts, and member benefits.",
+        url: "/roof-maintenance",
+        origin: resolvedOrigin,
+        provider: providerId,
+        areaServed: [
+          "Sarasota County, FL",
+          "Manatee County, FL",
+          "Charlotte County, FL",
+        ],
+        offers: offerItems,
+        serviceType: "Roof Maintenance",
+        id: `${resolvedOrigin}/#roof-care-club`,
+      }),
+    [offerItems, providerId, resolvedOrigin],
+  );
 
   return (
     <div aria-labelledby="roof-care-club" className="mt-24 py-8 not-prose">
@@ -199,12 +209,7 @@ export default function RoofCareClub() {
           Choose your plan and term. Switch to monthly view to see the equivalent cost—
           <span className="font-medium text-slate-800">plans are billed annually</span>.
         </p>
-        {/* JSON-LD: Service (Roof Care Club) */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
-        />
+        <JsonLd data={serviceLd} />
       </div>
 
       {/* Toggles */}

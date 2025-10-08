@@ -1,13 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import RouteTransitions from "@/components/RouteTransitions"
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AnalyticsScripts from "@/lib/analytics";
 import { inter, allura, candara } from "@/lib/fonts";
-import Script from "next/script";
 import { Suspense } from "react";
 import GtmRouteChange from "@/lib/gtm-route-change";
+import TawkChatLoader from "@/components/TawkChatLoader";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sonshineroofing.com"),
@@ -256,9 +255,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <GtmRouteChange />
         </Suspense>
         <Header />
-        <main className="flex-1">
-          <RouteTransitions>{children}</RouteTransitions>
-        </main>
+        <main className="flex-1">{children}</main>
         <Footer />
         {/* Global JSON-LD (RoofingContractor + Services) */}
         <script
@@ -266,28 +263,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(getGlobalSchema()) }}
         />
-        {/* Tawk.to live chat — lazy-load after idle to reduce LCP/INP */}
-        <Script id="tawk-lazy" strategy="afterInteractive">
-          {`
-            (function(){
-              function loadTawk(){
-                if (window.__tawkLoaded) return; window.__tawkLoaded = true;
-                try {
-                  window.Tawk_API = window.Tawk_API || {}; window.Tawk_LoadStart = new Date();
-                  var s=document.createElement('script');
-                  s.src='https://embed.tawk.to/5a971646d7591465c708203c/default';
-                  s.async=true;
-                  var f=document.getElementsByTagName('script')[0]; f.parentNode.insertBefore(s,f);
-                } catch(e) {}
-              }
-              if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadTawk, { timeout: 4000 });
-              } else {
-                setTimeout(loadTawk, 2500);
-              }
-            })();
-          `}
-        </Script>
+        <TawkChatLoader />
       </body>
     </html>
   );

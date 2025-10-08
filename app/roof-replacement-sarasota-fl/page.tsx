@@ -2,7 +2,8 @@ import Section from "@/components/layout/Section";
 import ServicesAside from "@/components/ServicesAside";
 import Image from "next/image";
 import SmartLink from "@/components/SmartLink";
-import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
+import { headers } from "next/headers";
+import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import { Accordion } from "@/components/Accordion";
@@ -10,54 +11,37 @@ import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks } from "lucide-reac
 import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";
+import { buildBasicMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, howToSchema, webPageSchema } from "@/lib/seo/schema";
+import { getServicePageConfig } from "@/lib/seo/service-pages";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
 const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
 const stepperStyles = "absolute -left-[5px] top-2 h-2 w-2 rounded-full bg-[#0045d7]";
 
-// ===== STATIC SEO FOR /roof-replacement-sarasota-fl (EDIT HERE) =====
-const SEO_TITLE_ROOF_REPLACEMENT = 'Roof Replacement in Sarasota, Manatee & Charlotte Counties | SonShine Roofing';
-const SEO_DESCRIPTION_ROOF_REPLACEMENT = 'Need a roof replacement in Southwest Florida? Since 1987, SonShine Roofing has installed long‑lasting shingle, tile, and metal roofs with strong workmanship warranties.';
-const SEO_KEYWORDS_ROOF_REPLACEMENT = [
-  'roof replacement',
-  'new roof',
-  're-roof',
-  'reroof',
-  'what warranties come with a new roof',
-  'what to expect',
-  'shingle roof replacement',
-  'tile roof replacement',
-  'metal roof replacement',
-  'repair vs. replace',
-  'Sarasota roofing',
-  'North Port Roofing',
-  'Venice Roofing',
-  'Manatee County roofing',
-  'Charlotte County roofing'
-];
-const SEO_CANONICAL_ROOF_REPLACEMENT = '/roof-replacement-sarasota-fl';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
+const SERVICE_PATH = "/roof-replacement-sarasota-fl";
+const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: SEO_TITLE_ROOF_REPLACEMENT,
-    description: SEO_DESCRIPTION_ROOF_REPLACEMENT,
-    keywords: SEO_KEYWORDS_ROOF_REPLACEMENT,
-    alternates: { canonical: SEO_CANONICAL_ROOF_REPLACEMENT },
-    openGraph: {
-      type: 'website',
-      title: SEO_TITLE_ROOF_REPLACEMENT,
-      description: SEO_DESCRIPTION_ROOF_REPLACEMENT,
-      url: SEO_CANONICAL_ROOF_REPLACEMENT,
-      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: SEO_TITLE_ROOF_REPLACEMENT,
-      description: SEO_DESCRIPTION_ROOF_REPLACEMENT,
-      images: [SEO_OG_IMAGE_DEFAULT],
-    },
-  };
+  const config = SERVICE_CONFIG;
+
+  if (!config) {
+    return buildBasicMetadata({
+      title: "Roof Replacement | SonShine Roofing",
+      description: "Roof replacement services from SonShine Roofing.",
+      path: SERVICE_PATH,
+    });
+  }
+
+  return buildBasicMetadata({
+    title: config.title,
+    description: config.description,
+    path: SERVICE_PATH,
+    keywords: config.keywords,
+    image: config.image,
+  });
 }
 
 
@@ -65,50 +49,50 @@ export default async function Page() {
   const pool = await listRecentPostsPool(36);
   // Dynamic FAQs for this service topic
   const faqs = await listFaqsWithContent(8, "roof-replacement").catch(() => []);
-  // JSON-LD (WebPage, BreadcrumbList, HowTo) — keep simple & page-scoped
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const pagePath = SEO_CANONICAL_ROOF_REPLACEMENT;
-  const pageUrl = `${base}${pagePath}`;
+  const origin = resolveSiteOrigin(await headers());
+  const config = SERVICE_CONFIG;
 
-  const webPageLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: SEO_TITLE_ROOF_REPLACEMENT,
-    description: SEO_DESCRIPTION_ROOF_REPLACEMENT,
-    url: pageUrl,
-    primaryImageOfPage: { '@type': 'ImageObject', url: `${base}${SEO_OG_IMAGE_DEFAULT}` },
-    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
-  } as const;
-  const faqLd = faqItemsToJsonLd(
-    faqs.map((f) => ({ question: f.title, answerHtml: f.contentHtml, url: `${base}/faq/${f.slug}` })),
-    pageUrl
+  const breadcrumbsConfig =
+    config?.breadcrumbs ?? [
+      { name: "Home", path: "/" },
+      { name: "Roof Replacement", path: SERVICE_PATH },
+    ];
+
+  const webPageLd = webPageSchema({
+    name: config?.title ?? "Roof Replacement",
+    description: config?.description,
+    url: SERVICE_PATH,
+    origin,
+    primaryImage: config?.image?.url ?? "/og-default.png",
+    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
+  });
+
+  const breadcrumbsLd = breadcrumbSchema(
+    breadcrumbsConfig.map((crumb) => ({
+      name: crumb.name,
+      item: crumb.path,
+    })),
+    { origin },
   );
 
-  const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'Roof Replacement', item: pageUrl },
+  const howToLd = howToSchema({
+    name: "Roof Replacement: What to Expect",
+    description:
+      "Step-by-step overview of a typical roof replacement from permits through final inspection and warranty.",
+    steps: [
+      { name: "Permits & Scheduling", text: "We file permits and set your installation date." },
+      { name: "Site Prep", text: "We protect landscaping and the home exterior." },
+      { name: "Tear-off & Inspection", text: "We remove old materials and inspect decking." },
+      {
+        name: "Install New Roof",
+        text: "Underlayment, flashing, ventilation, and finishing materials are installed.",
+      },
+      { name: "Final Inspection & Cleanup", text: "We inspect the final install and clean the site." },
+      { name: "Warranty & Maintenance", text: "We provide warranty info and maintenance tips." },
     ],
-  } as const;
-
-  const howToLd = {
-    '@context': 'https://schema.org',
-    '@type': 'HowTo',
-    name: 'Roof Replacement: What to Expect',
-    description: 'Step-by-step overview of a typical roof replacement from permits through final inspection and warranty.',
-    totalTime: undefined,
-    step: [
-      { '@type': 'HowToStep', name: 'Permits & Scheduling', text: 'We file permits and set your installation date.' },
-      { '@type': 'HowToStep', name: 'Site Prep', text: 'We protect landscaping and the home exterior.' },
-      { '@type': 'HowToStep', name: 'Tear-off & Inspection', text: 'We remove old materials and inspect decking.' },
-      { '@type': 'HowToStep', name: 'Install New Roof', text: 'Underlayment, flashing, ventilation, and finishing materials are installed.' },
-      { '@type': 'HowToStep', name: 'Final Inspection & Cleanup', text: 'We inspect the final install and clean the site.' },
-      { '@type': 'HowToStep', name: 'Warranty & Maintenance', text: 'We provide warranty info and maintenance tips.' }
-    ],
-    url: pageUrl,
-  } as const;
+    url: SERVICE_PATH,
+    origin,
+  });
   return (
     <>
       <Section>
@@ -116,21 +100,9 @@ export default async function Page() {
           <div id="article-root" className="prose min-w-0">
             <h1>Roof Replacement</h1>
             {/* JSON-LD: WebPage + BreadcrumbList + HowTo */}
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
-            />
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-            />
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }}
-            />
+            <JsonLd data={webPageLd} />
+            <JsonLd data={breadcrumbsLd} />
+            <JsonLd data={howToLd} />
 
             <h2>How do you know if you need a roof replacement?</h2>
             <p>
@@ -386,18 +358,11 @@ export default async function Page() {
           heading="Roof Replacement FAQs"
           topicSlug="roof-replacement"
           limit={8}
-          initialItems={faqs}
-          seeMoreHref="/faq"
-        />
+        initialItems={faqs}
+        seeMoreHref="/faq"
+      />
 
-        {/* FAQ Schema */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-        />
-
-      </Section>
-    </>
+    </Section>
+  </>
   );
 }

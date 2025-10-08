@@ -9,48 +9,35 @@ import LiteMap from "@/components/LiteMap";
 import OpenOrClosed from "@/components/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 import FinancingBand from "@/components/FinancingBand";
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 import { LEAD_SUCCESS_COOKIE } from '@/lib/contact-lead';
+import { buildBasicMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
+import { getServicePageConfig } from "@/lib/seo/service-pages";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
-// ===== STATIC SEO FOR /contact-us (EDIT HERE) =====
-const SEO_TITLE_CONTACT = 'Contact SonShine Roofing | Sarasota Roofing Company';
-const SEO_DESCRIPTION_CONTACT =
-  'Call (941) 866-4320 or send a message — our team responds quickly during business hours. Serving Sarasota, Manatee & Charlotte Counties since 1987.';
-const SEO_KEYWORDS_CONTACT = [
-  'contact',
-  'phone',
-  'address',
-  'email',
-  'map',
-  'Sarasota roofing',
-  'Manatee County roofing',
-  'Charlotte County roofing',
-  'roof repair',
-  'roof replacement'
-];
-const SEO_CANONICAL_CONTACT = '/contact-us';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
+const SERVICE_PATH = "/contact-us";
+const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: SEO_TITLE_CONTACT,
-    description: SEO_DESCRIPTION_CONTACT,
-    keywords: SEO_KEYWORDS_CONTACT,
-    alternates: { canonical: SEO_CANONICAL_CONTACT },
-    openGraph: {
-      type: 'website',
-      title: SEO_TITLE_CONTACT,
-      description: SEO_DESCRIPTION_CONTACT,
-      url: SEO_CANONICAL_CONTACT,
-      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: SEO_TITLE_CONTACT,
-      description: SEO_DESCRIPTION_CONTACT,
-      images: [SEO_OG_IMAGE_DEFAULT],
-    },
-  };
+  const config = SERVICE_CONFIG;
+
+  if (!config) {
+    return buildBasicMetadata({
+      title: "Contact SonShine Roofing",
+      description: "Get in touch with SonShine Roofing.",
+      path: SERVICE_PATH,
+    });
+  }
+
+  return buildBasicMetadata({
+    title: config.title,
+    description: config.description,
+    path: SERVICE_PATH,
+    keywords: config.keywords,
+    image: config.image,
+  });
 }
 
 const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal break-words overflow-hidden";
@@ -63,6 +50,27 @@ const badgeStyles = "badge badge--accent inline-flex items-center gap-2";
 export default async function Page() {
   const cookieStore = await cookies();
   const leadSuccessCookie = cookieStore.get(LEAD_SUCCESS_COOKIE)?.value ?? null;
+  const origin = resolveSiteOrigin(await headers());
+  const config = SERVICE_CONFIG;
+  const breadcrumbsConfig =
+    config?.breadcrumbs ?? [
+      { name: "Home", path: "/" },
+      { name: "Contact", path: SERVICE_PATH },
+    ];
+
+  const webPageLd = webPageSchema({
+    name: config?.title ?? "Contact SonShine Roofing",
+    description: config?.description,
+    url: SERVICE_PATH,
+    origin,
+    primaryImage: config?.image?.url ?? "/og-default.png",
+    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
+  });
+
+  const breadcrumbsLd = breadcrumbSchema(
+    breadcrumbsConfig.map((crumb) => ({ name: crumb.name, item: crumb.path })),
+    { origin },
+  );
 
   return (
     <Section>
@@ -71,6 +79,8 @@ export default async function Page() {
           {/* Main content */}
           <div className="prose max-w-full min-w-0">
             <h1 className={h1Styles}>Contact Us</h1>
+            <JsonLd data={webPageLd} />
+            <JsonLd data={breadcrumbsLd} />
             {/* Trust strip */}
             <div className="mt-4 not-prose items-center">
               <div className="flex flex-wrap items-center justify-start gap-2 text-sm font-medium text-slate-700">

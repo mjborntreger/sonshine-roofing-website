@@ -1,4 +1,8 @@
+import { headers } from "next/headers";
 import { listFaqsWithContent } from "@/lib/wp";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { faqSchema } from "@/lib/seo/schema";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 import FaqInlineListClient, { type FaqInlineListClientItem } from "./FaqInlineListClient";
 
 type FaqInlineItem = {
@@ -49,11 +53,31 @@ export default async function FaqInlineList({
       contentHtml: faq.contentHtml,
     }));
 
+  const headerList = await headers();
+  const origin = resolveSiteOrigin(headerList);
+  const normalizedSeeMoreHref =
+    seeMoreHref.length > 1 && seeMoreHref.endsWith("/") ? seeMoreHref.slice(0, -1) : seeMoreHref;
+
+  const schemaData = faqSchema(
+    items.map((faq) => ({
+      question: faq.title,
+      answerHtml: faq.contentHtml,
+      url: `${normalizedSeeMoreHref}/${faq.slug}`,
+    })),
+    {
+      origin,
+      url: seeMoreHref,
+    },
+  );
+
   return (
-    <FaqInlineListClient
-      heading={heading}
-      seeMoreHref={seeMoreHref}
-      items={items}
-    />
+    <>
+      <FaqInlineListClient
+        heading={heading}
+        seeMoreHref={seeMoreHref}
+        items={items}
+      />
+      <JsonLd data={schemaData} />
+    </>
   );
 }

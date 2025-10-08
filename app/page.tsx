@@ -11,7 +11,7 @@ import BestOfTheBest from "@/components/BestOfTheBest";
 import Section from "@/components/layout/Section";
 import type { Metadata } from 'next';
 import FaqInlineList from "@/components/FaqInlineList";
-import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
+import { listFaqsWithContent } from "@/lib/wp";
 import LeadFormSection from "@/components/LeadFormSection";
 import { cookies } from 'next/headers';
 
@@ -79,11 +79,6 @@ export default async function Page() {
   const projects = await listRecentProjectsPoolForFilters(4, 8);
   const posts = await listRecentPostsPoolForFilters(4, 4);
   const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const faqLd = faqItemsToJsonLd(
-    generalFaqs.map(f => ({ question: f.title, answerHtml: f.contentHtml, url: `${base}/faq/${f.slug}` })),
-    base
-  );
   return (
     <>
       <Hero />
@@ -124,12 +119,6 @@ export default async function Page() {
           limit={8}
           initialItems={generalFaqs}
           seeMoreHref="/faq"
-        />
-        {/* JSON-LD for FAQs on the home page */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
         />
       </Section>
     </>

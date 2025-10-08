@@ -5,6 +5,11 @@ import Link from "next/link";
 import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
+import { buildProfileMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, personSchema, webPageSchema } from "@/lib/seo/schema";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
 export const dynamic = "force-dynamic";
 
@@ -26,25 +31,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     : 'Meet the SonShine Roofing team serving Sarasota, Manatee, and Charlotte Counties.';
   const ogImage = person?.featuredImage?.url || '/og-default.png';
 
-  return {
+  const [firstName, ...restName] = person?.title?.split(" ") ?? [];
+  const metadata = buildProfileMetadata({
     title,
     description,
-    alternates: { canonical: canonicalPath },
-    robots: { index: isNathan, follow: true },
-    openGraph: {
-      type: 'profile',
-      title,
-      description,
-      url: canonicalPath,
-      images: [{ url: ogImage, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: [ogImage],
-    },
-  };
+    path: canonicalPath,
+    image: { url: ogImage, width: 1200, height: 630 },
+    profile: firstName
+      ? {
+          firstName,
+          lastName: restName.length ? restName.join(" ") : undefined,
+        }
+      : undefined,
+  });
+
+  metadata.robots = { index: isNathan, follow: true };
+  return metadata;
 }
 
 export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -62,39 +64,36 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
   const prev = idx >= 0 && idx < navItems.length - 1 ? navItems[idx + 1] : null;
   const next = idx > 0 ? navItems[idx - 1] : null;
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const pageUrl = `${base}/person/${person.slug}`;
-  const personId = `${pageUrl}#person`;
-  const personLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    '@id': personId,
+  const origin = resolveSiteOrigin(await headers());
+  const pagePath = `/person/${person.slug}`;
+
+  const personLd = personSchema({
     name: person.title,
-    jobTitle: person.positionTitle || undefined,
-    image: person.featuredImage?.url ? { '@type': 'ImageObject', url: person.featuredImage.url } : undefined,
-    url: pageUrl,
-    worksFor: { '@id': `${base}/#roofingcontractor` },
-  } as const;
+    description: stripHtml(person.contentHtml).slice(0, 160),
+    url: pagePath,
+    origin,
+    jobTitle: person.positionTitle ?? undefined,
+    image: person.featuredImage?.url,
+    worksFor: `${origin}/#roofingcontractor`,
+  });
 
-  const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'About SonShine Roofing', item: `${base}/about-sonshine-roofing` },
-      { '@type': 'ListItem', position: 3, name: person.title, item: pageUrl },
+  const breadcrumbsLd = breadcrumbSchema(
+    [
+      { name: 'Home', item: '/' },
+      { name: 'About SonShine Roofing', item: '/about-sonshine-roofing' },
+      { name: person.title, item: pagePath },
     ],
-  } as const;
+    { origin },
+  );
 
-  const webPageLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
+  const webPageLd = webPageSchema({
     name: `${person.title} | SonShine Roofing`,
     description: stripHtml(person.contentHtml).slice(0, 160),
-    url: pageUrl,
-    primaryImageOfPage: person.featuredImage?.url ? { '@type': 'ImageObject', url: person.featuredImage.url } : { '@type': 'ImageObject', url: `${base}/og-default.png` },
-    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: base },
-  } as const;
+    url: pagePath,
+    origin,
+    primaryImage: person.featuredImage?.url ?? '/og-default.png',
+    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: origin },
+  });
 
   return (
     <Section>
@@ -120,22 +119,9 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
               )}
               <div className="min-w-0">
                 <h1 className="text-3xl font-bold text-slate-900">{person.title}</h1>
-                {/* JSON-LD: Person + BreadcrumbList + WebPage */}
-                <script
-                  type="application/ld+json"
-                  suppressHydrationWarning
-                  dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }}
-                />
-                <script
-                  type="application/ld+json"
-                  suppressHydrationWarning
-                  dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-                />
-                <script
-                  type="application/ld+json"
-                  suppressHydrationWarning
-                  dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
-                />
+                <JsonLd data={personLd} />
+                <JsonLd data={breadcrumbsLd} />
+                <JsonLd data={webPageLd} />
                 {person.positionTitle && (
                   <p className="mt-1 text-base font-medium text-[#0045d7]">{person.positionTitle}</p>
                 )}

@@ -2,9 +2,14 @@ import Section from '@/components/layout/Section';
 import Link from 'next/link';
 import SmartLink from '@/components/SmartLink';
 import { createElement, Fragment, ReactNode } from 'react';
+import { headers } from 'next/headers';
 import { getGlossaryTerm, listGlossaryIndex, stripHtml } from '@/lib/wp';
 import { suggest } from '@/lib/fuzzy';
 import type { Metadata } from 'next';
+import { buildBasicMetadata } from '@/lib/seo/meta';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema, definedTermSchema } from '@/lib/seo/schema';
+import { resolveSiteOrigin } from '@/lib/seo/site';
 
 // Escapes a string for safe use inside a RegExp
 function escapeRegExp(s: string) {
@@ -276,72 +281,31 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const fallbackDesc = 'Plain-English definitions of common roofing terms used across Sarasota, Manatee, and Charlotte Counties.';
 
   const { slug } = await params;
+  const fallbackMetadata = buildBasicMetadata({
+    title: fallbackTitle,
+    description: fallbackDesc,
+    path: '/roofing-glossary',
+    image: { url: '/og-default.png', width: 1200, height: 630 },
+  });
+  fallbackMetadata.robots = { index: true, follow: true };
+
   try {
     const term = await getGlossaryTerm(slug);
-    if (!term) {
-      return {
-        title: fallbackTitle,
-        description: fallbackDesc,
-        alternates: { canonical: '/roofing-glossary' },
-        robots: { index: true, follow: true },
-        openGraph: {
-          type: 'article',
-          title: fallbackTitle,
-          description: fallbackDesc,
-          url: '/roofing-glossary',
-          images: [{ url: '/og-default.png', width: 1200, height: 630 }],
-        },
-        twitter: {
-          card: 'summary_large_image',
-          title: fallbackTitle,
-          description: fallbackDesc,
-          images: ['/og-default.png'],
-        },
-      };
-    }
+    if (!term) return fallbackMetadata;
 
     const title = `${term.title} | Roofing Glossary`;
     const description = stripHtml(term.contentHtml || '').slice(0, 160);
 
-    return {
+    const metadata = buildBasicMetadata({
       title,
       description,
-      alternates: { canonical: `/roofing-glossary/${term.slug}` },
-      robots: { index: true, follow: true },
-      openGraph: {
-        type: 'article',
-        title,
-        description,
-        url: `/roofing-glossary/${term.slug}`,
-        images: [{ url: '/og-default.png', width: 1200, height: 630 }],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: ['/og-default.png'],
-      },
-    };
+      path: `/roofing-glossary/${term.slug}`,
+      image: { url: '/og-default.png', width: 1200, height: 630 },
+    });
+    metadata.robots = { index: true, follow: true };
+    return metadata;
   } catch {
-    return {
-      title: fallbackTitle,
-      description: fallbackDesc,
-      alternates: { canonical: '/roofing-glossary' },
-      robots: { index: true, follow: true },
-      openGraph: {
-        type: 'article',
-        title: fallbackTitle,
-        description: fallbackDesc,
-        url: '/roofing-glossary',
-        images: [{ url: '/og-default.png', width: 1200, height: 630 }],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: fallbackTitle,
-        description: fallbackDesc,
-        images: ['/og-default.png'],
-      },
-    };
+    return fallbackMetadata;
   }
 }
 
@@ -403,25 +367,25 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
   const prev = hasPos && pos > 0 ? index[pos - 1] : hasPos ? index[index.length - 1] : null;
   const next = hasPos && pos < index.length - 1 ? index[pos + 1] : hasPos ? index[0] : null;
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const termUrl = `${base}/roofing-glossary/${term.slug}`;
-  const definedTermLd = {
-    '@context': 'https://schema.org',
-    '@type': 'DefinedTerm',
+  const origin = resolveSiteOrigin(await headers());
+  const termPath = `/roofing-glossary/${term.slug}`;
+
+  const definedTermLd = definedTermSchema({
     name: term.title,
     description: stripHtml(term.contentHtml || '').slice(0, 300),
-    url: termUrl,
-    inDefinedTermSet: `${base}/roofing-glossary`,
-  } as const;
-  const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'Roofing Glossary', item: `${base}/roofing-glossary` },
-      { '@type': 'ListItem', position: 3, name: term.title, item: termUrl },
+    url: termPath,
+    inDefinedTermSet: '/roofing-glossary',
+    origin,
+  });
+
+  const breadcrumbsLd = breadcrumbSchema(
+    [
+      { name: 'Home', item: '/' },
+      { name: 'Roofing Glossary', item: '/roofing-glossary' },
+      { name: term.title, item: termPath },
     ],
-  } as const;
+    { origin },
+  );
 
   return (
     <Section>
@@ -433,16 +397,8 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
         <article className="prose max-w-none">
           <h1>{term.title}</h1>
           {/* JSON-LD: DefinedTerm + Breadcrumbs */}
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(definedTermLd) }}
-          />
-          <script
-            type="application/ld+json"
-            suppressHydrationWarning
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-          />
+          <JsonLd data={definedTermLd} />
+          <JsonLd data={breadcrumbsLd} />
           {/* definition body from WordPress */}
           <div>
             {renderGlossaryHtml(term.contentHtml || '', index, term.slug)}

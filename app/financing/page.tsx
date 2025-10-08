@@ -4,51 +4,36 @@ import ProgramCard from '@/components/ProgramCard';
 import MonthlyEstimator from './MonthlyEstimator';
 import type { Metadata } from 'next';
 import Image from "next/image";
+import { headers } from "next/headers";
 import FaqInlineList from "@/components/FaqInlineList";
-import { listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
+import { listFaqsWithContent } from "@/lib/wp";
+import { buildBasicMetadata } from "@/lib/seo/meta";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { breadcrumbSchema, serviceSchema, webPageSchema } from "@/lib/seo/schema";
+import { getServicePageConfig } from "@/lib/seo/service-pages";
+import { resolveSiteOrigin } from "@/lib/seo/site";
 
-// ===== STATIC SEO FOR /financing (EDIT HERE) =====
-const SEO_TITLE_FINANCING = 'Roof Financing | SonShine Roofing';
-const SEO_DESCRIPTION_FINANCING = 'Flexible roof financing options in Sarasota, Manatee, and Charlotte Counties. Equity‑based (PACE) and credit‑based plans available — including no money down, deferred payments, and fixed‑rate terms.';
-const SEO_KEYWORDS_FINANCING = [
-  'roof financing',
-  'roof loans',
-  'PACE financing',
-  'YGrene',
-  'affordable roof financing',
-  'low interest rate',
-  'fast approval',
-  'Service Finance',
-  'roof payment plans',
-  'Sarasota roofing',
-  'North Port Roofing',
-  'Venice Roofing',
-  'Manatee County roofing',
-  'Charlotte County roofing'
-];
-const SEO_CANONICAL_FINANCING = '/financing';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
+const SERVICE_PATH = "/financing";
+const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: SEO_TITLE_FINANCING,
-    description: SEO_DESCRIPTION_FINANCING,
-    keywords: SEO_KEYWORDS_FINANCING,
-    alternates: { canonical: SEO_CANONICAL_FINANCING },
-    openGraph: {
-      type: 'website',
-      title: SEO_TITLE_FINANCING,
-      description: SEO_DESCRIPTION_FINANCING,
-      url: SEO_CANONICAL_FINANCING,
-      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: SEO_TITLE_FINANCING,
-      description: SEO_DESCRIPTION_FINANCING,
-      images: [SEO_OG_IMAGE_DEFAULT],
-    },
-  };
+  const config = SERVICE_CONFIG;
+
+  if (!config) {
+    return buildBasicMetadata({
+      title: "Roof Financing | SonShine Roofing",
+      description: "Roof financing options from SonShine Roofing.",
+      path: SERVICE_PATH,
+    });
+  }
+
+  return buildBasicMetadata({
+    title: config.title,
+    description: config.description,
+    path: SERVICE_PATH,
+    keywords: config.keywords,
+    image: config.image,
+  });
 }
 
 const h2 = 'mb-16 mt-40 text-3xl md:text-4xl text-center font-semibold text-slate-900';
@@ -72,68 +57,56 @@ const contactInfoIconStyles = "h-5 w-5 text-slate-500";
 export default async function FinancingPage() {
   // Dynamic FAQs for topic "financing-payment" (max 8)
   const faqs = await listFaqsWithContent(8, "financing-payment").catch(() => []);
+  const origin = resolveSiteOrigin(await headers());
+  const config = SERVICE_CONFIG;
 
-  // JSON-LD objects (Service, Breadcrumbs, WebPage)
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const pageUrl = `${base}${SEO_CANONICAL_FINANCING}`;
-  const faqLd = faqItemsToJsonLd(
-    faqs.map((f) => ({ question: f.title, answerHtml: f.contentHtml, url: `${base}/faq/${f.slug}` })),
-    pageUrl
+  const breadcrumbsConfig =
+    config?.breadcrumbs ?? [
+      { name: "Home", path: "/" },
+      { name: "Financing", path: SERVICE_PATH },
+    ];
+
+  const webPageLd = webPageSchema({
+    name: config?.title ?? "Roof Financing",
+    description: config?.description,
+    url: SERVICE_PATH,
+    origin,
+    primaryImage: config?.image?.url ?? "/og-default.png",
+    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
+  });
+
+  const breadcrumbsLd = breadcrumbSchema(
+    breadcrumbsConfig.map((crumb) => ({
+      name: crumb.name,
+      item: crumb.path,
+    })),
+    { origin },
   );
-  const org = {
-    '@type': 'Organization',
-    name: 'SonShine Roofing',
-    url: base,
-    logo: { '@type': 'ImageObject', url: `${base}/icon.png` },
-  } as const;
 
-  const serviceLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Service',
-    name: 'Roof Financing',
-    description: SEO_DESCRIPTION_FINANCING,
-    provider: org,
+  const serviceLd = serviceSchema({
+    name: "Roof Financing",
+    description:
+      config?.description ??
+      "Flexible roof financing options in Sarasota, Manatee, and Charlotte Counties.",
+    url: SERVICE_PATH,
+    origin,
+    provider: {
+      "@type": "Organization",
+      name: "SonShine Roofing",
+      url: origin,
+      logo: { "@type": "ImageObject", url: `${origin}/icon.png` },
+    },
     areaServed: [
-      { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
-      { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
-      { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
+      "Sarasota County, FL",
+      "Manatee County, FL",
+      "Charlotte County, FL",
     ],
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'Financing Programs',
-      itemListElement: [
-        { '@type': 'Offer', name: 'YGrene (PACE, equity‑based)', url: 'https://prequalification.ygrene.com/ContractorApply/XYFMHC' },
-        { '@type': 'Offer', name: 'Service Finance (credit‑based)', url: pageUrl },
-      ],
-    },
-    url: pageUrl,
-  } as const;
-
-  const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'Financing', item: pageUrl },
+    offers: [
+      { "@type": "Offer", name: "YGrene (PACE, equity‑based)", url: "https://prequalification.ygrene.com/ContractorApply/XYFMHC" },
+      { "@type": "Offer", name: "Service Finance (credit‑based)", url: SERVICE_PATH },
     ],
-  } as const;
-
-  const webPageLd = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: SEO_TITLE_FINANCING,
-    description: SEO_DESCRIPTION_FINANCING,
-    url: pageUrl,
-    primaryImageOfPage: {
-      '@type': 'ImageObject',
-      url: `${base}${SEO_OG_IMAGE_DEFAULT}`,
-    },
-    isPartOf: {
-      '@type': 'WebSite',
-      name: 'SonShine Roofing',
-      url: base,
-    },
-  } as const;
+    serviceType: "Roof Financing",
+  });
   // Local helpers for examples
   const currency = (n: number) => n.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
   const pmt = (principal: number, annualRate: number, months: number) => {
@@ -446,29 +419,9 @@ export default async function FinancingPage() {
           seeMoreHref="/faq"
         />
 
-        {/* FAQ Schema */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-        />
-        {/* Service Schema */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
-        />
-        {/* BreadcrumbList Schema */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-        />
-        {/* WebPage Schema (mirrors SEO metadata) */}
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageLd) }}
-        />
+        <JsonLd data={serviceLd} />
+        <JsonLd data={breadcrumbsLd} />
+        <JsonLd data={webPageLd} />
       </div>
     </section>
   );

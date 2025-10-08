@@ -92,7 +92,7 @@ function MenuToggleIcon({ open }: { open: boolean }) {
 function LabelWithIcon({ label, iconClassName }: { label: string; iconClassName?: string }) {
   const Icon = NAV_ICONS[label];
   return (
-    <span className="inline-flex items-center">
+    <span className="inline-flex font-display text-lg items-center">
       {Icon && (
         <Icon
           className={cn("h-4 w-4 inline mr-2", iconClassName ?? "text-[--brand-blue]")}

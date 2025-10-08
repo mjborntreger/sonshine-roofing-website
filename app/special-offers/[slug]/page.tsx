@@ -2,7 +2,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
 
 import Section from '@/components/layout/Section';
 import Container from '@/components/layout/Container';
@@ -10,6 +10,10 @@ import SpecialOfferForm from './SpecialOfferForm';
 import { getSpecialOfferBySlug, listSpecialOfferSlugs, stripHtml } from '@/lib/wp';
 import isExpired from '@/lib/isExpired';
 import { formatSpecialOfferExpiration } from '@/lib/specialOfferDates';
+import { buildBasicMetadata } from '@/lib/seo/meta';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema, offerSchema } from '@/lib/seo/schema';
+import { resolveSiteOrigin } from '@/lib/seo/site';
 
 type OgImageRecord = {
     url?: unknown;
@@ -44,12 +48,13 @@ export async function generateMetadata({
     const offer = await getSpecialOfferBySlug(slug).catch(() => null);
 
     if (!offer) {
-        return {
+        const metadata = buildBasicMetadata({
             title: 'Special Offer · SonShine Roofing',
             description: 'This special offer is not available right now.',
-            robots: buildRobotsMeta(),
-            alternates: { canonical: `/special-offers/${slug}` },
-        };
+            path: `/special-offers/${slug}`,
+        });
+        metadata.robots = buildRobotsMeta();
+        return metadata;
     }
 
     const seo = offer.seo ?? {};
@@ -70,23 +75,14 @@ export async function generateMetadata({
     const ogHeight =
         (ogImageRecord && typeof ogImageRecord.height === 'number' && ogImageRecord.height) || 630;
 
-    return {
+    const metadata = buildBasicMetadata({
         title,
         description,
-        robots: buildRobotsMeta(),
-        alternates: { canonical: `/special-offers/${slug}` },
-        openGraph: {
-            title,
-            description,
-            images: [{ url: ogUrl, width: ogWidth, height: ogHeight }],
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title,
-            description,
-            images: [ogUrl],
-        },
-    };
+        path: `/special-offers/${slug}`,
+        image: { url: ogUrl, width: ogWidth, height: ogHeight },
+    });
+    metadata.robots = buildRobotsMeta();
+    return metadata;
 }
 
 export default async function SpecialOfferPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -103,6 +99,32 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   const cookieStore = await cookies();
   const cookieKey = `ss_offer_${offer.slug}`;
   const cookieValue = cookieStore.get(cookieKey)?.value ?? null;
+
+  const origin = resolveSiteOrigin(await headers());
+  const pagePath = `/special-offers/${offer.slug}`;
+
+  const breadcrumbsLd = breadcrumbSchema(
+    [
+      { name: 'Home', item: '/' },
+      { name: 'Special Offers', item: '/special-offers' },
+      { name: offer.title, item: pagePath },
+    ],
+    { origin },
+  );
+
+  const offerSchemaData = offerSchema({
+    name: offer.title,
+    description: stripHtml(offer.contentHtml || '').slice(0, 160),
+    url: pagePath,
+    origin,
+    validThrough: offer.expirationDate || undefined,
+    availability: expired ? 'https://schema.org/Discontinued' : 'https://schema.org/InStock',
+    seller: {
+      '@type': 'Organization',
+      name: 'SonShine Roofing',
+      url: origin,
+    },
+  });
 
   let initialUnlock: { offerCode: string } | null = null;
   if (!expired && offer.offerCode && cookieValue) {
@@ -121,6 +143,9 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
 
     return (
         <div>
+            <JsonLd data={breadcrumbsLd} />
+            <JsonLd data={offerSchemaData} />
+
             <section>
                 <Container>
                     <div className="max-w-3xl space-y-6 rounded-2xl mt-24">
