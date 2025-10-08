@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import clsx from 'clsx';
-import { ChevronDown } from 'lucide-react';
+import { Accordion } from '@/components/Accordion';
 
 type Item = { label: string; why: string };
 
@@ -72,7 +72,6 @@ const PILLS: { key: GroupKey; label: string }[] = [
 
 export default function TipTopRoofCheckup({ className }: { className?: string }) {
     const [tab, setTab] = useState<GroupKey>('interior');
-    const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
 
     // JSON-LD (client-side): HowTo + page-specific Service for Tip Top Roof Check‑up
     const base = process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : 'https://sonshineroofing.com');
@@ -116,9 +115,6 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
         ],
     }), [base, pageUrl, providerId]);
 
-    const toggle = (id: string) =>
-        setOpenMap((m) => ({ ...m, [id]: !m[id] }));
-
     return (
         <div className={clsx('mt-32', className)}>
             <header className="text-center">
@@ -142,7 +138,7 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
             />
 
-            <div className="mx-auto mt-4 max-w-3xl rounded-xl border border-slate-400 bg-white p-4 text-center shadow-sm">
+            <div className="mx-auto mt-4 max-w-3xl rounded-3xl border border-slate-200 bg-white p-4 text-center shadow-sm">
                 <p className="text-sm text-slate-700">
                     You’ll get a written summary of findings, photos where helpful, and a clear plan to
                     extend the life of your roof—or a straight‑shooting estimate if replacement makes more sense.
@@ -166,7 +162,7 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
                                 'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm shadow-sm transition',
                                 active
                                     ? 'bg-[var(--brand-blue)] text-white border-transparent'
-                                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
+                                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                             )}
                             data-active={active}
                         >
@@ -192,33 +188,28 @@ export default function TipTopRoofCheckup({ className }: { className?: string })
                         id={`panel-${key}`}
                         aria-labelledby={`tab-${key}`}
                         hidden={tab !== key}
-                        className="rounded-2xl border border-slate-400 bg-white p-4 shadow-sm"
+                        className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm"
                     >
-                        <h3 className="text-lg font-semibold text-slate-900">{CHECKLIST[key].title}</h3>
+                        <h3>{CHECKLIST[key].title}</h3>
                         <p className="mt-1 text-sm text-slate-600">{CHECKLIST[key].blurb}</p>
 
-                        <ul className="mt-4 space-y-3 list-none not-prose p-0">
+                        <ul className="space-y-3 list-none not-prose p-0">
                             {CHECKLIST[key].items.map((it, idx) => {
                                 const id = `${key}-${idx}`;
-                                const open = Boolean(openMap[id]);
                                 return (
-                                    <li key={id} className="not-prose rounded-lg border border-slate-300 overflow-hidden transition-colors hover:bg-slate-50">
-                                        <button
-                                            type="button"
-                                            aria-expanded={open}
-                                            onClick={() => toggle(id)}
-                                            className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left"
+                                    <li key={id} className="not-prose">
+                                        <Accordion
+                                            summary={<h4>{it.label}</h4>}
+                                            radius="2xl"
+                                            tone="medium"
+                                            size="sm"
+                                            proseBody={false}
+                                            summaryClassName='text-[1rem]'
                                         >
-                                            <span className="font-medium text-slate-900">{it.label}</span>
-                                            <span className={clsx('shrink-0 transition', open ? 'rotate-180' : '')}>
-                                                <ChevronDown className="inline h-4 w-4" />
-                                            </span>
-                                        </button>
-                                        {open && (
-                                            <div className="px-4 pb-4 text-sm text-slate-700">
+                                            <p className="m-0">
                                                 <strong className="text-slate-900">Why we check this:</strong> {it.why}
-                                            </div>
-                                        )}
+                                            </p>
+                                        </Accordion>
                                     </li>
                                 );
                             })}

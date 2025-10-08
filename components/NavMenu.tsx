@@ -50,7 +50,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
 };
 
 const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Resources"]);
-const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-400";
+const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
   const prefersReducedMotion = useReducedMotion();

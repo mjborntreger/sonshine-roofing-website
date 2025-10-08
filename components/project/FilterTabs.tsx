@@ -82,7 +82,7 @@ export default function FilterTabs({
       <div
         role="tablist"
         aria-label={ariaLabel}
-        className="flex-wrap items-center justify-start gap-1 rounded-full border border-slate-300 bg-slate-100/70 p-1"
+        className="flex-wrap items-center w-fit justify-start gap-1 rounded-full border border-slate-300 bg-slate-100/70 p-1"
       >
         {orderedTabs.map((tab) => {
           const selected = tab.key === activeKey;

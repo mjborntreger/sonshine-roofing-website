@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 
+import { Accordion } from "@/components/Accordion";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, Percent, Landmark, ChevronDown, HelpCircle, ArrowRight } from "lucide-react";
+import { CheckCircle2, Percent, Landmark, HelpCircle, ArrowRight } from "lucide-react";
 
 type CTA = { href: string; label: string; title?: string; className?: string };
 
@@ -71,7 +72,7 @@ export default function ProgramCard({
   return (
     <div
       className={cn(
-        "rounded-2xl transition-transform",
+        "rounded-2xl h-fit transition-transform",
         wrapperClass,
         "hover:shadow-lg motion-safe:hover:scale-[1.01]",
         isBluePrimary && "shadow-lg"
@@ -166,21 +167,28 @@ export default function ProgramCard({
           </ul>
 
           {eligibility.length ? (
-            <details className="group mt-4 rounded-xl border border-slate-300 bg-white">
-              <summary className="flex items-center justify-between cursor-pointer select-none px-3 py-2 text-sm font-medium text-slate-900">
-                <span className="inline-flex items-center gap-2">
-                  <HelpCircle
-                    className={cn(
-                      "h-4 w-4",
-                      isOrange ? "text-[--brand-orange]" : isCyan ? "text-cyan-600" : "text-[--brand-blue]",
-                    )}
-                    aria-hidden
-                  />
-                  {eligibilityLabel || 'How eligibility works'}
-                </span>
-                <ChevronDown className="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" aria-hidden />
-              </summary>
-              <ul className="accordion-motion px-4 pb-3 pt-0 text-sm text-slate-700 space-y-1">
+            <Accordion
+              className="mt-4 rounded-xl border border-slate-300 bg-white"
+              summary={<span className="inline-flex items-center gap-2">{eligibilityLabel || "How eligibility works"}</span>}
+              icon={
+                <HelpCircle
+                  className={cn(
+                    "h-4 w-4",
+                    isOrange ? "text-[--brand-orange]" : isCyan ? "text-cyan-600" : "text-[--brand-blue]",
+                  )}
+                  aria-hidden
+                />
+              }
+              size="sm"
+              tone="medium"
+              radius="xl"
+              proseBody={false}
+              summaryClassName="px-3 py-2 text-sm font-medium text-slate-900"
+              iconWrapperClassName="inline-flex items-center justify-center"
+              chevronClassName="h-4 w-4 text-slate-500"
+              contentClassName="accordion-motion px-4 pb-3 pt-0 text-sm text-slate-700"
+            >
+              <ul className="space-y-1">
                 {eligibility.map((e, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 text-slate-400" aria-hidden />
@@ -188,7 +196,7 @@ export default function ProgramCard({
                   </li>
                 ))}
               </ul>
-            </details>
+            </Accordion>
           ) : null}
         </div>
 

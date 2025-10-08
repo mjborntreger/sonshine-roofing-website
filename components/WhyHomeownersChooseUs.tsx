@@ -1,12 +1,13 @@
 import type { ComponentType, SVGProps } from "react";
 
+import { Accordion } from "@/components/Accordion";
+
 import SmartLink from "./SmartLink";
 import {
   ShieldCheck,
   Shield,
   MapPin,
   HandCoins,
-  ChevronDown,
   Award,
   CalendarDays,
   BadgeCheck,
@@ -28,7 +29,8 @@ const CARD_SUMMARY_BASE = "flex cursor-pointer select-none items-center justify-
 const CARD_HEADER_BASE = "flex items-center gap-3 rounded-t-3xl px-6 pt-6 pb-4 text-lg font-semibold text-slate-900";
 const CARD_BODY_BASE = "flex-1 rounded-b-3xl px-6 pb-6 pt-4 text-sm leading-relaxed";
 const ICON_BASE = "grid h-10 w-10 place-items-center rounded-full transition-transform duration-200";
-const CHEVRON_BASE = "h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180";
+const CHEVRON_BASE =
+  "h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open/accordion:rotate-180";
 const TITLE_BASE = "relative inline-block text-slate-900 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:transition-all after:duration-300";
 
 type ThemeKey = "blue" | "orange";
@@ -167,33 +169,32 @@ export default async function WhyHomeownersChooseUs() {
 
           return (
             <div key={`${pillar.id}-mobile`} className={theme.frame}>
-              <details className={`${ACCORDION_SHELL_BASE} ${theme.shell}`} open={pillar.defaultOpen}>
-                <summary className={`${CARD_SUMMARY_BASE} ${theme.summary}`}>
-                  <span className="flex items-center gap-3">
-                    <span className={`${ICON_BASE} ${theme.icon}`}>
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                    <h3 className={`${TITLE_BASE} ${theme.titleAccent}`}>{pillar.title}</h3>
-                  </span>
-                  <ChevronDown className={CHEVRON_BASE} aria-hidden="true" />
-                </summary>
-                <div className={`${CARD_BODY_BASE} ${theme.body} accordion-motion`}>
-                  <p>{pillar.description}</p>
-                  {pillar.cta ? (
-                    <div className="mt-6 flex justify-end">
-                      <SmartLink
-                        href={pillar.cta.href}
-                        className="btn btn-brand-orange btn-md btn-press mt-2"
-                        title={pillar.cta.title}
-                        data-icon-affordance="right"
-                      >
-                        {pillar.cta.label}
-                        <ArrowRight className="icon-affordance ml-2 inline h-4 w-4" />
-                      </SmartLink>
-                    </div>
-                  ) : null}
-                </div>
-              </details>
+              <Accordion
+                className={`${ACCORDION_SHELL_BASE} ${theme.shell} border-0`}
+                summary={<h3 className={`${TITLE_BASE} ${theme.titleAccent}`}>{pillar.title}</h3>}
+                icon={<Icon className="h-5 w-5" aria-hidden="true" />}
+                iconWrapperClassName={`${ICON_BASE} ${theme.icon}`}
+                chevronClassName={CHEVRON_BASE}
+                summaryClassName={`${CARD_SUMMARY_BASE} ${theme.summary}`}
+                contentClassName={`${CARD_BODY_BASE} ${theme.body} accordion-motion`}
+                proseBody={false}
+                defaultOpen={pillar.defaultOpen}
+              >
+                <p>{pillar.description}</p>
+                {pillar.cta ? (
+                  <div className="mt-6 flex justify-end">
+                    <SmartLink
+                      href={pillar.cta.href}
+                      className="btn btn-brand-orange btn-md btn-press mt-2"
+                      title={pillar.cta.title}
+                      data-icon-affordance="right"
+                    >
+                      {pillar.cta.label}
+                      <ArrowRight className="icon-affordance ml-2 inline h-4 w-4" />
+                    </SmartLink>
+                  </div>
+                ) : null}
+              </Accordion>
             </div>
           );
         })}

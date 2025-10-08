@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import ResourceSearchController from '@/components/resource-search/ResourceSearchController';
 import ResourcesAside from '@/components/ResourcesAside';
 import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
+import { Accordion } from '@/components/Accordion';
 import FaqBulkToggleClient from './FaqBulkToggleClient';
 
 export const revalidate = 86400; // daily ISR
@@ -128,7 +129,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                     placeholder="Search questions..."
                     aria-label="Search FAQs"
                     autoComplete="off"
-                    className="w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[#0045d7] focus:outline-none"
+                    className="w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:outline-none"
                   />
                 </div>
               </div>
@@ -172,52 +173,45 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
                 if (list.length === 0) return null;
                 return (
                   <section key={slug} id={`topic-${slug}`}>
-                    <details className="faq-topic rounded-lg border border-slate-300 bg-white" open>
-                      <summary className="flex items-center justify-between cursor-pointer select-none px-4 py-2 text-sm font-semibold text-slate-800 hover:translate-y-[1px] transition">
-                        <span
-                          data-topic-name={title}
-                        >
-                          <HelpCircle className="h-4 w-4 text-[--brand-blue] mr-2 inline" />
+                    <Accordion
+                      className="faq-topic"
+                      icon={<HelpCircle className="h-4 w-4" aria-hidden="true" />}
+                      summary={
+                        <h2 className="text-sm text-slate-700" data-topic-name={title}>
                           {title}
-                        </span>
+                        </h2>
+                      }
+                      meta={
                         <span className="inline-flex items-center gap-2 text-slate-600">
                           <span className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-[#cef3ff] px-2 text-xs font-medium text-slate-700 faq-count">
                             {list.length}
                           </span>
                         </span>
-                      </summary>
-                      <div className="accordion-motion px-4 pb-4 pt-2 space-y-2">
-                        {list.map((f) => {
-                          return (
-                            <details
-                              key={f.slug}
-                              id={`faq-${f.slug}`}
-                              className="faq-item group rounded-md border border-slate-200 bg-white"
-                              data-title={(f.title || '').toString()}
-                              data-topic={title}
-                              data-excerpt=""
-                            >
-                              <summary className="flex items-start justify-between gap-4 px-4 py-3 cursor-pointer">
-                                <h3 className="prose text-slate-900">{f.title}</h3>
-                                <svg
-                                  className="h-5 w-5 shrink-0 self-center opacity-70 transition-transform duration-200 group-open:rotate-90"
-                                  viewBox="0 0 20 20"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  aria-hidden
-                                >
-                                  <path d="M7 5l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                              </summary>
-                              <div
-                                className="accordion-motion prose prose-sm px-4 pb-4 mt-1"
-                                dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }}
-                              />
-                            </details>
-                          );
-                        })}
-                      </div>
-                    </details>
+                      }
+                      radius="2xl"
+                      tone="medium"
+                      size="sm"
+                      proseBody={false}
+                      defaultOpen
+                    >
+                      {list.map((f) => (
+                        <Accordion
+                          key={f.slug}
+                          id={`faq-${f.slug}`}
+                          className="faq-item mb-2"
+                          data-title={(f.title || '').toString()}
+                          data-topic={title}
+                          data-excerpt=""
+                          summary={<h3 className="text-[1.2rem]">{f.title}</h3>}
+                          radius="2xl"
+                          tone="soft"
+                          size="sm"
+                          proseBody={false}
+                        >
+                          <div dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }} />
+                        </Accordion>
+                      ))}
+                    </Accordion>
                   </section>
                 );
               })}

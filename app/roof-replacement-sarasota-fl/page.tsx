@@ -5,13 +5,12 @@ import SmartLink from "@/components/SmartLink";
 import { listRecentPostsPool, listFaqsWithContent, faqItemsToJsonLd } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
-import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, ChevronDown } from "lucide-react";
+import { Accordion } from "@/components/Accordion";
+import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks } from "lucide-react";
 import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";
 
-const detailsStyles = "group not-prose rounded-3xl border border-slate-200 bg-white mb-4";
-const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
 const stepperStyles = "absolute -left-[5px] top-2 h-2 w-2 rounded-full bg-[#0045d7]";
@@ -148,56 +147,54 @@ export default async function Page() {
             <FinancingBand />
 
             <h2>What Should You Know Before Getting a Roof Replacement?</h2>
-            <details className={detailsStyles}>
-              <summary className={summaryStyles}>
-                <span className="flex items-center gap-2">
-                  <ShieldCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className="m-0">Know Your Contractor</h3>
-                </span>
-                <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
-              </summary>
-              <div className="accordion-motion prose px-4 pb-4 pt-0">
-                <p>
-                  SonShine Roofing is licensed by the State of Florida as a roofing
-                  contractor and is fully insured. While state law requires roofers
-                  to carry a valid license and insurance, neither guarantees quality
-                  workmanship, real experience, or a long-lasting roof.
-                </p>
+            <Accordion
+              icon={<ShieldCheck className="h-7 w-7" aria-hidden="true" />}
+              summary={<h3 className="text-xl text-slate-800">Know Your Contractor</h3>}
+              className="mb-4"
+              radius="2xl"
+              proseBody={false}
+            >
+              <p>
+                SonShine Roofing is licensed by the State of Florida as a roofing
+                contractor and is fully insured. While state law requires roofers
+                to carry a valid license and insurance, neither guarantees quality
+                workmanship, real experience, or a long-lasting roof.
+              </p>
 
-                <figure className={figureStyles}>
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-                    <Image
-                      src="https://next.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
-                      alt="Nathan Borntreger, owner of SonShine Roofing"
-                      fill
-                      className="object-cover mb-2"
-                      sizes="(max-width: 768px) 100vw, 800px"
-                      loading="lazy"
-                    />
-                  </div>
-                  <figcaption className="mt-3 mx-2 text-xs text-slate-500">
-                    <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #CCC1331483 | <SmartLink className="hover:underline no-italic text-[--brand-blue]" href="/person/nathan-borntreger">See full bio</SmartLink>
-                  </figcaption>
-                </figure>
+              <figure className={figureStyles}>
+                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+                  <Image
+                    src="https://next.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
+                    alt="Nathan Borntreger, owner of SonShine Roofing"
+                    fill
+                    className="object-cover mb-2"
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    loading="lazy"
+                  />
+                </div>
+                <figcaption className="mt-3 mx-2 text-xs text-slate-500">
+                  <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #CCC1331483 |{" "}
+                  <SmartLink className="hover:underline no-italic text-[--brand-blue]" href="/person/nathan-borntreger">
+                    See full bio
+                  </SmartLink>
+                </figcaption>
+              </figure>
 
-                <p>
-                  We bring over 50 years of combined expertise and hands-on experience
-                  to your real-world roofing needs. Our roofing crews are true employees
-                  of SonShine Roofing—not subcontractors—and we invest in their ongoing
-                  roofing education to keep pace with evolving industry standards.
-                </p>
-              </div>
-            </details>
+              <p>
+                We bring over 50 years of combined expertise and hands-on experience
+                to your real-world roofing needs. Our roofing crews are true employees
+                of SonShine Roofing—not subcontractors—and we invest in their ongoing
+                roofing education to keep pace with evolving industry standards.
+              </p>
+            </Accordion>
 
-            <details className={detailsStyles}>
-              <summary className={summaryStyles}>
-                <span className="flex items-center gap-2">
-                  <Layers className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className="m-0">Know What Materials You Need</h3>
-                </span>
-                <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
-              </summary>
-            <div className="accordion-motion prose px-4 pb-4 pt-0">
+            <Accordion
+              icon={<Layers className="h-7 w-7" aria-hidden="true" />}
+              summary={<h3 className="text-xl text-slate-800">Know What Materials You Need</h3>}
+              className="mb-4"
+              radius="2xl"
+              proseBody={false}
+            >
                 <p>
                   There are many roofing material options available to choose from,
                   and we’re here to help you determine what’s best for your home. As
@@ -223,23 +220,20 @@ export default async function Page() {
                   </div>
                 </figure>
 
-                <p>
-                  It’s not just about the materials themselves — proper installation is equally
-                  important. Our experienced team ensures that every component is installed to
-                  the highest standard for long-term durability and protection.
-                </p>
-              </div>
-            </details>
+              <p>
+                It’s not just about the materials themselves — proper installation is equally
+                important. Our experienced team ensures that every component is installed to
+                the highest standard for long-term durability and protection.
+              </p>
+            </Accordion>
 
-            <details className={detailsStyles}>
-              <summary className={summaryStyles}>
-                <span className="flex items-center gap-2">
-                  <BadgeCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className="m-0">Know What Warranties Come with Your New Roof</h3>
-                </span>
-                <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
-              </summary>
-            <div className="accordion-motion prose px-4 pb-4 pt-0">
+            <Accordion
+              icon={<BadgeCheck className="h-7 w-7" aria-hidden="true" />}
+              summary={<h3 className="text-xl text-slate-800">Know What Warranties Come with Your New Roof</h3>}
+              className="mb-4"
+              radius="2xl"
+              proseBody={false}
+            >
                 <p>
                   There are usually two types of warranty that come with your new roof: workmanship and manufacturer.
                   <br /><br />
@@ -247,58 +241,55 @@ export default async function Page() {
 
                 <h4>Workmanship Warranty</h4>
                 {/* Inline callout (#6) */}
-                <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
-                  <strong className="block text-slate-900 mb-1">Fact:</strong>
-                  <p className="m-0 text-slate-700">
-                    The vast majority of roof failures are caused by poor workmanship, and
-                    often you won’t notice these errors for many years down the line without yearly
-                    inspections.
-                  </p>
-                </div>
-                <p>
-                  This is why it is important to seek out roofers who stand behind their work
-                  with extended workmanship warranties and have a long-standing reputation.
-                  This ensures that you won’t be on the hook for costly repairs that are not
-                  your fault.
-                  <br /><br />
-                  Depending on your roof and warranty package, you can enjoy up to 30 years of
-                  workmanship coverage with SonShine Roofing.
-                  <br /><br />
-                </p>
-
-                <h4>Manufacturer Warranty</h4>
-                <p>
-                  Many roofing materials also come with warranties directly from the manufacturer
-                  that protect against product defects. That being said, such defects are incredibly
-                  rare with reputable vendors such as GAF, Eagle Tile, Westlake Royal Roofing,
-                  Polyglass USA, Crown Tile, and Sunshine State Metals.
-                  <br /><br />
-                  These warranties typically last for decades, some even up to 50 years on more
-                  durable materials such as metal or tile.
-                  <br /><br />
-                </p>
-
-                <h4>Important Note</h4>
-                <p>
-                  As with any contract, always read the fine print before you sign. Be aware that
-                  warranties typically do not cover anything considered beyond “normal wear and tear.”
-                  <br /><br />
-                  For example, if a tree falls on your roof during a hurricane, that is neither the
-                  manufacturer’s nor the roofer’s fault. Ideally this sort of event would be covered
-                  by your insurance company.
+              <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
+                <strong className="block text-slate-900 mb-1">Fact:</strong>
+                <p className="m-0 text-slate-700">
+                  The vast majority of roof failures are caused by poor workmanship, and
+                  often you won’t notice these errors for many years down the line without yearly
+                  inspections.
                 </p>
               </div>
-            </details>
+              <p>
+                This is why it is important to seek out roofers who stand behind their work
+                with extended workmanship warranties and have a long-standing reputation.
+                This ensures that you won’t be on the hook for costly repairs that are not
+                your fault.
+                <br /><br />
+                Depending on your roof and warranty package, you can enjoy up to 30 years of
+                workmanship coverage with SonShine Roofing.
+                <br /><br />
+              </p>
 
-            <details className={detailsStyles}>
-              <summary className={summaryStyles}>
-                <span className="flex items-center gap-2">
-                  <Wrench className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className="m-0">Know the Importance of Roof Maintenance</h3>
-                </span>
-                <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
-              </summary>
-            <div className="accordion-motion prose px-4 pb-4 pt-0">
+              <h4>Manufacturer Warranty</h4>
+              <p>
+                Many roofing materials also come with warranties directly from the manufacturer
+                that protect against product defects. That being said, such defects are incredibly
+                rare with reputable vendors such as GAF, Eagle Tile, Westlake Royal Roofing,
+                Polyglass USA, Crown Tile, and Sunshine State Metals.
+                <br /><br />
+                These warranties typically last for decades, some even up to 50 years on more
+                durable materials such as metal or tile.
+                <br /><br />
+              </p>
+
+              <h4>Important Note</h4>
+              <p>
+                As with any contract, always read the fine print before you sign. Be aware that
+                warranties typically do not cover anything considered beyond “normal wear and tear.”
+                <br /><br />
+                For example, if a tree falls on your roof during a hurricane, that is neither the
+                manufacturer’s nor the roofer’s fault. Ideally this sort of event would be covered
+                by your insurance company.
+              </p>
+            </Accordion>
+
+            <Accordion
+              icon={<Wrench className="h-7 w-7" aria-hidden="true" />}
+              summary={<h3 className="text-xl text-slate-800">Know the Importance of Roof Maintenance</h3>}
+              className="mb-4"
+              radius="2xl"
+              proseBody={false}
+            >
                 <p>
                   A roof replacement is a major investment—but that doesn’t mean your new roof is “set
                   it and forget it.” Regular maintenance is the key to protecting your roof’s longevity
@@ -320,64 +311,59 @@ export default async function Page() {
                     />
                   </div>
                 </figure>
-                <p>
-                  At SonShine Roofing, we’ve seen it all—shingles lifted by summer storms, debris buildup
-                  that traps moisture, and flashing that’s been slowly leaking for months. The good news?
-                  These are all preventable with the right maintenance plan. We recommend annual inspections
-                  and seasonal touch-ups to keep your roof performing like it should.
-                  <br /><br />
-                  Proper maintenance not only extends the life of your roof but also preserves your warranty,
-                  safeguards your home’s structure, and helps you avoid the stress of emergency repairs. Whether
-                  your roof is brand new or pushing its limits, we’re here to help you stay ahead of the
-                  curve—because since 1987, we’ve got you covered.
-                </p>
+              <p>
+                At SonShine Roofing, we’ve seen it all—shingles lifted by summer storms, debris buildup
+                that traps moisture, and flashing that’s been slowly leaking for months. The good news?
+                These are all preventable with the right maintenance plan. We recommend annual inspections
+                and seasonal touch-ups to keep your roof performing like it should.
+                <br /><br />
+                Proper maintenance not only extends the life of your roof but also preserves your warranty,
+                safeguards your home’s structure, and helps you avoid the stress of emergency repairs. Whether
+                your roof is brand new or pushing its limits, we’re here to help you stay ahead of the
+                curve—because since 1987, we’ve got you covered.
+              </p>
 
-                {/* Inline callout (#6) */}
-                <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Pro tip">
-                  <strong className="block text-slate-900 mb-1">Pro tip</strong>
-                  <p className="m-0 text-slate-700">Annual inspections keep warranties valid and catch small issues before they become leaks.</p>
-                </div>
+              {/* Inline callout (#6) */}
+              <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Pro tip">
+                <strong className="block text-slate-900 mb-1">Pro tip</strong>
+                <p className="m-0 text-slate-700">Annual inspections keep warranties valid and catch small issues before they become leaks.</p>
               </div>
-            </details>
+            </Accordion>
 
-            <details className="group not-prose rounded-3xl border border-slate-200 bg-white mb-6">
-              <summary className={summaryStyles}>
-                <span className="flex items-center gap-2">
-                  <ListChecks className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className="m-0">Know What to Expect</h3>
-                </span>
-                <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
-              </summary>
-            <div className="accordion-motion prose px-4 pb-4 pt-0">
-                {/* Stepper timeline (#4) */}
-                <ol className="my-4 not-prose border-slate-200 pl-6 space-y-4">
-                  <li className={liStyles}>
-                    <span className={stepperStyles} />
-                    <p className="m-0"><strong>Permits &amp; Scheduling</strong> — We file permits and set your installation date.</p>
-                  </li>
-                  <li className={liStyles}>
-                    <span className={stepperStyles} />
-                    <p className="m-0"><strong>Site Prep</strong> — Protect landscaping &amp; home exterior.</p>
-                  </li>
-                  <li className={liStyles}>
-                    <span className={stepperStyles} />
-                    <p className="m-0"><strong>Tear‑off &amp; Inspection</strong> — Remove old materials, inspect decking.</p>
-                  </li>
-                  <li className={liStyles}>
-                    <span className={stepperStyles} />
-                    <p className="m-0"><strong>Install New Roof</strong> — Underlayment, flashing, ventilation, and finish roof.</p>
-                  </li>
-                  <li className={liStyles}>
-                    <span className={stepperStyles} />
-                    <p className="m-0"><strong>Final Inspection &amp; Cleanup</strong> — Ensure quality and clean the site.</p>
-                  </li>
-                  <li className={liStyles}>
-                    <span className={stepperStyles} />
-                    <p className="m-0"><strong>Warranty &amp; Maintenance</strong> — Provide warranty info and maintenance tips.</p>
-                  </li>
-                </ol>
-              </div>
-            </details>
+            <Accordion
+              icon={<ListChecks className="h-7 w-7" aria-hidden="true" />}
+              summary={<h3 className="text-xl text-slate-800">Know What to Expect</h3>}
+              radius="2xl"
+              proseBody={false}
+            >
+              {/* Stepper timeline (#4) */}
+              <ol className="my-4 not-prose border-slate-200 pl-6 space-y-4">
+                <li className={liStyles}>
+                  <span className={stepperStyles} />
+                  <p className="m-0"><strong>Permits &amp; Scheduling</strong> — We file permits and set your installation date.</p>
+                </li>
+                <li className={liStyles}>
+                  <span className={stepperStyles} />
+                  <p className="m-0"><strong>Site Prep</strong> — Protect landscaping &amp; home exterior.</p>
+                </li>
+                <li className={liStyles}>
+                  <span className={stepperStyles} />
+                  <p className="m-0"><strong>Tear‑off &amp; Inspection</strong> — Remove old materials, inspect decking.</p>
+                </li>
+                <li className={liStyles}>
+                  <span className={stepperStyles} />
+                  <p className="m-0"><strong>Install New Roof</strong> — Underlayment, flashing, ventilation, and finish roof.</p>
+                </li>
+                <li className={liStyles}>
+                  <span className={stepperStyles} />
+                  <p className="m-0"><strong>Final Inspection &amp; Cleanup</strong> — Ensure quality and clean the site.</p>
+                </li>
+                <li className={liStyles}>
+                  <span className={stepperStyles} />
+                  <p className="m-0"><strong>Warranty &amp; Maintenance</strong> — Provide warranty info and maintenance tips.</p>
+                </li>
+              </ol>
+            </Accordion>
 
             <RepairVsReplace />
 

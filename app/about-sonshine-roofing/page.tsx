@@ -4,7 +4,8 @@ import { listPersons, listPersonsBySlugs } from '@/lib/wp';
 import PersonGrid from "./PersonGrid";
 import SocialMediaProfiles from "@/components/SocialMediaProfiles";
 import { HoursAndInformation } from "./HoursAndInformation";
-import { UserRoundSearch, CloudRainWind, ChevronDown, BadgeCheck, ExternalLink } from "lucide-react";
+import { Accordion } from "@/components/Accordion";
+import { UserRoundSearch, CloudRainWind, BadgeCheck, ExternalLink } from "lucide-react";
 import type { Metadata } from 'next';
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 
@@ -67,9 +68,6 @@ const ORDER: string[] = [
   'erick',
   'jose'
 ];
-
-const detailsStyles = "group not-prose rounded-2xl border border-slate-200 bg-white mb-4";
-const summaryStyles = "flex items-center justify-between cursor-pointer select-none p-4";
 
 export default async function Page() {
   const people = ORDER.length
@@ -136,51 +134,46 @@ export default async function Page() {
                 </a>
               </div>
 
-              <details open className={detailsStyles}>
-                <summary className={summaryStyles}>
-                  <span className="flex items-center gap-2">
-                    <UserRoundSearch className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                    <h2 className="m-0 text-lg font-semibold">Who we are</h2>
-                  </span>
-                  <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
-                </summary>
-                <div className="accordion-motion px-4 pb-4">
-                  <p>
-                    SonShine Roofing is a family-owned roofing company based in Sarasota, Florida,
-                    serving Sarasota, Manatee, and Charlotte County residents with 38+ years of experience.
-                    We specialize in residential roofing services, including roof repair, roof replacement,
-                    inspections, and our Roof Care Club, which is our preventative maintenance program designed
-                    for the unique weather conditions of Southwest Florida.
-                    <br /><br />
-                    We’ve learned that superior customer service and honesty with clients are the only way to
-                    stay in business. When you ask us to inspect your roof, we’ll tell you the flat-out truth
-                    and give you our best recommendation based on our 38+ years of professional experience.
-                    We’d be more than pleased to have you look through our client referrals.
-                  </p>
-                </div>
-              </details>
+              <Accordion
+                icon={<UserRoundSearch className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />}
+                summary={<h2 className="text-lg">Who we are</h2>}
+                className="mb-4"
+                radius="2xl"
+                proseBody={false}
+                defaultOpen
+              >
+                <p>
+                  SonShine Roofing is a family-owned roofing company based in Sarasota, Florida,
+                  serving Sarasota, Manatee, and Charlotte County residents with 38+ years of experience.
+                  We specialize in residential roofing services, including roof repair, roof replacement,
+                  inspections, and our Roof Care Club, which is our preventative maintenance program designed
+                  for the unique weather conditions of Southwest Florida.
+                  <br /><br />
+                  We’ve learned that superior customer service and honesty with clients are the only way to
+                  stay in business. When you ask us to inspect your roof, we’ll tell you the flat-out truth
+                  and give you our best recommendation based on our 38+ years of professional experience.
+                  We’d be more than pleased to have you look through our client referrals.
+                </p>
+              </Accordion>
 
-              <details className={detailsStyles}>
-                <summary className={summaryStyles}>
-                  <span className="flex items-center gap-2">
-                    <CloudRainWind className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                    <h2 className="m-0 text-lg font-semibold">Built for Florida&apos;s Weather</h2>
-                  </span>
-                  <ChevronDown className="h-5 w-5 transition-transform group-open:rotate-180" aria-hidden="true" />
-                </summary>
-                <div className="accordion-motion px-4 pb-4">
-                  <p className="prose">
-                    Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.
-                    Since we are keenly attuned to unpredictable nature of hurricane season, we focus on
-                    quality over quick fixes, offering durable, Florida-ready roofing solutions backed by
-                    manufacturer warranties and our own workmanship 30-year Leak Free Guarantee.
-                    <br /><br />
-                    When you choose SonShine Roofing, you are showing that you value honesty,
-                    integrity, reliable service, and unbeatable quality. We trust that you’ll make the
-                    right choice.
-                  </p>
-                </div>
-              </details>
+              <Accordion
+                icon={<CloudRainWind className="h-5 w-5" aria-hidden="true" />}
+                summary={<h2 className="text-lg">Built for Florida&apos;s Weather</h2>}
+                className="mb-4"
+                radius="2xl"
+                proseBody={false}             
+              >
+                <p className="prose">
+                  Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.
+                  Since we are keenly attuned to unpredictable nature of hurricane season, we focus on
+                  quality over quick fixes, offering durable, Florida-ready roofing solutions backed by
+                  manufacturer warranties and our own workmanship 30-year Leak Free Guarantee.
+                  <br /><br />
+                  When you choose SonShine Roofing, you are showing that you value honesty,
+                  integrity, reliable service, and unbeatable quality. We trust that you’ll make the
+                  right choice.
+                </p>
+              </Accordion>
 
               <HoursAndInformation />
 

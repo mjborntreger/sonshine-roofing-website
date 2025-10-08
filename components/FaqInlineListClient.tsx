@@ -1,7 +1,8 @@
 "use client";
 
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowDown, ArrowRight, ArrowUp, ChevronDown, HelpCircle } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, HelpCircle } from "lucide-react";
+import { Accordion } from "@/components/Accordion";
 import SmartLink from "./SmartLink";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
@@ -143,23 +144,17 @@ const FaqItem = forwardRef<HTMLDetailsElement, FaqItemProps>(function FaqItem(
   ref,
 ) {
   return (
-    <details
+    <Accordion
       ref={ref}
-      className="group not-prose w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-colors duration-200 ease-out group-open:border-[--brand-blue] group-open:bg-[--brand-blue]/5 group-open:shadow-md"
+      summary={<h3 className="text-[1.2rem]">{title}</h3>}
+      size="md"
+      tone="soft"
+      radius="2xl"
+      proseBody={false}
     >
-      <summary className="flex cursor-pointer select-none items-center justify-between px-4 py-3 transition-colors duration-200 ease-out hover:bg-slate-50">
-        <span className="flex items-center gap-2 text-left text-base font-medium text-slate-900">
-          {title}
-        </span>
-        <ChevronDown
-          className="h-5 w-5 transform transition-transform duration-200 ease-out group-open:rotate-180 group-open:scale-110"
-          aria-hidden="true"
-        />
-      </summary>
       <div
-        className="accordion-motion prose prose-sm px-4 pb-4 pt-0 text-slate-700"
         dangerouslySetInnerHTML={{ __html: contentHtml || "" }}
       />
-    </details>
+    </Accordion>
   );
 });

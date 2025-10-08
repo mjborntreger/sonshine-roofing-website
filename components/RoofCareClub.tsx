@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { Accordion } from '@/components/Accordion';
 
 // -----------------------------
 // Types & Data
@@ -325,24 +326,22 @@ export default function RoofCareClub() {
                 {plan.features.map((fid) => {
                   const f = featureById.get(fid)!;
                   return (
-                    <li key={fid} className="rounded-xl border border-slate-200">
-                      <details className="group [&_summary::-webkit-details-marker]:hidden">
-                        <summary className="flex cursor-pointer items-center justify-between gap-3 rounded-xl bg-slate-50/70 px-5 py-3.5 text-slate-900 hover:bg-slate-100">
-                          <span className="font-medium leading-snug text-[15px] md:text-base">{f.label}</span>
-                          <span
-                            aria-hidden
-                            className="text-slate-400 transition group-open:rotate-180"
-                          >
-                            ▾
-                          </span>
-                        </summary>
-                        {f.why && (
-                          <div className="accordion-motion px-4 pb-4 pt-2 text-sm text-slate-600">
-                            <span className="font-semibold text-slate-800">Why it matters: </span>
+                    <li key={fid}>
+                      <Accordion
+                        summary={<h4>{f.label}</h4>}
+                        radius="2xl"
+                        tone="soft"
+                        size="md"
+                        proseBody={false}
+                        summaryClassName='text-[1rem]'
+                      >
+                        {f.why ? (
+                          <div className="m-0">
+                            <span className="font-semibold text-slate-700">Why it matters: </span>
                             {f.why}
                           </div>
-                        )}
-                      </details>
+                        ) : null}
+                      </Accordion>
                     </li>
                   );
                 })}
