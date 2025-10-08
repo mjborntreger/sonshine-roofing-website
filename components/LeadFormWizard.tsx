@@ -47,7 +47,9 @@ import {
   CONTACT_PREF_OPTIONS,
   PROJECT_OPTIONS,
   getJourneyConfig,
+  getHelpTopicLabelsForDisplay,
   getSuccessLinks,
+  getTimelineLabelForDisplay,
   isJourneyKey,
   restoreLeadSuccessState,
 } from '@/components/lead-form/config';
