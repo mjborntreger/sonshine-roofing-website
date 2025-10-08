@@ -1,12 +1,15 @@
+import { buildBasicMetadata } from "@/lib/seo/meta";
 import type { Metadata } from "next";
 import Script from "next/script";
 
 const CALENDLY_URL = "https://calendly.com/michael-sonshineroofing?hide_landing_page_details=1&hide_gdpr_banner=1&primary_color=0045d7";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildBasicMetadata({
   title: "Calendly Test | SonShine Roofing",
   description: "Schedule time with the SonShine Roofing team using our embedded Calendly experience.",
-};
+  path: "/calendly-test",
+  robots: { index: false, follow: true },
+});
 
 export default function CalendlyTestPage() {
   return (

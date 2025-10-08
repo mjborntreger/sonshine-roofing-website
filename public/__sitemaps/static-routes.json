@@ -1,25 +1,21 @@
 {
-  "generatedAt": "2025-10-08T05:59:50.026Z",
+  "generatedAt": "2025-10-08T07:04:57.481Z",
   "routes": [
     {
       "loc": "/",
-      "lastmod": "2025-10-08T01:50:02.819Z"
+      "lastmod": "2025-10-08T06:55:38.621Z"
     },
     {
       "loc": "/about-sonshine-roofing",
-      "lastmod": "2025-10-08T02:27:34.396Z"
+      "lastmod": "2025-10-08T06:55:38.617Z"
     },
     {
       "loc": "/blog",
-      "lastmod": "2025-10-08T02:33:24.983Z"
-    },
-    {
-      "loc": "/calendly-test",
-      "lastmod": "2025-10-07T20:45:30.662Z"
+      "lastmod": "2025-10-08T06:55:38.618Z"
     },
     {
       "loc": "/contact-us",
-      "lastmod": "2025-10-08T02:28:41.059Z"
+      "lastmod": "2025-10-08T06:55:38.618Z"
     },
     {
       "loc": "/faq",
@@ -27,7 +23,7 @@
     },
     {
       "loc": "/financing",
-      "lastmod": "2025-10-08T02:23:11.145Z"
+      "lastmod": "2025-10-08T06:55:38.619Z"
     },
     {
       "loc": "/privacy-policy",
@@ -35,23 +31,23 @@
     },
     {
       "loc": "/project",
-      "lastmod": "2025-10-08T02:32:30.367Z"
+      "lastmod": "2025-10-08T06:55:38.623Z"
     },
     {
       "loc": "/roof-inspection",
-      "lastmod": "2025-10-08T02:25:50.716Z"
+      "lastmod": "2025-10-08T06:55:38.623Z"
     },
     {
       "loc": "/roof-maintenance",
-      "lastmod": "2025-10-08T02:24:28.210Z"
+      "lastmod": "2025-10-08T06:55:38.623Z"
     },
     {
       "loc": "/roof-repair",
-      "lastmod": "2025-10-08T02:20:34.926Z"
+      "lastmod": "2025-10-08T06:55:38.624Z"
     },
     {
       "loc": "/roof-replacement-sarasota-fl",
-      "lastmod": "2025-10-08T02:21:42.831Z"
+      "lastmod": "2025-10-08T06:55:38.624Z"
     },
     {
       "loc": "/roofing-glossary",
@@ -59,7 +55,7 @@
     },
     {
       "loc": "/video-library",
-      "lastmod": "2025-10-08T02:51:59.766Z"
+      "lastmod": "2025-10-08T06:55:38.626Z"
     }
   ]
 }
