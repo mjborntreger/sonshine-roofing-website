@@ -415,7 +415,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
     const successLinks = getSuccessLinks(successMeta.projectType);
     return (
       <div className="mt-8 flex justify-center px-4">
-        <div className="w-full max-w-3xl rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-md">
+        <div className="w-full max-w-5xl mx-auto rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-md">
           <div className="flex flex-col items-center text-center">
             <CheckCircle2 className="h-12 w-12 text-emerald-500" aria-hidden="true" />
             <h3 className="mt-4 text-3xl font-semibold text-slate-900">We’ve got it — thank you!</h3>
@@ -445,11 +445,11 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
             </div>
           </div>
           {successLinks.length > 0 && (
-            <div className="mt-10">
+            <div className="not-prose mt-10">
               <h4 className="text-lg font-semibold text-slate-900">What to do next</h4>
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 {successLinks.map(({ label, description, href, external, icon: Icon }) => (
-                  <a
+                  <SmartLink
                     key={`${label}-${href}`}
                     href={href}
                     target={external ? '_blank' : undefined}
@@ -473,7 +473,7 @@ export default function SimpleLeadForm({ initialSuccessCookie }: { initialSucces
                         <ArrowRight className="h-4 w-4 text-[--brand-blue] transition group-hover:translate-x-0.5" aria-hidden="true" />
                       )}
                     </span>
-                  </a>
+                  </SmartLink>
                 ))}
               </div>
             </div>

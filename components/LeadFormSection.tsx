@@ -1,25 +1,23 @@
-"use client";
+import { Suspense } from 'react';
+import { cookies } from 'next/headers';
+import LeadForm from '@/components/LeadForm';
+import { restoreLeadSuccessState, type LeadSuccessRestore } from '@/components/lead-form/config';
+import { LeadFormFallback } from '@/components/lead-form/Fallback';
 
-import { Suspense } from "react";
-import LeadForm from "@/components/LeadForm";
+type LeadFormSectionProps = {
+  initialSuccessCookie?: string | null;
+  restoredSuccess?: LeadSuccessRestore | null;
+};
 
-function LeadFormFallback() {
-  return (
-    <div
-      className="mt-8 min-h-[420px] rounded-3xl border border-blue-100 bg-white/70 p-8 shadow-sm"
-      aria-busy="true"
-      aria-live="polite"
-    >
-      <p className="text-sm font-semibold text-slate-500">Loading your guided request form…</p>
-    </div>
-  );
-}
+export default async function LeadFormSection({ initialSuccessCookie, restoredSuccess }: LeadFormSectionProps = {}) {
+  const cookieStore = await cookies();
+  const cookieValue = initialSuccessCookie ?? cookieStore.get('ss_lead_form_success')?.value ?? null;
+  const successState = restoredSuccess ?? restoreLeadSuccessState(cookieValue);
 
-export default function LeadFormSection({ initialSuccessCookie }: { initialSuccessCookie?: string | null }) {
   return (
     <div>
       <Suspense fallback={<LeadFormFallback />}>
-        <LeadForm initialSuccessCookie={initialSuccessCookie} />
+        <LeadForm initialSuccessCookie={cookieValue} restoredSuccess={successState} />
       </Suspense>
     </div>
   );
