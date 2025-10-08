@@ -1,5 +1,3 @@
-"use client";
-
 import { Hammer, Wrench, Search, ShieldCheck, HardHat } from "lucide-react";
 
 import QuickLinksPanel, { type QuickLinkItem, type QuickLinksPalette } from "@/components/QuickLinksPanel";
@@ -45,7 +43,11 @@ const PALETTE: QuickLinksPalette = {
   iconGradientToClass: "to-[#ffd8a8]",
 };
 
-export default function ServicesQuickLinks() {
+export type ServicesQuickLinksProps = {
+  activePath?: string;
+};
+
+export default function ServicesQuickLinks({ activePath = "/" }: ServicesQuickLinksProps) {
   return (
     <QuickLinksPanel
       className="mt-4"
@@ -53,6 +55,7 @@ export default function ServicesQuickLinks() {
       titleIcon={HardHat}
       links={LINKS}
       palette={PALETTE}
+      activePath={activePath}
     />
   );
 }

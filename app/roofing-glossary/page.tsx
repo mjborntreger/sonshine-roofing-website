@@ -7,6 +7,7 @@ import type { Metadata } from 'next';
 import SmartLink from '@/components/SmartLink';
 
 export const revalidate = 86400; // daily ISR
+const PAGE_PATH = '/roofing-glossary';
 
 export async function generateMetadata(): Promise<Metadata> {
   // EDIT: Roofing Glossary archive SEO (title/description)
@@ -16,12 +17,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: '/roofing-glossary' },
+    alternates: { canonical: PAGE_PATH },
     openGraph: {
       type: 'website',
       title,
       description,
-      url: '/roofing-glossary',
+      url: PAGE_PATH,
       images: [{ url: '/og-default.png', width: 1200, height: 630 }], // EDIT: swap if you add a dedicated OG image
     },
     twitter: {
@@ -59,8 +60,8 @@ export default async function GlossaryArchivePage() {
     '@type': 'DefinedTerm',
     name: t.title,
     description: stripHtml(t.excerpt ?? '').slice(0, 200),
-    url: `${base}/roofing-glossary/${t.slug}`,
-    inDefinedTermSet: `${base}/roofing-glossary`,
+    url: `${base}${PAGE_PATH}/${t.slug}`,
+    inDefinedTermSet: `${base}${PAGE_PATH}`,
   }));
 
   const glossaryLd = {
@@ -68,7 +69,7 @@ export default async function GlossaryArchivePage() {
     '@type': 'DefinedTermSet',
     name: 'Roofing Glossary',
     description: 'Plain-English definitions of roofing terms used by homeowners and pros in Southwest Florida.',
-    url: `${base}/roofing-glossary`,
+    url: `${base}${PAGE_PATH}`,
     hasDefinedTerm: definedTerms,
   } as const;
 
@@ -77,7 +78,7 @@ export default async function GlossaryArchivePage() {
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'Roofing Glossary', item: `${base}/roofing-glossary` },
+      { '@type': 'ListItem', position: 2, name: 'Roofing Glossary', item: `${base}${PAGE_PATH}` },
     ],
   } as const;
 
@@ -146,7 +147,7 @@ export default async function GlossaryArchivePage() {
           </div>
 
           {/* RIGHT: floating aside on desktop */}
-          <ResourcesAside />
+          <ResourcesAside activePath={PAGE_PATH} />
 
         </div>
       </div>

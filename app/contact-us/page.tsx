@@ -174,7 +174,7 @@ export default async function Page() {
           {/* Floating/sticky */}
           <aside className="lg:sticky top-16 self-start lg:h-fit">
             <SocialMediaProfiles />
-            <ResourcesQuickLinks />
+            <ResourcesQuickLinks activePath={SERVICE_PATH} />
           </aside>
 
         </div>

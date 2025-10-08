@@ -9,6 +9,7 @@ import { Accordion } from '@/components/Accordion';
 import FaqBulkToggleClient from './FaqBulkToggleClient';
 
 export const revalidate = 86400; // daily ISR
+const PAGE_PATH = '/faq';
 
 export async function generateMetadata(): Promise<Metadata> {
   // EDIT: FAQ archive SEO title/description/copy here (applies to prod + staging)
@@ -18,12 +19,12 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: '/faq' },
+    alternates: { canonical: PAGE_PATH },
     openGraph: {
       type: 'website',
       title,
       description,
-      url: '/faq',
+      url: PAGE_PATH,
       images: [{ url: '/og-default.png', width: 1200, height: 630 }], // EDIT: swap if you add a dedicated FAQ OG image
     },
     twitter: {
@@ -49,13 +50,13 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
 
   // JSON-LD: build FAQPage + Breadcrumbs (first 50 items)
   const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const faqLd = faqListToJsonLd(faqs.slice(0, 50), base, '/faq');
+  const faqLd = faqListToJsonLd(faqs.slice(0, 50), base, PAGE_PATH);
   const breadcrumbsLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
       { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'FAQ', item: `${base}/faq` },
+      { '@type': 'ListItem', position: 2, name: 'FAQ', item: `${base}${PAGE_PATH}` },
     ],
   } as const;
 
@@ -218,7 +219,7 @@ export default async function FAQArchivePage({ searchParams }: PageProps) {
             </div>
           </div>
           {/* RIGHT: floating aside on desktop */}
-          <ResourcesAside />
+          <ResourcesAside activePath={PAGE_PATH} />
         </div>
       </div>
 

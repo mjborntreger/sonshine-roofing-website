@@ -128,7 +128,7 @@ export default async function ProjectArchivePage({ searchParams }: PageProps) {
               initialFilters={initialFilters}
             />
           </div>
-          <ResourcesAside />
+          <ResourcesAside activePath={PAGE_PATH} />
         </div>
       </div>
     </Section>

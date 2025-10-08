@@ -291,7 +291,7 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
             />
           </div>
 
-          <ResourcesAside />
+          <ResourcesAside activePath={CANONICAL} />
         </div>
       </div>
 

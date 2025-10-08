@@ -1,5 +1,3 @@
-"use client";
-
 import { Image as ImageIcon, PlayCircle, Newspaper, BookOpen, HelpCircle, Wrench } from "lucide-react";
 
 import QuickLinksPanel, { type QuickLinkItem, type QuickLinksPalette } from "@/components/QuickLinksPanel";
@@ -52,7 +50,11 @@ const PALETTE: QuickLinksPalette = {
   iconGradientToClass: "to-[#00e3fe]",
 };
 
-export default function ResourcesQuickLinks() {
+export type ResourcesQuickLinksProps = {
+  activePath?: string;
+};
+
+export default function ResourcesQuickLinks({ activePath = "/" }: ResourcesQuickLinksProps) {
   return (
     <QuickLinksPanel
       className="my-4"
@@ -60,6 +62,7 @@ export default function ResourcesQuickLinks() {
       titleIcon={Wrench}
       links={LINKS}
       palette={PALETTE}
+      activePath={activePath}
     />
   );
 }

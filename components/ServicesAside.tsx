@@ -7,10 +7,14 @@ const arrowIconStyles = "icon-affordance h-4 w-4 inline ml-2";
 const semanticIconStyles = "h-4 w-4 inline mr-2";
 const buttonStyles = "btn w-full h-11 mt-2";
 
-export default function ServicesAside() {
+export type ServicesAsideProps = {
+    activePath?: string;
+};
+
+export default function ServicesAside({ activePath = "/" }: ServicesAsideProps) {
     return (
         <aside className="sticky top-16 self-start h-fit lg:w-[320px]">
-            <ServicesQuickLinks />
+            <ServicesQuickLinks activePath={activePath} />
 
             <TocFromHeadings
                 root="#article-root"

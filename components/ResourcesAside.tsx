@@ -1,10 +1,14 @@
 import ResourcesQuickLinks from "./ResourcesQuickLinks"
 import SidebarCta from "./SidebarCta";
 
-export default async function ResourcesAside() {
+export type ResourcesAsideProps = {
+    activePath?: string;
+};
+
+export default function ResourcesAside({ activePath = "/" }: ResourcesAsideProps) {
     return (
         <aside className="sticky top-16">
-            <ResourcesQuickLinks />
+            <ResourcesQuickLinks activePath={activePath} />
             <SidebarCta />
         </aside>
     )

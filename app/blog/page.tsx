@@ -124,7 +124,7 @@ export default async function BlogArchivePage({ searchParams }: PageProps) {
             />
           </div>
 
-          <ResourcesAside />
+          <ResourcesAside activePath={PAGE_PATH} />
         </div>
       </div>
     </Section>

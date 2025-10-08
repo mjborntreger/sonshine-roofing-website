@@ -1,6 +1,3 @@
-"use client";
-
-import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 
@@ -32,6 +29,7 @@ type QuickLinksPanelProps = {
   links: QuickLinkItem[];
   palette: QuickLinksPalette;
   className?: string;
+  activePath?: string;
 };
 
 function isActivePath(current: string, href: string) {
@@ -47,9 +45,8 @@ export default function QuickLinksPanel({
   links,
   palette,
   className,
+  activePath = "/",
 }: QuickLinksPanelProps) {
-  const pathname = usePathname() || "/";
-
   return (
     <div className={cn("rounded-3xl border border-slate-200 bg-white p-4 shadow-sm", className)}>
       <h2 className="not-prose mb-3 font-display text-center text-[1rem] leading-none font-bold uppercase tracking-wide text-slate-700">
@@ -59,7 +56,7 @@ export default function QuickLinksPanel({
 
       <ul className="space-y-2">
         {links.map(({ href, label, description, aria, Icon }) => {
-          const active = isActivePath(pathname, href);
+          const active = isActivePath(activePath, href);
           const commonClasses =
             "group flex items-center gap-3 rounded-2xl border bg-white px-3 py-2 text-sm font-medium transition hover:shadow-sm focus:outline-none focus-visible:ring-2 motion-reduce:transition-none";
           const stateClasses = active

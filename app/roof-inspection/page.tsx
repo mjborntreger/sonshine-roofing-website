@@ -146,7 +146,7 @@ export default async function Page() {
           </p>
         </div>
 
-        <ServicesAside />
+        <ServicesAside activePath={SERVICE_PATH} />
       </div>
 
       <div data-toc-exclude>
