@@ -177,7 +177,7 @@ export default function VideoGrid({
         initial={initialPage}
         filters={filters}
         pageSize={pageSize}
-        gridClass="mt-4 grid gap-6 grid-cols-1 md:grid-cols-2"
+        gridClass="mt-8"
         onVideoOpen={openModal}
       />
 

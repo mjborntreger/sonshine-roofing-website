@@ -6,6 +6,8 @@ export type OgImageInput = {
   height?: number;
   alt?: string;
 };
+
+type OpenGraphMetadata = NonNullable<Metadata["openGraph"]>;
 export const DEFAULT_OG_IMAGE: Required<Omit<OgImageInput, "alt">> & { alt?: string } = {
   url: "/og-default.png",
   width: 1200,
@@ -29,10 +31,7 @@ export type BasicMetadataInput = {
   keywords?: string[];
   image?: OgImageInput;
   robots?: Metadata["robots"];
-  openGraphType?: Metadata["openGraph"] extends infer OG ? OG extends { type?: infer T }
-    ? T
-    : never
-    : never;
+  openGraphType?: OpenGraphMetadata["type"];
 };
 
 export function buildBasicMetadata({
@@ -51,7 +50,7 @@ export function buildBasicMetadata({
     description,
     alternates: { canonical: path },
     openGraph: {
-      type: openGraphType as Metadata["openGraph"]["type"],
+      type: openGraphType,
       title,
       description,
       url: path,

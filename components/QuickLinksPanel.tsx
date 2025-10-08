@@ -93,7 +93,7 @@ export default function QuickLinksPanel({
                 </span>
 
                 <div className="min-w-0 flex-1 text-left">
-                  <h3 className="not-prose font-display leading-none block truncate text-[1rem] font-bold">{label}</h3>
+                  <h3 className="not-prose font-display leading-none truncate text-[1rem]">{label}</h3>
                   <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">{description}</p>
                 </div>
 

@@ -96,7 +96,7 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
           initial={result}
           filters={listFilters}
           pageSize={pageSize}
-          gridClass="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4"
+          gridClass="mt-8"
         />
       )}
       loadingOverlayMessage="Loading projects…"

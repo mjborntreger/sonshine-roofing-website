@@ -36,7 +36,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
       >
         <Card className="proj-card overflow-hidden hover:shadow-lg transition">
           <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-            <CardTitle className="font-semibold">{project.title}</CardTitle>
+            <CardTitle className="font-bold">{project.title}</CardTitle>
           </CardHeader>
 
           {project.heroImage?.url ? (

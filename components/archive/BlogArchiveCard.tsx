@@ -38,7 +38,7 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
     >
       <Card className="overflow-hidden hover:shadow-lg transition">
           <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-            <CardTitle className="font-semibold">{post.title}</CardTitle>
+            <CardTitle className="font-bold">{post.title}</CardTitle>
           </CardHeader>
 
           {post.featuredImage?.url ? (

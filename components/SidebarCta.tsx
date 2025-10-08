@@ -1,6 +1,5 @@
 import { HelpCircle, Phone, PencilLineIcon, SquareMenu, ArrowRight } from "lucide-react";
 import SmartLink from "./SmartLink";
-import Image from "next/image";
 
 // Style Constants //
 const titleIcon = "h-5 w-5 inline mr-2 text-[--brand-blue]";

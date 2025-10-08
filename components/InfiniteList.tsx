@@ -7,6 +7,7 @@ import type { PostCard, ProjectSummary, VideoItem } from "@/lib/wp";
 import { fetchPage, getCachedPages, setCachedPages } from "@/lib/resource-fetch";
 import { useIntersection } from "./useIntersection";
 import GridLoadingState from "@/components/layout/GridLoadingState";
+import Grid from "@/components/layout/Grid";
 
 import SmartLink from "@/components/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -176,7 +177,7 @@ const renderVideoItem = (
                 data-sa={serviceSlugs}
             >
                 <CardHeader>
-                    <CardTitle className="font-medium">{video.title}</CardTitle>
+                    <CardTitle className="font-bold">{video.title}</CardTitle>
                 </CardHeader>
 
                 <button
@@ -362,7 +363,7 @@ export default function InfiniteList<T>({
     initial,
     filters,
     pageSize = 24,
-    gridClass = "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4",
+    gridClass = "",
     renderItem,
     skeletonCount,
     onVideoOpen,
@@ -505,7 +506,7 @@ export default function InfiniteList<T>({
 
     return (
         <>
-            <div className={gridClass} data-loading={loading ? "true" : "false"}>
+            <Grid className={gridClass} data-loading={loading ? "true" : "false"}>
                 {items.map((item, index) => {
                     const uniqueKey = resolveItemKey(item, index);
                     return (
@@ -514,13 +515,13 @@ export default function InfiniteList<T>({
                         </Fragment>
                     );
                 })}
-            </div>
+            </Grid>
 
             {loading && (
                 <GridLoadingState
                     variant={loaderVariant}
                     count={skeletonCountEff}
-                    gridClassName={gridClass}
+                    className={gridClass}
                 />
             )}
 
