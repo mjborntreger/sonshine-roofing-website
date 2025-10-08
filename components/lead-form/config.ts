@@ -62,6 +62,12 @@ export type ResourceLink = {
   external?: boolean;
 };
 
+export type LeadFormUtmParams = {
+  source?: string;
+  medium?: string;
+  campaign?: string;
+};
+
 export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'repair',
@@ -115,7 +121,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
 ];
 
-const STANDARD_TIMELINE_OPTIONS: TimelineOption[] = [
+export const STANDARD_TIMELINE_OPTIONS: TimelineOption[] = [
   { value: 'within-72-hours', label: 'Within 72 hours' },
   { value: 'this-week', label: 'This week' },
   { value: 'this-month', label: 'This month' },

@@ -14,6 +14,7 @@ import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent } from "@/lib/wp";
 import LeadFormSection from "@/components/LeadFormSection";
 import { cookies } from 'next/headers';
+import type { LeadFormUtmParams } from "@/components/lead-form/config";
 
 // ===== STYLE CONSTANTS ===== //
 const leadFormLayout = "mx-auto w-full";
@@ -73,9 +74,25 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Page() {
+const normalizeParam = (value: string | string[] | undefined): string | undefined => {
+  if (Array.isArray(value)) return value[0];
+  return value ? String(value) : undefined;
+};
+
+const extractUtm = (params: Record<string, string | string[] | undefined>): LeadFormUtmParams => ({
+  source: normalizeParam(params['utm_source']),
+  medium: normalizeParam(params['utm_medium']),
+  campaign: normalizeParam(params['utm_campaign']),
+});
+
+export default async function Page({
+  searchParams = {},
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   const cookieStore = await cookies();
   const leadSuccessCookie = cookieStore.get('ss_lead_form_success')?.value ?? null;
+  const utm = extractUtm(searchParams ?? {});
   const projects = await listRecentProjectsPoolForFilters(4, 8);
   const posts = await listRecentPostsPoolForFilters(4, 4);
   const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
@@ -84,7 +101,7 @@ export default async function Page() {
       <Hero />
       <div className={leadFormLayout}>
         <div className="max-w-[1280px] mx-auto py-16">
-          <LeadFormSection initialSuccessCookie={leadSuccessCookie} />
+          <LeadFormSection initialSuccessCookie={leadSuccessCookie} utm={utm} />
         </div>
       </div>
       <div className={reviewsLayout}>

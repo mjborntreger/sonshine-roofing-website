@@ -16,6 +16,7 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { resolveSiteOrigin } from "@/lib/seo/site";
+import type { LeadFormUtmParams } from "@/components/lead-form/config";
 
 const SERVICE_PATH = "/contact-us";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -47,9 +48,25 @@ const h2Styles = "text-xl md:text-2xl text-slate-800";
 const pStyles = "text-md py-2 text-slate-700";
 const badgeStyles = "badge badge--accent inline-flex items-center gap-2";
 
-export default async function Page() {
+const normalizeParam = (value: string | string[] | undefined): string | undefined => {
+  if (Array.isArray(value)) return value[0];
+  return value ? String(value) : undefined;
+};
+
+const extractUtm = (params: Record<string, string | string[] | undefined>): LeadFormUtmParams => ({
+  source: normalizeParam(params['utm_source']),
+  medium: normalizeParam(params['utm_medium']),
+  campaign: normalizeParam(params['utm_campaign']),
+});
+
+export default async function Page({
+  searchParams = {},
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   const cookieStore = await cookies();
   const leadSuccessCookie = cookieStore.get(LEAD_SUCCESS_COOKIE)?.value ?? null;
+  const utm = extractUtm(searchParams ?? {});
   const origin = resolveSiteOrigin(await headers());
   const config = SERVICE_CONFIG;
   const breadcrumbsConfig =
@@ -167,7 +184,7 @@ export default async function Page() {
 
 
             <div className="mt-8">
-              <SimpleLeadForm initialSuccessCookie={leadSuccessCookie} />
+              <SimpleLeadForm initialSuccessCookie={leadSuccessCookie} utm={utm} />
             </div>
           </div>
 

@@ -9,6 +9,7 @@ import {
   isJourneyKey,
   type JourneyKey,
   type LeadSuccessRestore,
+  type LeadFormUtmParams,
 } from '@/components/lead-form/config';
 import LeadFormSkeleton from '@/components/lead-form/LeadFormSkeleton';
 
@@ -20,9 +21,10 @@ const LeadFormWizard = dynamic(() => import('./LeadFormWizard'), {
 type LeadFormProps = {
   initialSuccessCookie?: string | null;
   restoredSuccess?: LeadSuccessRestore | null;
+  utm?: LeadFormUtmParams;
 };
 
-export default function LeadForm({ initialSuccessCookie, restoredSuccess }: LeadFormProps) {
+export default function LeadForm({ initialSuccessCookie, restoredSuccess, utm }: LeadFormProps) {
   const initialJourneyFromSuccess = useMemo(() => {
     const journey = restoredSuccess?.formPreset.projectType;
     return journey && isJourneyKey(journey) ? journey : null;
@@ -128,6 +130,7 @@ export default function LeadForm({ initialSuccessCookie, restoredSuccess }: Lead
           restoredSuccess={restoredSuccess}
           initialJourney={selectedJourney}
           onResetSuccess={handleWizardReset}
+          utm={utm}
         />
       )}
     </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { FormEvent, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
@@ -8,18 +9,13 @@ import {
   ArrowRight,
   CalendarClock,
   Check,
-  CheckCircle2,
-  Clock4,
-  ExternalLink,
   ShieldCheck,
   Sparkles,
-  Star,
   ArrowUpRight,
   UserRound,
 } from 'lucide-react';
 import type { Route } from 'next';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Turnstile from '@/components/Turnstile';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { deleteCookie } from '@/lib/client-cookies';
@@ -53,7 +49,13 @@ import {
   isJourneyKey,
   restoreLeadSuccessState,
 } from '@/components/lead-form/config';
-import type { JourneyKey, LeadSuccessRestore, ProjectOption } from '@/components/lead-form/config';
+import type { JourneyKey, LeadSuccessRestore, ProjectOption, LeadFormUtmParams } from '@/components/lead-form/config';
+
+const Turnstile = dynamic(() => import('@/components/Turnstile'), { ssr: false });
+const LeadFormSuccess = dynamic(() => import('@/components/lead-form/LeadFormSuccess'), {
+  ssr: false,
+  loading: () => null,
+});
 
 const INPUT_BASE_CLASS =
   'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
@@ -71,11 +73,6 @@ const HELP_BUTTON_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue]/5 sh
 const HELP_BUTTON_UNSELECTED_CLASS =
   'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md';
 
-const SUCCESS_LINK_CARD_CLASS =
-  'group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[--brand-blue] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]';
-const SUCCESS_LINK_ICON_WRAPPER_CLASS =
-  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[--brand-blue]/10 text-[--brand-blue]';
-
 const INFO_BADGE_CLASS = 'inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1';
 
 type LeadFormWizardProps = {
@@ -83,6 +80,7 @@ type LeadFormWizardProps = {
   restoredSuccess?: LeadSuccessRestore | null;
   initialJourney?: JourneyKey | null;
   onResetSuccess?: () => void;
+  utm?: LeadFormUtmParams;
 };
 
 
@@ -223,6 +221,7 @@ export default function LeadFormWizard({
   restoredSuccess: restoredSuccessProp,
   initialJourney: initialJourneyProp,
   onResetSuccess,
+  utm: utmProp,
 }: LeadFormWizardProps = {}) {
   const router = useRouter();
   const restoredSuccess = useMemo(
@@ -251,7 +250,6 @@ export default function LeadFormWizard({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<Status>(restoredSuccess ? 'success' : 'idle');
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const searchParams = useSearchParams();
   const formRef = useRef<HTMLFormElement | null>(null);
   const reduceMotion = useReducedMotion();
   const prevStepRef = useRef(0);
@@ -264,12 +262,7 @@ export default function LeadFormWizard({
   const journey = getJourneyConfig(form.projectType);
   const helpSummary = useMemo(() => (form.helpTopics.length ? form.helpTopics.join(', ') : ''), [form.helpTopics]);
 
-  const utm = useMemo(() => {
-    const source = searchParams?.get('utm_source') || undefined;
-    const medium = searchParams?.get('utm_medium') || undefined;
-    const campaign = searchParams?.get('utm_campaign') || undefined;
-    return { source, medium, campaign };
-  }, [searchParams]);
+  const utm = useMemo(() => utmProp ?? {}, [utmProp]);
 
   useEffect(() => {
     hasMountedRef.current = true;
@@ -586,93 +579,8 @@ export default function LeadFormWizard({
       transition: { duration: 0.3, ease: 'easeOut' as const },
     };
 
-  if (status === 'success') {
-    const successLinks = getSuccessLinks(form.projectType);
-    return (
-      <div className="mt-8 flex justify-center px-4">
-        <div className="w-full max-w-3xl rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-md">
-          <div className="flex flex-col items-center text-center">
-            <CheckCircle2 className="h-12 w-12 text-emerald-500" aria-hidden="true" />
-            <h3 className="mt-4 text-3xl md:4xl font-semibold text-slate-900">We’ve got it — thank you!</h3>
-            <p className="mt-3 max-w-xl text-sm text-slate-600">
-              Your message is already on the way to our project support team. We’ll reach out shortly with next steps.
-              If a storm is moving in or water is coming inside, call us right now at{' '}
-              <a className="font-semibold text-[--brand-blue]" href="tel:+19418664320">(941) 866-4320</a>.
-            </p>
-            {(successMeta?.helpTopicLabels.length || successMeta?.timelineLabel) && (
-              <div className="mt-6 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-left">
-                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-600">What you shared</h4>
-                {successMeta?.timelineLabel && (
-                  <p className="mt-3 text-sm text-slate-600">
-                    <span className="font-semibold text-slate-700">Timeline:</span> {successMeta.timelineLabel}
-                  </p>
-                )}
-                {successMeta?.helpTopicLabels.length ? (
-                  <div className="mt-3">
-                    <p className="text-sm font-semibold text-slate-700">Your priorities:</p>
-                    <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
-                      {successMeta.helpTopicLabels.map((label) => (
-                        <li key={label}>{label}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            )}
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">
-              <span className={INFO_BADGE_CLASS}>
-                <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Licensed &amp; insured
-              </span>
-              <span className={INFO_BADGE_CLASS}>
-                <Clock4 className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Typical response under 30 minutes
-              </span>
-              <span className={INFO_BADGE_CLASS}>
-                <Star className="h-4 w-4 text-amber-500" aria-hidden="true" /> 4.8 rating on Google
-              </span>
-            </div>
-          </div>
-          {successLinks.length > 0 && (
-            <div className="mt-10">
-              <h4 className="text-lg font-semibold text-slate-900">What to do next</h4>
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                {successLinks.map(({ label, description, href, external, icon: Icon }) => (
-                  <a
-                    key={`${label}-${href}`}
-                    href={href}
-                    target={external ? '_blank' : undefined}
-                    rel={external ? 'noopener noreferrer' : undefined}
-                    className={SUCCESS_LINK_CARD_CLASS}
-                  >
-                    <div className="flex gap-3">
-                      <span className={SUCCESS_LINK_ICON_WRAPPER_CLASS}>
-                        <Icon className="h-5 w-5" aria-hidden="true" />
-                      </span>
-                      <div>
-                        <p className="text-sm font-semibold text-slate-900">{label}</p>
-                        <p className="mt-1 text-xs text-slate-500">{description}</p>
-                      </div>
-                    </div>
-                    <span className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[--brand-blue]">
-                      {external ? 'Open link' : 'Continue'}
-                      {external ? (
-                        <ExternalLink className="h-4 w-4 text-[--brand-blue] transition group-hover:translate-x-0.5" aria-hidden="true" />
-                      ) : (
-                        <ArrowRight className="h-4 w-4 text-[--brand-blue] transition group-hover:translate-x-0.5" aria-hidden="true" />
-                      )}
-                    </span>
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="mt-10 flex justify-center">
-            <Button type="button" variant="brandBlue" onClick={handleResetSuccess}>
-              Start a new request
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
+  if (status === 'success' && successMeta) {
+    return <LeadFormSuccess successMeta={successMeta} onReset={handleResetSuccess} />;
   }
 
   return (
