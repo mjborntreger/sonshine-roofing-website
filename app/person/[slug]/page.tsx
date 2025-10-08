@@ -1,7 +1,6 @@
 import { listPersonNav, listPersonsBySlug, stripHtml } from "@/lib/wp";
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
@@ -133,24 +132,24 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
             {(prev || next) && (
               <nav className="mt-8 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2">
                 {prev ? (
-                  <Link href={`/person/${prev.slug}`} className="block rounded-xl p-3 hover:bg-slate-50">
+                  <SmartLink href={`/person/${prev.slug}`} className="block rounded-xl p-3 hover:bg-slate-50">
                     <div className="text-xs uppercase tracking-wide text-slate-500">Previous</div>
                     <div className="mt-1 font-medium text-slate-900">{prev.title}</div>
                     {prev.positionTitle && (
                       <div className="text-sm text-slate-600">{prev.positionTitle}</div>
                     )}
-                  </Link>
+                  </SmartLink>
                 ) : (
                   <span />
                 )}
                 {next ? (
-                  <Link href={`/person/${next.slug}`} className="block rounded-xl p-3 text-right hover:bg-slate-50">
+                  <SmartLink href={`/person/${next.slug}`} className="block rounded-xl p-3 text-right hover:bg-slate-50">
                     <div className="text-xs uppercase tracking-wide text-slate-500">Next</div>
                     <div className="mt-1 font-medium text-slate-900">{next.title}</div>
                     {next.positionTitle && (
                       <div className="text-sm text-slate-600">{next.positionTitle}</div>
                     )}
-                  </Link>
+                  </SmartLink>
                 ) : (
                   <span />
                 )}

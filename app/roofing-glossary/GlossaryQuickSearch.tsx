@@ -1,7 +1,7 @@
 'use client';
 
 import { useDeferredValue, useMemo, useState } from 'react';
-import Link from 'next/link';
+import SmartLink from '@/components/SmartLink';
 import { Search } from 'lucide-react';
 
 import type { GlossaryItem } from '@/lib/fuzzy';
@@ -48,12 +48,12 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {filtered.map((t) => (
                 <li key={t.slug}>
-                  <Link
+                  <SmartLink
                     href={`/roofing-glossary/${t.slug}`}
                     className="block rounded-md border border-slate-400 bg-white px-3 py-2 hover:bg-slate-50"
                   >
                     {t.title}
-                  </Link>
+                  </SmartLink>
                 </li>
               ))}
             </ul>
@@ -69,12 +69,12 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
                   <ul className="mt-2 flex flex-wrap gap-2">
                     {suggestions.map((s) => (
                       <li key={s.slug}>
-                        <Link
+                        <SmartLink
                           href={`/roofing-glossary/${s.slug}`}
                           className="inline-flex min-w-0 max-w-full items-center rounded-full border border-slate-400 bg-white px-3 py-1 text-sm hover:bg-slate-50"
                         >
                           <span className="block max-w-full truncate">{s.title}</span>
-                        </Link>
+                        </SmartLink>
                       </li>
                     ))}
                   </ul>

@@ -1,6 +1,5 @@
 // app/[slug]/page.tsx
 import Image from "next/image";
-import Link from "next/link";
 import Section from "@/components/layout/Section";
 import SmartLink from "@/components/SmartLink";
 import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/wp";
@@ -344,18 +343,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       {(prev || next) && (
         <nav className="mt-12 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2">
           {prev ? (
-            <Link href={`/${prev.slug}`} className="block rounded-xl p-3 hover:bg-slate-50">
+            <SmartLink href={`/${prev.slug}`} className="block rounded-xl p-3 hover:bg-slate-50">
               <div className="text-xs uppercase tracking-wide text-slate-500">Previous</div>
               <div className="mt-1 font-medium text-slate-900">{prev.title}</div>
-            </Link>
+            </SmartLink>
           ) : (
             <span />
           )}
           {next ? (
-            <Link href={`/${next.slug}`} className="block rounded-xl p-3 text-right hover:bg-slate-50">
+            <SmartLink href={`/${next.slug}`} className="block rounded-xl p-3 text-right hover:bg-slate-50">
               <div className="text-xs uppercase tracking-wide text-slate-500">Next</div>
               <div className="mt-1 font-medium text-slate-900">{next.title}</div>
-            </Link>
+            </SmartLink>
           ) : (
             <span />
           )}

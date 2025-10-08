@@ -1,5 +1,4 @@
 import Section from '@/components/layout/Section';
-import Link from 'next/link';
 import SmartLink from '@/components/SmartLink';
 import { createElement, Fragment, ReactNode } from 'react';
 import { headers } from 'next/headers';
@@ -343,7 +342,7 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
     <Section>
       <div className="container-edge py-8">
         <nav className="mb-4 text-sm text-slate-600">
-          <Link href="/roofing-glossary" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← Back to Glossary</Link>
+          <SmartLink href="/roofing-glossary" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← Back to Glossary</SmartLink>
         </nav>
 
         <article className="prose max-w-none">
@@ -361,7 +360,7 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
         {hasPos && (
           <nav className="mt-10 flex items-center justify-between gap-4" aria-label="Term navigation">
             {prev ? (
-              <Link
+              <SmartLink
                 href={`/roofing-glossary/${prev.slug}`}
                 rel="prev"
                 className="group inline-flex max-w-[48%] items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50"
@@ -369,11 +368,11 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
               >
                 <span aria-hidden>←</span>
                 <span className="truncate">{prev.title}</span>
-              </Link>
+              </SmartLink>
             ) : <span />}
 
             {next ? (
-              <Link
+              <SmartLink
                 href={`/roofing-glossary/${next.slug}`}
                 rel="next"
                 className="group inline-flex max-w-[48%] items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-2 text-sm hover:bg-slate-50"
@@ -381,7 +380,7 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
               >
                 <span className="truncate">{next.title}</span>
                 <span aria-hidden>→</span>
-              </Link>
+              </SmartLink>
             ) : <span />}
           </nav>
         )}

@@ -1,5 +1,4 @@
 import Section from '@/components/layout/Section';
-import Link from 'next/link';
 import { listGlossaryIndex, stripHtml } from '@/lib/wp';
 import GlossaryQuickSearch from './GlossaryQuickSearch';
 import ResourcesAside from '@/components/ResourcesAside';
@@ -131,12 +130,12 @@ export default async function GlossaryArchivePage() {
                     <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                       {list.map((t) => (
                         <li key={t.slug}>
-                          <Link
+                          <SmartLink
                             href={`/roofing-glossary/${t.slug}`}
                             className="block rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800 hover:bg-slate-50"
                           >
                             {t.title}
-                          </Link>
+                          </SmartLink>
                         </li>
                       ))}
                     </ul>
