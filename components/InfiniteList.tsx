@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import type { MouseEvent, ReactNode } from "react";
+import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import type { PageResult, ResourceKind, ResourceQuery } from "@/lib/pagination";
 import type { PostCard, ProjectSummary, VideoItem } from "@/lib/wp";
 import { fetchPage, getCachedPages, setCachedPages } from "@/lib/resource-fetch";
@@ -14,7 +15,6 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { ArrowRight } from "lucide-react";
 import { stripHtml } from "@/lib/wp";
 import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
-import MediaFrame from "./MediaFrame";
 import { buildBlogPostHref, buildProjectHref, buildProjectHrefFromUri, ROUTES } from "@/lib/routes";
 
 const smallPillClass =
@@ -46,16 +46,23 @@ const Frame: React.FC<{
     sizes?: string;
     priority?: boolean;
 }> = ({ src, alt = "", ratio = "16 / 9", className, sizes, priority }) => {
-    if (!src) return <div className={className} style={{ aspectRatio: ratio }} />;
+    const style: CSSProperties = { aspectRatio: ratio };
+    if (!src) return <div className={className} style={style} />;
+    const wrapperClass = ["relative w-full overflow-hidden bg-slate-100", className]
+        .filter(Boolean)
+        .join(" ");
+
     return (
-        <MediaFrame
-            src={src}
-            alt={alt}
-            ratio={ratio}
-            className={className}
-            sizes={sizes}
-            priority={priority}
-        />
+        <div className={wrapperClass} style={style}>
+            <Image
+                fill
+                src={src}
+                alt={alt}
+                sizes={sizes}
+                priority={priority}
+                className="object-cover"
+            />
+        </div>
     );
 };
 

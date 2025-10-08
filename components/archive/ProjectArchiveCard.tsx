@@ -1,9 +1,8 @@
-"use client";
-
+import type { CSSProperties } from "react";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import SmartLink from "@/components/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import MediaFrame from "@/components/MediaFrame";
 import type { ProjectSummary } from "@/lib/wp";
 import { stripHtml } from "@/lib/wp";
 import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
@@ -11,7 +10,7 @@ import { buildProjectHref, buildProjectHrefFromUri, ROUTES } from "@/lib/routes"
 
 type Props = {
   project: ProjectSummary;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   className?: string;
 };
 
@@ -40,13 +39,18 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
           </CardHeader>
 
           {project.heroImage?.url ? (
-            <MediaFrame
-              src={project.heroImage.url}
-              alt={project.heroImage.altText ?? project.title}
-              ratio="16 / 10"
-              className="w-full"
-              sizes="(min-width: 1024px) 50vw, 100vw"
-            />
+            <div
+              className="relative w-full overflow-hidden bg-slate-100"
+              style={{ aspectRatio: "16 / 10" }}
+            >
+              <Image
+                fill
+                src={project.heroImage.url}
+                alt={project.heroImage.altText ?? project.title}
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
           ) : (
             <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
           )}

@@ -1,16 +1,28 @@
 'use client';
 
 import { useEffect } from 'react';
+import { markChatAutoOpened } from '@/lib/chat-consent';
+
+interface TawkApi {
+  maximize?: () => void;
+  onLoad?: () => void;
+  [key: string]: unknown;
+}
 
 declare global {
   interface Window {
     __tawkLoaded?: boolean;
-    Tawk_API?: Record<string, unknown>;
+    Tawk_API?: TawkApi;
     Tawk_LoadStart?: Date;
   }
 }
 
-export default function TawkChatLoader() {
+type TawkChatLoaderProps = {
+  autoOpen?: boolean;
+  onAutoOpenComplete?: () => void;
+};
+
+export default function TawkChatLoader({ autoOpen = false, onAutoOpenComplete }: TawkChatLoaderProps) {
   useEffect(() => {
     if (typeof window === 'undefined' || window.__tawkLoaded) return;
 
@@ -20,6 +32,22 @@ export default function TawkChatLoader() {
 
       try {
         window.Tawk_API = window.Tawk_API || {};
+        const tawkApi = window.Tawk_API;
+
+        if (autoOpen) {
+          tawkApi.onLoad = () => {
+            try {
+              tawkApi.maximize?.();
+              markChatAutoOpened();
+            } finally {
+              delete tawkApi.onLoad;
+              onAutoOpenComplete?.();
+            }
+          };
+        } else if (tawkApi.onLoad) {
+          delete tawkApi.onLoad;
+        }
+
         window.Tawk_LoadStart = new Date();
 
         const script = document.createElement('script');
@@ -38,7 +66,7 @@ export default function TawkChatLoader() {
     } else {
       setTimeout(loadTawk, 2500);
     }
-  }, []);
+  }, [autoOpen, onAutoOpenComplete]);
 
   return null;
 }

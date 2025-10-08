@@ -1,9 +1,8 @@
-"use client";
-
+import type { CSSProperties } from "react";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import SmartLink from "@/components/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import MediaFrame from "@/components/MediaFrame";
 import type { PostCard } from "@/lib/wp";
 import { stripHtml } from "@/lib/wp";
 import { lineClampStyle, truncateText } from "@/components/archive/card-utils";
@@ -17,7 +16,7 @@ const dateFormatter = new Intl.DateTimeFormat("en-US", {
 
 type Props = {
   post: PostCard;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   className?: string;
 };
 
@@ -42,13 +41,18 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
           </CardHeader>
 
           {post.featuredImage?.url ? (
-            <MediaFrame
-              src={post.featuredImage.url}
-              alt={post.featuredImage.altText ?? post.title}
-              ratio="16 / 9"
-              className="w-full"
-              sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-            />
+            <div
+              className="relative w-full overflow-hidden bg-slate-100"
+              style={{ aspectRatio: "16 / 9" }}
+            >
+              <Image
+                fill
+                src={post.featuredImage.url}
+                alt={post.featuredImage.altText ?? post.title}
+                sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                className="object-cover"
+              />
+            </div>
           ) : (
             <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
           )}

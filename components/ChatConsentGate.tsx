@@ -4,45 +4,24 @@ import { useEffect, useState } from 'react';
 import TawkChatLoader from './TawkChatLoader';
 import SmartLink from './SmartLink';
 import { Check, MessageSquare, X } from 'lucide-react';
-
-const COOKIE_NAME = 'sonshine-chat-consent';
-const CONSENT_YES = 'yes';
-const CONSENT_NO = 'no';
-const COOKIE_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
-
-function getConsentCookie(): 'yes' | 'no' | null {
-  if (typeof document === 'undefined') return null;
-
-  const match = document.cookie.match(new RegExp(`(?:^|; )${COOKIE_NAME}=([^;]*)`));
-  if (!match) return null;
-
-  try {
-    const value = decodeURIComponent(match[1]);
-    return value === CONSENT_YES || value === CONSENT_NO ? (value as 'yes' | 'no') : null;
-  } catch {
-    return null;
-  }
-}
-
-function setConsentCookie(value: 'yes' | 'no') {
-  if (typeof document === 'undefined') return;
-
-  try {
-    const expires = new Date(Date.now() + COOKIE_MAX_AGE_MS).toUTCString();
-    document.cookie = `${COOKIE_NAME}=${encodeURIComponent(value)}; path=/; expires=${expires}; SameSite=Lax`;
-  } catch {
-    // Ignore cookie write failures; prompt flow will fall back to per-session.
-  }
-}
+import {
+  hasChatAutoOpened,
+  hasGrantedChatConsent,
+  setChatConsent,
+} from '@/lib/chat-consent';
 
 export default function ChatConsentGate() {
   const [hasConsent, setHasConsent] = useState(false);
   const [checkedCookies, setCheckedCookies] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [shouldAutoOpen, setShouldAutoOpen] = useState(false);
 
   useEffect(() => {
-    const storedValue = getConsentCookie();
-    setHasConsent(storedValue === CONSENT_YES);
+    const consentGranted = hasGrantedChatConsent();
+    setHasConsent(consentGranted);
+    if (consentGranted && !hasChatAutoOpened()) {
+      setShouldAutoOpen(true);
+    }
     setCheckedCookies(true);
   }, []);
 
@@ -51,13 +30,18 @@ export default function ChatConsentGate() {
   }
 
   if (hasConsent) {
-    return <TawkChatLoader />;
+    return (
+      <TawkChatLoader
+        autoOpen={shouldAutoOpen}
+        onAutoOpenComplete={() => setShouldAutoOpen(false)}
+      />
+    );
   }
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {showPrompt ? (
-        <div className="max-w-sm rounded-3xl border border-slate-300 bg-white p-4 text-left shadow-xl">
+        <div className="max-w-xs rounded-3xl border border-slate-300 bg-white p-4 text-left shadow-xl">
           <p className="text-sm text-slate-800">
             By enabling chat you agree to connect with a Sonshine Roofing team member. We may collect your name,
             contact details, and any messages you share so we can respond to your inquiry.{' '}
@@ -68,7 +52,7 @@ export default function ChatConsentGate() {
               type="button"
               className="btn btn-outline btn-md"
               onClick={() => {
-                setConsentCookie(CONSENT_NO);
+                setChatConsent('no');
                 setShowPrompt(false);
               }}
             >
@@ -79,11 +63,12 @@ export default function ChatConsentGate() {
               type="button"
               className="btn btn-brand-blue btn-md"
               onClick={() => {
-                setConsentCookie(CONSENT_YES);
+                setChatConsent('yes');
                 setHasConsent(true);
+                setShouldAutoOpen(!hasChatAutoOpened());
               }}
             >
-              Enable live chat
+              Enable
               <Check className="h-4 w-4 inline ml-2" />
             </button>
           </div>

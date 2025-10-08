@@ -1,8 +1,8 @@
-"use client";
 import SmartLink from "./SmartLink";
 import { Star } from "lucide-react";
 import React from "react";
 import { buildTellUsWhyRatingHref } from "@/lib/routes";
+import styles from "./ReviewsCatcher.module.css";
 
 /**
  * ReviewsCatcher
@@ -44,9 +44,9 @@ export default function ReviewsCatcher() {
 
         <div className="my-8 md:my-12">
           {/* Stars row */}
-          <div className="rc-stars mx-auto flex w-fit items-center justify-center">
+          <div className={`${styles.rcStars} mx-auto w-fit`}>
             {/* We list 5..1 in DOM and flip visually with flex-row-reverse */}
-            <div className="flex flex-row-reverse items-center">
+            <div className={`${styles.starRow} flex flex-row-reverse items-center`}>
               {stars
                 .slice()
                 .reverse()
@@ -62,8 +62,7 @@ export default function ReviewsCatcher() {
                     />
                   );
 
-                  const linkClasses =
-                    "inline-flex flex-col items-center justify-center gap-2 text-slate-300 focus:outline-none md:gap-4";
+                  const linkClasses = `${styles.starLink} inline-flex flex-col items-center justify-center gap-2 text-slate-300 focus:outline-none md:gap-4`;
 
                   const linkContent = (
                     <>
@@ -71,7 +70,7 @@ export default function ReviewsCatcher() {
                       <span className="sr-only">{aria}</span>
                       <span
                         aria-hidden="true"
-                        className="rc-star-label text-xs font-semibold uppercase tracking-widest text-slate-500 md:text-base"
+                        className={`${styles.starLabel} text-xs font-semibold uppercase tracking-widest text-slate-500 md:text-base`}
                       >
                         {label.toUpperCase()}
                       </span>
@@ -79,7 +78,7 @@ export default function ReviewsCatcher() {
                   );
 
                   return (
-                    <span key={rating} className="rc-star inline-flex">
+                    <span key={rating} className={styles.starWrapper}>
                       {isExternal ? (
                         <a
                           href={GOOGLE_REVIEW_URL}
@@ -109,63 +108,6 @@ export default function ReviewsCatcher() {
           </div>
         </div>
       </div>
-
-      {/* Component-scoped CSS for cumulative hover & animations */}
-      <style jsx>{`
-        .rc-stars {
-          display: inline-block;
-          font-size: 0;
-        }
-        .rc-stars .flex {
-          display: flex;
-          gap: 2rem;
-        }
-        .rc-stars .flex > span a {
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-        }
-        /* Always bind fill to currentColor; animate via opacity to avoid flashing */
-        .rc-star :global(svg *) {
-          fill: currentColor;
-          fill-opacity: 0;
-          transition: fill-opacity 160ms ease, color 160ms ease;
-        }
-        .rc-stars .flex > span:hover :global(a),
-        .rc-stars .flex > span:hover ~ span :global(a),
-        .rc-stars .flex > span:focus-within :global(a),
-        .rc-stars .flex > span:focus-within ~ span :global(a) {
-          color: var(--brand-orange, #fb9216);
-        }
-        .rc-star :global(.rc-star-label) {
-          transition: color 160ms ease;
-        }
-        .rc-stars .flex > span:hover :global(.rc-star-label),
-        .rc-stars .flex > span:hover ~ span :global(.rc-star-label),
-        .rc-stars .flex > span:focus-within :global(.rc-star-label),
-        .rc-stars .flex > span:focus-within ~ span :global(.rc-star-label) {
-          color: var(--brand-orange, #fb9216);
-        }
-        .rc-stars .flex > span:hover :global(svg *),
-        .rc-stars .flex > span:hover ~ span :global(svg *),
-        .rc-stars .flex > span:focus-within :global(svg *),
-        .rc-stars .flex > span:focus-within ~ span :global(svg *) {
-          fill-opacity: 1;
-        }
-        @media (prefers-reduced-motion: no-preference) {
-          .rc-stars .flex > span :global(a) {
-            transition: color 160ms ease, transform 160ms cubic-bezier(0.2, 0.7, 0.2, 1);
-            will-change: transform;
-          }
-          .rc-stars .flex > span:hover :global(a),
-          .rc-stars .flex > span:hover ~ span :global(a),
-          .rc-stars .flex > span:focus-within :global(a),
-          .rc-stars .flex > span:focus-within ~ span :global(a) {
-            transform: translateY(-1px) scale(1.06);
-          }
-        }
-      `}</style>
     </section>
   );
 }

@@ -1,6 +1,4 @@
 // components/MediaFrame.tsx
-"use client";
-
 import Image, { ImageProps } from "next/image";
 import { CSSProperties } from "react";
 

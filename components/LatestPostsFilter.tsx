@@ -1,164 +1,93 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import type { ReactNode } from "react";
+import LatestPostsFilterClient from "./LatestPostsFilter.client";
 import BlogArchiveCard from "@/components/archive/BlogArchiveCard";
-import FilterTabs from "@/components/project/FilterTabs";
-import SmartLink from "./SmartLink";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PostCard } from "@/lib/wp";
 import {
-  ArrowRight,
-  GraduationCap,
-  Sun,
-  Wind,
-  type LucideIcon,
-} from "lucide-react";
-
-const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const pStyles = "my-8 text-center text-slate-500 justify-center text-sm md:text-md";
-
-type CategoryKey = "education" | "hurricane-preparation" | "energy-efficient-roofing";
+  POST_TAB_CONFIG,
+  type CategoryKey,
+} from "@/components/archive/latest-tab-config";
+import {
+  groupPostsByCategory,
+  orderTabs,
+} from "@/components/archive/latest-tab-utils";
 
 type Props = {
-  /** Server-fetched list of recent posts (include categoryTerms in wp.ts) */
   posts: PostCard[];
-  /** How many cards to show per filter */
   initial?: number;
-  /** Show heading + CTA (defaults true) */
   showHeader?: boolean;
 };
 
-const TAB_CONFIG: Array<{
+type TabPayload = {
   key: CategoryKey;
-  label: string;
-  icon: LucideIcon;
-}> = [
-  { key: "education", label: "Education", icon: GraduationCap },
-  { key: "hurricane-preparation", label: "Hurricane Preparation", icon: Wind },
-  { key: "energy-efficient-roofing", label: "Energy-Efficient Roofing", icon: Sun },
-];
+  totalCount: number;
+  slugs: string[];
+};
+
+type CardLookup = Record<string, ReactNode>;
+
+const sectionDescription =
+  "Enjoy these handcrafted articles from our team that discuss a wide variety of roofing topics (and a few extras, from our family to yours).";
+
+function buildCardLookup(posts: PostCard[]): CardLookup {
+  return posts.reduce((acc, post) => {
+    if (!post?.slug) return acc;
+    acc[post.slug] = (
+      <BlogArchiveCard
+        key={post.slug}
+        post={post}
+      />
+    );
+    return acc;
+  }, {} as CardLookup);
+}
+
+function buildTabs(groups: Record<CategoryKey, PostCard[]>, initial: number): TabPayload[] {
+  const order = orderTabs(POST_TAB_CONFIG);
+  return order.map((key) => {
+    const items = groups[key] ?? [];
+    const trimmed = items.slice(0, Math.max(0, initial));
+    return {
+      key,
+      totalCount: items.length,
+      slugs: trimmed.map((post) => post.slug).filter(Boolean),
+    };
+  });
+}
+
+function buildEmptyState(): ReactNode {
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <CardTitle className="font-medium">No matching posts</CardTitle>
+      </CardHeader>
+      <div className="h-48 w-full bg-slate-100" />
+      <CardContent>
+        <p className="text-sm text-slate-600">Try another filter.</p>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function LatestPostsFilter({ posts, initial = 4, showHeader = true }: Props) {
-  const [selected, setSelected] = useState<CategoryKey>("education");
+  const groups = groupPostsByCategory(posts ?? []);
+  const tabs = buildTabs(groups, initial);
+  const cardLookup = buildCardLookup(posts ?? []);
+  const emptyState = buildEmptyState();
 
-  const postsByCategory = useMemo(() => {
-    const normalized = Array.isArray(posts) ? posts : [];
-    const map = TAB_CONFIG.reduce(
-      (acc, tab) => {
-        acc[tab.key] = [];
-        return acc;
-      },
-      {} as Record<CategoryKey, PostCard[]>,
-    );
-
-    for (const post of normalized) {
-      const slugs = (post.categoryTerms ?? [])
-        .map((term) => term?.slug?.toLowerCase() ?? "")
-        .filter(Boolean);
-      if (slugs.includes("education")) map.education.push(post);
-      if (slugs.includes("hurricane-preparation")) map["hurricane-preparation"].push(post);
-      if (slugs.includes("energy-efficient-roofing")) map["energy-efficient-roofing"].push(post);
-    }
-
-    return map;
-  }, [posts]);
-
-  const tabs = useMemo(
-    () =>
-      TAB_CONFIG.map((tab) => ({
-        key: tab.key,
-        label: tab.label,
-        icon: tab.icon,
-        terms: [],
-        totalCount: postsByCategory[tab.key]?.length ?? 0,
-        selectedCount: 0,
-      })),
-    [postsByCategory],
-  );
-
-  const filtered = useMemo(() => {
-    const source = postsByCategory[selected] ?? [];
-    return source.slice(0, initial);
-  }, [postsByCategory, selected, initial]);
-
-  const renderFilterTabs = () => (
-    <div className={`flex justify-center ${showHeader ? "mt-6" : "mb-8"}`}>
-      <FilterTabs
-        tabs={tabs}
-        activeKey={selected}
-        onTabChange={(key) => setSelected(key as CategoryKey)}
-        isLoading={false}
-        ariaLabel="Latest blog filters"
-      >
-        {() => null}
-      </FilterTabs>
-    </div>
-  );
+  const initialKey =
+    tabs.find((tab) => tab.slugs.length > 0)?.key ?? orderTabs(POST_TAB_CONFIG)[0];
 
   return (
-    <div className="px-4 py-16 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
-      {showHeader ? (
-        <div className="text-center">
-          <h2 className="text-3xl text-slate-700 md:text-5xl mb-3 md:mb-4">Latest Blog Posts</h2>
-          {renderFilterTabs()}
-          <p className={pStyles}>
-            Enjoy these handcrafted articles from our team that discuss a wide variety of roofing topics (and a few extras, from our family to yours).
-          </p>
-        </div>
-      ) : (
-        renderFilterTabs()
-      )}
-
-      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2">
-        {filtered.length > 0 ? (
-          filtered.map((post, index) => (
-            <BlogArchiveCard
-              key={post.slug ?? `${post.title}-${index}`}
-              post={post}
-              className="motion-safe:animate-lp-fade-in"
-              style={{ animationDelay: `${index * 60}ms` }}
-            />
-          ))
-        ) : (
-          <Card className="overflow-hidden">
-            <CardHeader>
-              <CardTitle className="font-medium">No matching posts</CardTitle>
-            </CardHeader>
-            <div className="h-48 w-full bg-slate-100" />
-            <CardContent>
-              <p className="text-sm text-slate-600">Try another filter.</p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {showHeader && (
-        <div className="mt-12 text-center">
-          <SmartLink
-            href="/blog"
-            className={lessFatCta}
-            title="See All Blog Posts"
-            data-icon-affordance="right"
-          >
-            See All Blog Posts
-            <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
-          </SmartLink>
-        </div>
-      )}
-
-      <style jsx global>{`
-        @keyframes lp-fade-in {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: none; }
-        }
-        .animate-lp-fade-in { animation: lp-fade-in .28s ease-out both; }
-        /* Tailwind variant friendly: use with motion-safe:animate-lp-fade-in */
-      `}</style>
-    </div>
+    <LatestPostsFilterClient
+      showHeader={showHeader}
+      description={sectionDescription}
+      ctaHref="/blog"
+      ctaLabel="See All Blog Posts"
+      tabs={tabs}
+      initialKey={initialKey}
+      cardLookup={cardLookup}
+      emptyState={emptyState}
+    />
   );
 }

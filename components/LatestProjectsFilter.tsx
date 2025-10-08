@@ -1,165 +1,96 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import type { ReactNode } from "react";
+import LatestProjectsFilterClient from "./LatestProjectsFilter.client";
 import ProjectArchiveCard from "@/components/archive/ProjectArchiveCard";
-import FilterTabs from "@/components/project/FilterTabs";
-import SmartLink from "@/components/SmartLink";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProjectSummary } from "@/lib/wp";
 import {
-  ArrowRight,
-  Grid3x3,
-  Hammer,
-  Wrench,
-  type LucideIcon,
-} from "lucide-react";
-
-const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const pStyles = "my-8 text-slate-500 text-center justify-center text-sm md:text-md";
-
-type MaterialKey = "tile" | "shingle" | "metal";
+  PROJECT_TAB_CONFIG,
+  type MaterialKey,
+} from "@/components/archive/latest-tab-config";
+import {
+  groupProjectsByMaterial,
+  orderTabs,
+} from "@/components/archive/latest-tab-utils";
 
 type Props = {
-  /** Server-fetched list of recent projects (include materialTypes in wp.ts) */
   projects: ProjectSummary[];
-  /** How many cards to show per filter */
   initial?: number;
-  /** Show heading + CTA (defaults true) */
   showHeader?: boolean;
 };
 
-const TAB_CONFIG: Array<{
+type TabPayload = {
   key: MaterialKey;
-  label: string;
-  icon: LucideIcon;
-}> = [
-  { key: "tile", label: "Tile", icon: Grid3x3 },
-  { key: "shingle", label: "Shingle", icon: Hammer },
-  { key: "metal", label: "Metal", icon: Wrench },
-];
+  totalCount: number;
+  slugs: string[];
+};
+
+type CardLookup = Record<string, ReactNode>;
+
+const sectionDescription =
+  "Browse our latest projects and get an idea of what your new roof could look like.";
+
+function buildCardLookup(projects: ProjectSummary[]): CardLookup {
+  return projects.reduce((acc, project) => {
+    if (!project?.slug) return acc;
+    acc[project.slug] = (
+      <ProjectArchiveCard
+        key={project.slug}
+        project={project}
+      />
+    );
+    return acc;
+  }, {} as CardLookup);
+}
+
+function buildTabs(
+  groups: Record<MaterialKey, ProjectSummary[]>,
+  initial: number,
+): TabPayload[] {
+  const order = orderTabs(PROJECT_TAB_CONFIG);
+  return order.map((key) => {
+    const items = groups[key] ?? [];
+    const trimmed = items.slice(0, Math.max(0, initial));
+    return {
+      key,
+      totalCount: items.length,
+      slugs: trimmed.map((project) => project.slug).filter(Boolean),
+    };
+  });
+}
+
+function buildEmptyState(): ReactNode {
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <CardTitle className="font-medium">No matching projects</CardTitle>
+      </CardHeader>
+      <div className="h-48 w-full bg-slate-100" />
+      <CardContent>
+        <p className="text-sm text-slate-600">Try another filter.</p>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function LatestProjectsFilter({ projects, initial = 4, showHeader = true }: Props) {
-  const [selected, setSelected] = useState<MaterialKey>("tile");
+  const groups = groupProjectsByMaterial(projects ?? []);
+  const tabs = buildTabs(groups, initial);
+  const cardLookup = buildCardLookup(projects ?? []);
+  const emptyState = buildEmptyState();
 
-  const projectsByMaterial = useMemo(() => {
-    const normalized = Array.isArray(projects) ? projects : [];
-    const map = TAB_CONFIG.reduce(
-      (acc, tab) => {
-        acc[tab.key] = [];
-        return acc;
-      },
-      {} as Record<MaterialKey, ProjectSummary[]>,
-    );
-
-    for (const project of normalized) {
-      const slugs = (project.materialTypes ?? [])
-        .map((term) => String(term?.slug ?? "").toLowerCase())
-        .filter(Boolean);
-      if (slugs.includes("tile")) map.tile.push(project);
-      if (slugs.includes("shingle")) map.shingle.push(project);
-      if (slugs.includes("metal")) map.metal.push(project);
-    }
-
-    return map;
-  }, [projects]);
-
-  const tabs = useMemo(
-    () =>
-      TAB_CONFIG.map((tab) => ({
-        key: tab.key,
-        label: tab.label,
-        icon: tab.icon,
-        terms: [],
-        totalCount: projectsByMaterial[tab.key]?.length ?? 0,
-        selectedCount: 0,
-      })),
-    [projectsByMaterial],
-  );
-
-  const filtered = useMemo(() => {
-    const source = projectsByMaterial[selected] ?? [];
-    return source.slice(0, initial);
-  }, [projectsByMaterial, selected, initial]);
-
-  const renderFilterTabs = () => (
-    <div className={`flex justify-center ${showHeader ? "mt-6" : "mb-8"}`}>
-      <FilterTabs
-        tabs={tabs}
-        activeKey={selected}
-        onTabChange={(key) => setSelected(key as MaterialKey)}
-        isLoading={false}
-        ariaLabel="Latest project filters"
-      >
-        {() => null}
-      </FilterTabs>
-    </div>
-  );
+  const initialKey =
+    tabs.find((tab) => tab.slugs.length > 0)?.key ?? orderTabs(PROJECT_TAB_CONFIG)[0];
 
   return (
-    <div className="px-4 pt-12 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
-      {showHeader ? (
-        <div className="text-center">
-          <h2 className="text-3xl text-slate-700 md:text-5xl mb-3 md:mb-4">Latest Projects</h2>
-          {renderFilterTabs()}
-          <p className={pStyles}>
-            Browse our latest projects and get an idea of what your new roof could look like.
-          </p>
-        </div>
-      ) : (
-        renderFilterTabs()
-      )}
-
-      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2">
-        {filtered.length > 0 ? (
-          filtered.map((project, index) => (
-            <ProjectArchiveCard
-              key={project.slug ?? `${project.title}-${index}`}
-              project={project}
-              className="motion-safe:animate-lp-fade-in"
-              style={{ animationDelay: `${index * 60}ms` }}
-            />
-          ))
-        ) : (
-          <Card className="overflow-hidden">
-            <CardHeader>
-              <CardTitle className="font-medium">No matching projects</CardTitle>
-            </CardHeader>
-            <div className="h-48 w-full bg-slate-100" />
-            <CardContent>
-              <p className="text-sm text-slate-600">Try another filter.</p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
-
-      {showHeader && (
-        <div className="mt-12 text-center">
-          <SmartLink
-            href="/project"
-            className={lessFatCta}
-            title="See All Projects"
-            data-icon-affordance="right"
-            proseGuard
-          >
-            See All Projects
-            <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
-          </SmartLink>
-        </div>
-      )}
-
-      <style jsx global>{`
-        @keyframes lp-fade-in {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: none; }
-        }
-        .animate-lp-fade-in { animation: lp-fade-in .28s ease-out both; }
-        /* Tailwind variant friendly: use with motion-safe:animate-lp-fade-in */
-      `}</style>
-    </div>
+    <LatestProjectsFilterClient
+      showHeader={showHeader}
+      description={sectionDescription}
+      ctaHref="/project"
+      ctaLabel="See All Projects"
+      tabs={tabs}
+      initialKey={initialKey}
+      cardLookup={cardLookup}
+      emptyState={emptyState}
+    />
   );
 }

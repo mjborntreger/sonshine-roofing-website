@@ -27,7 +27,7 @@ if (!defined('SS_LEAD_RETRY_DELAYS')) {
 add_action('ss_lead_forward_retry', 'ss_lead_handle_scheduled_retry', 10, 1);
 
 define('SS_CONTACT_TO', 'messages@sonshineroofing.com');
-define('SS_FEEDBACK_TO', 'messages@sonshineroofing.com');
+define('SS_FEEDBACK_TO', 'marketing@sonshineroofing.com');
 define('SS_FINANCING_TO', 'messages@sonshineroofing.com');
 define('SS_SPECIAL_TO', 'messages@sonshineroofing.com');
 
