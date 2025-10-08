@@ -23,11 +23,11 @@ const FEATURE_PILL_CLASS = "badge badge--accent";
 const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
 const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
 const GRID_LAYOUT_CLASS = "mt-8 grid grid-cols-2 gap-5 items-start auto-rows-fr";
-const CARD_SHELL_BASE = "overflow-hidden rounded-2xl bg-white/95 backdrop-blur-sm flex h-full flex-col";
+const CARD_SHELL_BASE = "overflow-hidden rounded-3xl bg-white/95 backdrop-blur-sm flex h-full flex-col";
 const ACCORDION_SHELL_BASE = `group ${CARD_SHELL_BASE}`;
-const CARD_SUMMARY_BASE = "flex cursor-pointer select-none items-center justify-between gap-3 rounded-t-2xl px-6 py-5 text-left text-lg font-semibold text-slate-900 transition-colors";
-const CARD_HEADER_BASE = "flex items-center gap-3 rounded-t-3xl px-6 pt-6 pb-4 text-lg font-semibold text-slate-900";
-const CARD_BODY_BASE = "flex-1 rounded-b-3xl px-6 pb-6 pt-4 text-sm leading-relaxed";
+const CARD_SUMMARY_BASE = "flex cursor-pointer select-none items-center justify-between gap-3 rounded-t-3xl px-6 py-5 text-left text-lg font-semibold text-slate-900 transition-colors";
+const CARD_HEADER_BASE = "flex items-center gap-3 rounded-t-4xl px-6 pt-6 pb-4 text-lg font-semibold text-slate-900";
+const CARD_BODY_BASE = "flex-1 rounded-b-4xl px-6 pb-6 pt-4 text-sm leading-relaxed";
 const ICON_BASE = "grid h-10 w-10 place-items-center rounded-full transition-transform duration-200";
 const CHEVRON_BASE =
   "h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open/accordion:rotate-180";
@@ -45,7 +45,7 @@ const CARD_THEMES: Record<ThemeKey, {
 }> = {
   blue: {
     frame:
-      "group rounded-2xl p-[1px] bg-gradient-to-r from-[--brand-blue] via-[--brand-blue]/80 to-[--brand-cyan] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl h-full",
+      "group rounded-3xl p-[1px] bg-gradient-to-r from-[--brand-blue] via-[--brand-blue]/80 to-[--brand-cyan] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl h-full",
     shell: "ring-1 ring-blue-100/60",
     summary: "bg-blue-10/80 group-open:bg-blue-10/80 border-b border-blue-100/60",
     body: "bg-blue-10/10 text-slate-800",
@@ -55,7 +55,7 @@ const CARD_THEMES: Record<ThemeKey, {
   },
   orange: {
     frame:
-      "group rounded-2xl p-[1px] bg-gradient-to-r from-[--brand-orange] via-amber-400 to-amber-300 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl",
+      "group rounded-3xl p-[1px] bg-gradient-to-r from-[--brand-orange] via-amber-400 to-amber-300 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl",
     shell: "ring-1 ring-orange-200/70",
     summary: "bg-orange-10/80 group-open:bg-orange-50 border-b border-orange-100/60",
     body: "bg-orange-10/10 text-slate-800",
@@ -176,7 +176,7 @@ export default async function WhyHomeownersChooseUs() {
                 iconWrapperClassName={`${ICON_BASE} ${theme.icon}`}
                 chevronClassName={CHEVRON_BASE}
                 summaryClassName={`${CARD_SUMMARY_BASE} ${theme.summary}`}
-                contentClassName={`${CARD_BODY_BASE} ${theme.body} accordion-motion`}
+                contentClassName={`${CARD_BODY_BASE} ${theme.body}`}
                 proseBody={false}
                 defaultOpen={pillar.defaultOpen}
               >

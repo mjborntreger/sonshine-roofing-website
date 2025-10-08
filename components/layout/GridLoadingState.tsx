@@ -1,6 +1,7 @@
 import * as React from "react";
 import CardSkeleton, { type CardSkeletonProps } from "@/components/CardSkeleton";
 import Grid from "@/components/layout/Grid";
+import { cn } from "@/lib/utils";
 
 type Mode = "overlay" | "skeleton";
 
@@ -13,6 +14,7 @@ type GridLoadingStateProps = Omit<React.ComponentProps<typeof Grid>, "children">
   variant?: "blog" | "video" | "project";
   mode?: Mode;
   message?: string;
+  gridClassName?: string;
 };
 
 /**
@@ -25,6 +27,7 @@ type GridLoadingStateProps = Omit<React.ComponentProps<typeof Grid>, "children">
 export default function GridLoadingState({
   count = 6,
   className,
+  gridClassName,
   withImage = true,
   imageAspectClass,
   bodyLines = 2,
@@ -47,6 +50,7 @@ export default function GridLoadingState({
   }, [imageAspectClass, variant]);
 
   const items = React.useMemo(() => Array.from({ length: Math.max(0, count | 0) }), [count]);
+  const wrapperClassName = gridClassName ? cn(gridClassName, className) : className;
 
   if (mode === "overlay") {
     return (
@@ -60,11 +64,29 @@ export default function GridLoadingState({
     );
   }
 
+  if (gridClassName) {
+    return (
+      <div className={wrapperClassName} {...gridProps}>
+        {items.map((_, i) => (
+          <CardSkeleton
+            key={i}
+            variant={variant}
+            withImage={withImage}
+            imageAspectClass={resolvedAspect}
+            bodyLines={bodyLines}
+            showMeta={showMeta}
+          />
+        ))}
+      </div>
+    );
+  }
+
   return (
-    <Grid className={className} {...gridProps}>
+    <Grid className={wrapperClassName} {...gridProps}>
       {items.map((_, i) => (
         <CardSkeleton
           key={i}
+          variant={variant}
           withImage={withImage}
           imageAspectClass={resolvedAspect}
           bodyLines={bodyLines}

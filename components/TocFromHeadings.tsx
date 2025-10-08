@@ -240,7 +240,7 @@ export default function TocFromHeadings({
   const visibilityClass = mobile ? 'block md:hidden' : 'hidden lg:block';
   const navClasses = [
     visibilityClass,
-    'rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm my-4',
+    'rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm my-4',
     className,
   ]
     .filter(Boolean)
@@ -295,7 +295,7 @@ export default function TocFromHeadings({
       aria-label="Table of contents"
       className={navClasses}
     >
-      <div className="mb-3 text-sm text-center font-semibold tracking-wide text-slate-900">
+      <div className="mb-3 text-[1rem] text-center font-display font-bold tracking-wide text-slate-900">
         <List className="h-4 w-4 inline mr-2 text-[--brand-blue]" aria-hidden="true" />
         {title}
         <ArrowDown className="h-4 w-4 inline ml-2 text-[--brand-blue]" aria-hidden="true" />

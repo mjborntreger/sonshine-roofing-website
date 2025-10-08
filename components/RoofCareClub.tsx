@@ -272,7 +272,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
           return (
             <div
               key={plan.id}
-              className="relative flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm z-0 min-w-[280px]"
+              className="relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm z-0 min-w-[280px]"
             >
               {/* Header */}
               <div

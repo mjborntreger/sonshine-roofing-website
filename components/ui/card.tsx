@@ -5,11 +5,15 @@ import { cn } from "@/lib/utils";
 type DivProps = React.HTMLAttributes<HTMLDivElement> & { children?: React.ReactNode };
 type H3Props = React.HTMLAttributes<HTMLHeadingElement> & { children?: React.ReactNode };
 
-export function Card({ className, children, ...props }: DivProps) {
+export const Card = React.forwardRef<HTMLDivElement, DivProps>(function Card(
+  { className, children, ...props },
+  ref
+) {
   return (
     <div
+      ref={ref}
       className={cn(
-        "group/card not-prose rounded-2xl overflow-hidden",
+        "group/card not-prose rounded-3xl overflow-hidden",
         "border border-slate-200 bg-white text-slate-900 shadow-sm md:shadow-md",
         "transform-gpu transition-all duration-300",
         "hover:border-[#1C6FFF] hover:shadow-lg motion-safe:hover:-translate-y-[2px] motion-reduce:transform-none",
@@ -22,11 +26,14 @@ export function Card({ className, children, ...props }: DivProps) {
       {children}
     </div>
   );
-}
+});
 
-export function CardHeader({ className, children, ...props }: DivProps) {
+export const CardHeader = React.forwardRef<HTMLDivElement, DivProps>(function CardHeader(
+  { className, children, ...props },
+  ref
+) {
   return (
-    <div className={cn("relative flex flex-col space-y-1.5 p-6", className)} {...props}>
+    <div ref={ref} className={cn("relative flex flex-col space-y-1.5 p-6", className)} {...props}>
       {children}
       {/* SonShine gradient stripe under header */}
       <span className="pointer-events-none absolute bottom-0 left-0 h-1 w-full overflow-hidden">
@@ -36,34 +43,41 @@ export function CardHeader({ className, children, ...props }: DivProps) {
       </span>
     </div>
   );
-}
+});
 
-export function CardTitle({ className, children, ...props }: H3Props) {
+export const CardTitle = React.forwardRef<HTMLHeadingElement, H3Props>(function CardTitle(
+  { className, children, ...props },
+  ref
+) {
   return (
     <h3
-      className={cn(
-        "text-lg font-semibold leading-none tracking-tight text-slate-900",
-        className
-      )}
+      ref={ref}
+      className={cn("text-lg font-semibold leading-none tracking-tight text-slate-900", className)}
       {...props}
     >
       {children}
     </h3>
   );
-}
+});
 
-export function CardContent({ className, children, ...props }: DivProps) {
+export const CardContent = React.forwardRef<HTMLDivElement, DivProps>(function CardContent(
+  { className, children, ...props },
+  ref
+) {
   return (
-    <div className={cn("p-6 pt-4", className)} {...props}>
+    <div ref={ref} className={cn("p-6 pt-4", className)} {...props}>
       {children}
     </div>
   );
-}
+});
 
-export function CardFooter({ className, children, ...props }: DivProps) {
+export const CardFooter = React.forwardRef<HTMLDivElement, DivProps>(function CardFooter(
+  { className, children, ...props },
+  ref
+) {
   return (
-    <div className={cn("flex items-center p-6 pt-0", className)} {...props}>
+    <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props}>
       {children}
     </div>
   );
-}
+});

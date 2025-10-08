@@ -6,7 +6,7 @@ import Image from "next/image";
 const titleIcon = "h-5 w-5 inline mr-2 text-[--brand-blue]";
 const icon = "h-4 w-4 inline";
 const title = "text-lg font-semibold text-slate-900";
-const cardBase = "mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition";
+const cardBase = "mt-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition";
 const text = "mt-2 text-slate-600";
 
 export default function SidebarCta() {
@@ -21,17 +21,6 @@ export default function SidebarCta() {
                     Need help?
                 </h4>
                 <p className={text}>Talk to a real roofer now.</p>
-                <div className="relative aspect-[16/10] my-4" >
-                    <Image
-                        src="https://next.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
-                        alt="Nathan Borntreger, owner of SonShine Roofing"
-                        sizes="(max-width: 1024px) 80vw, 500px"
-                        fill
-                        className="rounded-2xl shadow-sm"
-                        loading="lazy"
-                        fetchPriority="low"
-                    />
-                </div>
                 <SmartLink
                     className="mt-3 w-full btn px-4 py-2 btn-brand-blue btn-sm phone-affordance"
                     href="tel:+19418664320"

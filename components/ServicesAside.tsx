@@ -20,8 +20,8 @@ export default function ServicesAside() {
 
             <div className="h-[1px] w-full bg-slate-200 my-4" />
 
-            <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm not-prose">
-                <h3 className="text-lg text-slate-900 text-center">Ready to get started?</h3>
+            <div className="mt-4 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm not-prose">
+                <h3 className="text-[1rem] mb-1 leading-none uppercase font-display font-bold text-slate-900 text-center">Ready to get started?</h3>
                 <SmartLink
                     href="/contact-us#book-an-appointment"
                     className={`${buttonStyles} btn-brand-blue`}

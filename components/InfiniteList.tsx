@@ -516,7 +516,13 @@ export default function InfiniteList<T>({
                 })}
             </div>
 
-            {loading && <GridLoadingState variant={loaderVariant} count={skeletonCountEff} />}
+            {loading && (
+                <GridLoadingState
+                    variant={loaderVariant}
+                    count={skeletonCountEff}
+                    gridClassName={gridClass}
+                />
+            )}
 
             <div ref={sentinelRef} aria-hidden="true" />
 

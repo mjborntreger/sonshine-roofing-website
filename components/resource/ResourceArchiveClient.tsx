@@ -413,7 +413,7 @@ export default function ResourceArchiveClient<Item>({
 
       <div
         ref={filtersRef}
-        className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-md backdrop-blur md:p-6"
+        className="rounded-3xl border border-slate-300 bg-white/80 p-4 shadow-md md:p-6"
         role="search"
       >
         <div className="flex flex-col gap-4">
