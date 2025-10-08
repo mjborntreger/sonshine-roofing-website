@@ -18,6 +18,7 @@ import {
   ExternalLink,
   ArrowUpRight,
   SquareMenu,
+  UserRoundSearch,
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/Turnstile';
@@ -176,6 +177,12 @@ const UNIVERSAL_RESOURCES: ResourceLink[] = [
     description: 'Browse our project gallery, learn more about your aesthetic options',
     href: '/project',
     icon: Star,
+  },
+  {
+    label: 'Learn about us',
+    description: 'Who we are, our mission and values',
+    href: '/about-sonshine-roofing',
+    icon: UserRoundSearch,
   },
 ];
 

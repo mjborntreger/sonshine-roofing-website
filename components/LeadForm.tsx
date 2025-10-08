@@ -28,6 +28,7 @@ import {
   ExternalLink,
   Wrench,
   ArrowUpRight,
+  UserRoundSearch,
 } from 'lucide-react';
 import type { Route } from 'next';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -323,6 +324,12 @@ const UNIVERSAL_RESOURCES: ResourceLink[] = [
     description: 'Browse our project gallery, learn more about your aesthetic options',
     href: '/project',
     icon: Star,
+  },
+  {
+    label: 'Learn about us',
+    description: 'Who we are, our mission and values',
+    href: '/about-sonshine-roofing',
+    icon: UserRoundSearch,
   },
 ];
 

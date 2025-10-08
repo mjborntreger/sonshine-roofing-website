@@ -6,7 +6,7 @@ import AnalyticsScripts from "@/lib/analytics";
 import { inter, allura, candara } from "@/lib/fonts";
 import { Suspense } from "react";
 import GtmRouteChange from "@/lib/gtm-route-change";
-import TawkChatLoader from "@/components/TawkChatLoader";
+import ChatConsentGate from "@/components/ChatConsentGate";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://sonshineroofing.com"),
@@ -263,7 +263,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(getGlobalSchema()) }}
         />
-        <TawkChatLoader />
+        <ChatConsentGate />
       </body>
     </html>
   );
