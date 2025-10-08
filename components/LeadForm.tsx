@@ -68,7 +68,7 @@ export default function LeadForm({ initialSuccessCookie, restoredSuccess, utm }:
   }, []);
 
   return (
-    <div>
+    <div id="get-started">
       {!showWizard && (
         <div ref={containerRef} className="overflow-hidden mx-2 rounded-3xl border border-blue-100 bg-white shadow-md">
           <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">

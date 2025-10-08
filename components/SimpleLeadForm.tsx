@@ -258,15 +258,22 @@ export default function SimpleLeadForm({ initialSuccessCookie, utm }: SimpleLead
   };
 
   if (status === 'success' && successMeta) {
-    return <LeadFormSuccess successMeta={successMeta} onReset={handleResetSuccess} maxWidthClassName="max-w-5xl" />;
+    return (
+      <>
+        <div id="book-an-appointment" className="h-0" aria-hidden="true" />
+        <LeadFormSuccess successMeta={successMeta} onReset={handleResetSuccess} maxWidthClassName="max-w-5xl" />
+      </>
+    );
   }
 
   return (
-    <form className="not-prose mt-8" onSubmit={handleSubmit} noValidate>
+    <>
+      <div id="book-an-appointment" className="h-0" aria-hidden="true" />
+      <form className="not-prose mt-8" onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <div className="mx-auto w-full max-w-3xl rounded-3xl border border-blue-100 bg-white shadow-md">
         <div className="border-b rounded-t-3xl border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
-          <h2 className="flex items-center text-xl md:text-2xl font-bold gap-2" id="book-an-appointment">
+          <h2 className="flex items-center text-xl md:text-2xl font-bold gap-2">
             <SquareMenu className="h-5 w-5 md:h-6 md:w-6 text-[--brand-blue]" aria-hidden="true" />
             <span>Contact Our Office</span>
           </h2>
@@ -545,6 +552,7 @@ export default function SimpleLeadForm({ initialSuccessCookie, utm }: SimpleLead
           </div>
         </div>
       </div>
-    </form>
+      </form>
+    </>
   );
 }

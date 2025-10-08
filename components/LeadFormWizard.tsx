@@ -593,7 +593,7 @@ export default function LeadFormWizard({
       <input type="hidden" name="bestTime" value={form.bestTime} />
       <input type="hidden" name="notes" value={form.notes} />
 
-      <div id="get-started" className="overflow-hidden mx-2 rounded-3xl border border-blue-100 bg-white shadow-md">
+      <div className="overflow-hidden mx-2 rounded-3xl border border-blue-100 bg-white shadow-md">
         <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
