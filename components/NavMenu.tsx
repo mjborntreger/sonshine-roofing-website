@@ -485,7 +485,7 @@ function MobileMenu() {
             role="menu"
             aria-label="Main"
             className="fixed left-2 right-2 z-[61]
-                       rounded-3xl border bg-slate-100 shadow-xl p-2
+                       rounded-3xl border bg-white shadow-xl p-2
                        top-[calc(var(--header-h,56px)+8px)]
                        max-h-[calc(100vh-var(--header-h,56px)-24px)] overflow-auto"
           >

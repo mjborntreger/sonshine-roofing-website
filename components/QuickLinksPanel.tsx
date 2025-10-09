@@ -49,8 +49,8 @@ export default function QuickLinksPanel({
 }: QuickLinksPanelProps) {
   return (
     <div className={cn("rounded-3xl border border-slate-200 bg-white p-4 shadow-sm", className)}>
-      <h2 className="not-prose mb-3 font-display text-center text-[1rem] leading-none font-bold uppercase tracking-wide text-slate-700">
-        <TitleIcon className={cn("mr-2 inline h-4 w-4 font-semibold", palette.titleIconClassName)} />
+      <h2 className="not-prose mb-3 font-display text-center text-[1rem] leading-none font-bold uppercase tracking-wide text-slate-600">
+        <TitleIcon className={cn("mr-2 inline h-4 w-4", palette.titleIconClassName)} />
         {title}
       </h2>
 
@@ -67,6 +67,7 @@ export default function QuickLinksPanel({
             <li key={href}>
               <SmartLink
                 href={href}
+                title={label}
                 aria-label={aria}
                 aria-current={active ? "page" : undefined}
                 data-active={active ? "true" : "false"}
@@ -90,7 +91,7 @@ export default function QuickLinksPanel({
                 </span>
 
                 <div className="min-w-0 flex-1 text-left">
-                  <h3 className="not-prose font-display leading-none truncate text-[1rem]">{label}</h3>
+                  <h3 className="not-prose font-normal font-display leading-none truncate text-[1rem]">{label}</h3>
                   <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">{description}</p>
                 </div>
 

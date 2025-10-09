@@ -77,10 +77,10 @@ export default function ChatConsentGate() {
       {!showPrompt ? (
         <button
           type="button"
-          className="rounded-full bg-[--brand-blue] px-4 py-3 text-md font-semibold text-white shadow-lg transition hover:bg-blue-700"
+          className="rounded-full bg-[--brand-blue] text-md md:text-lg px-4 py-3 text-md font-semibold text-white shadow-xl transition hover:bg-blue-700"
           onClick={() => setShowPrompt(true)}
         >
-          <MessageSquare className="h-5 w-5 inline mr-2" />
+          <MessageSquare className="h-5 w-5 md:h-[1.4rem] md:w-[1.4rem] inline mr-2" />
           Chat with us
         </button>
       ) : null}
