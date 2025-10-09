@@ -237,7 +237,7 @@ export default async function Page() {
                 Many roofing materials also come with warranties directly from the manufacturer
                 that protect against product defects. That being said, such defects are incredibly
                 rare with reputable vendors such as GAF, Eagle Tile, Westlake Royal Roofing,
-                Polyglass USA, Crown Tile, and Sunshine State Metals.
+                Polyglass USA, Crown Tile, and Sunshine Metal Supply.
                 <br /><br />
                 These warranties typically last for decades, some even up to 50 years on more
                 durable materials such as metal or tile.

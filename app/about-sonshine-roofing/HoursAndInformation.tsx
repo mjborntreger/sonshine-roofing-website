@@ -60,7 +60,6 @@ export async function HoursAndInformation() {
             <li>Bradenton</li>
             <li>Palmetto</li>
             <li>Parrish</li>
-            <li>Myakka Ciy</li>
             <li>Venice</li>
             <li>Nokomis</li>
             <li>North Port</li>
