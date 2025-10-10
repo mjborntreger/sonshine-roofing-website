@@ -51,10 +51,6 @@ export function pushToDataLayer(event: GtmEvent) {
 
   win.__gtmQueue!.push(event);
 
-  if (win.dataLayer) {
-    win.dataLayer.push(event);
-  }
-
   logDebug("queued", event);
 }
 
