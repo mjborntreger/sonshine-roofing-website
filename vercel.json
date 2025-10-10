@@ -14,6 +14,48 @@
         { "key": "X-Robots-Tag", "value": "noindex, nofollow, noimageindex" },
         { "key": "Cache-Control", "value": "no-store" }
       ]
+    },
+    {
+      "source": "/_next/static/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.(?:ico|png|jpg|jpeg|gif|svg|webp|avif|json|txt|webmanifest)$",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/__sitemaps/static-routes.json",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=300" }
+      ]
+    },
+    {
+      "source": "/sitemap_index/(blog|project|roofing-glossary|person)(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=300" }
+      ]
+    },
+    {
+      "source": "/sitemap_index$",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=300" }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
     }
   ]
 }
