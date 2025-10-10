@@ -1,4 +1,5 @@
 import { deleteCookie, readCookie, writeCookie } from '@/lib/client-cookies';
+import { pushToDataLayer } from '@/lib/gtm';
 import { normalizePhoneForSubmit, isUsPhoneComplete } from '@/lib/phone';
 import type { ContactLeadInput, LeadInput } from '@/lib/validation';
 
@@ -289,16 +290,7 @@ export async function submitLead<T extends LeadInput>(
       if (contactReadyCookie) {
         writeCookie(CONTACT_READY_COOKIE, '1', contactReadyCookieMaxAge);
       }
-      if (gtmEvent && typeof window !== 'undefined') {
-        try {
-          type DataLayerWindow = Window & { dataLayer?: Array<Record<string, unknown>> };
-          const dlWindow = window as DataLayerWindow;
-          dlWindow.dataLayer = dlWindow.dataLayer || [];
-          dlWindow.dataLayer.push(gtmEvent);
-        } catch {
-          // ignore GTM push issues
-        }
-      }
+      if (gtmEvent) pushToDataLayer(gtmEvent);
       return { ok: true, status: response.status, data: json };
     }
 

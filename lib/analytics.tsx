@@ -1,6 +1,32 @@
 "use client";
 
+import { useEffect } from "react";
 import Script from "next/script";
+
+import type { GtmWindow } from "@/lib/gtm";
+
+function ensureGtmGlobals(win: GtmWindow) {
+  win.dataLayer = win.dataLayer ?? [];
+  win.__gtmQueue = win.__gtmQueue ?? [];
+  if (typeof win.__gtmLoaded !== "boolean") {
+    win.__gtmLoaded = false;
+  }
+}
+
+export function flushQueuedEvents(win: GtmWindow) {
+  if (!win.dataLayer) {
+    win.dataLayer = [];
+  }
+  const queue = win.__gtmQueue;
+  if (!queue || queue.length === 0) return;
+
+  while (queue.length > 0) {
+    const event = queue.shift();
+    if (event) {
+      win.dataLayer.push(event);
+    }
+  }
+}
 
 export default function AnalyticsScripts() {
   const GTM = process.env.NEXT_PUBLIC_GTM_ID;
@@ -9,12 +35,35 @@ export default function AnalyticsScripts() {
     process.env.NEXT_PUBLIC_ENV === "production" ||
     process.env.NEXT_PUBLIC_ENABLE_GTM_PREVIEW === "true";
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const win = window as GtmWindow;
+    ensureGtmGlobals(win);
+  }, []);
+
   if (!GTM || !ENABLED) return null;
 
   return (
     <>
-      {/* Google Tag Manager – head snippet (afterInteractive) */}
-      <Script id="gtm-init" strategy="afterInteractive">
+      {/* Google Tag Manager – head snippet (lazyOnload) */}
+      <Script
+        id="gtm-init"
+        strategy="lazyOnload"
+        onLoad={() => {
+          if (typeof window === "undefined") return;
+          const win = window as GtmWindow;
+          ensureGtmGlobals(win);
+          win.__gtmLoaded = true;
+          flushQueuedEvents(win);
+        }}
+        onReady={() => {
+          if (typeof window === "undefined") return;
+          const win = window as GtmWindow;
+          ensureGtmGlobals(win);
+          win.__gtmLoaded = true;
+          flushQueuedEvents(win);
+        }}
+      >
         {`
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],

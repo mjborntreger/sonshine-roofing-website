@@ -23,6 +23,8 @@ import {
   type ReadonlyURLSearchParams,
 } from "next/navigation";
 
+import { pushToDataLayer } from "@/lib/gtm";
+
 // Keys to ignore when building the signature so Tag Assistant / GA linker noise
 // doesn't create distinct signatures.
 const IGNORE_QS = new Set([
@@ -80,17 +82,14 @@ export default function GtmRouteChange() {
     win.__pvSigSent.add(sig);
 
     // Ensure dataLayer exists and push after paint so title is accurate.
-    win.dataLayer = win.dataLayer ?? [];
     requestAnimationFrame(() => {
-      const layer = win.dataLayer ?? [];
-      layer.push({
+      pushToDataLayer({
         event: "page_view",
         source: "react-client", // use this to whitelist in GTM
         page_location: window.location.href,
         page_path: pathname || "/",
         page_title: document.title || undefined,
       });
-      win.dataLayer = layer;
     });
   }, [pathname, searchParams]);
 
