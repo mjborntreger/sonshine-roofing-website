@@ -37,7 +37,7 @@ export async function VideoWithSchema({
   publisherName,
   schemaId,
 }: VideoWithSchemaProps) {
-  const headerList = headers();
+  const headerList = await headers();
   const origin = resolveSiteOrigin(headerList);
 
   const embedBase = host === "youtube" ? "https://www.youtube.com/embed/" : "https://www.youtube-nocookie.com/embed/";
