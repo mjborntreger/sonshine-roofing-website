@@ -39,7 +39,10 @@ const heroImageUrl = (item: VideoItem): string | undefined => {
   return undefined;
 };
 
-type VideoModule = Pick<typeof import("@/lib/wp"), "getVideoEntryBySlug" | "videoJsonLd">;
+type VideoModule = Pick<
+  typeof import("@/lib/wp"),
+  "getVideoEntryBySlug" | "getProjectBySlug" | "projectToVideoItem" | "videoJsonLd"
+>;
 
 const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
   { slug: "commercials", label: "Commercials" },
@@ -229,13 +232,20 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
   if (videoSlug) {
     try {
       const mod: VideoModule = await import("@/lib/wp");
-      const getOne = mod.getVideoEntryBySlug;
+      const getEntry = mod.getVideoEntryBySlug;
+      const getProject = mod.getProjectBySlug;
+      const toProjectItem = mod.projectToVideoItem;
       const toJsonLd = mod.videoJsonLd;
-      if (typeof getOne === "function") {
-        const selected = await getOne(videoSlug).catch(() => null);
-        if (selected && typeof toJsonLd === "function") {
-          selectedVideoLd = toJsonLd(selected, base);
-        }
+
+      let selected = typeof getEntry === "function" ? await getEntry(videoSlug).catch(() => null) : null;
+
+      if (!selected && typeof getProject === "function" && typeof toProjectItem === "function") {
+        const project = await getProject(videoSlug).catch(() => null);
+        selected = project ? toProjectItem(project) : null;
+      }
+
+      if (selected && typeof toJsonLd === "function") {
+        selectedVideoLd = toJsonLd(selected, base);
       }
     } catch {
       // ignore

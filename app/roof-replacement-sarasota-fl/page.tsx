@@ -7,7 +7,7 @@ import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import { Accordion } from "@/components/Accordion";
-import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks } from "lucide-react";
+import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, Lightbulb, CircleCheckBig } from "lucide-react";
 import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/FinancingBand";
@@ -214,7 +214,12 @@ export default async function Page() {
                 <h4>Workmanship Warranty</h4>
                 {/* Inline callout (#6) */}
               <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
-                <strong className="block text-slate-900 mb-1">Fact:</strong>
+                <strong 
+                  className="uppercase block font-display text-[1rem] text-slate-800 mb-1"
+                  >
+                    <CircleCheckBig className="h-4 w-4 mr-2 text-[--brand-blue] inline" />
+                    Fact:
+                </strong>
                 <p className="m-0 text-slate-700">
                   The vast majority of roof failures are caused by poor workmanship, and
                   often you won’t notice these errors for many years down the line without yearly
@@ -297,7 +302,12 @@ export default async function Page() {
 
               {/* Inline callout (#6) */}
               <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Pro tip">
-                <strong className="block text-slate-900 mb-1">Pro tip</strong>
+                <strong 
+                  className="uppercase text-[1rem] font-display block text-slate-800 mb-1"
+                  >
+                    <Lightbulb className="text-[--brand-orange] h-4 w-4 mr-2 inline"/>
+                    Pro Tip:
+                </strong>
                 <p className="m-0 text-slate-700">Annual inspections keep warranties valid and catch small issues before they become leaks.</p>
               </div>
             </Accordion>

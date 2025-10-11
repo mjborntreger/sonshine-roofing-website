@@ -10,9 +10,11 @@ type Props = {
   title: string;
   videoId: string;
   className?: string;
+  posterUrl?: string;
+  posterAlt?: string;
 };
 
-export default function ProjectVideo({ title, videoId, className }: Props) {
+export default function ProjectVideo({ title, videoId, className, posterUrl, posterAlt }: Props) {
   const [open, setOpen] = useState(false);
 
   const [mounted, setMounted] = useState(false);
@@ -100,7 +102,9 @@ export default function ProjectVideo({ title, videoId, className }: Props) {
     };
   }, [open]);
 
-  const thumb = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  const youtubeThumb = `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  const facadeSrc = posterUrl?.trim() ? posterUrl.trim() : youtubeThumb;
+  const facadeAlt = posterAlt?.trim() || title;
 
   // springPop animation preset
   const A = {
@@ -127,8 +131,8 @@ export default function ProjectVideo({ title, videoId, className }: Props) {
         className={`relative block w-full overflow-hidden rounded-2xl ${className ?? ""}`}
       >
         <Image
-          src={thumb}
-          alt={title}
+          src={facadeSrc}
+          alt={facadeAlt}
           width={1280}
           height={720}
           sizes="(max-width: 1280px) 100vw, 768px"

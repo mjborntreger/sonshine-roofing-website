@@ -1,4 +1,7 @@
 // app/[slug]/page.tsx
+import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
+import { cn } from "@/lib/utils";
+import FaqInlineList from "@/components/FaqInlineList";
 import Image from "next/image";
 import Section from "@/components/layout/Section";
 import SmartLink from "@/components/SmartLink";
@@ -14,6 +17,7 @@ import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { blogPostingSchema } from "@/lib/seo/schema";
 import { resolveSiteOrigin } from "@/lib/seo/site";
+import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 
 export const revalidate = 900;
 
@@ -118,19 +122,19 @@ function decorateExternalAnchors(html: string, baseHost: string) {
   });
 }
 
-// Inject CTA after the Nth paragraph (server-side, hydration-safe)
+// Inject CTA after the 3rd paragraph (server-side, hydration-safe)
 function injectCtaAfterNthParagraph(html: string, n = 3) {
-  const btn = buttonVariants({ variant: "brandOrange" }); // add { size: "sm" } if you want
+  const btn = cn(buttonVariants({ variant: "brandOrange" }), "justify-end"); // add { size: "sm" } if you want
 
   const cta = `
-<div class="my-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm relative overflow-hidden">
+<div class="my-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm relative overflow-hidden">
   <span class="pointer-events-none absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]"></span>
-  <h3 class="m-0 text-xl font-semibold text-slate-900">Book a Free Estimate</h3>
-  <p class="mt-2 text-slate-600 italic">Since 1987 we’ve got you covered — schedule a fast, no-pressure visit.</p>
+  <h3 class="m-0 text-xl text-slate-900">Take the first step</h3>
+  <p class="mt-2 text-slate-600 italic">Schedule a fast, no-pressure visit. Since 1987 we’ve got you covered.</p>
   <a
     href="/contact-us/#book-an-appointment"
     data-button="true"
-    class="${btn} mt-4 inline-flex items-center no-underline"
+    class="${btn} mt-4 items-center no-underline"
     data-icon-affordance="right"
   >
     Get started
@@ -151,7 +155,7 @@ function injectCtaAfterNthParagraph(html: string, n = 3) {
       <path d="m12 5 7 7-7 7" />
     </svg>
   </a>
-</div>
+</div>  
 `.trim();
 
   let count = 0;
@@ -209,6 +213,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   if (!post) notFound();
 
+  const primaryCategorySlug = post.categoryTerms?.find((term) => term.slug)?.slug;
+
   const origin = await getBaseUrlFromHeaders();
   const shareUrl = `${origin}/${slug}`;
   const dateStr = new Date(post.date).toLocaleDateString("en-US", {
@@ -250,6 +256,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const withIds = ensureHeadingIds(safeHtml);
   const withAnchors = decorateExternalAnchors(withIds, new URL(origin).hostname);
   const htmlWithCta = injectCtaAfterNthParagraph(withAnchors, 3);
+
+  // Recent posts pool for YouMayAlsoLike.tsx
+  const pool = await listRecentPostsPool(36);
+
+  // FAQs fetch
+  const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
 
   // prev/next using lightweight nav list (slug + title + date)
   const all = await listRecentPostNav(200).catch(() => []);
@@ -360,6 +372,20 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           )}
         </nav>
       )}
+      
+      <YouMayAlsoLike
+        posts={pool}
+        category={primaryCategorySlug}
+        excludeSlug={post.slug}
+      />
+
+      <FaqInlineList
+        heading="General FAQs"
+        topicSlug="general"
+        limit={8}
+        initialItems={generalFaqs}
+        seeMoreHref="/faq"
+      />
     </Section>
   );
 }

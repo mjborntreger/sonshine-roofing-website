@@ -96,6 +96,8 @@ export type ProjectSummary = {
   uri: string;
   title: string;
   year: number | null;
+  /** Optional ISO publish date (used for recency sorting) */
+  date?: string | null;
   heroImage: WpImage | null;
   /** Short description for client-side search (from ACF projectDetails.projectDescription) */
   projectDescription?: string | null;
@@ -169,6 +171,7 @@ export type Post = {
   authorName?: string | null;
   featuredImage?: { url: string; altText?: string | null };
   categories: string[];
+  categoryTerms?: TermLite[];
   /** Optional short HTML excerpt (rendered), useful for previews & SEO fallbacks */
   excerpt?: string;
   /** RankMath SEO (as exposed by WPGraphQL Rank Math) */
@@ -524,7 +527,7 @@ function extractYouTubeId(url: string): string | null {
     return null;
   }
 }
-function youtubeThumb(id: string) {
+export function youtubeThumb(id: string) {
   return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 }
 
@@ -1425,6 +1428,33 @@ export async function listProjectVideos(limit = 100): Promise<VideoItem[]> {
   return items;
 }
 
+export function projectToVideoItem(project: ProjectFull): VideoItem | null {
+  const rawUrl = typeof project.youtubeUrl === 'string' ? project.youtubeUrl.trim() : '';
+  if (!rawUrl) return null;
+  const youtubeId = extractYouTubeId(rawUrl);
+  if (!youtubeId) return null;
+
+  const slug = project.slug?.trim() ?? '';
+  const id = slug ? `project-${slug}` : `project-${youtubeId}`;
+
+  return {
+    id,
+    slug: slug || undefined,
+    title: project.title,
+    youtubeUrl: rawUrl,
+    youtubeId,
+    thumbnailUrl: youtubeThumb(youtubeId),
+    source: 'project',
+    date: project.date ?? undefined,
+    excerpt: project.projectDescription,
+    materialTypes: project.materialTypes ?? [],
+    serviceAreas: project.serviceAreas ?? [],
+    categories: [{ name: 'Roofing Projects', slug: 'roofing-project' }],
+    featuredImage: project.heroImage ? { url: project.heroImage.url } : undefined,
+    seo: project.seo,
+  };
+}
+
 // --- Paged videos (merge video entries + project videos) -----------------
 export type VideoFiltersInput = {
   buckets?: VideoBucketKey[];      // which buckets to include (OR). If omitted, include all.
@@ -2095,7 +2125,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
           }
         }
         categories(first: 12) {
-          nodes { name }
+          nodes { name slug }
         }
         seo {
           title
@@ -2117,9 +2147,21 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 
   const featuredImageNode = extractNode(p.featuredImage);
   const featuredImageRecord = asRecord(featuredImageNode);
-  const categories = extractNodes(p.categories)
+  const categoryNodes = extractNodes(p.categories);
+  const categories = categoryNodes
     .map((node) => toStringSafe(readRecordString(asRecord(node), "name")))
     .filter((name) => name.length > 0);
+
+  const categoryTerms: TermLite[] = categoryNodes
+    .map((node) => {
+      const record = asRecord(node);
+      if (!record) return null;
+      const name = toStringSafe(record.name);
+      const slug = toStringSafe(record.slug);
+      if (!name && !slug) return null;
+      return { name, slug };
+    })
+    .filter((term): term is TermLite => Boolean(term && (term.name.length > 0 || term.slug.length > 0)));
 
   return {
     slug: toStringSafe(p.slug) || slug,
@@ -2140,6 +2182,7 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
           }
         : undefined,
     categories,
+    categoryTerms,
     excerpt: typeof p.excerpt === 'string' ? p.excerpt : undefined,
     seo: isRecord(p.seo) ? (p.seo as Post['seo']) : undefined,
   } satisfies Post;
@@ -2185,6 +2228,7 @@ export async function listRecentProjects(
       uri: toStringSafe(entry.uri),
       title: toStringSafe(entry.title),
       year: pickYear(isoDate),
+      date: isoDate,
       heroImage: pickImageFrom(entry.featuredImage),
       projectDescription: readProjectDescription(projectDetails),
       materialTypes: mapTermNodes(filters?.materialType),
@@ -2192,6 +2236,14 @@ export async function listRecentProjects(
       serviceAreas: mapTermNodes(filters?.serviceArea),
     } satisfies ProjectSummary;
   });
+}
+
+/**
+ * Lightweight pool of recent projects for client-side recommendation modules.
+ * Delegates to listRecentProjects but allows callers to request a larger batch.
+ */
+export async function listRecentProjectsPool(limit = 24): Promise<ProjectSummary[]> {
+  return listRecentProjects(limit);
 }
 
 export type ProjectsArchiveFilters = {
@@ -2377,6 +2429,7 @@ export async function listProjectsPaged({
       uri: toStringSafe(node.uri),
       title: toStringSafe(node.title),
       year: pickYear(isoDate),
+      date: isoDate,
       heroImage: pickImageFrom(node.featuredImage),
       projectDescription: readProjectDescription(detailsRecord),
       materialTypes: mapTermNodes(filtersRecord?.materialType),
@@ -2473,6 +2526,7 @@ export async function listRecentProjectsByMaterial(
       uri: toStringSafe(node.uri),
       title: toStringSafe(node.title),
       year: pickYear(isoDate),
+      date: isoDate,
       heroImage: pickImageFrom(node.featuredImage),
       projectDescription: readProjectDescription(detailsRecord),
       materialTypes: mapTermNodes(filtersRecord?.materialType),
@@ -2719,6 +2773,7 @@ export async function filterProjects({
         uri: toStringSafe(p.uri),
         title: toStringSafe(p.title),
         year: pickYear(dateValue),
+        date: dateValue,
         heroImage: pickImageFrom(p.featuredImage),
         materialTypes: mapTermNodes(filters?.materialType),
         roofColors: mapTermNodes(filters?.roofColor),

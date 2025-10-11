@@ -1,10 +1,13 @@
 import Image from "next/image";
+import FaqInlineList from "@/components/FaqInlineList";
+import { listFaqsWithContent } from "@/lib/wp";
 import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { getProjectBySlug, listProjectSlugs } from "@/lib/wp";
+import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/wp";
 import ProjectVideo from "./ProjectVideo";
+import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import ShareWhatYouThink from "@/components/ShareWhatYouThink";
 
 import type { Metadata } from "next";
@@ -95,11 +98,20 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
 
   if (!project) notFound();
 
+  const projectPool = await listRecentProjectsPool(36);
+  const serviceAreaSlugs = (project.serviceAreas ?? [])
+    .map((term) => term?.slug)
+    .filter((value): value is string => typeof value === "string" && value.length > 0);
+  const primaryServiceAreaName =
+    project.serviceAreas && project.serviceAreas.length > 0
+      ? project.serviceAreas[0]?.name ?? null
+      : null;
+
   const videoId = getYouTubeId(project.youtubeUrl);
   const hasAnyBadges =
     (project.materialTypes?.length ?? 0) +
-      (project.roofColors?.length ?? 0) +
-      (project.serviceAreas?.length ?? 0) >
+    (project.roofColors?.length ?? 0) +
+    (project.serviceAreas?.length ?? 0) >
     0;
 
   const origin = resolveSiteOrigin(await headers());
@@ -118,19 +130,27 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
   const areaServed = (project.serviceAreas || []).map((t) => t.name);
   const materials = (project.materialTypes || []).map((t) => t.name);
   const colors = (project.roofColors || []).map((t) => t.name);
+  const posterUrl = project.heroImage?.url ? ogImgAbs : undefined;
 
-  const videoSchema = videoId
-    ? videoObjectSchema({
-        name: project.title,
-        description: (project.seo?.description || project.projectDescription || "").slice(0, 160),
-        canonicalUrl: `/project/${slug}`,
-        embedUrl: `https://www.youtube.com/embed/${videoId}`,
-        contentUrl: project.youtubeUrl ?? undefined,
-        thumbnailUrls: [ogImgAbs],
-        uploadDate: project.date || undefined,
-        origin,
-      })
+  const videoSchemaInput = videoId
+    ? {
+      name: project.title,
+      description: (project.seo?.description || project.projectDescription || "").slice(0, 160),
+      canonicalUrl: `/project/${slug}`,
+      embedUrl: `https://www.youtube.com/embed/${videoId}`,
+      contentUrl: project.youtubeUrl ?? undefined,
+      thumbnailUrls: [ogImgAbs],
+      uploadDate: project.date || undefined,
+      origin,
+    }
+    : null;
+
+  const videoSchema = videoSchemaInput ? videoObjectSchema(videoSchemaInput) : undefined;
+  const videoSchemaNoContext = videoSchemaInput
+    ? videoObjectSchema({ ...videoSchemaInput, withContext: false })
     : undefined;
+
+  const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
 
   const projectSchema = creativeWorkSchema({
     name: project.title,
@@ -149,11 +169,12 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
       name: "SonShine Roofing",
       logo: { "@type": "ImageObject", url: `${origin}/icon.png` },
     },
-    additionalProperties: videoSchema ? { video: videoSchema } : undefined,
+    additionalProperties: videoSchemaNoContext ? { video: videoSchemaNoContext } : undefined,
   });
 
   return (
     <Section>
+      {videoSchema ? <JsonLd id="project-video" data={videoSchema} /> : null}
       <JsonLd data={projectSchema} />
       <SmartLink href="/project" className="no-underline hover:underline text-sm text-slate-600">
         ← Back to projects
@@ -161,17 +182,23 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
 
       {/* Title + gradient stripe */}
       <div className="prose">
-        <h1 className="mb-2">{project.title}</h1>
+        <h1 className="my-4 text-3xl md:text-5xl">{project.title}</h1>
       </div>
-      <div className="h-1 w-full mt-6 rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
       <ShareWhatYouThink />
+
+      <div className="h-1 w-full mt-6 mb-2 rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
 
       {/* Two-column layout */}
       <div className="mt-6 grid grid-cols-1 items-start gap-8 lg:grid-cols-[4fr_2fr]">
         {/* Left column: Video facade (fallback to image) + badges */}
         <div>
           {videoId ? (
-            <ProjectVideo title={project.title} videoId={videoId} />
+            <ProjectVideo
+              title={project.title}
+              videoId={videoId}
+              posterUrl={posterUrl}
+              posterAlt={project.heroImage?.altText || project.title}
+            />
           ) : (
             project.heroImage?.url && (
               <Image
@@ -207,7 +234,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
         <div className="prose rounded-3xl border-slate-200 p-6 bg-white shadow-md">
           {project.projectDescription && (
             <>
-              <h3>Project Details</h3>
+              <h3>Project Summary</h3>
               <p>{project.projectDescription}</p>
             </>
           )}
@@ -242,6 +269,22 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
       {project.contentHtml && (
         <div className="prose mt-6" dangerouslySetInnerHTML={{ __html: project.contentHtml }} />
       )}
+
+      <YouMayAlsoLike
+        variant="project"
+        projects={projectPool}
+        serviceAreaSlug={serviceAreaSlugs}
+        serviceAreaName={primaryServiceAreaName}
+        excludeSlug={project.slug}
+      />
+
+      <FaqInlineList
+        heading="General FAQs"
+        topicSlug="general"
+        limit={8}
+        initialItems={generalFaqs}
+        seeMoreHref="/faq"
+      />
     </Section>
   );
 }

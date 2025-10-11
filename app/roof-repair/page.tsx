@@ -6,7 +6,7 @@ import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 import { Accordion } from "@/components/Accordion";
-import { Layers, Droplets, Bug, Hammer, PanelRight } from "lucide-react";
+import { Layers, Droplets, Bug, Hammer, PanelRight, CircleCheckBig } from "lucide-react";
 import RepairVsReplace from "@/components/RepairVsReplace";
 import type { Metadata } from "next";
 import FinancingBand from "@/components/FinancingBand";
@@ -82,7 +82,12 @@ export default async function Page() {
 
           <h2>What Does It Cost to Repair a Roof?</h2>
           <div className="my-4 rounded-xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
-            <strong className="block text-slate-900 mb-1">Fact:</strong>
+            <strong 
+              className="block font-display uppercase text-slate-800 mb-1"
+              >
+                <CircleCheckBig className="h-4 w-4 mr-2 inline text-[--brand-blue]" />
+                Fact:
+            </strong>
             <p className="m-0 text-slate-700">
               Repairing parts of a roof will cost considerably less than a full-on
               replacement of the entire system.
