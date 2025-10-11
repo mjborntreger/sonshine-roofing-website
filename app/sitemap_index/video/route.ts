@@ -95,7 +95,7 @@ const getVideoEntryNodes = unstable_cache(
     let after: string | null = null;
 
     do {
-      const variables = after ? { first: 200, after } : { first: 200 };
+      const variables: { first: number; after?: string | null } = after ? { first: 200, after } : { first: 200 };
       const data = await wpFetch<VideoEntriesResult>(query, variables);
       const page = data?.videoEntries;
       const pageNodes = page?.nodes ?? [];
@@ -142,7 +142,7 @@ const getProjectVideoNodes = unstable_cache(
     let after: string | null = null;
 
     do {
-      const variables = after ? { first: 200, after } : { first: 200 };
+      const variables: { first: number; after?: string | null } = after ? { first: 200, after } : { first: 200 };
       const data = await wpFetch<ProjectVideosResult>(query, variables);
       const page = data?.projects;
       const pageNodes = page?.nodes ?? [];
