@@ -45,8 +45,8 @@ type ProjectVideoNode = {
     projectDescription?: string | null;
   } | null;
   projectFilters?: {
-    materialType?: { nodes?: Maybe<{ name?: string | null }> | null } | null;
-    serviceArea?: { nodes?: Maybe<{ name?: string | null }> | null } | null;
+    materialType?: { nodes?: Maybe<{ name?: string | null }>[] | null } | null;
+    serviceArea?: { nodes?: Maybe<{ name?: string | null }>[] | null } | null;
   } | null;
 };
 
