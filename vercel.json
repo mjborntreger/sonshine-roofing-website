@@ -28,7 +28,7 @@
       ]
     },
     {
-      "source": "/(.*)\\.(?:ico|png|jpg|jpeg|gif|svg|webp|avif|json|txt|webmanifest)$",
+      "source": "/:path*\\.(ico|png|jpg|jpeg|gif|svg|webp|avif|json|txt|webmanifest)$",
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
       ]
