@@ -50,7 +50,7 @@
               Generated for human-friendly viewing. Search engines ignore this styling.
             </div>
             <xsl:if test="not(/sm:sitemapindex | /sitemapindex)">
-              <a class="back-link" href="/sitemap_index">&larr; Back to sitemap index</a>
+              <a class="back-link" href="/sitemap_index">Back to sitemap index</a>
             </xsl:if>
           </header>
           <xsl:choose>
