@@ -8,6 +8,7 @@ Quick Checks
 - Sitemaps
   - `/sitemap_index` lists child sitemaps.
   - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
+  - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
 - GTM
   - `NEXT_PUBLIC_GTM_ID` set, and container publishes page_view from Custom Event.
 

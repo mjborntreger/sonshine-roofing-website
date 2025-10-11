@@ -40,7 +40,7 @@
       ]
     },
     {
-      "source": "/sitemap_index/(blog|project|roofing-glossary|person)(.*)",
+      "source": "/sitemap_index/(blog|project|roofing-glossary|person|video)(.*)",
       "headers": [
         { "key": "Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=300" }
       ]

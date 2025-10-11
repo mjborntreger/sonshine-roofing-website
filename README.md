@@ -67,6 +67,7 @@ Quick Checks
 - Sitemaps
   - `/sitemap_index` lists child sitemaps.
   - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
+  - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
 - GTM
   - `NEXT_PUBLIC_GTM_ID` set, and container publishes page_view from Custom Event.
 
@@ -130,7 +131,7 @@ Sitemaps
 - Index: `/sitemap_index`
 - Children:
   - `/sitemap_index/static` (build-time manifest)
-  - `/sitemap_index/blog`, `/project`, `/faq`, `/roofing-glossary`, `/person`
+  - `/sitemap_index/blog`, `/project`, `/roofing-glossary`, `/person`, `/video`
 - Preview mode on staging: set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`.
 
 Structured Data

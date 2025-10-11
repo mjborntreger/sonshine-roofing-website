@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:sm="http://www.sitemaps.org/schemas/sitemap/0.9">
+  xmlns:sm="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <xsl:output method="html" version="1.0" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"/>
   <xsl:strip-space elements="*"/>
 
@@ -27,6 +28,13 @@
           a{color:#93c5fd;text-decoration:none}
           a:hover{text-decoration:underline}
           .muted{color:#9ca3af;font-size:12px}
+          .video-item{margin:6px 0;padding:8px 10px;border:1px solid #1f2937;border-radius:8px;background:#0b1220}
+          .video-title{font-weight:600;font-size:13px;color:#f8fafc;margin-bottom:4px}
+          .video-meta{color:#9ca3af;font-size:12px;margin-top:2px}
+          .video-meta a{color:#93c5fd}
+          .video-meta .tag{display:inline-block;margin:2px 4px 0 0;padding:2px 6px;border-radius:999px;background:#172033;color:#cbd5f5;font-size:11px}
+          .back-link{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 12px;border:1px solid #1f2937;border-radius:8px;background:#172033;color:#cbd5f5;font-size:13px;text-decoration:none}
+          .back-link:hover{background:#1f2a44;text-decoration:none}
         </style>
       </head>
       <body>
@@ -41,6 +49,9 @@
             <div class="muted">
               Generated for human-friendly viewing. Search engines ignore this styling.
             </div>
+            <xsl:if test="not(/sm:sitemapindex | /sitemapindex)">
+              <a class="back-link" href="/sitemap_index">&larr; Back to sitemap index</a>
+            </xsl:if>
           </header>
           <xsl:choose>
             <xsl:when test="/sm:sitemapindex | /sitemapindex">
@@ -67,6 +78,7 @@
                   <tr>
                     <th>Location</th>
                     <th>Last Modified</th>
+                    <th>Videos</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -74,6 +86,59 @@
                     <tr>
                       <td><a href="{sm:loc|loc}"><xsl:value-of select="sm:loc|loc"/></a></td>
                       <td><xsl:value-of select="sm:lastmod|lastmod"/></td>
+                      <td>
+                        <xsl:choose>
+                          <xsl:when test="video:video">
+                            <xsl:for-each select="video:video">
+                              <div class="video-item">
+                                <div class="video-title">
+                                  <xsl:value-of select="video:title"/>
+                                </div>
+                                <div class="video-meta">
+                                  Thumbnail:
+                                  <a href="{video:thumbnail_loc}">
+                                    <xsl:value-of select="video:thumbnail_loc"/>
+                                  </a>
+                                </div>
+                                <xsl:if test="video:publication_date">
+                                  <div class="video-meta">
+                                    Published: <xsl:value-of select="video:publication_date"/>
+                                  </div>
+                                </xsl:if>
+                                <div class="video-meta">
+                                  Player:
+                                  <a href="{video:player_loc}">
+                                    <xsl:value-of select="video:player_loc"/>
+                                  </a>
+                                </div>
+                                <xsl:if test="video:content_loc">
+                                  <div class="video-meta">
+                                    Content:
+                                    <a href="{video:content_loc}">
+                                      <xsl:value-of select="video:content_loc"/>
+                                    </a>
+                                  </div>
+                                </xsl:if>
+                                <xsl:if test="video:description">
+                                  <div class="video-meta">
+                                    <xsl:value-of select="video:description"/>
+                                  </div>
+                                </xsl:if>
+                                <xsl:if test="video:tag">
+                                  <div class="video-meta">
+                                    <xsl:for-each select="video:tag">
+                                      <span class="tag"><xsl:value-of select="."/></span>
+                                    </xsl:for-each>
+                                  </div>
+                                </xsl:if>
+                              </div>
+                            </xsl:for-each>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <span class="muted">—</span>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </td>
                     </tr>
                   </xsl:for-each>
                 </tbody>

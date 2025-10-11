@@ -18,7 +18,7 @@ Sitemaps
 - Index: `/sitemap_index`
 - Children:
   - `/sitemap_index/static` (build-time manifest)
-  - `/sitemap_index/blog`, `/project`, `/faq`, `/roofing-glossary`, `/person`
+  - `/sitemap_index/blog`, `/project`, `/roofing-glossary`, `/person`, `/video`
 - Preview mode on staging: set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`.
 
 Structured Data
