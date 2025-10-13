@@ -98,6 +98,7 @@ const nextConfig = {
       { source: "/roofing-services", destination: "contact-us", permanent: true },
       { source: "/home", destination: "/", permanent: true },
       { source: "/what-should-i-do-if-my-roof-is-damaged-after-a-storm/", destination: "/roof-is-damaged-after-a-storm/", permanent: true },
+      { source: "/book", destination: "/contact-us", permanent: true },
 
       // === Persons ===
       { source: "/about/mina-2", destination: "/person/mina", permanent: true },
@@ -118,6 +119,7 @@ const nextConfig = {
       { source: "/roof-leaks", destination: "/roof-leaks-warning-signs", permanent: true },
       { source: "/10-warning-signs-of-roof-leaks", destination: "/roof-leaks-warning-signs", permanent: true },
       { source: "/🌞-energy-efficient-roofing-options-for-florida-homes-save-money-and-beat-the-heat-☀%EF%B8%8F💸🏠", destination: "/energy-efficient-roofing-options-florida", permanent: true },
+      { source: "/9-warning-signs-of-roof-leaks", destination: "/roof-leaks-warning-signs", permanent: true },
 
       // === Broken Backlinks ===
       { source: "/wp-content/uploads/roof-lifespan-1-1080x619.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/extend-roof-lifespan.webp", permanent: true },

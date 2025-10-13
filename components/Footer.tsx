@@ -78,7 +78,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <SmartLink
-                    className="font-display text-sm md:text-md uppercase font-bold text-[--brand-blue] hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                    className="font-display tracking-wider text-sm md:text-md uppercase font-bold text-[--brand-blue] hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
                     href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
                     aria-label="Florida Roofing Contractor's License Number CCC1331483"
                     target="_blank"
