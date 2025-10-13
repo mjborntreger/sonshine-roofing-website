@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Section from "@/components/layout/Section";
 import SimpleLeadForm from "@/components/SimpleLeadForm";
 import SmartLink from "@/components/SmartLink";
@@ -161,9 +162,21 @@ export default async function Page() {
 
             <FinancingBand />
 
-
             <div className="mt-8">
-              <SimpleLeadForm />
+              <Suspense
+                fallback={
+                  <div className="mx-auto w-full max-w-3xl rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+                    <div className="h-6 w-32 animate-pulse rounded-full bg-slate-200" />
+                    <div className="mt-4 space-y-3">
+                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
+                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
+                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
+                    </div>
+                  </div>
+                }
+              >
+                <SimpleLeadForm />
+              </Suspense>
             </div>
           </div>
 
