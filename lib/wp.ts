@@ -815,7 +815,7 @@ export async function listFaqsWithContent(limit = 50, topicSlug?: string): Promi
     const data = await wpFetch<{ faqTopic: { faqs?: { nodes?: UnknownRecord[] } } | null }>(
       query,
       { first: limit, slug: topicSlug },
-      1800
+      86400
     );
     const nodes = data?.faqTopic?.faqs?.nodes ?? [];
     return nodes.map(mapNode);
@@ -846,7 +846,7 @@ export async function listFaqsWithContent(limit = 50, topicSlug?: string): Promi
       }
     }
   `;
-  const data = await wpFetch<{ faqs: { nodes: UnknownRecord[] } }>(query, { first: limit }, 1800);
+  const data = await wpFetch<{ faqs: { nodes: UnknownRecord[] } }>(query, { first: limit }, 86400);
   const nodes = data?.faqs?.nodes ?? [];
   return nodes.map(mapNode);
 }
@@ -1056,7 +1056,7 @@ export async function listPersons(limit = 30): Promise<Person[]> {
     }
   `;
 
-  const data = await wpFetch<{ persons: { nodes: UnknownRecord[] } }>(query, { limit });
+  const data = await wpFetch<{ persons: { nodes: UnknownRecord[] } }>(query, { limit }, 86400);
   const nodes = data?.persons?.nodes || [];
 
   return nodes.map((n: UnknownRecord): Person => {
@@ -1088,7 +1088,7 @@ export async function listPersonNav(limit = 50): Promise<Array<{ slug: string; t
     }
   `;
 
-  const data = await wpFetch<{ persons: { nodes: UnknownRecord[] } }>(query, { limit });
+  const data = await wpFetch<{ persons: { nodes: UnknownRecord[] } }>(query, { limit }, 86400);
   const nodes = data?.persons?.nodes || [];
 
   return nodes

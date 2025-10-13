@@ -9,14 +9,15 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, personSchema, webPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
+const PERSON_REVALIDATE_SECONDS = revalidate;
 
 // Dynamic metadata per person
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   let person = null;
   try {
-    person = await listPersonsBySlug(slug, { cache: "no-store" });
+    person = await listPersonsBySlug(slug, { revalidateSeconds: PERSON_REVALIDATE_SECONDS });
   } catch {
     person = null;
   }
@@ -47,10 +48,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return metadata;
 }
 
+export async function generateStaticParams() {
+  const navItems = await listPersonNav(50).catch(() => [] as Awaited<ReturnType<typeof listPersonNav>>);
+  return navItems.map(({ slug }) => ({ slug }));
+}
+
 export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [person, navItems] = await Promise.all([
-    listPersonsBySlug(slug, { cache: "no-store" }).catch(() => null),
+    listPersonsBySlug(slug, { revalidateSeconds: PERSON_REVALIDATE_SECONDS }).catch(() => null),
     listPersonNav(50).catch(() => [] as Awaited<ReturnType<typeof listPersonNav>>),
   ]);
   if (!person) return notFound();

@@ -38,10 +38,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 type PageProps = { searchParams?: Promise<{ q?: string; topic?: string }> };
 
-export default async function FAQArchivePage({ searchParams }: PageProps) {
-  const sp = (await searchParams) ?? ({} as { q?: string; topic?: string });
-  const qRaw = sp.q ?? '';
-  const q = qRaw.trim();
+export default async function FAQArchivePage(_: PageProps) {
+  const q = "";
 
   const [topics, faqs] = await Promise.all([
     listFaqTopics(200).catch(() => [] as FaqTopic[]),
