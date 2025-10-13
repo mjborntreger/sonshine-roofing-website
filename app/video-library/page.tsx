@@ -194,6 +194,7 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
 
   const origin = SITE_ORIGIN;
   const collectionUrl = `${origin}${CANONICAL}`;
+  const base = collectionUrl;
 
   const topList = allVideos.slice(0, 12);
   const itemListElement = topList.map((item, index) => {
