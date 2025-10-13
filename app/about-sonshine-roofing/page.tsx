@@ -14,6 +14,7 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { resolveSiteOrigin } from "@/lib/seo/site";
+import Image from "next/image";
 
 const SERVICE_PATH = "/about-sonshine-roofing";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -114,6 +115,17 @@ export default async function Page() {
                 </a>
               </div>
 
+              <div className="flex items-center justify-self-center">
+                <Image
+                  src="https://next.sonshineroofing.com/wp-content/uploads/About-Us-Collage-new.png"
+                  alt="Team collage for SonShine Roofing, the best roofing company in Sarasota"
+                  title="SonShine Roofing Team"
+                  width={800}
+                  height={225}
+                  className="my-6"
+                />
+              </div>
+
               <Accordion
                 icon={<UserRoundSearch className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />}
                 summary={<h2 className="text-lg">Who we are</h2>}
@@ -141,7 +153,7 @@ export default async function Page() {
                 summary={<h2 className="text-lg">Built for Florida&apos;s Weather</h2>}
                 className="mb-4"
                 radius="2xl"
-                proseBody={false}             
+                proseBody={false}
               >
                 <p className="prose">
                   Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.

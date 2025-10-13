@@ -1,8 +1,9 @@
-import LazyYoutubeEmbed from "./LazyYoutubeEmbed";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { videoObjectSchema } from "@/lib/seo/schema";
 import { resolveSiteOrigin } from "@/lib/seo/site";
+import { getYouTubeVideoMeta, selectBestThumbnailUrl } from "@/lib/youtube";
 import { headers } from "next/headers";
+import LazyYoutubeEmbed from "./LazyYoutubeEmbed";
 
 type VideoWithSchemaProps = {
   videoId: string;
@@ -43,24 +44,56 @@ export async function VideoWithSchema({
   const embedBase = host === "youtube" ? "https://www.youtube.com/embed/" : "https://www.youtube-nocookie.com/embed/";
   const embedUrl = `${embedBase}${videoId}`;
 
-  const watchUrl =
-    typeof contentUrl === "string" && contentUrl.trim().length > 0
-      ? contentUrl.trim()
-      : `https://www.youtube.com/watch?v=${videoId}`;
+  const providedContentUrl = typeof contentUrl === "string" ? contentUrl.trim() : "";
+  const defaultWatchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+  let resolvedContentUrl = providedContentUrl.length > 0 ? providedContentUrl : defaultWatchUrl;
 
-  const thumbnail =
-    typeof thumbnailUrl === "string" && thumbnailUrl.trim().length > 0
-      ? thumbnailUrl.trim()
-      : `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  const providedThumbnail = typeof thumbnailUrl === "string" ? thumbnailUrl.trim() : "";
+  let resolvedThumbnail =
+    providedThumbnail.length > 0 ? providedThumbnail : `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+
+  let resolvedDescription = description;
+  let resolvedUploadDate = uploadDate;
+
+  const shouldFetchMeta =
+    !resolvedUploadDate ||
+    !resolvedDescription ||
+    (providedContentUrl.length === 0 && resolvedContentUrl === defaultWatchUrl) ||
+    providedThumbnail.length === 0;
+
+  if (shouldFetchMeta) {
+    const meta = await getYouTubeVideoMeta(videoId).catch(() => null);
+    if (meta) {
+      if (!resolvedUploadDate && meta.uploadDate) resolvedUploadDate = meta.uploadDate;
+
+      if (resolvedContentUrl === defaultWatchUrl && meta.watchUrl) {
+        resolvedContentUrl = meta.watchUrl;
+      }
+
+      if (providedThumbnail.length === 0) {
+        const bestThumbnail = selectBestThumbnailUrl(meta.thumbnails);
+        if (bestThumbnail) resolvedThumbnail = bestThumbnail;
+      }
+
+      if (!resolvedDescription && meta.description) {
+        resolvedDescription = meta.description;
+      }
+    }
+  }
+
+  const resolvedCanonical =
+    canonicalUrl && canonicalUrl.trim().length > 0 ? canonicalUrl.trim() : resolvedContentUrl;
+
+  const finalDescription = resolvedDescription?.trim();
 
   const schema = videoObjectSchema({
     name: title,
-    description,
-    canonicalUrl: canonicalUrl && canonicalUrl.trim().length > 0 ? canonicalUrl.trim() : watchUrl,
-    contentUrl: watchUrl,
+    description: finalDescription,
+    canonicalUrl: resolvedCanonical,
+    contentUrl: resolvedContentUrl,
     embedUrl,
-    thumbnailUrls: [thumbnail],
-    uploadDate,
+    thumbnailUrls: [resolvedThumbnail],
+    uploadDate: resolvedUploadDate,
     origin,
     isFamilyFriendly,
     publisherName,
@@ -73,11 +106,10 @@ export async function VideoWithSchema({
         videoId={videoId}
         title={title}
         className={className}
-        posterUrl={posterUrl ?? thumbnail}
+        posterUrl={posterUrl ?? resolvedThumbnail}
         host={host}
         query={query}
       />
     </>
   );
 }
-
