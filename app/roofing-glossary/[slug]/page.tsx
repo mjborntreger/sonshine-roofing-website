@@ -1,14 +1,13 @@
 import Section from '@/components/layout/Section';
 import SmartLink from '@/components/SmartLink';
 import { createElement, Fragment, ReactNode } from 'react';
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getGlossaryTerm, listGlossaryIndex, stripHtml } from '@/lib/wp';
 import type { Metadata } from 'next';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, definedTermSchema } from '@/lib/seo/schema';
-import { resolveSiteOrigin } from '@/lib/seo/site';
+import { SITE_ORIGIN } from '@/lib/seo/site';
 
 // Escapes a string for safe use inside a RegExp
 function escapeRegExp(s: string) {
@@ -318,7 +317,7 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
   const prev = hasPos && pos > 0 ? index[pos - 1] : hasPos ? index[index.length - 1] : null;
   const next = hasPos && pos < index.length - 1 ? index[pos + 1] : hasPos ? index[0] : null;
 
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const termPath = `/roofing-glossary/${term.slug}`;
 
   const definedTermLd = definedTermSchema({

@@ -1,13 +1,12 @@
 import Section from '@/components/layout/Section';
 import type { Route } from 'next';
-import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import { getFaq, listFaqIndex, listFaqSlugs } from '@/lib/wp';
 import type { FaqSummary } from '@/lib/wp';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, faqSchema } from '@/lib/seo/schema';
-import { resolveSiteOrigin } from '@/lib/seo/site';
+import { SITE_ORIGIN } from '@/lib/seo/site';
 import SmartLink from '@/components/SmartLink';
 
 export const revalidate = 3600; // 1h
@@ -49,7 +48,7 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
   const prev = i > 0 ? ordered[i - 1] : null;
   const next = i >= 0 && i < ordered.length - 1 ? ordered[i + 1] : null;
 
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const pagePath = `/faq/${faq.slug}`;
   const breadcrumbsLd = breadcrumbSchema(
     [

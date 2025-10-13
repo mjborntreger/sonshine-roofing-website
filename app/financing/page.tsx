@@ -4,14 +4,13 @@ import ProgramCard from '@/components/ProgramCard';
 import MonthlyEstimator from './MonthlyEstimator';
 import type { Metadata } from 'next';
 import Image from "next/image";
-import { headers } from "next/headers";
 import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent } from "@/lib/wp";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, serviceSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 const SERVICE_PATH = "/financing";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -57,7 +56,7 @@ const contactInfoIconStyles = "h-5 w-5 text-slate-500";
 export default async function FinancingPage() {
   // Dynamic FAQs for topic "financing-payment" (max 8)
   const faqs = await listFaqsWithContent(8, "financing-payment").catch(() => []);
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
 
   const breadcrumbsConfig =

@@ -7,9 +7,10 @@ import { inter, allura, candara } from "@/lib/fonts";
 import { Suspense } from "react";
 import GtmRouteChange from "@/lib/gtm-route-change";
 import ChatConsentGate from "@/components/ChatConsentGate";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sonshineroofing.com"),
+  metadataBase: new URL(SITE_ORIGIN),
   openGraph: {
     type: "website",
     siteName: "SonShine Roofing",
@@ -46,7 +47,7 @@ export const viewport: Viewport = {
 };
 
 // ——— Global JSON-LD (EDIT HERE) ———
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
+const BASE_URL = SITE_ORIGIN;
 const PHONE_E164 = '+1-941-866-4320';
 const LOGO_URL_512 = 'https://sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png'; // 512×512
 // Aggregate rating (editable constants)

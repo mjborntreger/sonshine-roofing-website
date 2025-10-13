@@ -4,11 +4,10 @@ import Image from "next/image";
 import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import { buildProfileMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, personSchema, webPageSchema } from "@/lib/seo/schema";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 export const dynamic = "force-dynamic";
 
@@ -50,20 +49,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const person = await listPersonsBySlug(slug, { cache: "no-store" }).catch(() => null);
+  const [person, navItems] = await Promise.all([
+    listPersonsBySlug(slug, { cache: "no-store" }).catch(() => null),
+    listPersonNav(50).catch(() => [] as Awaited<ReturnType<typeof listPersonNav>>),
+  ]);
   if (!person) return notFound();
 
-  let navItems: Awaited<ReturnType<typeof listPersonNav>> = [];
-  try {
-    navItems = await listPersonNav(50);
-  } catch {
-    navItems = [];
-  }
   const idx = navItems.findIndex((item) => item.slug === slug);
   const prev = idx >= 0 && idx < navItems.length - 1 ? navItems[idx + 1] : null;
   const next = idx > 0 ? navItems[idx - 1] : null;
 
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const pagePath = `/person/${person.slug}`;
 
   const personLd = personSchema({

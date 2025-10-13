@@ -1,8 +1,7 @@
-import { headers } from "next/headers";
 import { listFaqsWithContent } from "@/lib/wp";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { faqSchema } from "@/lib/seo/schema";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 import FaqInlineListClient, { type FaqInlineListClientItem } from "./FaqInlineListClient";
 
 type FaqInlineItem = {
@@ -21,6 +20,8 @@ type Props = {
   limit?: number;
   /** Preloaded FAQs (e.g., reused server data fetched for JSON-LD). */
   initialItems?: FaqInlineItem[];
+  /** Override the canonical origin when required (defaults to SITE_ORIGIN). */
+  origin?: string;
 };
 
 const parseDate = (value?: string | null): number => {
@@ -35,6 +36,7 @@ export default async function FaqInlineList({
   topicSlug,
   limit = 8,
   initialItems,
+  origin: originOverride,
 }: Props) {
   let records = initialItems;
 
@@ -53,8 +55,7 @@ export default async function FaqInlineList({
       contentHtml: faq.contentHtml,
     }));
 
-  const headerList = await headers();
-  const origin = resolveSiteOrigin(headerList);
+  const origin = originOverride ?? SITE_ORIGIN;
   const normalizedSeeMoreHref =
     seeMoreHref.length > 1 && seeMoreHref.endsWith("/") ? seeMoreHref.slice(0, -1) : seeMoreHref;
 

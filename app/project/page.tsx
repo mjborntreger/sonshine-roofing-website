@@ -7,12 +7,11 @@ import {
   type ProjectsArchiveFilters,
 } from "@/lib/wp";
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import ProjectArchiveClient from "./ProjectArchiveClient";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 export const revalidate = 900; // 15 minutes ISR
 
@@ -95,7 +94,7 @@ export default async function ProjectArchivePage({ searchParams }: PageProps) {
     serviceAreaSlugs,
   };
 
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
 
   const collectionLd = collectionPageSchema({
     name: PAGE_TITLE,

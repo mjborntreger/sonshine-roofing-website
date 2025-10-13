@@ -3,7 +3,6 @@ import FaqInlineList from "@/components/FaqInlineList";
 import { listFaqsWithContent } from "@/lib/wp";
 import SmartLink from "@/components/SmartLink";
 import Section from "@/components/layout/Section";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/wp";
 import ProjectVideo from "./ProjectVideo";
@@ -14,7 +13,7 @@ import type { Metadata } from "next";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { creativeWorkSchema, videoObjectSchema } from "@/lib/seo/schema";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 type OgImageRecord = {
   url?: unknown;
@@ -94,11 +93,15 @@ const Badge = ({ children }: { children: React.ReactNode }) => (
 
 export default async function Page(props: { params: Promise<{ slug: string }> }) {
   const { slug } = await props.params;
-  const project = await getProjectBySlug(slug);
+  const projectPromise = getProjectBySlug(slug);
+  const projectPoolPromise = listRecentProjectsPool(36);
+  const faqsPromise = listFaqsWithContent(8, "roof-replacement").catch(() => []);
+
+  const project = await projectPromise;
 
   if (!project) notFound();
 
-  const projectPool = await listRecentProjectsPool(36);
+  const [projectPool, faqs] = await Promise.all([projectPoolPromise, faqsPromise]);
   const serviceAreaSlugs = (project.serviceAreas ?? [])
     .map((term) => term?.slug)
     .filter((value): value is string => typeof value === "string" && value.length > 0);
@@ -114,7 +117,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
     (project.serviceAreas?.length ?? 0) >
     0;
 
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const shareUrl = `${origin}/project/${slug}`;
 
   const ogImageSecondary = isRecord(project.seo?.openGraph?.image)
@@ -149,8 +152,6 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
   const videoSchemaNoContext = videoSchemaInput
     ? videoObjectSchema({ ...videoSchemaInput, withContext: false })
     : undefined;
-
-  const faqs = await listFaqsWithContent(8, "roof-replacement").catch(() => []);
 
   const projectSchema = creativeWorkSchema({
     name: project.title,

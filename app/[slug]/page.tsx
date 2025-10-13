@@ -11,12 +11,11 @@ import { buttonVariants } from "@/components/ui/button";
 import ShareWhatYouThink from "@/components/ShareWhatYouThink";
 import TocFromHeadings from "@/components/TocFromHeadings";
 import SidebarCta from "@/components/SidebarCta";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { blogPostingSchema } from "@/lib/seo/schema";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
 
 export const revalidate = 900;
@@ -93,12 +92,6 @@ function ensureHeadingIds(html: string) {
     return `<h${level}${attrStr}>${inner}</h${level}>`;
   });
 }
-
-
-async function getBaseUrlFromHeaders() {
-  return resolveSiteOrigin(await headers());
-}
-
 function isExternalHref(href: string, baseHost: string) {
   try {
     if (href.startsWith("/") || href.startsWith("#") || href.startsWith("./") || href.startsWith("../")) return false;
@@ -209,13 +202,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   if (slug.startsWith("_")) notFound();
-  const post = await getPostBySlug(slug);
+  const postPromise = getPostBySlug(slug);
+  const poolPromise = listRecentPostsPool(36);
+  const generalFaqsPromise = listFaqsWithContent(8, "general").catch(() => []);
+  const navPromise = listRecentPostNav(200).catch(
+    () => [] as Awaited<ReturnType<typeof listRecentPostNav>>,
+  );
+  const [post, pool, generalFaqs, all] = await Promise.all([
+    postPromise,
+    poolPromise,
+    generalFaqsPromise,
+    navPromise,
+  ]);
 
   if (!post) notFound();
 
   const primaryCategorySlug = post.categoryTerms?.find((term) => term.slug)?.slug;
 
-  const origin = await getBaseUrlFromHeaders();
+  const origin = SITE_ORIGIN;
   const shareUrl = `${origin}/${slug}`;
   const dateStr = new Date(post.date).toLocaleDateString("en-US", {
     timeZone: "America/New_York",
@@ -257,14 +261,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const withAnchors = decorateExternalAnchors(withIds, new URL(origin).hostname);
   const htmlWithCta = injectCtaAfterNthParagraph(withAnchors, 3);
 
-  // Recent posts pool for YouMayAlsoLike.tsx
-  const pool = await listRecentPostsPool(36);
-
-  // FAQs fetch
-  const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
-
   // prev/next using lightweight nav list (slug + title + date)
-  const all = await listRecentPostNav(200).catch(() => []);
   const idx = all.findIndex((p) => p.slug === slug);
   const prev = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null; // older
   const next = idx > 0 ? all[idx - 1] : null; // newer

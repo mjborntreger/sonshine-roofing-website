@@ -2,7 +2,6 @@ import Section from "@/components/layout/Section";
 import ServicesAside from "@/components/ServicesAside";
 import Image from "next/image";
 import SmartLink from "@/components/SmartLink";
-import { headers } from "next/headers";
 import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
@@ -15,7 +14,7 @@ import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, howToSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
@@ -46,10 +45,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 
 export default async function Page() {
-  const pool = await listRecentPostsPool(36);
-  // Dynamic FAQs for this service topic
-  const faqs = await listFaqsWithContent(8, "roof-replacement").catch(() => []);
-  const origin = resolveSiteOrigin(await headers());
+  const [pool, faqs] = await Promise.all([
+    listRecentPostsPool(36),
+    // Dynamic FAQs for this service topic (gracefully handle WP hiccups)
+    listFaqsWithContent(8, "roof-replacement").catch(() => []),
+  ]);
+  const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
 
   const breadcrumbsConfig =

@@ -9,10 +9,9 @@ import {
   type TermLite,
 } from "@/lib/wp";
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 export const revalidate = 900;
 
@@ -193,8 +192,7 @@ export default async function VideoLibraryPage({ searchParams }: PageProps) {
 
   const allVideos: VideoItem[] = [...entries, ...projectVideos];
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || "https://sonshineroofing.com";
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const collectionUrl = `${origin}${CANONICAL}`;
 
   const topList = allVideos.slice(0, 12);

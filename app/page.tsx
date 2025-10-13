@@ -94,9 +94,11 @@ export default async function Page({
   const cookieStore = await cookies();
   const leadSuccessCookie = cookieStore.get('ss_lead_form_success')?.value ?? null;
   const utm = extractUtm(resolvedSearchParams);
-  const projects = await listRecentProjectsPoolForFilters(4, 8);
-  const posts = await listRecentPostsPoolForFilters(4, 4);
-  const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
+  const [projects, posts, generalFaqs] = await Promise.all([
+    listRecentProjectsPoolForFilters(4, 8),
+    listRecentPostsPoolForFilters(4, 4),
+    listFaqsWithContent(8, "general").catch(() => []),
+  ]);
   return (
     <>
       <Hero />

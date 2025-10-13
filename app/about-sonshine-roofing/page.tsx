@@ -7,13 +7,12 @@ import { HoursAndInformation } from "./HoursAndInformation";
 import { Accordion } from "@/components/Accordion";
 import { UserRoundSearch, CloudRainWind, BadgeCheck, ExternalLink } from "lucide-react";
 import type { Metadata } from 'next';
-import { headers } from "next/headers";
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 import Image from "next/image";
 
 const SERVICE_PATH = "/about-sonshine-roofing";
@@ -60,7 +59,7 @@ export default async function Page() {
   const people = ORDER.length
     ? await listPersonsBySlugs(ORDER)
     : await listPersons(20);
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
 
   const breadcrumbsConfig =

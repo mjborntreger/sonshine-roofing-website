@@ -1,8 +1,7 @@
 import { JsonLd } from "@/lib/seo/json-ld";
 import { videoObjectSchema } from "@/lib/seo/schema";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 import { getYouTubeVideoMeta, selectBestThumbnailUrl } from "@/lib/youtube";
-import { headers } from "next/headers";
 import LazyYoutubeEmbed from "./LazyYoutubeEmbed";
 
 type VideoWithSchemaProps = {
@@ -20,6 +19,7 @@ type VideoWithSchemaProps = {
   isFamilyFriendly?: boolean;
   publisherName?: string;
   schemaId?: string;
+  origin?: string;
 };
 
 export async function VideoWithSchema({
@@ -37,9 +37,9 @@ export async function VideoWithSchema({
   isFamilyFriendly = true,
   publisherName,
   schemaId,
+  origin: originOverride,
 }: VideoWithSchemaProps) {
-  const headerList = await headers();
-  const origin = resolveSiteOrigin(headerList);
+  const origin = originOverride ?? SITE_ORIGIN;
 
   const embedBase = host === "youtube" ? "https://www.youtube.com/embed/" : "https://www.youtube-nocookie.com/embed/";
   const embedUrl = `${embedBase}${videoId}`;

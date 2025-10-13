@@ -9,13 +9,13 @@ import LiteMap from "@/components/LiteMap";
 import OpenOrClosed from "@/components/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/ResourcesQuickLinks";
 import FinancingBand from "@/components/FinancingBand";
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 import { LEAD_SUCCESS_COOKIE } from '@/lib/contact-lead';
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 import type { LeadFormUtmParams } from "@/components/lead-form/config";
 
 const SERVICE_PATH = "/contact-us";
@@ -68,7 +68,7 @@ export default async function Page({
   const cookieStore = await cookies();
   const leadSuccessCookie = cookieStore.get(LEAD_SUCCESS_COOKIE)?.value ?? null;
   const utm = extractUtm(resolvedSearchParams);
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
   const breadcrumbsConfig =
     config?.breadcrumbs ?? [

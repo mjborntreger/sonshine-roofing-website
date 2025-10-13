@@ -2,7 +2,7 @@ import Image from 'next/image';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { cookies, headers } from 'next/headers';
+import { cookies } from 'next/headers';
 
 import Section from '@/components/layout/Section';
 import Container from '@/components/layout/Container';
@@ -13,7 +13,7 @@ import { formatSpecialOfferExpiration } from '@/lib/specialOfferDates';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, offerSchema } from '@/lib/seo/schema';
-import { resolveSiteOrigin } from '@/lib/seo/site';
+import { SITE_ORIGIN } from '@/lib/seo/site';
 
 type OgImageRecord = {
     url?: unknown;
@@ -100,7 +100,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   const cookieKey = `ss_offer_${offer.slug}`;
   const cookieValue = cookieStore.get(cookieKey)?.value ?? null;
 
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const pagePath = `/special-offers/${offer.slug}`;
 
   const breadcrumbsLd = breadcrumbSchema(

@@ -1,7 +1,6 @@
 import Section from "@/components/layout/Section";
 import Image from "next/image";
 import SmartLink from "@/components/SmartLink";
-import { headers } from "next/headers";
 import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
 import FaqInlineList from "@/components/FaqInlineList";
 import YouMayAlsoLike from "@/components/YouMayAlsoLike";
@@ -13,7 +12,7 @@ import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
-import { resolveSiteOrigin } from "@/lib/seo/site";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 const SERVICE_PATH = "/roof-inspection";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -39,10 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const pool = await listRecentPostsPool(36);
-  const faqs = await listFaqsWithContent(8, "roof-inspection").catch(() => []);
+  const [pool, faqs] = await Promise.all([
+    listRecentPostsPool(36),
+    listFaqsWithContent(8, "roof-inspection").catch(() => []),
+  ]);
 
-  const origin = resolveSiteOrigin(await headers());
+  const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
   const breadcrumbsConfig =
     config?.breadcrumbs ?? [
