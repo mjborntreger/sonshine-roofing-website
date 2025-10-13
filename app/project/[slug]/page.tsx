@@ -150,7 +150,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
     ? videoObjectSchema({ ...videoSchemaInput, withContext: false })
     : undefined;
 
-  const generalFaqs = await listFaqsWithContent(8, "general").catch(() => []);
+  const faqs = await listFaqsWithContent(8, "roof-replacement").catch(() => []);
 
   const projectSchema = creativeWorkSchema({
     name: project.title,
@@ -279,10 +279,10 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
       />
 
       <FaqInlineList
-        heading="General FAQs"
-        topicSlug="general"
+        heading="Roof Replacement FAQs"
+        topicSlug="roof-replacement"
         limit={8}
-        initialItems={generalFaqs}
+        initialItems={faqs}
         seeMoreHref="/faq"
       />
     </Section>
