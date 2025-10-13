@@ -76,7 +76,6 @@ const HELP_BUTTON_UNSELECTED_CLASS =
 const INFO_BADGE_CLASS = 'inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1';
 
 type LeadFormWizardProps = {
-  initialSuccessCookie?: string | null;
   restoredSuccess?: LeadSuccessRestore | null;
   initialJourney?: JourneyKey | null;
   onResetSuccess?: () => void;
@@ -217,7 +216,6 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
 }
 
 export default function LeadFormWizard({
-  initialSuccessCookie,
   restoredSuccess: restoredSuccessProp,
   initialJourney: initialJourneyProp,
   onResetSuccess,
@@ -225,8 +223,8 @@ export default function LeadFormWizard({
 }: LeadFormWizardProps = {}) {
   const router = useRouter();
   const restoredSuccess = useMemo(
-    () => restoredSuccessProp ?? restoreLeadSuccessState(initialSuccessCookie),
-    [restoredSuccessProp, initialSuccessCookie]
+    () => restoredSuccessProp ?? restoreLeadSuccessState(),
+    [restoredSuccessProp]
   );
   const initialJourney = restoredSuccess
     ? null

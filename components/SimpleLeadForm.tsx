@@ -28,10 +28,10 @@ import {
   PROJECT_OPTIONS,
   STANDARD_TIMELINE_OPTIONS,
   type JourneyKey,
-  type LeadFormUtmParams,
   type ProjectOption,
   getTimelineLabelForDisplay,
 } from '@/components/lead-form/config';
+import { useUtmParams } from '@/components/lead-form/useUtmParams';
 
 const Turnstile = dynamic(() => import('@/components/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-form/LeadFormSuccess'), {
@@ -55,11 +55,6 @@ type FormState = {
   state: string;
   zip: string;
   consentSms: boolean;
-};
-
-type SimpleLeadFormProps = {
-  initialSuccessCookie?: string | null;
-  utm?: LeadFormUtmParams;
 };
 
 const INITIAL_STATE: FormState = {
@@ -98,8 +93,8 @@ function buildSuccessMetaFromPayload(payload: LeadSuccessCookiePayload): Success
   };
 }
 
-export default function SimpleLeadForm({ initialSuccessCookie, utm }: SimpleLeadFormProps = {}) {
-  const parsedCookie = useMemo(() => parseLeadSuccessCookie(initialSuccessCookie), [initialSuccessCookie]);
+export default function SimpleLeadForm() {
+  const parsedCookie = useMemo(() => parseLeadSuccessCookie(), []);
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -108,7 +103,7 @@ export default function SimpleLeadForm({ initialSuccessCookie, utm }: SimpleLead
     parsedCookie ? buildSuccessMetaFromPayload(parsedCookie) : null
   );
 
-  const utmParams = useMemo(() => utm ?? {}, [utm]);
+  const utmParams = useUtmParams();
 
   const setField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));

@@ -4,14 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ArrowRight } from 'lucide-react';
 import SmartLink from '@/components/SmartLink';
-import {
-  PROJECT_OPTIONS,
-  isJourneyKey,
-  type JourneyKey,
-  type LeadSuccessRestore,
-  type LeadFormUtmParams,
-} from '@/components/lead-form/config';
+import { PROJECT_OPTIONS, isJourneyKey, type JourneyKey, type LeadSuccessRestore } from '@/components/lead-form/config';
 import LeadFormSkeleton from '@/components/lead-form/LeadFormSkeleton';
+import { useUtmParams } from '@/components/lead-form/useUtmParams';
 
 const LeadFormWizard = dynamic(() => import('./LeadFormWizard'), {
   ssr: false,
@@ -19,12 +14,10 @@ const LeadFormWizard = dynamic(() => import('./LeadFormWizard'), {
 });
 
 type LeadFormProps = {
-  initialSuccessCookie?: string | null;
   restoredSuccess?: LeadSuccessRestore | null;
-  utm?: LeadFormUtmParams;
 };
 
-export default function LeadForm({ initialSuccessCookie, restoredSuccess, utm }: LeadFormProps) {
+export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
   const initialJourneyFromSuccess = useMemo(() => {
     const journey = restoredSuccess?.formPreset.projectType;
     return journey && isJourneyKey(journey) ? journey : null;
@@ -32,6 +25,7 @@ export default function LeadForm({ initialSuccessCookie, restoredSuccess, utm }:
 
   const [selectedJourney, setSelectedJourney] = useState<JourneyKey | null>(initialJourneyFromSuccess);
   const [showWizard, setShowWizard] = useState<boolean>(() => Boolean(restoredSuccess));
+  const utm = useUtmParams();
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -126,7 +120,6 @@ export default function LeadForm({ initialSuccessCookie, restoredSuccess, utm }:
 
       {showWizard && (
         <LeadFormWizard
-          initialSuccessCookie={initialSuccessCookie}
           restoredSuccess={restoredSuccess}
           initialJourney={selectedJourney}
           onResetSuccess={handleWizardReset}
