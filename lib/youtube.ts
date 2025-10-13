@@ -105,8 +105,10 @@ async function fetchYouTubeMeta(videoId: string): Promise<YouTubeVideoMeta | nul
     }
 
     const data = (await response.json()) as UnknownRecord;
-    const items = Array.isArray((data as YouTubeApiResponse).items) ? (data as YouTubeApiResponse).items : [];
-    const snippet = resolveSnippet(items[0]);
+    const responseData = data as YouTubeApiResponse;
+    const items = Array.isArray(responseData?.items) ? responseData.items : [];
+    const firstItem = items.length > 0 ? items[0] : null;
+    const snippet = resolveSnippet(firstItem);
 
     if (!snippet) return null;
 
