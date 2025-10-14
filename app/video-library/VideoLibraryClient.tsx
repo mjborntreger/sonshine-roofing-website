@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { Clapperboard, Layers, MapPin } from "lucide-react";
 
 import ResourceArchiveClient, {
@@ -33,6 +33,8 @@ export default function VideoLibraryClient({
   pageSize,
   initialFilters,
 }: Props) {
+  const forcedRoofingRef = useRef(false);
+
   const normalizeSelections = useCallback((input: Record<string, string[]>) => {
     const next: Record<string, string[]> = {};
     const keys = new Set([...Object.keys(input), "bucket", "material", "area"]);
@@ -45,11 +47,25 @@ export default function VideoLibraryClient({
     const shouldForceRoofing = Boolean(hasMaterial || hasArea);
 
     if (shouldForceRoofing) {
+      forcedRoofingRef.current = true;
       if (next.bucket.length !== 1 || next.bucket[0] !== "roofing-project") {
         next.bucket = ["roofing-project"];
       }
-    } else if (next.bucket.length === 1 && next.bucket[0] === "roofing-project") {
-      next.bucket = [];
+    } else {
+      const containsRoofing = next.bucket.includes("roofing-project");
+      if (forcedRoofingRef.current) {
+        forcedRoofingRef.current = false;
+        if (containsRoofing && next.bucket.length === 1) {
+          next.bucket = [];
+        }
+      }
+      if (containsRoofing && next.bucket.length > 1) {
+        next.bucket = ["roofing-project"];
+      }
+    }
+
+    for (const key of Object.keys(next)) {
+      next[key] = Array.from(new Set(next[key].map((value) => value.trim()).filter(Boolean)));
     }
 
     return next;
