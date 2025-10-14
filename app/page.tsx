@@ -22,7 +22,7 @@ const narrowLayout = "mx-auto w-full max-w-[1280px]";
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
 const SEO_DESCRIPTION_HOME =
-  'Your trusted local roofing contractor serving Sarasota, Manatee & Charlotte Counties. Affordable financing and industry-best warranties.';
+  'Fast, Friendly, & Reliable | (941) 866-4320 | Licensed & Insured | Your trusted local roofing contractor serving Sarasota, Manatee & Charlotte Counties.';
 const SEO_KEYWORDS_HOME = [
   'Sarasota roofing',
   'North Port roofing',

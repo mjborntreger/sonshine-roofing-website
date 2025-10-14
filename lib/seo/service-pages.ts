@@ -12,9 +12,12 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
   "/roof-repair": {
     title: "Roof Repair in Sarasota, Manatee & Charlotte Counties | SonShine Roofing",
     description:
-      "Fast, lasting roof repair for leaks, flashing, fascia and storm damage. Serving Southwest Florida since 1987.",
+      "FREE ESTIMATES | (941) 866-4320 | Fast, lasting roof repair for leaks, flashing, fascia and storm damage | Serving Sarasota & surrounding areas since 1987.",
     keywords: [
       "roof repair",
+      "roof repair near me",
+      "roof repair service",
+      "reliable roof repair",
       "leak repair",
       "roof leak",
       "rotting fascia",
@@ -30,11 +33,13 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       "shingle repair",
       "metal roof repair",
       "tile roof repair",
-      "Sarasota roofing",
-      "North Port Roofing",
-      "Venice Roofing",
-      "Manatee County roofing",
-      "Charlotte County roofing",
+      "Sarasota roof repair",
+      "North Port roof repair",
+      "Venice roof repair",
+      "Bradenton roof repair",
+      "Port Charlotte roof repair",
+      "Nokomis roof repair",
+      "Gulf Gate roof repair",
     ],
     image: { url: "/og-default.png", width: 1200, height: 630 },
     breadcrumbs: [
@@ -45,7 +50,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
   "/roof-replacement-sarasota-fl": {
     title: "Roof Replacement in Sarasota, Manatee & Charlotte Counties | SonShine Roofing",
     description:
-      "Need a roof replacement in Southwest Florida? Since 1987, SonShine Roofing has installed long‑lasting shingle, tile, and metal roofs with strong workmanship warranties.",
+      "FREE ESTIMATES | (941) 866-4320 | Since 1987, SonShine Roofing has installed long‑lasting shingle, tile, flat and metal roofs with strong workmanship warranties & industry-leading financing.",
     keywords: [
       "roof replacement",
       "new roof",
@@ -72,7 +77,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
   "/financing": {
     title: "Roof Financing | SonShine Roofing",
     description:
-      "Flexible roof financing options in Sarasota, Manatee, and Charlotte Counties. Equity‑based (PACE) and credit‑based plans available — including no money down, deferred payments, and fixed‑rate terms.",
+      "Get approved today! | (941) 866-4320 | Easy, convenient financing options for your next roof | ",
     keywords: [
       "roof financing",
       "roof loans",

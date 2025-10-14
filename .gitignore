@@ -35,15 +35,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 acf-export-2025-09-17.json
-<<<<<<< Updated upstream
 
-# WP plugins
+# WordPress
 ss-lead-endpoint.php
-ss-lead-endpoint.php
-
-# ACF JSON Manifest
+sonshine-headless-cleanup.php
 ACF-to-GraphQL-manifest.json
-=======
-*.php
-ss-lead-endpoint.php
->>>>>>> Stashed changes
+
+# Email Signature
+email-signature-template-ssri-oct-2025.html
