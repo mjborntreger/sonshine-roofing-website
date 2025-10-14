@@ -1,37 +1,9 @@
 import { Suspense } from 'react';
 import TellUsWhyForm from './TellUsWhyForm';
 
-const RATING_VALUES = ['1', '2', '3'] as const;
-type RatingString = (typeof RATING_VALUES)[number];
+export const dynamic = 'force-static';
 
-const ratingValueLookup: Record<RatingString, 1 | 2 | 3> = {
-  '1': 1,
-  '2': 2,
-  '3': 3,
-};
-
-type TellUsWhySearchParams = Record<string, string | string[] | undefined>;
-
-type TellUsWhyPageProps = {
-  searchParams?: Promise<TellUsWhySearchParams>;
-};
-
-function toRatingString(input: string | string[] | undefined): RatingString {
-  if (Array.isArray(input)) {
-    return toRatingString(input[0]);
-  }
-  if (typeof input === 'string' && RATING_VALUES.includes(input as RatingString)) {
-    return input as RatingString;
-  }
-  return '3';
-}
-
-export default async function TellUsWhyPage({ searchParams }: TellUsWhyPageProps) {
-  const params = searchParams ? await searchParams : ({} as TellUsWhySearchParams);
-  const ratingParam = params.rating;
-  const rating = toRatingString(ratingParam);
-  const ratingValue = ratingValueLookup[rating];
-
+export default function TellUsWhyPage() {
   return (
     <Suspense
       fallback={
@@ -41,7 +13,7 @@ export default async function TellUsWhyPage({ searchParams }: TellUsWhyPageProps
         </main>
       }
     >
-      <TellUsWhyForm rating={rating} ratingValue={ratingValue} />
+      <TellUsWhyForm />
     </Suspense>
   );
 }

@@ -13,15 +13,25 @@ import {
   type FeedbackLeadInput,
 } from '@/lib/contact-lead';
 
-type RatingString = '1' | '2' | '3';
-
-type TellUsWhyFormProps = {
-  rating: RatingString;
-  ratingValue: 1 | 2 | 3;
+const RATING_VALUES = ['1', '2', '3'] as const;
+type RatingString = (typeof RATING_VALUES)[number];
+const ratingValueLookup: Record<RatingString, 1 | 2 | 3> = {
+  '1': 1,
+  '2': 2,
+  '3': 3,
 };
 
-export default function TellUsWhyForm({ rating, ratingValue }: TellUsWhyFormProps) {
+function toRatingString(input: string | null): RatingString {
+  if (input && RATING_VALUES.includes(input as RatingString)) {
+    return input as RatingString;
+  }
+  return '3';
+}
+
+export default function TellUsWhyForm() {
   const qs = useSearchParams();
+  const rating = toRatingString(qs?.get('rating') ?? null);
+  const ratingValue = ratingValueLookup[rating];
 
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
   const [err, setErr] = useState<string | null>(null);

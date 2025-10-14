@@ -44,7 +44,7 @@ const items = files.map((f) => {
 });
 
 // Exclude specific routes from the static sitemap
-const EXCLUDE = new Set(["/calendly-test", "/reviews", "/tell-us-why", "/thank-you"]);
+const EXCLUDE = new Set(["/calendly-test", "/reviews", "/tell-us-why"]);
 const filtered = items.filter(({ loc }) => !EXCLUDE.has(loc));
 
 // Optionally fallback to commit time
