@@ -30,6 +30,7 @@ export const inter = localFont({
   ],
   variable: "--font-inter",
   display: "swap",
+  preload: true,
 });
 
 export const allura = localFont({
@@ -42,6 +43,7 @@ export const allura = localFont({
   ],
   variable: "--font-allura",
   display: "swap",
+  preload: true,
 });
 
 export const candara = localFont({
@@ -59,5 +61,5 @@ export const candara = localFont({
   ],
   variable: "--font-candara",
   display: "swap",
-  preload: false,
+  preload: true,
 });

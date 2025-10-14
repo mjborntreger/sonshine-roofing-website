@@ -212,29 +212,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <link rel="preconnect" href="https://i.ytimg.com" crossOrigin="" />
         <link rel="preconnect" href="https://www.youtube-nocookie.com" crossOrigin="" />
 
-        {/* Self-hosted font preloads */}
-        <link
-          rel="preload"
-          href="/fonts/inter-v20-latin-regular.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/inter-v20-latin-600.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          href="/fonts/candara-bold.woff2"
-          as="font"
-          type="font/woff2"
-          crossOrigin="anonymous"
-        />
-
         {/* Facebook Share Button Attribution */}
         <meta property="fb:app_id" content="1087269253041713" />
 
