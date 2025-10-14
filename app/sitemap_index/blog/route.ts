@@ -4,6 +4,9 @@ import { wpFetch } from '@/lib/wp';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { unstable_cache } from 'next/cache';
 
+export const dynamic = 'force-static';
+export const revalidate = 3600; // safety net; tag-based revalidation will be faster
+
 const BASE = process.env.NEXT_PUBLIC_SITE_URL!;
 const ENABLED =
   process.env.NEXT_PUBLIC_ENV === 'production' ||
