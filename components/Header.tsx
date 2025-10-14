@@ -3,7 +3,7 @@
 import SmartLink from "@/components/SmartLink";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useSelectedLayoutSegments } from "next/navigation";
 import { NavMenu } from "./NavMenu";
 import { cn } from "@/lib/utils";
 
@@ -14,13 +14,14 @@ const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : us
 
 export default function Header() {
   const ref = useRef<HTMLElement>(null);
-  const pathname = usePathname();
-  const isLanding = pathname === "/";
+  const segments = useSelectedLayoutSegments();
+  const initialLanding = segments.length === 0;
   const [scrollState, setScrollState] = useState(() => ({
     collapsed: false,
-    progress: isLanding ? 0 : 1,
+    progress: initialLanding ? 0 : 1,
   }));
   const stateRef = useRef(scrollState);
+  const isLanding = segments.length === 0;
 
   useEffect(() => {
     stateRef.current = scrollState;
