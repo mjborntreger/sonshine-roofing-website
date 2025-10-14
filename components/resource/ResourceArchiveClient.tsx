@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ListFilter, RotateCcw, Search } from "lucide-react";
 
 import FilterTabs from "@/components/project/FilterTabs";
@@ -120,6 +120,8 @@ export default function ResourceArchiveClient<Item>({
 }: ResourceArchiveClientProps<Item>) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const paramsSignature = searchParams?.toString() ?? "";
 
   const [searchInput, setSearchInput] = useState(initialFilters.search ?? "");
   const [selections, setSelections] = useState<SelectionMap>(() => {
@@ -260,6 +262,30 @@ export default function ResourceArchiveClient<Item>({
   }, [result]);
 
   const lastQueryRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    const params = paramsSignature ? new URLSearchParams(paramsSignature) : new URLSearchParams();
+    const urlSearchValue = params.get(searchParamKey) ?? "";
+
+    const nextSelections: SelectionMap = {};
+    for (const group of groups) {
+      const raw = params.get(group.paramKey);
+      if (raw) {
+        const parsed = raw
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean);
+        nextSelections[group.key] = parsed;
+      } else {
+        nextSelections[group.key] = [];
+      }
+    }
+
+    const normalizedSelections = normalizeSelections ? normalizeSelections(nextSelections) : nextSelections;
+
+    setSearchInput((prev) => (prev === urlSearchValue ? prev : urlSearchValue));
+    setSelections((prev) => (areSelectionMapsEqual(prev, normalizedSelections) ? prev : normalizedSelections));
+  }, [groups, normalizeSelections, paramsSignature, searchParamKey]);
 
   useEffect(() => {
     const params = new URLSearchParams();

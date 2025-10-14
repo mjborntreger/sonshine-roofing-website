@@ -1,11 +1,7 @@
 import Section from "@/components/layout/Section";
 import ResourcesAside from "@/components/ResourcesAside";
 import BlogArchiveClient from "./BlogArchiveClient";
-import {
-  listBlogCategories,
-  listPostsPaged,
-  type PostsFiltersInput,
-} from "@/lib/wp";
+import { listBlogCategories, listPostsPaged } from "@/lib/wp";
 import type { Metadata } from "next";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
@@ -19,7 +15,6 @@ const PAGE_TITLE = "Roofing Blog for Sarasota, Manatee & Charlotte Counties | So
 const PAGE_DESCRIPTION = "Practical roofing tips, how‑tos, and local insights from our Sarasota team. Serving SW Florida since 1987.";
 const PAGE_IMAGE = "/og-default.png";
 const PAGE_SIZE = 6;
-const MIN_SEARCH_LENGTH = 2;
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildBasicMetadata({
@@ -39,53 +34,19 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-type PageProps = {
-  searchParams?: Promise<Record<string, string | string[]>>;
-};
+export const dynamic = "force-static";
 
-const toFirstParam = (value: string | string[] | undefined): string => {
-  if (Array.isArray(value)) return value[0] ?? "";
-  return value ?? "";
-};
-
-const toSlugArray = (value: string | string[] | undefined): string[] => {
-  if (Array.isArray(value)) {
-    return value
-      .flatMap((item) => (typeof item === "string" ? item.split(",") : []))
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  if (typeof value === "string") {
-    return value
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
-  }
-  return [];
-};
-
-export default async function BlogArchivePage({ searchParams }: PageProps) {
-  const params = searchParams ? await searchParams : {};
-
-  const rawSearch = toFirstParam(params.q).trim();
-  const categorySlugs = toSlugArray(params.cat);
-  const searchForQuery = rawSearch.length >= MIN_SEARCH_LENGTH ? rawSearch : undefined;
-
-  const filters: PostsFiltersInput = {
-    q: searchForQuery,
-    categorySlugs: categorySlugs.length ? categorySlugs : undefined,
-  };
-
+export default async function BlogArchivePage() {
   const [initialResult, categories] = await Promise.all([
-    listPostsPaged({ first: PAGE_SIZE, after: null, filters }),
+    listPostsPaged({ first: PAGE_SIZE, after: null }),
     listBlogCategories(100),
   ]);
 
   const filteredCategories = categories.filter((cat) => cat.slug.toLowerCase() !== "uncategorized");
 
   const initialFilters = {
-    search: rawSearch,
-    categorySlugs,
+    search: "",
+    categorySlugs: [] as string[],
   };
 
   const origin = SITE_ORIGIN;

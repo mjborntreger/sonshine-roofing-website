@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2025-10-13T23:41:53.024Z",
+  "generatedAt": "2025-10-14T01:36:31.642Z",
   "routes": [
     {
       "loc": "/",
@@ -11,7 +11,7 @@
     },
     {
       "loc": "/blog",
-      "lastmod": "2025-10-13T20:00:19.965Z"
+      "lastmod": "2025-10-14T01:35:07.782Z"
     },
     {
       "loc": "/contact-us",
@@ -31,7 +31,7 @@
     },
     {
       "loc": "/project",
-      "lastmod": "2025-10-13T19:59:54.076Z"
+      "lastmod": "2025-10-14T01:35:28.135Z"
     },
     {
       "loc": "/roof-inspection",
