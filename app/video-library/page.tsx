@@ -1,16 +1,16 @@
 import { cache } from "react";
 
 import Section from "@/components/layout/Section";
-import ResourcesAside from "@/components/ResourcesAside";
-import VideoLibraryClient from "./VideoLibraryClient";
-import VideoShareBar from "./VideoShareBar";
+import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside";
+import VideoLibraryClient from "../../components/dynamic-content/video/VideoLibraryClient";
+import VideoShareBar from "../../components/dynamic-content/video/VideoShareBar";
 import {
   listRecentVideoEntries,
   listProjectVideos,
   listVideoItemsPaged,
   type VideoItem,
   type TermLite,
-} from "@/lib/wp";
+} from "@/lib/content/wp";
 import type { Metadata } from "next";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
@@ -42,7 +42,7 @@ const heroImageUrl = (item: VideoItem): string | undefined => {
 };
 
 type VideoModule = Pick<
-  typeof import("@/lib/wp"),
+  typeof import("@/lib/content/wp"),
   "getVideoEntryBySlug" | "getProjectBySlug" | "projectToVideoItem"
 >;
 
@@ -60,7 +60,7 @@ const toFirstParam = (value: string | string[] | undefined): string => {
 };
 
 const fetchVideoForMetadata = cache(async (slug: string) => {
-  const mod: VideoModule = await import("@/lib/wp");
+  const mod: VideoModule = await import("@/lib/content/wp");
   const getEntry = mod.getVideoEntryBySlug;
   const getProject = mod.getProjectBySlug;
   const toProjectItem = mod.projectToVideoItem;

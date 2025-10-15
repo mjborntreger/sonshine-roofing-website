@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import type { ResourceQuery } from "@/lib/pagination";
+import type { ResourceQuery } from "@/lib/ui/pagination";
 import {
   // BLOG
   listPostsPaged,
@@ -11,7 +11,7 @@ import {
   type VideoFiltersInput,
   // VIDEOS
   listVideoItemsPaged, // small adapter; see note below
-} from "@/lib/wp";
+} from "@/lib/content/wp";
 
 type RouteContext = { params: Promise<{ kind: string }> };
 

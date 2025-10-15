@@ -2,7 +2,7 @@
 
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
-import { wpFetch } from '@/lib/wp';
+import { wpFetch } from '@/lib/content/wp';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 
 export const dynamic = 'force-static';

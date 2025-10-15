@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
-import { wpFetch, stripHtml, youtubeThumb } from '@/lib/wp';
+import { wpFetch, stripHtml, youtubeThumb } from '@/lib/content/wp';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 
 export const dynamic = 'force-static';

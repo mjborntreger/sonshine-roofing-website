@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 
-import { listPostsPaged, listVideoItemsPaged } from "../lib/wp";
+import { listPostsPaged, listVideoItemsPaged } from "../lib/content/wp";
 
 type FetchStub = typeof fetch;
 

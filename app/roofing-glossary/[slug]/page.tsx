@@ -1,8 +1,8 @@
 import Section from '@/components/layout/Section';
-import SmartLink from '@/components/SmartLink';
+import SmartLink from '@/components/utils/SmartLink';
 import { createElement, Fragment, ReactNode } from 'react';
 import { notFound } from 'next/navigation';
-import { getGlossaryTerm, listGlossaryIndex, stripHtml } from '@/lib/wp';
+import { getGlossaryTerm, listGlossaryIndex, stripHtml } from '@/lib/content/wp';
 import type { Metadata } from 'next';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';

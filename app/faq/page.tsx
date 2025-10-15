@@ -1,12 +1,12 @@
 import Section from '@/components/layout/Section';
-import { listFaqTopics, listFaqsWithContent, faqListToJsonLd } from '@/lib/wp';
-import type { FaqFull, FaqTopic } from '@/lib/wp';
+import { listFaqTopics, listFaqsWithContent, faqListToJsonLd } from '@/lib/content/wp';
+import type { FaqFull, FaqTopic } from '@/lib/content/wp';
 import type { Metadata } from 'next';
-import ResourceSearchController from '@/components/resource-search/ResourceSearchController';
-import ResourcesAside from '@/components/ResourcesAside';
+import ResourceSearchController from '@/components/dynamic-content/ResourceSearchController';
+import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
-import { Accordion } from '@/components/Accordion';
-import FaqBulkToggleClient from './FaqBulkToggleClient';
+import { Accordion } from '@/components/ui/Accordion';
+import FaqBulkToggleClient from '../../components/dynamic-content/faq/FaqBulkToggleClient';
 
 export const revalidate = 86400; // daily ISR
 const PAGE_PATH = '/faq';

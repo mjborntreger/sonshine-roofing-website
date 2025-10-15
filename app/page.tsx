@@ -1,18 +1,18 @@
-import Hero from "@/components/Hero";
-import ReviewsCarousel from "@/components/ReviewsCarousel";
-import WhyHomeownersChooseUs from "@/components/WhyHomeownersChooseUs";
-import LatestProjectsFilter from "@/components/LatestProjectsFilter";
-import { listRecentProjectsPoolForFilters } from '@/lib/wp';
-import LatestPostsFilters from "@/components/LatestPostsFilter";
-import { listRecentPostsPoolForFilters } from '@/lib/wp';
-import ResourcesQuickLinks from "@/components/ResourcesQuickLinks"
-import ServicesQuickLinks from "@/components/ServicesQuickLinks";
-import BestOfTheBest from "@/components/BestOfTheBest";
+import Hero from "@/components/marketing/landing-page/Hero";
+import ReviewsCarousel from "@/components/reviews-widget/ReviewsCarousel";
+import WhyHomeownersChooseUs from "@/components/marketing/landing-page/WhyHomeownersChooseUs";
+import LatestProjectsFilter from "@/components/dynamic-content/latest-filters/LatestProjectsFilter";
+import { listRecentProjectsPoolForFilters } from '@/lib/content/wp';
+import LatestPostsFilters from "@/components/dynamic-content/latest-filters/LatestPostsFilter";
+import { listRecentPostsPoolForFilters } from '@/lib/content/wp';
+import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks"
+import ServicesQuickLinks from "@/components/global-nav/static-pages/ServicesQuickLinks";
+import BestOfTheBest from "@/components/marketing/landing-page/BestOfTheBest";
 import Section from "@/components/layout/Section";
 import type { Metadata } from 'next';
-import FaqInlineList from "@/components/FaqInlineList";
-import { listFaqsWithContent } from "@/lib/wp";
-import LeadFormSection from "@/components/LeadFormSection";
+import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
+import { listFaqsWithContent } from "@/lib/content/wp";
+import LeadFormSection from "@/components/lead-capture/lead-form/LeadFormSection";
 
 // ===== STYLE CONSTANTS ===== //
 const leadFormLayout = "mx-auto w-full";

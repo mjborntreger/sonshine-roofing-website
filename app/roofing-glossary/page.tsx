@@ -1,9 +1,9 @@
 import Section from '@/components/layout/Section';
-import { listGlossaryIndex, stripHtml } from '@/lib/wp';
-import GlossaryQuickSearch from './GlossaryQuickSearch';
-import ResourcesAside from '@/components/ResourcesAside';
+import { listGlossaryIndex, stripHtml } from '@/lib/content/wp';
+import GlossaryQuickSearch from '../../components/dynamic-content/roofing-glossary/GlossaryQuickSearch';
+import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import type { Metadata } from 'next';
-import SmartLink from '@/components/SmartLink';
+import SmartLink from '@/components/utils/SmartLink';
 
 export const revalidate = 86400; // daily ISR
 const PAGE_PATH = '/roofing-glossary';

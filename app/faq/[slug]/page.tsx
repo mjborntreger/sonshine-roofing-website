@@ -1,13 +1,13 @@
 import Section from '@/components/layout/Section';
 import type { Route } from 'next';
 import { notFound } from 'next/navigation';
-import { getFaq, listFaqIndex, listFaqSlugs } from '@/lib/wp';
-import type { FaqSummary } from '@/lib/wp';
+import { getFaq, listFaqIndex, listFaqSlugs } from '@/lib/content/wp';
+import type { FaqSummary } from '@/lib/content/wp';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, faqSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
-import SmartLink from '@/components/SmartLink';
+import SmartLink from '@/components/utils/SmartLink';
 
 export const revalidate = 3600; // 1h
 

@@ -7,8 +7,8 @@ import {
   type FeedbackLeadInput,
   type SpecialOfferLeadInput,
   type ContactLeadInput,
-} from '@/lib/validation';
-import { formatPhoneUSForDisplay } from '@/lib/phone';
+} from '@/lib/lead-capture/validation';
+import { formatPhoneUSForDisplay } from '@/lib/lead-capture/phone';
 
 type UnknownRecord = Record<string, unknown>;
 

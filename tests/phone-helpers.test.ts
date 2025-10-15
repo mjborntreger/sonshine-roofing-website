@@ -6,7 +6,7 @@ import {
   normalizePhoneForSubmit,
   formatPhoneForDisplay,
   formatPhoneExample,
-} from '../lib/phone';
+} from '../lib/lead-capture/phone';
 
 (() => {
   assert.equal(sanitizePhoneInput('(941) 555-1234'), '9415551234');

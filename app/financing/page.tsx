@@ -1,11 +1,11 @@
-import SmartLink from "@/components/SmartLink";
+import SmartLink from "@/components/utils/SmartLink";
 import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ListStart, ChevronRight } from "lucide-react";
-import ProgramCard from '@/components/ProgramCard';
-import MonthlyEstimator from './MonthlyEstimator';
+import ProgramCard from '@/components/marketing/financing/ProgramCard';
+import MonthlyEstimator from '../../components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
 import Image from "next/image";
-import FaqInlineList from "@/components/FaqInlineList";
-import { listFaqsWithContent } from "@/lib/wp";
+import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
+import { listFaqsWithContent } from "@/lib/content/wp";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, serviceSchema, webPageSchema } from "@/lib/seo/schema";

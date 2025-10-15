@@ -1,22 +1,22 @@
 // app/[slug]/page.tsx
-import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
+import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
 import { cn } from "@/lib/utils";
-import FaqInlineList from "@/components/FaqInlineList";
+import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import Image from "next/image";
 import Section from "@/components/layout/Section";
-import SmartLink from "@/components/SmartLink";
-import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/wp";
+import SmartLink from "@/components/utils/SmartLink";
+import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/content/wp";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
-import ShareWhatYouThink from "@/components/ShareWhatYouThink";
-import TocFromHeadings from "@/components/TocFromHeadings";
-import SidebarCta from "@/components/SidebarCta";
+import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
+import TocFromHeadings from "@/components/global-nav/static-pages/TocFromHeadings";
+import SidebarCta from "@/components/cta/SidebarCta";
 import { notFound } from "next/navigation";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { blogPostingSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
-import YouMayAlsoLike from "@/components/YouMayAlsoLike";
+import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 
 export const revalidate = 900;
 

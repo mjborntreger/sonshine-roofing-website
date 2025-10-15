@@ -1,6 +1,6 @@
 // app/sitemap_index/blog/route.ts
 import { NextResponse } from 'next/server';
-import { wpFetch } from '@/lib/wp';
+import { wpFetch } from '@/lib/content/wp';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { unstable_cache } from 'next/cache';
 

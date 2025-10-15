@@ -1,4 +1,4 @@
-import SmartLink from "@/components/SmartLink";
+import SmartLink from "@/components/utils/SmartLink";
 import Section from "@/components/layout/Section";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

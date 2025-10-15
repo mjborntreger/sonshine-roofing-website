@@ -1,13 +1,13 @@
 import Image from "next/image";
-import FaqInlineList from "@/components/FaqInlineList";
-import { listFaqsWithContent } from "@/lib/wp";
-import SmartLink from "@/components/SmartLink";
+import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
+import { listFaqsWithContent } from "@/lib/content/wp";
+import SmartLink from "@/components/utils/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
-import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/wp";
-import ProjectVideo from "./ProjectVideo";
-import YouMayAlsoLike from "@/components/YouMayAlsoLike";
-import ShareWhatYouThink from "@/components/ShareWhatYouThink";
+import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/content/wp";
+import ProjectVideo from "../../../components/dynamic-content/project/ProjectVideo";
+import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
+import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
 
 import type { Metadata } from "next";
 import { buildArticleMetadata } from "@/lib/seo/meta";

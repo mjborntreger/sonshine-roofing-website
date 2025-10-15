@@ -1,7 +1,7 @@
-import { listPersonNav, listPersonsBySlug, stripHtml } from "@/lib/wp";
+import { listPersonNav, listPersonsBySlug, stripHtml } from "@/lib/content/wp";
 import type { Metadata } from "next";
 import Image from "next/image";
-import SmartLink from "@/components/SmartLink";
+import SmartLink from "@/components/utils/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
 import { buildProfileMetadata } from "@/lib/seo/meta";

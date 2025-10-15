@@ -1,12 +1,12 @@
 import Section from "@/components/layout/Section";
 import Image from "next/image";
-import { listRecentPostsPool, listFaqsWithContent } from "@/lib/wp";
-import FaqInlineList from "@/components/FaqInlineList";
-import YouMayAlsoLike from "@/components/YouMayAlsoLike";
-import RoofCareClub from "@/components/RoofCareClub";
+import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
+import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
+import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
+import RoofCareClub from "@/components/marketing/service-pages/RoofCareClub";
 import type { Metadata } from 'next';
-import FinancingBand from "@/components/FinancingBand";
-import ServicesAside from "@/components/ServicesAside";
+import FinancingBand from "@/components/cta/FinancingBand";
+import ServicesAside from "@/components/global-nav/static-pages/ServicesAside";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";

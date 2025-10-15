@@ -1,61 +1,61 @@
 {
-  "generatedAt": "2025-10-14T02:14:58.783Z",
+  "generatedAt": "2025-10-15T05:13:36.614Z",
   "routes": [
     {
       "loc": "/",
-      "lastmod": "2025-10-13T21:30:20.174Z"
+      "lastmod": "2025-10-15T05:09:05.978Z"
     },
     {
       "loc": "/about-sonshine-roofing",
-      "lastmod": "2025-10-13T19:56:40.957Z"
+      "lastmod": "2025-10-15T05:07:25.066Z"
     },
     {
       "loc": "/blog",
-      "lastmod": "2025-10-14T01:35:07.782Z"
-    },
-    {
-      "loc": "/contact-us",
-      "lastmod": "2025-10-13T21:53:52.777Z"
+      "lastmod": "2025-10-15T05:10:57.771Z"
     },
     {
       "loc": "/faq",
-      "lastmod": "2025-10-13T23:33:56.529Z"
+      "lastmod": "2025-10-15T05:10:47.073Z"
+    },
+    {
+      "loc": "/contact-us",
+      "lastmod": "2025-10-15T04:51:20.432Z"
     },
     {
       "loc": "/financing",
-      "lastmod": "2025-10-13T19:56:53.299Z"
+      "lastmod": "2025-10-15T05:11:10.338Z"
     },
     {
       "loc": "/privacy-policy",
-      "lastmod": "2025-09-16T07:21:16.122Z"
+      "lastmod": "2025-10-15T04:10:21.938Z"
     },
     {
       "loc": "/project",
-      "lastmod": "2025-10-14T01:35:28.135Z"
+      "lastmod": "2025-10-15T05:10:17.135Z"
     },
     {
       "loc": "/roof-inspection",
-      "lastmod": "2025-10-13T20:00:30.023Z"
+      "lastmod": "2025-10-15T04:41:14.367Z"
     },
     {
       "loc": "/roof-maintenance",
-      "lastmod": "2025-10-13T19:58:03.678Z"
+      "lastmod": "2025-10-15T04:41:14.367Z"
     },
     {
       "loc": "/roof-repair",
-      "lastmod": "2025-10-13T19:58:47.330Z"
+      "lastmod": "2025-10-15T04:41:14.367Z"
     },
     {
       "loc": "/roof-replacement-sarasota-fl",
-      "lastmod": "2025-10-13T19:58:31.717Z"
+      "lastmod": "2025-10-15T04:41:14.367Z"
     },
     {
       "loc": "/roofing-glossary",
-      "lastmod": "2025-10-08T20:12:32.440Z"
+      "lastmod": "2025-10-15T05:10:49.797Z"
     },
     {
       "loc": "/video-library",
-      "lastmod": "2025-10-14T02:14:25.649Z"
+      "lastmod": "2025-10-15T05:02:48.169Z"
     }
   ]
 }

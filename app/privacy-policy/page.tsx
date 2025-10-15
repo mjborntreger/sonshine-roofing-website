@@ -1,6 +1,6 @@
 import Section from "@/components/layout/Section";
-import RevealEmail from "@/components/RevealEmail";
-import RevealPhone from "@/components/RevealPhone";
+import RevealEmail from "@/components/utils/RevealEmail";
+import RevealPhone from "@/components/utils/RevealPhone";
 import type { Metadata } from "next";
 
 // ===== STATIC SEO FOR /privacy-policy =====
