@@ -6,7 +6,7 @@ import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import type { PageResult, ResourceKind, ResourceQuery } from "@/lib/ui/pagination";
 import type { PostCard, ProjectSummary, VideoItem } from "@/lib/content/wp";
 import { fetchPage, getCachedPages, setCachedPages } from "@/lib/content/resource-fetch";
-import { useIntersection } from "@/lib/useIntersection";
+import { useIntersection } from "@/lib/ui/useIntersection";
 import GridLoadingState from "@/components/layout/GridLoadingState";
 import Grid from "@/components/layout/Grid";
 

@@ -4,8 +4,8 @@ import { useDeferredValue, useMemo, useState } from 'react';
 import SmartLink from '@/components/utils/SmartLink';
 import { Search } from 'lucide-react';
 
-import type { GlossaryItem } from '@/lib/fuzzy';
-import { filterContains, suggest } from '@/lib/fuzzy';
+import type { GlossaryItem } from '@/components/dynamic-content/roofing-glossary/fuzzy';
+import { filterContains, suggest } from '@/components/dynamic-content/roofing-glossary/fuzzy';
 
 export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }) {
   const [q, setQ] = useState('');

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import Skeleton from "@/components/ui-skeleton/Skeleton";
+import Skeleton from "@/components/ui/Skeleton";
 
 export type CardSkeletonProps = React.HTMLAttributes<HTMLDivElement> & {
   /** Which card layout to mirror. Defaults to the blog card. */

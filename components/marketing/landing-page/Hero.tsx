@@ -5,7 +5,7 @@ import type { KeyboardEvent } from "react";
 import { ChevronDown } from "lucide-react";
 import SmartLink from "../../utils/SmartLink";
 import ShinyText from "./ShinyText";
-import { scrollToAnchor } from "@/lib/scroll-to-anchor";
+import { scrollToAnchor } from "@/lib/ui/scroll-to-anchor";
 
 export default function Hero() {
   const [shouldAnimateArrow, setShouldAnimateArrow] = useState(false);

@@ -4,7 +4,7 @@ import SmartLink from "@/components/utils/SmartLink";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelectedLayoutSegments } from "next/navigation";
-import { NavMenu } from "../../nav/NavMenu";
+import { NavMenu } from "./NavMenu";
 import { cn } from "@/lib/utils";
 
 const HEADER_COLLAPSE_THRESHOLD = 140; // tweak this to adjust when the header compresses

@@ -1,61 +1,61 @@
 {
-  "generatedAt": "2025-10-15T05:13:36.614Z",
+  "generatedAt": "2025-10-15T15:59:57.192Z",
   "routes": [
     {
       "loc": "/",
-      "lastmod": "2025-10-15T05:09:05.978Z"
+      "lastmod": "2025-10-15T05:57:37.589Z"
     },
     {
       "loc": "/about-sonshine-roofing",
-      "lastmod": "2025-10-15T05:07:25.066Z"
+      "lastmod": "2025-10-15T05:57:37.584Z"
     },
     {
       "loc": "/blog",
-      "lastmod": "2025-10-15T05:10:57.771Z"
-    },
-    {
-      "loc": "/faq",
-      "lastmod": "2025-10-15T05:10:47.073Z"
+      "lastmod": "2025-10-15T05:57:37.585Z"
     },
     {
       "loc": "/contact-us",
-      "lastmod": "2025-10-15T04:51:20.432Z"
+      "lastmod": "2025-10-15T05:57:37.586Z"
+    },
+    {
+      "loc": "/faq",
+      "lastmod": "2025-10-15T05:57:37.587Z"
     },
     {
       "loc": "/financing",
-      "lastmod": "2025-10-15T05:11:10.338Z"
+      "lastmod": "2025-10-15T05:57:37.587Z"
     },
     {
       "loc": "/privacy-policy",
-      "lastmod": "2025-10-15T04:10:21.938Z"
+      "lastmod": "2025-10-15T05:57:37.589Z"
     },
     {
       "loc": "/project",
-      "lastmod": "2025-10-15T05:10:17.135Z"
+      "lastmod": "2025-10-15T05:57:37.590Z"
     },
     {
       "loc": "/roof-inspection",
-      "lastmod": "2025-10-15T04:41:14.367Z"
+      "lastmod": "2025-10-15T05:57:37.591Z"
     },
     {
       "loc": "/roof-maintenance",
-      "lastmod": "2025-10-15T04:41:14.367Z"
+      "lastmod": "2025-10-15T05:57:37.592Z"
     },
     {
       "loc": "/roof-repair",
-      "lastmod": "2025-10-15T04:41:14.367Z"
+      "lastmod": "2025-10-15T05:57:37.592Z"
     },
     {
       "loc": "/roof-replacement-sarasota-fl",
-      "lastmod": "2025-10-15T04:41:14.367Z"
+      "lastmod": "2025-10-15T05:57:37.593Z"
     },
     {
       "loc": "/roofing-glossary",
-      "lastmod": "2025-10-15T05:10:49.797Z"
+      "lastmod": "2025-10-15T05:57:37.594Z"
     },
     {
       "loc": "/video-library",
-      "lastmod": "2025-10-15T05:02:48.169Z"
+      "lastmod": "2025-10-15T05:57:37.597Z"
     }
   ]
 }

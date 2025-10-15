@@ -1,5 +1,5 @@
 import * as React from "react";
-import CardSkeleton, { type CardSkeletonProps } from "@/components/ui-skeleton/CardSkeleton";
+import CardSkeleton, { type CardSkeletonProps } from "@/components/ui/CardSkeleton";
 import Grid from "@/components/layout/Grid";
 
 type Mode = "overlay" | "skeleton";

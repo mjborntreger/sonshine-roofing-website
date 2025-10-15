@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 
-import { parseLead } from '../lib/validation';
+import { parseLead } from '../lib/lead-capture/validation';
 
 (() => {
   const contact = parseLead({

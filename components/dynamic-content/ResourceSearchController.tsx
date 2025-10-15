@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import type { ResourceKind } from "./useResourceFilters";
+import type { ResourceKind } from "../../lib/content/useResourceFilters";
 
 type Ids = {
   query: string;
@@ -28,7 +28,7 @@ export default function ResourceSearchController({ kind, ids, urlKeys, minQueryL
     let cleanup: (() => void) | undefined;
     let cancelled = false;
 
-    import("./useResourceFilters")
+    import("../../lib/content/useResourceFilters")
       .then((mod) => {
         if (cancelled) return;
         const mount = mod.mountResourceFilters;
