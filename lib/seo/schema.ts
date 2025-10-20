@@ -890,7 +890,6 @@ export const sponsorFeaturesItemListSchema = ({
         };
       }
       if (sameAs.length) organization.sameAs = sameAs;
-      if (providerId) organization.parentOrganization = { "@id": ensureAbsoluteUrl(providerId, origin) };
 
       const listItem: SchemaInit = {
         "@type": "ListItem",
