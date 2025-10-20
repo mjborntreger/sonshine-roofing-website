@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { faqSchema, videoObjectSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
 import type { PageInfo, PageResult } from "../ui/pagination";
@@ -411,6 +412,55 @@ export async function getLocationBySlug(slug: string): Promise<LocationRecord | 
     seo: isRecord(node.seo) ? (node.seo as LocationRecord["seo"]) : undefined,
   };
 }
+
+export const listLocationSlugs = cache(async (limit = 500): Promise<string[]> => {
+  const query = /* GraphQL */ `
+    query ListLocationSlugs($first: Int!, $after: String) {
+      locations(
+        first: $first
+        after: $after
+        where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
+      ) {
+        pageInfo { hasNextPage endCursor }
+        nodes { slug }
+      }
+    }
+  `;
+
+  const pageSize = Math.min(200, Math.max(1, limit));
+  const slugs: string[] = [];
+  let after: string | null = null;
+
+  do {
+    const variables: { first: number; after?: string | null } = after
+      ? { first: pageSize, after }
+      : { first: pageSize };
+
+    const data = await wpFetch<{
+      locations: {
+        pageInfo?: { hasNextPage?: boolean; endCursor?: string | null };
+        nodes?: UnknownRecord[];
+      };
+    }>(query, variables, 3600);
+
+    const nodes = data?.locations?.nodes ?? [];
+    for (const node of nodes) {
+      const record = asRecord(node);
+      const slug = record ? toStringSafe(record.slug).trim() : "";
+      if (slug) {
+        slugs.push(slug);
+        if (slugs.length >= limit) break;
+      }
+    }
+    if (slugs.length >= limit) break;
+
+    const pageInfo = data?.locations?.pageInfo;
+    const nextCursor = toStringSafe(pageInfo?.endCursor).trim();
+    after = pageInfo?.hasNextPage && nextCursor ? nextCursor : null;
+  } while (after);
+
+  return slugs;
+});
 
 const mapSponsorFeatureNode = (node: UnknownRecord | null | undefined): SponsorFeature | null => {
   if (!node) return null;

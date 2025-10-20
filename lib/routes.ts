@@ -100,6 +100,12 @@ export const NAV_RESOURCES: ReadonlyArray<{ label: string; href: Route }> = [
   { label: 'FAQ', href: ROUTES.faq },
 ];
 
+export const NAV_LOCATIONS: ReadonlyArray<{ label: string; href: Route }> = [
+  { label: 'Sarasota, FL', href: '/locations/sarasota' as Route },
+  // keep adding each published location slug…
+];
+
+
 export const normalizePathname = (input: string): string => {
   try {
     const url = new URL(input, "https://example.com");

@@ -4,6 +4,7 @@ import {
   listFaqsWithContent,
   listRecentPostsPoolForFilters,
   listRecentProjectsByServiceArea,
+  listLocationSlugs,
   listSponsorFeaturesByServiceArea,
 } from "@/lib/content/wp";
 import type { LocationRecord } from "@/lib/content/wp";
@@ -24,6 +25,7 @@ import ServiceAreaMap from "@/components/location/ServiceAreaMap";
 import NeighborhoodsServedSection from "@/components/location/NeighborhoodsServedSection";
 import type { Metadata } from "next";
 import { buildArticleMetadata } from "@/lib/seo/meta";
+import { ensureAbsoluteUrl } from "@/lib/seo/site";
 
 type OgImageRecord = {
   url?: unknown;
@@ -37,6 +39,16 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 type Params = { slug: string };
 export const revalidate = 600;
+
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
+  try {
+    const slugs = await listLocationSlugs();
+    return slugs.map((slug: string) => ({ slug }));
+  } catch (error) {
+    console.error("Failed to list location slugs", error);
+    return [];
+  }
+}
 
 // ===== STYLE CONSTANTS ===== //
 const leadFormLayout = "w-full px-2";
@@ -164,6 +176,10 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   const modifiedDisplay = formatDate(location.modified);
 
   const featuredReviews = normalizeFeaturedReviews(location.featuredReviews);
+  const locationSchemaUrl = ensureAbsoluteUrl(`/locations/${slug}`);
+  const schemaBusinessName = location.locationName
+    ? `SonShine Roofing — ${location.locationName}`
+    : null;
   return (
     <>
       <Hero title={`The Best Roofing Company in ${location.locationName} for Over 38 Years`} />
@@ -185,6 +201,10 @@ export default async function LocationPage({ params }: { params: Promise<Params>
             showDisclaimer={false}
             limit={featuredReviews.length}
             fallbackToRemote={true}
+            schemaOptions={{
+              businessName: schemaBusinessName ?? undefined,
+              businessUrl: locationSchemaUrl,
+            }}
           />
         ) : (
           <p className="text-sm text-slate-600">No reviews highlighted yet.</p>

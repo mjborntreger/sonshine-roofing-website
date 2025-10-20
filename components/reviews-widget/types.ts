@@ -10,5 +10,9 @@ export type Review = {
 
 export type ReviewsPayload = {
   avg_rating?: number | string | null;
+  review_count?: number | string | null;
+  rating_count?: number | string | null;
+  total_reviews?: number | string | null;
+  total_ratings?: number | string | null;
   reviews?: Review[];
 };

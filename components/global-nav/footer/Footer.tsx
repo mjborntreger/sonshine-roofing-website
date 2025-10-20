@@ -2,7 +2,7 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import SmartLink from "@/components/utils/SmartLink";
 import { ArrowUpRight, ArrowUp, Star } from "lucide-react";
-import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from "@/lib/routes";
+import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from "@/lib/routes";
 
 const SOCIALS = [
   { href: "https://www.facebook.com/sonshineroofing", label: "Facebook", domain: "facebook.com" },
@@ -25,7 +25,7 @@ const FooterBadges = dynamic(() => import("@/components/global-nav/footer/Footer
   loading: () => (
     <div
       aria-hidden="true"
-      className="my-10 h-24 w-full animate-pulse rounded-lg bg-slate-300/40"
+      className="w-full h-24 my-10 rounded-lg animate-pulse bg-slate-300/40"
     />
   ),
 });
@@ -40,19 +40,19 @@ export default function Footer() {
         aria-label="return to top of page"
       >
         Return to Top
-        <ArrowUp className="icon-affordance h-4 w-4 inline ml-2" />
+        <ArrowUp className="inline w-4 h-4 ml-2 icon-affordance" />
       </SmartLink>
 
       <FooterBadges />
 
       <footer className="bg-[#cef3ff] pt-20">
-        <div className="mx-auto max-w-6xl px-10">
+        <div className="max-w-6xl px-10 mx-auto">
           <h2 className="sr-only">Footer</h2>
 
           {/* Columns */}
           <nav
             aria-label="Footer"
-            className="grid grid-cols-2 gap-12 lg:grid-cols-4"
+            className="grid grid-cols-2 gap-12 lg:grid-cols-5"
           >
             {/* Company */}
             <div>
@@ -134,12 +134,27 @@ export default function Footer() {
               </ul>
             </div>
 
+            {/* Locations */}
+            <div>
+              <h3 className={h3Styles}>Service Areas</h3>
+              <ul className="mt-4 space-y-3 text-sm">
+                {NAV_LOCATIONS.map((r) => (
+                  <li key={r.href}>
+                    <SmartLink href={r.href} className={linkStyles}>
+                      {r.label}
+                    </SmartLink>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+
             {/* Hours */}
             <div>
               <h3 className={h3Styles}>
                 Hours of Operation
               </h3>
-              <dl className="mt-4 grid grid-cols-2 text-sm gap-x-1 gap-y-3 pr-8">
+              <dl className="grid grid-cols-2 pr-8 mt-4 text-sm gap-x-1 gap-y-3">
                 <dt className={hoursStyles}>Mon.</dt>
                 <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
                 <dt className={hoursStyles}>Tues.</dt>
@@ -162,13 +177,13 @@ export default function Footer() {
           <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
             <SmartLink
               href="/reviews"
-              className="text-sm md:text-md text-white btn btn-brand-orange px-3 py-2"
+              className="px-3 py-2 text-sm text-white md:text-md btn btn-brand-orange"
               data-icon-affordance="up-right"
               target="_blank"
             >
-              <Star className="h-3 w-3 md:h-4 md:w-4 mr-2 text-white" />
+              <Star className="w-3 h-3 mr-2 text-white md:h-4 md:w-4" />
               Leave a Review
-              <ArrowUpRight className="inline h-3 w-3 md:h-4 md:w-4 ml-1 text-white icon-affordance" />
+              <ArrowUpRight className="inline w-3 h-3 ml-1 text-white md:h-4 md:w-4 icon-affordance" />
             </SmartLink>
 
             {/* Socials Badges Row */}
@@ -190,7 +205,7 @@ export default function Footer() {
                     height={32}
                     sizes="(max-width: 32px) 5vw 366px"
                     loading="lazy"
-                    className="h-6 w-6"
+                    className="w-6 h-6"
                   />
                 </a>
               ))}
@@ -199,18 +214,18 @@ export default function Footer() {
           </div>
 
           {/* Bottom bar */}
-          <div className="mt-3 border-t border-slate-300 pt-6 flex flex-wrap justify-between items-center gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 mt-3 border-t border-slate-300">
             <div className="text-xs text-slate-500">
               © {new Date().getFullYear()} SonShine Roofing — Since 1987 we’ve got you covered. | All Rights Reserved
             </div>
 
-            <nav className="text-xs font-semibold text-slate-500 flex items-center justify-end gap-4">
+            <nav className="flex items-center justify-end gap-4 text-xs font-semibold text-slate-500">
               <SmartLink href={ROUTES.privacyPolicy}>Privacy Policy</SmartLink>
               <SmartLink href={ROUTES.sitemapIndex}>XML Sitemap</SmartLink>
             </nav>
           </div>
           <div className="py-4">
-            <div className="text-xs font-semibold text-slate-500 text-right">
+            <div className="text-xs font-semibold text-right text-slate-500">
               <SmartLink href="https://michaelborntreger.life">Website created by: Michael Borntreger</SmartLink>
             </div>
           </div>
