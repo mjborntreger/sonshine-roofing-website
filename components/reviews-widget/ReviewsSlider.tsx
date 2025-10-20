@@ -7,14 +7,30 @@ import { createPortal } from 'react-dom';
 import SmartLink from '../utils/SmartLink';
 import { ArrowUpRight, Quote } from 'lucide-react';
 import Image from 'next/image';
+import type { Review } from './types';
 
-type Review = {
-  author_name: string;
-  author_url?: string;
-  rating: number;
-  text: string;
-  time: number;
-  relative_time_description?: string;
+const OWNER_RESPONSE_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Nathan-Edited-Bio-Photo-175x175-1.webp";
+
+const ordinalize = (day: number): string => {
+  const j = day % 10;
+  const k = day % 100;
+  if (j === 1 && k !== 11) return `${day}st`;
+  if (j === 2 && k !== 12) return `${day}nd`;
+  if (j === 3 && k !== 13) return `${day}rd`;
+  return `${day}th`;
+};
+
+const formatReviewDate = (time?: number | null, fallback?: string | null | undefined): string | null => {
+  if (typeof time === 'number' && Number.isFinite(time) && time > 0) {
+    const date = new Date(time * 1000);
+    if (!Number.isNaN(date.getTime())) {
+      const month = date.toLocaleString('en-US', { month: 'long' });
+      const day = ordinalize(date.getDate());
+      const year = date.getFullYear();
+      return `${month} ${day}, ${year}`;
+    }
+  }
+  return fallback?.trim() || null;
 };
 
 export default function ReviewsSlider({
@@ -168,7 +184,7 @@ export default function ReviewsSlider({
   }, [closeModal, modalIndex, reviews.length]);
 
   return (
-    <div className="embla relative w-full isolate py-6 md:py-8">
+    <div className="relative w-full py-6 embla isolate md:py-8">
       {/**
        * Edge Fades (full-bleed to viewport)
        *
@@ -185,7 +201,7 @@ export default function ReviewsSlider({
        */}
       <div
         aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 z-10 h-full w-screen -translate-x-1/2"
+        className="absolute top-0 z-10 w-screen h-full -translate-x-1/2 pointer-events-none left-1/2"
         style={fadeOverlayStyle}
       >
         {/* Left overlay: solid bg color at the extreme edge -> transparent toward content */}
@@ -207,7 +223,7 @@ export default function ReviewsSlider({
       </div>
       {/* Viewport with gutters + mask fade; spacing uses padding model */}
       <div
-        className="embla__viewport overflow-x-hidden overflow-y-visible px-5 py-3"
+        className="px-5 py-3 overflow-x-hidden overflow-y-visible embla__viewport"
         ref={viewportRef}
         style={{
           // Content mask (optional): softly fade the slider contents themselves at the edges
@@ -222,6 +238,7 @@ export default function ReviewsSlider({
         <div className="embla__container ml-[-1rem] flex flex-nowrap will-change-transform">
           {reviews.map((r, i) => {
             const text = r.text?.length > 250 ? r.text.slice(0, 250) + '…' : r.text || '';
+            const formattedDate = formatReviewDate(r.time, r.relative_time_description);
             return (
               <button
                 key={i}
@@ -233,35 +250,54 @@ export default function ReviewsSlider({
                 <article className="h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
                     <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <h3 className="m-0 flex items-center gap-2 font-bold text-xl text-slate-700">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="flex items-center gap-2 m-0 text-xl font-bold text-slate-700">
                           <Image
                             src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
                             alt="Google logo"
                             width={40}
                             height={40}
-                            className="h-5 w-5 flex-none"
+                            className="flex-none w-5 h-5"
                           />
                           <span>{r.author_name}</span>
                         </h3>
                         <div className="my-2 flex items-center gap-1 text-[#fb9216]">
                           {Array.from({ length: 5 }).map((_, j) => (
-                            <svg key={j} viewBox="0 0 24 24" className="h-6 w-6 fill-current" aria-hidden>
+                            <svg key={j} viewBox="0 0 24 24" className="w-6 h-6 fill-current" aria-hidden>
                               <path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.336 24 12 20.125 4.664 24 6 15.6 0 9.753l8.332-1.735z" />
                             </svg>
-                          ))}
-                        </div>
-                        {r.relative_time_description && (
-                          <div className="mt-1 text-xs text-slate-500">{r.relative_time_description}</div>
-                        )}
+                        ))}
                       </div>
-                      <Quote className="mt-1 h-10 w-10 flex-none text-slate-300" aria-hidden />
+                      {formattedDate && (
+                        <div className="mt-1 text-xs text-slate-500">{formattedDate}</div>
+                      )}
                     </div>
-                  </header>
-                  <p className="text-sm md:text-md leading-7 text-slate-700">{text}</p>
-                </article>
-              </button>
-            );
+                    <Quote className="flex-none w-10 h-10 mt-1 text-slate-300" aria-hidden />
+                  </div>
+                </header>
+                <p className="text-sm leading-7 md:text-md text-slate-700">{text}</p>
+                {r.ownerReply ? (
+                  <blockquote className="pl-4 mt-4 text-sm text-left border-l-4 border-blue-500 text-slate-600">
+                    <div className="flex items-start gap-3">
+                      <Image
+                        src={OWNER_RESPONSE_IMAGE}
+                        alt="Owner response avatar"
+                        width={40}
+                        height={40}
+                        className="flex-none object-cover w-10 h-10 border border-blue-200 rounded-full"
+                      />
+                      <div>
+                        <span className="block text-xs tracking-wide uppercase text-slate-400">
+                          Nathan Borntreger
+                        </span>
+                        <p className="mt-1 italic whitespace-pre-wrap line-clamp-6">{r.ownerReply}</p>
+                      </div>
+                    </div>
+                  </blockquote>
+                ) : null}
+              </article>
+            </button>
+          );
           })}
         </div>
       </div>
@@ -273,6 +309,7 @@ export default function ReviewsSlider({
         (() => {
           const r = reviews[modalIndex]!;
           const href = r.author_url || gbpUrl;
+          const formattedDate = formatReviewDate(r.time, r.relative_time_description);
           return (
             <div
               className="fixed inset-0 z-[2147483647] grid place-items-center bg-black/45 py-16 md:p-16"
@@ -289,43 +326,62 @@ export default function ReviewsSlider({
                   ref={closeBtnRef}
                   type="button"
                   aria-label="Close review"
-                  className="absolute right-3 top-3 h-8 w-8 text-slate-800 flex items-center justify-center"
+                  className="absolute flex items-center justify-center w-8 h-8 right-3 top-3 text-slate-800"
                   onClick={closeModal}
                 >
-                  <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden>
+                  <svg viewBox="0 0 24 24" className="w-6 h-6" aria-hidden>
                     <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                 </button>
                 <header className="px-5 pt-4 pb-2">
                   <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <h4 id="review-title" className="m-0 flex items-center gap-2 text-2xl font-bold text-slate-700">
+                    <div className="flex-1 min-w-0">
+                      <h4 id="review-title" className="flex items-center gap-2 m-0 text-2xl font-bold text-slate-700">
                         <Image
                           src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
                           alt="Google logo"
                           width={40}
                           height={40}
-                          className="h-5 w-5 flex-none"
+                          className="flex-none w-5 h-5"
                         />
                         <span>{r.author_name}</span>
                       </h4>
                       <div className="my-3 flex gap-1 text-[#fb9216]">
                         {Array.from({ length: 5 }).map((_, j) => (
-                          <svg key={j} viewBox="0 0 24 24" className="h-7 w-7 fill-current" aria-hidden>
+                          <svg key={j} viewBox="0 0 24 24" className="fill-current h-7 w-7" aria-hidden>
                             <path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.336 24 12 20.125 4.664 24 6 15.6 0 9.753l8.332-1.735z" />
                           </svg>
                         ))}
                       </div>
-                      {r.relative_time_description && (
-                        <div className="mt-1 text-xs md:text-sm text-slate-500">{r.relative_time_description}</div>
+                      {formattedDate && (
+                        <div className="mt-1 text-xs md:text-sm text-slate-500">{formattedDate}</div>
                       )}
                     </div>
                   </div>
                 </header>
-                <div className="max-h-[60vh] overflow-auto px-5 pb-4 pt-1">
-                  <p className="m-0 text-md md:text-lg leading-7 text-slate-700 whitespace-pre-wrap">{r.text || ''}</p>
+                <div className="max-h-[60vh] overflow-auto px-5 pb-4 pt-1 space-y-4">
+                  <p className="m-0 leading-7 whitespace-pre-wrap text-md md:text-lg text-slate-700">{r.text || ''}</p>
+                  {r.ownerReply ? (
+                    <blockquote className="pl-4 m-0 text-sm text-left whitespace-pre-wrap border-l-4 border-blue-500 text-slate-600">
+                      <div className="flex items-start gap-3">
+                        <Image
+                          src={OWNER_RESPONSE_IMAGE}
+                          alt="Owner response avatar"
+                          width={48}
+                          height={48}
+                          className="flex-none object-cover w-12 h-12 border border-blue-200 rounded-full"
+                        />
+                        <div>
+                          <span className="block text-xs tracking-wide uppercase text-slate-400">
+                            Nathan Borntreger
+                          </span>
+                          <p className="mt-1 italic whitespace-pre-wrap line-clamp-6">{r.ownerReply}</p>
+                        </div>
+                      </div>
+                    </blockquote>
+                  ) : null}
                 </div>
-                <div className="flex justify-end gap-2 border-t border-slate-300 p-4">
+                <div className="flex justify-end gap-2 p-4 border-t border-slate-300">
                   <SmartLink
                     href={href}
                     target="_blank"
@@ -334,7 +390,7 @@ export default function ReviewsSlider({
                     data-icon-affordance="up-right"
                   >
                     View on Google
-                    <ArrowUpRight className="icon-affordance h-4 w-4 inline ml-2" />
+                    <ArrowUpRight className="inline w-4 h-4 ml-2 icon-affordance" />
                   </SmartLink>
                 </div>
               </div>

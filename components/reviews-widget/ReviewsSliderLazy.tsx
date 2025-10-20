@@ -1,15 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ComponentType } from 'react';
-
-type Review = {
-  author_name: string;
-  author_url?: string;
-  rating: number;
-  text: string;
-  time: number;
-  relative_time_description?: string;
-};
+import type { Review } from './types';
 
 type Props = {
   reviews: Review[];

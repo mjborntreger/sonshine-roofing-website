@@ -21,7 +21,9 @@ export default function Header() {
     progress: initialLanding ? 0 : 1,
   }));
   const stateRef = useRef(scrollState);
-  const isLanding = segments.length === 0;
+  const isLanding = 
+    segments.length === 0 || 
+    (segments[0] === "locations" && segments.length === 2);
 
   useEffect(() => {
     stateRef.current = scrollState;

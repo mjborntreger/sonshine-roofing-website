@@ -50,6 +50,7 @@ import {
   restoreLeadSuccessState,
 } from '@/components/lead-capture/lead-form/config';
 import type { JourneyKey, LeadSuccessRestore, ProjectOption, LeadFormUtmParams } from '@/components/lead-capture/lead-form/config';
+import { renderHighlight } from '@/components/utils/renderHighlight';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
@@ -535,11 +536,13 @@ export default function LeadFormWizard({
       case 'need':
         return {
           title: 'Let’s get you squared away',
+          highlightText: 'squared away',
           description: 'We’ll tailor the next few questions so we can route you to the right spot.',
         };
       case 'context':
         return {
           title: 'How can we help?',
+          highlightText: 'we help?',
           description: journey?.showHelpMulti
             ? 'We’ll pull together the right team and resources just for you'
             : 'Share what’s going on so we can point you to the best next step.',
@@ -547,19 +550,22 @@ export default function LeadFormWizard({
       case 'contact':
         return {
           title: 'How can we reach you?',
+          highlightText: 'reach you?',
           description: 'We respond within 30 minutes during business hours — faster if it’s an emergency.',
         };
       case 'schedule':
         return {
           title: 'Where are you located?',
+          highlightText: 'Where',
           description: 'Confirm the service address and the best time to connect.',
         };
       default:
-        return { title: '', description: '' };
+        return { title: '', description: '', highlightText: null };
     }
   };
 
-  const { title, description } = getStepMeta(activeStepId);
+  const { title, description, highlightText } = getStepMeta(activeStepId);
+  const renderedTitle = renderHighlight(title, highlightText);
   const progressPercent = ((activeStepIndex + 1) / totalSteps) * 100;
 
   const isInitialRender = !hasMountedRef.current;
@@ -582,7 +588,7 @@ export default function LeadFormWizard({
   }
 
   return (
-    <form ref={formRef} className="md:pt-8 pb-24" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="pb-24" onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <input type="hidden" name="projectType" value={form.projectType} />
       <input type="hidden" name="helpTopics" value={helpSummary} />
@@ -591,12 +597,12 @@ export default function LeadFormWizard({
       <input type="hidden" name="bestTime" value={form.bestTime} />
       <input type="hidden" name="notes" value={form.notes} />
 
-      <div className="overflow-hidden mx-2 rounded-3xl border border-blue-100 bg-white shadow-md">
-        <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
+      <div className="mx-2 overflow-hidden bg-white border border-blue-100 shadow-md rounded-3xl">
+        <div className="p-6 border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-wide text-[--brand-blue]">Step {activeStepIndex + 1} of {totalSteps}</p>
-              <h3 className="mt-3 mb-4 text-xl md:text-3xl font-semibold text-slate-900">{title}</h3>
+              <h3 className="mt-3 mb-4 text-xl font-semibold md:text-3xl text-slate-900">{renderedTitle}</h3>
               <p className="mt-3 text-xs md:text-sm text-slate-600">{description}</p>
             </div>
             <div className="relative aspect-[21/9] h-[54px] w-[158px] mb-4">
@@ -609,14 +615,14 @@ export default function LeadFormWizard({
               />
             </div>
           </div>
-          <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-blue-100">
+          <div className="w-full h-2 mt-4 overflow-hidden bg-blue-100 rounded-full">
             <div className="h-full rounded-full bg-[--brand-blue] transition-[width]" style={{ width: `${progressPercent}%` }} />
           </div>
         </div>
 
         <div className="p-6">
           {globalError && (
-            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="px-4 py-3 mb-4 text-sm text-red-700 border border-red-200 rounded-xl bg-red-50">
               {globalError}
             </div>
           )}
@@ -644,29 +650,29 @@ export default function LeadFormWizard({
                       >
                         <div>
                           <div className={cn('inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium', accent)}>
-                            <Icon className="h-4 w-4" aria-hidden="true" />
+                            <Icon className="w-4 h-4" aria-hidden="true" />
                             {selectable ? (selected ? 'Selected' : 'Tap to select') : 'Opens a new page'}
                           </div>
-                          <h4 className="mt-4 text-md md:text-xl font-semibold text-slate-900">{label}</h4>
-                          <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                          <h4 className="mt-4 font-semibold text-md md:text-xl text-slate-900">{label}</h4>
+                          <div className="flex items-center justify-between mt-1 text-xs text-slate-500">
                             <p className="text-xs md:text-md text-slate-500">{description}</p>
-                            <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1" aria-hidden="true" />
+                            <ArrowRight className="w-4 h-4 transition text-slate-400 group-hover:translate-x-1" aria-hidden="true" />
                           </div>
                         </div>
                       </button>
                     );
                   })}
                   {errors.projectType && (
-                    <p className="md:col-span-2 text-sm font-medium text-red-600">{errors.projectType}</p>
+                    <p className="text-sm font-medium text-red-600 md:col-span-2">{errors.projectType}</p>
                   )}
                 </div>
               )}
 
               {activeStepId === 'context' && (
                 <div className="py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-                  <div className="space-y-4">
+                  <div>
                     {!journey && (
-                      <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+                      <p className="px-4 py-3 text-sm border rounded-xl border-amber-200 bg-amber-50 text-amber-700">
                         Pick an option to get started above and we&rsquo;ll guide you from there.
                       </p>
                     )}
@@ -674,10 +680,10 @@ export default function LeadFormWizard({
                     {journey?.showHelpMulti && (
                       <div>
                         <div className="flex-col items-baseline justify-start">
-                          <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-600">What&rsquo;s the situation?</h4>
-                          <p className="text-xs mt-2 mb-1 font-medium text-slate-500">Select all that apply</p>
+                          <h4 className="text-sm font-semibold tracking-wide uppercase text-slate-600">What&rsquo;s the situation?</h4>
+                          <p className="mt-2 mb-1 text-xs font-medium text-slate-500">Select all that apply</p>
                         </div>
-                        <div className="mt-3 grid gap-3 md:grid-cols-2">
+                        <div className="grid gap-3 mt-3 md:grid-cols-2">
                           {journey.helpOptions.map(({ value, label, description, icon: Icon }) => {
                             const selected = form.helpTopics.includes(value);
                             return (
@@ -695,7 +701,7 @@ export default function LeadFormWizard({
                                   <div className="inline-flex flex-wrap">
                                     <Icon className={cn('h-6 w-6 mr-3 shrink-0', selected ? 'text-[--brand-blue]' : 'text-slate-400')} aria-hidden="true" />
                                     <p className="text-sm font-semibold text-slate-900">{label}</p>
-                                    <p className="mt-1 ml-9 text-xs text-slate-500">{description}</p>
+                                    <p className="mt-1 text-xs ml-9 text-slate-500">{description}</p>
                                   </div>
                                   <div className="">
                                     <Check className={cn("h-5 w-5 ml-6 mr-1", selected ? "text-[--brand-blue]" : "text-white")} />
@@ -710,9 +716,9 @@ export default function LeadFormWizard({
                     )}
 
                     {journey?.showTimeline && (
-                      <div>
-                        <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Timeline</h4>
-                        <div className="mt-3 flex flex-wrap gap-2">
+                      <div className="mt-4">
+                        <h4 className="text-sm font-semibold tracking-wide uppercase text-slate-500">Timeline</h4>
+                        <div className="flex flex-wrap gap-2 mt-3">
                           {journey.timelineOptions.map(({ value, label }) => {
                             const selected = form.timeline === value;
                             return (
@@ -737,7 +743,7 @@ export default function LeadFormWizard({
                     )}
 
                     {journey?.showNotes && (
-                      <div>
+                      <div className="mt-4">
                         <label htmlFor="notes" className="text-sm font-semibold text-slate-700">
                           {journey.notesLabel}
                         </label>
@@ -756,7 +762,7 @@ export default function LeadFormWizard({
                       </div>
                     )}
                   </div>
-                  <aside className="flex flex-col h-fit gap-4 rounded-2xl border border-blue-100 bg-blue-50/60 px-4 py-4 text-sm text-slate-600">
+                  <aside className="flex flex-col gap-4 px-4 py-4 text-sm border border-blue-100 h-fit rounded-2xl bg-blue-50/60 text-slate-600">
                     <div className="flex items-start gap-3">
                       <CalendarClock className="mt-1 h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
                       <div>
@@ -784,7 +790,7 @@ export default function LeadFormWizard({
               )}
 
               {activeStepId === 'contact' && (
-                <div className="py-2 grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 py-2 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700">
                     First name*
                     <input
@@ -858,8 +864,8 @@ export default function LeadFormWizard({
                   </label>
 
                   <div className="md:col-span-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Preferred contact method</p>
-                    <div className="mt-3 flex flex-wrap gap-3">
+                    <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">Preferred contact method</p>
+                    <div className="flex flex-wrap gap-3 mt-3">
                       {CONTACT_PREF_OPTIONS.map(({ value, label, icon: Icon }) => {
                         const selected = form.preferredContact === value;
                         return (
@@ -874,7 +880,7 @@ export default function LeadFormWizard({
                             )}
                             aria-pressed={selected}
                           >
-                            <Icon className="h-4 w-4" aria-hidden="true" />
+                            <Icon className="w-4 h-4" aria-hidden="true" />
                             {label}
                           </button>
                         );
@@ -885,7 +891,7 @@ export default function LeadFormWizard({
               )}
 
               {activeStepId === 'schedule' && (
-                <div className="py-2 grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 py-2 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700 md:col-span-2">
                     Street address*
                     <input
@@ -970,8 +976,8 @@ export default function LeadFormWizard({
                   </label>
 
                   <div className="md:col-span-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">When should we connect?</p>
-                    <div className="mt-3 flex flex-wrap gap-3">
+                    <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">When should we connect?</p>
+                    <div className="flex flex-wrap gap-3 mt-3">
                       {BEST_TIME_OPTIONS.map(({ value, label }) => {
                         const selected = form.bestTime === value;
                         return (
@@ -993,13 +999,13 @@ export default function LeadFormWizard({
                     {errors.bestTime && <p className="mt-2 text-sm font-medium text-red-600">{errors.bestTime}</p>}
                   </div>
 
-                  <label className="md:col-span-2 flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
+                  <label className="flex items-center gap-3 px-4 py-3 text-xs border md:col-span-2 rounded-2xl border-slate-200 bg-slate-50 text-slate-600">
                     <input
                       type="checkbox"
                       name="consentSms"
                       checked={form.consentSms}
                       onChange={(event) => onSelect('consentSms', event.target.checked)}
-                      className="h-4 w-4 rounded border-slate-300 text-[--brand-blue] focus:ring-[--brand-blue]"
+                      className="h-4 w-4 cursor-pointer rounded border-slate-300 text-[--brand-blue] focus:ring-[--brand-blue]"
                     />
                     <span>
                       <div className="text-xs text-slate-500">
@@ -1010,11 +1016,11 @@ export default function LeadFormWizard({
                     </span>
                   </label>
 
-                  <p className="md:col-span-2 text-xs text-slate-500">
+                  <p className="text-xs md:col-span-2 text-slate-500">
                     For more information,{' '}
                     <SmartLink href="/privacy-policy" className="font-semibold text-[--brand-blue] hover:underline">
                       view our privacy policy
-                      <ArrowUpRight className="h-3 w-3 ml-1 inline" />
+                      <ArrowUpRight className="inline w-3 h-3 ml-1" />
                     </SmartLink>
                   </p>
 
@@ -1028,7 +1034,7 @@ export default function LeadFormWizard({
           </AnimatePresence>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-blue-50 px-6 py-4 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-4 px-6 py-4 border-t border-blue-50 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
             <span className={INFO_BADGE_CLASS}>
               <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
@@ -1040,23 +1046,23 @@ export default function LeadFormWizard({
             </span>
           </div>
         </div>
-        <div className="flex justify-end gap-3 mx-8 my-6 items-center">
+        <div className="flex items-center justify-end gap-3 mx-8 my-6">
           {activeStepIndex > 0 && (
             <Button type="button" data-icon-affordance="left" variant="secondary" size="sm" onClick={handleBack} className="gap-2">
-              <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
+              <ArrowLeft className="w-4 h-4 icon-affordance" aria-hidden="true" />
               Back
             </Button>
           )}
           {activeStepIndex < totalSteps - 1 && (
             <Button type="button" data-icon-affordance="right" variant="brandBlue" size="sm" onClick={handleNext} className="gap-2">
               Continue
-              <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+              <ArrowRight className="w-4 h-4 icon-affordance" aria-hidden="true" />
             </Button>
           )}
           {activeStepIndex === totalSteps - 1 && (
             <Button type="submit" variant="brandOrange" size="sm" disabled={status === 'submitting'} className="gap-2">
               {status === 'submitting' ? 'Sending…' : 'Submit my request'}
-              {status !== 'submitting' && <Check className="h-4 w-4" aria-hidden="true" />}
+              {status !== 'submitting' && <Check className="w-4 h-4" aria-hidden="true" />}
             </Button>
           )}
         </div>

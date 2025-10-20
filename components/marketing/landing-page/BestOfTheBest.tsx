@@ -1,26 +1,52 @@
 import Image from "next/image";
 import { BestOfTheBestVideo } from "@/components/marketing/landing-page/BestOfTheBestVideo";
 
+
+
 const imageHeight = 175;
 const imageWidth = 175;
-const imageClasses = "transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm"
+const imageClasses = "transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm";
 
-export default async function bestOfTheBest() {
+type BestOfTheBestProps = {
+  title?: string
+  highlightText?: string;
+};
+
+const defaultHighlight = "Sarasota's Best Roofer";
+
+export default async function bestOfTheBest({
+  title = `Voted ${defaultHighlight} for 5 Years`,
+  highlightText = defaultHighlight
+}: BestOfTheBestProps) {
+  const highlightIndex = title.indexOf(highlightText);
+  const renderedTitle =
+    highlightIndex >= 0 ? (
+      <>
+        {title.slice(0, highlightIndex)}
+        <span className="text-[--brand-blue]">{highlightText}</span>
+        {title.slice(highlightIndex + highlightText.length)}
+      </>
+    ) : (
+      title
+    );
   return (
-    <div className="px-4 py-32">
-      <div 
-        aria-label="botb-title" 
+    <section className="px-4 py-32">
+      <div
+        aria-label="botb-title"
         id="botb-title"
       >
-        <h2 className="text-center text-3xl md:text-5xl text-slate-700 py-8">
-          Best of the Best Award Winner (2021–2025)
-        </h2>
+        <div className="text-center">
+          <h2 className="text-3xl md:text-5xl text-slate-700">
+            {renderedTitle}
+          </h2>
+          <p className="mt-2 mb-8 text-sm text-slate-500" >Our reputation</p>
+        </div>
       </div>
 
 
       {/* Badges: responsive, semantic list with subtle hover affordances */}
-      <ul className="my-16 grid grid-cols-5 place-items-center justify-center gap-4">
-        <li className="group relative">
+      <ul className="grid justify-center grid-cols-5 gap-4 my-16 place-items-center">
+        <li className="relative group">
           <Image
             src="https://next.sonshineroofing.com/wp-content/uploads/2021-Best-of-the-Best-award-icon.bak-175x175.webp"
             aria-label="Best of the Best 2021 Award"
@@ -36,7 +62,7 @@ export default async function bestOfTheBest() {
           />
         </li>
 
-        <li className="group relative">
+        <li className="relative group">
           <Image
             src="https://next.sonshineroofing.com/wp-content/uploads/2022-Best-of-the-Best-award-icon.bak-175x175.webp"
             aria-label="Best of the Best 2022 Award"
@@ -52,7 +78,7 @@ export default async function bestOfTheBest() {
 
         </li>
 
-        <li className="group relative">
+        <li className="relative group">
           <Image
             src="https://next.sonshineroofing.com/wp-content/uploads/2023-best-of-the-best-award.bak-175x175.webp"
             aria-label="Best of the Best 2023 Award"
@@ -68,7 +94,7 @@ export default async function bestOfTheBest() {
 
         </li>
 
-        <li className="group relative">
+        <li className="relative group">
           <Image
             src="https://next.sonshineroofing.com/wp-content/uploads/backup/2024-Best-of-the-Best-badge-icon-1-175x175.webp"
             aria-label="Best of the Best 2024 Award"
@@ -84,7 +110,7 @@ export default async function bestOfTheBest() {
 
         </li>
 
-        <li className="group relative">
+        <li className="relative group">
           <Image
             src="https://next.sonshineroofing.com/wp-content/uploads/BOTB25_Award_1080px-175x175.webp"
             aria-label="Best of the Best 2025 Award"
@@ -101,7 +127,7 @@ export default async function bestOfTheBest() {
         </li>
       </ul>
 
-      <div className="mt-16 grid gap-8 grid-cols-1 md:grid-cols-2 items-start mx-auto">
+      <div className="grid items-start grid-cols-1 gap-8 mx-auto mt-16 md:grid-cols-2">
         <figure className="text-slate-900">
           <blockquote className="italic text-md">
             <p>
@@ -110,7 +136,7 @@ export default async function bestOfTheBest() {
               Best of the Best award.&rdquo;
             </p>
           </blockquote>
-          <figcaption className="mt-6 text-md text-right not-italic">—Rich Noonan, Best of the Best TV</figcaption>
+          <figcaption className="mt-6 not-italic text-right text-md">—Rich Noonan, Best of the Best TV</figcaption>
         </figure>
 
         <div className="relative">
@@ -118,6 +144,6 @@ export default async function bestOfTheBest() {
           <BestOfTheBestVideo />
         </div>
       </div>
-    </div>
+    </section>
   );
 }

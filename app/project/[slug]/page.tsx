@@ -31,8 +31,8 @@ export async function generateStaticParams() {
   return slugs.map((slug: string) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { slug } = params;
 
   const project = await getProjectBySlug(slug).catch(() => null);
   if (!project) notFound();
@@ -86,13 +86,13 @@ function getYouTubeId(url?: string | null): string | null {
 }
 
 const Badge = ({ children }: { children: React.ReactNode }) => (
-  <span className="inline-block rounded-full bg-slate-100 px-2 py-1 text-xs text-slate-700">
+  <span className="inline-block px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
     {children}
   </span>
 );
 
-export default async function Page(props: { params: Promise<{ slug: string }> }) {
-  const { slug } = await props.params;
+export default async function Page({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const projectPromise = getProjectBySlug(slug);
   const projectPoolPromise = listRecentProjectsPool(36);
   const faqsPromise = listFaqsWithContent(8, "roof-replacement").catch(() => []);
@@ -177,9 +177,6 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
     <Section>
       {videoSchema ? <JsonLd id="project-video" data={videoSchema} /> : null}
       <JsonLd data={projectSchema} />
-      <SmartLink href="/project" className="no-underline hover:underline text-sm text-slate-600">
-        ← Back to projects
-      </SmartLink>
 
       {/* Title + gradient stripe */}
       <div className="prose">
@@ -217,7 +214,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
           )}
 
           {hasAnyBadges && (
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mt-4">
               {project.materialTypes?.map((t) => (
                 <Badge key={`mt-${t.slug}`}>{t.name}</Badge>
               ))}
@@ -232,7 +229,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
         </div>
 
         {/* Right column: Project Details + Products */}
-        <div className="prose rounded-3xl border-slate-200 p-6 bg-white shadow-md">
+        <div className="p-6 prose bg-white shadow-md rounded-3xl border-slate-200">
           {project.projectDescription && (
             <>
               <h3>Project Summary</h3>
@@ -243,7 +240,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
           {project.productLinks?.length > 0 && (
             <>
               <h3 className="mt-6">Products Used</h3>
-              <ul className="list-disc pl-5">
+              <ul className="pl-5 list-disc">
                 {project.productLinks.map((p, i) => (
                   <li key={i}>
                     {p.productLink ? (
@@ -268,7 +265,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
 
       {/* Main content */}
       {project.contentHtml && (
-        <div className="prose mt-6" dangerouslySetInnerHTML={{ __html: project.contentHtml }} />
+        <div className="mt-6 prose" dangerouslySetInnerHTML={{ __html: project.contentHtml }} />
       )}
 
       <YouMayAlsoLike

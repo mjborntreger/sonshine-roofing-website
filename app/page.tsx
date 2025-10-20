@@ -2,21 +2,20 @@ import Hero from "@/components/marketing/landing-page/Hero";
 import ReviewsCarousel from "@/components/reviews-widget/ReviewsCarousel";
 import WhyHomeownersChooseUs from "@/components/marketing/landing-page/WhyHomeownersChooseUs";
 import LatestProjectsFilter from "@/components/dynamic-content/latest-filters/LatestProjectsFilter";
-import { listRecentProjectsPoolForFilters } from '@/lib/content/wp';
+import { listRecentProjectsPoolForFilters, listRecentPostsPoolForFilters, listFaqsWithContent, listSponsorFeaturesByServiceArea } from '@/lib/content/wp';
 import LatestPostsFilters from "@/components/dynamic-content/latest-filters/LatestPostsFilter";
-import { listRecentPostsPoolForFilters } from '@/lib/content/wp';
 import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks"
 import ServicesQuickLinks from "@/components/global-nav/static-pages/ServicesQuickLinks";
 import BestOfTheBest from "@/components/marketing/landing-page/BestOfTheBest";
 import Section from "@/components/layout/Section";
 import type { Metadata } from 'next';
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
-import { listFaqsWithContent } from "@/lib/content/wp";
 import LeadFormSection from "@/components/lead-capture/lead-form/LeadFormSection";
+import LocalPartnershipsSection from "@/components/location/LocalPartnershipsSection";
 
 // ===== STYLE CONSTANTS ===== //
 const leadFormLayout = "mx-auto w-full";
-const reviewsLayout = "mx-auto w-full bg-[#cef3ff]"
+const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
 const narrowLayout = "mx-auto w-full max-w-[1280px]";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
@@ -72,11 +71,21 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Page() {
-  const [projects, posts, generalFaqs] = await Promise.all([
+type Params = { slug: string };
+export const revalidate = 600;
+
+export default async function Page({ params }: { params: Params }) {
+  const { slug } = await params;
+  const sponsorFeaturesPromise = listSponsorFeaturesByServiceArea(slug, {
+      primaryLimit: 8,
+      fallbackLimit: 6,
+      minimum: 4,
+    }).catch(() => []);
+  const [projects, posts, generalFaqs, sponsorFeatures] = await Promise.all([
     listRecentProjectsPoolForFilters(4, 8),
-    listRecentPostsPoolForFilters(4, 4),
+    listRecentPostsPoolForFilters(4, 4).catch(() => []),
     listFaqsWithContent(8, "general").catch(() => []),
+    sponsorFeaturesPromise,
   ]);
   return (
     <>
@@ -87,13 +96,17 @@ export default async function Page() {
         </div>
       </div>
       <div className={reviewsLayout}>
-        <ReviewsCarousel />
+        <ReviewsCarousel highlightText="Our Customers" />
       </div>
       <div className={narrowLayout}>
         <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
             <div className="mx-2">
-              <WhyHomeownersChooseUs />
+              <WhyHomeownersChooseUs highlightText="Homeowners" />
+              <LocalPartnershipsSection
+                features={sponsorFeatures}
+                emptyMessage="No sponsored partners yet."
+              />
               <BestOfTheBest />
               <LatestProjectsFilter projects={projects} initial={4} />
               <LatestPostsFilters posts={posts} initial={4} />
@@ -101,7 +114,7 @@ export default async function Page() {
           </div>
 
           {/* Sticky Section */}
-          <div className="hidden lg:block min-w-0 lg:sticky lg:top-24 self-start px-4">
+          <div className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-24">
             <ServicesQuickLinks activePath="/" />
             <ResourcesQuickLinks activePath="/" />
           </div>

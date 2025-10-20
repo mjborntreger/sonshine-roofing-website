@@ -244,7 +244,6 @@ export default function YouMayAlsoLike(props: Props) {
   const { className, excludeSlug, ctaHref, ctaLabel } = props;
   const limit = props.limit ?? 4;
   const baseClassName = ["mt-32 not-prose px-2", className].filter(Boolean).join(" ");
-
   if (props.variant === "project") {
     const projectItems = selectProjects(props.projects, {
       serviceAreaSlug: props.serviceAreaSlug,
@@ -287,7 +286,7 @@ export default function YouMayAlsoLike(props: Props) {
             proseGuard
           >
             {finalCtaLabel}
-            <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
+            <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
           </SmartLink>
         </div>
       </section>
@@ -308,7 +307,7 @@ export default function YouMayAlsoLike(props: Props) {
 
   return (
     <section className={baseClassName} aria-labelledby="ymal-heading">
-      <div className="flex justify-start mt-36 mb-12">
+      <div className="flex justify-start mb-12 mt-36">
         <h2 id="ymal-heading" className="text-3xl md:text-4xl">
           <Sparkles className="inline h-7 w-7 md:h-10 md:w-10 text-[--brand-blue] mr-3" />
           {finalHeading}
@@ -335,7 +334,7 @@ export default function YouMayAlsoLike(props: Props) {
           proseGuard
         >
           {finalCtaLabel}
-          <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
+          <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
         </SmartLink>
       </div>
     </section>

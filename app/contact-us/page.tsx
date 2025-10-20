@@ -7,6 +7,7 @@ import Image from 'next/image';
 import SocialMediaProfiles from "@/components/global-nav/static-pages/SocialMediaProfiles";
 import type { Metadata } from 'next';
 import LiteMap from "@/components/utils/LiteMap";
+import { renderHighlight } from "@/components/utils/renderHighlight";
 import OpenOrClosed from "@/components/utils/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks";
 import FinancingBand from "@/components/cta/FinancingBand";
@@ -189,7 +190,7 @@ export default async function Page() {
         </div>
         <div className="my-24">
           <h2 className="text-2xl md:text-5xl mb-16 text-center flex items-center justify-center gap-3">
-            <span>Find Us on Google Maps</span>
+            <span>{renderHighlight("Find Us on Google Maps", "Find Us")}</span>
             <Image
               src="https://next.sonshineroofing.com/wp-content/uploads/Maps_Pin_FullColor-x1000-1.webp"
               alt="SonShine Roofing map pin"

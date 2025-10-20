@@ -23,6 +23,7 @@ export function GET() {
     <sitemap><loc>${BASE}/sitemap_index/static</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/blog</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/project</loc></sitemap>
+    <sitemap><loc>${BASE}/sitemap_index/location</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/roofing-glossary</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/person</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/video</loc></sitemap>

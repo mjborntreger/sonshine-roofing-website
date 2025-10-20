@@ -13,7 +13,7 @@ import {
   listVideoItemsPaged, // small adapter; see note below
 } from "@/lib/content/wp";
 
-type RouteContext = { params: Promise<{ kind: string }> };
+type RouteContext = { params: { kind: string } };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -49,7 +49,7 @@ export async function POST(
   context: RouteContext
 ) {
   try {
-    const { kind } = await context.params;
+    const { kind } = context.params;
 
     let rawBody: unknown;
     try {

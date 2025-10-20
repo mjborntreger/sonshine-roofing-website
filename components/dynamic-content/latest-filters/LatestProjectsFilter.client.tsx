@@ -10,6 +10,7 @@ import {
   type MaterialKey,
   type TabConfig,
 } from "@/components/dynamic-content/latest-filters/latest-tab-config";
+import { renderHighlight } from "@/components/utils/renderHighlight";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
 const pStyles = "my-8 text-slate-500 text-center justify-center text-sm md:text-md";
@@ -88,12 +89,14 @@ export default function LatestProjectsFilter({
       </FilterTabs>
     </div>
   );
+  const heading = "Latest Projects";
+  const renderedHeading = renderHighlight(heading, "Latest");
 
   return (
     <div className="px-4 pt-12 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="text-3xl text-slate-700 md:text-5xl mb-3 md:mb-4">Latest Projects</h2>
+          <h2 className="text-3xl text-slate-700 md:text-5xl mb-3 md:mb-4">{renderedHeading}</h2>
           {renderFilterTabs()}
           <p className={pStyles}>{description}</p>
         </div>

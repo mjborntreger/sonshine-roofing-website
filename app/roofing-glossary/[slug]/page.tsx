@@ -273,8 +273,8 @@ function renderGlossaryHtml(
 
 export const revalidate = 86400;
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { slug } = params;
 
   try {
     const term = await getGlossaryTerm(slug);
@@ -302,7 +302,7 @@ export async function generateStaticParams() {
   return index.map((t) => ({ slug: t.slug }));
 }
 
-export default async function GlossaryTermPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function GlossaryTermPage({ params }: { params: { slug: string } }) {
   const { slug } = await params;
   const [index, term] = await Promise.all([
     listGlossaryIndex(1000).catch(() => []),
@@ -339,7 +339,7 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
 
   return (
     <Section>
-      <div className="container-edge py-8">
+      <div className="py-8 container-edge">
         <nav className="mb-4 text-sm text-slate-600">
           <SmartLink href="/roofing-glossary" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← Back to Glossary</SmartLink>
         </nav>
@@ -357,7 +357,7 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
 
         {/* Prev / Next navigation */}
         {hasPos && (
-          <nav className="mt-10 flex items-center justify-between gap-4" aria-label="Term navigation">
+          <nav className="flex items-center justify-between gap-4 mt-10" aria-label="Term navigation">
             {prev ? (
               <SmartLink
                 href={`/roofing-glossary/${prev.slug}`}

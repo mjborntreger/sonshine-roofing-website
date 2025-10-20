@@ -27,7 +27,8 @@ type TabPayload = {
 type CardLookup = Record<string, ReactNode>;
 
 const sectionDescription =
-  "Enjoy these handcrafted articles from our team that discuss a wide variety of roofing topics (and a few extras, from our family to yours).";
+  
+"Whether you are looking for a full roof replacement or just considering options, explore our blog to learn more about roofing.";
 
 function buildCardLookup(posts: PostCard[]): CardLookup {
   return posts.reduce((acc, post) => {
@@ -61,7 +62,7 @@ function buildEmptyState(): ReactNode {
       <CardHeader>
         <CardTitle className="font-medium">No matching posts</CardTitle>
       </CardHeader>
-      <div className="h-48 w-full bg-slate-100" />
+      <div className="w-full h-48 bg-slate-100" />
       <CardContent>
         <p className="text-sm text-slate-600">Try another filter.</p>
       </CardContent>

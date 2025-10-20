@@ -32,6 +32,7 @@ import {
   getTimelineLabelForDisplay,
 } from '@/components/lead-capture/lead-form/config';
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
+import { renderHighlight } from '@/components/utils/renderHighlight';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
@@ -270,7 +271,7 @@ export default function SimpleLeadForm() {
         <div className="border-b rounded-t-3xl border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
           <h2 className="flex items-center text-xl md:text-2xl font-bold gap-2">
             <SquareMenu className="h-5 w-5 md:h-6 md:w-6 text-[--brand-blue]" aria-hidden="true" />
-            <span>Contact Our Office</span>
+            <span>{renderHighlight('Contact Our Office', 'Our Office')}</span>
           </h2>
           <p className="text-slate-500 mt-1 text-xs pb-2">We respond within 30 minutes during business hours</p>
         </div>

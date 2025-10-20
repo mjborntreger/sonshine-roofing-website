@@ -162,8 +162,8 @@ export async function generateStaticParams() {
 }
 
 // -------- Metadata (SEO) --------
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { slug } = params;
   if (slug.startsWith("_")) notFound();
 
   // Use unified post fetcher (deduped with page) that now includes RankMath SEO
@@ -199,8 +199,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 // -------- Page --------
-export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default async function Page({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   if (slug.startsWith("_")) notFound();
   const postPromise = getPostBySlug(slug);
   const poolPromise = listRecentPostsPool(36);
@@ -269,12 +269,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   return (
     <Section>
       <JsonLd data={postSchema} />
-      {/* Back link */}
-      <div className="mb-3">
-        <SmartLink href="/blog" className="text-sm text-slate-600 no-underline hover:underline">
-          ← Back to Blog
-        </SmartLink>
-      </div>
 
       {/* Title + gradient stripe */}
       <div className="prose">
@@ -283,7 +277,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <div className="h-1 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
 
       {/* Meta row */}
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-600">
+      <div className="flex flex-wrap items-center mt-3 text-sm gap-x-4 gap-y-2 text-slate-600">
         <span>{dateStr}</span>
         <span>•</span>
         <span>{readingMinutes} min read</span>
@@ -314,7 +308,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             sizes="(max-width: 1600px) 100vw, 1600px"
             width={1600}
             height={900}
-            className="h-auto w-full object-cover"
+            className="object-cover w-full h-auto"
             priority={false}
           />
         </div>
@@ -331,13 +325,13 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         {/* Article (single SSR block to avoid hydration mismatches) */}
         <article
           id="article-root"
-          className="prose px-2"
+          className="px-2 prose"
           dangerouslySetInnerHTML={{ __html: htmlWithCta }}
         />
 
         {/* Sidebar (desktop, sticky) */}
         <aside>
-          <div className="sticky top-16 grid grid-cols-1">
+          <div className="sticky grid grid-cols-1 top-16">
             <TocFromHeadings
               root="#article-root"
               levels={[2, 3]}
@@ -350,18 +344,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
       {/* Prev / Next */}
       {(prev || next) && (
-        <nav className="mt-12 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2">
+        <nav className="grid gap-4 p-4 mt-12 bg-white border shadow-sm rounded-2xl border-slate-200 sm:grid-cols-2">
           {prev ? (
-            <SmartLink href={`/${prev.slug}`} className="block rounded-xl p-3 hover:bg-slate-50">
-              <div className="text-xs uppercase tracking-wide text-slate-500">Previous</div>
+            <SmartLink href={`/${prev.slug}`} className="block p-3 rounded-xl hover:bg-slate-50">
+              <div className="text-xs tracking-wide uppercase text-slate-500">Previous</div>
               <div className="mt-1 font-medium text-slate-900">{prev.title}</div>
             </SmartLink>
           ) : (
             <span />
           )}
           {next ? (
-            <SmartLink href={`/${next.slug}`} className="block rounded-xl p-3 text-right hover:bg-slate-50">
-              <div className="text-xs uppercase tracking-wide text-slate-500">Next</div>
+            <SmartLink href={`/${next.slug}`} className="block p-3 text-right rounded-xl hover:bg-slate-50">
+              <div className="text-xs tracking-wide uppercase text-slate-500">Next</div>
               <div className="mt-1 font-medium text-slate-900">{next.title}</div>
             </SmartLink>
           ) : (

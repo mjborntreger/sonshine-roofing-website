@@ -239,6 +239,339 @@ export type Person = {
   positionTitle?: string | null;
 };
 
+// === Location Types === //
+export type LocationNeighborhood = {
+  neighborhood: string | null;
+  neighborhoodDescription: string | null;
+  zipCodes: string[];
+  neighborhoodImage: WpImage | null;
+};
+export type LocationFaqItem = { question: string | null; answer: string | null };
+export type SponsorLinks = {
+  facebookUrl?: string | null;
+  instagramUrl?: string | null;
+  websiteUrl?: string | null;
+};
+export type SponsorFeature = {
+  id: string;
+  slug: string;
+  title: string | null;
+  contentHtml: string | null;
+  links: SponsorLinks | null;
+  featuredImage: WpImage | null;
+};
+export type LocationRecord = {
+  slug: string;
+  title: string;
+  contentHtml: string;
+  date: string | null;
+  modified: string | null;
+  locationName: string | null;
+  nearbyLandmarks: string[];
+  mapImage: WpImage | null;
+  featuredReviews: {
+    reviewAuthor: string | null;
+    review: string | null;
+    ownerReply: string | null;
+    reviewUrl: string | null;
+    reviewDate: string | null;
+  }[];
+  neighborhoodsServed: LocationNeighborhood[];
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    canonicalUrl?: string | null;
+    openGraph?: {
+      title?: string | null;
+      description?: string | null;
+      type?: string | null;
+      image?: {
+        url?: string | null;
+        secureUrl?: string | null;
+        width?: number | null;
+        height?: number | null;
+        type?: string | null;
+      } | null;
+    } | null;
+  };
+};
+
+// ----- Locations -----
+
+export async function getLocationBySlug(slug: string): Promise<LocationRecord | null> {
+  const query = /* GraphQL */ `
+    query LocationBySlug($slug: ID!) {
+      location(id: $slug, idType: SLUG) {
+        slug
+        title
+        content(format: RENDERED)
+        date
+        modified
+        locationAttributes {
+          locationName
+          nearbyLandmarks {
+            landmark
+          }
+          map {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+          featuredReviews {
+            reviewAuthor
+            review
+            ownerReply
+            reviewUrl
+            reviewDate
+          }
+          neighborhoodsServed {
+            neighborhood
+            neighborhoodDescription
+            zipCodes {
+              zipCode
+            }
+            neighborhoodImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+          }
+        }
+        seo {
+          title
+          description
+          canonicalUrl
+          openGraph {
+            title
+            description
+            type
+            image {
+              url
+              secureUrl
+              width
+              height
+              type
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const data = await wpFetch<{ location?: UnknownRecord | null }>(query, { slug }, 600);
+  const node = asRecord(data?.location);
+  if (!node) return null;
+
+  const attrs = asRecord(node.locationAttributes);
+
+  const nearbyLandmarks = asArray(attrs?.nearbyLandmarks)
+    .map((item) => toStringSafe(asRecord(item)?.landmark))
+    .filter((landmark) => landmark.length > 0);
+
+  const mapImage = pickImageFrom(attrs?.map);
+
+  const featuredReviews = asArray(attrs?.featuredReviews).map((item) => {
+    const review = asRecord(item);
+    return {
+      reviewAuthor: stringOrNull(review?.reviewAuthor),
+      review: stringOrNull(review?.review),
+      ownerReply: stringOrNull(review?.ownerReply),
+      reviewUrl: stringOrNull(review?.reviewUrl),
+      reviewDate: stringOrNull(review?.reviewDate),
+    };
+  });
+
+  const neighborhoodsServed = asArray(attrs?.neighborhoodsServed).map((item) => {
+    const record = asRecord(item);
+    const zipCodes = asArray(record?.zipCodes)
+      .map((zip) => toStringSafe(asRecord(zip)?.zipCode))
+      .filter((zip) => zip.length > 0);
+
+    return {
+      neighborhood: stringOrNull(record?.neighborhood),
+      neighborhoodDescription: stringOrNull(record?.neighborhoodDescription),
+      zipCodes,
+      neighborhoodImage: pickImageFrom(record?.neighborhoodImage),
+    };
+  });
+
+  return {
+    slug: toStringSafe(node.slug) || slug,
+    title: toStringSafe(node.title),
+    contentHtml: toStringSafe(node.content),
+    date: stringOrNull(node.date),
+    modified: stringOrNull(node.modified),
+    locationName: stringOrNull(attrs?.locationName),
+    nearbyLandmarks,
+    mapImage,
+    featuredReviews,
+    neighborhoodsServed,
+    seo: isRecord(node.seo) ? (node.seo as LocationRecord["seo"]) : undefined,
+  };
+}
+
+const mapSponsorFeatureNode = (node: UnknownRecord | null | undefined): SponsorFeature | null => {
+  if (!node) return null;
+  const attributes = asRecord(node.sponsorFeatureAttributes);
+  const links = asRecord(attributes?.links);
+
+  return {
+    id: toStringSafe(node.id),
+    slug: toStringSafe(node.slug),
+    title: stringOrNull(node.title),
+    contentHtml: stringOrNull(node.content),
+    links: links
+      ? {
+          facebookUrl: stringOrNull(links.facebookUrl),
+          instagramUrl: stringOrNull(links.instagramUrl),
+          websiteUrl: stringOrNull(links.websiteUrl),
+        }
+      : null,
+    featuredImage: pickImageFrom(node.featuredImage),
+  };
+};
+
+const dedupeSponsorFeatures = (features: SponsorFeature[]): SponsorFeature[] => {
+  const seen = new Set<string>();
+  const result: SponsorFeature[] = [];
+  for (const feature of features) {
+    const key = feature.slug || feature.id;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    result.push(feature);
+  }
+  return result;
+};
+
+export async function listSponsorFeaturesByServiceArea(
+  serviceAreaSlugs: string[] | string | null,
+  {
+    primaryLimit = 8,
+    fallbackLimit = 4,
+    minimum = 4,
+    revalidateSeconds = 600,
+  }: {
+    primaryLimit?: number;
+    fallbackLimit?: number;
+    minimum?: number;
+    revalidateSeconds?: number;
+  } = {}
+): Promise<SponsorFeature[]> {
+  const normalizedSlugs = (Array.isArray(serviceAreaSlugs) ? serviceAreaSlugs : [serviceAreaSlugs])
+    .map((value) => (typeof value === "string" ? value.trim().toLowerCase() : ""))
+    .filter((value) => value.length > 0);
+
+  type SponsorFeatureNode = {
+    nodes?: UnknownRecord[] | null;
+  };
+
+  let primary: SponsorFeature[] = [];
+
+  if (normalizedSlugs.length) {
+    const primaryQuery = /* GraphQL */ `
+      query SponsorFeaturesByServiceArea($slugs: [String!], $limit: Int!) {
+        sponsorFeatures(
+          first: $limit
+          where: {
+            taxQuery: {
+              relation: AND
+              taxArray: [
+                { taxonomy: SERVICE_AREA, terms: $slugs, field: SLUG, operator: IN }
+              ]
+            }
+          }
+        ) {
+          nodes {
+            id
+            slug
+            title
+            content(format: RENDERED)
+            sponsorFeatureAttributes {
+              links {
+                facebookUrl
+                instagramUrl
+                websiteUrl
+              }
+            }
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const primaryData = await wpFetch<{ sponsorFeatures?: SponsorFeatureNode }>(
+      primaryQuery,
+      { slugs: normalizedSlugs, limit: primaryLimit },
+      { revalidateSeconds }
+    ).catch(() => null);
+
+    primary = dedupeSponsorFeatures(
+      asArray<UnknownRecord>(primaryData?.sponsorFeatures?.nodes)
+        .map(mapSponsorFeatureNode)
+        .filter((feature): feature is SponsorFeature => feature !== null)
+    );
+  }
+
+  if (primary.length >= minimum) {
+    return primary;
+  }
+
+  const fallbackQuery = /* GraphQL */ `
+    query FallbackSponsorFeatures($limit: Int!) {
+      sponsorFeatures(first: $limit) {
+        nodes {
+          id
+          slug
+          title
+          content(format: RENDERED)
+          sponsorFeatureAttributes {
+            links {
+              facebookUrl
+              instagramUrl
+              websiteUrl
+            }
+          }
+          featuredImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+        }
+      }
+    }
+  `;
+
+  const fallbackData = await wpFetch<{ sponsorFeatures?: SponsorFeatureNode }>(
+    fallbackQuery,
+    { limit: Math.max(fallbackLimit, minimum) },
+    { revalidateSeconds }
+  ).catch(() => null);
+
+  const fallback = dedupeSponsorFeatures(
+    asArray<UnknownRecord>(fallbackData?.sponsorFeatures?.nodes)
+      .map(mapSponsorFeatureNode)
+      .filter((feature): feature is SponsorFeature => feature !== null)
+  );
+
+  const merged = dedupeSponsorFeatures([...primary, ...fallback]);
+
+  if (!merged.length) return [];
+
+  if (merged.length < minimum && fallbackLimit > merged.length) {
+    return merged.slice(0, minimum);
+  }
+
+  return merged;
+}
+
 // ----- Glossary Types -----
 export type GlossarySummary = {
   slug: string;
@@ -339,8 +672,8 @@ function getAuthHeader(): string | null {
     typeof Buffer !== "undefined"
       ? Buffer.from(raw).toString("base64")
       : typeof btoa !== "undefined"
-      ? btoa(raw)
-      : "";
+        ? btoa(raw)
+        : "";
   return `Basic ${base64}`;
 }
 
@@ -397,8 +730,8 @@ export async function wpFetch<T = Json>(
   const errors = Array.isArray(json.errors)
     ? json.errors
     : json.errors
-    ? [json.errors]
-    : [];
+      ? [json.errors]
+      : [];
 
   if (errors.length > 0) {
     if (WP_VERBOSE_ERRORS) {
@@ -553,6 +886,8 @@ type FaqIndexResponse = {
 };
 
 // ----- Queries -----
+
+// === 
 
 /** List FAQ topics (taxonomy terms) including optional ACF `featured` boolean */
 export async function listFaqTopics(limit = 100): Promise<FaqTopic[]> {
@@ -763,6 +1098,8 @@ export async function getSpecialOfferBySlug(slug: string): Promise<SpecialOffer 
     seo: isRecord(node.seo) ? (node.seo as SpecialOffer['seo']) : undefined,
   };
 }
+
+
 /**
  * Fetch a list of FAQs with full rendered content, optionally filtered by topic, for archive JSON-LD.
  */
@@ -926,12 +1263,12 @@ export function faqItemsToJsonLd(
   const origin =
     pageUrl && pageUrl.startsWith("http")
       ? (() => {
-          try {
-            return new URL(pageUrl).origin;
-          } catch {
-            return SITE_ORIGIN;
-          }
-        })()
+        try {
+          return new URL(pageUrl).origin;
+        } catch {
+          return SITE_ORIGIN;
+        }
+      })()
       : SITE_ORIGIN;
   return faqSchema(
     items.map((item) => ({
@@ -1310,12 +1647,12 @@ export function videoJsonLd(video: VideoItem, base: string): Record<string, unkn
   const origin =
     base && base.startsWith("http")
       ? (() => {
-          try {
-            return new URL(base).origin;
-          } catch {
-            return SITE_ORIGIN;
-          }
-        })()
+        try {
+          return new URL(base).origin;
+        } catch {
+          return SITE_ORIGIN;
+        }
+      })()
       : SITE_ORIGIN;
   const seo = video.seo;
   const openGraph = isRecord(seo?.openGraph) ? (seo?.openGraph as UnknownRecord) : undefined;
@@ -1367,9 +1704,9 @@ export function videoJsonLd(video: VideoItem, base: string): Record<string, unkn
     isFamilyFriendly: true,
     potentialAction: video.youtubeUrl
       ? {
-          "@type": "WatchAction",
-          target: video.youtubeUrl,
-        }
+        "@type": "WatchAction",
+        target: video.youtubeUrl,
+      }
       : undefined,
   });
 }
@@ -1504,9 +1841,9 @@ export async function listVideoItemsPaged({
   const q = typeof qValue === 'string' ? qValue.trim().toLowerCase() : String(qValue ?? '').trim().toLowerCase();
   const bucketsListRaw =
     Array.isArray(f.buckets) ? f.buckets
-    : Array.isArray(record.bucket) ? record.bucket
-    : Array.isArray(record.b) ? record.b
-    : null;
+      : Array.isArray(record.bucket) ? record.bucket
+        : Array.isArray(record.b) ? record.b
+          : null;
   const bucketsList = bucketsListRaw ? bucketsListRaw.map((value) => String(value)) : null;
   const bucketSet = bucketsList && bucketsList.length ? new Set(bucketsList as VideoBucketKey[]) : null;
 
@@ -1713,6 +2050,8 @@ export async function listVideoItemsPaged({
   } as PageResult<VideoItem> & { facets: FacetGroup[] };
 }
 
+// === 
+
 // --- List recent posts for the archive ---
 export async function listRecentPosts(limit = 12): Promise<PostCard[]> {
   const query = /* GraphQL */ `
@@ -1748,9 +2087,9 @@ export async function listRecentPosts(limit = 12): Promise<PostCard[]> {
     const featuredImageRecord = asRecord(featuredImageNode);
     const featuredImage = featuredImageRecord && typeof featuredImageRecord.sourceUrl === 'string'
       ? {
-          url: String(featuredImageRecord.sourceUrl),
-          altText: featuredImageRecord.altText ? String(featuredImageRecord.altText) : undefined,
-        }
+        url: String(featuredImageRecord.sourceUrl),
+        altText: featuredImageRecord.altText ? String(featuredImageRecord.altText) : undefined,
+      }
       : undefined;
 
     const categoriesNodes = extractNodes(node.categories);
@@ -1763,9 +2102,9 @@ export async function listRecentPosts(limit = 12): Promise<PostCard[]> {
         const record = asRecord(item);
         return record
           ? {
-              name: toStringSafe(record.name),
-              slug: toStringSafe(record.slug),
-            }
+            name: toStringSafe(record.name),
+            slug: toStringSafe(record.slug),
+          }
           : null;
       })
       .filter((term): term is TermLite => !!term && term.name.length > 0);
@@ -1994,9 +2333,9 @@ export async function listPostsPaged({
       featuredImage:
         featuredImageRecord && typeof featuredImageRecord.sourceUrl === 'string'
           ? {
-              url: String(featuredImageRecord.sourceUrl || ''),
-              altText: featuredImageRecord.altText ? String(featuredImageRecord.altText) : undefined,
-            }
+            url: String(featuredImageRecord.sourceUrl || ''),
+            altText: featuredImageRecord.altText ? String(featuredImageRecord.altText) : undefined,
+          }
           : undefined,
       categories,
       categoryTerms,
@@ -2039,7 +2378,7 @@ export async function listRecentPostsPoolForFilters(
   perType = 4,
   allCount = 4,
   fetchCap = 60,
-  categorySlugs: string[] = ['education','hurricane-preparation','energy-efficient-roofing']
+  categorySlugs: string[] = ['education', 'hurricane-preparation', 'energy-efficient-roofing']
 ): Promise<PostCard[]> {
   const needed = allCount + perType * categorySlugs.length * 2; // modest cushion for de-dupes
   const batchSize = Math.max(fetchCap, needed);
@@ -2177,9 +2516,9 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
     featuredImage:
       featuredImageRecord && typeof featuredImageRecord.sourceUrl === 'string'
         ? {
-            url: String(featuredImageRecord.sourceUrl),
-            altText: featuredImageRecord.altText ? String(featuredImageRecord.altText) : undefined,
-          }
+          url: String(featuredImageRecord.sourceUrl),
+          altText: featuredImageRecord.altText ? String(featuredImageRecord.altText) : undefined,
+        }
         : undefined,
     categories,
     categoryTerms,
@@ -2446,24 +2785,24 @@ export async function listProjectsPaged({
 
   const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
     ? data.facetCounts.facets.map((facetNode) => {
-        const facetRecord = asRecord(facetNode);
-        const bucketsSource = facetRecord?.buckets;
-        const bucketsNodes = Array.isArray(bucketsSource) ? bucketsSource : extractNodes(bucketsSource);
+      const facetRecord = asRecord(facetNode);
+      const bucketsSource = facetRecord?.buckets;
+      const bucketsNodes = Array.isArray(bucketsSource) ? bucketsSource : extractNodes(bucketsSource);
 
-        const buckets = bucketsNodes
-          .map((bucketNode) => asRecord(bucketNode))
-          .filter((bucketRecord): bucketRecord is UnknownRecord => Boolean(bucketRecord))
-          .map((bucketRecord) => ({
-            slug: toStringSafe(bucketRecord.slug),
-            name: toStringSafe(bucketRecord.name),
-            count: typeof bucketRecord.count === 'number' ? bucketRecord.count : 0,
-          }));
+      const buckets = bucketsNodes
+        .map((bucketNode) => asRecord(bucketNode))
+        .filter((bucketRecord): bucketRecord is UnknownRecord => Boolean(bucketRecord))
+        .map((bucketRecord) => ({
+          slug: toStringSafe(bucketRecord.slug),
+          name: toStringSafe(bucketRecord.name),
+          count: typeof bucketRecord.count === 'number' ? bucketRecord.count : 0,
+        }));
 
-        return {
-          taxonomy: toStringSafe(facetRecord?.taxonomy),
-          buckets,
-        } satisfies FacetGroup;
-      })
+      return {
+        taxonomy: toStringSafe(facetRecord?.taxonomy),
+        buckets,
+      } satisfies FacetGroup;
+    })
     : [];
 
   const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
@@ -2558,8 +2897,8 @@ export async function listRecentProjectsPoolForFilters(
 
   const allLatest = recent.slice(0, allCount);
   const shingle = byType('shingle');
-  const metal   = byType('metal');
-  const tile    = byType('tile');
+  const metal = byType('metal');
+  const tile = byType('tile');
 
   // Merge & de-dupe, preserving first appearance (recency)
   const seen = new Set<string>();
@@ -2706,27 +3045,29 @@ export async function filterProjects({
   first = 12,
   after = null,
 }: ProjectFiltersInput) {
+  const mt = materialTypeSlugs.filter((slug) => typeof slug === 'string' && slug.trim().length);
+  const rc = roofColorSlugs.filter((slug) => typeof slug === 'string' && slug.trim().length);
+  const sa = serviceAreaSlugs.filter((slug) => typeof slug === 'string' && slug.trim().length);
+
+  const taxArray: Array<Record<string, unknown>> = [];
+  if (mt.length) taxArray.push({ taxonomy: 'MATERIALTYPE', terms: mt, field: 'SLUG', operator: 'IN' });
+  if (rc.length) taxArray.push({ taxonomy: 'ROOFCOLOR', terms: rc, field: 'SLUG', operator: 'IN' });
+  if (sa.length) taxArray.push({ taxonomy: 'SERVICEAREA', terms: sa, field: 'SLUG', operator: 'IN' });
+
+  const taxQuery = taxArray.length ? { relation: 'AND', taxArray } : undefined;
+
   const query = /* GraphQL */ `
     query FilterProjects(
       $first: Int!
       $after: String
-      $mt: [String!]
-      $rc: [String!]
-      $sa: [String!]
+      $taxQuery: TaxQuery
     ) {
       projects(
         first: $first
         after: $after
         where: {
           orderby: { field: DATE, order: DESC }
-          taxQuery: {
-            relation: AND
-            taxArray: [
-              { taxonomy: MATERIAL_TYPE, terms: $mt, field: SLUG, operator: IN }
-              { taxonomy: ROOF_COLOR,     terms: $rc, field: SLUG, operator: IN }
-              { taxonomy: SERVICE_AREA,   terms: $sa, field: SLUG, operator: IN }
-            ]
-          }
+          taxQuery: $taxQuery
         }
       ) {
         pageInfo { hasNextPage endCursor }
@@ -2736,6 +3077,7 @@ export async function filterProjects({
           title
           date
           featuredImage { node { sourceUrl altText } }
+          projectDetails { projectDescription }
           projectFilters {
             materialType { nodes { name slug } }
             roofColor    { nodes { name slug } }
@@ -2755,9 +3097,7 @@ export async function filterProjects({
   const data = await wpFetch<FilterProjectsResponse>(query, {
     first,
     after,
-    mt: materialTypeSlugs.length ? materialTypeSlugs : null,
-    rc: roofColorSlugs.length ? roofColorSlugs : null,
-    sa: serviceAreaSlugs.length ? serviceAreaSlugs : null,
+    taxQuery,
   });
 
   const nodes: UnknownRecord[] = data?.projects?.nodes ?? [];
@@ -2767,6 +3107,7 @@ export async function filterProjects({
     pageInfo,
     items: nodes.map((p): ProjectSummary => {
       const filters = asRecord(p.projectFilters);
+      const details = asRecord(p.projectDetails);
       const dateValue = typeof p.date === 'string' ? p.date : null;
       return {
         slug: toStringSafe(p.slug),
@@ -2775,12 +3116,32 @@ export async function filterProjects({
         year: pickYear(dateValue),
         date: dateValue,
         heroImage: pickImageFrom(p.featuredImage),
+        projectDescription: readProjectDescription(details),
         materialTypes: mapTermNodes(filters?.materialType),
         roofColors: mapTermNodes(filters?.roofColor),
         serviceAreas: mapTermNodes(filters?.serviceArea),
       };
     }),
   };
+}
+
+export async function listRecentProjectsByServiceArea(
+  serviceAreaSlug: string | string[] | null,
+  limit = 4
+): Promise<ProjectSummary[]> {
+  const slugs = Array.isArray(serviceAreaSlug) ? serviceAreaSlug : [serviceAreaSlug];
+  const normalized = slugs
+    .map((slug) => (typeof slug === 'string' ? slug.trim().toLowerCase() : ''))
+    .filter((slug) => slug.length > 0);
+
+  if (!normalized.length) return [];
+
+  const result = await filterProjects({
+    serviceAreaSlugs: normalized,
+    first: limit,
+  });
+
+  return result.items.slice(0, limit);
 }
 
 /** ----------------------------------------------------------------------

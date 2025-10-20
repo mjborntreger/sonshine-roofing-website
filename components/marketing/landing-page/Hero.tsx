@@ -7,7 +7,11 @@ import SmartLink from "../../utils/SmartLink";
 import ShinyText from "./ShinyText";
 import { scrollToAnchor } from "@/lib/ui/scroll-to-anchor";
 
-export default function Hero() {
+type HeroProps = {
+  title?: string
+};
+
+export default function Hero({ title = "The Best Roofing Company in Sarasota, Manatee, and Charlotte Counties for Over 38 Years" }: HeroProps) {
   const [shouldAnimateArrow, setShouldAnimateArrow] = useState(false);
 
   const handleCtaKeyDown = (event: KeyboardEvent<HTMLAnchorElement>) => {
@@ -24,10 +28,10 @@ export default function Hero() {
   return (
     <>
       <section
-        className="overflow-hidden relative isolate h-auto text-white">
+        className="relative h-auto overflow-hidden text-white isolate">
         {/* Background video */}
         <video
-          className="absolute inset-0 -z-10 h-full w-full object-cover pointer-events-none motion-safe:opacity-100 motion-reduce:hidden"
+          className="absolute inset-0 object-cover w-full h-full pointer-events-none -z-10 motion-safe:opacity-100 motion-reduce:hidden"
           src="https://next.sonshineroofing.com/wp-content/uploads/website-background-video-hero-optimized-new.webm"
           autoPlay
           muted
@@ -43,18 +47,18 @@ export default function Hero() {
 
 
         {/* Content */}
-        <div className="text-white max-w-8xl mx-auto px-4 text-center not-prose pt-16">
+        <div className="px-4 pt-16 mx-auto text-center text-white max-w-8xl not-prose">
 
           <ShinyText
             text="Since 1987 we've got you covered"
-            className="mt-16 mb-16 lg:mb-24 font-script text-3xl md:text-3xl lg:text-7xl"
+            className="mt-16 mb-16 text-3xl lg:mb-24 font-script md:text-3xl lg:text-7xl"
             disabled={false}
             speed={2.5}
           >
           </ShinyText>
 
           <h1 className="max-w-6xl mx-auto text-4xl md:text-5xl lg:text-7xl justify-center font-display font-bold md:leading-[5rem] lg:leading-[6rem] mb-4 text-white">
-            Your Trusted Local Roofing Contractor in Sarasota, Manatee, and Charlotte Counties for Over 38 Years
+            {title}
           </h1>
         </div>
         <SmartLink
@@ -63,10 +67,10 @@ export default function Hero() {
           onKeyDown={handleCtaKeyDown}
           aria-label="Scroll to the quick roofing quiz"
         >
-          <div className="mb-3 px-6 text-xs uppercase text-neutral-300 md:text-md">
+          <div className="px-6 mb-3 text-xs uppercase text-neutral-300 md:text-md">
             Step 1: Let&rsquo;s get you squared away
           </div>
-          <h2 className="text-white py-2 text-3xl md:text-6xl">
+          <h2 className="py-2 text-3xl text-white md:text-6xl">
             Get Started
           </h2>
           <div className="mt-4 text-sm text-slate-200 md:text-lg">

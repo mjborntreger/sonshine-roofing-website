@@ -10,6 +10,7 @@ import {
   type CategoryKey,
   type TabConfig,
 } from "@/components/dynamic-content/latest-filters/latest-tab-config";
+import { renderHighlight } from "@/components/utils/renderHighlight";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
 const pStyles = "my-8 text-center text-slate-500 justify-center text-sm md:text-md";
@@ -88,20 +89,22 @@ export default function LatestPostsFilter({
       </FilterTabs>
     </div>
   );
+  const heading = "Latest Posts";
+  const renderedHeading = renderHighlight(heading, "Latest");
 
   return (
     <div className="px-4 py-16 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="text-3xl text-slate-700 md:text-5xl mb-3 md:mb-4">Latest Blog Posts</h2>
-          {renderFilterTabs()}
+          <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
           <p className={pStyles}>{description}</p>
+          {renderFilterTabs()}
         </div>
       ) : (
         renderFilterTabs()
       )}
 
-      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2">
+      <div key={selected} className="grid gap-6 mt-8 md:grid-cols-2">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];
@@ -128,7 +131,7 @@ export default function LatestPostsFilter({
             data-icon-affordance="right"
           >
             {ctaLabel}
-            <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
+            <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
           </SmartLink>
         </div>
       )}

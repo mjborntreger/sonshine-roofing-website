@@ -20,8 +20,8 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const faq = await getFaq(slug).catch(() => null);
   if (!faq) notFound();
   const title = faq?.title ? `${faq.title} – FAQ` : 'FAQ';
@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return metadata;
 }
 
-export default async function FAQSlugPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export default async function FAQSlugPage({ params }: { params: { slug: string } }) {
+  const { slug } = params;
   const faq = await getFaq(slug).catch(() => null);
 
   if (!faq) notFound();

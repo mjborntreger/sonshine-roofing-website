@@ -1,6 +1,7 @@
 import type { ComponentType, SVGProps } from "react";
 
 import { Accordion } from "@/components/ui/Accordion";
+import { renderHighlight } from "@/components/utils/renderHighlight";
 
 import SmartLink from "../../utils/SmartLink";
 import {
@@ -19,7 +20,7 @@ import {
 const SECTION_CONTAINER = "px-2";
 const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
 const SECTION_SUBTITLE = "mt-2 mb-8 text-sm text-slate-500"
-const FEATURE_PILL_CLASS = "badge badge--accent";
+const FEATURE_PILL_CLASS = "inline-flex items-center gap-2 badge badge--accent";
 const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
 const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
 const GRID_LAYOUT_CLASS = "mt-8 grid grid-cols-2 gap-5 items-start auto-rows-fr";
@@ -34,6 +35,12 @@ const CHEVRON_BASE =
 const TITLE_BASE = "relative inline-block text-slate-900 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:transition-all after:duration-300";
 
 type ThemeKey = "blue" | "orange";
+
+type WhyHomeownersChooseUsProps = {
+  title?: string;
+  highlightText?: string;
+};
+
 
 const CARD_THEMES: Record<ThemeKey, {
   frame: string;
@@ -122,39 +129,44 @@ const pillars: Pillar[] = [
   },
 ];
 
-export default async function WhyHomeownersChooseUs() {
+export default async function WhyHomeownersChooseUs({
+  title = "Why Homeowners Choose Us",
+  highlightText,
+}: WhyHomeownersChooseUsProps) {
+  const renderedTitle = renderHighlight(title, highlightText);
+
   return (
-    <div className={SECTION_CONTAINER}>
+    <section className={SECTION_CONTAINER}>
       <div className="text-center">
-        <h2 className={SECTION_HEADING}>Why Homeowners Choose Us</h2>
-        <p className={SECTION_SUBTITLE}>(because we&rsquo;re awesome)</p>
+        <h2 className={SECTION_HEADING}>{renderedTitle}</h2>
+        <p className={SECTION_SUBTITLE}>Our Strengths</p>
         
         <div className={FEATURE_LIST_CLASS}>
-          <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+          <span className={FEATURE_PILL_CLASS}>
             <Award className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
             GAF Master Elite Certified
           </span>
-          <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+          <span className={FEATURE_PILL_CLASS}>
             <CalendarDays className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
             38+ Years
           </span>
-          <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+          <span className={FEATURE_PILL_CLASS}>
             <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
             A+ Rated with the BBB
           </span>
-          <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
-            <Star className="h-4 w-4 text-amber-500" aria-hidden="true" />
+          <span className={FEATURE_PILL_CLASS}>
+            <Star className="w-4 h-4 text-amber-500" aria-hidden="true" />
             4.8 on Google
           </span>
-          <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+          <span className={FEATURE_PILL_CLASS}>
             <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
             Licensed and Insured
           </span>
-          <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+          <span className={FEATURE_PILL_CLASS}>
             <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
             Warranty
           </span>
-          <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+          <span className={FEATURE_PILL_CLASS}>
             <Banknote className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
             Financing
           </span>
@@ -172,7 +184,7 @@ export default async function WhyHomeownersChooseUs() {
               <Accordion
                 className={`${ACCORDION_SHELL_BASE} ${theme.shell} border-0`}
                 summary={<h3 className={`${TITLE_BASE} ${theme.titleAccent}`}>{pillar.title}</h3>}
-                icon={<Icon className="h-5 w-5" aria-hidden="true" />}
+                icon={<Icon className="w-5 h-5" aria-hidden="true" />}
                 iconWrapperClassName={`${ICON_BASE} ${theme.icon}`}
                 chevronClassName={CHEVRON_BASE}
                 summaryClassName={`${CARD_SUMMARY_BASE} ${theme.summary}`}
@@ -182,15 +194,15 @@ export default async function WhyHomeownersChooseUs() {
               >
                 <p>{pillar.description}</p>
                 {pillar.cta ? (
-                  <div className="mt-6 flex justify-end">
+                  <div className="flex justify-end mt-6">
                     <SmartLink
                       href={pillar.cta.href}
-                      className="btn btn-brand-orange btn-md btn-press mt-2"
+                      className="mt-2 btn btn-brand-orange btn-md btn-press"
                       title={pillar.cta.title}
                       data-icon-affordance="right"
                     >
                       {pillar.cta.label}
-                      <ArrowRight className="icon-affordance ml-2 inline h-4 w-4" />
+                      <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
                     </SmartLink>
                   </div>
                 ) : null}
@@ -212,7 +224,7 @@ export default async function WhyHomeownersChooseUs() {
                 <div className={`${CARD_HEADER_BASE} ${theme.summary}`}>
                   <span className="flex items-center gap-3">
                     <span className={`${ICON_BASE} ${theme.icon}`}>
-                      <Icon className="h-5 w-5" aria-hidden="true" />
+                      <Icon className="w-5 h-5" aria-hidden="true" />
                     </span>
                     <h3 className={`${TITLE_BASE} ${theme.titleAccent}`}>{pillar.title}</h3>
                   </span>
@@ -220,15 +232,15 @@ export default async function WhyHomeownersChooseUs() {
                 <div className={`${CARD_BODY_BASE} ${theme.body}`}>
                   <p>{pillar.description}</p>
                   {pillar.cta ? (
-                    <div className="mt-6 flex justify-end">
+                    <div className="flex justify-end mt-6">
                       <SmartLink
                         href={pillar.cta.href}
-                        className="btn btn-brand-orange btn-md btn-press mt-2"
+                        className="mt-2 btn btn-brand-orange btn-md btn-press"
                         title={pillar.cta.title}
                         data-icon-affordance="right"
                       >
                         {pillar.cta.label}
-                        <ArrowRight className="icon-affordance ml-2 inline h-4 w-4" />
+                        <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
                       </SmartLink>
                     </div>
                   ) : null}
@@ -238,6 +250,6 @@ export default async function WhyHomeownersChooseUs() {
           );
         })}
       </div>
-    </div>
+    </section>
   );
 }
