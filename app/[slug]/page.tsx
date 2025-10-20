@@ -162,8 +162,8 @@ export async function generateStaticParams() {
 }
 
 // -------- Metadata (SEO) --------
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   if (slug.startsWith("_")) notFound();
 
   // Use unified post fetcher (deduped with page) that now includes RankMath SEO
@@ -199,8 +199,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 // -------- Page --------
-export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   if (slug.startsWith("_")) notFound();
   const postPromise = getPostBySlug(slug);
   const poolPromise = listRecentPostsPool(36);

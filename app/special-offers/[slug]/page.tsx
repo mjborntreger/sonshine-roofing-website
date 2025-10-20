@@ -42,9 +42,9 @@ function buildRobotsMeta() {
 export async function generateMetadata({
     params,
 }: {
-    params: { slug: string };
+    params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-    const { slug } = params;
+    const { slug } = await params;
     const offer = await getSpecialOfferBySlug(slug).catch(() => null);
 
     if (!offer) {
@@ -85,8 +85,8 @@ export async function generateMetadata({
     return metadata;
 }
 
-export default async function SpecialOfferPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function SpecialOfferPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const offer = await getSpecialOfferBySlug(slug);
 
   if (!offer) {

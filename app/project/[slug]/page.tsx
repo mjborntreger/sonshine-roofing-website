@@ -31,8 +31,8 @@ export async function generateStaticParams() {
   return slugs.map((slug: string) => ({ slug }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
 
   const project = await getProjectBySlug(slug).catch(() => null);
   if (!project) notFound();
@@ -91,8 +91,8 @@ const Badge = ({ children }: { children: React.ReactNode }) => (
   </span>
 );
 
-export default async function Page({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const projectPromise = getProjectBySlug(slug);
   const projectPoolPromise = listRecentProjectsPool(36);
   const faqsPromise = listFaqsWithContent(8, "roof-replacement").catch(() => []);
@@ -244,14 +244,14 @@ export default async function Page({ params }: { params: { slug: string } }) {
                 {project.productLinks.map((p, i) => (
                   <li key={i}>
                     {p.productLink ? (
-                      <a
+                      <SmartLink
                         href={p.productLink}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="underline"
                       >
                         {p.productName}
-                      </a>
+                      </SmartLink>
                     ) : (
                       <span>{p.productName}</span>
                     )}

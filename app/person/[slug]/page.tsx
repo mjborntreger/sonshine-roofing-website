@@ -13,8 +13,8 @@ export const revalidate = 86400;
 const PERSON_REVALIDATE_SECONDS = revalidate;
 
 // Dynamic metadata per person
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
   let person = null;
   try {
     person = await listPersonsBySlug(slug, { revalidateSeconds: PERSON_REVALIDATE_SECONDS });
@@ -53,8 +53,8 @@ export async function generateStaticParams() {
   return navItems.map(({ slug }) => ({ slug }));
 }
 
-export default async function PersonPage({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
   const [person, navItems] = await Promise.all([
     listPersonsBySlug(slug, { revalidateSeconds: PERSON_REVALIDATE_SECONDS }).catch(() => null),
     listPersonNav(50).catch(() => [] as Awaited<ReturnType<typeof listPersonNav>>),

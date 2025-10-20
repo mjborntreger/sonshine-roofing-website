@@ -273,8 +273,8 @@ function renderGlossaryHtml(
 
 export const revalidate = 86400;
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const { slug } = params;
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
 
   try {
     const term = await getGlossaryTerm(slug);
@@ -302,7 +302,7 @@ export async function generateStaticParams() {
   return index.map((t) => ({ slug: t.slug }));
 }
 
-export default async function GlossaryTermPage({ params }: { params: { slug: string } }) {
+export default async function GlossaryTermPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [index, term] = await Promise.all([
     listGlossaryIndex(1000).catch(() => []),

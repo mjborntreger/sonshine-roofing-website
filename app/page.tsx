@@ -74,7 +74,7 @@ export async function generateMetadata(): Promise<Metadata> {
 type Params = { slug: string };
 export const revalidate = 600;
 
-export default async function Page({ params }: { params: Params }) {
+export default async function Page({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const sponsorFeaturesPromise = listSponsorFeaturesByServiceArea(slug, {
       primaryLimit: 8,
