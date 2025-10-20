@@ -4,7 +4,7 @@
 
 ---
 
-## Runtime configuration
+## Runtime configuration 
 
 - `NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT` → defaults to `https://next.sonshineroofing.com/graphql`.
 - `WP_BASIC_AUTH_USER` / `WP_BASIC_AUTH_PASS` → optional Basic Auth applied on every request.
