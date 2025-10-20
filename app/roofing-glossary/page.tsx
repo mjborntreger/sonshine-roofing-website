@@ -4,6 +4,9 @@ import GlossaryQuickSearch from '../../components/dynamic-content/roofing-glossa
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import type { Metadata } from 'next';
 import SmartLink from '@/components/utils/SmartLink';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema, definedTermSchema } from '@/lib/seo/schema';
+import { SITE_ORIGIN } from '@/lib/seo/site';
 
 export const revalidate = 86400; // daily ISR
 const PAGE_PATH = '/roofing-glossary';
@@ -54,32 +57,35 @@ export default async function GlossaryArchivePage() {
   );
 
   // JSON-LD: DefinedTermSet + Breadcrumbs
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const definedTerms = terms.map((t) => ({
-    '@type': 'DefinedTerm',
-    name: t.title,
-    description: stripHtml(t.excerpt ?? '').slice(0, 200),
-    url: `${base}${PAGE_PATH}/${t.slug}`,
-    inDefinedTermSet: `${base}${PAGE_PATH}`,
-  }));
+  const origin = SITE_ORIGIN;
+  const pageUrl = `${origin}${PAGE_PATH}`;
+  const definedTerms = terms.map((t) =>
+    definedTermSchema({
+      name: t.title,
+      description: stripHtml(t.excerpt ?? '').slice(0, 200),
+      url: `${PAGE_PATH}/${t.slug}`,
+      inDefinedTermSet: PAGE_PATH,
+      origin,
+      withContext: false,
+    }),
+  );
 
   const glossaryLd = {
     '@context': 'https://schema.org',
     '@type': 'DefinedTermSet',
     name: 'Roofing Glossary',
     description: 'Plain-English definitions of roofing terms used by homeowners and pros in Southwest Florida.',
-    url: `${base}${PAGE_PATH}`,
+    url: pageUrl,
     hasDefinedTerm: definedTerms,
   } as const;
 
-  const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'Roofing Glossary', item: `${base}${PAGE_PATH}` },
+  const breadcrumbsLd = breadcrumbSchema(
+    [
+      { name: 'Home', item: '/' },
+      { name: 'Roofing Glossary', item: PAGE_PATH },
     ],
-  } as const;
+    { origin },
+  );
 
   return (
     <Section>
@@ -94,16 +100,8 @@ export default async function GlossaryArchivePage() {
             </p>
 
             {/* JSON-LD: DefinedTermSet + Breadcrumbs */}
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(glossaryLd) }}
-            />
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-            />
+            <JsonLd data={glossaryLd} />
+            <JsonLd data={breadcrumbsLd} />
 
             <GlossaryQuickSearch terms={terms} />
 

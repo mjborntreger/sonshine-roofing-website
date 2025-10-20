@@ -12,7 +12,9 @@
     "test:forms": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/form-phone-integration.test.ts",
     "test:facets": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/verify-facets.ts",
     "test:video-schema": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/video-schema-uploaddate.test.ts",
-    "test": "npm run test:phone && npm run test:forms && npm run test:facets && npm run test:video-schema"
+    "test:faq-schema": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/faq-schema-plaintext.test.ts",
+    "test:review-schema": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/review-schema-defaults.test.ts",
+    "test": "npm run test:phone && npm run test:forms && npm run test:facets && npm run test:video-schema && npm run test:faq-schema && npm run test:review-schema"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.0.5",

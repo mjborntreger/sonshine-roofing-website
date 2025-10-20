@@ -1,16 +1,17 @@
-import ReviewsSliderLazy from '@/components/reviews-widget/ReviewsSliderLazy';
+import ReviewsSliderLazy from "@/components/reviews-widget/ReviewsSliderLazy";
 import { Button } from "@/components/ui/button";
 import SmartLink from "@/components/utils/SmartLink";
-import { ArrowUpRight } from 'lucide-react';
-import type { Review, ReviewsPayload } from './types';
+import { ArrowUpRight } from "lucide-react";
+import type { Review, ReviewsPayload } from "./types";
 import { renderHighlight } from "@/components/utils/renderHighlight";
-import { buildReviewSchema, type ReviewSchemaOptions } from './buildReviewSchema';
 
-const RAW_REVIEWS_URL = (process.env.NEXT_PUBLIC_REVIEWS_URL ?? '').replace(/\u200B/g, '').trim();
-const REVIEWS_URL = RAW_REVIEWS_URL || 'https://next.sonshineroofing.com/wp-content/uploads/sonshine-reviews/reviews-archive.json';
+const RAW_REVIEWS_URL = (process.env.NEXT_PUBLIC_REVIEWS_URL ?? "").replace(/\u200B/g, "").trim();
+const REVIEWS_URL =
+  RAW_REVIEWS_URL || "https://next.sonshineroofing.com/wp-content/uploads/sonshine-reviews/reviews-archive.json";
 
-const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? '').replace(/\u200B/g, '').trim();
-const GBP_URL = RAW_GBP_URL || 'https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958';
+const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
+const GBP_URL =
+  RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
 
 const DEFAULT_CONTAINER_CLASS = "py-32 mb-16 max-w-[1600px] mx-auto overflow-hidden";
 
@@ -27,8 +28,6 @@ type ReviewsCarouselProps = {
   showDisclaimer?: boolean;
   limit?: number;
   fallbackToRemote?: boolean;
-  enableSchema?: boolean;
-  schemaOptions?: ReviewSchemaOptions | null;
 };
 
 const ensureValidUrl = (value?: string | null): string | null => {
@@ -52,13 +51,6 @@ const toNumberOrNull = (value: number | string | null | undefined): number | nul
 const sanitizeLimit = (value?: number): number =>
   Number.isFinite(value) && value !== undefined && value > 0 ? Math.floor(value) : 8;
 
-const toPositiveIntegerOrNull = (value: number | string | null | undefined): number | null => {
-  const parsed = toNumberOrNull(value);
-  if (parsed === null) return null;
-  const floored = Math.floor(parsed);
-  return Number.isFinite(floored) && floored >= 0 ? floored : null;
-};
-
 export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
   const {
     reviews: injectedReviews,
@@ -73,8 +65,6 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
     showDisclaimer = true,
     limit,
     fallbackToRemote = true,
-    enableSchema = true,
-    schemaOptions = null,
   } = props ?? {};
 
   const safeLimit = sanitizeLimit(limit);
@@ -86,8 +76,6 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
 
   let sourceReviews: Review[] = Array.isArray(injectedReviews) ? injectedReviews : [];
   let avgRatingValue = toNumberOrNull(injectedAvgRating);
-  let remoteReviewCount: number | null = null;
-  let remoteRatingCount: number | null = null;
 
   const shouldAttemptRemote =
     fallbackToRemote && (!sourceReviews.length || avgRatingValue === null);
@@ -107,26 +95,10 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
       return {};
     });
 
-    const maybeReviewCount =
-      toPositiveIntegerOrNull(data.review_count) ??
-      toPositiveIntegerOrNull(data.total_reviews);
-    const maybeRatingCount =
-      toPositiveIntegerOrNull(data.rating_count) ??
-      toPositiveIntegerOrNull(data.total_ratings);
-
-    if (maybeReviewCount !== null) remoteReviewCount = maybeReviewCount;
-    if (maybeRatingCount !== null) remoteRatingCount = maybeRatingCount;
-
     avgRatingValue = avgRatingValue ?? toNumberOrNull(data.avg_rating);
 
     if (!sourceReviews.length) {
       sourceReviews = Array.isArray(data.reviews) ? data.reviews : [];
-      if (remoteReviewCount === null && Array.isArray(data.reviews)) {
-        remoteReviewCount = data.reviews.length;
-      }
-      if (remoteRatingCount === null && Array.isArray(data.reviews)) {
-        remoteRatingCount = data.reviews.length;
-      }
     }
   }
 
@@ -143,90 +115,63 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
     ? `Average Google rating ${avgRatingDisplay} out of 5`
     : 'View our Business Profile on Google';
   const renderedHeading = heading ? renderHighlight(heading, highlightText) : null;
-  const schemaReviewCount =
-    remoteReviewCount ??
-    toPositiveIntegerOrNull(sourceReviews.length) ??
-    toPositiveIntegerOrNull(filtered.length) ??
-    null;
-  const schemaData = enableSchema
-    ? buildReviewSchema({
-        reviews: filtered,
-        averageRating: avgRatingValue,
-        reviewCount: schemaReviewCount,
-        ratingCount: remoteRatingCount ?? schemaReviewCount,
-        options: {
-          ...(schemaOptions ?? undefined),
-          providerUrl: resolvedGbpUrl,
-        },
-      })
-    : null;
-
   return (
-    <>
-      {schemaData ? (
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-        />
+    <div className={className}>
+      {heading ? (
+        <h2 className="mx-2 text-3xl text-center text-slate-700 md:text-5xl">
+          {renderedHeading}
+        </h2>
       ) : null}
-      <div className={className}>
-        {heading ? (
-          <h2 className="mx-2 text-3xl text-center text-slate-700 md:text-5xl">
-            {renderedHeading}
-          </h2>
-        ) : null}
-        {showBusinessProfileLink ? (
-          <p className="mt-3 text-sm text-center text-slate-500 hover:text-slate-400">
-            <SmartLink
-              href={resolvedGbpUrl}
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              aria-label={googleLinkAriaLabel}
-              data-icon-affordance="up-right"
-            >
-              Our Business Profile on Google
-              <ArrowUpRight className="inline w-3 h-3 ml-2 icon-affordance" />
-            </SmartLink>
-          </p>
-        ) : null}
-        <div className="mt-6 text-center not-prose">
-          {hasRatingSummary && (
-            <SmartLink
-              href={resolvedGbpUrl}
-              target="_blank"
-              rel="noopener noreferrer nofollow"
-              aria-label={`Average Google rating ${avgRatingDisplay} out of 5`}
-              className="inline-flex items-center px-4 py-2 btn btn-brand-orange"
-              data-icon-affordance="up-right"
-            >
-              <span className="mr-2 text-3xl">{avgRatingDisplay}</span>
-              <span aria-hidden="true">★</span>&nbsp;on Google
-            </SmartLink>
-          )}
-          <ReviewsSliderLazy reviews={filtered} gbpUrl={resolvedGbpUrl} />
-          <div className="text-center">
-            {showDisclaimer ? (
-              <p className="mb-10 text-sm italic text-slate-500">
-                All reviews shown above are automatically pulled from Google using the official API.
-              </p>
-            ) : null}
-            {showSeeAllButton ? (
-              <Button variant="brandBlue" asChild>
-                <SmartLink
-                  href={resolvedGbpUrl}
-                  target="_blank"
-                  rel="noopener noreferrer nofollow"
-                  data-icon-affordance="up-right"
-                >
-                  See All Google Reviews
-                  <ArrowUpRight className="inline w-4 h-4 ml-2 icon-affordance" />
-                </SmartLink>
-              </Button>
-            ) : null}
-          </div>
+      {showBusinessProfileLink ? (
+        <p className="mt-3 text-sm text-center text-slate-500 hover:text-slate-400">
+          <SmartLink
+            href={resolvedGbpUrl}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            aria-label={googleLinkAriaLabel}
+            data-icon-affordance="up-right"
+          >
+            Our Business Profile on Google
+            <ArrowUpRight className="inline w-3 h-3 ml-2 icon-affordance" />
+          </SmartLink>
+        </p>
+      ) : null}
+      <div className="mt-6 text-center not-prose">
+        {hasRatingSummary && (
+          <SmartLink
+            href={resolvedGbpUrl}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
+            aria-label={`Average Google rating ${avgRatingDisplay} out of 5`}
+            className="inline-flex items-center px-4 py-2 btn btn-brand-orange"
+            data-icon-affordance="up-right"
+          >
+            <span className="mr-2 text-3xl">{avgRatingDisplay}</span>
+            <span aria-hidden="true">★</span>&nbsp;on Google
+          </SmartLink>
+        )}
+        <ReviewsSliderLazy reviews={filtered} gbpUrl={resolvedGbpUrl} />
+        <div className="text-center">
+          {showDisclaimer ? (
+            <p className="mb-10 text-sm italic text-slate-500">
+              All reviews shown above are automatically pulled from Google using the official API.
+            </p>
+          ) : null}
+          {showSeeAllButton ? (
+            <Button variant="brandBlue" asChild>
+              <SmartLink
+                href={resolvedGbpUrl}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                data-icon-affordance="up-right"
+              >
+                See All Google Reviews
+                <ArrowUpRight className="inline w-4 h-4 ml-2 icon-affordance" />
+              </SmartLink>
+            </Button>
+          ) : null}
         </div>
       </div>
-    </>
+    </div>
   );
 }

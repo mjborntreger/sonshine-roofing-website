@@ -39,6 +39,72 @@ function trimFragment(value: string): string {
   return value.replace(/#.*$/, "");
 }
 
+const DEFAULT_POSTAL_ADDRESS = {
+  streetAddress: "2555 Porter Lake Dr STE 109",
+  addressLocality: "Sarasota",
+  addressRegion: "FL",
+  postalCode: "34240",
+  addressCountry: "US",
+} as const;
+
+const DEFAULT_BUSINESS_PHONE = "+1-941-866-4320";
+const DEFAULT_BUSINESS_NAME = "SonShine Roofing";
+const DEFAULT_BUSINESS_TYPE = "RoofingContractor";
+const DEFAULT_MAX_REVIEWS = 40;
+const DEFAULT_BEST_RATING = 5;
+const DEFAULT_WORST_RATING = 1;
+
+type MaybeNumber = number | string | null | undefined;
+
+const trimOrNull = (value: string | null | undefined): string | null => {
+  if (!value) return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
+const toFiniteNumber = (value: MaybeNumber): number | null => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value === "string" && value.trim().length > 0) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+};
+
+const toPositiveInteger = (value: MaybeNumber): number | null => {
+  const parsed = toFiniteNumber(value);
+  if (parsed === null) return null;
+  const integral = Math.trunc(parsed);
+  return integral > 0 ? integral : null;
+};
+
+const toIsoDate = (unixSeconds?: number | null): string | null => {
+  if (typeof unixSeconds !== "number" || !Number.isFinite(unixSeconds)) return null;
+  if (unixSeconds <= 0) return null;
+  const date = new Date(unixSeconds * 1000);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+};
+
+const stripToPlainText = (html: string | null | undefined): string | null => {
+  if (!html) return null;
+  const text = html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\s+([.,;:!?])/g, "$1")
+    .trim();
+  return text.length ? text : null;
+};
+
+const normalizeRelativeUrl = (value: string | null | undefined, origin: string): string | null => {
+  const trimmed = trimOrNull(value);
+  if (!trimmed) return null;
+  if (trimmed.startsWith("//")) {
+    return ensureAbsoluteUrl(`https:${trimmed}`, origin);
+  }
+  return ensureAbsoluteUrl(trimmed, origin);
+};
+
 export type FaqSchemaItem = {
   question: string;
   answerHtml: string;
@@ -56,10 +122,11 @@ export function faqSchema(
   { origin = SITE_ORIGIN, url, withContext = true }: FaqSchemaOptions = {},
 ) {
   const mainEntity = items.map((item) => {
+    const answerText = stripToPlainText(item.answerHtml) ?? "";
     const entity: SchemaInit = {
       "@type": "Question",
       name: item.question,
-      acceptedAnswer: { "@type": "Answer", text: item.answerHtml },
+      acceptedAnswer: { "@type": "Answer", text: answerText },
     };
     if (item.url) entity.url = ensureAbsoluteUrl(item.url, origin);
     return entity;
@@ -578,6 +645,281 @@ export function offerSchema({
 
   return applyContext(schema, withContext);
 }
+
+export type ReviewForSchema = {
+  author_name?: string;
+  author_url?: string | null;
+  rating?: number | null;
+  text?: string;
+  time?: number | null;
+  ownerReply?: string | null;
+};
+
+export type ReviewSchemaOptions = {
+  businessName?: string | null;
+  businessUrl?: string | null;
+  businessType?: string | null;
+  bestRating?: MaybeNumber;
+  worstRating?: MaybeNumber;
+  sameAs?: (string | null | undefined)[] | null;
+  providerUrl?: string | null;
+  maxReviews?: number | null;
+  address?: {
+    streetAddress?: string;
+    addressLocality?: string;
+    addressRegion?: string;
+    postalCode?: string;
+    addressCountry?: string;
+  } | null;
+  telephone?: string | null;
+  geo?: {
+    latitude?: number | null;
+    longitude?: number | null;
+  } | null;
+  origin?: string;
+  id?: string | null;
+  additionalTypes?: string[];
+  withContext?: boolean;
+};
+
+export type BuildReviewSchemaArgs = {
+  reviews: ReviewForSchema[];
+  averageRating?: MaybeNumber;
+  reviewCount?: MaybeNumber;
+  ratingCount?: MaybeNumber;
+  options?: ReviewSchemaOptions | null;
+};
+
+export const buildReviewSchema = ({
+  reviews,
+  averageRating,
+  reviewCount,
+  ratingCount,
+  options,
+}: BuildReviewSchemaArgs): Record<string, unknown> | null => {
+  if (!Array.isArray(reviews) || reviews.length === 0) return null;
+
+  const safeOptions = options ?? {};
+  const origin = trimOrNull(safeOptions.origin) ?? SITE_ORIGIN;
+
+  const bestRating = toFiniteNumber(safeOptions.bestRating) ?? DEFAULT_BEST_RATING;
+  const worstRating = toFiniteNumber(safeOptions.worstRating) ?? DEFAULT_WORST_RATING;
+
+  const ratingValues = reviews
+    .map((review) => toFiniteNumber(review.rating))
+    .filter((value): value is number => value !== null);
+
+  const derivedAverage =
+    ratingValues.length > 0
+      ? ratingValues.reduce((acc, value) => acc + value, 0) / ratingValues.length
+      : null;
+
+  const ratingValue =
+    toFiniteNumber(averageRating) ??
+    (derivedAverage !== null ? Number(derivedAverage.toFixed(2)) : null);
+
+  if (ratingValue === null) return null;
+
+  const effectiveReviewCount =
+    toPositiveInteger(reviewCount) ??
+    toPositiveInteger(ratingCount) ??
+    (ratingValues.length > 0 ? ratingValues.length : reviews.length);
+
+  const effectiveRatingCount =
+    toPositiveInteger(ratingCount) ?? effectiveReviewCount;
+
+  const providerUrl = normalizeRelativeUrl(safeOptions.providerUrl, origin);
+  const businessName =
+    trimOrNull(safeOptions.businessName) ?? DEFAULT_BUSINESS_NAME;
+  const businessType = trimOrNull(safeOptions.businessType) ?? DEFAULT_BUSINESS_TYPE;
+  const businessUrlInput =
+    trimOrNull(safeOptions.businessUrl) ?? SITE_ORIGIN;
+  const businessUrl = ensureAbsoluteUrl(businessUrlInput, origin);
+  const maxReviews =
+    toPositiveInteger(safeOptions.maxReviews) ?? DEFAULT_MAX_REVIEWS;
+  const telephone = trimOrNull(safeOptions.telephone) ?? DEFAULT_BUSINESS_PHONE;
+
+  const sameAs = (safeOptions.sameAs ?? [])
+    .concat(providerUrl ? [providerUrl] : [])
+    .map(trimOrNull)
+    .filter((value): value is string => Boolean(value));
+
+  const limitedReviews = reviews.slice(0, maxReviews).map((review, index) => {
+    const authorName = trimOrNull(review.author_name) || `Reviewer ${index + 1}`;
+    const reviewBody = trimOrNull(review.text) || "No review text provided.";
+    const rating = toFiniteNumber(review.rating) ?? bestRating;
+    const datePublished = toIsoDate(review.time);
+    const reviewUrl = trimOrNull(review.author_url) ?? providerUrl ?? businessUrl;
+    const ownerReply = trimOrNull(review.ownerReply);
+
+    const result: Record<string, unknown> = {
+      "@type": "Review",
+      author: {
+        "@type": "Person",
+        name: authorName,
+      },
+      reviewBody,
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: rating,
+        bestRating,
+        worstRating,
+      },
+      url: reviewUrl,
+    };
+
+    if (datePublished) result.datePublished = datePublished;
+    if (ownerReply) {
+      result.comment = {
+        "@type": "Comment",
+        text: ownerReply,
+        author: {
+          "@type": "Organization",
+          name: businessName,
+        },
+      };
+    }
+
+    return result;
+  });
+
+  const resolvedAddress = {
+    ...DEFAULT_POSTAL_ADDRESS,
+    ...(safeOptions.address ?? {}),
+  };
+
+  const baseTypes = Array.from(
+    new Set(["LocalBusiness", businessType, ...(safeOptions.additionalTypes ?? [])]),
+  );
+
+  const schema: SchemaInit = {
+    "@type": baseTypes,
+    name: businessName,
+    url: businessUrl,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue,
+      bestRating,
+      worstRating,
+      reviewCount: effectiveReviewCount,
+      ratingCount: effectiveRatingCount,
+    },
+    address: {
+      "@type": "PostalAddress",
+      ...resolvedAddress,
+    },
+  };
+
+  if (safeOptions.id) schema["@id"] = ensureAbsoluteUrl(safeOptions.id, origin);
+  if (telephone) schema.telephone = telephone;
+  if (sameAs.length > 0) schema.sameAs = Array.from(new Set(sameAs));
+  if (limitedReviews.length > 0) schema.review = limitedReviews;
+
+  const latitude = safeOptions.geo?.latitude ?? null;
+  const longitude = safeOptions.geo?.longitude ?? null;
+  if (latitude !== null && longitude !== null) {
+    schema.geo = {
+      "@type": "GeoCoordinates",
+      latitude,
+      longitude,
+    };
+  }
+
+  const includeContext = safeOptions.withContext ?? true;
+  return includeContext ? { "@context": SCHEMA_CONTEXT, ...schema } : schema;
+};
+
+export type SponsorFeatureForSchema = {
+  title?: string | null;
+  contentHtml?: string | null;
+  links?: {
+    facebookUrl?: string | null;
+    instagramUrl?: string | null;
+    websiteUrl?: string | null;
+  } | null;
+  featuredImage?: {
+    url?: string | null;
+    altText?: string | null;
+  } | null;
+};
+
+export type SponsorItemListSchemaInput = {
+  features: SponsorFeatureForSchema[];
+  name: string;
+  description?: string | null;
+  origin?: string;
+  providerId?: string | null;
+  id?: string | null;
+  withContext?: boolean;
+};
+
+export const sponsorFeaturesItemListSchema = ({
+  features,
+  name,
+  description,
+  origin = SITE_ORIGIN,
+  providerId,
+  id,
+  withContext = true,
+}: SponsorItemListSchemaInput): Record<string, unknown> | null => {
+  if (!Array.isArray(features) || features.length === 0) return null;
+
+  const itemListElement = features
+    .map((feature, index) => {
+      const title = trimOrNull(feature.title) || `Sponsor ${index + 1}`;
+      const websiteUrl = normalizeRelativeUrl(feature.links?.websiteUrl, origin);
+      const sameAs = uniqueStrings([
+        normalizeRelativeUrl(feature.links?.facebookUrl, origin),
+        normalizeRelativeUrl(feature.links?.instagramUrl, origin),
+      ]);
+      const descriptionText = stripToPlainText(feature.contentHtml);
+      const logoUrl = normalizeRelativeUrl(feature.featuredImage?.url, origin);
+
+      const organization: SchemaInit = {
+        "@type": "Organization",
+        name: title,
+      };
+
+      if (websiteUrl) organization.url = websiteUrl;
+      if (descriptionText) organization.description = descriptionText;
+      if (logoUrl) {
+        organization.logo = {
+          "@type": "ImageObject",
+          url: logoUrl,
+          ...(feature.featuredImage?.altText ? { caption: feature.featuredImage.altText } : {}),
+        };
+      }
+      if (sameAs.length) organization.sameAs = sameAs;
+      if (providerId) organization.parentOrganization = { "@id": ensureAbsoluteUrl(providerId, origin) };
+
+      const listItem: SchemaInit = {
+        "@type": "ListItem",
+        position: index + 1,
+        name: title,
+        item: organization,
+      };
+
+      if (websiteUrl) listItem.url = websiteUrl;
+
+      return listItem;
+    })
+    .filter(compact);
+
+  if (itemListElement.length === 0) return null;
+
+  const schema: SchemaInit = {
+    "@type": "ItemList",
+    name,
+    numberOfItems: itemListElement.length,
+    itemListElement,
+  };
+
+  if (description) schema.description = description;
+  if (providerId) schema.provider = { "@id": ensureAbsoluteUrl(providerId, origin) };
+  if (id) schema["@id"] = ensureAbsoluteUrl(id, origin);
+
+  return applyContext(schema, withContext);
+};
 
 export type GraphSchemaInput = {
   items: SchemaInit[];

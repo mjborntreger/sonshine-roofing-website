@@ -7,6 +7,9 @@ import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside'
 import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
 import { Accordion } from '@/components/ui/Accordion';
 import FaqBulkToggleClient from '../../components/dynamic-content/faq/FaqBulkToggleClient';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema } from '@/lib/seo/schema';
+import { SITE_ORIGIN } from '@/lib/seo/site';
 
 export const revalidate = 86400; // daily ISR
 const PAGE_PATH = '/faq';
@@ -47,16 +50,15 @@ export default async function FAQArchivePage(_: PageProps) {
   ]);
 
   // JSON-LD: build FAQPage + Breadcrumbs (first 50 items)
-  const base = process.env.NEXT_PUBLIC_BASE_URL || 'https://sonshineroofing.com';
-  const faqLd = faqListToJsonLd(faqs.slice(0, 50), base, PAGE_PATH);
-  const breadcrumbsLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: `${base}/` },
-      { '@type': 'ListItem', position: 2, name: 'FAQ', item: `${base}${PAGE_PATH}` },
+  const origin = SITE_ORIGIN;
+  const faqLd = faqListToJsonLd(faqs.slice(0, 50), origin, PAGE_PATH);
+  const breadcrumbsLd = breadcrumbSchema(
+    [
+      { name: 'Home', item: '/' },
+      { name: 'FAQ', item: PAGE_PATH },
     ],
-  } as const;
+    { origin },
+  );
 
   // Sort topics: featured topics first (if available), then alphabetically
   const topicsSorted = [...topics].sort((a, b) => {
@@ -105,16 +107,8 @@ export default async function FAQArchivePage(_: PageProps) {
             </p>
 
             {/* JSON-LD: FAQPage + Breadcrumbs */}
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
-            />
-            <script
-              type="application/ld+json"
-              suppressHydrationWarning
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsLd) }}
-            />
+            <JsonLd data={faqLd} />
+            <JsonLd data={breadcrumbsLd} />
 
             {/* Search (client-side, exact phrase like Blog) */}
             <div className="mt-6" role="search">

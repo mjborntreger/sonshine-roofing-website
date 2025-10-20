@@ -25,7 +25,9 @@ import ServiceAreaMap from "@/components/location/ServiceAreaMap";
 import NeighborhoodsServedSection from "@/components/location/NeighborhoodsServedSection";
 import type { Metadata } from "next";
 import { buildArticleMetadata } from "@/lib/seo/meta";
-import { ensureAbsoluteUrl } from "@/lib/seo/site";
+import { JsonLd } from "@/lib/seo/json-ld";
+import { buildReviewSchema, sponsorFeaturesItemListSchema, graphSchema } from "@/lib/seo/schema";
+import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
 
 type OgImageRecord = {
   url?: unknown;
@@ -55,6 +57,9 @@ const leadFormLayout = "w-full px-2";
 const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
 const narrowLayout = "mx-auto w-full max-w-[1280px]";
 const FALLBACK_REVIEW_INTERVAL_SECONDS = 60;
+const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
+const GBP_PROFILE_URL =
+  RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
 // =========================== //
 
 
@@ -180,8 +185,67 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   const schemaBusinessName = location.locationName
     ? `SonShine Roofing — ${location.locationName}`
     : null;
+  const globalBusinessId = `${SITE_ORIGIN}/#roofingcontractor`;
+
+  const ratingAggregate = featuredReviews.reduce(
+    (acc, review) => {
+      if (typeof review.rating === "number" && Number.isFinite(review.rating)) {
+        acc.sum += review.rating;
+        acc.count += 1;
+      }
+      return acc;
+    },
+    { sum: 0, count: 0 }
+  );
+  const averageRating =
+    ratingAggregate.count > 0 ? ratingAggregate.sum / ratingAggregate.count : null;
+
+  const reviewSchema = featuredReviews.length
+    ? buildReviewSchema({
+        reviews: featuredReviews,
+        averageRating,
+        reviewCount: featuredReviews.length,
+        ratingCount: ratingAggregate.count || featuredReviews.length,
+        options: {
+          businessName: schemaBusinessName ?? "SonShine Roofing",
+          businessUrl: locationSchemaUrl,
+          providerUrl: GBP_PROFILE_URL,
+          origin: SITE_ORIGIN,
+          id: `${locationSchemaUrl}#roofing-contractor`,
+          address: {
+            addressLocality: location.locationName ?? undefined,
+          },
+          telephone: "+1-941-866-4320",
+          withContext: false,
+        },
+      })
+    : null;
+
+  const sponsorHeading = location.locationName
+    ? `${location.locationName} Partnerships`
+    : "Local Partnerships";
+
+  const sponsorSchema = sponsorFeaturesItemListSchema({
+    features: sponsorFeatures,
+    name: sponsorHeading,
+    description: "Who We Sponsor",
+    origin: SITE_ORIGIN,
+    providerId: globalBusinessId,
+    id: `${locationSchemaUrl}#sponsor-itemlist`,
+    withContext: false,
+  });
+
+  const structuredDataItems = [reviewSchema, sponsorSchema].filter(
+    (item): item is Record<string, unknown> => Boolean(item)
+  );
+
+  const structuredData = structuredDataItems.length
+    ? graphSchema({ items: structuredDataItems })
+    : null;
+
   return (
     <>
+      {structuredData ? <JsonLd data={structuredData} /> : null}
       <Hero title={`The Best Roofing Company in ${location.locationName} for Over 38 Years`} />
 
       <section className={leadFormLayout}>
@@ -201,10 +265,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
             showDisclaimer={false}
             limit={featuredReviews.length}
             fallbackToRemote={true}
-            schemaOptions={{
-              businessName: schemaBusinessName ?? undefined,
-              businessUrl: locationSchemaUrl,
-            }}
           />
         ) : (
           <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
