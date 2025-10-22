@@ -179,7 +179,6 @@ export default function Footer() {
               href="/reviews"
               className="px-3 py-2 text-sm text-white md:text-md btn btn-brand-orange"
               data-icon-affordance="up-right"
-              target="_blank"
             >
               <Star className="w-3 h-3 mr-2 text-white md:h-4 md:w-4" />
               Leave a Review

@@ -1,8 +1,10 @@
+import Image from "next/image";
 import SmartLink from "../utils/SmartLink";
-import { Star } from "lucide-react";
+import { ArrowUpRight, Star } from "lucide-react";
 import React from "react";
 import { buildTellUsWhyRatingHref } from "@/lib/routes";
 import styles from "./ReviewsCatcher.module.css";
+import { Button } from "../ui/button";
 
 /**
  * ReviewsCatcher
@@ -31,12 +33,29 @@ export default function ReviewsCatcher() {
   return (
     <section className="w-full py-10 text-center">
       <div className="mx-auto md:max-w-8xl">
-        <h1 className="text-slate-500 font-semibold tracking-tight text-xl md:text-2xl">
+        <h1 className="text-xl font-semibold tracking-tight text-slate-500 md:text-2xl">
           Reviews
         </h1>
-        <h2 className="mt-2 md:mt-4 text-slate-700 text-5xl md:text-8xl">
+        <h2 className="mt-2 text-5xl md:mt-4 text-slate-700 md:text-8xl">
           How did we do?
         </h2>
+        <Button className="mt-8" variant="ghost" size="lg">
+          <SmartLink
+            href={GOOGLE_REVIEW_URL}
+            target="_blank"
+            className="inline-flex items-center gap-2"
+          >
+            <Image
+              alt="Google logo"
+              src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
+              width={20}
+              height={20}
+              className="object-contain w-5 h-5"
+            />
+            <span>Review Us On Google</span>
+            <ArrowUpRight className="w-4 h-4" />
+          </SmartLink>
+        </Button>
         <div
           aria-hidden="true"
           className="mx-auto mt-8 h-[3px] w-36 rounded-full bg-gradient-to-r from-[#fb9216] via-[#ffb347] to-[#fb9216] md:mt-8 md:h-1 md:w-96"
@@ -57,8 +76,8 @@ export default function ReviewsCatcher() {
 
                   const StarSvg = (
                     <Star
-                      className="h-12 w-12 md:h-36 md:w-36"
-                      // stroke uses currentColor; fill toggled via CSS
+                      className="w-8 h-8 md:w-16 md:h-16 lg:h-36 lg:w-36"
+                    // stroke uses currentColor; fill toggled via CSS
                     />
                   );
 

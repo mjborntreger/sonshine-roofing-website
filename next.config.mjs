@@ -99,6 +99,7 @@ const nextConfig = {
       { source: "/home", destination: "/", permanent: true },
       { source: "/what-should-i-do-if-my-roof-is-damaged-after-a-storm/", destination: "/roof-is-damaged-after-a-storm/", permanent: true },
       { source: "/book", destination: "/contact-us", permanent: true },
+      { source: "/about-us", destination: "about-sonshine-roofing", permanent: true },
 
       // === Persons ===
       { source: "/about/mina-2", destination: "/person/mina", permanent: true },
