@@ -24,6 +24,29 @@ export const revalidate = 900;
 function stripHtml(html: string) {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
 }
+const hostMatchesDomain = (host: string, domain: string) =>
+  host === domain || host.endsWith(`.${domain}`);
+
+function isAllowedIframeSrc(src: string) {
+  try {
+    const url = new URL(src, "https://example.com");
+    if (url.protocol !== "https:") return false;
+
+    const host = url.hostname.toLowerCase();
+    if (hostMatchesDomain(host, "youtube.com") || hostMatchesDomain(host, "youtube-nocookie.com")) {
+      return url.pathname.startsWith("/embed/");
+    }
+
+    if (hostMatchesDomain(host, "acculynx.com")) {
+      return true;
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 function sanitizeHtml(html: string) {
   if (!html) return "";
   // Remove script tags (and their contents)
@@ -34,14 +57,10 @@ function sanitizeHtml(html: string) {
   // Neutralize javascript: in href/src attributes
   out = out.replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1="#"');
   // Allow iframes only from approved hosts (YouTube-nocookie and Acculynx)
-  out = out.replace(/<iframe[^>]*src=["']([^"']+)["'][^>]*><\/iframe>/gi, (m, src) => {
-    try {
-      const u = new URL(src, "https://example.com");
-      const host = u.hostname.toLowerCase();
-      if (host.endsWith("youtube-nocookie.com") || host.endsWith("acculynx.com")) return m;
-      return "";
-    } catch { return ""; }
-  });
+  out = out.replace(
+    /<iframe\b[^>]*src=["']([^"']+)["'][^>]*>[\s\S]*?<\/iframe>/gi,
+    (match, src) => (isAllowedIframeSrc(src) ? match : "")
+  );
   return out;
 }
 function calcReadingMinutes(html: string, wpm = 225) {
