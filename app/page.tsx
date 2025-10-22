@@ -102,13 +102,13 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
             <div className="mx-2">
+              <LatestProjectsFilter projects={projects} initial={4} />
               <WhyHomeownersChooseUs highlightText="Homeowners" />
               <LocalPartnershipsSection
                 features={sponsorFeatures}
                 emptyMessage="No sponsored partners yet."
               />
               <BestOfTheBest />
-              <LatestProjectsFilter projects={projects} initial={4} />
               <LatestPostsFilters posts={posts} initial={4} />
             </div>
           </div>

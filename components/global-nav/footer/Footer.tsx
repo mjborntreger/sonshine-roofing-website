@@ -108,6 +108,7 @@ export default function Footer() {
                 Roofing Services
               </h3>
               <ul className="mt-4 space-y-3 text-sm">
+                {/* NAV_SERVICES pulls from buildServiceHref; supply location slug once scoped pages exist. */}
                 {NAV_SERVICES.map((r) => (
                   <li key={r.href}>
                     <SmartLink href={r.href} className={linkStyles}>

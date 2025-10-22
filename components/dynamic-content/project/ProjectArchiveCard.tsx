@@ -30,11 +30,11 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
     <div className={className} style={style}>
       <SmartLink
         href={href}
-        className="group block rounded-3xl focus-visible:outline-none"
+        className="block group rounded-3xl focus-visible:outline-none"
         data-icon-affordance="right"
       >
-        <Card className="proj-card overflow-hidden hover:shadow-lg transition">
-          <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
+        <Card className="overflow-hidden transition proj-card hover:shadow-lg">
+          <CardHeader className="px-5 pt-5 pb-5 sm:px-6 sm:pt-6">
             <CardTitle className="font-bold">{project.title}</CardTitle>
           </CardHeader>
 
@@ -55,7 +55,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
             <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
           )}
 
-          <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
+          <CardContent className="px-5 pt-5 pb-4 sm:px-6 sm:pb-6">
             {summary && (
               <p className="text-sm text-slate-600" style={lineClampStyle}>
                 {summary}
@@ -64,7 +64,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
 
             {(project.materialTypes?.length ?? 0) + (project.serviceAreas?.length ?? 0) + (project.roofColors?.length ?? 0) > 0 && (
               <div className="relative mt-4 -mx-5 sm:mx-0">
-                <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                <div className="flex gap-2 px-5 pb-2 overflow-x-auto flex-nowrap scrollbar-none sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
                   {(project.materialTypes ?? []).map((t) => (
                     <span
                       key={`mat-${project.slug}-${t.slug}`}
@@ -89,9 +89,12 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
                       <span className={pillLabelClass}>{t.name}</span>
                     </span>
                   ))}
+                  <span className={pillClass}>
+                      <span className={pillLabelClass}>Roof Replacement</span>
+                    </span>
                 </div>
-                <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent sm:hidden" />
-                <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent sm:hidden" />
+                <div className="absolute left-0 w-6 pointer-events-none inset-y-1 bg-gradient-to-r from-white to-transparent sm:hidden" />
+                <div className="absolute right-0 w-6 pointer-events-none inset-y-1 bg-gradient-to-l from-white to-transparent sm:hidden" />
               </div>
             )}
           </CardContent>
@@ -99,7 +102,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
           <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
             <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
               View project
-              <ArrowRight className="icon-affordance h-4 w-4" />
+              <ArrowRight className="w-4 h-4 icon-affordance" />
             </span>
           </CardFooter>
         </Card>

@@ -30,7 +30,7 @@ import type { NavItem } from "@/lib/routes";
 import { NAV_MAIN, ROUTES } from "@/lib/routes";
 
 type Item = NavItem;
-const NAV: Item[] = NAV_MAIN as Item[];
+const NAV: Item[] = NAV_MAIN as Item[]; // service links resolve through buildServiceHref for future location variants
 
 const NAV_ICONS: Record<string, LucideIcon> = {
   About: UserSearch,

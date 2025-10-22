@@ -15,6 +15,10 @@ const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : us
 export default function Header() {
   const ref = useRef<HTMLElement>(null);
   const segments = useSelectedLayoutSegments();
+  const locationSlug =
+    segments[0] === "locations" && typeof segments[1] === "string" ? segments[1] : null;
+  // Keep the hero logo pointed at the active location so nested location routes stay scoped.
+  const logoHref = locationSlug ? `/locations/${locationSlug}` : "/";
   const initialLanding = segments.length === 0;
   const [scrollState, setScrollState] = useState(() => ({
     collapsed: false,
@@ -144,7 +148,7 @@ export default function Header() {
         )}
       >
         <SmartLink
-          href="/"
+          href={logoHref}
           className={cn(
             "flex items-center gap-2 transition-transform duration-200 ease-out",
             collapsed ? "scale-[0.7]" : "scale-100"

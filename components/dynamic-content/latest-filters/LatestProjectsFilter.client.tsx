@@ -93,10 +93,10 @@ export default function LatestProjectsFilter({
   const renderedHeading = renderHighlight(heading, "Latest");
 
   return (
-    <div className="px-4 pt-12 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="px-4 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="text-3xl text-slate-700 md:text-5xl mb-3 md:mb-4">{renderedHeading}</h2>
+          <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
           {renderFilterTabs()}
           <p className={pStyles}>{description}</p>
         </div>
@@ -104,7 +104,7 @@ export default function LatestProjectsFilter({
         renderFilterTabs()
       )}
 
-      <div key={selected} className="mt-8 grid gap-6 md:grid-cols-2">
+      <div key={selected} className="grid gap-6 mt-8 md:grid-cols-2">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];
@@ -132,7 +132,7 @@ export default function LatestProjectsFilter({
             proseGuard
           >
             {ctaLabel}
-            <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
+            <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
           </SmartLink>
         </div>
       )}

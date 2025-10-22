@@ -259,7 +259,7 @@ export default function YouMayAlsoLike(props: Props) {
 
     return (
       <section className={baseClassName} aria-labelledby="ymal-heading">
-        <div className="flex justify-start mt-36 mb-12">
+        <div className="flex justify-start mb-12 mt-36">
           <h2 id="ymal-heading" className="text-3xl md:text-4xl">
             <Sparkles className="inline h-7 w-7 md:h-10 md:w-10 text-[--brand-blue] mr-3" />
             {finalHeading}
@@ -301,7 +301,7 @@ export default function YouMayAlsoLike(props: Props) {
 
   if (!blogItems.length) return null;
 
-  const finalHeading = props.heading ?? "You May Also Like";
+  const finalHeading = props.heading ?? "Learn More";
   const finalCtaHref = ctaHref || "/blog";
   const finalCtaLabel = ctaLabel || "See All Posts";
 

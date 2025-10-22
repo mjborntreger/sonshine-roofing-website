@@ -52,6 +52,72 @@ export const ROUTES = {
   tellUsWhy: '/tell-us-why' as Route,
 } as const;
 
+export type BuildServiceHrefOptions = {
+  locationSlug?: string | null;
+  preferLocation?: boolean;
+};
+
+export const SERVICE_ROUTE_DEFINITIONS = [
+  {
+    key: "roofReplacement",
+    label: "Roof Replacement",
+    baseHref: ROUTES.roofReplacement,
+    locationSegment: "roof-replacement",
+  },
+  {
+    key: "roofRepair",
+    label: "Roof Repair",
+    baseHref: ROUTES.roofRepair,
+    locationSegment: "roof-repair",
+  },
+  {
+    key: "roofInspection",
+    label: "Roof Inspection",
+    baseHref: ROUTES.roofInspection,
+    locationSegment: "roof-inspection",
+  },
+  {
+    key: "roofMaintenance",
+    label: "Roof Maintenance",
+    baseHref: ROUTES.roofMaintenance,
+    locationSegment: "roof-maintenance",
+  },
+] as const;
+
+type ServiceRouteDefinition = (typeof SERVICE_ROUTE_DEFINITIONS)[number];
+export type ServiceRouteKey = ServiceRouteDefinition["key"];
+
+const SERVICE_ROUTE_LOOKUP: Record<ServiceRouteKey, ServiceRouteDefinition> =
+  SERVICE_ROUTE_DEFINITIONS.reduce((acc, def) => {
+    acc[def.key] = def;
+    return acc;
+  }, {} as Record<ServiceRouteKey, ServiceRouteDefinition>);
+
+const sanitizeLocationSlug = (value: string | null | undefined) => {
+  if (!value) return null;
+  const trimmed = value.trim().replace(/^\/+|\/+$/g, "");
+  return trimmed || null;
+};
+
+export const buildServiceHref = (
+  service: ServiceRouteKey,
+  options?: BuildServiceHrefOptions
+): string => {
+  const definition = SERVICE_ROUTE_LOOKUP[service];
+  if (!definition) return ROUTES.home;
+
+  const slug = sanitizeLocationSlug(options?.locationSlug);
+  if (options?.preferLocation && slug) {
+    // When location-scoped service pages are launched, enabling preferLocation will flip links automatically.
+    return `/locations/${slug}/${definition.locationSegment}`;
+  }
+
+  return definition.baseHref;
+};
+
+export const getServiceRouteDefinition = (service: ServiceRouteKey) =>
+  SERVICE_ROUTE_LOOKUP[service];
+
 export type NavItem = { label: string; href?: Route; children?: NavItem[] };
 
 export const NAV_MAIN: ReadonlyArray<NavItem> = [
@@ -59,12 +125,10 @@ export const NAV_MAIN: ReadonlyArray<NavItem> = [
   { label: 'Financing', href: ROUTES.financing },
   {
     label: 'Roofing Services',
-    children: [
-      { label: 'Roof Replacement', href: ROUTES.roofReplacement },
-      { label: 'Roof Repair', href: ROUTES.roofRepair },
-      { label: 'Roof Inspection', href: ROUTES.roofInspection },
-      { label: 'Roof Maintenance', href: ROUTES.roofMaintenance },
-    ],
+    children: SERVICE_ROUTE_DEFINITIONS.map(({ label, key }) => ({
+      label,
+      href: buildServiceHref(key) as Route, // widen when enabling location-scoped service variants
+    })),
   },
   {
     label: 'Resources',
@@ -86,11 +150,11 @@ export const NAV_COMPANY: ReadonlyArray<{ label: string; href: Route }> = [
 ];
 
 export const NAV_SERVICES: ReadonlyArray<{ label: string; href: Route }> = [
-  { label: 'Roof Replacement', href: ROUTES.roofReplacement },
-  { label: 'Roof Repair', href: ROUTES.roofRepair },
-  { label: 'Roof Inspection', href: ROUTES.roofInspection },
-  { label: 'Roof Maintenance', href: ROUTES.roofMaintenance },
-];
+  ...SERVICE_ROUTE_DEFINITIONS.map(({ label, key }) => ({
+    label,
+    href: buildServiceHref(key) as Route, // widen when enabling location-scoped service variants
+  })),
+] as const;
 
 export const NAV_RESOURCES: ReadonlyArray<{ label: string; href: Route }> = [
   { label: 'Project Gallery', href: ROUTES.project },
