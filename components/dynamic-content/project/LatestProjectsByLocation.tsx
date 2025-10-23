@@ -14,7 +14,7 @@ type Props = {
   className?: string;
 };
 
-const baseWrapperClass = "px-4 py-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden";
+const baseWrapperClass = "px-4 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden";
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
 const SECTION_SUBTITLE = "mt-2 mb-8 text-sm text-slate-500";
 const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";

@@ -33,8 +33,8 @@ export default function ServiceAreaMap({
   emptyLandmarksMessage = "No landmarks captured yet.",
 }: ServiceAreaMapProps) {
   const wrapperClassName = className
-    ? `max-w-4xl px-2 mt-12 mx-auto space-y-2 ${className}`
-    : "max-w-4xl px-2 mt-12 mx-auto space-y-2";
+    ? `max-w-4xl px-2 mt-24 mx-auto space-y-2 ${className}`
+    : "max-w-4xl px-2 mt-24 mx-auto space-y-2";
   const locationLabel = locationName ?? fallbackLocationLabel;
   const eyebrowText =
     eyebrow ?? (locationLabel ? `Nearby Landmarks in ${locationLabel}, FL` : "Nearby Landmarks");

@@ -93,7 +93,7 @@ export default function LatestPostsFilter({
   const renderedHeading = renderHighlight(heading, "Latest");
 
   return (
-    <div className="px-4 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="px-4 pt-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
           <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>

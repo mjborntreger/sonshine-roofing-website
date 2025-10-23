@@ -23,28 +23,30 @@ const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota
 const SEO_DESCRIPTION_HOME =
   'Fast, Friendly, & Reliable | (941) 866-4320 | Licensed & Insured | Your trusted local roofing contractor serving Sarasota, Manatee & Charlotte Counties.';
 const SEO_KEYWORDS_HOME = [
+  'best roofing company',
   'Sarasota roofing',
   'North Port roofing',
   'Bradenton roofing',
-  'venice roofing',
-  'nokomis roofing',
-  'palmetto roofing',
-  'parrish roofing',
-  'port charlotte roofing',
-  'metal roof',
-  'tile roof',
-  'shingle roof',
+  'Venice roofing',
+  'Nokomis roofing',
+  'Palmetto roofing',
+  'Parrish roofing',
+  'Port Charlotte roofing',
   'roof replacement',
-  'financing',
-  'GAF Master Elite',
-  'Licensed and Insured',
-  'warranty',
   'roof repair',
   'roof inspection',
   'roof maintenance',
+  'tile roof',
+  'shingle roof',
+  'metal roof',
+  'flat roof',
+  'financing',
+  'licensed and insured',
   'Manatee County roofing',
   'Charlotte County roofing',
-  'roofing contractor'
+  'Sarasota County roofing',
+  'roofing contractor',
+  'roofing company',
 ];
 const SEO_CANONICAL_HOME = '/';
 const SEO_OG_IMAGE_DEFAULT = '/og-default.png';

@@ -275,6 +275,10 @@ export default async function LocationPage({ params }: { params: Promise<Params>
         <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
             <div className="mx-2">
+              <LatestProjectsByLocation
+                projects={locationProjects}
+                locationName={location.locationName}
+              />
               <WhyHomeownersChooseUs
                 title={`Why ${location.locationName} Homeowners Choose Us`}
                 highlightText={location.locationName ? `${location.locationName} Homeowners` : undefined}
@@ -294,10 +298,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
                   <p className="mt-4">No WordPress editor content provided for this location.</p>
                 )}
               </section>
-              <LatestProjectsByLocation
-                projects={locationProjects}
-                locationName={location.locationName}
-              />
               <LatestPostsFilter posts={posts} initial={4} />
               <ServiceAreaMap
                 mapImage={location.mapImage}
