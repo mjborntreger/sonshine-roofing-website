@@ -8,12 +8,15 @@ import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/li
 import ProjectVideo from "../../../components/dynamic-content/project/ProjectVideo";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
+import ProjectGallery from "@/components/dynamic-content/project/ProjectGallery";
+import { PROJECT_GALLERY_DEFAULT_HEIGHT, PROJECT_GALLERY_DEFAULT_WIDTH } from "@/components/dynamic-content/project/galleryConfig";
 
 import type { Metadata } from "next";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { creativeWorkSchema, videoObjectSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import { ArrowLeft } from "lucide-react";
 
 type OgImageRecord = {
   url?: unknown;
@@ -135,6 +138,51 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const colors = (project.roofColors || []).map((t) => t.name);
   const posterUrl = project.heroImage?.url ? ogImgAbs : undefined;
 
+  const seenGalleryUrls = new Set<string>();
+  const galleryImageObjects: Array<Record<string, unknown>> = [];
+  const addImageObject = (
+    url?: string | null,
+    caption?: string | null,
+    width?: number | null,
+    height?: number | null,
+    ref?: string
+  ) => {
+    if (!url) return;
+    const absoluteUrl = url.startsWith("http") ? url : `${origin}${url}`;
+    if (seenGalleryUrls.has(absoluteUrl)) return;
+    const index = galleryImageObjects.length + 1;
+    const object: Record<string, unknown> = {
+      "@type": "ImageObject",
+      "@id": `${shareUrl}#image-${ref ?? index}`,
+      url: absoluteUrl,
+      contentUrl: absoluteUrl,
+    };
+    if (caption && caption.trim().length > 0) object.caption = caption.trim();
+    const widthValue = typeof width === "number" && Number.isFinite(width) ? width : PROJECT_GALLERY_DEFAULT_WIDTH;
+    object.width = widthValue;
+    if (typeof height === "number" && Number.isFinite(height)) object.height = height;
+    galleryImageObjects.push(object);
+    seenGalleryUrls.add(absoluteUrl);
+  };
+
+  addImageObject(
+    ogImgAbs,
+    project.heroImage?.altText ?? project.title,
+    project.heroImage?.width ?? PROJECT_GALLERY_DEFAULT_WIDTH,
+    project.heroImage?.height ?? PROJECT_GALLERY_DEFAULT_HEIGHT,
+    "primary"
+  );
+
+  project.projectImages.forEach((img, idx) => {
+    addImageObject(
+      img.url,
+      img.altText || project.title,
+      img.width ?? PROJECT_GALLERY_DEFAULT_WIDTH,
+      img.height ?? PROJECT_GALLERY_DEFAULT_HEIGHT,
+      `gallery-${idx + 1}`
+    );
+  });
+
   const videoSchemaInput = videoId
     ? {
       name: project.title,
@@ -153,6 +201,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     ? videoObjectSchema({ ...videoSchemaInput, withContext: false })
     : undefined;
 
+  const projectAdditionalProps: Record<string, unknown> = {};
+  if (videoSchemaNoContext) projectAdditionalProps.video = videoSchemaNoContext;
+  if (galleryImageObjects.length > 0) projectAdditionalProps.image = galleryImageObjects;
+
   const projectSchema = creativeWorkSchema({
     name: project.title,
     description: (project.seo?.description || project.projectDescription || "").slice(0, 160),
@@ -170,7 +222,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       name: "SonShine Roofing",
       logo: { "@type": "ImageObject", url: `${origin}/icon.png` },
     },
-    additionalProperties: videoSchemaNoContext ? { video: videoSchemaNoContext } : undefined,
+    additionalProperties: Object.keys(projectAdditionalProps).length ? projectAdditionalProps : undefined,
   });
 
   return (
@@ -179,8 +231,16 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       <JsonLd data={projectSchema} />
 
       {/* Title + gradient stripe */}
-      <div className="prose">
-        <h1 className="my-4 text-3xl md:text-5xl">{project.title}</h1>
+      <div>
+        <SmartLink href="/project" title="Back to Project Gallery" aria-label="Back to Project Gallery" data-icon-affordance="left">
+          <nav 
+            className="hover:underline text-slate-500"
+            >
+              <ArrowLeft className="icon-affordance h-4 inline mr-2 w-4" />
+              Back to Project Gallery
+          </nav>
+        </SmartLink>
+        <h1 className="mb-8 mt-4 text-3xl md:text-5xl">{project.title}</h1>
       </div>
       <ShareWhatYouThink />
 
@@ -224,12 +284,18 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               {project.serviceAreas?.map((t) => (
                 <Badge key={`sa-${t.slug}`}>{t.name}</Badge>
               ))}
+              <Badge>Roof Replacement</Badge>
             </div>
           )}
+
+          <div className="bg-slate-200 h-[1.5px] my-16 w-full" />
+
+          {/* Gallery */}
+          <ProjectGallery images={project.projectImages} projectTitle={project.title} />
         </div>
 
         {/* Right column: Project Details + Products */}
-        <div className="p-6 prose bg-white shadow-md rounded-3xl border-slate-200">
+        <div className="p-6 sticky top-24 prose bg-white shadow-md rounded-3xl border-slate-200">
           {project.projectDescription && (
             <>
               <h3>Project Summary</h3>
@@ -262,6 +328,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           )}
         </div>
       </div>
+
 
       {/* Main content */}
       {project.contentHtml && (

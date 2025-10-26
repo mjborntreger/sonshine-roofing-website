@@ -25,6 +25,21 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
     project.uri ??
     ROUTES.project;
   const summary = truncateText(stripHtml(project.projectDescription ?? ""), 260);
+  const pillItems = [
+    ...(project.materialTypes ?? []).map((t) => ({
+      key: `mat-${project.slug}-${t.slug}`,
+      label: t.name,
+    })),
+    ...(project.serviceAreas ?? []).map((t) => ({
+      key: `sa-${project.slug}-${t.slug}`,
+      label: t.name,
+    })),
+    ...(project.roofColors ?? []).map((t) => ({
+      key: `rc-${project.slug}-${t.slug}`,
+      label: t.name,
+    })),
+    { key: `static-${project.slug}`, label: "Roof Replacement" },
+  ];
 
   return (
     <div className={className} style={style}>
@@ -62,36 +77,14 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
               </p>
             )}
 
-            {(project.materialTypes?.length ?? 0) + (project.serviceAreas?.length ?? 0) + (project.roofColors?.length ?? 0) > 0 && (
+            {pillItems.length > 0 && (
               <div className="relative mt-4 -mx-5 sm:mx-0">
                 <div className="flex gap-2 px-5 pb-2 overflow-x-auto flex-nowrap scrollbar-none sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-                  {(project.materialTypes ?? []).map((t) => (
-                    <span
-                      key={`mat-${project.slug}-${t.slug}`}
-                      className={pillClass}
-                    >
-                      <span className={pillLabelClass}>{t.name}</span>
+                  {pillItems.map((pill) => (
+                    <span key={pill.key} className={pillClass}>
+                      <span className={pillLabelClass}>{pill.label}</span>
                     </span>
                   ))}
-                  {(project.serviceAreas ?? []).map((t) => (
-                    <span
-                      key={`sa-${project.slug}-${t.slug}`}
-                      className={pillClass}
-                    >
-                      <span className={pillLabelClass}>{t.name}</span>
-                    </span>
-                  ))}
-                  {(project.roofColors ?? []).map((t) => (
-                    <span
-                      key={`rc-${project.slug}-${t.slug}`}
-                      className={pillClass}
-                    >
-                      <span className={pillLabelClass}>{t.name}</span>
-                    </span>
-                  ))}
-                  <span className={pillClass}>
-                      <span className={pillLabelClass}>Roof Replacement</span>
-                    </span>
                 </div>
                 <div className="absolute left-0 w-6 pointer-events-none inset-y-1 bg-gradient-to-r from-white to-transparent sm:hidden" />
                 <div className="absolute right-0 w-6 pointer-events-none inset-y-1 bg-gradient-to-l from-white to-transparent sm:hidden" />

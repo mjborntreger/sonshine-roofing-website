@@ -123,6 +123,7 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
 
   return (
     <>
+      <h2 className="mb-3">Project Video</h2>
       {/* Facade */}
       <button
         type="button"

@@ -86,7 +86,7 @@ const buildProjectUri = (slug: string) => `/${PROJECT_BASE}/${slug}/`;
 const WP_VERBOSE_ERRORS = process.env.NODE_ENV !== "production";
 
 // ----- Types -----
-export type WpImage = { url: string; altText: string };
+export type WpImage = { url: string; altText: string; width?: number | null; height?: number | null };
 
 export type TermLite = { name: string; slug: string };
 
@@ -117,6 +117,7 @@ export type ProjectFull = ProjectSummary & {
   modified?: string | null;
   projectDescription: string | null;
   productLinks: ProductLink[];
+  projectImages: WpImage[];
   materialTypes: TermLite[];
   roofColors: TermLite[];
   serviceAreas: TermLite[];
@@ -797,15 +798,21 @@ export async function wpFetch<T = Json>(
 type ImageNode = {
   sourceUrl?: unknown;
   altText?: unknown;
+  mediaDetails?: unknown;
 };
 
 const pickImage = (node?: Maybe<ImageNode>): WpImage | null => {
   if (!isRecord(node)) return null;
   const url = toStringSafe(node.sourceUrl);
   if (!url) return null;
+  const mediaDetails = asRecord(node.mediaDetails);
+  const width = typeof mediaDetails?.width === "number" ? mediaDetails.width : null;
+  const height = typeof mediaDetails?.height === "number" ? mediaDetails.height : null;
   return {
     url,
     altText: toStringSafe(node.altText),
+    width,
+    height,
   };
 };
 
@@ -839,6 +846,11 @@ const mapProductLinks = (rows?: readonly Maybe<ProductLinkNode>[]): ProductLink[
         productLink: productLinkValue ? productLinkValue : null,
       };
     });
+
+const mapImages = (rows?: readonly Maybe<ImageNode>[]): WpImage[] =>
+  (rows ?? [])
+    .map((node) => pickImage(node))
+    .filter((image): image is WpImage => Boolean(image));
 
 // calcReadingTimeMinutes Helper Function
 const htmlEntityMap: Record<string, string> = {
@@ -3026,6 +3038,16 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
             productName
             productLink
           }
+          projectImages {
+            nodes {
+              sourceUrl
+              altText
+              mediaDetails {
+                width
+                height
+              }
+            }
+          }
         }
 
         # ACF Field Group: projectFilters (taxonomy fields)
@@ -3060,6 +3082,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
 
     projectDescription: readProjectDescription(projectDetails),
     productLinks: mapProductLinks(asArray<Maybe<ProductLinkNode>>(projectDetails?.productLinks)),
+    projectImages: mapImages(extractNodes(projectDetails?.projectImages) as Maybe<ImageNode>[]),
 
     materialTypes: mapTermNodes(projectFilters?.materialType),
     roofColors: mapTermNodes(projectFilters?.roofColor),
