@@ -1,18 +1,37 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import SmartLink from "@/components/utils/SmartLink";
-import { ArrowUpRight, ArrowUp, Star } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowUp,
+  Star,
+  Facebook,
+  Instagram,
+  Youtube,
+  Twitter,
+  Home,
+  MapPin,
+  Pin,
+  BadgeCheck,
+  type LucideIcon,
+} from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from "@/lib/routes";
 
-const SOCIALS = [
-  { href: "https://www.facebook.com/sonshineroofing", label: "Facebook", domain: "facebook.com" },
-  { href: "https://www.instagram.com/sonshineroofing", label: "Instagram", domain: "instagram.com" },
-  { href: "https://www.youtube.com/c/sonshineroofing", label: "YouTube", domain: "youtube.com" },
-  { href: "https://nextdoor.com/pages/sonshine-roofing-sarasota-fl", label: "Nextdoor", domain: "nextdoor.com" },
-  { href: "https://www.google.com/maps/place/SonShine+Roofing/@27.3105774,-82.4518265,16z/data=!3m1!4b1!4m6!3m5!1s0x88c34710987d2023:0x5318594fb175e958!8m2!3d27.3105727!4d-82.446961!16s%2Fg%2F1wh4gn84?entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D", label: "Google Business Profile", domain: "google.com" },
-  { href: "https://www.yelp.com/biz/sonshine-roofing-sarasota", label: "Yelp", domain: "yelp.com" },
-  { href: "https://www.pinterest.com/sonshineroofing", label: "Pinterest", domain: "pinterest.com" },
-  { href: "https://x.com/ssroofinginc", label: "X (Twitter)", domain: "x.com" },
+type SocialLink = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+};
+
+const SOCIALS: SocialLink[] = [
+  { href: "https://www.facebook.com/sonshineroofing", label: "Facebook", icon: Facebook },
+  { href: "https://www.instagram.com/sonshineroofing", label: "Instagram", icon: Instagram },
+  { href: "https://www.youtube.com/c/sonshineroofing", label: "YouTube", icon: Youtube },
+  { href: "https://nextdoor.com/pages/sonshine-roofing-sarasota-fl", label: "Nextdoor", icon: Home },
+  { href: "https://www.google.com/maps/place/SonShine+Roofing/@27.3105774,-82.4518265,16z/data=!3m1!4b1!4m6!3m5!1s0x88c34710987d2023:0x5318594fb175e958!8m2!3d27.3105727!4d-82.446961!16s%2Fg%2F1wh4gn84?entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D", label: "Google Business Profile", icon: MapPin },
+  { href: "https://www.yelp.com/biz/sonshine-roofing-sarasota", label: "Yelp", icon: BadgeCheck },
+  { href: "https://www.pinterest.com/sonshineroofing", label: "Pinterest", icon: Pin },
+  { href: "https://x.com/ssroofinginc", label: "X (Twitter)", icon: Twitter },
 ];
 
 const linkStyles = "text-xs md:text-sm text-slate-600 hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]";
@@ -188,27 +207,22 @@ export default function Footer() {
 
             {/* Socials Badges Row */}
             <div className="flex items-center gap-2">
-              {SOCIALS.map((s) => (
-                <a
-                  key={s.href}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  title={s.label}
-                  className="h-6 w-6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
-                >
-                  <Image
-                    src={`https://www.google.com/s2/favicons?domain=${s.domain}&sz=64`}
-                    alt={s.label}
-                    width={32}
-                    height={32}
-                    sizes="(max-width: 32px) 5vw 366px"
-                    loading="lazy"
-                    className="w-6 h-6"
-                  />
-                </a>
-              ))}
+              {SOCIALS.map((s) => {
+                const Icon = s.icon;
+                return (
+                  <a
+                    key={s.href}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    title={s.label}
+                    className="flex h-6 w-6 items-center justify-center text-[--brand-blue] transition-colors hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                  >
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </a>
+                );
+              })}
             </div>
 
           </div>

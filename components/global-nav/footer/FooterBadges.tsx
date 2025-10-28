@@ -6,7 +6,7 @@ const imageWidth = 150;
 const imageStyles = "my-6 h-[100px] w-auto";
 
 const badges = [
-   {
+  {
     href: "https://mysafeflhome.com/",
     title: "My Safe Florida Home Certified Contractor",
     src: "https://next.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
@@ -51,11 +51,16 @@ const badges = [
     title: "A+ Rating with the BBB",
     src: "https://next.sonshineroofing.com/wp-content/uploads/bbb.webp",
   },
+  {
+    href: "https://tricountymetals.com",
+    title: "Official Tri-County Metals Installer",
+    src: "https://next.sonshineroofing.com/wp-content/uploads/tri-county-metals-logo-transparent-bg.webp",
+  },
 ];
 
 export default function FooterBadges() {
   return (
-    <div className="mx-auto max-w-6xl px-10 grid grid-cols-3 lg:grid-cols-9 place-items-center justify-center gap-3 my-20">
+    <div className="mx-auto max-w-6xl px-10 grid grid-cols-3 lg:grid-cols-10 place-items-center justify-center gap-3 my-20">
       {badges.map((badge) => (
         <SmartLink
           key={badge.href}

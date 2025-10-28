@@ -93,7 +93,7 @@ export default function LatestProjectsFilter({
   const renderedHeading = renderHighlight(heading, "Latest");
 
   return (
-    <div className="px-4 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="px-4 pb-24 md:px-12 max-w-[1600px] mx-auto">
       {showHeader ? (
         <div className="text-center">
           <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
@@ -104,7 +104,7 @@ export default function LatestProjectsFilter({
         renderFilterTabs()
       )}
 
-      <div key={selected} className="grid gap-6 mt-8 md:grid-cols-2">
+      <div key={selected} className="grid gap-6 mt-8 grid-cols-1 md:grid-cols-2">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];
