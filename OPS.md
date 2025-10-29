@@ -10,7 +10,7 @@ Quick Checks
   - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
   - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
 - GTM
-  - `NEXT_PUBLIC_GTM_ID` set, and container publishes page_view from Custom Event.
+  - `NEXT_PUBLIC_GTM_ID` set and GA4 Enhanced Measurement enabled for page views.
 
 Revalidation
 - GraphQL-backed pages cache by tag. Use your `/api/revalidate` endpoint (if present) to bust tags.
@@ -35,4 +35,4 @@ Status Checklist (handoff)
 - [ ] Robots staging: Disallow all
 - [ ] Sitemaps preview: ON/OFF as expected
 - [ ] Search Console: property verified, sitemap submitted (prod)
-- [ ] GTM: container ID set, page_view verified
+- [ ] GTM: container ID set, GA4 Enhanced Measurement capturing page views

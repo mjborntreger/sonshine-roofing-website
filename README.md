@@ -11,7 +11,7 @@ Runbook (Staging vs Prod)
 - Security
   - CSP enforced on staging, report-only on production
 - GTM
-  - Loads when `NEXT_PUBLIC_GTM_ID` set and env permits; route changes sent via custom `page_view` event
+  - Loads when `NEXT_PUBLIC_GTM_ID` set and env permits; GA4 Enhanced Measurement handles page views.
  
 
 
@@ -53,7 +53,7 @@ Cache/Invalidation
 
 GTMetrix/Analytics
 - GTM loads only when `NEXT_PUBLIC_GTM_ID` is set and env permits.
-- Route changes pushed via `lib/gtm-route-change.tsx`.
+- GA4 Enhanced Measurement should remain enabled for single-page route tracking.
 
 
 
@@ -69,7 +69,7 @@ Quick Checks
   - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
   - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
 - GTM
-  - `NEXT_PUBLIC_GTM_ID` set, and container publishes page_view from Custom Event.
+  - `NEXT_PUBLIC_GTM_ID` set; GA4 Enhanced Measurement is enabled for page views.
 
 Revalidation
 - GraphQL-backed pages cache by tag. Use your `/api/revalidate` endpoint (if present) to bust tags.

@@ -36,5 +36,4 @@ Cache/Invalidation
 
 GTMetrix/Analytics
 - GTM loads only when `NEXT_PUBLIC_GTM_ID` is set and env permits.
-- Route changes pushed via `lib/gtm-route-change.tsx`.
-
+- GA4 Enhanced Measurement should be enabled to track SPA route changes.

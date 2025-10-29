@@ -4,8 +4,6 @@ import Header from "@/components/global-nav/header/Header";
 import Footer from "@/components/global-nav/footer/Footer";
 import AnalyticsScripts from "@/lib/telemetry/analytics";
 import { inter, allura, candara } from "@/lib/ui/fonts";
-import { Suspense } from "react";
-import GtmRouteChange from "@/lib/telemetry/gtm-route-change";
 import ChatConsentGate from "@/components/lead-capture/tawk-chatbot/ChatConsentGate";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 
@@ -229,9 +227,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         "
       >
         <AnalyticsScripts />
-        <Suspense fallback={null}>
-          <GtmRouteChange />
-        </Suspense>
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

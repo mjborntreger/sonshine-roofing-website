@@ -3209,12 +3209,48 @@ export async function listRecentProjectsByServiceArea(
 
   if (!normalized.length) return [];
 
+  const uniqueBySlug = (projects: ProjectSummary[]): ProjectSummary[] => {
+    const seen = new Set<string>();
+    const deduped: ProjectSummary[] = [];
+    for (const project of projects) {
+      const slug = typeof project.slug === 'string' ? project.slug : '';
+      if (!slug.length) continue;
+      if (seen.has(slug)) continue;
+      seen.add(slug);
+      deduped.push(project);
+    }
+    return deduped;
+  };
+
+  const FALLBACK_SERVICE_AREA_SLUG = 'sarasota';
+
   const result = await filterProjects({
     serviceAreaSlugs: normalized,
     first: limit,
   });
 
-  return result.items.slice(0, limit);
+  const primaryProjects = uniqueBySlug(result.items).slice(0, limit);
+
+  const needsFallback =
+    primaryProjects.length < limit && !normalized.includes(FALLBACK_SERVICE_AREA_SLUG);
+
+  if (!needsFallback) {
+    return primaryProjects.slice(0, limit);
+  }
+
+  const fallbackResult = await filterProjects({
+    serviceAreaSlugs: [FALLBACK_SERVICE_AREA_SLUG],
+    first: limit,
+  });
+
+  const fallbackProjects = uniqueBySlug(fallbackResult.items);
+  const existingSlugs = new Set(primaryProjects.map((project) => project.slug));
+  const backfill = fallbackProjects.filter(
+    (project) => typeof project.slug === 'string' && !existingSlugs.has(project.slug)
+  );
+
+  // Preserve location-specific ordering; append Sarasota projects as backfill.
+  return [...primaryProjects, ...backfill].slice(0, limit);
 }
 
 /** ----------------------------------------------------------------------

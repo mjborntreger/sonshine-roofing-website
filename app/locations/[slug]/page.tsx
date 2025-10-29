@@ -57,6 +57,8 @@ const leadFormLayout = "w-full px-2";
 const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
 const narrowLayout = "mx-auto w-full max-w-[1280px]";
 const FALLBACK_REVIEW_INTERVAL_SECONDS = 60;
+const MAX_LOCATION_REVIEWS = 10;
+const SARASOTA_SLUG = "sarasota";
 const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
 const GBP_PROFILE_URL =
   RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
@@ -104,6 +106,35 @@ const normalizeFeaturedReviews = (reviews: LocationRecord["featuredReviews"]): R
       return normalized;
     })
     .filter((item): item is Review => item !== null);
+};
+
+const buildReviewKey = (review: Review): string => {
+  const author = review.author_name?.trim().toLowerCase() ?? "";
+  const text = review.text.trim().replace(/\s+/g, " ").toLowerCase();
+  const time = typeof review.time === "number" ? review.time : "";
+  return `${author}|${text}|${time}`;
+};
+
+const mergeReviewsWithBackfill = (primary: Review[], fallback: Review[], max: number): Review[] => {
+  const seen = new Set<string>();
+  const uniquePrimary = primary.filter((review) => {
+    const key = buildReviewKey(review);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  if (uniquePrimary.length >= max) return uniquePrimary;
+
+  const uniqueFallback = fallback.filter((review) => {
+    const key = buildReviewKey(review);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  const combined = uniquePrimary.concat(uniqueFallback);
+  return combined.length > max ? combined.slice(0, max) : combined;
 };
 
 
@@ -181,13 +212,27 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   const modifiedDisplay = formatDate(location.modified);
 
   const featuredReviews = normalizeFeaturedReviews(location.featuredReviews);
+  let displayReviews = featuredReviews;
+  if (slug !== SARASOTA_SLUG && featuredReviews.length < MAX_LOCATION_REVIEWS) {
+    const sarasotaLocation = await getLocationBySlug(SARASOTA_SLUG).catch(() => null);
+    const fallbackReviews = sarasotaLocation
+      ? normalizeFeaturedReviews(sarasotaLocation.featuredReviews)
+      : [];
+    if (fallbackReviews.length) {
+      displayReviews = mergeReviewsWithBackfill(
+        featuredReviews,
+        fallbackReviews,
+        MAX_LOCATION_REVIEWS
+      );
+    }
+  }
   const locationSchemaUrl = ensureAbsoluteUrl(`/locations/${slug}`);
   const schemaBusinessName = location.locationName
     ? `SonShine Roofing — ${location.locationName}`
     : null;
   const globalBusinessId = `${SITE_ORIGIN}/#roofingcontractor`;
 
-  const ratingAggregate = featuredReviews.reduce(
+  const ratingAggregate = displayReviews.reduce(
     (acc, review) => {
       if (typeof review.rating === "number" && Number.isFinite(review.rating)) {
         acc.sum += review.rating;
@@ -200,12 +245,12 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   const averageRating =
     ratingAggregate.count > 0 ? ratingAggregate.sum / ratingAggregate.count : null;
 
-  const reviewSchema = featuredReviews.length
+  const reviewSchema = displayReviews.length
     ? buildReviewSchema({
-        reviews: featuredReviews,
+        reviews: displayReviews,
         averageRating,
-        reviewCount: featuredReviews.length,
-        ratingCount: ratingAggregate.count || featuredReviews.length,
+        reviewCount: displayReviews.length,
+        ratingCount: ratingAggregate.count || displayReviews.length,
         options: {
           businessName: schemaBusinessName ?? "SonShine Roofing",
           businessUrl: locationSchemaUrl,
@@ -242,6 +287,9 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   const structuredData = structuredDataItems.length
     ? graphSchema({ items: structuredDataItems })
     : null;
+  const hasDisplayReviews = displayReviews.length > 0;
+  const carouselLimit =
+    displayReviews.length >= MAX_LOCATION_REVIEWS ? displayReviews.length : MAX_LOCATION_REVIEWS;
 
   return (
     <>
@@ -254,16 +302,16 @@ export default async function LocationPage({ params }: { params: Promise<Params>
         </div>
       </section>
       <section className={reviewsLayout}>
-        {featuredReviews.length ? (
+        {hasDisplayReviews ? (
           <ReviewsCarousel
-            reviews={featuredReviews}
+            reviews={displayReviews}
             heading={`What Our ${location.locationName || location.title || slug} Customers Say`}
             highlightText={location.locationName ? `${location.locationName} Customers` : undefined}
             showBusinessProfileLink={true}
             showRatingSummary={true}
             showSeeAllButton={true}
             showDisclaimer={false}
-            limit={featuredReviews.length}
+            limit={carouselLimit}
             fallbackToRemote={true}
           />
         ) : (
