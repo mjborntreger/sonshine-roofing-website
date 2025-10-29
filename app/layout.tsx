@@ -4,7 +4,7 @@ import Header from "@/components/global-nav/header/Header";
 import Footer from "@/components/global-nav/footer/Footer";
 import AnalyticsScripts from "@/lib/telemetry/analytics";
 import { inter, allura, candara } from "@/lib/ui/fonts";
-import ChatConsentGate from "@/components/lead-capture/tawk-chatbot/ChatConsentGate";
+import BrevoChatLoader from "@/components/lead-capture/brevo-chatbot/BrevoChatLoader";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 
 export const metadata: Metadata = {
@@ -236,7 +236,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: JSON.stringify(getGlobalSchema()) }}
         />
-        <ChatConsentGate />
+        <BrevoChatLoader />
       </body>
     </html>
   );
