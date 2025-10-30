@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 
+type BrevoConversationsFn = ((...args: unknown[]) => void) & { q?: unknown[][] };
+
 declare global {
   interface Window {
     __brevoConversationsLoaded?: boolean;
@@ -10,8 +12,6 @@ declare global {
       (...args: unknown[]): void;
       q?: unknown[][];
     };
-    requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
-    cancelIdleCallback?: (handle: number) => void;
   }
 }
 
@@ -26,10 +26,10 @@ export default function BrevoChatLoader() {
       try {
         window.BrevoConversationsID = '68507bf3bb6bfc804b0cadfc';
         if (!window.BrevoConversations) {
-          const queueingFunction = (...args: unknown[]) => {
+          const queueingFunction: BrevoConversationsFn = (...args: unknown[]) => {
             (queueingFunction.q = queueingFunction.q || []).push(args);
           };
-          window.BrevoConversations = queueingFunction as typeof window.BrevoConversations;
+          window.BrevoConversations = queueingFunction;
         }
 
         const script = document.createElement('script');

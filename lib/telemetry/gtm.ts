@@ -30,7 +30,6 @@ function isDev() {
 function logDebug(message: string, payload: unknown) {
   if (!isDev()) return;
   try {
-    // eslint-disable-next-line no-console -- development diagnostics
     console.info(`[GTM] ${message}`, payload);
   } catch {
     // ignore logging failures
