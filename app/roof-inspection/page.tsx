@@ -22,8 +22,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   if (!config) {
     return buildBasicMetadata({
-      title: "Roof Inspection | SonShine Roofing",
-      description: "Roof inspection services from SonShine Roofing.",
+      title: "Residential Roof Inspection | SonShine Roofing",
+      description: "Roof inspections with ZERO hassle | Fast, Friendly, Professional | (941) 866-4320 | Call Us Today!",
       path: SERVICE_PATH,
     });
   }
@@ -72,7 +72,7 @@ export default async function Page() {
     <Section>
       <div className="grid gap-4 px-2 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
         <div id="article-root" className="prose min-w-0">
-          <h1>Roof Inspection</h1>
+          <h1>Residential Roof Inspection</h1>
           {/* JSON-LD: WebPage + BreadcrumbList */}
           <JsonLd data={webPageLd} />
           <JsonLd data={breadcrumbsLd} />
@@ -133,7 +133,7 @@ export default async function Page() {
           </div>
 
           <p>
-            Comprehensive roof inspections become even more critical during tough economic times,
+            Comprehensive residential roof inspections become even more critical during tough economic times,
             helping you maximize your roof’s service life and avoid premature roof replacement.
             As we like to say: the only people who can afford to ignore their roof are those who
             can afford to buy a new one.
