@@ -242,7 +242,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </SmartLink>
         <h1 className="mb-8 mt-4 text-3xl md:text-5xl">{project.title}</h1>
       </div>
-      <ShareWhatYouThink />
+      <ShareWhatYouThink urlOverride={shareUrl} />
 
       <div className="h-1 w-full mt-6 mb-2 rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
 

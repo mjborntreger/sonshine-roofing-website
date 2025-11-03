@@ -31,20 +31,20 @@ type Props = {
 export default function ProjectArchiveClient({ initialResult, filterTerms, pageSize, initialFilters }: Props) {
   const groups: FilterGroupConfig[] = [
     {
-      key: "material",
-      label: "Material",
-      facet: "material_type",
-      paramKey: "mt",
-      icon: Layers,
-      options: filterTerms.materials.map((term) => ({ slug: term.slug, label: term.name })),
-    },
-    {
       key: "roof",
       label: "Roof Color",
       facet: "roof_color",
       paramKey: "rc",
       icon: Palette,
       options: filterTerms.roofColors.map((term) => ({ slug: term.slug, label: term.name })),
+    },
+    {
+      key: "material",
+      label: "Material",
+      facet: "material_type",
+      paramKey: "mt",
+      icon: Layers,
+      options: filterTerms.materials.map((term) => ({ slug: term.slug, label: term.name })),
     },
     {
       key: "area",
