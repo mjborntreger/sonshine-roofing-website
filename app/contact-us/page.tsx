@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Section from "@/components/layout/Section";
 import SimpleLeadForm from "@/components/lead-capture/lead-form/SimpleLeadForm";
 import SmartLink from "@/components/utils/SmartLink";
-import { Phone, MapPin, ShieldCheck, BadgeCheck, Banknote, Star, ArrowUpRight } from "lucide-react";
+import { Phone, MapPin, ShieldCheck, BadgeCheck, Banknote, Star } from "lucide-react";
 import Image from 'next/image';
 import SocialMediaProfiles from "@/components/global-nav/static-pages/SocialMediaProfiles";
 import type { Metadata } from 'next';
@@ -115,14 +115,7 @@ export default async function Page() {
                 />
                 <div>
                   <p className="text-md font-semibold text-slate-900">
-                    You’ll likely talk to 
-                    <SmartLink 
-                      className="text-[--brand-blue] hover:underline" 
-                      href="/person/tara"
-                      data-icon-affordance="up-right"
-                      > Tara
-                      <ArrowUpRight className="icon-affordance h-4 w-4 inline ml-1" />
-                    </SmartLink>
+                    You’ll likely talk to <span className="inline text-[--brand-blue]">Tara</span>
                   </p>
                   <p className="text-md text-slate-600">She’s friendly, fast, and hates leaks.</p>
                 </div>

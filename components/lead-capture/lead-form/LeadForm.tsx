@@ -67,7 +67,7 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
   return (
     <div id="get-started">
       {!showWizard && (
-        <div ref={containerRef} className="overflow-hidden mx-auto max-w-5xl rounded-3xl border border-blue-100 bg-white shadow-md">
+        <div ref={containerRef} className="overflow-hidden mx-auto max-w-6xl rounded-3xl border border-blue-100 bg-white shadow-md">
           <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
