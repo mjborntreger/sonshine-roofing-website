@@ -1,36 +1,64 @@
 'use client';
 
-import { useEffect, useRef, useState, type ComponentType } from 'react';
+import { useCallback, useEffect, useState, type ComponentType } from 'react';
 import type { Review } from './types';
 
 type Props = {
   reviews: Review[];
   gbpUrl: string;
+  fallbackId?: string;
 };
 
-export default function ReviewsSliderLazy({ reviews, gbpUrl }: Props) {
-  const [Slider, setSlider] = useState<ComponentType<Props> | null>(null);
+type SliderComponent = ComponentType<Pick<Props, 'reviews' | 'gbpUrl'>>;
+
+export default function ReviewsSliderLazy({ reviews, gbpUrl, fallbackId }: Props) {
+  const [Slider, setSlider] = useState<SliderComponent | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const hideFallback = useCallback(() => {
+    if (!fallbackId) return;
+    const fallbackEl = document.getElementById(fallbackId);
+    if (fallbackEl) {
+      fallbackEl.classList.add('hidden');
+      fallbackEl.setAttribute('data-hidden-by', 'reviews-slider');
+    }
+  }, [fallbackId]);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el || shouldLoad) return;
+    if (shouldLoad) return;
+    if (typeof window === 'undefined') return;
 
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries.some(entry => entry.isIntersecting)) {
-          setShouldLoad(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: '200px 0px' }
-    );
+    let triggered = false;
 
-    observer.observe(el);
+    const cleanup = () => {
+      window.removeEventListener('scroll', handleEvent);
+      window.removeEventListener('wheel', handleEvent);
+      window.removeEventListener('touchmove', handleEvent);
+      window.removeEventListener('keydown', handleEvent);
+    };
 
-    return () => observer.disconnect();
-  }, [shouldLoad]);
+    const triggerLoad = () => {
+      if (triggered) return;
+      triggered = true;
+      hideFallback();
+      setShouldLoad(true);
+      cleanup();
+    };
+
+    const handleEvent = () => triggerLoad();
+
+    if (window.scrollY > 0) {
+      triggerLoad();
+      return cleanup;
+    }
+
+    window.addEventListener('scroll', handleEvent, { passive: true });
+    window.addEventListener('wheel', handleEvent, { passive: true });
+    window.addEventListener('touchmove', handleEvent, { passive: true });
+    window.addEventListener('keydown', handleEvent);
+
+    return cleanup;
+  }, [shouldLoad, hideFallback]);
 
   useEffect(() => {
     if (!shouldLoad || Slider) return;
@@ -45,9 +73,11 @@ export default function ReviewsSliderLazy({ reviews, gbpUrl }: Props) {
     };
   }, [shouldLoad, Slider]);
 
-  return (
-    <div ref={containerRef}>
-      {Slider ? <Slider reviews={reviews} gbpUrl={gbpUrl} /> : null}
-    </div>
-  );
+  useEffect(() => {
+    if (!Slider) return;
+    const frame = requestAnimationFrame(hideFallback);
+    return () => cancelAnimationFrame(frame);
+  }, [Slider, hideFallback]);
+
+  return Slider ? <Slider reviews={reviews} gbpUrl={gbpUrl} /> : null;
 }

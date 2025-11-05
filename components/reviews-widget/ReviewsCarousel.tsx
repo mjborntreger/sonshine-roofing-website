@@ -51,6 +51,30 @@ const toNumberOrNull = (value: number | string | null | undefined): number | nul
 const sanitizeLimit = (value?: number): number =>
   Number.isFinite(value) && value !== undefined && value > 0 ? Math.floor(value) : 8;
 
+const ordinalize = (day: number): string => {
+  const j = day % 10;
+  const k = day % 100;
+  if (j === 1 && k !== 11) return `${day}st`;
+  if (j === 2 && k !== 12) return `${day}nd`;
+  if (j === 3 && k !== 13) return `${day}rd`;
+  return `${day}th`;
+};
+
+const formatReviewDate = (time?: number | null, fallback?: string | null): string | null => {
+  if (typeof time === 'number' && Number.isFinite(time) && time > 0) {
+    const date = new Date(time * 1000);
+    if (!Number.isNaN(date.getTime())) {
+      const month = date.toLocaleString('en-US', { month: 'long' });
+      const day = ordinalize(date.getDate());
+      const year = date.getFullYear();
+      return `${month} ${day}, ${year}`;
+    }
+  }
+  return fallback?.trim() || null;
+};
+
+const createFallbackId = (): string => `reviews-fallback-${Math.random().toString(36).slice(2, 10)}`;
+
 export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
   const {
     reviews: injectedReviews,
@@ -115,6 +139,51 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
     ? `Average Google rating ${avgRatingDisplay} out of 5`
     : 'View our Business Profile on Google';
   const renderedHeading = heading ? renderHighlight(heading, highlightText) : null;
+  const fallbackId = createFallbackId();
+
+  const fallbackReviews = (
+    <div
+      id={fallbackId}
+      className="grid gap-6 mt-10 text-left md:grid-cols-2 lg:grid-cols-3"
+    >
+      {filtered.map((review, index) => {
+        const ratingValue = Math.min(5, Math.max(0, Math.round(review.rating ?? 5)));
+        const formattedDate = formatReviewDate(review.time, review.relative_time_description);
+        return (
+          <article
+            key={`${review.author_name}-${review.time ?? index}`}
+            className="flex flex-col h-full p-6 text-left rounded-3xl border border-slate-200 bg-white/80 shadow-sm"
+          >
+            <header className="flex flex-col gap-2">
+              <div className="text-lg font-semibold text-slate-800">{review.author_name}</div>
+              <div className="flex flex-wrap items-center gap-2 text-[#fb9216]">
+                <span className="sr-only">{`Rated ${ratingValue} out of 5`}</span>
+                {Array.from({ length: 5 }).map((_, starIndex) => (
+                  <span key={starIndex} aria-hidden="true" className="text-xl leading-none">
+                    {starIndex < ratingValue ? '★' : '☆'}
+                  </span>
+                ))}
+                {formattedDate ? (
+                  <span className="text-xs font-medium tracking-wide uppercase text-slate-400">
+                    {formattedDate}
+                  </span>
+                ) : null}
+              </div>
+            </header>
+            <p className="mt-4 text-sm leading-7 whitespace-pre-line text-slate-700 flex-1">
+              {review.text}
+            </p>
+            {review.ownerReply ? (
+              <blockquote className="pl-4 mt-4 text-sm italic text-left border-l-4 border-blue-500 text-slate-600">
+                {review.ownerReply}
+              </blockquote>
+            ) : null}
+          </article>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div className={className}>
       {heading ? (
@@ -150,7 +219,8 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
             <span aria-hidden="true">★</span>&nbsp;on Google
           </SmartLink>
         )}
-        <ReviewsSliderLazy reviews={filtered} gbpUrl={resolvedGbpUrl} />
+        {fallbackReviews}
+        <ReviewsSliderLazy reviews={filtered} gbpUrl={resolvedGbpUrl} fallbackId={fallbackId} />
         <div className="text-center">
           {showDisclaimer ? (
             <p className="mb-10 text-sm italic text-slate-500">

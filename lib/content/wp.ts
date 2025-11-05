@@ -55,10 +55,39 @@ const toStringSafe = (value: unknown, fallback = ""): string => {
 const stringOrNull = (value: unknown): string | null =>
   typeof value === "string" ? value : null;
 
+const readTrimmedString = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : null;
+};
+
 const readProjectDescription = (details: unknown): string | null => {
   const record = asRecord(details);
   const raw = record?.projectDescription;
   return typeof raw === "string" ? raw : null;
+};
+
+const readProjectTestimonial = (details: unknown): ProjectTestimonial | null => {
+  const record = asRecord(details);
+  const testimonial = asRecord(record?.customerTestimonial);
+  if (!testimonial) return null;
+
+  const customerReview = readTrimmedString(testimonial.customerReview);
+  if (!customerReview) return null;
+
+  const customerName = readTrimmedString(testimonial.customerName) ?? undefined;
+  const ownerReply = readTrimmedString(testimonial.ownerReply) ?? undefined;
+  const reviewDate = readTrimmedString(testimonial.reviewDate) ?? undefined;
+  const reviewUrlRaw = readTrimmedString(testimonial.reviewUrl);
+  const reviewUrl = reviewUrlRaw ? ensureAbsoluteUrl(reviewUrlRaw, SITE_ORIGIN) : undefined;
+
+  return {
+    customerName,
+    customerReview,
+    ownerReply,
+    reviewUrl,
+    reviewDate,
+  };
 };
 
 const readRecordString = (record: UnknownRecord | null, key: string): string | null => {
@@ -92,6 +121,14 @@ export type TermLite = { name: string; slug: string };
 
 export type ProductLink = { productName: string; productLink: string | null };
 
+export type ProjectTestimonial = {
+  customerName?: string;
+  customerReview: string;
+  ownerReply?: string;
+  reviewUrl?: string;
+  reviewDate?: string;
+};
+
 export type ProjectSummary = {
   slug: string;
   uri: string;
@@ -122,6 +159,7 @@ export type ProjectFull = ProjectSummary & {
   roofColors: TermLite[];
   serviceAreas: TermLite[];
   youtubeUrl?: string | null;
+  customerTestimonial?: ProjectTestimonial | null;
   /** RankMath SEO block for OG/Twitter + JSON-LD mapping */
   seo?: {
     title?: string | null;
@@ -3048,6 +3086,13 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
               }
             }
           }
+          customerTestimonial {
+            customerName
+            customerReview
+            ownerReply
+            reviewUrl
+            reviewDate
+          }
         }
 
         # ACF Field Group: projectFilters (taxonomy fields)
@@ -3083,6 +3128,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
     projectDescription: readProjectDescription(projectDetails),
     productLinks: mapProductLinks(asArray<Maybe<ProductLinkNode>>(projectDetails?.productLinks)),
     projectImages: mapImages(extractNodes(projectDetails?.projectImages) as Maybe<ImageNode>[]),
+    customerTestimonial: readProjectTestimonial(projectDetails),
 
     materialTypes: mapTermNodes(projectFilters?.materialType),
     roofColors: mapTermNodes(projectFilters?.roofColor),

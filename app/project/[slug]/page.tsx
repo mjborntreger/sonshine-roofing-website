@@ -10,13 +10,14 @@ import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
 import ProjectGallery from "@/components/dynamic-content/project/ProjectGallery";
 import { PROJECT_GALLERY_DEFAULT_HEIGHT, PROJECT_GALLERY_DEFAULT_WIDTH } from "@/components/dynamic-content/project/galleryConfig";
+import ProjectTestimonial from "@/components/dynamic-content/project/ProjectTestimonial";
 
 import type { Metadata } from "next";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
-import { creativeWorkSchema, videoObjectSchema } from "@/lib/seo/schema";
+import { creativeWorkSchema, projectReviewSchema, videoObjectSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, List, Rows3 } from "lucide-react";
 
 type OgImageRecord = {
   url?: unknown;
@@ -225,10 +226,22 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     additionalProperties: Object.keys(projectAdditionalProps).length ? projectAdditionalProps : undefined,
   });
 
+  const reviewSchema =
+    project.customerTestimonial
+      ? projectReviewSchema({
+          testimonial: project.customerTestimonial,
+          projectName: project.title,
+          projectUrl: shareUrl,
+          projectImage: project.heroImage?.url,
+          origin,
+        })
+      : null;
+
   return (
     <Section>
       {videoSchema ? <JsonLd id="project-video" data={videoSchema} /> : null}
       <JsonLd data={projectSchema} />
+      {reviewSchema ? <JsonLd id="project-review" data={reviewSchema} /> : null}
 
       {/* Title + gradient stripe */}
       <div>
@@ -272,7 +285,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               />
             )
           )}
-
           {hasAnyBadges && (
             <div className="flex flex-wrap gap-2 mt-4">
               {project.materialTypes?.map((t) => (
@@ -288,6 +300,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             </div>
           )}
 
+          {project.customerTestimonial ? (
+            <ProjectTestimonial testimonial={project.customerTestimonial} className="mt-8" />
+          ) : null}
+
           <div className="bg-slate-200 h-[1.5px] my-16 w-full" />
 
           {/* Gallery */}
@@ -298,14 +314,22 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <div className="p-6 sticky top-24 prose bg-white shadow-md rounded-3xl border-slate-200">
           {project.projectDescription && (
             <>
-              <h3>Project Summary</h3>
+              <h3>
+                <Rows3 className="text-[--brand-blue] mr-2 inline h-5 w-5" />
+                Project Summary
+              </h3>
               <p>{project.projectDescription}</p>
             </>
           )}
 
           {project.productLinks?.length > 0 && (
             <>
-              <h3 className="mt-6">Products Used</h3>
+              <h3 
+                className="mt-6"
+                >
+                  <List className="text-[--brand-blue] mr-2 inline h-5 w-5" />
+                  Products Used
+                </h3>
               <ul className="pl-5 list-disc">
                 {project.productLinks.map((p, i) => (
                   <li key={i}>

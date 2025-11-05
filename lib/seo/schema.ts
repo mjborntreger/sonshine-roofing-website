@@ -86,6 +86,14 @@ const toIsoDate = (unixSeconds?: number | null): string | null => {
   return date.toISOString();
 };
 
+const toIsoDateString = (value?: string | null): string | null => {
+  const trimmed = trimOrNull(value ?? null);
+  if (!trimmed) return null;
+  const date = new Date(trimmed);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+};
+
 const stripToPlainText = (html: string | null | undefined): string | null => {
   if (!html) return null;
   const text = html
@@ -828,6 +836,82 @@ export const buildReviewSchema = ({
   const includeContext = safeOptions.withContext ?? true;
   return includeContext ? { "@context": SCHEMA_CONTEXT, ...schema } : schema;
 };
+
+export type ProjectReviewSchemaInput = {
+  testimonial: {
+    customerName?: string;
+    customerReview: string;
+    ownerReply?: string;
+    reviewUrl?: string;
+    reviewDate?: string;
+  };
+  projectName: string;
+  projectUrl: string;
+  projectImage?: string | null;
+  origin?: string;
+  withContext?: boolean;
+};
+
+export function projectReviewSchema({
+  testimonial,
+  projectName,
+  projectUrl,
+  projectImage,
+  origin = SITE_ORIGIN,
+  withContext = true,
+}: ProjectReviewSchemaInput) {
+  const reviewBody = trimOrNull(testimonial.customerReview);
+  if (!reviewBody) return null;
+
+  const authorName = trimOrNull(testimonial.customerName) || "SonShine Roofing Homeowner";
+  const canonicalProjectUrl = ensureAbsoluteUrl(projectUrl, origin);
+  const reviewUrl = testimonial.reviewUrl
+    ? ensureAbsoluteUrl(testimonial.reviewUrl, origin)
+    : canonicalProjectUrl;
+
+  const itemReviewed: SchemaInit = {
+    "@type": "CreativeWork",
+    name: projectName,
+    url: canonicalProjectUrl,
+  };
+
+  if (projectImage) {
+    itemReviewed.image = ensureAbsoluteUrl(projectImage, origin);
+  }
+
+  const schema: SchemaInit = {
+    "@type": "Review",
+    url: reviewUrl,
+    reviewBody,
+    author: {
+      "@type": "Person",
+      name: authorName,
+    },
+    itemReviewed,
+    publisher: {
+      "@type": "Organization",
+      name: DEFAULT_BUSINESS_NAME,
+      url: origin,
+    },
+  };
+
+  const isoDate = toIsoDateString(testimonial.reviewDate);
+  if (isoDate) schema.datePublished = isoDate;
+
+  const ownerReply = trimOrNull(testimonial.ownerReply);
+  if (ownerReply) {
+    schema.comment = {
+      "@type": "Comment",
+      text: ownerReply,
+      author: {
+        "@type": "Organization",
+        name: DEFAULT_BUSINESS_NAME,
+      },
+    };
+  }
+
+  return applyContext(schema, withContext);
+}
 
 export type SponsorFeatureForSchema = {
   title?: string | null;
