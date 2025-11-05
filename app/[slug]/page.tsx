@@ -151,7 +151,7 @@ function injectCtaAfterNthParagraph(html: string, n = 3) {
   >
     Get started
     <svg
-      xmlns="http://www.w3.org/2000/svg"
+      xmlns="https://www.w3.org/2000/svg"
       width="24"
       height="24"
       viewBox="0 0 24 24"

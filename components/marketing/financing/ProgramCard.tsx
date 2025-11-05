@@ -92,7 +92,7 @@ export default function ProgramCard({
             {logoUrl ? (
               <Image
                 src={logoUrl}
-                alt="Program logo"
+                alt={title}
                 width={96}
                 height={32}
                 className="h-8 w-auto opacity-70"
