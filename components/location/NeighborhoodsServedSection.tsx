@@ -30,7 +30,7 @@ export default function NeighborhoodsServedSection({
         <p className={SECTION_SUBTITLE}>{eyebrow}</p>
       </div>
       {neighborhoods.length ? (
-        <div className="grid grid-cols-1 gap-6 space-y-6 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {neighborhoods.map((neighborhood, index) => {
             const title = neighborhood.neighborhood || `Neighborhood ${index + 1}`;
             const zipCodes = neighborhood.zipCodes ?? [];
