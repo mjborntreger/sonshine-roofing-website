@@ -36,9 +36,9 @@ const extractNode = (value: unknown, key = 'node'): unknown => {
   return record ? record[key] : undefined;
 };
 
-const toImageNode = (value: unknown): Maybe<ImageNode> => {
+const toImageNode = (value: unknown): Maybe<WpImageNode> => {
   const record = asRecord(value);
-  return record as ImageNode | null;
+  return record as WpImageNode | null;
 };
 
 const pickImageFrom = (value: unknown): WpImage | null => pickImage(toImageNode(extractNode(value)));
@@ -833,13 +833,13 @@ export async function wpFetch<T = Json>(
 }
 
 // ----- Helpers -----
-type ImageNode = {
+export type WpImageNode = {
   sourceUrl?: unknown;
   altText?: unknown;
   mediaDetails?: unknown;
 };
 
-const pickImage = (node?: Maybe<ImageNode>): WpImage | null => {
+const pickImage = (node?: Maybe<WpImageNode>): WpImage | null => {
   if (!isRecord(node)) return null;
   const url = toStringSafe(node.sourceUrl);
   if (!url) return null;
@@ -885,7 +885,7 @@ const mapProductLinks = (rows?: readonly Maybe<ProductLinkNode>[]): ProductLink[
       };
     });
 
-const mapImages = (rows?: readonly Maybe<ImageNode>[]): WpImage[] =>
+export const mapImages = (rows?: readonly Maybe<WpImageNode>[]): WpImage[] =>
   (rows ?? [])
     .map((node) => pickImage(node))
     .filter((image): image is WpImage => Boolean(image));
@@ -3127,7 +3127,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
 
     projectDescription: readProjectDescription(projectDetails),
     productLinks: mapProductLinks(asArray<Maybe<ProductLinkNode>>(projectDetails?.productLinks)),
-    projectImages: mapImages(extractNodes(projectDetails?.projectImages) as Maybe<ImageNode>[]),
+    projectImages: mapImages(extractNodes(projectDetails?.projectImages) as Maybe<WpImageNode>[]),
     customerTestimonial: readProjectTestimonial(projectDetails),
 
     materialTypes: mapTermNodes(projectFilters?.materialType),

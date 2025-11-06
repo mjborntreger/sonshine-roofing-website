@@ -9,6 +9,7 @@ Quick Checks
   - `/sitemap_index` lists child sitemaps.
   - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
   - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
+  - `/sitemap_index/image` surfaces primary blog/project/location images.
 - GTM
   - `NEXT_PUBLIC_GTM_ID` set and GA4 Enhanced Measurement enabled for page views.
 
@@ -34,5 +35,6 @@ Financing calculator webhook (WordPress)
 Status Checklist (handoff)
 - [ ] Robots staging: Disallow all
 - [ ] Sitemaps preview: ON/OFF as expected
+- [ ] Image sitemap (`/sitemap_index/image`) returns expected entries
 - [ ] Search Console: property verified, sitemap submitted (prod)
 - [ ] GTM: container ID set, GA4 Enhanced Measurement capturing page views

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
-import { wpFetch } from '@/lib/content/wp';
+import { wpFetch, mapImages, type WpImageNode } from '@/lib/content/wp';
 import { formatLastmod, normalizeEntryPath } from '../utils';
+import { serializeImageEntry, type ImageSitemapEntry } from './serialization';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600;
@@ -16,26 +17,20 @@ const PREVIEW =
 
 type Maybe<T> = T | null | undefined;
 
-type MediaNode = {
-  sourceUrl?: string | null;
-  altText?: string | null;
-  mediaDetails?: Maybe<{ width?: number | null; height?: number | null }>;
-};
-
-type MediaWrapper = { node?: Maybe<MediaNode> };
+type ImageNodeWrapper = { node?: Maybe<WpImageNode> };
 
 type BlogImageNode = {
   uri?: string | null;
   modifiedGmt?: string | null;
-  featuredImage?: Maybe<MediaWrapper>;
+  featuredImage?: Maybe<ImageNodeWrapper>;
 };
 
 type ProjectImageNode = {
   uri?: string | null;
   modifiedGmt?: string | null;
-  featuredImage?: Maybe<MediaWrapper>;
+  featuredImage?: Maybe<ImageNodeWrapper>;
   projectDetails?: Maybe<{
-    projectImages?: Maybe<{ nodes?: Maybe<MediaNode>[] | null }>;
+    projectImages?: Maybe<{ nodes?: Maybe<WpImageNode>[] | null }>;
   }>;
 };
 
@@ -43,16 +38,22 @@ type LocationImageNode = {
   uri?: string | null;
   modifiedGmt?: string | null;
   locationAttributes?: Maybe<{
-    map?: Maybe<MediaWrapper>;
+    map?: Maybe<ImageNodeWrapper>;
     neighborhoodsServed?: Maybe<
       Array<
         Maybe<{
           neighborhood?: string | null;
-          neighborhoodImage?: Maybe<MediaWrapper>;
+          neighborhoodImage?: Maybe<ImageNodeWrapper>;
         }>
       >
     >;
   }>;
+};
+
+type PersonImageNode = {
+  uri?: string | null;
+  modifiedGmt?: string | null;
+  featuredImage?: Maybe<ImageNodeWrapper>;
 };
 
 type BlogImageResult = {
@@ -76,46 +77,22 @@ type LocationImageResult = {
   } | null;
 };
 
-type SitemapImage = {
-  url: string;
-  alt?: string | null;
-  width?: number | null;
-  height?: number | null;
+type PersonImageResult = {
+  persons?: {
+    pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
+    nodes?: Maybe<PersonImageNode>[] | null;
+  } | null;
 };
 
-type ImageSitemapEntry = {
-  loc: string;
-  lastmod?: string | null;
-  images: SitemapImage[];
+const mapWrapperImages = (wrapper?: Maybe<ImageNodeWrapper>) => {
+  const node = wrapper?.node;
+  return node ? mapImages([node]) : [];
 };
 
-const pickImage = (node?: Maybe<MediaNode>): SitemapImage | null => {
-  if (!node || !node.sourceUrl) return null;
-  const url = node.sourceUrl.trim();
-  if (!url) return null;
-  return {
-    url,
-    alt: node.altText?.trim() || null,
-    width: typeof node.mediaDetails?.width === 'number' ? node.mediaDetails.width : null,
-    height: typeof node.mediaDetails?.height === 'number' ? node.mediaDetails.height : null,
-  };
-};
-
-const pickImageFromWrapper = (wrapper?: Maybe<MediaWrapper>) => pickImage(wrapper?.node);
-
-const dedupeImages = (images: Array<SitemapImage | null>, limit = 100): SitemapImage[] => {
-  const seen = new Set<string>();
-  const result: SitemapImage[] = [];
-  for (const img of images) {
-    if (!img) continue;
-    const url = img.url.trim();
-    if (!url || seen.has(url)) continue;
-    seen.add(url);
-    result.push({ ...img, url });
-    if (result.length >= limit) break;
-  }
-  return result;
-};
+const toImageNodeArray = (
+  nodes?: Maybe<WpImageNode>[] | null
+): ReadonlyArray<Maybe<WpImageNode>> | undefined =>
+  Array.isArray(nodes) ? nodes : undefined;
 
 const getBlogImageNodes = unstable_cache(
   async () => {
@@ -134,7 +111,6 @@ const getBlogImageNodes = unstable_cache(
               node {
                 sourceUrl
                 altText
-                mediaDetails { width height }
               }
             }
           }
@@ -181,7 +157,6 @@ const getProjectImageNodes = unstable_cache(
               node {
                 sourceUrl
                 altText
-                mediaDetails { width height }
               }
             }
             projectDetails {
@@ -189,7 +164,6 @@ const getProjectImageNodes = unstable_cache(
                 nodes {
                   sourceUrl
                   altText
-                  mediaDetails { width height }
                 }
               }
             }
@@ -238,7 +212,6 @@ const getLocationImageNodes = unstable_cache(
                 node {
                   sourceUrl
                   altText
-                  mediaDetails { width height }
                 }
               }
               neighborhoodsServed {
@@ -247,7 +220,6 @@ const getLocationImageNodes = unstable_cache(
                   node {
                     sourceUrl
                     altText
-                    mediaDetails { width height }
                   }
                 }
               }
@@ -279,11 +251,58 @@ const getLocationImageNodes = unstable_cache(
   { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:locations'] }
 );
 
+const getPersonImageNodes = unstable_cache(
+  async () => {
+    const query = /* GraphQL */ `
+      query ImageSitemapPersons($first: Int!, $after: String) {
+        persons(
+          first: $first
+          after: $after
+          where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
+        ) {
+          pageInfo { hasNextPage endCursor }
+          nodes {
+            uri
+            modifiedGmt
+            featuredImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const nodes: PersonImageNode[] = [];
+    let after: string | null = null;
+
+    do {
+      const variables: { first: number; after?: string | null } = after
+        ? { first: 200, after }
+        : { first: 200 };
+      const data = await wpFetch<PersonImageResult>(query, variables);
+      const page = data?.persons;
+      const pageNodes = page?.nodes ?? [];
+      for (const node of pageNodes) {
+        if (node) nodes.push(node);
+      }
+      after = page?.pageInfo?.hasNextPage ? page?.pageInfo?.endCursor ?? null : null;
+    } while (after);
+
+    return nodes;
+  },
+  ['sitemap-image-persons'],
+  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:person'] }
+);
+
 const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
-  const [blogNodes, projectNodes, locationNodes] = await Promise.all([
+  const [blogNodes, projectNodes, locationNodes, personNodes] = await Promise.all([
     getBlogImageNodes(),
     getProjectImageNodes(),
     getLocationImageNodes(),
+    getPersonImageNodes(),
   ]);
 
   const entries: ImageSitemapEntry[] = [];
@@ -291,7 +310,7 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
   for (const node of blogNodes) {
     const path = normalizeEntryPath(node.uri ?? '');
     if (path === '/') continue;
-    const images = dedupeImages([pickImageFromWrapper(node.featuredImage)]);
+    const images = mapWrapperImages(node.featuredImage);
     if (!images.length) continue;
     entries.push({
       loc: path,
@@ -303,9 +322,9 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
   for (const node of projectNodes) {
     const path = normalizeEntryPath(node.uri ?? '');
     if (path === '/') continue;
-    const gallery =
-      node.projectDetails?.projectImages?.nodes?.map((item) => pickImage(item)) ?? [];
-    const images = dedupeImages([pickImageFromWrapper(node.featuredImage), ...gallery]);
+    const gallery = mapImages(toImageNodeArray(node.projectDetails?.projectImages?.nodes));
+    const hero = mapWrapperImages(node.featuredImage);
+    const images = [...hero, ...gallery];
     if (!images.length) continue;
     entries.push({
       loc: path,
@@ -321,20 +340,31 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
       : rawPath;
     if (path === '/') continue;
 
-    const neighborhoods =
-      node.locationAttributes?.neighborhoodsServed
-        ?.map((item) => {
-          if (!item) return null;
-          const img = pickImageFromWrapper(item.neighborhoodImage);
-          if (!img) return null;
-          return img.alt ? img : { ...img, alt: item.neighborhood ?? img.alt };
-        }) ?? [];
+    const mapImage = mapWrapperImages(node.locationAttributes?.map);
+    const neighborhoodImages =
+      node.locationAttributes?.neighborhoodsServed?.flatMap((item) => {
+        if (!item) return [];
+        const images = mapWrapperImages(item.neighborhoodImage);
+        if (!images.length) return [];
+        return images.map((img) => ({
+          ...img,
+          altText: img.altText || item.neighborhood || undefined,
+        }));
+      }) ?? [];
 
-    const images = dedupeImages([
-      pickImageFromWrapper(node.locationAttributes?.map),
-      ...neighborhoods,
-    ]);
+    const images = [...mapImage, ...neighborhoodImages];
+    if (!images.length) continue;
+    entries.push({
+      loc: path,
+      lastmod: formatLastmod(node.modifiedGmt),
+      images,
+    });
+  }
 
+  for (const node of personNodes) {
+    const path = normalizeEntryPath(node.uri ?? '');
+    if (path === '/') continue;
+    const images = mapWrapperImages(node.featuredImage);
     if (!images.length) continue;
     entries.push({
       loc: path,
@@ -358,13 +388,14 @@ export async function GET() {
     `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
   ].join('');
 
+  const urls = entries
+    .map((entry) => serializeImageEntry(BASE, entry))
+    .filter((entry): entry is string => Boolean(entry));
+
   const body = [
     head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">`,
-    ...entries.map((entry) => {
-      const lastmod = entry.lastmod ? `<lastmod>${entry.lastmod}</lastmod>` : '';
-      return `<url><loc>${BASE}${entry.loc}</loc>${lastmod}</url>`;
-    }),
+    ...urls,
     `</urlset>`,
   ].join('');
 

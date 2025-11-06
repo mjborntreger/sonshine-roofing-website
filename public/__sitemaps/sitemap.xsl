@@ -2,7 +2,8 @@
 <xsl:stylesheet version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:sm="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <xsl:output method="html" version="1.0" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"/>
   <xsl:strip-space elements="*"/>
 
@@ -33,6 +34,10 @@
           .video-meta{color:#9ca3af;font-size:12px;margin-top:2px}
           .video-meta a{color:#93c5fd}
           .video-meta .tag{display:inline-block;margin:2px 4px 0 0;padding:2px 6px;border-radius:999px;background:#172033;color:#cbd5f5;font-size:11px}
+          .image-item{margin:6px 0;padding:8px 10px;border:1px solid #1f2937;border-radius:8px;background:#0b1220}
+          .image-title{font-weight:600;font-size:13px;color:#f8fafc;margin-bottom:4px}
+          .image-meta{color:#9ca3af;font-size:12px;margin-top:2px}
+          .image-meta a{color:#93c5fd}
           .back-link{display:inline-flex;align-items:center;gap:6px;margin-top:12px;padding:6px 12px;border:1px solid #1f2937;border-radius:8px;background:#172033;color:#cbd5f5;font-size:13px;text-decoration:none}
           .back-link:hover{background:#1f2a44;text-decoration:none}
         </style>
@@ -78,6 +83,7 @@
                   <tr>
                     <th>Location</th>
                     <th>Last Modified</th>
+                    <th>Images</th>
                     <th>Videos</th>
                   </tr>
                 </thead>
@@ -86,6 +92,33 @@
                     <tr>
                       <td><a href="{sm:loc|loc}"><xsl:value-of select="sm:loc|loc"/></a></td>
                       <td><xsl:value-of select="sm:lastmod|lastmod"/></td>
+                      <td>
+                        <xsl:choose>
+                          <xsl:when test="image:image">
+                            <xsl:for-each select="image:image">
+                              <div class="image-item">
+                                <div class="image-title">
+                                  <xsl:choose>
+                                    <xsl:when test="normalize-space(image:title)">
+                                      <xsl:value-of select="image:title"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>Image</xsl:otherwise>
+                                  </xsl:choose>
+                                </div>
+                                <div class="image-meta">
+                                  Source:
+                                  <a href="{image:loc}">
+                                    <xsl:value-of select="image:loc"/>
+                                  </a>
+                                </div>
+                              </div>
+                            </xsl:for-each>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <span class="muted">—</span>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </td>
                       <td>
                         <xsl:choose>
                           <xsl:when test="video:video">

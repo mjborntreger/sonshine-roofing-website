@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch, stripHtml, youtubeThumb } from '@/lib/content/wp';
-import { formatLastmod, normalizeEntryPath } from '../utils';
+import { formatLastmod, normalizeEntryPath, xmlEscape, trimTo } from '../utils';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600; // safety net; tag-based revalidation should refresh sooner
@@ -159,19 +159,6 @@ const getProjectVideoNodes = unstable_cache(
 );
 
 const VIDEO_NAMESPACE = 'http://www.google.com/schemas/sitemap-video/1.1';
-
-const xmlEscape = (value: string): string =>
-  value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
-
-const trimTo = (value: string, max: number): string => {
-  if (value.length <= max) return value;
-  return value.slice(0, max).replace(/\s+\S*$/, '') + '…';
-};
 
 type VideoSitemapItem = {
   loc: string;

@@ -16,3 +16,16 @@ export const normalizeEntryPath = (value?: string | null) => {
   if (leading === '/') return '/';
   return leading.replace(/\/+$/, '');
 };
+
+export const xmlEscape = (value: string): string =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+
+export const trimTo = (value: string, max: number): string => {
+  if (value.length <= max) return value;
+  return value.slice(0, max).replace(/\s+\S*$/, '') + '…';
+};

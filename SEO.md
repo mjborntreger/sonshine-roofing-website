@@ -18,8 +18,9 @@ Sitemaps
 - Index: `/sitemap_index`
 - Children:
   - `/sitemap_index/static` (build-time manifest)
-  - `/sitemap_index/blog`, `/project`, `/roofing-glossary`, `/person`, `/video`
+  - `/sitemap_index/blog`, `/project`, `/roofing-glossary`, `/person`, `/video`, `/image`
 - Preview mode on staging: set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`.
+- After releases that touch image content, resubmit `/sitemap_index/image` in Search Console.
 
 Structured Data
 - RoofingContractor + Services JSON-LD injected in `app/layout.tsx`.

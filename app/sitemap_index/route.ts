@@ -27,6 +27,7 @@ export function GET() {
     <sitemap><loc>${BASE}/sitemap_index/roofing-glossary</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/person</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/video</loc></sitemap>
+    <sitemap><loc>${BASE}/sitemap_index/image</loc></sitemap>
   </sitemapindex>`;
   return new NextResponse(xml, {
     headers: {

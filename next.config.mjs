@@ -83,6 +83,8 @@ const nextConfig = {
       { source: "/sitemap_index.xml", destination: "/sitemap_index", permanent: true },
       { source: "/video-sitemap", destination: "/sitemap_index", permanent: true },
       { source: "/local-sitemap", destination: "/sitemap_index", permanent: true },
+      { source: "/image-sitemap", destination: "/sitemap_index/image", permanent: true },
+      { source: "/image-sitemap.xml", destination: "/sitemap_index/image", permanent: true },
       { source: "/roof-inspection-sarasota", destination: "/roof-inspection", permanent: true },
       { source: "/html-sitemap", destination: "/sitemap_index", permanent: true },
       { source: "/expert-answers-to-your-roofing-questions", destination: "/faq", permanent: true },
