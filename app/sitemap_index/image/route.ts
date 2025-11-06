@@ -342,15 +342,19 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
 
     const mapImage = mapWrapperImages(node.locationAttributes?.map);
     const neighborhoodImages =
-      node.locationAttributes?.neighborhoodsServed?.flatMap((item) => {
-        if (!item) return [];
+      node.locationAttributes?.neighborhoodsServed?.reduce((acc, item) => {
+        if (!item) return acc;
         const images = mapWrapperImages(item.neighborhoodImage);
-        if (!images.length) return [];
-        return images.map((img) => ({
-          ...img,
-          altText: img.altText || item.neighborhood || undefined,
-        }));
-      }) ?? [];
+        if (!images.length) return acc;
+        const fallback = item.neighborhood?.trim();
+        images.forEach((img) => {
+          acc.push({
+            ...img,
+            altText: img.altText || fallback || img.altText,
+          });
+        });
+        return acc;
+      }, [] as ReturnType<typeof mapWrapperImages>) ?? [];
 
     const images = [...mapImage, ...neighborhoodImages];
     if (!images.length) continue;
