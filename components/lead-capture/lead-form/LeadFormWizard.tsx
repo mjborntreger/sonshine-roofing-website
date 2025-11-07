@@ -846,7 +846,7 @@ export default function LeadFormWizard({
                       </div>
                     )}
                   </div>
-                  <aside className="flex flex-col gap-4 text-sm h-fit text-slate-600">     
+                  <aside className="hidden lg:flex flex-col gap-4 text-sm h-fit text-slate-600">     
                     <ProjectTestimonial
                       customerName="Pasquale A."
                       formattedDate="November 4th, 2025"
