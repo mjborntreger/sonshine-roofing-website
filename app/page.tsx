@@ -93,7 +93,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     <>
       <Hero />
       <div className={leadFormLayout}>
-        <div className="max-w-[1280px] mx-auto py-16">
+        <div className="max-w-[1280px] pt-16 mx-auto">
           <LeadFormSection />
         </div>
       </div>

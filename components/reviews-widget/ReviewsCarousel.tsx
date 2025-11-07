@@ -13,7 +13,7 @@ const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "
 const GBP_URL =
   RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
 
-const DEFAULT_CONTAINER_CLASS = "py-32 max-w-[1600px] mx-auto overflow-hidden";
+const DEFAULT_CONTAINER_CLASS = "py-24 max-w-[1600px] mx-auto overflow-hidden";
 
 type ReviewsCarouselProps = {
   reviews?: Review[];
