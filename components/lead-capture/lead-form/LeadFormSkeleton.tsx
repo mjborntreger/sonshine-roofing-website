@@ -26,10 +26,11 @@ function NeedStepSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
-          className="flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-white px-4 py-5 shadow-sm"
+          className="flex h-full flex-col gap-4 rounded-3xl border border-slate-200 bg-white px-4 py-5 shadow-sm"
         >
+          <Skeleton className="h-36 w-full rounded-2xl" />
           <Skeleton className="h-6 w-40 rounded-full" />
-          <div className="mt-4 space-y-3">
+          <div className="space-y-3">
             <Skeleton className="h-6 w-48 rounded-lg" />
             <Skeleton className="h-4 w-full rounded-lg" />
             <Skeleton className="h-4 w-3/4 rounded-lg" />
@@ -48,13 +49,14 @@ function ContextStepSkeleton() {
         <Skeleton className="h-4 w-64 rounded-lg" />
         <div className="grid gap-3 md:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="flex items-start gap-3">
-                <Skeleton className="h-6 w-6 rounded-full" />
+            <div key={i} className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+              <Skeleton className="h-32 w-full rounded-xl" />
+              <div className="flex items-start justify-between gap-3">
                 <div className="space-y-2">
                   <Skeleton className="h-5 w-40 rounded-lg" />
                   <Skeleton className="h-4 w-48 rounded-lg" />
                 </div>
+                <Skeleton className="h-7 w-7 rounded-full" />
               </div>
             </div>
           ))}

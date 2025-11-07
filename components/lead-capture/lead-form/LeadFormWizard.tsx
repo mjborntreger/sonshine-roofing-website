@@ -51,6 +51,7 @@ import {
 } from '@/components/lead-capture/lead-form/config';
 import type { JourneyKey, LeadSuccessRestore, ProjectOption, LeadFormUtmParams } from '@/components/lead-capture/lead-form/config';
 import { renderHighlight } from '@/components/utils/renderHighlight';
+import ProjectTestimonial from '@/components/dynamic-content/project/ProjectTestimonial';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
@@ -69,12 +70,45 @@ const SELECTION_PILL_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue] t
 const SELECTION_PILL_UNSELECTED_CLASS = 'border-slate-200 bg-white text-slate-700 hover:border-slate-300';
 
 const HELP_BUTTON_BASE_CLASS =
-  'flex items-start gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+  'group flex flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 const HELP_BUTTON_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]';
 const HELP_BUTTON_UNSELECTED_CLASS =
   'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md';
 
 const INFO_BADGE_CLASS = 'inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1';
+
+const ROOF_TYPE_OPTIONS: RoofTypeOption[] = [
+  {
+    value: 'shingle',
+    label: 'Shingle',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Shingle-Roof.webp',
+    imageAlt: 'Shingle Roof',
+  },
+  {
+    value: 'metal',
+    label: 'Metal',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Metal-Roof.webp',
+    imageAlt: 'Metal Roof',
+  },
+  {
+    value: 'tile',
+    label: 'Tile',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Tile-Roof.webp',
+    imageAlt: 'Concrete tile roof',
+  },
+  {
+    value: 'flat',
+    label: 'Flat',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Flat-Roof.webp',
+    imageAlt: 'Flat roof',
+  },
+];
+
+function getRoofTypeLabel(value: RoofTypeValue | ''): string | null {
+  if (!value) return null;
+  const option = ROOF_TYPE_OPTIONS.find((item) => item.value === value);
+  return option?.label ?? null;
+}
 
 type LeadFormWizardProps = {
   restoredSuccess?: LeadSuccessRestore | null;
@@ -91,11 +125,21 @@ type LeadFormWizardProps = {
 
 type StepId = 'need' | 'context' | 'contact' | 'schedule';
 
+type RoofTypeValue = 'shingle' | 'metal' | 'tile' | 'flat';
+
+type RoofTypeOption = {
+  value: RoofTypeValue;
+  label: string;
+  imageSrc: string;
+  imageAlt: string;
+};
+
 interface FormState {
   projectType: string;
   helpTopics: string[];
   timeline: string;
   notes: string;
+  roofType: RoofTypeValue | '';
   firstName: string;
   lastName: string;
   email: string;
@@ -115,6 +159,7 @@ const INITIAL_STATE: FormState = {
   helpTopics: [],
   timeline: '',
   notes: '',
+  roofType: '',
   firstName: '',
   lastName: '',
   email: '',
@@ -166,7 +211,7 @@ const STEP_ORDER: StepId[] = ['need', 'context', 'contact', 'schedule'];
 const STEP_FIELD_KEYS: Record<StepId, ReadonlyArray<keyof FormState>> = {
   need: ['projectType'],
   context: ['helpTopics', 'timeline', 'notes'],
-  contact: ['firstName', 'lastName', 'email', 'phone'],
+  contact: ['roofType', 'firstName', 'lastName', 'email', 'phone'],
   schedule: ['address1', 'city', 'state', 'zip', 'bestTime'],
 };
 
@@ -303,6 +348,7 @@ export default function LeadFormWizard({
           helpTopics: [],
           timeline: '',
           notes: '',
+          roofType: '',
         },
       });
       setErrors({});
@@ -427,6 +473,10 @@ export default function LeadFormWizard({
       ? BEST_TIME_OPTIONS.find((option) => option.value === form.bestTime)?.label || form.bestTime
       : '';
     const notesText = form.notes.trim();
+    const roofTypeLabel = getRoofTypeLabel(form.roofType);
+    const combinedNotes = roofTypeLabel
+      ? [notesText, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
+      : notesText;
     const resourceLinksForPayload: ContactLeadResourceLink[] = getSuccessLinks(form.projectType).map(
       ({ label, description, href, external }) => ({
         label,
@@ -440,7 +490,7 @@ export default function LeadFormWizard({
       projectType: form.projectType,
       helpSummary: helpSummary || undefined,
       timelineLabel: timelineLabel || undefined,
-      notes: notesText || undefined,
+      notes: combinedNotes.trim() || undefined,
       preferredContact: form.preferredContact,
       bestTimeLabel: bestTimeLabel || undefined,
       consentSms: form.consentSms,
@@ -618,6 +668,13 @@ export default function LeadFormWizard({
           <div className="w-full h-2 mt-4 overflow-hidden bg-blue-100 rounded-full">
             <div className="h-full rounded-full bg-[--brand-blue] transition-[width]" style={{ width: `${progressPercent}%` }} />
           </div>
+          <div className="flex items-start gap-3 mt-8">
+            <CalendarClock className="mt-1 h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+            <div>
+              <p className="font-semibold text-slate-800">Need help now?</p>
+              <p className="mt-1">Call <a href="tel:+19418664320" className="font-semibold text-[--brand-blue]">(941) 866-4320</a> and we’ll fast-track your request.</p>
+            </div>
+          </div>
         </div>
 
         <div className="p-6">
@@ -632,7 +689,7 @@ export default function LeadFormWizard({
               {activeStepId === 'need' && (
                 <div className="grid gap-4 md:grid-cols-2">
                   {PROJECT_OPTIONS.map((option) => {
-                    const { value, label, description, icon: Icon, accent, action } = option;
+                    const { value, label, description, icon: Icon, accent, action, imageSrc, imageAlt } = option;
                     const selectable = action === 'advance' && isJourneyKey(value);
                     const selected = selectable && form.projectType === value;
                     return (
@@ -649,11 +706,20 @@ export default function LeadFormWizard({
                         aria-pressed={selectable ? selected : undefined}
                       >
                         <div>
-                          <div className={cn('inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium', accent)}>
+                          <div className="relative w-full overflow-hidden rounded-2xl bg-slate-100 aspect-[7/3]">
+                            <Image
+                              src={imageSrc}
+                              alt={imageAlt}
+                              fill
+                              sizes="(min-width: 1024px) 320px, 100vw"
+                              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                            />
+                          </div>
+                          <div className={cn('mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium', accent)}>
                             <Icon className="w-4 h-4" aria-hidden="true" />
                             {selectable ? (selected ? 'Selected' : 'Tap to select') : 'Opens a new page'}
                           </div>
-                          <h4 className="mt-4 font-semibold text-md md:text-xl text-slate-900">{label}</h4>
+                          <h4 className="mt-2 font-semibold text-md md:text-xl text-slate-900">{label}</h4>
                           <div className="flex items-center justify-between mt-1 text-xs text-slate-500">
                             <p className="text-xs md:text-md text-slate-500">{description}</p>
                             <ArrowRight className="w-4 h-4 transition text-slate-400 group-hover:translate-x-1" aria-hidden="true" />
@@ -669,7 +735,7 @@ export default function LeadFormWizard({
               )}
 
               {activeStepId === 'context' && (
-                <div className="py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+                <div className="py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
                   <div>
                     {!journey && (
                       <p className="px-4 py-3 text-sm border rounded-xl border-amber-200 bg-amber-50 text-amber-700">
@@ -684,7 +750,7 @@ export default function LeadFormWizard({
                           <p className="mt-2 mb-1 text-xs font-medium text-slate-500">Select all that apply</p>
                         </div>
                         <div className="grid gap-3 mt-3 md:grid-cols-2">
-                          {journey.helpOptions.map(({ value, label, description, icon: Icon }) => {
+                          {journey.helpOptions.map(({ value, label, description, icon: Icon, imageSrc, imageAlt }) => {
                             const selected = form.helpTopics.includes(value);
                             return (
                               <button
@@ -697,14 +763,32 @@ export default function LeadFormWizard({
                                 )}
                                 aria-pressed={selected}
                               >
-                                <div className="flex justify-between">
-                                  <div className="inline-flex flex-wrap">
-                                    <Icon className={cn('h-6 w-6 mr-3 shrink-0', selected ? 'text-[--brand-blue]' : 'text-slate-400')} aria-hidden="true" />
-                                    <p className="text-sm font-semibold text-slate-900">{label}</p>
-                                    <p className="mt-1 text-xs ml-9 text-slate-500">{description}</p>
+                                <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 aspect-[5/2]">
+                                  {imageSrc ? (
+                                    <Image
+                                      src={imageSrc}
+                                      alt={imageAlt ?? label}
+                                      fill
+                                      sizes="(min-width: 768px) 320px, 100vw"
+                                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                                    />
+                                  ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-slate-300">
+                                      <Icon className="h-10 w-10" aria-hidden="true" />
+                                    </div>
+                                  )}
+                                  <div className="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow">
+                                    <Icon className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+                                    <span>{selected ? 'Selected' : 'Tap to add'}</span>
                                   </div>
-                                  <div className="">
-                                    <Check className={cn("h-5 w-5 ml-6 mr-1", selected ? "text-[--brand-blue]" : "text-white")} />
+                                </div>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <p className="text-sm font-semibold text-slate-900">{label}</p>
+                                    <p className="mt-1 text-xs text-slate-500">{description}</p>
+                                  </div>
+                                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
+                                    <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
                                   </div>
                                 </div>
                               </button>
@@ -750,7 +834,7 @@ export default function LeadFormWizard({
                         <textarea
                           id="notes"
                           name="notes"
-                          rows={journey.requireNotes ? 5 : 3}
+                          rows={journey.requireNotes ? 8 : 3}
                           className="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
                           placeholder={journey.notesPlaceholder}
                           value={form.notes}
@@ -762,35 +846,60 @@ export default function LeadFormWizard({
                       </div>
                     )}
                   </div>
-                  <aside className="flex flex-col gap-4 px-4 py-4 text-sm border border-blue-100 h-fit rounded-2xl bg-blue-50/60 text-slate-600">
-                    <div className="flex items-start gap-3">
-                      <CalendarClock className="mt-1 h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                      <div>
-                        <p className="font-semibold text-slate-800">Need help now?</p>
-                        <p className="mt-1">Call <a href="tel:+19418664320" className="font-semibold text-[--brand-blue]">(941) 866-4320</a> and we’ll fast-track your request.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Sparkles className="mt-1 h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                      <div>
-                        <p className="font-semibold text-slate-800">We’ll prep resources for you</p>
-                        <p className="mt-1">Based on your answers we’ll send links, FAQs, or financing options that fit.</p>
-                      </div>
-                    </div>
-                    <div className="p-4 hidden md:flex h-[250px] w-[256px]">
-                      <Image
-                        src="https://next.sonshineroofing.com/wp-content/uploads/cropped-runningman-update-e1751376711567.webp"
-                        alt="sonshine roofing running man"
-                        width={250}
-                        height={256}
-                      />
-                    </div>
+                  <aside className="flex flex-col gap-4 text-sm h-fit text-slate-600">     
+                    <ProjectTestimonial
+                      customerName="Pasquale A."
+                      formattedDate="November 4th, 2025"
+                      customerReview="Sonshine roofing did an excellent job of replacing our entire roof. Their staff was professional in every aspect. We received multiple updates on the progress, including house calls. Whenever we had a question and called the office, the staff was always polite, and we were immediately put through to the production manager. This company was very easy to work with and came in with a very fair price for the job. We would highly recommend them."
+                      reviewUrl="https://www.google.com/maps/contrib/103054944051170712920/place/ChIJIyB9mBBHw4gRWOl1sU9ZGFM/@27.3105727,-83.1061407,311254m/data=!3m1!1e3!4m6!1m5!8m4!1e1!2s103054944051170712920!3m1!1e1?hl=en&entry=ttu&g_ep=EgoyMDI1MTEwNC4xIKXMDSoASAFQAw%3D%3D"
+                      ownerReply="Hi Pat! Thanks for trusting us to perform a tile roof replacement on your Sarasota home. We pride ourselves on great communication, so we're glad to see that it shows."
+                    />
                   </aside>
                 </div>
               )}
 
               {activeStepId === 'contact' && (
                 <div className="grid gap-4 py-2 md:grid-cols-2">
+                  <div className="md:col-span-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">What type of roof do you have?</p>
+                    <div className="grid gap-3 mt-3 md:grid-cols-4">
+                      {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
+                        const selected = form.roofType === value;
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => onSelect('roofType', value)}
+                            className={cn(
+                              HELP_BUTTON_BASE_CLASS,
+                              selected ? HELP_BUTTON_SELECTED_CLASS : HELP_BUTTON_UNSELECTED_CLASS
+                            )}
+                            aria-pressed={selected}
+                          >
+                            <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 aspect-[5/2]">
+                              <Image
+                                src={imageSrc}
+                                alt={imageAlt}
+                                fill
+                                sizes="(min-width: 768px) 320px, 100vw"
+                                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                              />
+                              <div className="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow">
+                                <Sparkles className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+                                <span>{selected ? 'Selected' : 'Tap to select'}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center justify-between gap-3">
+                              <p className="text-sm font-semibold text-slate-900">{label}</p>
+                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
+                                <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                   <label className="flex flex-col text-sm font-medium text-slate-700">
                     First name*
                     <input

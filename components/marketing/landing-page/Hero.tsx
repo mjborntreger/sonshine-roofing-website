@@ -67,9 +67,6 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
           onKeyDown={handleCtaKeyDown}
           aria-label="Scroll to the quick roofing quiz"
         >
-          <div className="px-6 mb-3 text-xs uppercase text-neutral-300 md:text-md">
-            Step 1: Let&rsquo;s get you squared away
-          </div>
           <h2 className="py-2 text-3xl text-white md:text-6xl">
             Get Started
           </h2>

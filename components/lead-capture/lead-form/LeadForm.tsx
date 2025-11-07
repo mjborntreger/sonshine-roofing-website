@@ -91,19 +91,28 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
           <div className="p-6">
             <div className="grid gap-4 lg:grid-cols-2">
               {PROJECT_OPTIONS.map((option) => {
-                const { value, label, description, icon: Icon, accent, action, href } = option;
+                const { value, label, description, icon: Icon, accent, action, href, imageSrc, imageAlt } = option;
                 const content = (
-                  <>
-                    <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${accent}`}>
+                  <div className="flex flex-col gap-3">
+                    <div className="relative w-full overflow-hidden rounded-2xl bg-slate-100 aspect-[7/3]">
+                      <Image
+                        src={imageSrc}
+                        alt={imageAlt}
+                        fill
+                        sizes="(min-width: 1024px) 320px, 100vw"
+                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                      />
+                    </div>
+                    <div className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${accent}`}>
                       <Icon className="h-4 w-4" aria-hidden="true" />
                       {action === 'advance' ? 'Tap to select' : 'Opens a new page'}
                     </div>
-                    <h4 className="mt-4 text-md md:text-xl font-semibold text-slate-900">{label}</h4>
-                    <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
+                    <h4 className="text-md md:text-2xl font-semibold text-slate-900">{label}</h4>
+                    <div className="flex items-center justify-between text-xs text-slate-500">
                       <p className="text-xs md:text-md text-slate-500">{description}</p>
                       <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1" aria-hidden="true" />
                     </div>
-                  </>
+                  </div>
                 );
 
                 if (action === 'link' && href) {

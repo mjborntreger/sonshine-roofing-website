@@ -236,7 +236,7 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
               className="flex items-center gap-2"
             >
               <Zap className="h-4 w-4 text-white" aria-hidden="true" />
-              Free 60-second Quote
+              Instant Quote
             </SmartLink>
           </Button>
         </li>
@@ -625,7 +625,7 @@ function MobileMenu() {
                     className="flex items-center justify-center gap-x-2"
                   >
                     <Zap className="w-4 h-4 text-white" aria-hidden="true" />
-                    Free 60-second Quote
+                    Instant Quote
                   </SmartLink>
                 </Button>
               </li>

@@ -7,6 +7,11 @@ import { ArrowUpRight, Quote } from "lucide-react";
 type Props = {
   testimonial?: ProjectTestimonialData | null;
   className?: string;
+  customerName?: string;
+  formattedDate?: string;
+  customerReview?: string;
+  reviewUrl?: string;
+  ownerReply?: string;
 };
 
 const GOOGLE_LOGO = "https://next.sonshineroofing.com/wp-content/uploads/google.webp";
@@ -20,11 +25,22 @@ const formatReviewDate = (value?: string) => {
   return parsed.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 };
 
-export default function ProjectTestimonial({ testimonial, className }: Props) {
-  if (!testimonial?.customerReview) return null;
+export default function ProjectTestimonial({
+  testimonial,
+  className,
+  customerName,
+  formattedDate,
+  customerReview,
+  reviewUrl,
+  ownerReply,
+}: Props) {
+  const resolvedReview = customerReview ?? testimonial?.customerReview;
+  if (!resolvedReview) return null;
 
-  const { customerName, customerReview, ownerReply, reviewUrl, reviewDate } = testimonial;
-  const formattedDate = formatReviewDate(reviewDate);
+  const resolvedName = customerName ?? testimonial?.customerName ?? "SonShine Roofing Homeowner";
+  const resolvedDate = formattedDate ?? formatReviewDate(testimonial?.reviewDate);
+  const resolvedUrl = reviewUrl ?? testimonial?.reviewUrl;
+  const resolvedOwnerReply = ownerReply ?? testimonial?.ownerReply;
 
   return (
     <section
@@ -47,22 +63,20 @@ export default function ProjectTestimonial({ testimonial, className }: Props) {
             Homeowner Testimonial
           </p>
           <div className="mt-3 text-sm text-slate-600">
-            <p className="text-lg font-semibold text-slate-900">
-              {customerName || "SonShine Roofing Homeowner"}
-            </p>
-            {formattedDate ? <p>{formattedDate}</p> : null}
+            <p className="text-lg font-semibold text-slate-900">{resolvedName}</p>
+            {resolvedDate ? <p>{resolvedDate}</p> : null}
           </div>
         </div>
         <Quote className="h-10 w-10 text-slate-200" aria-hidden />
       </header>
 
       <blockquote className="mt-5 space-y-4 text-lg leading-relaxed text-slate-900">
-        <p className="whitespace-pre-line">{customerReview}</p>
+        <p className="whitespace-pre-line">{resolvedReview}</p>
       </blockquote>
 
-      {reviewUrl ? (
+      {resolvedUrl ? (
         <SmartLink
-          href={reviewUrl}
+          href={resolvedUrl}
           target="_blank"
           rel="noopener noreferrer"
           data-icon-affordance="up-right"
@@ -73,7 +87,7 @@ export default function ProjectTestimonial({ testimonial, className }: Props) {
         </SmartLink>
       ) : null}
 
-      {ownerReply ? (
+      {resolvedOwnerReply ? (
         <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
           <div className="flex items-start gap-3">
             <Image
@@ -86,7 +100,7 @@ export default function ProjectTestimonial({ testimonial, className }: Props) {
             />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Nathan Borntreger</p>
-              <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{ownerReply}</p>
+              <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{resolvedOwnerReply}</p>
             </div>
           </div>
         </div>

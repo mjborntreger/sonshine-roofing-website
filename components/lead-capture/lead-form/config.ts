@@ -29,6 +29,8 @@ export type ProjectOption = {
   accent: string;
   action: 'advance' | 'link';
   href?: string;
+  imageSrc: string;
+  imageAlt: string;
 };
 
 export type HelpOption = {
@@ -36,6 +38,8 @@ export type HelpOption = {
   label: string;
   description: string;
   icon: LucideIcon;
+  imageSrc?: string;
+  imageAlt?: string;
 };
 
 export type TimelineOption = {
@@ -71,11 +75,13 @@ export type LeadFormUtmParams = {
 export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'repair',
-    label: 'Emergency leak help',
+    label: 'My roof is leaking',
     description: 'Water coming in or ceiling damage right now',
     icon: Droplets,
     accent: 'border-rose-200 bg-rose-50 text-rose-600',
     action: 'advance',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Emergency-Roof-Repair.webp',
+    imageAlt: 'Crew handling an emergency roof repair with tarps on the roof',
   },
   {
     value: 'retail',
@@ -84,6 +90,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     icon: Hammer,
     accent: 'border-amber-200 bg-amber-50 text-amber-600',
     action: 'advance',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp',
+    imageAlt: 'Homeowners reviewing plans for a roof replacement',
   },
   {
     value: 'maintenance',
@@ -92,6 +100,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     icon: Wrench,
     accent: 'border-emerald-200 bg-emerald-50 text-emerald-600',
     action: 'advance',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
+    imageAlt: 'Technician performing light roof repairs and an inspection',
   },
   {
     value: 'financing-link',
@@ -101,6 +111,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     accent: 'border-sky-200 bg-sky-50 text-sky-600',
     action: 'link',
     href: '/financing#get-started',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp',
+    imageAlt: 'Homeowner reviewing roof financing options on a tablet',
   },
   {
     value: 'project-gallery',
@@ -110,6 +122,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     accent: 'border-purple-200 bg-purple-50 text-purple-600',
     action: 'link',
     href: '/project',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/See-Our-Past-Work.webp',
+    imageAlt: 'Finished roofing project showcasing past work',
   },
   {
     value: 'something-else',
@@ -118,6 +132,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     icon: MessageCircle,
     accent: 'border-violet-200 bg-violet-50 text-violet-600',
     action: 'advance',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Something-Else.webp',
+    imageAlt: 'Homeowner talking with a roofing advisor',
   },
 ];
 
@@ -133,39 +149,51 @@ export const STANDARD_TIMELINE_OPTIONS: TimelineOption[] = [
 const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
   {
     value: 'active-leak',
-    label: 'I have an active leak',
+    label: 'Water damage',
     description: 'There is water inside or the interior is compromised',
     icon: Droplets,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/i-have-an-active-leak.webp',
+    imageAlt: 'Active roof leak with buckets catching water inside a home',
   },
   {
     value: 'aging-out',
-    label: 'Roof is aging out',
+    label: 'Aging roof',
     description: 'It’s close to the end of its lifespan and we want a plan',
     icon: SunDim,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/roof-is-aging-out.webp',
+    imageAlt: 'Homeowner inspecting an older roof showing wear',
   },
   {
     value: 'just-researching',
     label: 'Researching options',
     description: 'Gathering ideas, timelines, and investment ranges',
     icon: TrendingUp,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/researching-options.webp',
+    imageAlt: 'Couple reviewing roofing options on a laptop',
   },
   {
     value: 'visible-damage',
-    label: 'I can see roof damage',
+    label: 'Exterior roof damage',
     description: 'Missing shingles, lifted tiles, or debris on the roof',
     icon: AlertTriangle,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/I-can-see-roof-damage.webp',
+    imageAlt: 'Close-up of shingles showing visible roof damage',
   },
   {
     value: 'inspection-needed',
     label: 'Need an inspection report',
     description: 'For insurance, warranty, or peace of mind before hurricane season',
     icon: ShieldCheck,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/need-an-inspection-report.webp',
+    imageAlt: 'Roof inspector documenting findings on a clipboard',
   },
   {
     value: 'financing-options',
-    label: 'I am interested in my financing options',
+    label: 'Interested in financing',
     description: 'No credit check, personalized quiz, detailed monthly payment calculator',
     icon: HandCoins,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Interested-in-Financing-Options.webp',
+    imageAlt: 'Homeowner discussing roofing financing options with advisor',
   },
 ];
 
@@ -175,18 +203,32 @@ const MAINTENANCE_HELP: HelpOption[] = [
     label: 'Need an inspection report',
     description: 'For insurance, warranty, or peace of mind before hurricane season',
     icon: ClipboardList,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/need-an-inspection-report.webp',
+    imageAlt: 'Roof inspector documenting findings on a clipboard',
   },
   {
     value: 'visible-damage',
-    label: 'I can see roof damage',
+    label: 'Exterior roof damage',
     description: 'Missing shingles, lifted tiles, or debris on the roof',
     icon: AlertTriangle,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/I-can-see-roof-damage.webp',
+    imageAlt: 'Close-up of shingles showing visible roof damage',
+  },
+  {
+    value: 'active-leak',
+    label: 'Water damage',
+    description: 'There is water inside or the interior is compromised',
+    icon: Droplets,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/i-have-an-active-leak.webp',
+    imageAlt: 'Active roof leak with buckets catching water inside a home',
   },
   {
     value: 'roof-care-club',
     label: 'I want to join the Roof Care Club',
     description: 'Yearly maintenance plan, documentation for insurance',
     icon: Sparkles,
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
+    imageAlt: 'Technician performing routine roof maintenance',
   },
 ];
 
