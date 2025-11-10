@@ -111,8 +111,7 @@ export default function LazyYoutubeEmbed({
         <>
           <Image
             src={poster}
-            alt=""
-            aria-hidden="true"
+            alt={`${title} thumbnail`}
             fill
             priority={false}
             sizes="(max-width: 768px) 100vw, 50vw"

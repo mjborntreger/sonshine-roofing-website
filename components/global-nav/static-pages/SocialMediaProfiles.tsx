@@ -48,12 +48,10 @@ export default function SocialMediaProfiles() {
                 data-icon-affordance="right"
                 className={baseClass}
               >
-                <span className={chipClass} aria-hidden="true">
+                <span className={chipClass}>
                   <Image
                     src={`https://www.google.com/s2/favicons?domain=${l.domain}&sz=64`}
-                    alt=""
-                    aria-hidden="true"
-                    role="presentation"
+                    alt={`${l.label} logo`}
                     width={24}
                     height={24}
                     sizes="(max-width: 24px)"
