@@ -126,7 +126,7 @@ export default function TellUsWhyForm() {
   if (status === 'ok') {
     return (
       <main className="container-edge mx-auto max-w-2xl py-10">
-        <h1 className="text-3xl font-semibold">Thanks for telling us.</h1>
+        <h2 className="text-3xl font-semibold">Thanks for telling us.</h2>
         <p className="mt-2 text-slate-700">
           We read every note and will reach out if we need more details. Since 1987 we’ve got you covered.
         </p>
