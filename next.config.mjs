@@ -75,6 +75,7 @@ const nextConfig = {
       { source: "/about", destination: "/about-sonshine-roofing", permanent: true },
       { source: "/roof-replacement", destination: "/roof-replacement-sarasota-fl", permanent: true },
       { source: "/services/roof-replacement", destination: "/roof-replacement-sarasota-fl", permanent: true },
+      { source: "/roof-replacement-sarasota", destination: "/roof-replacement-sarasota-fl", permanent: true },
       { source: "/services/roof-repair", destination: "/roof-repair", permanent: true },
       { source: "/services/roof-inspection", destination: "/roof-inspection", permanent: true },
       { source: "/services/roof-maintenance", destination: "/roof-maintenance", permanent: true },
