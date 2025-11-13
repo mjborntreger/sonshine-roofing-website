@@ -179,10 +179,18 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
                 <div
                   className="absolute inset-0 flex items-center justify-center p-4"
                   onPointerDown={(e) => {
-                    if (e.target === e.currentTarget) closeModal();
+                    if (e.target === e.currentTarget) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      closeModal();
+                    }
                   }}
                   onClick={(e) => {
-                    if (e.target === e.currentTarget) closeModal();
+                    if (e.target === e.currentTarget) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      closeModal();
+                    }
                   }}
                 >
                   <motion.div
