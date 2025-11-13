@@ -27,6 +27,11 @@ type ResourceArchiveResult<Item> = PageResult<Item> & {
   facets?: ResourceFacetGroup[];
 };
 
+type FacetBucketInfo = {
+  count: number;
+  label?: string;
+};
+
 export type FilterGroupConfig = {
   key: string;
   label: string;
@@ -185,13 +190,20 @@ export default function ResourceArchiveClient<Item>({
   const listKey = useMemo(() => JSON.stringify(listFilters), [listFilters]);
 
   const facetMap = useMemo(() => {
-    const map = new Map<string, Map<string, number>>();
+    const map = new Map<string, Map<string, FacetBucketInfo>>();
     const facets = result.facets;
     if (Array.isArray(facets)) {
       for (const facet of facets) {
-        const bucketMap = new Map<string, number>();
+        const bucketMap = new Map<string, FacetBucketInfo>();
         for (const bucket of facet.buckets ?? []) {
-          bucketMap.set(String(bucket.slug), typeof bucket.count === "number" ? bucket.count : 0);
+          const slug = String(bucket.slug);
+          if (!slug) continue;
+          const bucketLabel =
+            typeof bucket.name === "string" && bucket.name.trim().length ? bucket.name : undefined;
+          bucketMap.set(slug, {
+            count: typeof bucket.count === "number" ? bucket.count : 0,
+            label: bucketLabel,
+          });
         }
         map.set(String(facet.taxonomy), bucketMap);
       }
@@ -201,7 +213,7 @@ export default function ResourceArchiveClient<Item>({
 
   const tabs = useMemo(() => {
     return groups.map((group) => {
-      const facetCounts = facetMap.get(group.facet) ?? new Map();
+      const facetCounts = facetMap.get(group.facet) ?? new Map<string, FacetBucketInfo>();
       const optionMap = new Map(group.options.map((opt) => [opt.slug, opt.label]));
       const seen = new Set<string>();
       const terms: Array<TermLite & { count: number } & { slug: string }> = [];
@@ -212,21 +224,24 @@ export default function ResourceArchiveClient<Item>({
         terms.push({ slug, name: label, count } as TermLite & { count: number } & { slug: string });
       };
 
-      facetCounts.forEach((count, slug) => {
-        const label = optionMap.get(slug) ?? optionMap.get(slug.toLowerCase()) ?? slug;
-        pushTerm(slug, label, count);
+      facetCounts.forEach((info, slug) => {
+        const optionLabel = optionMap.get(slug) ?? optionMap.get(slug.toLowerCase());
+        const label = optionLabel ?? info.label ?? slug;
+        pushTerm(slug, label, info.count);
       });
 
       for (const opt of group.options) {
-        const existing = facetCounts.get(opt.slug) ?? facetCounts.get(opt.slug.toLowerCase()) ?? 0;
+        const bucketInfo = facetCounts.get(opt.slug) ?? facetCounts.get(opt.slug.toLowerCase());
+        const existing = bucketInfo?.count ?? 0;
         pushTerm(opt.slug, opt.label, existing);
       }
 
       const selected = sortedSelections[group.key] ?? [];
       for (const slug of selected) {
         if (!seen.has(slug)) {
-          const label = optionMap.get(slug) ?? slug;
-          pushTerm(slug, label, facetCounts.get(slug) ?? 0);
+          const bucketInfo = facetCounts.get(slug) ?? facetCounts.get(slug.toLowerCase());
+          const label = optionMap.get(slug) ?? bucketInfo?.label ?? slug;
+          pushTerm(slug, label, bucketInfo?.count ?? 0);
         }
       }
 
