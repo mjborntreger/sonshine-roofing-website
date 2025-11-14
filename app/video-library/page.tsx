@@ -50,7 +50,7 @@ const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
   { slug: "commercials", label: "Commercials" },
   { slug: "explainers", label: "Explainers" },
   { slug: "roofing-project", label: "Roofing Projects" },
-  { slug: "accolades", label: "Accolades" },
+  { slug: "in-the-field", label: "In the Field" },
   { slug: "other", label: "Other" },
 ];
 
