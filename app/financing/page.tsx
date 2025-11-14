@@ -83,10 +83,10 @@ export default async function FinancingPage() {
   );
 
   const serviceLd = serviceSchema({
-    name: "Roof Financing",
+    name: "Flexible Roof Financing | Free Monthly Payment Estimator",
     description:
       config?.description ??
-      "Flexible roof financing options in Sarasota, Manatee, and Charlotte Counties.",
+      "Get flexible roof financing with clear, upfront numbers. After taking a short quiz, use our free monthly payment calculator to estimate costs, compare options, and plan your roof replacement with confidence.",
     url: SERVICE_PATH,
     origin,
     provider: {
