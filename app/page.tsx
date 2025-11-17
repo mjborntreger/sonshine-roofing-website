@@ -19,7 +19,7 @@ const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
 const narrowLayout = "mx-auto w-full max-w-[1280px]";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
-const SEO_TITLE_HOME = 'SonShine Roofing | Expert Roofing Contractor in Sarasota, Manatee, and Charlotte, FL';
+const SEO_TITLE_HOME = 'SonShine Roofing | Best Roofing Company in Sarasota';
 const SEO_DESCRIPTION_HOME =
   'Fast, Friendly, & Reliable | (941) 866-4320 | Licensed & Insured | Your trusted local roofing contractor serving Sarasota, Manatee & Charlotte Counties.';
 const SEO_KEYWORDS_HOME = [
