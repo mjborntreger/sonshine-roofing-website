@@ -2,13 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
-import { ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import { PROJECT_OPTIONS, isJourneyKey, type JourneyKey, type LeadSuccessRestore } from '@/components/lead-capture/lead-form/config';
 import LeadFormSkeleton from '@/components/lead-capture/lead-form/LeadFormSkeleton';
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { renderHighlight } from '@/components/utils/renderHighlight';
+import LeadFormStepShell from '@/components/lead-capture/lead-form/LeadFormStepShell';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
+  PROJECT_OPTION_CARD_BASE_CLASS,
+  PROJECT_OPTION_CARD_UNSELECTED_CLASS,
+  PROJECT_OPTION_CARD_SELECTED_CLASS,
+  ProjectOptionCardContent,
+} from '@/components/lead-capture/lead-form/ProjectOptionCard';
 
 const LeadFormWizard = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormWizard'), {
   ssr: false,
@@ -26,6 +34,7 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
   }, [restoredSuccess]);
 
   const [selectedJourney, setSelectedJourney] = useState<JourneyKey | null>(initialJourneyFromSuccess);
+  const [pendingJourney, setPendingJourney] = useState<JourneyKey | null>(null);
   const [showWizard, setShowWizard] = useState<boolean>(() => Boolean(restoredSuccess));
   const utm = useUtmParams();
 
@@ -53,76 +62,85 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
     return () => observer.disconnect();
   }, [showWizard]);
 
-  const handleAdvance = useCallback((journey: JourneyKey) => {
-    setSelectedJourney(journey);
+  const handleAdvance = useCallback(() => {
+    if (!pendingJourney) return;
+    setSelectedJourney(pendingJourney);
     setShowWizard(true);
-  }, []);
+  }, [pendingJourney]);
 
   const handleWizardReset = useCallback(() => {
     setSelectedJourney(null);
+    setPendingJourney(null);
     setShowWizard(false);
   }, []);
   const stepZeroHeading = renderHighlight('Let’s get you squared away', 'squared away');
+  const isContinueDisabled = !pendingJourney;
 
   return (
     <div id="get-started">
       {!showWizard && (
-        <div ref={containerRef} className="overflow-hidden mx-auto max-w-6xl rounded-3xl border border-blue-100 bg-white shadow-md">
-          <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-[--brand-blue]">Step 1 of 4</p>
-                <h3 className="mt-3 mb-4 text-2xl md:text-3xl font-semibold text-slate-900">{stepZeroHeading}</h3>
-                <p className="mt-3 text-xs md:text-sm text-slate-600">
-                  We’ll tailor the next few questions so we can route you to the right spot.
-                </p>
+        <div ref={containerRef}>
+          <LeadFormStepShell
+            stepLabel="Step 1 of 4"
+            title={stepZeroHeading}
+            description="We’ll tailor the next few questions so we can route you to the right spot."
+            bottomSlot={(
+              <div className="mx-8 my-6 flex items-center justify-between gap-3">
+                <Button type="button" data-icon-affordance="left" variant="secondary" size="sm" className="gap-2" disabled>
+                  <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
+                  Back
+                </Button>
+                <Button
+                  type="button"
+                  data-icon-affordance="right"
+                  variant="brandBlue"
+                  size="sm"
+                  className="gap-2"
+                  disabled={isContinueDisabled}
+                  onClick={() => handleAdvance()}
+                >
+                  Continue
+                  <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+                </Button>
               </div>
-              <div className="relative mb-4 h-[54px] w-[158px] aspect-[21/9]">
-                <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
-                  alt="sonshine logo, no swoosh"
-                  width={158}
-                  height={54}
-                  className="absolute top-[20px] right-0"
-                />
-              </div>
+            )}
+          >
+
+            <div className="mb-8 flex items-center justify-between gap-3">
+              <Button type="button" data-icon-affordance="left" variant="secondary" size="sm" className="gap-2" disabled>
+                <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
+                Back
+              </Button>
+              <Button
+                type="button"
+                data-icon-affordance="right"
+                variant="brandBlue"
+                size="sm"
+                className="gap-2"
+                disabled={isContinueDisabled}
+                onClick={() => handleAdvance()}
+              >
+                Continue
+                <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+              </Button>
             </div>
-          </div>
-          <div className="p-6">
+            <p className="text-slate-600 inline-flex mt-2 mb-4 text-xs">Select an option to continue</p>
+
             <div className="grid gap-4 lg:grid-cols-2">
               {PROJECT_OPTIONS.map((option) => {
-                const { value, label, description, icon: Icon, accent, action, href, imageSrc, imageAlt } = option;
-                const content = (
-                  <div className="flex flex-col gap-3">
-                    <div className="relative w-full overflow-hidden rounded-2xl bg-slate-100 aspect-[7/3]">
-                      <Image
-                        src={imageSrc}
-                        alt={imageAlt}
-                        fill
-                        sizes="(min-width: 1024px) 320px, 100vw"
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                      />
-                    </div>
-                    <div className={`inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${accent}`}>
-                      <Icon className="h-4 w-4" aria-hidden="true" />
-                      {action === 'advance' ? 'Tap to select' : 'Opens a new page'}
-                    </div>
-                    <h4 className="text-md md:text-2xl font-semibold text-slate-900">{label}</h4>
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <p className="text-xs md:text-md text-slate-500">{description}</p>
-                      <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1" aria-hidden="true" />
-                    </div>
-                  </div>
+                const { value, action, href } = option;
+                const journeyValue = isJourneyKey(value) ? value : null;
+                const isSelectable = action === 'advance' && Boolean(journeyValue);
+                const isSelected = Boolean(isSelectable && journeyValue && pendingJourney === journeyValue);
+                const cardClass = cn(
+                  PROJECT_OPTION_CARD_BASE_CLASS,
+                  isSelected ? PROJECT_OPTION_CARD_SELECTED_CLASS : PROJECT_OPTION_CARD_UNSELECTED_CLASS
                 );
 
                 if (action === 'link' && href) {
                   return (
-                    <SmartLink
-                      key={value}
-                      href={href}
-                      className="group flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-white px-4 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2"
-                    >
-                      <div>{content}</div>
+                    <SmartLink key={value} href={href} className={cardClass}>
+                      <ProjectOptionCardContent option={option} />
                     </SmartLink>
                   );
                 }
@@ -131,15 +149,19 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
                   <button
                     key={value}
                     type="button"
-                    onClick={() => handleAdvance(value as JourneyKey)}
-                    className="group flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-white px-4 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2"
+                    onClick={() => {
+                      if (!journeyValue) return;
+                      setPendingJourney(journeyValue);
+                    }}
+                    className={cardClass}
+                    aria-pressed={isSelected}
                   >
-                    <div>{content}</div>
+                    <ProjectOptionCardContent option={option} />
                   </button>
                 );
               })}
             </div>
-          </div>
+          </LeadFormStepShell>
         </div>
       )}
 

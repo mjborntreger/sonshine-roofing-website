@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { FormEvent, useMemo, useState } from 'react';
-import { ArrowRight, ArrowUpRight, SquareMenu, Sparkles, Check } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, SquareMenu, Check } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import { Button } from '@/components/ui/button';
 import { deleteCookie } from '@/lib/telemetry/client-cookies';
@@ -34,6 +34,12 @@ import {
 } from '@/components/lead-capture/lead-form/config';
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { renderHighlight } from '@/components/utils/renderHighlight';
+import {
+  PROJECT_OPTION_CARD_BASE_CLASS,
+  PROJECT_OPTION_CARD_SELECTED_CLASS,
+  PROJECT_OPTION_CARD_UNSELECTED_CLASS,
+  ProjectOptionCardContent,
+} from '@/components/lead-capture/lead-form/ProjectOptionCard';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
@@ -490,39 +496,20 @@ export default function SimpleLeadForm() {
 
                 <p className="text-xs mt-8 font-semibold uppercase tracking-wide text-slate-500">What do you need?</p>
                 <div className="mt-3 grid gap-4 md:grid-cols-2">
-                  {SIMPLE_PROJECT_OPTIONS.map(({ value, label, description, icon: Icon, accent, imageSrc, imageAlt }) => {
-                    const selected = form.projectType === value;
+                  {SIMPLE_PROJECT_OPTIONS.map((option) => {
+                    const selected = form.projectType === option.value;
                     return (
                       <button
-                        key={value}
+                        key={option.value}
                         type="button"
-                        onClick={() => setField('projectType', value)}
+                        onClick={() => setField('projectType', option.value)}
                         className={cn(
-                          'group flex h-full flex-col justify-between rounded-3xl border border-slate-200 bg-white px-4 py-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2',
-                          selected && 'border-[--brand-blue] shadow-[0_10px_25px_rgba(15,76,129,0.12)]'
+                          PROJECT_OPTION_CARD_BASE_CLASS,
+                          selected ? PROJECT_OPTION_CARD_SELECTED_CLASS : PROJECT_OPTION_CARD_UNSELECTED_CLASS
                         )}
                         aria-pressed={selected}
                       >
-                        <div>
-                          <div className="relative w-full overflow-hidden rounded-2xl bg-slate-100 aspect-[7/3]">
-                            <Image
-                              src={imageSrc}
-                              alt={imageAlt}
-                              fill
-                              sizes="(min-width: 768px) 240px, 100vw"
-                              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                            />
-                          </div>
-                          <div className={cn('mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium', accent)}>
-                            <Icon className="h-4 w-4" aria-hidden="true" />
-                            {selected ? 'Selected' : 'Tap to select'}
-                          </div>
-                          <h4 className="mt-2 text-md md:text-xl font-semibold text-slate-900">{label}</h4>
-                          <div className="mt-1 flex items-center justify-between text-xs text-slate-500">
-                            <p className="text-xs md:text-md text-slate-500">{description}</p>
-                            <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1" aria-hidden="true" />
-                          </div>
-                        </div>
+                        <ProjectOptionCardContent option={option} />
                       </button>
                     );
                   })}
@@ -557,12 +544,11 @@ export default function SimpleLeadForm() {
               </section>
 
               <section>
-                <p className="text-xs mt-8 font-semibold uppercase tracking-wide text-slate-500">What type of roof do you have?</p>
+                <p className="text-xs mt-8 font-semibold uppercase tracking-wide text-slate-500">What type of roof do you currently have?</p>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
                     const selected = form.roofType === value;
                     return (
-
                       <button
                         key={value}
                         type="button"
@@ -583,10 +569,6 @@ export default function SimpleLeadForm() {
                             sizes="(min-width: 768px) 320px, 100vw"
                             className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                           />
-                          <div className="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow">
-                            <Sparkles className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-                            <span>{selected ? 'Selected' : 'Tap to select'}</span>
-                          </div>
                         </div>
                         <div className="flex items-center justify-between gap-3">
                           <p className="text-sm font-semibold text-slate-900">{label}</p>

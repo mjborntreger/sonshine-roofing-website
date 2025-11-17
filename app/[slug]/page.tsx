@@ -41,6 +41,14 @@ function isAllowedIframeSrc(src: string) {
       return true;
     }
 
+    if (hostMatchesDomain(host, "facebook.com") || hostMatchesDomain(host, "connect.facebook.net")) {
+      return true;
+    }
+
+    if (hostMatchesDomain(host, "instagram.com")) {
+      return true;
+    }
+
     return false;
   } catch {
     return false;

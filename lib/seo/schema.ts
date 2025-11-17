@@ -1,4 +1,5 @@
 import { ensureAbsoluteUrl, SITE_ORIGIN } from "./site";
+import { DEFAULT_REVIEW_PLATFORM, getReviewPlatformMeta, type ReviewPlatform } from "@/lib/reviews/platforms";
 
 type MaybeString = string | null | undefined;
 
@@ -844,6 +845,7 @@ export type ProjectReviewSchemaInput = {
     ownerReply?: string;
     reviewUrl?: string;
     reviewDate?: string;
+    reviewPlatform?: ReviewPlatform;
   };
   projectName: string;
   projectUrl: string;
@@ -879,6 +881,23 @@ export function projectReviewSchema({
     itemReviewed.image = ensureAbsoluteUrl(projectImage, origin);
   }
 
+  const resolvedPlatform = testimonial.reviewPlatform ?? DEFAULT_REVIEW_PLATFORM;
+  const platformMeta = getReviewPlatformMeta(resolvedPlatform);
+  const reviewIsExternal = Boolean(testimonial.reviewUrl);
+
+  const publisher: SchemaInit = reviewIsExternal
+    ? {
+        "@type": "Organization",
+        name: platformMeta.publisherName,
+        url: platformMeta.publisherUrl,
+        sameAs: [reviewUrl],
+      }
+    : {
+        "@type": "Organization",
+        name: DEFAULT_BUSINESS_NAME,
+        url: origin,
+      };
+
   const schema: SchemaInit = {
     "@type": "Review",
     url: reviewUrl,
@@ -888,10 +907,12 @@ export function projectReviewSchema({
       name: authorName,
     },
     itemReviewed,
-    publisher: {
-      "@type": "Organization",
-      name: DEFAULT_BUSINESS_NAME,
-      url: origin,
+    publisher,
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: DEFAULT_BEST_RATING,
+      bestRating: DEFAULT_BEST_RATING,
+      worstRating: DEFAULT_WORST_RATING,
     },
   };
 

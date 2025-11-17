@@ -259,10 +259,20 @@ type GalleryImageProps = {
 
 function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
   const [loaded, setLoaded] = React.useState(false);
+  const imageRef = React.useRef<HTMLImageElement | null>(null);
+  const handleLoad = React.useCallback(() => setLoaded(true), []);
   const width = image.width ?? PROJECT_GALLERY_DEFAULT_WIDTH;
   const height = image.height ?? PROJECT_GALLERY_DEFAULT_HEIGHT;
   const aspectStyle: React.CSSProperties = { aspectRatio: `${width} / ${height}` };
   const alt = image.altText || projectTitle;
+
+  React.useEffect(() => {
+    setLoaded(false);
+    const imgEl = imageRef.current;
+    if (imgEl?.complete) {
+      handleLoad();
+    }
+  }, [image.url, handleLoad]);
 
   return (
     <button
@@ -274,12 +284,13 @@ function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
     >
       {!loaded ? <Skeleton className="pointer-events-none absolute inset-0 h-full w-full" /> : null}
       <Image
+        ref={imageRef}
         src={image.url}
         alt={alt}
         fill
         sizes="(min-width: 1024px) 50vw, 100vw"
         className={`${imageClassBase} ${loaded ? "opacity-100" : "opacity-0"}`}
-        onLoadingComplete={() => setLoaded(true)}
+        onLoad={handleLoad}
         loading="lazy"
       />
       <span

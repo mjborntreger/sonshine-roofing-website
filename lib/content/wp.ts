@@ -1,6 +1,11 @@
 import { cache } from "react";
 import { faqSchema, videoObjectSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
+import {
+  DEFAULT_REVIEW_PLATFORM,
+  normalizeReviewPlatform,
+  type ReviewPlatform,
+} from "@/lib/reviews/platforms";
 import type { PageInfo, PageResult } from "../ui/pagination";
 
 type Json = Record<string, unknown>;
@@ -61,6 +66,21 @@ const readTrimmedString = (value: unknown): string | null => {
   return trimmed.length ? trimmed : null;
 };
 
+const readSelectValue = (value: unknown): string | null => {
+  const direct = readTrimmedString(value);
+  if (direct) return direct;
+
+  if (Array.isArray(value)) {
+    for (const entry of value) {
+      if (typeof entry !== "string") continue;
+      const trimmed = entry.trim();
+      if (trimmed.length) return trimmed;
+    }
+  }
+
+  return null;
+};
+
 const readProjectDescription = (details: unknown): string | null => {
   const record = asRecord(details);
   const raw = record?.projectDescription;
@@ -80,6 +100,8 @@ const readProjectTestimonial = (details: unknown): ProjectTestimonial | null => 
   const reviewDate = readTrimmedString(testimonial.reviewDate) ?? undefined;
   const reviewUrlRaw = readTrimmedString(testimonial.reviewUrl);
   const reviewUrl = reviewUrlRaw ? ensureAbsoluteUrl(reviewUrlRaw, SITE_ORIGIN) : undefined;
+  const reviewType = readSelectValue(testimonial.reviewType);
+  const reviewPlatform = normalizeReviewPlatform(reviewType) ?? DEFAULT_REVIEW_PLATFORM;
 
   return {
     customerName,
@@ -87,6 +109,7 @@ const readProjectTestimonial = (details: unknown): ProjectTestimonial | null => 
     ownerReply,
     reviewUrl,
     reviewDate,
+    reviewPlatform,
   };
 };
 
@@ -127,6 +150,7 @@ export type ProjectTestimonial = {
   ownerReply?: string;
   reviewUrl?: string;
   reviewDate?: string;
+  reviewPlatform: ReviewPlatform;
 };
 
 export type ProjectSummary = {
@@ -3092,6 +3116,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
             ownerReply
             reviewUrl
             reviewDate
+            reviewType
           }
         }
 

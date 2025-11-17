@@ -1,8 +1,9 @@
 import SmartLink from "@/components/utils/SmartLink";
 import type { ProjectTestimonial as ProjectTestimonialData } from "@/lib/content/wp";
+import { DEFAULT_REVIEW_PLATFORM, getReviewPlatformMeta, type ReviewPlatform } from "@/lib/reviews/platforms";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-import { ArrowUpRight, Quote } from "lucide-react";
+import { ArrowUpRight, Quote, Star } from "lucide-react";
 
 type Props = {
   testimonial?: ProjectTestimonialData | null;
@@ -12,9 +13,9 @@ type Props = {
   customerReview?: string;
   reviewUrl?: string;
   ownerReply?: string;
+  reviewPlatform?: ReviewPlatform;
 };
 
-const GOOGLE_LOGO = "https://next.sonshineroofing.com/wp-content/uploads/google.webp";
 const OWNER_RESPONSE_IMAGE =
   "https://next.sonshineroofing.com/wp-content/uploads/Nathan-Edited-Bio-Photo-175x175-1.webp";
 
@@ -33,6 +34,7 @@ export default function ProjectTestimonial({
   customerReview,
   reviewUrl,
   ownerReply,
+  reviewPlatform,
 }: Props) {
   const resolvedReview = customerReview ?? testimonial?.customerReview;
   if (!resolvedReview) return null;
@@ -41,6 +43,8 @@ export default function ProjectTestimonial({
   const resolvedDate = formattedDate ?? formatReviewDate(testimonial?.reviewDate);
   const resolvedUrl = reviewUrl ?? testimonial?.reviewUrl;
   const resolvedOwnerReply = ownerReply ?? testimonial?.ownerReply;
+  const resolvedPlatform = reviewPlatform ?? testimonial?.reviewPlatform ?? DEFAULT_REVIEW_PLATFORM;
+  const platformMeta = getReviewPlatformMeta(resolvedPlatform);
 
   return (
     <section
@@ -52,10 +56,13 @@ export default function ProjectTestimonial({
     >
       <header className="flex items-start justify-between gap-4">
         <div>
-          <p className="flex items-center gap-3 text-sm uppercase tracking-[0.2em] text-[--brand-blue] mb-4">
+          <p
+            className="flex items-center gap-3 text-sm uppercase tracking-[0.2em] mb-4"
+            style={{ color: platformMeta.accentColor }}
+          >
             <Image
-              src={GOOGLE_LOGO}
-              alt="Google logo"
+              src={platformMeta.logoSrc}
+              alt={platformMeta.logoAlt}
               width={28}
               height={28}
               className="h-5 w-5 flex-none"
@@ -67,8 +74,24 @@ export default function ProjectTestimonial({
             {resolvedDate ? <p>{resolvedDate}</p> : null}
           </div>
         </div>
-        <Quote className="h-10 w-10 text-slate-200" aria-hidden />
+        <Quote
+          className="h-10 w-10 opacity-20"
+          style={{ color: platformMeta.accentColor }}
+          aria-hidden
+        />
       </header>
+
+      <div className="mt-2 flex items-center gap-1 text-amber-400" role="img" aria-label="Rated five out of five stars">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Star
+            key={`review-star-${index}`}
+            className="h-4 w-4"
+            fill="currentColor"
+            stroke="none"
+            aria-hidden="true"
+          />
+        ))}
+      </div>
 
       <blockquote className="mt-5 space-y-4 text-lg leading-relaxed text-slate-900">
         <p className="whitespace-pre-line">{resolvedReview}</p>
@@ -80,9 +103,10 @@ export default function ProjectTestimonial({
           target="_blank"
           rel="noopener noreferrer"
           data-icon-affordance="up-right"
-          className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[--brand-blue]"
+          className="mt-4 inline-flex items-center gap-1 text-sm font-semibold"
+          style={{ color: platformMeta.accentColor }}
         >
-          Read full review on Google
+          Read original review on {platformMeta.label}
           <ArrowUpRight className="h-4 w-4 inline icon-affordance" />
         </SmartLink>
       ) : null}

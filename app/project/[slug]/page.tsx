@@ -229,12 +229,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const reviewSchema =
     project.customerTestimonial
       ? projectReviewSchema({
-          testimonial: project.customerTestimonial,
-          projectName: project.title,
-          projectUrl: shareUrl,
-          projectImage: project.heroImage?.url,
-          origin,
-        })
+        testimonial: project.customerTestimonial,
+        projectName: project.title,
+        projectUrl: shareUrl,
+        projectImage: project.heroImage?.url,
+        origin,
+      })
       : null;
 
   return (
@@ -246,11 +246,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       {/* Title + gradient stripe */}
       <div>
         <SmartLink href="/project" title="Back to Project Gallery" aria-label="Back to Project Gallery" data-icon-affordance="left">
-          <nav 
+          <nav
             className="hover:underline text-slate-500"
-            >
-              <ArrowLeft className="icon-affordance h-4 inline mr-2 w-4" />
-              Back to Project Gallery
+          >
+            <ArrowLeft className="icon-affordance h-4 inline mr-2 w-4" />
+            Back to Project Gallery
           </nav>
         </SmartLink>
         <h1 className="mb-8 mt-4 text-3xl md:text-5xl">{project.title}</h1>
@@ -300,6 +300,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             </div>
           )}
 
+          {/* Customer Testimonial */}
           {project.customerTestimonial ? (
             <ProjectTestimonial testimonial={project.customerTestimonial} className="mt-8" />
           ) : null}
@@ -324,12 +325,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
           {project.productLinks?.length > 0 && (
             <>
-              <h3 
+              <h3
                 className="mt-6"
-                >
-                  <List className="text-[--brand-blue] mr-2 inline h-5 w-5" />
-                  Products Used
-                </h3>
+              >
+                <List className="text-[--brand-blue] mr-2 inline h-5 w-5" />
+                Products Used
+              </h3>
               <ul className="pl-5 list-disc">
                 {project.productLinks.map((p, i) => (
                   <li key={i}>
@@ -351,13 +352,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             </>
           )}
         </div>
+
+        {/* Block Editor Field */}
+        {project.contentHtml && (
+          <div className="mt-6 prose" dangerouslySetInnerHTML={{ __html: project.contentHtml }} />
+        )}
       </div>
-
-
-      {/* Main content */}
-      {project.contentHtml && (
-        <div className="mt-6 prose" dangerouslySetInnerHTML={{ __html: project.contentHtml }} />
-      )}
 
       <YouMayAlsoLike
         variant="project"

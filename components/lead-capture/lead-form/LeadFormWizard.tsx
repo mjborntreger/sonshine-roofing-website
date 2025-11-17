@@ -4,16 +4,7 @@ import dynamic from 'next/dynamic';
 import { FormEvent, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
-import {
-  ArrowLeft,
-  ArrowRight,
-  CalendarClock,
-  Check,
-  ShieldCheck,
-  Sparkles,
-  ArrowUpRight,
-  UserRound,
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarClock, Check, ShieldCheck, ArrowUpRight, UserRound } from 'lucide-react';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -52,6 +43,13 @@ import {
 import type { JourneyKey, LeadSuccessRestore, ProjectOption, LeadFormUtmParams } from '@/components/lead-capture/lead-form/config';
 import { renderHighlight } from '@/components/utils/renderHighlight';
 import ProjectTestimonial from '@/components/dynamic-content/project/ProjectTestimonial';
+import LeadFormStepShell from '@/components/lead-capture/lead-form/LeadFormStepShell';
+import {
+  PROJECT_OPTION_CARD_BASE_CLASS,
+  PROJECT_OPTION_CARD_SELECTED_CLASS,
+  PROJECT_OPTION_CARD_UNSELECTED_CLASS,
+  ProjectOptionCardContent,
+} from '@/components/lead-capture/lead-form/ProjectOptionCard';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
@@ -74,8 +72,6 @@ const HELP_BUTTON_BASE_CLASS =
 const HELP_BUTTON_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]';
 const HELP_BUTTON_UNSELECTED_CLASS =
   'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md';
-
-const INFO_BADGE_CLASS = 'inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1';
 
 const ROOF_TYPE_OPTIONS: RoofTypeOption[] = [
   {
@@ -303,6 +299,9 @@ export default function LeadFormWizard({
 
   const activeStepId = STEP_ORDER[activeStepIndex];
   const totalSteps = STEP_ORDER.length;
+  const isBackDisabled = activeStepIndex === 0;
+  const hasNextStep = activeStepIndex < totalSteps - 1;
+  const isFinalStep = activeStepIndex === totalSteps - 1;
   const journey = getJourneyConfig(form.projectType);
   const helpSummary = useMemo(() => (form.helpTopics.length ? form.helpTopics.join(', ') : ''), [form.helpTopics]);
 
@@ -647,92 +646,118 @@ export default function LeadFormWizard({
       <input type="hidden" name="bestTime" value={form.bestTime} />
       <input type="hidden" name="notes" value={form.notes} />
 
-      <div className="mx-2 overflow-hidden bg-white border border-blue-100 shadow-md rounded-3xl">
-        <div className="p-6 border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50">
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-xs uppercase tracking-wide text-[--brand-blue]">Step {activeStepIndex + 1} of {totalSteps}</p>
-              <h3 className="mt-3 mb-4 text-xl font-semibold md:text-3xl text-slate-900">{renderedTitle}</h3>
-              <p className="mt-3 text-xs md:text-sm text-slate-600">{description}</p>
+      <LeadFormStepShell
+        stepLabel={`Step ${activeStepIndex + 1} of ${totalSteps}`}
+        title={renderedTitle}
+        description={description}
+        headerFooter={(
+          <>
+            <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-blue-100">
+              <div className="h-full rounded-full bg-[--brand-blue] transition-[width]" style={{ width: `${progressPercent}%` }} />
             </div>
-            <div className="relative aspect-[21/9] h-[54px] w-[158px] mb-4">
-              <Image
-                src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
-                alt="sonshine logo, no swoosh"
-                width={158}
-                height={54}
-                className="absolute top-[20px] right-0"
-              />
+            <div className="mt-8 flex items-start gap-3">
+              <CalendarClock className="mt-1 h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+              <div>
+                <p className="font-semibold text-slate-800">Need help now?</p>
+                <p className="mt-1">
+                  Call <a href="tel:+19418664320" className="font-semibold text-[--brand-blue]">(941) 866-4320</a> and we’ll fast-track your request.
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="w-full h-2 mt-4 overflow-hidden bg-blue-100 rounded-full">
-            <div className="h-full rounded-full bg-[--brand-blue] transition-[width]" style={{ width: `${progressPercent}%` }} />
-          </div>
-          <div className="flex items-start gap-3 mt-8">
-            <CalendarClock className="mt-1 h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-            <div>
-              <p className="font-semibold text-slate-800">Need help now?</p>
-              <p className="mt-1">Call <a href="tel:+19418664320" className="font-semibold text-[--brand-blue]">(941) 866-4320</a> and we’ll fast-track your request.</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="p-6">
-          {globalError && (
-            <div className="px-4 py-3 mb-4 text-sm text-red-700 border border-red-200 rounded-xl bg-red-50">
-              {globalError}
-            </div>
-          )}
-
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div key={activeStepId} {...stepMotionProps}>
-              {activeStepId === 'need' && (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {PROJECT_OPTIONS.map((option) => {
-                    const { value, label, description, icon: Icon, accent, action, imageSrc, imageAlt } = option;
-                    const selectable = action === 'advance' && isJourneyKey(value);
-                    const selected = selectable && form.projectType === value;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => handleProjectOption(option)}
-                        className={cn(
-                          'group flex h-full flex-col justify-between rounded-3xl border bg-white px-4 py-5 text-left shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                          selected
-                            ? 'border-[--brand-blue] shadow-[0_10px_25px_rgba(15,76,129,0.12)]'
-                            : 'border-slate-200 hover:-translate-y-0.5 hover:shadow-lg'
-                        )}
-                        aria-pressed={selectable ? selected : undefined}
-                      >
-                        <div>
-                          <div className="relative w-full overflow-hidden rounded-2xl bg-slate-100 aspect-[7/3]">
-                            <Image
-                              src={imageSrc}
-                              alt={imageAlt}
-                              fill
-                              sizes="(min-width: 1024px) 320px, 100vw"
-                              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                            />
-                          </div>
-                          <div className={cn('mt-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium', accent)}>
-                            <Icon className="w-4 h-4" aria-hidden="true" />
-                            {selectable ? (selected ? 'Selected' : 'Tap to select') : 'Opens a new page'}
-                          </div>
-                          <h4 className="mt-2 font-semibold text-md md:text-xl text-slate-900">{label}</h4>
-                          <div className="flex items-center justify-between mt-1 text-xs text-slate-500">
-                            <p className="text-xs md:text-md text-slate-500">{description}</p>
-                            <ArrowRight className="w-4 h-4 transition text-slate-400 group-hover:translate-x-1" aria-hidden="true" />
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                  {errors.projectType && (
-                    <p className="text-sm font-medium text-red-600 md:col-span-2">{errors.projectType}</p>
-                  )}
-                </div>
+          </>
+        )}
+        bottomSlot={(
+          <>
+            <div className="mx-6 my-6 flex items-center justify-between gap-3">
+              <Button
+                type="button"
+                data-icon-affordance="left"
+                variant="secondary"
+                size="sm"
+                onClick={handleBack}
+                className="gap-2"
+                disabled={isBackDisabled}
+              >
+                <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
+                Back
+              </Button>
+              {hasNextStep && (
+                <Button type="button" data-icon-affordance="right" variant="brandBlue" size="sm" onClick={handleNext} className="gap-2">
+                  Continue
+                  <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+                </Button>
               )}
+              {isFinalStep && (
+                <Button type="submit" variant="brandOrange" size="sm" disabled={status === 'submitting'} className="gap-2">
+                  {status === 'submitting' ? 'Sending…' : 'Submit my request'}
+                  {status !== 'submitting' && <Check className="h-4 w-4" aria-hidden="true" />}
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+      >
+        {globalError && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {globalError}
+          </div>
+        )}
+
+        <AnimatePresence mode="wait" initial={false}>
+          <div className="mb-8 flex items-center justify-between gap-3">
+            <Button
+              type="button"
+              data-icon-affordance="left"
+              variant="secondary"
+              size="sm"
+              onClick={handleBack}
+              className="gap-2"
+              disabled={isBackDisabled}
+            >
+              <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
+              Back
+            </Button>
+            {hasNextStep && (
+              <Button type="button" data-icon-affordance="right" variant="brandBlue" size="sm" onClick={handleNext} className="gap-2">
+                Continue
+                <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+              </Button>
+            )}
+            {isFinalStep && (
+              <Button type="submit" variant="brandOrange" size="sm" disabled={status === 'submitting'} className="gap-2">
+                {status === 'submitting' ? 'Sending…' : 'Submit my request'}
+                {status !== 'submitting' && <Check className="h-4 w-4" aria-hidden="true" />}
+              </Button>
+            )}
+          </div>
+
+          <motion.div key={activeStepId} {...stepMotionProps}>
+            {activeStepId === 'need' && (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {PROJECT_OPTIONS.map((option) => {
+                  const { value, action } = option;
+                  const selectable = action === 'advance' && isJourneyKey(value);
+                  const selected = selectable && form.projectType === value;
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => handleProjectOption(option)}
+                      className={cn(
+                        PROJECT_OPTION_CARD_BASE_CLASS,
+                        selected ? PROJECT_OPTION_CARD_SELECTED_CLASS : PROJECT_OPTION_CARD_UNSELECTED_CLASS
+                      )}
+                      aria-pressed={selectable ? selected : undefined}
+                    >
+                      <ProjectOptionCardContent option={option} />
+                    </button>
+                  );
+                })}
+                {errors.projectType && (
+                  <p className="text-sm font-medium text-red-600 lg:col-span-2">{errors.projectType}</p>
+                )}
+              </div>
+            )}
 
               {activeStepId === 'context' && (
                 <div className="py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
@@ -777,10 +802,6 @@ export default function LeadFormWizard({
                                       <Icon className="h-10 w-10" aria-hidden="true" />
                                     </div>
                                   )}
-                                  <div className="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow">
-                                    <Icon className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-                                    <span>{selected ? 'Selected' : 'Tap to add'}</span>
-                                  </div>
                                 </div>
                                 <div className="flex items-start justify-between gap-3">
                                   <div>
@@ -853,6 +874,7 @@ export default function LeadFormWizard({
                       customerReview="Sonshine roofing did an excellent job of replacing our entire roof. Their staff was professional in every aspect. We received multiple updates on the progress, including house calls. Whenever we had a question and called the office, the staff was always polite, and we were immediately put through to the production manager. This company was very easy to work with and came in with a very fair price for the job. We would highly recommend them."
                       reviewUrl="https://www.google.com/maps/contrib/103054944051170712920/place/ChIJIyB9mBBHw4gRWOl1sU9ZGFM/@27.3105727,-83.1061407,311254m/data=!3m1!1e3!4m6!1m5!8m4!1e1!2s103054944051170712920!3m1!1e1?hl=en&entry=ttu&g_ep=EgoyMDI1MTEwNC4xIKXMDSoASAFQAw%3D%3D"
                       ownerReply="Hi Pat! Thanks for trusting us to perform a tile roof replacement on your Sarasota home. We pride ourselves on great communication, so we're glad to see that it shows."
+                      reviewPlatform="google"
                     />
                   </aside>
                 </div>
@@ -884,10 +906,6 @@ export default function LeadFormWizard({
                                 sizes="(min-width: 768px) 320px, 100vw"
                                 className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                               />
-                              <div className="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-700 shadow">
-                                <Sparkles className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-                                <span>{selected ? 'Selected' : 'Tap to select'}</span>
-                              </div>
                             </div>
                             <div className="flex items-center justify-between gap-3">
                               <p className="text-sm font-semibold text-slate-900">{label}</p>
@@ -1141,41 +1159,7 @@ export default function LeadFormWizard({
               )}
             </motion.div>
           </AnimatePresence>
-        </div>
-
-        <div className="flex flex-col gap-4 px-6 py-4 border-t border-blue-50 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
-            <span className={INFO_BADGE_CLASS}>
-              <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-              Trusted locally since 1987
-            </span>
-            <span className={INFO_BADGE_CLASS}>
-              <UserRound className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-              Roof advisors, not call center scripts
-            </span>
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-3 mx-8 my-6">
-          {activeStepIndex > 0 && (
-            <Button type="button" data-icon-affordance="left" variant="secondary" size="sm" onClick={handleBack} className="gap-2">
-              <ArrowLeft className="w-4 h-4 icon-affordance" aria-hidden="true" />
-              Back
-            </Button>
-          )}
-          {activeStepIndex < totalSteps - 1 && (
-            <Button type="button" data-icon-affordance="right" variant="brandBlue" size="sm" onClick={handleNext} className="gap-2">
-              Continue
-              <ArrowRight className="w-4 h-4 icon-affordance" aria-hidden="true" />
-            </Button>
-          )}
-          {activeStepIndex === totalSteps - 1 && (
-            <Button type="submit" variant="brandOrange" size="sm" disabled={status === 'submitting'} className="gap-2">
-              {status === 'submitting' ? 'Sending…' : 'Submit my request'}
-              {status !== 'submitting' && <Check className="w-4 h-4" aria-hidden="true" />}
-            </Button>
-          )}
-        </div>
-      </div>
-    </form>
-  );
+        </LeadFormStepShell>
+      </form>
+    );
 }
