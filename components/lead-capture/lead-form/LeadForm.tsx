@@ -8,7 +8,7 @@ import { PROJECT_OPTIONS, isJourneyKey, type JourneyKey, type LeadSuccessRestore
 import LeadFormSkeleton from '@/components/lead-capture/lead-form/LeadFormSkeleton';
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { renderHighlight } from '@/components/utils/renderHighlight';
-import LeadFormStepShell from '@/components/lead-capture/lead-form/LeadFormStepShell';
+import LeadFormStepShell, { LeadFormStepControls } from '@/components/lead-capture/lead-form/LeadFormStepShell';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -76,57 +76,46 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
   const stepZeroHeading = renderHighlight('Let’s get you squared away', 'squared away');
   const isContinueDisabled = !pendingJourney;
 
+  const renderNavigationControls = (className?: string) => (
+    <LeadFormStepControls
+      className={className}
+      start={(
+        <Button type="button" data-icon-affordance="left" variant="secondary" size="sm" className="gap-2" disabled>
+          <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
+          Back
+        </Button>
+      )}
+      end={(
+        <Button
+          type="button"
+          data-icon-affordance="right"
+          variant="brandBlue"
+          size="sm"
+          className="gap-2"
+          disabled={isContinueDisabled}
+          onClick={() => handleAdvance()}
+        >
+          Continue
+          <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+        </Button>
+      )}
+    />
+  );
+
   return (
     <div id="get-started">
       {!showWizard && (
-        <div ref={containerRef}>
+        <div className="pb-16" ref={containerRef}>
           <LeadFormStepShell
             stepLabel="Step 1 of 4"
             title={stepZeroHeading}
             description="We’ll tailor the next few questions so we can route you to the right spot."
-            bottomSlot={(
-              <div className="mx-8 my-6 flex items-center justify-between gap-3">
-                <Button type="button" data-icon-affordance="left" variant="secondary" size="sm" className="gap-2" disabled>
-                  <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
-                  Back
-                </Button>
-                <Button
-                  type="button"
-                  data-icon-affordance="right"
-                  variant="brandBlue"
-                  size="sm"
-                  className="gap-2"
-                  disabled={isContinueDisabled}
-                  onClick={() => handleAdvance()}
-                >
-                  Continue
-                  <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
-                </Button>
-              </div>
-            )}
+            bottomSlot={renderNavigationControls()}
           >
+            {renderNavigationControls('mb-6')}
+            <p className="text-slate-600 inline-flex mt-2 mb-4 text-xs">Select an option, then hit "continue"</p>
 
-            <div className="mb-8 flex items-center justify-between gap-3">
-              <Button type="button" data-icon-affordance="left" variant="secondary" size="sm" className="gap-2" disabled>
-                <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
-                Back
-              </Button>
-              <Button
-                type="button"
-                data-icon-affordance="right"
-                variant="brandBlue"
-                size="sm"
-                className="gap-2"
-                disabled={isContinueDisabled}
-                onClick={() => handleAdvance()}
-              >
-                Continue
-                <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
-              </Button>
-            </div>
-            <p className="text-slate-600 inline-flex mt-2 mb-4 text-xs">Select an option to continue</p>
-
-            <div className="grid gap-4 lg:grid-cols-2">
+            <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
               {PROJECT_OPTIONS.map((option) => {
                 const { value, action, href } = option;
                 const journeyValue = isJourneyKey(value) ? value : null;

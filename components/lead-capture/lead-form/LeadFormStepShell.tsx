@@ -47,7 +47,22 @@ export default function LeadFormStepShell({
 
       <div className="p-6">{children}</div>
 
-      {bottomSlot}
+      {bottomSlot ? <div className="p-6">{bottomSlot}</div> : null}
+    </div>
+  );
+}
+
+type LeadFormStepControlsProps = {
+  start?: ReactNode;
+  end?: ReactNode;
+  className?: string;
+};
+
+export function LeadFormStepControls({ start, end, className }: LeadFormStepControlsProps) {
+  return (
+    <div className={cn('flex flex-wrap items-center justify-between gap-3', className)}>
+      <div className="flex items-center gap-3">{start}</div>
+      <div className="flex items-center gap-3">{end}</div>
     </div>
   );
 }

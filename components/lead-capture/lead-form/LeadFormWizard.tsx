@@ -43,7 +43,7 @@ import {
 import type { JourneyKey, LeadSuccessRestore, ProjectOption, LeadFormUtmParams } from '@/components/lead-capture/lead-form/config';
 import { renderHighlight } from '@/components/utils/renderHighlight';
 import ProjectTestimonial from '@/components/dynamic-content/project/ProjectTestimonial';
-import LeadFormStepShell from '@/components/lead-capture/lead-form/LeadFormStepShell';
+import LeadFormStepShell, { LeadFormStepControls } from '@/components/lead-capture/lead-form/LeadFormStepShell';
 import {
   PROJECT_OPTION_CARD_BASE_CLASS,
   PROJECT_OPTION_CARD_SELECTED_CLASS,
@@ -617,6 +617,42 @@ export default function LeadFormWizard({
   const renderedTitle = renderHighlight(title, highlightText);
   const progressPercent = ((activeStepIndex + 1) / totalSteps) * 100;
 
+  const renderNavigationControls = (className?: string) => (
+    <LeadFormStepControls
+      className={className}
+      start={(
+        <Button
+          type="button"
+          data-icon-affordance="left"
+          variant="secondary"
+          size="sm"
+          onClick={handleBack}
+          className="gap-2"
+          disabled={isBackDisabled}
+        >
+          <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
+          Back
+        </Button>
+      )}
+      end={(
+        <>
+          {hasNextStep && (
+            <Button type="button" data-icon-affordance="right" variant="brandBlue" size="sm" onClick={handleNext} className="gap-2">
+              Continue
+              <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
+          {isFinalStep && (
+            <Button type="submit" variant="brandOrange" size="sm" disabled={status === 'submitting'} className="gap-2">
+              {status === 'submitting' ? 'Sending…' : 'Submit my request'}
+              {status !== 'submitting' && <Check className="h-4 w-4" aria-hidden="true" />}
+            </Button>
+          )}
+        </>
+      )}
+    />
+  );
+
   const isInitialRender = !hasMountedRef.current;
 
   const stepMotionProps = reduceMotion
@@ -637,7 +673,7 @@ export default function LeadFormWizard({
   }
 
   return (
-    <form ref={formRef} className="pb-24" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="pb-16" onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <input type="hidden" name="projectType" value={form.projectType} />
       <input type="hidden" name="helpTopics" value={helpSummary} />
@@ -666,36 +702,7 @@ export default function LeadFormWizard({
             </div>
           </>
         )}
-        bottomSlot={(
-          <>
-            <div className="mx-6 my-6 flex items-center justify-between gap-3">
-              <Button
-                type="button"
-                data-icon-affordance="left"
-                variant="secondary"
-                size="sm"
-                onClick={handleBack}
-                className="gap-2"
-                disabled={isBackDisabled}
-              >
-                <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
-                Back
-              </Button>
-              {hasNextStep && (
-                <Button type="button" data-icon-affordance="right" variant="brandBlue" size="sm" onClick={handleNext} className="gap-2">
-                  Continue
-                  <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
-                </Button>
-              )}
-              {isFinalStep && (
-                <Button type="submit" variant="brandOrange" size="sm" disabled={status === 'submitting'} className="gap-2">
-                  {status === 'submitting' ? 'Sending…' : 'Submit my request'}
-                  {status !== 'submitting' && <Check className="h-4 w-4" aria-hidden="true" />}
-                </Button>
-              )}
-            </div>
-          </>
-        )}
+        bottomSlot={renderNavigationControls()}
       >
         {globalError && (
           <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -703,34 +710,9 @@ export default function LeadFormWizard({
           </div>
         )}
 
-        <AnimatePresence mode="wait" initial={false}>
-          <div className="mb-8 flex items-center justify-between gap-3">
-            <Button
-              type="button"
-              data-icon-affordance="left"
-              variant="secondary"
-              size="sm"
-              onClick={handleBack}
-              className="gap-2"
-              disabled={isBackDisabled}
-            >
-              <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
-              Back
-            </Button>
-            {hasNextStep && (
-              <Button type="button" data-icon-affordance="right" variant="brandBlue" size="sm" onClick={handleNext} className="gap-2">
-                Continue
-                <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
-              </Button>
-            )}
-            {isFinalStep && (
-              <Button type="submit" variant="brandOrange" size="sm" disabled={status === 'submitting'} className="gap-2">
-                {status === 'submitting' ? 'Sending…' : 'Submit my request'}
-                {status !== 'submitting' && <Check className="h-4 w-4" aria-hidden="true" />}
-              </Button>
-            )}
-          </div>
+        {renderNavigationControls('mb-8')}
 
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div key={activeStepId} {...stepMotionProps}>
             {activeStepId === 'need' && (
               <div className="grid gap-4 lg:grid-cols-2">
