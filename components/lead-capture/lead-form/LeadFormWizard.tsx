@@ -715,7 +715,7 @@ export default function LeadFormWizard({
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={activeStepId} {...stepMotionProps}>
             {activeStepId === 'need' && (
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
                 {PROJECT_OPTIONS.map((option) => {
                   const { value, action } = option;
                   const selectable = action === 'advance' && isJourneyKey(value);
@@ -756,7 +756,7 @@ export default function LeadFormWizard({
                           <h4 className="text-sm font-semibold tracking-wide uppercase text-slate-600">What&rsquo;s the situation?</h4>
                           <p className="mt-2 mb-1 text-xs font-medium text-slate-500">Select all that apply</p>
                         </div>
-                        <div className="grid gap-3 mt-3 md:grid-cols-2">
+                        <div className="grid gap-3 mt-3 grid-cols-2 md:grid-cols-3">
                           {journey.helpOptions.map(({ value, label, description, icon: Icon, imageSrc, imageAlt }) => {
                             const selected = form.helpTopics.includes(value);
                             return (
@@ -866,7 +866,7 @@ export default function LeadFormWizard({
                 <div className="grid gap-4 py-2 md:grid-cols-2">
                   <div className="md:col-span-2">
                     <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">What type of roof do you have?</p>
-                    <div className="grid gap-3 mt-3 md:grid-cols-4">
+                    <div className="grid gap-3 mt-3 grid-cols-2 md:grid-cols-4">
                       {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
                         const selected = form.roofType === value;
                         return (

@@ -138,11 +138,11 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
 ];
 
 export const STANDARD_TIMELINE_OPTIONS: TimelineOption[] = [
-  { value: 'within-72-hours', label: 'Within 72 hours' },
+  { value: 'within-72-hours', label: 'ASAP' },
   { value: 'this-week', label: 'This week' },
   { value: 'this-month', label: 'This month' },
-  { value: 'next-2-3-months', label: 'In the next 2–3 months' },
-  { value: 'this-year', label: 'This year' },
+  { value: 'next-2-3-months', label: '2–3 months' },
+  { value: 'this-year', label: 'This Year' },
   { value: 'not-sure-yet', label: 'Not sure yet' },
 ];
 
