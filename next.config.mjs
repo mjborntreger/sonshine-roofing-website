@@ -124,6 +124,7 @@ const nextConfig = {
       { source: "/10-warning-signs-of-roof-leaks", destination: "/roof-leaks-warning-signs", permanent: true },
       { source: "/🌞-energy-efficient-roofing-options-for-florida-homes-save-money-and-beat-the-heat-☀%EF%B8%8F💸🏠", destination: "/energy-efficient-roofing-options-florida", permanent: true },
       { source: "/9-warning-signs-of-roof-leaks", destination: "/roof-leaks-warning-signs", permanent: true },
+      { source: "/project/treedale-glen-lakewood-ranch", destination: "/project/treesdale-glen-lakewood-ranch", permanent: true },
 
       // === Broken Backlinks ===
       { source: "/wp-content/uploads/roof-lifespan-1-1080x619.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/extend-roof-lifespan.webp", permanent: true },
