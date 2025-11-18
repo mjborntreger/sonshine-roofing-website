@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { KeyboardEvent } from "react";
-import { ChevronDown, Phone } from "lucide-react";
-import SmartLink from "../../utils/SmartLink";
+import { Phone } from "lucide-react";
 import ShinyText from "./ShinyText";
 import { scrollToAnchor } from "@/lib/ui/scroll-to-anchor";
 
@@ -12,19 +11,6 @@ type HeroProps = {
 };
 
 export default function Hero({ title = "The Best Roofing Company in Sarasota, Manatee, and Charlotte Counties for Over 38 Years" }: HeroProps) {
-  const [shouldAnimateArrow, setShouldAnimateArrow] = useState(false);
-
-  const handleCtaKeyDown = (event: KeyboardEvent<HTMLAnchorElement>) => {
-    if (event.key !== " ") return;
-    event.preventDefault();
-    scrollToAnchor("get-started");
-  };
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setShouldAnimateArrow(true), 400);
-    return () => window.clearTimeout(timer);
-  }, []);
-
   return (
     <>
       <section

@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { FormEvent, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowLeft, ArrowRight, CalendarClock, Check, ShieldCheck, ArrowUpRight, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarClock, Check, ArrowUpRight } from 'lucide-react';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
