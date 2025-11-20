@@ -43,9 +43,9 @@ const REVIEW_COUNT = "text-xs text-slate-500 mb-2";
 
 // BADGES STYLES
 const BADGE_TITLE_STYLES = "text-md md:text-xl text-slate-800";
-const BADGE_SUBTITLE_STYLES = "text-slate-600 text-xs mb-8";
+const BADGE_SUBTITLE_STYLES = "text-slate-600 text-xs mb-4";
 const BADGE_CARD_STYLES = "flex-col items-center gap-2 rounded-2xl border border-dashed border-slate-200/80 bg-[#fb9216]/5 p-6 text-center shadow-inner transition hover:-translate-y-1 hover:border-[--brand-blue]/40 hover:shadow-lg";
-const BADGE_IMAGE_WRAPPER = "relative mt-2 flex h-24 w-full items-center justify-center";
+const BADGE_IMAGE_WRAPPER = "relative flex h-32 w-full items-center justify-center";
 const BADGE_IMAGE_CLASS = "h-full w-auto max-w-[300px] object-contain drop-shadow-sm";
 const BADGE_IMAGE_SIZES = "(min-width: 1280px) 200px, (min-width: 1024px) 180px, (min-width: 768px) 33vw, 50vw";
 
