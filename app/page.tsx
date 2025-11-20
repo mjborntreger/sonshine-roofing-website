@@ -95,7 +95,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
       <Hero />
       <div className={reviewsLayout}>
         <HeroTrustBar />
-        <ReviewsCarousel highlightText={"Roofing Experts"} />
+        <ReviewsCarousel />
       </div>
       <div className={leadFormLayout}>
         <div className="max-w-[1280px] pt-16 mx-auto">
