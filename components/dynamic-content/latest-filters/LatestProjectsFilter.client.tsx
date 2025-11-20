@@ -13,7 +13,7 @@ import {
 import { renderHighlight } from "@/components/utils/renderHighlight";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const pStyles = "my-8 text-slate-500 text-center justify-center text-sm md:text-md";
+const pStyles = "mt-4 mb-6 text-slate-500 text-center justify-center text-sm md:text-md";
 
 type TabPayload = {
   key: MaterialKey;
@@ -89,16 +89,16 @@ export default function LatestProjectsFilter({
       </FilterTabs>
     </div>
   );
-  const heading = "Latest Projects";
-  const renderedHeading = renderHighlight(heading, "Latest");
+  const heading = "Latest Roof Replacement Projects";
+  const renderedHeading = renderHighlight(heading, "Roof Replacement Projects");
 
   return (
     <div className="px-4 pb-24 md:px-12 max-w-[1600px] mx-auto">
       {showHeader ? (
         <div className="text-center">
           <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
-          {renderFilterTabs()}
           <p className={pStyles}>{description}</p>
+          {renderFilterTabs()}
         </div>
       ) : (
         renderFilterTabs()

@@ -1,4 +1,5 @@
 import Hero from "@/components/marketing/landing-page/Hero";
+import HeroTrustBar from "@/components/marketing/landing-page/HeroTrustBar";
 import ReviewsCarousel from "@/components/reviews-widget/ReviewsCarousel";
 import WhyHomeownersChooseUs from "@/components/marketing/landing-page/WhyHomeownersChooseUs";
 import LatestProjectsFilter from "@/components/dynamic-content/latest-filters/LatestProjectsFilter";
@@ -14,7 +15,7 @@ import LeadFormSection from "@/components/lead-capture/lead-form/LeadFormSection
 import LocalPartnershipsSection from "@/components/location/LocalPartnershipsSection";
 
 // ===== STYLE CONSTANTS ===== //
-const leadFormLayout = "mx-auto w-full";
+const leadFormLayout = "mx-auto w-full bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent";
 const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
 const narrowLayout = "mx-auto w-full max-w-[1280px]";
 
@@ -92,20 +93,21 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   return (
     <>
       <Hero />
+      <div className={reviewsLayout}>
+        <HeroTrustBar />
+        <ReviewsCarousel highlightText={"Roofing Experts"} />
+      </div>
       <div className={leadFormLayout}>
         <div className="max-w-[1280px] pt-16 mx-auto">
           <LeadFormSection />
         </div>
-      </div>
-      <div className={reviewsLayout}>
-        <ReviewsCarousel highlightText="Our Customers" />
       </div>
       <div className={narrowLayout}>
         <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
           <div className="min-w-0">
             <div className="mx-2">
               <LatestProjectsFilter projects={projects} initial={4} />
-              <WhyHomeownersChooseUs highlightText="Homeowners" />
+              <WhyHomeownersChooseUs highlightText="Family-owned" />
               <LocalPartnershipsSection
                 features={sponsorFeatures}
                 emptyMessage="No sponsored partners yet."

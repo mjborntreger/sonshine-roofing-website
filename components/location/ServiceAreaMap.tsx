@@ -37,7 +37,7 @@ export default function ServiceAreaMap({
     : "max-w-4xl px-2 mt-24 mx-auto space-y-2";
   const locationLabel = locationName ?? fallbackLocationLabel;
   const eyebrowText =
-    eyebrow ?? (locationLabel ? `Nearby Landmarks in ${locationLabel}, FL` : "Nearby Landmarks");
+    eyebrow ?? (locationLabel ? `We proudly provide expert residential roofing services in ${locationLabel}, FL and surrounding areas, ` : "We proudly provide expert residential roofing services to the following area:");
   const renderedHeading = renderHighlight(heading, "Service Area");
 
   if (!mapImage?.url) {

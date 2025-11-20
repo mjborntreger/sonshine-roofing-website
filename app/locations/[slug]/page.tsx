@@ -28,6 +28,7 @@ import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildReviewSchema, sponsorFeaturesItemListSchema, graphSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
+import HeroTrustBar from "@/components/marketing/landing-page/HeroTrustBar";
 
 type OgImageRecord = {
   url?: unknown;
@@ -53,7 +54,7 @@ export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
 }
 
 // ===== STYLE CONSTANTS ===== //
-const leadFormLayout = "w-full px-2";
+const leadFormLayout = "mx-auto w-full bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent";
 const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
 const narrowLayout = "mx-auto w-full max-w-[1280px]";
 const FALLBACK_REVIEW_INTERVAL_SECONDS = 60;
@@ -192,11 +193,12 @@ export default async function LocationPage({ params }: { params: Promise<Params>
 
   if (!location) notFound();
 
-  const toPossessive = (name: string | null) =>
-    !name ? "" : name.endsWith("s") ? `${name}'` : `${name}'s`;
-  const locationPossessive = toPossessive(location.locationName);
-  const botbTitle = `Voted ${locationPossessive} Best Roofer for 5 Years`;
-  const botbHighlight = `${locationPossessive} Best Roofer`;
+  const botbTitle = `Voted Best ${location.locationName} Roofer for 5 Years`;
+  const botbHighlight = `Best ${location.locationName} Roofer`;
+  const heroTrustHeadingTarget = location.locationName || location.title || slug;
+  const heroTrustHeading = heroTrustHeadingTarget
+    ? `Top-rated Local Roofing Contractor in ${heroTrustHeadingTarget} and Surrounding Areas`
+    : undefined;
 
   const formatDate = (input: string | null | undefined) => {
     if (!input) return null;
@@ -247,23 +249,23 @@ export default async function LocationPage({ params }: { params: Promise<Params>
 
   const reviewSchema = displayReviews.length
     ? buildReviewSchema({
-        reviews: displayReviews,
-        averageRating,
-        reviewCount: displayReviews.length,
-        ratingCount: ratingAggregate.count || displayReviews.length,
-        options: {
-          businessName: schemaBusinessName ?? "SonShine Roofing",
-          businessUrl: locationSchemaUrl,
-          providerUrl: GBP_PROFILE_URL,
-          origin: SITE_ORIGIN,
-          id: `${locationSchemaUrl}#roofing-contractor`,
-          address: {
-            addressLocality: location.locationName ?? undefined,
-          },
-          telephone: "+1-941-866-4320",
-          withContext: false,
+      reviews: displayReviews,
+      averageRating,
+      reviewCount: displayReviews.length,
+      ratingCount: ratingAggregate.count || displayReviews.length,
+      options: {
+        businessName: schemaBusinessName ?? "SonShine Roofing",
+        businessUrl: locationSchemaUrl,
+        providerUrl: GBP_PROFILE_URL,
+        origin: SITE_ORIGIN,
+        id: `${locationSchemaUrl}#roofing-contractor`,
+        address: {
+          addressLocality: location.locationName ?? undefined,
         },
-      })
+        telephone: "+1-941-866-4320",
+        withContext: false,
+      },
+    })
     : null;
 
   const sponsorHeading = location.locationName
@@ -295,29 +297,27 @@ export default async function LocationPage({ params }: { params: Promise<Params>
     <>
       {structuredData ? <JsonLd data={structuredData} /> : null}
       <Hero title={`The Best Roofing Company in ${location.locationName} for Over 38 Years`} />
-
-      <section className={leadFormLayout}>
-        <div className="max-w-[1280px] mx-auto py-16 gap-8">
-          <LeadFormSection />
-        </div>
-      </section>
-      <section className={reviewsLayout}>
+      <div className={reviewsLayout}>
+        <HeroTrustBar heading={heroTrustHeading} />
         {hasDisplayReviews ? (
           <ReviewsCarousel
             reviews={displayReviews}
-            heading={`What Our ${location.locationName || location.title || slug} Customers Say`}
-            highlightText={location.locationName ? `${location.locationName} Customers` : undefined}
+            heading={`Residential Roofing Experts in ${location.locationName || location.title || slug}`}
+            highlightText={"Roofing Experts"}
             showBusinessProfileLink={true}
-            showRatingSummary={true}
-            showSeeAllButton={true}
-            showDisclaimer={false}
+            showDisclaimer={true}
             limit={carouselLimit}
             fallbackToRemote={true}
           />
         ) : (
           <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
         )}
-      </section>
+      </div>
+      <div className={leadFormLayout}>
+        <div className="max-w-[1280px] mx-auto py-16 gap-8">
+          <LeadFormSection />
+        </div>
+      </div>
 
       <main className={narrowLayout}>
         <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
@@ -328,15 +328,18 @@ export default async function LocationPage({ params }: { params: Promise<Params>
                 locationName={location.locationName}
               />
               <WhyHomeownersChooseUs
-                title={`Why ${location.locationName} Homeowners Choose Us`}
-                highlightText={location.locationName ? `${location.locationName} Homeowners` : undefined}
+                title={`Family-owned ${location.locationName} Roofing Company`}
+                highlightText={location.locationName ? `${location.locationName} Roofing Company` : undefined}
+                description={`Since 1987, SonShine Roofing has been an integral part of the ${location.locationName} community. Over the past 38 years, we've always honored a tradition of honesty, respect, and integrity in everything we do.`}
               />
               <LocalPartnershipsSection
                 features={sponsorFeatures}
+                eyebrow={`As a pillar of the ${location.locationName} roofing community, we believe it is our duty to give back to organizations whose values align with ours. As you'll see, we proudly support law enforcement, youth sports, and more.`}
                 emptyMessage="No sponsored partners yet."
               />
               <BestOfTheBest title={botbTitle} highlightText={botbHighlight} />
-              <section className="p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-slate-200">
+              <LatestPostsFilter posts={posts} initial={4} />
+              <section className="mt-12 p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-slate-200">
                 <h2 className="text-xl md:text-3xl">{`A Special Message to ${location.locationName} Homeowners:`}</h2>
                 <p className="italic text-slate-400">{`Updated: ${modifiedDisplay}`}</p>
 
@@ -346,7 +349,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
                   <p className="mt-4">No WordPress editor content provided for this location.</p>
                 )}
               </section>
-              <LatestPostsFilter posts={posts} initial={4} />
               <ServiceAreaMap
                 mapImage={location.mapImage}
                 landmarks={location.nearbyLandmarks}
@@ -364,7 +366,9 @@ export default async function LocationPage({ params }: { params: Promise<Params>
 
         </div>
 
-        <NeighborhoodsServedSection neighborhoods={location.neighborhoodsServed} />
+        <NeighborhoodsServedSection 
+          neighborhoods={location.neighborhoodsServed}
+          eyebrow={`During our 38-year tenure in ${location.locationName}, we've always kept prices competitive without sacrificing on a quality roofing experience. We adapt to your neighborhood, not the other way around.`} />
         <Section>
           <FaqInlineList
             heading="General FAQs"

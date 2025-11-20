@@ -73,7 +73,7 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
     setPendingJourney(null);
     setShowWizard(false);
   }, []);
-  const stepZeroHeading = renderHighlight('Let’s get you squared away', 'squared away');
+  const stepZeroHeading = renderHighlight('How can we help?', 'we help');
   const isContinueDisabled = !pendingJourney;
 
   const renderNavigationControls = (className?: string) => (
@@ -105,7 +105,7 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
   return (
     <div id="get-started">
       {!showWizard && (
-        <div className="pb-16" ref={containerRef}>
+        <div className="px-4 md:px-10 pb-12" ref={containerRef}>
           <LeadFormStepShell
             stepLabel="Step 1 of 4"
             title={stepZeroHeading}

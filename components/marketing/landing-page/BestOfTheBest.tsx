@@ -12,7 +12,7 @@ type BestOfTheBestProps = {
   highlightText?: string;
 };
 
-const defaultHighlight = "Sarasota's Best Roofer";
+const defaultHighlight = "Best Sarasota Roofer";
 
 export default async function bestOfTheBest({
   title = `Voted ${defaultHighlight} for 5 Years`,
@@ -39,7 +39,7 @@ export default async function bestOfTheBest({
           <h2 className="text-3xl md:text-5xl text-slate-700">
             {renderedTitle}
           </h2>
-          <p className="mt-2 mb-8 text-sm text-slate-500" >Our reputation</p>
+          <p className="mt-2 mb-8 text-sm text-slate-500" >SonShine Roofing is a five-time winner of the National Best of the Best Award which recognizes local roofing contractors with excellent reviews, top-rated customer service, and superior workmanship.</p>
         </div>
       </div>
 

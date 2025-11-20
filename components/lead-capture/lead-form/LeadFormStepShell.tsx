@@ -24,8 +24,8 @@ export default function LeadFormStepShell({
   bottomSlot,
 }: LeadFormStepShellProps) {
   return (
-    <div className={cn('mx-auto w-full max-w-6xl overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-md', className)}>
-      <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
+    <div className={cn('mx-auto w-full max-w-[1600px] overflow-hidden rounded-3xl border border-blue-100 bg-sky-50 shadow-xl', className)}>
+      <div className="border-b border-blue-100 bg-gradient-to-l from-amber-100 via-amber-50 to-sky-50 p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-xs uppercase tracking-wide text-[--brand-blue]">{stepLabel}</p>

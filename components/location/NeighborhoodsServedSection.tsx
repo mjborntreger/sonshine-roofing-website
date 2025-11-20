@@ -15,13 +15,13 @@ type NeighborhoodsServedSectionProps = {
 
 export default function NeighborhoodsServedSection({
   neighborhoods,
-  heading = "We Work Where You Live",
-  eyebrow = 'We take the word "local" seriously',
+  heading = `Affordable Roofing Services in your Neighborhood`,
+  eyebrow,
   className,
   emptyMessage = "No neighborhoods have been listed yet.",
 }: NeighborhoodsServedSectionProps) {
   const sectionClassName = className ? `px-4 ${className}` : "px-4";
-  const renderedHeading = renderHighlight(heading, "You");
+  const renderedHeading = renderHighlight(heading, "Affordable Roofing Services");
 
   return (
     <section className={sectionClassName}>

@@ -119,14 +119,15 @@ export default function ProjectTestimonial({
               alt="Owner response avatar"
               width={48}
               height={48}
-              className="h-12 w-12 rounded-full border border-blue-100 object-cover"
+              className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
               loading="lazy"
             />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Nathan Borntreger</p>
-              <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{resolvedOwnerReply}</p>
+              <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+              <span className="pb-2 text-xs text-slate-500">Owner</span>
             </div>
           </div>
+          <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{resolvedOwnerReply}</p>
         </div>
       ) : null}
     </section>

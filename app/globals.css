@@ -95,6 +95,12 @@
   to { opacity: 1; transform: none; }
 }
 
+@keyframes trust-bar-drift {
+  0% { transform: translateY(0); opacity: 0.85; }
+  50% { transform: translateY(8px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 0.85; }
+}
+
 @layer utilities {
   /* Apply to any block that should show a shimmer sweep.
      Example: <div class="w-24 h-4 rounded shimmer"></div> */
@@ -119,11 +125,21 @@
   .animate-lp-fade-in {
     animation: lp-fade-in .28s ease-out both;
   }
+
+  .animate-trust-drift {
+    animation: trust-bar-drift 5.2s ease-in-out infinite;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --skeleton-base: rgba(255, 255, 255, 0.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-trust-drift {
+    animation: none !important;
   }
 }
 

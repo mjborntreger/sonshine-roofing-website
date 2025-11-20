@@ -28,7 +28,7 @@ type CardLookup = Record<string, ReactNode>;
 
 const sectionDescription =
   
-"Whether you are looking for a full roof replacement or just considering options, explore our blog to learn more about roofing.";
+"Whether you are looking for a full roof replacement or just considering options, explore our insightful roofing blog to learn more about material choices, aesthetic options, energy efficiency, and more.";
 
 function buildCardLookup(posts: PostCard[]): CardLookup {
   return posts.reduce((acc, post) => {
@@ -84,7 +84,7 @@ export default function LatestPostsFilter({ posts, initial = 4, showHeader = tru
       showHeader={showHeader}
       description={sectionDescription}
       ctaHref="/blog"
-      ctaLabel="See All Blog Posts"
+      ctaLabel="See Blog Archive"
       tabs={tabs}
       initialKey={initialKey}
       cardLookup={cardLookup}

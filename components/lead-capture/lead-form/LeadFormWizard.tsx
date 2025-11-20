@@ -584,8 +584,8 @@ export default function LeadFormWizard({
     switch (stepId) {
       case 'need':
         return {
-          title: 'Let’s get you squared away',
-          highlightText: 'squared away',
+          title: 'How can we help?',
+          highlightText: 'we help',
           description: 'We’ll tailor the next few questions so we can route you to the right spot.',
         };
       case 'context':
@@ -673,7 +673,7 @@ export default function LeadFormWizard({
   }
 
   return (
-    <form ref={formRef} className="pb-16" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="px-4 md:px-10 pb-12" onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <input type="hidden" name="projectType" value={form.projectType} />
       <input type="hidden" name="helpTopics" value={helpSummary} />

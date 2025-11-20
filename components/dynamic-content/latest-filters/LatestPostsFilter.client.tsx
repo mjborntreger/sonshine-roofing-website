@@ -13,7 +13,7 @@ import {
 import { renderHighlight } from "@/components/utils/renderHighlight";
 
 const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const pStyles = "my-8 text-center text-slate-500 justify-center text-sm md:text-md";
+const pStyles = "my-4 mb-6 text-center text-slate-500 justify-center text-sm md:text-md";
 
 type TabPayload = {
   key: CategoryKey;
@@ -89,11 +89,11 @@ export default function LatestPostsFilter({
       </FilterTabs>
     </div>
   );
-  const heading = "Latest Posts";
-  const renderedHeading = renderHighlight(heading, "Latest");
+  const heading = "Latest Roofing Insights";
+  const renderedHeading = renderHighlight(heading, "Roofing Insights");
 
   return (
-    <div className="px-4 pt-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="px-4 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
           <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>

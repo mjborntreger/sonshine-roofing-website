@@ -15,13 +15,13 @@ type LocalPartnershipsSectionProps = {
 
 export default function LocalPartnershipsSection({
   features,
-  heading = "Local Partnerships",
-  eyebrow = "Who We Sponsor",
+  heading = "Community-driven Values",
+  eyebrow = "As a pillar of the Sarasota roofing community, we believe it is our duty to give back to organizations whose values align with ours. As you'll see, we proudly support law enforcement, youth sports, and more.",
   className,
   emptyMessage = "No partnerships recorded yet.",
 }: LocalPartnershipsSectionProps) {
   const sectionClassName = className ? `mx-2 mt-24 ${className}` : "mx-2 mt-24";
-  const renderedHeading = renderHighlight(heading, "Local");
+  const renderedHeading = renderHighlight(heading, "Community-driven");
 
   return (
     <section className={sectionClassName}>

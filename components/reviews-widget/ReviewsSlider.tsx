@@ -184,7 +184,7 @@ export default function ReviewsSlider({
   }, [closeModal, modalIndex, reviews.length]);
 
   return (
-    <div className="relative w-full py-6 embla isolate md:py-8">
+    <div className="relative w-full embla isolate">
       {/**
        * Edge Fades (full-bleed to viewport)
        *
@@ -247,7 +247,7 @@ export default function ReviewsSlider({
                 aria-label={`Open full review by ${r.author_name}`}
                 className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_80%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none bg-transparent p-0 m-0 text-left cursor-pointer"
               >
-                <article className="h-full rounded-3xl border border-slate-200 bg-white p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
+                <article className="h-full rounded-3xl border border-slate-200 bg-cyan-50 p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -275,7 +275,7 @@ export default function ReviewsSlider({
                     <Quote className="flex-none w-10 h-10 mt-1 text-slate-300" aria-hidden />
                   </div>
                 </header>
-                <p className="text-sm leading-7 md:text-md text-slate-700">{text}</p>
+                <p className="text-md md:text-lg text-slate-700">{text}</p>
                 {r.ownerReply ? (
                   <blockquote className="pl-4 mt-4 text-sm text-left border-l-4 border-blue-500 text-slate-600">
                     <div className="flex items-start gap-3">

@@ -24,20 +24,20 @@ export default function LatestProjectsByLocation({
   locationName,
   heading,
   description,
-  ctaHref = "/project",
-  ctaLabel = "See All Projects",
+  ctaHref = "/project?sa=north-port",
+  ctaLabel = "See All North Port Roof Installation Projects",
   className,
 }: Props) {
   if (!Array.isArray(projects) || projects.length === 0) return null;
 
   const resolvedHeading =
-    heading ?? (locationName ? `Recent Projects in ${locationName}` : "Recent Projects");
+    heading ?? (locationName ? `Latest Roof Replacement Projects in ${locationName}` : "Latest Roof Replacement Projects");
 
   const resolvedDescription =
     description ??
     (locationName
-      ? `Our latest roof replacements in ${locationName}, FL`
-      : "Our latest roof replacements for Southwest Florida homeowners");
+      ? `Browse our latest shingle, metal, and tile roof replacements in ${locationName}, FL and get an idea of what your new roof could look like.`
+      : "Browse our latest shingle, metal, and tile roof replacement projects and get an idea of what your new roof could look like.");
 
   const wrapperClass = [baseWrapperClass, className].filter(Boolean).join(" ");
   const renderedHeading = renderHighlight(resolvedHeading, locationName);

@@ -1,5 +1,4 @@
 import ReviewsSliderLazy from "@/components/reviews-widget/ReviewsSliderLazy";
-import { Button } from "@/components/ui/button";
 import SmartLink from "@/components/utils/SmartLink";
 import { ArrowUpRight } from "lucide-react";
 import type { Review, ReviewsPayload } from "./types";
@@ -13,18 +12,15 @@ const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "
 const GBP_URL =
   RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
 
-const DEFAULT_CONTAINER_CLASS = "py-24 max-w-[1600px] mx-auto overflow-hidden";
+const DEFAULT_CONTAINER_CLASS = "pt-8 max-w-[1600px] mx-auto overflow-hidden";
 
 type ReviewsCarouselProps = {
   reviews?: Review[];
-  avgRating?: number | string | null;
   gbpUrl?: string | null;
   heading?: string | null;
   highlightText?: string | null;
   className?: string;
   showBusinessProfileLink?: boolean;
-  showRatingSummary?: boolean;
-  showSeeAllButton?: boolean;
   showDisclaimer?: boolean;
   limit?: number;
   fallbackToRemote?: boolean;
@@ -37,15 +33,6 @@ const ensureValidUrl = (value?: string | null): string | null => {
   } catch {
     return null;
   }
-};
-
-const toNumberOrNull = (value: number | string | null | undefined): number | null => {
-  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
-  if (typeof value === 'string' && value.trim().length) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
 };
 
 const sanitizeLimit = (value?: number): number =>
@@ -78,14 +65,11 @@ const createFallbackId = (): string => `reviews-fallback-${Math.random().toStrin
 export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
   const {
     reviews: injectedReviews,
-    avgRating: injectedAvgRating,
     gbpUrl: injectedGbpUrl,
-    heading = "What Our Customers Say",
+    heading = "Residential Roofing Experts",
     highlightText,
     className = DEFAULT_CONTAINER_CLASS,
     showBusinessProfileLink = true,
-    showRatingSummary = true,
-    showSeeAllButton = true,
     showDisclaimer = true,
     limit,
     fallbackToRemote = true,
@@ -99,10 +83,8 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
   }
 
   let sourceReviews: Review[] = Array.isArray(injectedReviews) ? injectedReviews : [];
-  let avgRatingValue = toNumberOrNull(injectedAvgRating);
 
-  const shouldAttemptRemote =
-    fallbackToRemote && (!sourceReviews.length || avgRatingValue === null);
+  const shouldAttemptRemote = fallbackToRemote && !sourceReviews.length;
 
   if (shouldAttemptRemote) {
     const resolvedReviewsUrl = ensureValidUrl(REVIEWS_URL);
@@ -119,8 +101,6 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
       return {};
     });
 
-    avgRatingValue = avgRatingValue ?? toNumberOrNull(data.avg_rating);
-
     if (!sourceReviews.length) {
       sourceReviews = Array.isArray(data.reviews) ? data.reviews : [];
     }
@@ -133,18 +113,13 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
 
   if (filtered.length === 0) return null;
 
-  const avgRatingDisplay = typeof avgRatingValue === 'number' ? avgRatingValue.toFixed(1) : null;
-  const hasRatingSummary = showRatingSummary && !!avgRatingDisplay;
-  const googleLinkAriaLabel = hasRatingSummary
-    ? `Average Google rating ${avgRatingDisplay} out of 5`
-    : 'View our Business Profile on Google';
-  const renderedHeading = heading ? renderHighlight(heading, highlightText) : null;
+  const googleLinkAriaLabel = 'See All Google Reviews';
   const fallbackId = createFallbackId();
 
   const fallbackReviews = (
     <div
       id={fallbackId}
-      className="grid gap-6 mt-10 text-left md:grid-cols-2 lg:grid-cols-3"
+      className="grid gap-6 text-left md:grid-cols-2 lg:grid-cols-3"
     >
       {filtered.map((review, index) => {
         const ratingValue = Math.min(5, Math.max(0, Math.round(review.rating ?? 5)));
@@ -186,61 +161,29 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
 
   return (
     <div className={className}>
-      {heading ? (
-        <h2 className="mx-2 text-3xl text-center text-slate-700 md:text-5xl">
-          {renderedHeading}
-        </h2>
-      ) : null}
-      {showBusinessProfileLink ? (
-        <p className="mt-3 text-sm text-center text-slate-500 hover:text-slate-400">
-          <SmartLink
-            href={resolvedGbpUrl}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            aria-label={googleLinkAriaLabel}
-            data-icon-affordance="up-right"
-          >
-            Our Business Profile on Google
-            <ArrowUpRight className="inline w-3 h-3 ml-2 icon-affordance" />
-          </SmartLink>
-        </p>
-      ) : null}
-      <div className="mt-6 text-center not-prose">
-        {hasRatingSummary && (
-          <SmartLink
-            href={resolvedGbpUrl}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            aria-label={`Average Google rating ${avgRatingDisplay} out of 5`}
-            className="inline-flex items-center px-4 py-2 btn btn-brand-orange"
-            data-icon-affordance="up-right"
-          >
-            <span className="mr-2 text-3xl">{avgRatingDisplay}</span>
-            <span aria-hidden="true">★</span>&nbsp;on Google
-          </SmartLink>
-        )}
-        {fallbackReviews}
-        <ReviewsSliderLazy reviews={filtered} gbpUrl={resolvedGbpUrl} fallbackId={fallbackId} />
-        <div className="text-center">
+      <div className="text-center not-prose">
+        <div className="mb-4 flex flex-wrap gap-y-2 justify-center mx-auto max-w-6xl">
           {showDisclaimer ? (
-            <p className="mb-10 text-sm italic text-slate-500">
-              All reviews shown above are automatically pulled from Google using the official API.
-            </p>
-          ) : null}
-          {showSeeAllButton ? (
-            <Button variant="brandBlue" asChild>
+            <p className="mx-2 text-sm text-slate-500">
+              All reviews shown below are automatically pulled from Google using the official API.
+            </p>) : null}
+          {showBusinessProfileLink ? (
+            <p className="text-md text-slate-700 font-semibold transition hover:text-[--brand-blue]">
               <SmartLink
                 href={resolvedGbpUrl}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
+                aria-label={googleLinkAriaLabel}
                 data-icon-affordance="up-right"
               >
                 See All Google Reviews
-                <ArrowUpRight className="inline w-4 h-4 ml-2 icon-affordance" />
+                <ArrowUpRight className="inline w-3 h-3 ml-2 icon-affordance" />
               </SmartLink>
-            </Button>
+            </p>
           ) : null}
         </div>
+        {fallbackReviews}
+        <ReviewsSliderLazy reviews={filtered} gbpUrl={resolvedGbpUrl} fallbackId={fallbackId} />
       </div>
     </div>
   );

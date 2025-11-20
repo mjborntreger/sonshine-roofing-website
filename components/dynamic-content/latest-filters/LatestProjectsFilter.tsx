@@ -27,7 +27,7 @@ type TabPayload = {
 type CardLookup = Record<string, ReactNode>;
 
 const sectionDescription =
-  "Browse our latest projects and get an idea of what your new roof could look like.";
+  "Browse our latest shingle, metal, and tile roof replacement projects in Sarasota, Manatee and Charlotte Counties and get an idea of what your new roof could look like.";
 
 function buildCardLookup(projects: ProjectSummary[]): CardLookup {
   return projects.reduce((acc, project) => {
@@ -86,7 +86,7 @@ export default function LatestProjectsFilter({ projects, initial = 4, showHeader
       showHeader={showHeader}
       description={sectionDescription}
       ctaHref="/project"
-      ctaLabel="See All Projects"
+      ctaLabel="See All Roof Installation Projects"
       tabs={tabs}
       initialKey={initialKey}
       cardLookup={cardLookup}

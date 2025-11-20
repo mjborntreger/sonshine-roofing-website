@@ -7,7 +7,7 @@ const imageStyles = "my-6 h-[100px] w-auto";
 
 const badges = [
   {
-    href: "https://mysafeflhome.com/",
+    href: "https://mysafeflhome.com",
     title: "My Safe Florida Home Certified Contractor",
     src: "https://next.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
   },
@@ -32,6 +32,11 @@ const badges = [
     src: "https://next.sonshineroofing.com/wp-content/uploads/FRSA-400x401.webp",
   },
   {
+    href: "https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick",
+    title: "A+ Rated Roofing Contractor with the BBB",
+    src: "https://next.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp",
+  },
+  {
     href: "https://www.nrca.net/Members/Members/Detail/26f0eca5-8397-4524-8ea3-807a1735e028#",
     title: "National Roofing Contractors Association",
     src: "https://next.sonshineroofing.com/wp-content/uploads/National-Roofing-Contractors-Association.webp",
@@ -39,17 +44,12 @@ const badges = [
   {
     href: "https://www.gaf.com/en-us/roofing-contractors/residential/sonshine-roofing-inc-1104247",
     title: "GAF Master Elite Certified",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/master-elite-logo-hi-res-png-400x400.png",
+    src: "https://next.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp",
   },
   {
     href: "https://www.expertise.com/fl/sarasota/roofing",
     title: "Expertise.com",
     src: "https://res.cloudinary.com/expertise-com/image/upload/remote_media/awards/fl_sarasota_roofing_2025_transparent.svg",
-  },
-  {
-    href: "https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick",
-    title: "A+ Rating with the BBB",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/bbb.webp",
   },
   {
     href: "https://tricountymetals.com",

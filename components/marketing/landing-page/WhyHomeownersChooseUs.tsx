@@ -19,7 +19,7 @@ import {
 
 const SECTION_CONTAINER = "px-2";
 const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
-const SECTION_SUBTITLE = "mt-2 mb-8 text-sm text-slate-500"
+const SECTION_SUBTITLE = "mt-4 mb-8 text-sm text-slate-500"
 const FEATURE_PILL_CLASS = "inline-flex items-center gap-2 badge badge--accent";
 const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
 const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
@@ -39,6 +39,7 @@ type ThemeKey = "blue" | "orange";
 type WhyHomeownersChooseUsProps = {
   title?: string;
   highlightText?: string;
+  description?: string;
 };
 
 
@@ -91,9 +92,9 @@ type Pillar = {
 const pillars: Pillar[] = [
   {
     id: "local-expertise",
-    title: "Local Expertise",
+    title: "Your Local Roofing Experts",
     description:
-      "We are not some out-of-town outfit. We know the codes, the weather, the quirks of Florida homes—and how to roof them right.",
+      "As residential roofing pros located in the Sarasota area, we deeply understand your local roofing needs (because they are the same as ours). We live right here with you in Sarasota, Bradenton, Venice, North Port, and we always treat your roof like its our own.",
     icon: MapPin,
     theme: "blue",
   },
@@ -101,7 +102,7 @@ const pillars: Pillar[] = [
     id: "quality-craftsmanship",
     title: "Quality Craftsmanship",
     description:
-      "Our crews don’t cut corners. Every shingle, every nail, every detail is done with pride, precision, and care. 100% of our work is done by our crews—not subcontractors—and we back it with industry-leading warranties.",
+      "Our crews don’t cut corners. Every shingle, tile, metal panel, nail, and screw, is installed with pride, precision, and care. 100% of our work is done by our in-house crews (we NEVER use subcontractors) and we back it with industry-leading warranties, a handshake, and a smile.",
     icon: ShieldCheck,
     theme: "blue",
   },
@@ -117,7 +118,7 @@ const pillars: Pillar[] = [
     id: "flexible-financing",
     title: "Flexible Financing",
     description:
-      "Low-interest home-secured and credit-based plans—see your options in minutes. No obligation.",
+      "Compare YGrene’s equity-secured plans (tax-bill payments, 18–24 month deferrals) with Service Finance signature loans and 0% promos. We guide you through the quick quiz, paperwork, and monthly estimator so you know your payment before you ever sign.",
     icon: HandCoins,
     theme: "orange",
     defaultOpen: true,
@@ -129,9 +130,13 @@ const pillars: Pillar[] = [
   },
 ];
 
+const DEFAULT_DESCRIPTION =
+  "Since 1987, SonShine Roofing has been a pillar of the Sarasota community. Over the past 38 years, we've always honored a tradition of honesty, respect, and integrity in everything we do.";
+
 export default async function WhyHomeownersChooseUs({
-  title = "Why Homeowners Choose Us",
+  title = "Family-owned Roofing Company",
   highlightText,
+  description = DEFAULT_DESCRIPTION,
 }: WhyHomeownersChooseUsProps) {
   const renderedTitle = renderHighlight(title, highlightText);
 
@@ -139,7 +144,7 @@ export default async function WhyHomeownersChooseUs({
     <section className={SECTION_CONTAINER}>
       <div className="text-center">
         <h2 className={SECTION_HEADING}>{renderedTitle}</h2>
-        <p className={SECTION_SUBTITLE}>Our Strengths</p>
+        <p className={SECTION_SUBTITLE}>{description}</p>
         
         <div className={FEATURE_LIST_CLASS}>
           <span className={FEATURE_PILL_CLASS}>
@@ -148,7 +153,7 @@ export default async function WhyHomeownersChooseUs({
           </span>
           <span className={FEATURE_PILL_CLASS}>
             <CalendarDays className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-            38+ Years
+            38+ Years Expertise
           </span>
           <span className={FEATURE_PILL_CLASS}>
             <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
@@ -164,11 +169,11 @@ export default async function WhyHomeownersChooseUs({
           </span>
           <span className={FEATURE_PILL_CLASS}>
             <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-            Warranty
+            25-year Warranty
           </span>
           <span className={FEATURE_PILL_CLASS}>
             <Banknote className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-            Financing
+            Flexible Financing
           </span>
         </div>
       </div>
