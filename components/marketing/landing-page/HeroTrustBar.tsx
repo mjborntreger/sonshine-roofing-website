@@ -42,7 +42,8 @@ const TITLE_AND_LOGO = "flex flex-row justify-start";
 const REVIEW_COUNT = "text-xs text-slate-500 mb-2";
 
 // BADGES STYLES
-const BADGE_TITLE_STYLES = "text-sm md:text-lg mb-8 font-semibold text-slate-700";
+const BADGE_TITLE_STYLES = "text-md md:text-xl text-slate-800";
+const BADGE_SUBTITLE_STYLES = "text-slate-600 text-xs mb-8";
 const BADGE_CARD_STYLES = "flex-col items-center gap-2 rounded-2xl border border-dashed border-slate-200/80 bg-[#fb9216]/5 p-6 text-center shadow-inner transition hover:-translate-y-1 hover:border-[--brand-blue]/40 hover:shadow-lg";
 const BADGE_IMAGE_WRAPPER = "relative mt-2 flex h-24 w-full items-center justify-center";
 const BADGE_IMAGE_CLASS = "h-full w-auto max-w-[300px] object-contain drop-shadow-sm";
@@ -149,6 +150,7 @@ const BADGES = [
   {
     id: "badge-1",
     label: "GAF Master Elite Cerified",
+    subtitle: "Industry-leading warranties and premium products you can rely on.",
     href: "https://www.gaf.com/en-us/roofing-contractors/residential/sonshine-roofing-inc-1104247",
     src: "https://next.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp",
     alt: "GAF Master Elite Contractor Seal",
@@ -156,6 +158,7 @@ const BADGES = [
   {
     id: "badge-4",
     label: "My Safe FL Home Certified",
+    subtitle: "By choosing us, you potentially save thousands in insurance costs and wind mitigation services.",
     href: "https://mysafeflhome.com",
     src: "https://next.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
     alt: "My Safe FL Home Certified Roofing Contractor in Florida",
@@ -163,6 +166,7 @@ const BADGES = [
   {
     id: "badge-3",
     label: "A+ Rating with the BBB",
+    subtitle: "A roofer with stability and a longstanding reputation in the community.",
     href: "https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick",
     src: "https://next.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp",
     alt: "A+ Rated Roofing Contractor with the Better Business Bureau",
@@ -170,6 +174,7 @@ const BADGES = [
   {
     id: "badge-2",
     label: "Best Roofers in Sarasota Award (2025)",
+    subtitle: "Best-in-class customer service and workmanship, guaranteed.",
     href: "https://www.expertise.com/fl/sarasota/roofing",
     src: "https://res.cloudinary.com/expertise-com/image/upload/remote_media/awards/fl_sarasota_roofing_2025_transparent.svg",
     alt: "Expertise.com Best Roofers in Sarasota Award (2025)",
@@ -254,7 +259,8 @@ export default function HeroTrustBar({
                   title={badge.alt}
                   className={BADGE_CARD_STYLES}
                 >
-                    <p className={BADGE_TITLE_STYLES}>{badge.label}</p>
+                    <h3 className={BADGE_TITLE_STYLES}>{badge.label}</h3>
+                    <p className={BADGE_SUBTITLE_STYLES}>{badge.subtitle}</p>
                     {badge.src ? (
                       <div className={BADGE_IMAGE_WRAPPER}>
                         <Image
