@@ -2,7 +2,6 @@ import ReviewsSliderLazy from "@/components/reviews-widget/ReviewsSliderLazy";
 import SmartLink from "@/components/utils/SmartLink";
 import { ArrowUpRight } from "lucide-react";
 import type { Review, ReviewsPayload } from "./types";
-import { renderHighlight } from "@/components/utils/renderHighlight";
 
 const RAW_REVIEWS_URL = (process.env.NEXT_PUBLIC_REVIEWS_URL ?? "").replace(/\u200B/g, "").trim();
 const REVIEWS_URL =
@@ -17,8 +16,6 @@ const DEFAULT_CONTAINER_CLASS = "pt-8 max-w-[1600px] mx-auto overflow-hidden";
 type ReviewsCarouselProps = {
   reviews?: Review[];
   gbpUrl?: string | null;
-  heading?: string | null;
-  highlightText?: string | null;
   className?: string;
   showBusinessProfileLink?: boolean;
   showDisclaimer?: boolean;
@@ -66,8 +63,6 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
   const {
     reviews: injectedReviews,
     gbpUrl: injectedGbpUrl,
-    heading = "Residential Roofing Experts",
-    highlightText,
     className = DEFAULT_CONTAINER_CLASS,
     showBusinessProfileLink = true,
     showDisclaimer = true,
