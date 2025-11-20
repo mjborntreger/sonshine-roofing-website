@@ -1,7 +1,9 @@
 import ReviewsSliderLazy from "@/components/reviews-widget/ReviewsSliderLazy";
 import SmartLink from "@/components/utils/SmartLink";
 import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import type { Review, ReviewsPayload } from "./types";
+import { OWNER_RESPONSE_IMAGE } from "./constants";
 
 const RAW_REVIEWS_URL = (process.env.NEXT_PUBLIC_REVIEWS_URL ?? "").replace(/\u200B/g, "").trim();
 const REVIEWS_URL =
@@ -144,9 +146,23 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
               {review.text}
             </p>
             {review.ownerReply ? (
-              <blockquote className="pl-4 mt-4 text-sm italic text-left border-l-4 border-blue-500 text-slate-600">
-                {review.ownerReply}
-              </blockquote>
+              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                <div className="flex items-start gap-3">
+                  <Image
+                    src={OWNER_RESPONSE_IMAGE}
+                    alt="Owner response avatar"
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
+                    loading="lazy"
+                  />
+                  <div>
+                    <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+                    <span className="pb-2 text-xs text-slate-500">Owner</span>
+                  </div>
+                </div>
+                <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{review.ownerReply}</p>
+              </div>
             ) : null}
           </article>
         );

@@ -81,7 +81,7 @@ const REVIEW_LINKS = [
     accentClass: TITLE_ACCENT_GOOGLE,
     accentHex: "#2563eb",
     quote:
-      "\u201CIt’s one thing for me to give a good review as a customer which I am. But I talked to a roofer in our neighborhood and he gave Sonshine Roofing a compliment. He saw the job done on the under layment and said it was very well done. The layment was tucked under the eves. I figured that was a better testament to job well done. Because it was from someone in the industry. -Adam B.\u201D",
+      "\u201CIt’s one thing for me to give a good review as a customer which I am. But I talked to a roofer in our neighborhood and he gave Sonshine Roofing a compliment. He saw the job done on the under layment and said it was very well done. The layment was tucked under the eves. I figured that was a better testament to job well done. Because it was from someone in the industry.\u201D -Adam B.",
   },
   {
     id: "yelp",
@@ -96,7 +96,7 @@ const REVIEW_LINKS = [
     accentClass: TITLE_ACCENT_YELP,
     accentHex: "#ef4444",
     quote:
-      "\u201CAfter replacing my roof due to the impact of Hurricane Ian, SonShine Roofing recently followed up to make sure there were no issues from Hurricane Idalia. I thought their follow up and customer service was excellent!! Thank you SonShine Roofing! –Keri C.\u201D",
+      "\u201CAfter replacing my roof due to the impact of Hurricane Ian, SonShine Roofing recently followed up to make sure there were no issues from Hurricane Idalia. I thought their follow up and customer service was excellent!! Thank you SonShine Roofing!\u201D –Keri C.",
   },
   {
     id: "nextdoor",
@@ -126,7 +126,7 @@ const REVIEW_LINKS = [
     accentClass: TITLE_ACCENT_ANGI,
     accentHex: "#ef4444",
     quote:
-      "\u201CIt went very well. We met- the representative was on time, completed his work quickly and he took the time to clearly discuss his findings. He was helpful in offering us realistic options for roof replacement. –A.S.\u201D",
+      "\u201CIt went very well. We met- the representative was on time, completed his work quickly and he took the time to clearly discuss his findings. He was helpful in offering us realistic options for roof replacement.\u201D –A.S.",
   },
   {
     id: "facebook",
@@ -141,7 +141,7 @@ const REVIEW_LINKS = [
     accentClass: TITLE_ACCENT_FACEBOOK,
     accentHex: "#2563eb",
     quote:
-      "\u201CSonShine did an awesome job on my roof. Their system for getting everything done was very refined, no downtime whatsoever once the replacement had started. I can’t recommend them enough. The quality and craftsmanship is VERY apparent post install. –Christopher Johnson\u201D",
+      "\u201CSonShine did an awesome job on my roof. Their system for getting everything done was very refined, no downtime whatsoever once the replacement had started. I can’t recommend them enough. The quality and craftsmanship is VERY apparent post install.\u201D –Christopher Johnson",
   },
 ] as const;
 

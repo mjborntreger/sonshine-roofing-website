@@ -8,8 +8,7 @@ import SmartLink from '../utils/SmartLink';
 import { ArrowUpRight, Quote } from 'lucide-react';
 import Image from 'next/image';
 import type { Review } from './types';
-
-const OWNER_RESPONSE_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Nathan-Edited-Bio-Photo-175x175-1.webp";
+import { OWNER_RESPONSE_IMAGE } from './constants';
 
 const ordinalize = (day: number): string => {
   const j = day % 10;
@@ -235,7 +234,7 @@ export default function ReviewsSlider({
             'linear-gradient(to right, transparent, black var(--reviews-fade-width, 56px), black calc(100% - var(--reviews-fade-width, 28px)), transparent)',
         }}
       >
-        <div className="embla__container ml-[-1rem] flex flex-nowrap will-change-transform">
+        <div className="embla__container ml-[-1rem] items-start flex flex-nowrap will-change-transform">
           {reviews.map((r, i) => {
             const text = r.text?.length > 250 ? r.text.slice(0, 250) + '…' : r.text || '';
             const formattedDate = formatReviewDate(r.time, r.relative_time_description);
@@ -247,11 +246,11 @@ export default function ReviewsSlider({
                 aria-label={`Open full review by ${r.author_name}`}
                 className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_80%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none bg-transparent p-0 m-0 text-left cursor-pointer"
               >
-                <article className="h-full rounded-3xl border border-slate-200 bg-cyan-50 p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
+                <article className="h-fit rounded-3xl border border-slate-200 bg-cyan-50 p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="flex items-center gap-2 m-0 text-xl font-bold text-slate-700">
+                        <h3 className="flex items-start gap-2 m-0 text-xl font-bold text-slate-700">
                           <Image
                             src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
                             alt="Google logo"
@@ -277,23 +276,23 @@ export default function ReviewsSlider({
                 </header>
                 <p className="text-md md:text-lg text-slate-700">{text}</p>
                 {r.ownerReply ? (
-                  <blockquote className="pl-4 mt-4 text-sm text-left border-l-4 border-blue-500 text-slate-600">
+                  <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                     <div className="flex items-start gap-3">
                       <Image
                         src={OWNER_RESPONSE_IMAGE}
                         alt="Owner response avatar"
-                        width={40}
-                        height={40}
-                        className="flex-none object-cover w-10 h-10 border border-blue-200 rounded-full"
+                        width={48}
+                        height={48}
+                        className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
+                        loading="lazy"
                       />
                       <div>
-                        <span className="block text-xs tracking-wide uppercase text-slate-400">
-                          Nathan Borntreger
-                        </span>
-                        <p className="mt-1 italic whitespace-pre-wrap line-clamp-6">{r.ownerReply}</p>
+                        <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+                        <span className="pb-2 text-xs text-slate-500">Owner</span>
                       </div>
                     </div>
-                  </blockquote>
+                    <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{r.ownerReply}</p>
+                  </div>
                 ) : null}
               </article>
             </button>
@@ -362,23 +361,23 @@ export default function ReviewsSlider({
                 <div className="max-h-[60vh] overflow-auto px-5 pb-4 pt-1 space-y-4">
                   <p className="m-0 leading-7 whitespace-pre-wrap text-md md:text-lg text-slate-700">{r.text || ''}</p>
                   {r.ownerReply ? (
-                    <blockquote className="pl-4 m-0 text-sm text-left whitespace-pre-wrap border-l-4 border-blue-500 text-slate-600">
+                    <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                       <div className="flex items-start gap-3">
                         <Image
                           src={OWNER_RESPONSE_IMAGE}
                           alt="Owner response avatar"
                           width={48}
                           height={48}
-                          className="flex-none object-cover w-12 h-12 border border-blue-200 rounded-full"
+                          className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
+                          loading="lazy"
                         />
                         <div>
-                          <span className="block text-xs tracking-wide uppercase text-slate-400">
-                            Nathan Borntreger
-                          </span>
-                          <p className="mt-1 italic whitespace-pre-wrap line-clamp-6">{r.ownerReply}</p>
+                          <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+                          <span className="pb-2 text-xs text-slate-500">Owner</span>
                         </div>
                       </div>
-                    </blockquote>
+                      <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{r.ownerReply}</p>
+                    </div>
                   ) : null}
                 </div>
                 <div className="flex justify-end gap-2 p-4 border-t border-slate-300">

@@ -69,7 +69,7 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
   if (!safeItems.length) return null;
 
   return (
-    <div className="mb-8 px-2" data-toc-exclude>
+    <div className="my-8 px-2" data-toc-exclude>
       <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="flex items-center gap-2 text-center text-3xl font-semibold text-slate-800 sm:text-left md:text-4xl">
           <HelpCircle
