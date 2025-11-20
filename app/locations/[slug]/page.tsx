@@ -302,8 +302,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
         {hasDisplayReviews ? (
           <ReviewsCarousel
             reviews={displayReviews}
-            heading={`Residential Roofing Experts in ${location.locationName || location.title || slug}`}
-            highlightText={"Roofing Experts"}
             showBusinessProfileLink={true}
             showDisclaimer={true}
             limit={carouselLimit}
