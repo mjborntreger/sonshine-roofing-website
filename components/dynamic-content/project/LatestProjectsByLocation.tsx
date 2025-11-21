@@ -24,8 +24,8 @@ export default function LatestProjectsByLocation({
   locationName,
   heading,
   description,
-  ctaHref = "/project?sa=north-port",
-  ctaLabel = "See All North Port Roof Installation Projects",
+  ctaHref = "/project",
+  ctaLabel = `See Full Project Gallery`,
   className,
 }: Props) {
   if (!Array.isArray(projects) || projects.length === 0) return null;

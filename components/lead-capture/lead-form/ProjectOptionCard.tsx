@@ -27,7 +27,7 @@ export function ProjectOptionCardContent({ option }: ProjectOptionCardContentPro
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
       </div>
-      <h4 className="text-md font-semibold text-slate-900 md:text-xl">{label}</h4>
+      <h4 className="text-md leading-tight text-slate-900 md:text-xl">{label}</h4>
       <div className="flex items-center justify-between text-xs text-slate-500">
         <p className="text-xs text-slate-500 md:text-md">{description}</p>
         <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:translate-x-1" aria-hidden="true" />

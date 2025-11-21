@@ -715,7 +715,7 @@ export default function LeadFormWizard({
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={activeStepId} {...stepMotionProps}>
             {activeStepId === 'need' && (
-              <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
                 {PROJECT_OPTIONS.map((option) => {
                   const { value, action } = option;
                   const selectable = action === 'advance' && isJourneyKey(value);

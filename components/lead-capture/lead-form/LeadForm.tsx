@@ -115,7 +115,7 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
             {renderNavigationControls('mb-6')}
             <p className="text-slate-600 inline-flex mt-2 mb-4 text-xs">Select an option, then hit &ldquo;continue.&rdquo;</p>
 
-            <div className="grid gap-4 grid-cols-2 md:grid-cols-3">
+            <div className="grid gap-4 1 md:grid-cols-3">
               {PROJECT_OPTIONS.map((option) => {
                 const { value, action, href } = option;
                 const journeyValue = isJourneyKey(value) ? value : null;
