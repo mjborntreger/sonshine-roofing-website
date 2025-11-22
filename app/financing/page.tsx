@@ -127,7 +127,7 @@ export default async function FinancingPage() {
             <HandCoins className="h-7 w-7 md:h-12 md:w-12 text-[--brand-blue] inline ml-4"/>
           </h1>
           <p className={`${lead} mt-4`}>
-            Finance your roof with comfortable monthly payment plans customized to fit your needs. Choose from <strong>equity‑based</strong> (home‑secured) or <strong>credit‑based</strong> plans — both with <span className="font-bold text-[--brand-blue]">same-day approvals</span> and clear terms. When you talk to one of our roofing specialists, we&rsquo;ll guide you through the process every step of the way.
+            Finance your roof with comfortable monthly payment plans customized to fit your needs. Choose from <strong>equity‑based</strong> (home‑secured) or <strong>credit‑based</strong> plans — both with <span className="font-bold text-[--brand-blue]">same-day approvals</span> and clear terms. When you talk to one of our roofing specialists, we&rsquo;ll guide you through the entire process every step of the way.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
@@ -172,7 +172,7 @@ export default async function FinancingPage() {
         <div className="gradient-divider mt-10" />
 
         <h2 id="get-started" className='mt-16 mb-4 text-3xl md:text-4xl text-center font-semibold text-slate-900'>
-          Free <span className="text-[--brand-blue]">Roof Financing</span> Monthly Payment Calculator
+          Free <span className="text-[--brand-blue]">Roof Financing</span> Monthly Payment Estimator
         </h2>
         <p className="text-center mx-auto max-w-3xl text-slate-600 mb-8 text-sm md:text-md">Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.</p>
         <MonthlyEstimator />
