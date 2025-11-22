@@ -93,7 +93,7 @@ export default function ProjectTestimonial({
         ))}
       </div>
 
-      <blockquote className="mt-5 space-y-4 text-lg leading-relaxed text-slate-900">
+      <blockquote className="mt-5 space-y-4 text-lg text-slate-900">
         <p className="whitespace-pre-line">{resolvedReview}</p>
       </blockquote>
 
@@ -124,7 +124,7 @@ export default function ProjectTestimonial({
             />
             <div>
               <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
-              <span className="pb-2 text-xs text-slate-500">Owner</span>
+              <span className="pb-2 text-xs text-slate-500">Owner/Operator</span>
             </div>
           </div>
           <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{resolvedOwnerReply}</p>

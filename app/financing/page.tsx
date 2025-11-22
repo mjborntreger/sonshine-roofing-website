@@ -1,5 +1,5 @@
 import SmartLink from "@/components/utils/SmartLink";
-import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ListStart, ChevronRight } from "lucide-react";
+import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ChevronRight } from "lucide-react";
 import ProgramCard from '@/components/marketing/financing/ProgramCard';
 import MonthlyEstimator from '../../components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
@@ -86,7 +86,7 @@ export default async function FinancingPage() {
     name: "Flexible Roof Financing | Free Monthly Payment Estimator",
     description:
       config?.description ??
-      "Get flexible roof financing with clear, upfront numbers. After taking a short quiz, use our free monthly payment calculator to estimate costs, compare options, and plan your roof replacement with confidence.",
+      "Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.",
     url: SERVICE_PATH,
     origin,
     provider: {
@@ -123,13 +123,11 @@ export default async function FinancingPage() {
         {/* Hero */}
         <div className="mx-auto max-w-3xl mt-12 text-center">
           <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">
-            Roof Financing Made Simple
+            Roof Financing <span className="text-[--brand-blue]">Made Simple</span>
             <HandCoins className="h-7 w-7 md:h-12 md:w-12 text-[--brand-blue] inline ml-4"/>
           </h1>
           <p className={`${lead} mt-4`}>
-            Spread the cost of your roof over comfortable monthly payments. Choose from
-            equity‑based (house‑secured) or credit‑based plans — both with fast approvals and
-            clear terms.
+            Finance your roof with comfortable monthly payment plans customized to fit your needs. Choose from <strong>equity‑based</strong> (home‑secured) or <strong>credit‑based</strong> plans — both with <span className="font-bold text-[--brand-blue]">same-day approvals</span> and clear terms. When you talk to one of our roofing specialists, we&rsquo;ll guide you through the process every step of the way.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
@@ -173,16 +171,16 @@ export default async function FinancingPage() {
 
         <div className="gradient-divider mt-10" />
 
-        <h2 id="get-started" className='my-16 text-3xl md:text-4xl text-center font-semibold text-slate-900'>
-          <ListStart className={h2Icon} />
-          1. Get Started
+        <h2 id="get-started" className='mt-16 mb-4 text-3xl md:text-4xl text-center font-semibold text-slate-900'>
+          Free <span className="text-[--brand-blue]">Roof Financing</span> Monthly Payment Calculator
         </h2>
+        <p className="text-center mx-auto max-w-3xl text-slate-600 mb-8 text-sm md:text-md">Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.</p>
         <MonthlyEstimator />
 
         {/* Two programs (plan cards) */}
         <h2 className={h2} id="pick-a-plan">
           <ArrowLeftRight className={h2Icon} />
-          2. Pick a Plan
+          Choose a Roof Financing Plan
         </h2>
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ProgramCard
@@ -262,12 +260,12 @@ export default async function FinancingPage() {
             <ol className="mt-3 list-decimal pl-5 space-y-2 text-slate-700">
               <li>
                 <SmartLink
-                  href="#docs"
+                  href="#get-started"
                   className="text-[--brand-blue]"
                   data-icon-affordance="right"
                   proseGuard
                 >
-                  Know what documents you&rsquo;ll need
+                  Take our free Roof Financing Quiz to discover the ideal plan for you.
                   <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
                 </SmartLink>
               </li>
@@ -278,13 +276,11 @@ export default async function FinancingPage() {
                   data-icon-affordance="right"
                   proseGuard
                 >
-                  Schedule an appointment with a Roofing Specialist
+                  Know what documents you&rsquo;ll need
                   <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
                 </SmartLink>
               </li>
-              <li>We take care of the application</li>
-              <li>Same-day Approval</li>
-              <li>We schedule your project</li>
+              <li>We&rsquo;ll reach out same day or next (if after hours) and schedule a time to meet. Check your email after taking the quiz for additional personalized resources.</li>
             </ol>
           </section>
 
@@ -296,7 +292,7 @@ export default async function FinancingPage() {
             </h3>
             <p className="mt-3 text-slate-700 flex-1">
               Our team has helped Sarasota homeowners finance roofs for decades. We’ll walk you
-              through monthly payments, timelines, and total costs — candidly and clearly.
+              through monthly payments, timelines, and total costs — candidly and clearly. Just give us a call and we&rsquo;ll sort it out.
             </p>
             <div className="pt-2">
               <SmartLink
@@ -315,7 +311,7 @@ export default async function FinancingPage() {
         {/* Documents checklist (non-interactive) */}
           <h2 className={h2} id="docs">
             <ListChecks className={h2Icon} />
-            3. What You’ll Need
+            Documents You&rsquo;ll Need
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <section 

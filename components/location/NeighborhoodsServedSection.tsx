@@ -15,7 +15,7 @@ type NeighborhoodsServedSectionProps = {
 
 export default function NeighborhoodsServedSection({
   neighborhoods,
-  heading = `Affordable Roofing Services in your Neighborhood`,
+  heading = `Affordable Roofing Services`,
   eyebrow,
   className,
   emptyMessage = "No neighborhoods have been listed yet.",

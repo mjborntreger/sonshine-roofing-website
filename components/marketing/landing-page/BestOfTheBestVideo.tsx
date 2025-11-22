@@ -13,7 +13,7 @@ export async function BestOfTheBestVideo() {
     <VideoWithSchema
       videoId={BEST_OF_VIDEO_ID}
       title="SonShine Roofing - Best of the Best 2023"
-      className="border border-slate-300"
+      className="border border-slate-300 shadow-lg"
       canonicalUrl="/"
       description="Best of the Best TV highlights why SonShine Roofing stands out among roofing contractors."
       schemaId="best-of-the-best-video"

@@ -4,6 +4,7 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight, HandCoins, Wallet } from 'lucide-react';
+import ProjectTestimonial from '@/components/dynamic-content/project/ProjectTestimonial';
 import Turnstile from '@/components/lead-capture/Turnstile';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/components/marketing/financing/financing-programs';
 import { readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
@@ -300,7 +301,6 @@ const PROGRAM_DETAIL_ANCHORS: Record<FinancingProgramKey, string> = {
 
 // ============ STYLE CONSTANTS ====================== //
 const pillBase = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-tight shadow-sm';
-const infoPillClass = `${pillBase} text-slate-400`;
 const successPillClass = `${pillBase} bg-emerald-500 text-white`;
 const gradientShell = 'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
 const innerPanelBase = 'rounded-3xl bg-white';
@@ -848,7 +848,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     ? `Question ${step + 1} of ${totalQuizQuestions}`
     : `Step ${formStepNumber} of ${totalFormSteps}`;
   const stepSubtitle = isQuizStep
-    ? 'Tap an option to continue.'
+    ? 'A few easy questions tailored to your needs'
     : step === summaryStepIndex
       ? 'Almost there! Hit “Next” to continue.'
       : 'Fill out each field to continue.';
@@ -1158,98 +1158,126 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           )}
 
           <div className="bg-blue-50/40 text-sm text-slate-600 px-8 pt-6">
-            Answer a few quick questions to reveal monthly payment estimates for YGrene and Service Finance programs.
+            Take this quiz and discover the best roof financing plan for your particular budget and amount of equity in your home.
           </div>
-          <div className="space-y-6 bg-blue-50/40 px-6 py-6 rounded-b-3xl">
-            <div className="flex flex-col gap-2 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap items-center gap-3">
-                <span>{stepTitle}</span>
-                <div
-                  className="flex items-center gap-2 text-xs text-slate-500"
-                  role="progressbar"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={progressPercent}
-                  aria-label="Progress"
-                >
-                  <div className="relative h-1.5 w-28 overflow-hidden rounded-full bg-slate-200/80 md:w-32">
+          <div className="bg-blue-50/40 px-6 py-6 rounded-b-3xl">
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
+              <div className="space-y-6">
+                <div className="flex flex-col gap-2 rounded-2xl w-fit border border-blue-100/70 bg-white/80 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span>{stepTitle}</span>
                     <div
-                      className="absolute inset-y-0 left-0 rounded-full bg-[--brand-blue] transition-all duration-300 ease-in-out"
-                      style={{ width: `${progressPercent}%` }}
-                    />
+                      className="flex items-center gap-2 text-xs text-slate-500"
+                      role="progressbar"
+                      aria-valuemin={0}
+                      aria-valuemax={100}
+                      aria-valuenow={progressPercent}
+                      aria-label="Progress"
+                    >
+                      <div className="relative h-1.5 w-28 overflow-hidden rounded-full bg-slate-200/80 md:w-32">
+                        <div
+                          className="absolute inset-y-0 left-0 rounded-full bg-[--brand-blue] transition-all duration-300 ease-in-out"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                      <span className="min-w-[3ch] text-xs font-semibold text-slate-600">{progressPercent}%</span>
+                    </div>
                   </div>
-                  <span className="min-w-[3ch] text-xs font-semibold text-slate-600">{progressPercent}%</span>
+                  <span className="text-sm text-slate-500">{stepSubtitle}</span>
+                </div>
+
+                <LayoutGroup>
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`step-${step}`}
+                      layout
+                      ref={stepContentRef}
+                      tabIndex={-1}
+                      className="focus:outline-none"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.28, ease: [0.32, 0, 0.15, 1] }}
+                    >
+                      {renderStepFields(step)}
+                    </motion.div>
+                  </AnimatePresence>
+                </LayoutGroup>
+
+                {globalError && (
+                  <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm" role="alert">
+                    {globalError}
+                  </div>
+                )}
+
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={step > 0 ? handleBack : undefined}
+                    className={`inline-flex items-center gap-1 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue] ${step === 0 ? 'cursor-not-allowed opacity-60' : ''}`}
+                    disabled={step === 0}
+                    data-icon-affordance="left"
+                  >
+                    <Undo2
+                      className={`icon-affordance h-4 w-4 ${step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}`}
+                      aria-hidden="true"
+                    />
+                    <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>Back</span>
+                  </button>
+
+                  <div className="px-1 flex-1 font-semibold text-center text-xs text-slate-600">
+                    Don&rsquo;t worry<span className="font-normal">&mdash;we won&rsquo;t run your credit until you ask.</span>
+                  </div>
+
+                  {step < thirdFormStepIndex ? (
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="btn btn-brand-blue btn-md inline-flex items-center gap-2"
+                      disabled={nextDisabled}
+                      data-icon-affordance="right"
+                    >
+                      Next
+                      <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+                    </button>
+                  ) : (
+                    <button
+                      type="submit"
+                      className="btn btn-brand-orange btn-md inline-flex items-center gap-2"
+                      disabled={submission === 'submitting'}
+                      data-icon-affordance={submission === 'submitting' ? undefined : 'right'}
+                    >
+                      {submission === 'submitting' ? 'Sending…' : 'Show my results'}
+                      {submission !== 'submitting' && <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />}
+                    </button>
+                  )}
+                </div>
+
+                <div className="lg:hidden">
+                  <ProjectTestimonial
+                    className="mt-4"
+                    customerName="David B."
+                    formattedDate="Sep. 9, 2025"
+                    customerReview="Very professional from start to finish, from the first inspection to the final cleanup, they were great. And their communications were excellent, every day we got a text from Josh telling us what to expect. Can’t say enough good things about them."
+                    ownerReply="Thanks, David! Glad to hear our professionalism and communication were top-notch. Josh will be pumped to hear his daily updates were well received. He works hard to keep homeowners in the loop. And I have to say, your new roof looks stellar! University Park is such a beautiful area and your new tile roof really hits the mark. Glad we could do that for you. Appreciate the kind words!"
+                    reviewUrl="https://maps.app.goo.gl/t6h2vXmDSigk9F3Y9"
+                    reviewPlatform="google"
+                  />
                 </div>
               </div>
-              <span className="text-slate-500 md:hidden">{stepSubtitle}</span>
-              <span className={`${infoPillClass} hidden md:inline-flex`}>{stepSubtitle}</span>
-            </div>
 
-            <LayoutGroup>
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`step-${step}`}
-                  layout
-                  ref={stepContentRef}
-                  tabIndex={-1}
-                  className="focus:outline-none"
-                  initial={{ opacity: 1 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.28, ease: [0.32, 0, 0.15, 1] }}
-                >
-                  {renderStepFields(step)}
-                </motion.div>
-              </AnimatePresence>
-            </LayoutGroup>
-
-            {globalError && (
-              <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm" role="alert">
-                {globalError}
-              </div>
-            )}
-
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 shadow-sm">
-              <button
-                type="button"
-                onClick={step > 0 ? handleBack : undefined}
-                className={`inline-flex items-center gap-1 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue] ${step === 0 ? 'cursor-not-allowed opacity-60' : ''}`}
-                disabled={step === 0}
-                data-icon-affordance="left"
-              >
-                <Undo2
-                  className={`icon-affordance h-4 w-4 ${step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}`}
-                  aria-hidden="true"
+              <aside className="hidden lg:block">
+                {/* Placeholder review props; replace with real testimonial content */}
+                <ProjectTestimonial
+                  className="h-full"
+                  customerName="David B."
+                  formattedDate="Sep. 9, 2025"
+                  customerReview="Very professional from start to finish, from the first inspection to the final cleanup, they were great. And their communications were excellent, every day we got a text from Josh telling us what to expect. Can’t say enough good things about them."
+                  ownerReply="Thanks, David! Glad to hear our professionalism and communication were top-notch. Josh will be pumped to hear his daily updates were well received. He works hard to keep homeowners in the loop. And I have to say, your new roof looks stellar! University Park is such a beautiful area and your new tile roof really hits the mark. Glad we could do that for you. Appreciate the kind words!"
+                  reviewUrl="https://maps.app.goo.gl/t6h2vXmDSigk9F3Y9"
+                  reviewPlatform="google"
                 />
-                <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>Back</span>
-              </button>
-
-              <div className="flex-1 text-center text-xs italic text-slate-500">
-                No credit check needed — you’re just exploring options.
-              </div>
-
-              {step < thirdFormStepIndex ? (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="btn btn-brand-blue btn-md inline-flex items-center gap-2"
-                  disabled={nextDisabled}
-                  data-icon-affordance="right"
-                >
-                  Next
-                  <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className="btn btn-brand-orange btn-md inline-flex items-center gap-2"
-                  disabled={submission === 'submitting'}
-                  data-icon-affordance={submission === 'submitting' ? undefined : 'right'}
-                >
-                  {submission === 'submitting' ? 'Sending…' : 'Show my results'}
-                  {submission !== 'submitting' && <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />}
-                </button>
-              )}
+              </aside>
             </div>
           </div>
         </form>

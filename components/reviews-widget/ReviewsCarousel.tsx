@@ -4,6 +4,7 @@ import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import type { Review, ReviewsPayload } from "./types";
 import { OWNER_RESPONSE_IMAGE } from "./constants";
+import ReviewStarRow from "@/components/reviews-widget/ReviewStarRow";
 
 const RAW_REVIEWS_URL = (process.env.NEXT_PUBLIC_REVIEWS_URL ?? "").replace(/\u200B/g, "").trim();
 const REVIEWS_URL =
@@ -128,13 +129,8 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
           >
             <header className="flex flex-col gap-2">
               <div className="text-lg font-semibold text-slate-800">{review.author_name}</div>
-              <div className="flex flex-wrap items-center gap-2 text-[#fb9216]">
-                <span className="sr-only">{`Rated ${ratingValue} out of 5`}</span>
-                {Array.from({ length: 5 }).map((_, starIndex) => (
-                  <span key={starIndex} aria-hidden="true" className="text-xl leading-none">
-                    {starIndex < ratingValue ? '★' : '☆'}
-                  </span>
-                ))}
+              <div className="flex flex-wrap items-center gap-2">
+                <ReviewStarRow rating={ratingValue} />
                 {formattedDate ? (
                   <span className="text-xs font-medium tracking-wide uppercase text-slate-400">
                     {formattedDate}

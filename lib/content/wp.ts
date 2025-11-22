@@ -163,6 +163,9 @@ export type ProjectSummary = {
   heroImage: WpImage | null;
   /** Short description for client-side search (from ACF projectDetails.projectDescription) */
   projectDescription?: string | null;
+  /** Optional homeowner review snippet + attribution */
+  reviewSnippet?: string | null;
+  reviewAuthorName?: string | null;
   /** Optional taxonomy terms to enable client-side filtering */
   materialTypes?: TermLite[];
   /** Additional taxonomies for client-side filtering */
@@ -2670,7 +2673,13 @@ export async function listRecentProjects(
           title
           date
           featuredImage { node { sourceUrl altText } }
-          projectDetails { projectDescription }
+          projectDetails {
+            projectDescription
+            customerTestimonial {
+              customerName
+              customerReview
+            }
+          }
           projectFilters {
             materialType { nodes { name slug } }
             roofColor    { nodes { name slug } }
@@ -2685,6 +2694,7 @@ export async function listRecentProjects(
   return nodes.map((entry) => {
     const filters = asRecord(entry.projectFilters);
     const projectDetails = asRecord(entry.projectDetails);
+    const testimonial = readProjectTestimonial(projectDetails);
     const isoDate = stringOrNull(entry.date);
     return {
       slug: toStringSafe(entry.slug),
@@ -2694,6 +2704,8 @@ export async function listRecentProjects(
       date: isoDate,
       heroImage: pickImageFrom(entry.featuredImage),
       projectDescription: readProjectDescription(projectDetails),
+      reviewSnippet: testimonial?.customerReview ?? null,
+      reviewAuthorName: testimonial?.customerName ?? null,
       materialTypes: mapTermNodes(filters?.materialType),
       roofColors: mapTermNodes(filters?.roofColor),
       serviceAreas: mapTermNodes(filters?.serviceArea),
@@ -2819,7 +2831,13 @@ export async function listProjectsPaged({
           title
           date
           featuredImage { node { sourceUrl altText } }
-          projectDetails { projectDescription }
+          projectDetails {
+            projectDescription
+            customerTestimonial {
+              customerName
+              customerReview
+            }
+          }
           projectFilters {
             materialType { nodes { name slug } }
             roofColor    { nodes { name slug } }
@@ -2886,6 +2904,7 @@ export async function listProjectsPaged({
   const items: ProjectSummary[] = nodes.map((node) => {
     const filtersRecord = asRecord(node.projectFilters);
     const detailsRecord = asRecord(node.projectDetails);
+    const testimonial = readProjectTestimonial(detailsRecord);
     const isoDate = stringOrNull(node.date);
     return {
       slug: toStringSafe(node.slug),
@@ -2895,6 +2914,8 @@ export async function listProjectsPaged({
       date: isoDate,
       heroImage: pickImageFrom(node.featuredImage),
       projectDescription: readProjectDescription(detailsRecord),
+      reviewSnippet: testimonial?.customerReview ?? null,
+      reviewAuthorName: testimonial?.customerName ?? null,
       materialTypes: mapTermNodes(filtersRecord?.materialType),
       roofColors: mapTermNodes(filtersRecord?.roofColor),
       serviceAreas: mapTermNodes(filtersRecord?.serviceArea),
@@ -2967,7 +2988,13 @@ export async function listRecentProjectsByMaterial(
           title
           date
           featuredImage { node { sourceUrl altText } }
-          projectDetails { projectDescription }
+          projectDetails {
+            projectDescription
+            customerTestimonial {
+              customerName
+              customerReview
+            }
+          }
           projectFilters {
             materialType { nodes { name slug } }
             roofColor    { nodes { name slug } }
@@ -2983,6 +3010,7 @@ export async function listRecentProjectsByMaterial(
   return nodes.map((node) => {
     const filtersRecord = asRecord(node.projectFilters);
     const detailsRecord = asRecord(node.projectDetails);
+    const testimonial = readProjectTestimonial(detailsRecord);
     const isoDate = stringOrNull(node.date);
     return {
       slug: toStringSafe(node.slug),
@@ -2992,6 +3020,8 @@ export async function listRecentProjectsByMaterial(
       date: isoDate,
       heroImage: pickImageFrom(node.featuredImage),
       projectDescription: readProjectDescription(detailsRecord),
+      reviewSnippet: testimonial?.customerReview ?? null,
+      reviewAuthorName: testimonial?.customerName ?? null,
       materialTypes: mapTermNodes(filtersRecord?.materialType),
       roofColors: mapTermNodes(filtersRecord?.roofColor),
       serviceAreas: mapTermNodes(filtersRecord?.serviceArea),
@@ -3221,7 +3251,13 @@ export async function filterProjects({
           title
           date
           featuredImage { node { sourceUrl altText } }
-          projectDetails { projectDescription }
+          projectDetails {
+            projectDescription
+            customerTestimonial {
+              customerName
+              customerReview
+            }
+          }
           projectFilters {
             materialType { nodes { name slug } }
             roofColor    { nodes { name slug } }
@@ -3252,6 +3288,7 @@ export async function filterProjects({
     items: nodes.map((p): ProjectSummary => {
       const filters = asRecord(p.projectFilters);
       const details = asRecord(p.projectDetails);
+      const testimonial = readProjectTestimonial(details);
       const dateValue = typeof p.date === 'string' ? p.date : null;
       return {
         slug: toStringSafe(p.slug),
@@ -3261,6 +3298,8 @@ export async function filterProjects({
         date: dateValue,
         heroImage: pickImageFrom(p.featuredImage),
         projectDescription: readProjectDescription(details),
+        reviewSnippet: testimonial?.customerReview ?? null,
+        reviewAuthorName: testimonial?.customerName ?? null,
         materialTypes: mapTermNodes(filters?.materialType),
         roofColors: mapTermNodes(filters?.roofColor),
         serviceAreas: mapTermNodes(filters?.serviceArea),

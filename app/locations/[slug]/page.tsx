@@ -337,7 +337,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
               />
               <BestOfTheBest title={botbTitle} highlightText={botbHighlight} />
               <LatestPostsFilter posts={posts} initial={4} />
-              <section className="mt-12 p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-slate-200">
+              <section className="mt-12 mx-2 p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-slate-200">
                 <h2 className="text-xl md:text-3xl">{`A Special Message to ${location.locationName} Homeowners:`}</h2>
                 <p className="italic text-slate-400">{`Updated: ${modifiedDisplay}`}</p>
 
@@ -366,7 +366,9 @@ export default async function LocationPage({ params }: { params: Promise<Params>
 
         <NeighborhoodsServedSection 
           neighborhoods={location.neighborhoodsServed}
-          eyebrow={`During our 38-year tenure in ${location.locationName}, we've always kept prices competitive without sacrificing on a quality roofing experience. We adapt to your neighborhood, not the other way around.`} />
+          eyebrow={`During our 38-year tenure in ${location.locationName}, we've always kept prices competitive without sacrificing on a quality roofing experience. We adapt to your neighborhood, not the other way around.`} 
+          heading={`Affordable Roofing Services in ${location.locationName}`}
+        />
         <Section>
           <FaqInlineList
             heading="General FAQs"

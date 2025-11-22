@@ -126,6 +126,7 @@ export default async function Page() {
               className="mb-4"
               radius="2xl"
               proseBody={false}
+              open
             >
               <p>
                 SonShine Roofing is licensed by the State of Florida as a roofing
@@ -361,6 +362,7 @@ export default async function Page() {
             posts={pool}
             category="roof-replacement-services"
             excludeSlug={''}
+            heading="Learn more about our roof replacement services"
           />
         </div>
 

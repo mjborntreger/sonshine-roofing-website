@@ -28,7 +28,7 @@ type CardLookup = Record<string, ReactNode>;
 
 const sectionDescription =
   
-"Whether you are looking for a full roof replacement or just considering options, explore our insightful roofing blog to learn more about material choices, aesthetic options, energy efficiency, and more.";
+"Whether you are looking for a full roof replacement or just considering options, explore our in-depth roofing blog to learn more about material choices, hurricane preparation, energy efficiency, and more.";
 
 function buildCardLookup(posts: PostCard[]): CardLookup {
   return posts.reduce((acc, post) => {

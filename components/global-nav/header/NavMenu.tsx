@@ -234,6 +234,7 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
             <SmartLink
               href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
               className="flex items-center gap-2"
+              external={false}
             >
               <Zap className="h-4 w-4 text-white" aria-hidden="true" />
               Instant Quote

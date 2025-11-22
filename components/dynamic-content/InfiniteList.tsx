@@ -16,6 +16,7 @@ import { ArrowRight } from "lucide-react";
 import { stripHtml } from "@/lib/content/wp";
 import { lineClampStyle, truncateText } from "@/components/dynamic-content/card-utils";
 import { buildBlogPostHref, buildProjectHref, buildProjectHrefFromUri, ROUTES } from "@/lib/routes";
+import ProjectReviewSnippet from "@/components/dynamic-content/project/ProjectReviewSnippet";
 
 const smallPillClass =
     "inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700";
@@ -347,6 +348,8 @@ const renderProjectItem = (project: ProjectSummary, index: number): ReactNode =>
                                 <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent sm:hidden" />
                             </div>
                         )}
+
+                        <ProjectReviewSnippet review={project.reviewSnippet} author={project.reviewAuthorName} />
                     </CardContent>
 
                     <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">

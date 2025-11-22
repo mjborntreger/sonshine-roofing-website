@@ -25,6 +25,8 @@ type ProjectPoolItem = {
   date?: string | null;
   heroImage?: { url: string; altText?: string | null } | null;
   projectDescription?: string | null;
+  reviewSnippet?: string | null;
+  reviewAuthorName?: string | null;
   materialTypes?: { slug: string; name?: string | null }[] | null;
   roofColors?: { slug: string; name?: string | null }[] | null;
   serviceAreas?: { slug: string; name?: string | null }[] | null;
@@ -124,6 +126,8 @@ function toProjectSummary(item: ProjectPoolItem): ProjectSummary {
         }
       : null,
     projectDescription: item.projectDescription ?? null,
+    reviewSnippet: item.reviewSnippet ?? null,
+    reviewAuthorName: item.reviewAuthorName ?? null,
     materialTypes: mapTerms(item.materialTypes),
     roofColors: mapTerms(item.roofColors),
     serviceAreas: mapTerms(item.serviceAreas),

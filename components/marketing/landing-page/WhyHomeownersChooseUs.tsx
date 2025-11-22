@@ -94,7 +94,7 @@ const pillars: Pillar[] = [
     id: "local-expertise",
     title: "Your Local Roofing Experts",
     description:
-      "As residential roofing pros located in the Sarasota area, we deeply understand your local roofing needs (because they are the same as ours). We live right here with you in Sarasota, Bradenton, Venice, North Port, and we always treat your roof like its our own.",
+      "As residential roofing pros located in the Sarasota area, we deeply understand your local roofing needs (because they're the same as ours). We live right here with you in Sarasota, Bradenton, Venice, North Port, and we always treat your roof like it's our own.",
     icon: MapPin,
     theme: "blue",
   },

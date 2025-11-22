@@ -7,6 +7,7 @@ import type { ProjectSummary } from "@/lib/content/wp";
 import { stripHtml } from "@/lib/content/wp";
 import { lineClampStyle, truncateText } from "@/components/dynamic-content/card-utils";
 import { buildProjectHref, buildProjectHrefFromUri, ROUTES } from "@/lib/routes";
+import ProjectReviewSnippet from "@/components/dynamic-content/project/ProjectReviewSnippet";
 
 type Props = {
   project: ProjectSummary;
@@ -90,6 +91,8 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
                 <div className="absolute right-0 w-6 pointer-events-none inset-y-1 bg-gradient-to-l from-white to-transparent sm:hidden" />
               </div>
             )}
+
+            <ProjectReviewSnippet review={project.reviewSnippet} author={project.reviewAuthorName} />
           </CardContent>
 
           <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">

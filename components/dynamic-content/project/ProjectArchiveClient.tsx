@@ -59,8 +59,8 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
   return (
     <ResourceArchiveClient
       kind="project"
-      title="Project Gallery"
-      description="Explore our latest installs across Sarasota, Manatee, and Charlotte counties. Filter by material, roof color, and service area — or search by phrase to find a specific project."
+      title="Roofing Project Gallery"
+      description="Explore our latest major roof replacements in Sarasota, Bradenton, Venice, North Port, and more. Filter by material (shingle, metal, tile), roof color, and service area — or search by phrase to find a specific project."
       apiPath="/api/resources/project"
       pageSize={pageSize}
       initialResult={initialResult}
@@ -73,12 +73,12 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
         },
       }}
       groups={groups}
-      searchPlaceholder="Search projects..."
+      searchPlaceholder="Search roof replacement projects..."
       labels={{ itemSingular: "project", itemPlural: "projects" }}
       emptyState={{
         title: "No results found.",
         description: {
-          default: "Try clearing or adjusting your filters to see more projects.",
+          default: "Try clearing or adjusting your filters to see more roof replacement projects.",
           withSearch: "Try clearing filters or searching for a different phrase.",
         },
         actionLabel: "Clear all filters",
@@ -99,7 +99,7 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
           gridClass="mt-8"
         />
       )}
-      loadingOverlayMessage="Loading projects…"
+      loadingOverlayMessage="Loading roof replacement projects…"
     />
   );
 }

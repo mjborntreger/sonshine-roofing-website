@@ -158,7 +158,7 @@ const BADGES = [
   {
     id: "badge-4",
     label: "My Safe FL Home Certified",
-    subtitle: "By choosing us, you potentially save thousands in insurance costs and wind mitigation services.",
+    subtitle: "Save thousands in insurance costs and wind mitigation services.",
     href: "https://mysafeflhome.com",
     src: "https://next.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
     alt: "My Safe FL Home Certified Roofing Contractor in Florida",
@@ -166,7 +166,7 @@ const BADGES = [
   {
     id: "badge-3",
     label: "A+ Rating with the BBB",
-    subtitle: "A roofer with stability and a longstanding reputation in the community.",
+    subtitle: "Stability and a longstanding reputation in the community.",
     href: "https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick",
     src: "https://next.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp",
     alt: "A+ Rated Roofing Contractor with the Better Business Bureau",
