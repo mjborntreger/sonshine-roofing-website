@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
-import { X } from "lucide-react";
+import { PlayCircle, X } from "lucide-react";
 
 type Props = {
   title: string;
@@ -123,13 +123,12 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
 
   return (
     <>
-      <h2 className="mb-3">Project Video</h2>
       {/* Facade */}
       <button
         type="button"
         aria-label={`Play video: ${title}`}
         onClick={() => setOpen(true)}
-        className={`relative block w-full overflow-hidden rounded-2xl ${className ?? ""}`}
+        className={`relative block w-full shadow-blue-500 shadow-md overflow-hidden rounded-2xl ${className ?? ""}`}
       >
         <Image
           src={facadeSrc}
@@ -149,6 +148,10 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
           </span>
         </span>
       </button>
+      <p className="flex items-center gap-2 text-sm text-slate-500 my-4" aria-live="off">
+        <span>Tap to watch video</span>
+        <PlayCircle className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+      </p>
 
       {/* Modal (portaled to body so it covers header/footer and ignores transformed ancestors) */}
       {mounted &&

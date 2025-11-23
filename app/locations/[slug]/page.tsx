@@ -8,7 +8,7 @@ import {
   listSponsorFeaturesByServiceArea,
 } from "@/lib/content/wp";
 import type { LocationRecord } from "@/lib/content/wp";
-import Hero from "@/components/marketing/landing-page/Hero";
+import Hero from "@/components/marketing/landing-page/LandingHero";
 import LeadFormSection from "@/components/lead-capture/lead-form/LeadFormSection";
 import ReviewsCarousel from "@/components/reviews-widget/ReviewsCarousel";
 import type { Review } from "@/components/reviews-widget/types";

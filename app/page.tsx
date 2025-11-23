@@ -1,4 +1,4 @@
-import Hero from "@/components/marketing/landing-page/Hero";
+import Hero from "@/components/marketing/landing-page/LandingHero";
 import HeroTrustBar from "@/components/marketing/landing-page/HeroTrustBar";
 import ReviewsCarousel from "@/components/reviews-widget/ReviewsCarousel";
 import WhyHomeownersChooseUs from "@/components/marketing/landing-page/WhyHomeownersChooseUs";

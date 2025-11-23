@@ -49,7 +49,7 @@ export default function ProjectTestimonial({
   return (
     <section
       className={cn(
-        "rounded-3xl border border-blue-200 bg-white p-6 shadow-md",
+        "rounded-3xl border border-blue-200 bg-amber-50/50 p-6 shadow-md",
         "transition hover:shadow-lg",
         className
       )}
@@ -112,8 +112,8 @@ export default function ProjectTestimonial({
       ) : null}
 
       {resolvedOwnerReply ? (
-        <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
-          <div className="flex items-start gap-3">
+        <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
+          <SmartLink className="flex items-start gap-3" href="/person/nathan-borntreger" title="See Nathan Borntreger's Profile">
             <Image
               src={OWNER_RESPONSE_IMAGE}
               alt="Owner response avatar"
@@ -123,10 +123,10 @@ export default function ProjectTestimonial({
               loading="lazy"
             />
             <div>
-              <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+              <p className="pt-2 text-md font-semibold text-slate-700 hover:text-[--brand-blue] transition-colors">Nathan Borntreger</p>
               <span className="pb-2 text-xs text-slate-500">Owner/Operator</span>
             </div>
-          </div>
+          </SmartLink>
           <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{resolvedOwnerReply}</p>
         </div>
       ) : null}

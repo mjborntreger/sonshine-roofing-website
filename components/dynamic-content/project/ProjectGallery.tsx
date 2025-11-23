@@ -17,7 +17,7 @@ type ProjectGalleryProps = {
 const imageClassBase =
   "pointer-events-none select-none object-cover transition-opacity duration-500 ease-out";
 
-const containerBase = "relative overflow-hidden rounded-2xl bg-slate-100";
+const containerBase = "relative overflow-hidden rounded-3xl border border-blue-200 bg-slate-100";
 
 export default function ProjectGallery({ images, projectTitle }: ProjectGalleryProps) {
   const [mounted, setMounted] = React.useState(false);
@@ -223,13 +223,13 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
   if (!hasImages) return null;
 
   return (
-    <section aria-label="Project Photos" className="space-y-4 mt-16">
-      <h2>Project Photos</h2>
-      <p className="flex items-center gap-2 text-sm text-slate-500" aria-live="off">
-        <span>Tap to expand</span>
+    <section aria-label="Project Photos" className="not-prose space-y-4 mt-16 p-6 bg-white rounded-3xl shadow-md border border-blue-200">
+      <h2 className="text-xl md:text-3xl">Photo Gallery</h2>
+      <p className="text-xs flex items-center gap-2 md:text-sm text-slate-500" aria-live="off">
+        <span>Tap to expand an image</span>
         <Expand className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
       </p>
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {images.map((image, index) => (
           <GalleryImage
             key={`${image.url}-${index}`}
@@ -271,7 +271,7 @@ function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
     <button
       type="button"
       onClick={onOpen}
-      className={`${containerBase} group block w-full cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]`}
+      className={`${containerBase} shadow-md group block w-full cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]`}
       style={aspectStyle}
       aria-label={`Open photo: ${alt}`}
     >
