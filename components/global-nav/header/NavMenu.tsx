@@ -230,13 +230,13 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
         ))}
 
         <li className="pl-2">
-          <Button asChild size="sm" variant="brandOrange">
+          <Button asChild size="sm" variant="outline" className="bg-neutral-900/60 text-white backdrop-blur hover:bg-neutral-900/90">
             <SmartLink
               href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
               className="flex items-center gap-2"
               external={false}
             >
-              <Zap className="h-4 w-4 text-white" aria-hidden="true" />
+              <Zap className="h-4 w-4 text-[--brand-orange]" aria-hidden="true" />
               Instant Quote
             </SmartLink>
           </Button>
