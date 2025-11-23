@@ -59,19 +59,19 @@ const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-for
 
 const INPUT_BASE_CLASS =
   'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
-const INPUT_DEFAULT_CLASS = 'border-slate-200';
+const INPUT_DEFAULT_CLASS = 'border-blue-200';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
 
 const SELECTION_PILL_BASE_CLASS =
   'rounded-full border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 const SELECTION_PILL_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue] text-white shadow';
-const SELECTION_PILL_UNSELECTED_CLASS = 'border-slate-200 bg-white text-slate-700 hover:border-slate-300';
+const SELECTION_PILL_UNSELECTED_CLASS = 'border-blue-200 bg-white text-slate-700 hover:border-blue-300';
 
 const HELP_BUTTON_BASE_CLASS =
   'group flex flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 const HELP_BUTTON_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]';
 const HELP_BUTTON_UNSELECTED_CLASS =
-  'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md';
+  'border-blue-200 bg-white hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md';
 
 const ROOF_TYPE_OPTIONS: RoofTypeOption[] = [
   {
@@ -838,7 +838,7 @@ export default function LeadFormWizard({
                           id="notes"
                           name="notes"
                           rows={journey.requireNotes ? 8 : 3}
-                          className="mt-2 w-full rounded-2xl border border-slate-200 px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
+                          className="mt-2 w-full rounded-2xl border border-blue-200 px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
                           placeholder={journey.notesPlaceholder}
                           value={form.notes}
                           onChange={(event) => onSelect('notes', event.target.value)}
@@ -1108,13 +1108,13 @@ export default function LeadFormWizard({
                     {errors.bestTime && <p className="mt-2 text-sm font-medium text-red-600">{errors.bestTime}</p>}
                   </div>
 
-                  <label className="flex items-center gap-3 px-4 py-3 text-xs border md:col-span-2 rounded-2xl border-slate-200 bg-slate-50 text-slate-600">
+                  <label className="flex items-center gap-3 px-4 py-3 text-xs border md:col-span-2 rounded-2xl border-blue-200 bg-slate-50 text-slate-600">
                     <input
                       type="checkbox"
                       name="consentSms"
                       checked={form.consentSms}
                       onChange={(event) => onSelect('consentSms', event.target.checked)}
-                      className="h-4 w-4 cursor-pointer rounded border-slate-300 text-[--brand-blue] focus:ring-[--brand-blue]"
+                      className="h-4 w-4 cursor-pointer rounded border-blue-200 text-[--brand-blue] focus:ring-[--brand-blue]"
                     />
                     <span>
                       <div className="text-xs text-slate-500">

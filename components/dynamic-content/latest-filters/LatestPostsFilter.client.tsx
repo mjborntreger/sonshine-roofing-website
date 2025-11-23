@@ -104,7 +104,7 @@ export default function LatestPostsFilter({
         renderFilterTabs()
       )}
 
-      <div key={selected} className="grid gap-6 mt-8 md:grid-cols-2">
+      <div key={selected} className="grid gap-6 mt-8 md:grid-cols-4">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];

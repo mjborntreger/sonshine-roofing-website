@@ -15,9 +15,9 @@ import LeadFormSection from "@/components/lead-capture/lead-form/LeadFormSection
 import LocalPartnershipsSection from "@/components/location/LocalPartnershipsSection";
 
 // ===== STYLE CONSTANTS ===== //
-const leadFormLayout = "mx-auto w-full bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent";
+const leadFormLayout = "mx-auto w-full";
 const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
-const narrowLayout = "mx-auto w-full max-w-[1280px]";
+const narrowLayout = "bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent mx-auto w-full";
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Best Roofing Company in Sarasota';
@@ -80,10 +80,10 @@ export const revalidate = 600;
 export default async function Page({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const sponsorFeaturesPromise = listSponsorFeaturesByServiceArea(slug, {
-      primaryLimit: 8,
-      fallbackLimit: 6,
-      minimum: 4,
-    }).catch(() => []);
+    primaryLimit: 8,
+    fallbackLimit: 6,
+    minimum: 4,
+  }).catch(() => []);
   const [projects, posts, generalFaqs, sponsorFeatures] = await Promise.all([
     listRecentProjectsPoolForFilters(4, 8),
     listRecentPostsPoolForFilters(4, 4).catch(() => []),
@@ -97,23 +97,16 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         <HeroTrustBar />
         <ReviewsCarousel />
       </div>
-      <div className={leadFormLayout}>
-        <div className="max-w-[1280px] pt-16 mx-auto">
-          <LeadFormSection />
-        </div>
-      </div>
       <div className={narrowLayout}>
-        <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
+        <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] max-w-[1280px] mx-auto items-start">
           <div className="min-w-0">
             <div className="mx-2">
-              <LatestProjectsFilter projects={projects} initial={4} />
               <WhyHomeownersChooseUs highlightText="Family-owned" />
               <LocalPartnershipsSection
                 features={sponsorFeatures}
                 emptyMessage="No sponsored partners yet."
               />
               <BestOfTheBest />
-              <LatestPostsFilters posts={posts} initial={4} />
             </div>
           </div>
 
@@ -122,7 +115,17 @@ export default async function Page({ params }: { params: Promise<Params> }) {
             <ServicesQuickLinks activePath="/" />
             <ResourcesQuickLinks activePath="/" />
           </div>
-
+        </div>
+      </div>
+      <div className={leadFormLayout}>
+        <div className="max-w-[1280px] pt-16 mx-auto">
+          <LatestProjectsFilter projects={projects} initial={4} />
+          <LeadFormSection />
+        </div>
+      </div>
+      <div className={leadFormLayout}>
+        <div className="max-w-[1280px] pt-16 mx-auto">
+          <LatestPostsFilters posts={posts} initial={4} />
         </div>
       </div>
 

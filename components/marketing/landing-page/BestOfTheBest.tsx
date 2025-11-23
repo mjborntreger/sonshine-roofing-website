@@ -30,7 +30,7 @@ export default async function bestOfTheBest({
       title
     );
   return (
-    <section className="px-4 py-32">
+    <section className="px-4 pt-24">
       <div
         aria-label="botb-title"
         id="botb-title"
