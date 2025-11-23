@@ -32,7 +32,7 @@ const CARD_BODY_BASE = "flex-1 rounded-b-4xl px-6 pb-6 pt-4 text-sm leading-rela
 const ICON_BASE = "grid h-10 w-10 place-items-center rounded-full transition-transform duration-200";
 const CHEVRON_BASE =
   "h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open/accordion:rotate-180";
-const TITLE_BASE = "relative inline-block text-slate-900 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:transition-all after:duration-300";
+const TITLE_BASE = "text-xl md:text-2xl relative inline-block text-slate-900 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:transition-all after:duration-300";
 
 type ThemeKey = "blue" | "orange";
 
@@ -92,7 +92,7 @@ type Pillar = {
 const pillars: Pillar[] = [
   {
     id: "local-expertise",
-    title: "Your Local Roofing Experts",
+    title: "Family-owned & Local",
     description:
       "As residential roofing pros located in the Sarasota area, we deeply understand your local roofing needs (because they're the same as ours). We live right here with you in Sarasota, Bradenton, Venice, North Port, and we always treat your roof like it's our own.",
     icon: MapPin,

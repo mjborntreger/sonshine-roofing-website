@@ -17,7 +17,7 @@ import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 
 const figureStyles = "not-prose py-8";
-
+const ACCORDION_TITLE = "text-xl";
 const SERVICE_PATH = "/roof-repair";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
@@ -114,7 +114,7 @@ export default async function Page() {
           <h2>Common Roof Repairs</h2>
           <Accordion
             icon={<Layers className="h-7 w-7" aria-hidden="true" />}
-            summary={<h3>Curling Shingles</h3>}
+            summary={<h3 className={ACCORDION_TITLE}>Curling Shingles</h3>}
             className="mb-4"
             radius="2xl"
             proseBody={false}
@@ -150,7 +150,7 @@ export default async function Page() {
           </Accordion>
           <Accordion
             icon={<Droplets className="h-7 w-7" aria-hidden="true" />}
-            summary={<h3>Water Damage</h3>}
+            summary={<h3 className={ACCORDION_TITLE}>Water Damage</h3>}
             className="mb-4"
             radius="2xl"
             proseBody={false}
@@ -183,7 +183,7 @@ export default async function Page() {
           </Accordion>
           <Accordion
             icon={<Bug className="h-7 w-7" aria-hidden="true" />}
-            summary={<h3>Insect Damage</h3>}
+            summary={<h3 className={ACCORDION_TITLE}>Insect Damage</h3>}
             className="mb-4"
             radius="2xl"
             proseBody={false}
@@ -219,7 +219,7 @@ export default async function Page() {
           </Accordion>
           <Accordion
             icon={<Hammer className="h-7 w-7" aria-hidden="true" />}
-            summary={<h3>Worn Out or Damaged Flashings</h3>}
+            summary={<h3 className={ACCORDION_TITLE}>Worn Out or Damaged Flashings</h3>}
             className="mb-4"
             radius="2xl"
             proseBody={false}
@@ -259,7 +259,7 @@ export default async function Page() {
           </Accordion>
           <Accordion
             icon={<PanelRight className="h-7 w-7" aria-hidden="true" />}
-            summary={<h3>Rotting Fascia</h3>}
+            summary={<h3 className={ACCORDION_TITLE}>Rotting Fascia</h3>}
             className="mb-6"
             radius="2xl"
             proseBody={false}
@@ -307,7 +307,7 @@ export default async function Page() {
           posts={pool}
           category="roof-repair-services"
           excludeSlug={''}
-          heading="Learn more about our roof repair services"
+          heading="Learn More About Roof Repair Services"
         />
       </div>
 

@@ -2,11 +2,11 @@ import { Accordion } from "@/components/ui/Accordion";
 import { Hammer, House, ArrowLeftRight } from "lucide-react";
 
 const iconStyles = "h-5 w-5 text-[--brand-blue]";
-const cardStyles = "rounded-3xl border border-slate-200 bg-white p-4 h-fit";
+const cardStyles = "rounded-3xl border border-blue-200 bg-white p-4 h-fit";
 
 const accordionDefaults = {
     radius: "2xl" as const,
-    tone: "medium" as const,
+    tone: "soft" as const,
     size: "sm" as const,
     proseBody: false,
     summaryClassName: "text-[1rem]",

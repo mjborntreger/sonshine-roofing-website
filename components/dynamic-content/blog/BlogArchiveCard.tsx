@@ -20,6 +20,10 @@ type Props = {
   className?: string;
 };
 
+const pillClass =
+  "inline-flex min-w-0 max-w-full items-center rounded-full font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-[0.75rem] sm:text-xs text-slate-700 sm:px-3 sm:py-1 sm:text-sm";
+const pillLabelClass = "block max-w-full truncate";
+
 export default function BlogArchiveCard({ post, style, className }: Props) {
   const href = buildBlogPostHref(post.slug) ?? ROUTES.blog;
   const date = post.date ? new Date(post.date) : null;
@@ -50,7 +54,7 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
                 src={post.featuredImage.url}
                 alt={post.featuredImage.altText ?? post.title}
                 sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-                className="object-cover"
+                className="object-cover transition-transform duration-300 hover:scale-[1.06]"
               />
             </div>
           ) : (
@@ -73,19 +77,19 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
                 {post.categories.map((cat) => (
                   <span
                     key={cat}
-                    className="inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                    className={pillClass}
                   >
-                    <span className="block max-w-full truncate">{cat}</span>
+                    <span className={pillLabelClass}>{cat}</span>
                   </span>
                 ))}
               </div>
             )}
           </CardContent>
 
-          <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
-            <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
+          <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
+            <span className="items-center gap-2 text-md font-semibold tracking-wide">
               Read full article
-              <ArrowRight className="icon-affordance h-4 w-4" />
+              <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
             </span>
           </CardFooter>
       </Card>

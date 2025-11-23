@@ -141,7 +141,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
             <JsonLd data={howToLd} />
             <JsonLd data={serviceLd} />
 
-            <div className="mx-auto mt-4 max-w-3xl rounded-3xl border border-slate-200 bg-white p-4 text-center shadow-sm">
+            <div className="mx-auto mt-4 max-w-3xl rounded-3xl border border-blue-200 bg-white p-4 text-center shadow-sm">
                 <p className="text-sm text-slate-700">
                     You’ll get a written summary of findings, photos where helpful, and a clear plan to
                     extend the life of your roof—or a straight‑shooting estimate if replacement makes more sense.
@@ -165,7 +165,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                                 'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm shadow-sm transition',
                                 active
                                     ? 'bg-[var(--brand-blue)] text-white border-transparent'
-                                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                                    : 'bg-white text-slate-700 border-blue-200 hover:bg-slate-50'
                             )}
                             data-active={active}
                         >
@@ -191,7 +191,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                         id={`panel-${key}`}
                         aria-labelledby={`tab-${key}`}
                         hidden={tab !== key}
-                        className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm"
+                        className="rounded-3xl border border-blue-200 bg-white p-4 shadow-sm"
                     >
                         <h3>{CHECKLIST[key].title}</h3>
                         <p className="mt-1 text-sm text-slate-600">{CHECKLIST[key].blurb}</p>

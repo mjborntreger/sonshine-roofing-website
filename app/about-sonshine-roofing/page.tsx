@@ -166,9 +166,9 @@ export default async function Page() {
                 </p>
               </Accordion>
 
-              <HoursAndInformation />
-
               <AboutVideo />
+
+              <HoursAndInformation />
 
             </div>
 

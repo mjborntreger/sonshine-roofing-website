@@ -111,7 +111,7 @@ export default async function GlossaryArchivePage() {
                 <SmartLink
                   key={l}
                   href={`#glossary-${l === '#' ? 'num' : l}`}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-300 bg-white hover:bg-slate-50"
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-blue-300 bg-white hover:bg-slate-50"
                 >
                   {l}
                 </SmartLink>
@@ -130,7 +130,7 @@ export default async function GlossaryArchivePage() {
                         <li key={t.slug}>
                           <SmartLink
                             href={`/roofing-glossary/${t.slug}`}
-                            className="block rounded-md border border-slate-300 bg-white px-3 py-2 text-slate-800 hover:bg-slate-50"
+                            className="block rounded-md border border-blue-300 bg-white px-3 py-2 text-slate-800 hover:bg-slate-50"
                           >
                             {t.title}
                           </SmartLink>

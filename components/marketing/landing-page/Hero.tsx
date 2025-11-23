@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, Phone } from "lucide-react";
+import { Phone } from "lucide-react";
 import ShinyText from "./ShinyText";
 
 type HeroProps = {
@@ -37,14 +37,6 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
           <h1 className="mb-8 max-w-6xl mx-auto text-4xl md:text-5xl lg:text-7xl justify-center md:leading-[5rem] lg:leading-[6rem] text-white">
             {title}
           </h1>
-          <div className="md:hidden mb-10 flex justify-center">
-            <div className="relative flex flex-col items-center text-white/80">
-              <span className="sr-only">Scroll to continue</span>
-              <div className="animate-trust-drift rounded-full border border-white/70 bg-[#cef3ff]/20 backdrop-blur p-3 shadow-md">
-                <ArrowDown className="h-5 w-5 text-white" aria-hidden="true" />
-              </div>
-            </div>
-          </div>
 
           <a className="phone-affordance hover:bg-neutral-800/50 transition-colors font-semibold block py-4 px-6 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 text-2xl md:text-4xl tracking-wider text-[--brand-cyan] mb-[12rem]" 
             href="tel:+19418664320"
@@ -55,12 +47,11 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
             <span 
               className="mt-2 block font-extralight text-xs tracking-wider text-slate-300"
               >
-                CALL TODAY | LICENSE #CCC1331483
+                INSURED | LICENSE #CCC1331483
             
             </span>
           </a>
-        </div>
-        
+        </div>    
       </section>
     </>
   );

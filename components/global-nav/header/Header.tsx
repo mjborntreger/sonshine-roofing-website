@@ -105,8 +105,8 @@ export default function Header() {
   const backgroundOpacity = isLanding ? progress : 1;
   const isTransparent = isLanding && backgroundOpacity === 0;
   const isOverlay = isLanding;
-  const headerBackground = `rgba(245, 245, 245, ${backgroundOpacity})`;
-  const headerBorder = `rgba(226, 232, 240, ${backgroundOpacity})`;
+  const headerBackground = `rgba(236, 254, 255, ${backgroundOpacity})`;
+  const headerBorder = `rgba(191, 219, 254, ${backgroundOpacity})`;
   const backdropBlur = backgroundOpacity > 0 ? `blur(${6 + backgroundOpacity * 6}px)` : "blur(0px)";
   const expandedLogo = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-final-1.webp";
   const collapsedLogo = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-2.webp";

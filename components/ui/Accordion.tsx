@@ -37,7 +37,7 @@ const DETAIL_BASE =
   "group/accordion not-prose w-full overflow-hidden border bg-white shadow-sm transition-colors duration-200 ease-out [&_summary::-webkit-details-marker]:hidden";
 
 const SUMMARY_BASE =
-  "flex cursor-pointer select-none items-center justify-between gap-4 text-left text-sm font-medium text-slate-900 transition-colors duration-200 ease-out hover:bg-slate-50";
+  "flex cursor-pointer select-none items-center justify-between gap-4 text-left text-sm font-medium text-slate-900 transition-colors duration-200 ease-out hover:bg-blue-10";
 
 const SUMMARY_SIZE: Record<AccordionSize, string> = {
   sm: "px-3.5 py-3 text-sm",
@@ -50,9 +50,9 @@ const BODY_PADDING: Record<AccordionSize, string> = {
 };
 
 const TONE_BORDER: Record<AccordionTone, string> = {
-  soft: "border-slate-200",
-  medium: "border-slate-300",
-  strong: "border-slate-400",
+  soft: "border-blue-200",
+  medium: "border-blue-300",
+  strong: "border-blue-400",
 };
 
 const RADIUS_MAP: Record<AccordionRadius, string> = {

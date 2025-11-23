@@ -147,7 +147,7 @@ function injectCtaAfterNthParagraph(html: string, n = 3) {
   const btn = cn(buttonVariants({ variant: "brandOrange" }), "justify-end"); // add { size: "sm" } if you want
 
   const cta = `
-<div class="my-8 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm relative overflow-hidden">
+<div class="my-8 rounded-3xl border border-blue-200 bg-white p-6 shadow-sm relative overflow-hidden">
   <span class="pointer-events-none absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]"></span>
   <h3 class="m-0 text-xl text-slate-900">Take the first step</h3>
   <p class="mt-2 text-slate-600 italic">Schedule a fast, no-pressure visit. Since 1987 we’ve got you covered.</p>
@@ -371,7 +371,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
       {/* Prev / Next */}
       {(prev || next) && (
-        <nav className="grid gap-4 p-4 mt-12 bg-white border shadow-sm rounded-2xl border-slate-200 sm:grid-cols-2">
+        <nav className="grid gap-4 p-4 mt-12 bg-white border shadow-sm rounded-2xl border-blue-200 sm:grid-cols-2">
           {prev ? (
             <SmartLink href={`/${prev.slug}`} className="block p-3 rounded-xl hover:bg-slate-50">
               <div className="text-xs tracking-wide uppercase text-slate-500">Previous</div>

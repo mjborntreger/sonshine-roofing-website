@@ -240,7 +240,7 @@ export default function TocFromHeadings({
   const visibilityClass = mobile ? 'block md:hidden' : 'hidden lg:block';
   const navClasses = [
     visibilityClass,
-    'rounded-3xl border border-slate-200 bg-white px-4 py-4 shadow-sm my-4',
+    'rounded-3xl border border-blue-200 bg-white px-4 py-4 shadow-sm my-4',
     className,
   ]
     .filter(Boolean)

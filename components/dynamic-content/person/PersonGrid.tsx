@@ -24,21 +24,25 @@ export default function PersonGrid({ people }: { people: Person[] }) {
               >
                 <Card className="overflow-hidden hover:shadow-lg transition">
                   <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-                    <CardTitle className="font-semibold">{p.title}</CardTitle>
+                    <CardTitle className="font-bold text-xl">{p.title}</CardTitle>
                     {p.positionTitle && (
                       <p className="mt-1 text-sm text-slate-600">{p.positionTitle}</p>
                     )}
                   </CardHeader>
 
                   {p.featuredImage?.url ? (
-                    <MediaFrame
-                      src={p.featuredImage.url}
-                      alt={p.featuredImage.altText || p.title}
-                      ratio="4 / 3"
-                      className="w-full"
-                      sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
-                      priority={false}
-                    />
+                    <div
+                      className="relative w-full overflow-hidden bg-blue-200"
+                    >
+                      <MediaFrame
+                        src={p.featuredImage.url}
+                        alt={p.featuredImage.altText || p.title}
+                        ratio="4 / 3"
+                        className="object-cover w-full transition-transform duration-300 hover:scale-[1.06]"
+                        sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 100vw"
+                        priority={false}
+                      />
+                    </div>
                   ) : (
                     <div className="aspect-[4/3] w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
                   )}
@@ -49,12 +53,12 @@ export default function PersonGrid({ people }: { people: Person[] }) {
                     )}
                   </CardContent>
 
-                  <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
-                    <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
-                      View profile
-                      <ArrowRight className="icon-affordance h-4 w-4" />
-                    </span>
-                  </CardFooter>
+                  <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
+                        <span className="items-center gap-2 text-md font-semibold tracking-wide">
+                            See profile
+                            <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
+                        </span>
+                    </CardFooter>
                 </Card>
               </SmartLink>
             </li>

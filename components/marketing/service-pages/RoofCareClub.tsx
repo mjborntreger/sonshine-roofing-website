@@ -215,7 +215,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
       {/* Toggles */}
       <div className="mt-6 flex flex-col items-center gap-3">
         {/* Duration */}
-        <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+        <div className="inline-flex rounded-full border border-blue-200 bg-white p-1 shadow-sm">
           {[1, 2, 3].map((t) => (
             <button
               key={t}
@@ -235,7 +235,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
         </div>
 
         {/* Display mode */}
-        <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 shadow-sm">
+        <div className="inline-flex rounded-full border border-blue-200 bg-white p-1 shadow-sm">
           {(['year', 'month'] as const).map((m) => (
             <button
               key={m}
@@ -272,7 +272,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
           return (
             <div
               key={plan.id}
-              className="relative flex flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm z-0 min-w-[280px]"
+              className="relative flex flex-col overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm z-0 min-w-[280px]"
             >
               {/* Header */}
               <div

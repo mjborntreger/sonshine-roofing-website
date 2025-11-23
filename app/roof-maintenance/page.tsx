@@ -126,7 +126,7 @@ export default async function Page() {
           posts={pool}
           category="roof-maintenance-services"
           excludeSlug={''}
-          heading="Learn more about our roof maintenance services"
+          heading="Learn More About Roof Maintenance Services"
         />
       </div>
 

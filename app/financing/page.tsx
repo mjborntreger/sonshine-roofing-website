@@ -50,7 +50,7 @@ const checkIconServiceFinance = 'mt-0.5 h-4 w-4 text-[--brand-cyan] flex-none';
 const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
 const ctaSecondary = 'btn w-full btn-brand-blue btn-lg phone-affordance';
 const ctaPrimary = "btn btn-brand-orange btn-lg"
-const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
+const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border-blue-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
 const contactInfoIconStyles = "h-5 w-5 text-slate-500";
 
 export default async function FinancingPage() {
@@ -231,7 +231,7 @@ export default async function FinancingPage() {
         {/* Comparison / how it works (custom panels with icons) */}
         <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Which option fits me? */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section className="rounded-2xl shadow-sm border border-blue-300 bg-white p-4">
             <h3 className={h3}>
               <ListChecks className={sectionIcon} aria-hidden="true" />
               Which option fits me?
@@ -252,7 +252,7 @@ export default async function FinancingPage() {
           </section>
 
           {/* What&rsquo;s Next */}
-          <section id="whats-next" className="rounded-2xl border border-slate-200 bg-white p-4">
+          <section id="whats-next" className="rounded-2xl border shadow-sm border-blue-300 bg-white p-4">
             <h3 className={h3}>
               <ListOrdered className={sectionIcon} aria-hidden="true" />
               What&rsquo;s next?
@@ -285,7 +285,7 @@ export default async function FinancingPage() {
           </section>
 
           {/* Questions? */}
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 h-full flex flex-col">
+          <section className="rounded-2xl border shadow-sm border-blue-300 bg-white p-4 h-full flex flex-col">
             <h3 className={h3}>
               <HelpCircle className={sectionIcon} aria-hidden="true" />
               Questions?

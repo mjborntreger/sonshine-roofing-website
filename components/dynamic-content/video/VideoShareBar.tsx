@@ -45,7 +45,7 @@ export default function VideoShareBar({ collectionUrl }: Props) {
   };
 
   return (
-    <div className="mb-6 rounded-md border border-slate-300 bg-white p-3">
+    <div className="mb-6 rounded-md border border-blue-300 bg-white p-3">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <label htmlFor="video-share-url" className="text-sm font-medium text-slate-700">Share this video</label>
         <div className="flex w-full items-center gap-2">
@@ -53,13 +53,13 @@ export default function VideoShareBar({ collectionUrl }: Props) {
             id="video-share-url"
             readOnly
             value={shareUrl}
-            className="w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-blue-300 bg-slate-50 px-3 py-2 text-sm"
           />
           <button
             id="video-share-copy"
             type="button"
             onClick={handleCopy}
-            className="whitespace-nowrap rounded-md border border-slate-300 px-3 py-2 text-sm transition hover:bg-slate-50"
+            className="whitespace-nowrap rounded-md border border-blue-300 px-3 py-2 text-sm transition hover:bg-slate-50"
           >
             Copy link
           </button>

@@ -129,10 +129,10 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
               </div>
             </header>
 
-            <div className="mt-8 prose max-w-none border border-slate-300 bg-white p-5 rounded-2xl" dangerouslySetInnerHTML={{ __html: person.contentHtml }} />
+            <div className="mt-8 prose max-w-none border border-blue-300 bg-white p-5 rounded-2xl" dangerouslySetInnerHTML={{ __html: person.contentHtml }} />
 
             {(prev || next) && (
-              <nav className="mt-8 grid gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-2">
+              <nav className="mt-8 grid gap-4 rounded-2xl border border-blue-200 bg-white p-4 shadow-sm sm:grid-cols-2">
                 {prev ? (
                   <SmartLink href={`/person/${prev.slug}`} className="block rounded-xl p-3 hover:bg-slate-50">
                     <div className="text-xs uppercase tracking-wide text-slate-500">Previous</div>

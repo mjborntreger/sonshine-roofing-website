@@ -112,7 +112,7 @@ export default async function FAQArchivePage(_: PageProps) {
 
             {/* Search (client-side, exact phrase like Blog) */}
             <div className="mt-6" role="search">
-              <div className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
+              <div className="rounded-2xl border border-blue-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
                 <div className="inline-flex w-full items-start">
                   <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
                   <input
@@ -122,7 +122,7 @@ export default async function FAQArchivePage(_: PageProps) {
                     placeholder="Search questions..."
                     aria-label="Search FAQs"
                     autoComplete="off"
-                    className="w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:outline-none"
+                    className="w-full rounded-md border border-blue-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:outline-none"
                   />
                 </div>
               </div>
@@ -147,7 +147,7 @@ export default async function FAQArchivePage(_: PageProps) {
             </div>
 
             {/* Client-driven No results panel */}
-            <div id="faq-no-results" className="mt-6 hidden rounded-md border border-slate-400 bg-white p-4">
+            <div id="faq-no-results" className="mt-6 hidden rounded-md border border-blue-400 bg-white p-4">
               <p className="text-sm text-slate-700">
                 No results for <span id="faq-query" className="font-semibold"></span>.
               </p>

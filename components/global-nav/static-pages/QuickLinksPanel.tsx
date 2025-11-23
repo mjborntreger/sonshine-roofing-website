@@ -48,7 +48,7 @@ export default function QuickLinksPanel({
   activePath = "/",
 }: QuickLinksPanelProps) {
   return (
-    <div className={cn("rounded-3xl border border-slate-200 bg-white p-4 shadow-sm", className)}>
+    <div className={cn("rounded-3xl border border-blue-200 bg-white p-4 shadow-sm", className)}>
       <h2 className="not-prose mb-3 font-display text-center text-[1rem] leading-none font-bold uppercase tracking-wide text-slate-600">
         <TitleIcon className={cn("mr-2 inline h-4 w-4", palette.titleIconClassName)} />
         {title}
@@ -61,7 +61,7 @@ export default function QuickLinksPanel({
             "group flex items-center gap-3 rounded-2xl border bg-white px-3 py-2 text-sm font-medium transition hover:shadow-sm focus:outline-none focus-visible:ring-2 motion-reduce:transition-none";
           const stateClasses = active
             ? cn(palette.activeBorderClass, "text-slate-900")
-            : "border-slate-200 text-slate-800";
+            : "border-blue-200 text-slate-800";
 
           return (
             <li key={href}>

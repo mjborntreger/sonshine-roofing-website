@@ -98,7 +98,7 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
         </div>
 
         {/* Prev / Next */}
-        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-slate-200 pt-6 sm:flex-row">
+        <div className="mt-10 flex flex-col justify-between gap-3 border-t border-blue-200 pt-6 sm:flex-row">
           {prev ? (
             <SmartLink href={("/faq/" + prev.slug) as Route} className="group inline-flex items-center gap-2 text-slate-700 hover:text-[#0045d7]">
               <span aria-hidden className="transition-transform group-hover:-translate-x-0.5">←</span>
@@ -117,7 +117,7 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
           <SmartLink
             href="tel:19418664320"
-            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition"
+            className="rounded-xl border border-blue-200 bg-white p-5 shadow-sm hover:shadow-md transition"
           >
             <div className="text-sm font-semibold text-slate-900">Still stuck?</div>
             <div className="mt-1 text-slate-700">Talk to a real roofer now.</div>
@@ -129,7 +129,7 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
           >
             <div className="text-sm font-semibold text-slate-900">Prefer to write?</div>
             <div className="mt-1 text-slate-700">Send us a message and we’ll follow up.</div>
-            <div className="mt-3 inline-flex rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Contact form</div>
+            <div className="mt-3 inline-flex rounded-md border border-blue-300 px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50">Contact form</div>
           </SmartLink>
         </div>
 

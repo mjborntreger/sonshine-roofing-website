@@ -19,9 +19,9 @@ import { buildBlogPostHref, buildProjectHref, buildProjectHrefFromUri, ROUTES } 
 import ProjectReviewSnippet from "@/components/dynamic-content/project/ProjectReviewSnippet";
 
 const smallPillClass =
-    "inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700";
+    "inline-flex min-w-0 max-w-full items-center rounded-full font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-[0.75rem] sm:text-xs text-slate-800 sm:px-3 sm:py-1 sm:text-sm";
 const largePillClass =
-    "inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm";
+    "inline-flex min-w-0 max-w-full items-center rounded-full font-semibold tracking-tight bg-[--brand-orange] px-2.5 py-1 text-[0.75rem] sm:text-xs text-white sm:px-3 sm:py-1 sm:text-sm";
 const pillLabelClass = "block max-w-full truncate";
 
 type Props<T> = {
@@ -49,7 +49,7 @@ const Frame: React.FC<{
 }> = ({ src, alt = "", ratio = "16 / 9", className, sizes, priority }) => {
     const style: CSSProperties = { aspectRatio: ratio };
     if (!src) return <div className={className} style={style} />;
-    const wrapperClass = ["relative w-full overflow-hidden bg-slate-100", className]
+    const wrapperClass = ["relative overflow-hidden bg-blue-100", className]
         .filter(Boolean)
         .join(" ");
 
@@ -91,16 +91,20 @@ const renderBlogItem = (post: PostCard): ReactNode => {
             <SmartLink href={href} className="group block" data-icon-affordance="right">
                 <Card className="overflow-hidden hover:shadow-lg transition">
                     <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-                        <CardTitle className="font-semibold">{post.title}</CardTitle>
+                        <CardTitle className="text-xl font-semibold">{post.title}</CardTitle>
                     </CardHeader>
                     {post.featuredImage?.url ? (
-                        <Frame
-                            src={post.featuredImage.url}
-                            alt={post.featuredImage.altText ?? post.title}
-                            ratio="16 / 9"
-                            className="w-full"
-                            sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-                        />
+                        <div
+                            className="relative w-full overflow-hidden bg-blue-200"
+                        >
+                            <Frame
+                                src={post.featuredImage.url}
+                                alt={post.featuredImage.altText ?? post.title}
+                                ratio="16 / 9"
+                                className="object-cover w-full transition-transform duration-300 hover:scale-[1.06]"
+                                sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                            />
+                        </div>
                     ) : (
                         <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
                     )}
@@ -126,10 +130,10 @@ const renderBlogItem = (post: PostCard): ReactNode => {
                             </div>
                         )}
                     </CardContent>
-                    <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
-                        <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
-                            Read full article
-                            <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+                    <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
+                        <span className="items-center gap-2 text-md font-semibold tracking-wide">
+                            Read full post
+                            <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
                         </span>
                     </CardFooter>
                 </Card>
@@ -185,7 +189,7 @@ const renderVideoItem = (
                 data-sa={serviceSlugs}
             >
                 <CardHeader>
-                    <CardTitle className="font-bold">{video.title}</CardTitle>
+                    <CardTitle className="text-xl font-bold">{video.title}</CardTitle>
                 </CardHeader>
 
                 <button
@@ -195,13 +199,17 @@ const renderVideoItem = (
                     data-video-slug={safeSlug}
                     className="relative block w-full"
                 >
-                    <Frame
-                        src={video.thumbnailUrl}
-                        alt={video.title}
-                        ratio="16 / 9"
-                        className="w-full"
-                        sizes="(min-width: 1024px) 50vw, 100vw"
-                    />
+                    <div
+                        className="relative w-full overflow-hidden bg-blue-200"
+                    >
+                        <Frame
+                            src={video.thumbnailUrl}
+                            alt={video.title}
+                            ratio="16 / 9"
+                            className="object-cover w-full transition-transform duration-300 hover:scale-[1.06]"
+                            sizes="(min-width: 1024px) 50vw, 100vw"
+                        />
+                    </div>
                     <span className="absolute inset-0 grid place-items-center bg-black/0 transition group-hover:bg-black/15">
                         <span className="grid place-items-center rounded-full bg-white/90 p-4 shadow-md">
                             <svg viewBox="0 0 24 24" aria-hidden="true" className="w-6 fill-slate-900">
@@ -240,16 +248,16 @@ const renderVideoItem = (
                         </div>
                     ) : null}
                 </CardContent>
-                <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
+                <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
                     <button
                         type="button"
                         onClick={handleOpen}
                         data-video-slug={safeSlug}
-                        className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight focus-visible:outline-none"
+                        className="items-center gap-2 text-md font-semibold tracking-wide"
                         data-icon-affordance="right"
                     >
                         Watch video
-                        <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+                        <ArrowRight className="inline ml-2 icon-affordance h-4 w-4" aria-hidden="true" />
                     </button>
                 </CardFooter>
             </Card>
@@ -298,13 +306,17 @@ const renderProjectItem = (project: ProjectSummary, index: number): ReactNode =>
                     </CardHeader>
 
                     {heroImage?.url ? (
-                        <Frame
-                            src={heroImage.url}
-                            alt={heroImage.altText ?? project.title}
-                            ratio="16 / 10"
-                            className="w-full"
-                            sizes="(min-width: 1024px) 50vw, 100vw"
-                        />
+                        <div
+                            className="relative w-full overflow-hidden bg-blue-200"
+                        >
+                            <Frame
+                                src={heroImage.url}
+                                alt={heroImage.altText ?? project.title}
+                                ratio="16 / 10"
+                                className="object-cover w-full transition-transform duration-300 hover:scale-[1.06]"
+                                sizes="(min-width: 1024px) 50vw, 100vw"
+                            />
+                        </div>
                     ) : (
                         <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
                     )}
@@ -352,10 +364,10 @@ const renderProjectItem = (project: ProjectSummary, index: number): ReactNode =>
                         <ProjectReviewSnippet review={project.reviewSnippet} author={project.reviewAuthorName} />
                     </CardContent>
 
-                    <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
-                        <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
+                    <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
+                        <span className="items-center gap-2 text-md font-semibold tracking-wide">
                             View project
-                            <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+                            <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
                         </span>
                     </CardFooter>
                 </Card>

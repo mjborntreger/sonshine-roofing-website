@@ -49,7 +49,7 @@ export default function ProjectTestimonial({
   return (
     <section
       className={cn(
-        "rounded-3xl border border-slate-200 bg-white p-6 shadow-md",
+        "rounded-3xl border border-blue-200 bg-white p-6 shadow-md",
         "transition hover:shadow-lg",
         className
       )}
@@ -112,7 +112,7 @@ export default function ProjectTestimonial({
       ) : null}
 
       {resolvedOwnerReply ? (
-        <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
           <div className="flex items-start gap-3">
             <Image
               src={OWNER_RESPONSE_IMAGE}

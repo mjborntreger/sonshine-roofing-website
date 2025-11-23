@@ -171,7 +171,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
                     <article className="prose prose-slate max-w-none print:prose">
                         <div dangerouslySetInnerHTML={{ __html: offer.contentHtml }} />
                         {offer.featuredImage?.url && (
-                            <figure className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
+                            <figure className="overflow-hidden rounded-3xl border border-blue-200 bg-white">
                                 <Image
                                     src={offer.featuredImage.url}
                                     alt={offer.featuredImage.altText || offer.title}

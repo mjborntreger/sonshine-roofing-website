@@ -337,7 +337,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
               />
               <BestOfTheBest title={botbTitle} highlightText={botbHighlight} />
               <LatestPostsFilter posts={posts} initial={4} />
-              <section className="mt-12 mx-2 p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-slate-200">
+              <section className="mt-12 mx-2 p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-blue-200">
                 <h2 className="text-xl md:text-3xl">{`A Special Message to ${location.locationName} Homeowners:`}</h2>
                 <p className="italic text-slate-400">{`Updated: ${modifiedDisplay}`}</p>
 

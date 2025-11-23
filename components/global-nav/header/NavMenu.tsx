@@ -214,7 +214,7 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
                 {/* ANIM: Panel fade+lift speed — edit PANEL_DURATION_MS (and/or Tailwind 'duration-150') */}
                 <div
                   className={cn(
-                    "absolute left-0 top-full mt-2 min-w-[240px] rounded-3xl border bg-white border-slate-300 shadow-lg origin-top",
+                    "absolute left-0 top-full mt-2 min-w-[240px] rounded-3xl border bg-white border-blue-200 shadow-lg origin-top",
                     "transition-all duration-150 ease-out",
                     enteredPanel ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
                   )}
@@ -486,7 +486,7 @@ function MobileMenu() {
             role="menu"
             aria-label="Main"
             className="fixed left-2 right-2 z-[61]
-                       rounded-3xl border bg-white shadow-xl p-2
+                       rounded-3xl border border-blue-200 bg-white shadow-xl p-2
                        top-[calc(var(--header-h,56px)+8px)]
                        max-h-[calc(100vh-var(--header-h,56px)-24px)] overflow-auto"
           >
@@ -507,7 +507,7 @@ function MobileMenu() {
                   <LabelWithIcon label="Home" />
                 </SmartLink>
               </li>
-              <hr className="my-1 border-slate-200" />
+              <hr className="my-1 border-blue-100" />
               {NAV.map((item, i) => {
                 const k = `lv1-${i}`;
                 const hasChildren = !!item.children?.length;

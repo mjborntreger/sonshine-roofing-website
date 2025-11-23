@@ -296,7 +296,7 @@ export type VideoItem = {
   };
 };
 
-export type VideoBucketKey = "roofing-project" | "commercials" | "accolades" | "explainers" | "other";
+export type VideoBucketKey = "roofing-project" | "commercials" | "explainers" | "in-the-field" | "other";
 
 export type Person = {
   slug: string;
@@ -1941,7 +1941,7 @@ function bucketOf(v: VideoItem): VideoBucketKey {
   if (v.source === "project") return "roofing-project";
   const slugs = (v.categories || []).map(c => (c.slug || c.name || "").toLowerCase());
   if (slugs.some(s => ["commercial", "commercials", "tv", "ad", "ads"].includes(s))) return "commercials";
-  if (slugs.some(s => ["accolade", "accolades", "awards", "press"].includes(s))) return "accolades";
+  if (slugs.some(s => ["in-the-field"].includes(s))) return "in-the-field";
   if (slugs.some(s => ["explainer", "explainers", "how-to", "tips", "education", "educational"].includes(s))) return "explainers";
   return "other";
 }
@@ -2057,7 +2057,7 @@ export async function listVideoItemsPaged({
     commercials: "Commercials",
     explainers: "Explainers",
     "roofing-project": "Roofing Projects",
-    accolades: "Accolades",
+    "in-the-field": "In the Field",
     other: "Other",
   };
   const isVideoBucketKey = (value: string): value is VideoBucketKey =>

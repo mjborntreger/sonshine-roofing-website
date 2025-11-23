@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ListFilter, RotateCcw, Search } from "lucide-react";
+import { RotateCcw, Search } from "lucide-react";
 
 import FilterTabs from "@/components/dynamic-content/FilterTabs";
 import GridLoadingState from "@/components/layout/GridLoadingState";
@@ -454,7 +454,7 @@ export default function ResourceArchiveClient<Item>({
 
       <div
         ref={filtersRef}
-        className="rounded-3xl border border-slate-300 bg-white/80 p-4 shadow-md md:p-6"
+        className="rounded-3xl border border-blue-300 bg-white p-4 shadow-md md:p-6"
         role="search"
       >
         <div className="flex flex-col gap-4">
@@ -467,18 +467,18 @@ export default function ResourceArchiveClient<Item>({
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
               placeholder={searchPlaceholder}
-              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
+              className="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
             />
           </div>
 
           {groups.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3">
-              <h2 className="text-sm font-semibold text-slate-700"><ListFilter className="h-4 w-4 mr-2 inline" />Filters</h2>
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-blue-200 pt-3">
+              <h2 className="text-sm font-semibold text-slate-600">Filters</h2>
               <button
                 type="button"
                 onClick={clearFilters}
                 disabled={!hasActiveFilters}
-                className="inline-flex items-center gap-1 rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-slate-100"
+                className="inline-flex items-center gap-1 rounded-full border border-blue-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-slate-100"
               >
                 Reset filters
                 <RotateCcw className="h-4 w-4 inline ml-2" />
@@ -514,8 +514,8 @@ export default function ResourceArchiveClient<Item>({
                             active
                               ? "border-[--brand-blue] bg-[--brand-blue] text-white"
                               : disabled
-                                ? "border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed"
-                                : "border-slate-200 bg-white text-slate-700 hover:border-[--brand-blue]"
+                                ? "border-blue-200 bg-slate-100 text-slate-400 cursor-not-allowed"
+                                : "border-blue-200 bg-cyan-50 text-slate-700 hover:border-[--brand-blue]"
                           }`}
                           aria-pressed={active}
                         >
@@ -561,7 +561,7 @@ export default function ResourceArchiveClient<Item>({
       ) : null}
 
       {filteredCount === 0 ? (
-        <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6 text-slate-700">
+        <div className="mt-8 rounded-xl border border-amber-400 bg-white p-6 text-slate-700">
           <p className="mb-2 font-medium">{emptyState.title}</p>
           <p className="text-sm">
             {normalizedSearch.length >= minSearchLength && emptyState.description.withSearch
@@ -572,7 +572,7 @@ export default function ResourceArchiveClient<Item>({
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-4 rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-50"
+              className="mt-4 rounded-md border border-amber-300 px-3 py-1.5 text-sm hover:bg-slate-50"
             >
               {emptyState.actionLabel}
             </button>

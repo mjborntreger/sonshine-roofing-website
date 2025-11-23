@@ -21,7 +21,7 @@ export default function PostContentWithCta({ html, injectAfter = 3 }: Props) {
 
   function Cta() {
     return (
-      <div className="my-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm relative overflow-hidden">
+      <div className="my-8 rounded-2xl border border-blue-200 bg-white p-6 shadow-sm relative overflow-hidden">
         <span className="pointer-events-none absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
         <h3 className="m-0 text-xl font-semibold text-slate-900">Book a Free Estimate</h3>
         <p className="mt-2 text-slate-600">

@@ -16,7 +16,7 @@ type Props = {
 };
 
 const pillClass =
-  "inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700 sm:px-3 sm:py-1 sm:text-sm";
+  "inline-flex min-w-0 max-w-full items-center rounded-full font-semibold tracking-tight bg-[--brand-orange] px-2.5 py-1 text-[0.75rem] sm:text-xs text-white sm:px-3 sm:py-1 sm:text-sm";
 const pillLabelClass = "block max-w-full truncate";
 
 export default function ProjectArchiveCard({ project, style, className }: Props) {
@@ -39,14 +39,13 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
       key: `rc-${project.slug}-${t.slug}`,
       label: t.name,
     })),
-    { key: `static-${project.slug}`, label: "Roof Replacement" },
   ];
 
   return (
     <div className={className} style={style}>
       <SmartLink
         href={href}
-        className="block group rounded-3xl focus-visible:outline-none"
+        className="bg-amber-50/50 block group rounded-3xl focus-visible:outline-none"
         data-icon-affordance="right"
       >
         <Card className="overflow-hidden transition proj-card hover:shadow-lg">
@@ -56,7 +55,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
 
           {project.heroImage?.url ? (
             <div
-              className="relative w-full overflow-hidden bg-slate-100"
+              className="relative w-full overflow-hidden bg-blue-200"
               style={{ aspectRatio: "16 / 10" }}
             >
               <Image
@@ -64,7 +63,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
                 src={project.heroImage.url}
                 alt={project.heroImage.altText ?? project.title}
                 sizes="(min-width: 1024px) 50vw, 100vw"
-                className="object-cover"
+                className="object-cover transition-transform duration-300 hover:scale-[1.06]"
               />
             </div>
           ) : (
@@ -77,6 +76,8 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
                 {summary}
               </p>
             )}
+
+            <ProjectReviewSnippet review={project.reviewSnippet} author={project.reviewAuthorName} />
 
             {pillItems.length > 0 && (
               <div className="relative mt-4 -mx-5 sm:mx-0">
@@ -91,14 +92,12 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
                 <div className="absolute right-0 w-6 pointer-events-none inset-y-1 bg-gradient-to-l from-white to-transparent sm:hidden" />
               </div>
             )}
-
-            <ProjectReviewSnippet review={project.reviewSnippet} author={project.reviewAuthorName} />
           </CardContent>
 
-          <CardFooter className="flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6">
-            <span className="inline-flex items-center gap-2 text-sm font-semibold tracking-tight">
+          <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
+            <span className="items-center gap-2 text-md font-semibold tracking-wide">
               View project
-              <ArrowRight className="w-4 h-4 icon-affordance" />
+              <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
             </span>
           </CardFooter>
         </Card>

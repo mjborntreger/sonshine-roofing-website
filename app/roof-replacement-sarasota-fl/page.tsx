@@ -321,7 +321,7 @@ export default async function Page() {
               proseBody={false}
             >
               {/* Stepper timeline (#4) */}
-              <ol className="my-4 not-prose border-slate-200 pl-6 space-y-4">
+              <ol className="my-4 not-prose border-blue-100 pl-6 space-y-4">
                 <li className={liStyles}>
                   <span className={stepperStyles} />
                   <p className="m-0"><strong>Permits &amp; Scheduling</strong> — We file permits and set your installation date.</p>
@@ -362,7 +362,7 @@ export default async function Page() {
             posts={pool}
             category="roof-replacement-services"
             excludeSlug={''}
-            heading="Learn more about our roof replacement services"
+            heading="Learn More About Roof Replacement Services"
           />
         </div>
 

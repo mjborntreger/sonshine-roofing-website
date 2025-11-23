@@ -24,7 +24,7 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
 
   return (
     <div className="mt-6">
-      <div className="rounded-2xl border border-slate-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
+      <div className="rounded-2xl border border-blue-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
         <div className="inline-flex w-full items-start">
           <label htmlFor="glossary-search" className="sr-only">
             Search glossary terms
@@ -35,7 +35,7 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search terms..."
-            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
+            className="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
             aria-label="Search glossary terms"
           />
         </div>
@@ -50,7 +50,7 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
                 <li key={t.slug}>
                   <SmartLink
                     href={`/roofing-glossary/${t.slug}`}
-                    className="block rounded-md border border-slate-400 bg-white px-3 py-2 hover:bg-slate-50"
+                    className="block rounded-md border border-blue-400 bg-white px-3 py-2 hover:bg-slate-50"
                   >
                     {t.title}
                   </SmartLink>
@@ -58,7 +58,7 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
               ))}
             </ul>
           ) : (
-            <div className="rounded-md border border-slate-400 bg-white p-4">
+            <div className="rounded-md border border-blue-400 bg-white p-4">
               <p className="text-sm text-slate-700">
                 No exact matches for <span className="font-semibold">“{q}”</span>.
               </p>
@@ -71,7 +71,7 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
                       <li key={s.slug}>
                         <SmartLink
                           href={`/roofing-glossary/${s.slug}`}
-                          className="inline-flex min-w-0 max-w-full items-center rounded-full border border-slate-400 bg-white px-3 py-1 text-sm hover:bg-slate-50"
+                          className="inline-flex min-w-0 max-w-full items-center rounded-full border border-blue-400 bg-white px-3 py-1 text-sm hover:bg-slate-50"
                         >
                           <span className="block max-w-full truncate">{s.title}</span>
                         </SmartLink>
