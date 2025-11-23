@@ -1,6 +1,6 @@
 "use client";
 
-import { Phone } from "lucide-react";
+import { Phone, ShieldCheck } from "lucide-react";
 import ShinyText from "./ShinyText";
 
 type HeroProps = {
@@ -38,15 +38,16 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
             {title}
           </h1>
 
-          <a className="phone-affordance hover:bg-neutral-800/50 transition-colors font-semibold block py-4 px-6 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 text-2xl md:text-4xl tracking-wider text-[--brand-cyan] mb-[12rem]" 
+          <a className="phone-affordance hover:bg-neutral-800/50 transition-colors font-semibold block py-4 px-6 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 text-2xl md:text-4xl tracking-wider text-white mb-[12rem]" 
             href="tel:+19418664320"
           >
-            <Phone className="phone-affordance-icon h-5 w-5 md:h-8 md:w-8 inline mr-2" />
+            <Phone className="phone-affordance-icon text-[--brand-cyan] h-5 w-5 md:h-8 md:w-8 inline mr-2" />
             (941) 866-4320
   
             <span 
-              className="mt-2 block font-extralight text-xs tracking-wider text-slate-300"
+              className="mt-2 block font-extralight text-xs tracking-wider text-green-400"
               >
+                <ShieldCheck className="text-[--brand-cyan] h-3 w-3 inline mr-1" />
                 INSURED | LICENSE #CCC1331483
             
             </span>
