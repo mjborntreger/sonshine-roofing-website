@@ -874,7 +874,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   onClick={() => handleQuizAnswer(stepIndex, option.value)}
                   className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${selected
                     ? 'border-[--brand-blue] bg-[--brand-blue]/10 text-[--brand-blue] focus-visible:ring-[--brand-blue]/40'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-[--brand-blue]/40 hover:bg-[--brand-blue]/5 focus-visible:ring-[--brand-blue]/40'
+                    : 'border-blue-100 bg-white text-slate-700 hover:border-[--brand-blue]/40 hover:bg-[--brand-blue]/5 focus-visible:ring-[--brand-blue]/40'
                     }`}
                   aria-pressed={selected}
                 >

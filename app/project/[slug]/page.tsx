@@ -17,7 +17,8 @@ import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { creativeWorkSchema, projectReviewSchema, videoObjectSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
-import { ArrowLeft, List, Rows3 } from "lucide-react";
+import { List, Rows3 } from "lucide-react";
+import BackToProjectsButton from "@/components/dynamic-content/project/BackToProjectsButton";
 
 type OgImageRecord = {
   url?: unknown;
@@ -90,7 +91,7 @@ function getYouTubeId(url?: string | null): string | null {
 }
 
 const Badge = ({ children }: { children: React.ReactNode }) => (
-  <span className="inline-block px-2 py-1 text-xs rounded-full bg-slate-100 text-slate-700">
+  <span className="inline-block px-2 py-1 text-xs rounded-full bg-[--brand-orange] text-white">
     {children}
   </span>
 );
@@ -245,14 +246,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
       {/* Title + gradient stripe */}
       <div>
-        <SmartLink href="/project" title="Back to Project Gallery" aria-label="Back to Project Gallery" data-icon-affordance="left">
-          <nav
-            className="hover:underline text-slate-500"
-          >
-            <ArrowLeft className="icon-affordance h-4 inline mr-2 w-4" />
-            Back to Project Gallery
-          </nav>
-        </SmartLink>
+        <BackToProjectsButton />
         <h1 className="mb-8 mt-4 text-3xl md:text-5xl">{project.title}</h1>
       </div>
       <ShareWhatYouThink urlOverride={shareUrl} />
@@ -302,10 +296,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
           {/* Customer Testimonial */}
           {project.customerTestimonial ? (
-            <ProjectTestimonial testimonial={project.customerTestimonial} className="mt-8" />
+            <ProjectTestimonial testimonial={project.customerTestimonial} className="my-8" />
           ) : null}
-
-          <div className="bg-slate-200 h-[1.5px] my-16 w-full" />
 
           {/* Gallery */}
           <ProjectGallery images={project.projectImages} projectTitle={project.title} />

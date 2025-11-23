@@ -230,7 +230,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
   if (!hasImages) return null;
 
   return (
-    <section aria-label="Project Photos" className="space-y-4">
+    <section aria-label="Project Photos" className="space-y-4 mt-16">
       <h2>Project Photos</h2>
       <p className="flex items-center gap-2 text-sm text-slate-500" aria-live="off">
         <span>Tap to expand</span>
