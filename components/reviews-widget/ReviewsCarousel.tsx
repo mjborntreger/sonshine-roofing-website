@@ -14,7 +14,7 @@ const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "
 const GBP_URL =
   RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
 
-const DEFAULT_CONTAINER_CLASS = "pt-8 max-w-[1600px] mx-auto overflow-hidden";
+const DEFAULT_CONTAINER_CLASS = "pt-4 max-w-[1600px] mx-auto overflow-hidden";
 
 type ReviewsCarouselProps = {
   reviews?: Review[];
@@ -169,7 +169,7 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
   return (
     <div className={className}>
       <div className="text-center not-prose">
-        <div className="mb-4 flex flex-wrap gap-y-2 justify-center mx-auto max-w-6xl">
+        <div className="mb-2 flex flex-wrap gap-y-4 justify-center mx-auto max-w-6xl">
           {showDisclaimer ? (
             <p className="mx-2 text-sm text-slate-500">
               All reviews shown below are automatically pulled from Google using the official API.

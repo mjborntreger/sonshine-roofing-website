@@ -127,7 +127,7 @@ export default async function Page() {
 
               <Accordion
                 icon={<UserRoundSearch className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />}
-                summary={<h2 className="text-lg">Who we are</h2>}
+                summary={<h2 className="text-2xl">Who we are</h2>}
                 className="mb-4"
                 radius="2xl"
                 proseBody={false}
@@ -149,10 +149,11 @@ export default async function Page() {
 
               <Accordion
                 icon={<CloudRainWind className="h-5 w-5" aria-hidden="true" />}
-                summary={<h2 className="text-lg">Built for Florida&apos;s Weather</h2>}
+                summary={<h2 className="text-2xl">Local & Trusted</h2>}
                 className="mb-4"
                 radius="2xl"
                 proseBody={false}
+                defaultOpen
               >
                 <p className="prose">
                   Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.

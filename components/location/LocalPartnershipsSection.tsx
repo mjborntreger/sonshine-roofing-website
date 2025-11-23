@@ -44,7 +44,7 @@ export default function LocalPartnershipsSection({
                         src={feature.featuredImage.url}
                         alt={feature.featuredImage.altText || `${feature.title ?? "Sponsor"} logo`}
                         fill
-                        className="object-cover border rounded-full border-slate-200"
+                        className="object-cover border rounded-full border-blue-200"
                         sizes="48px"
                         loading="lazy"
                       />

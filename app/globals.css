@@ -368,7 +368,6 @@
            transition duration-300 ease-in-out
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0
            disabled:pointer-events-none disabled:opacity-50;
-    box-shadow: var(--elev-1);
   }
 
   /* Variants */

@@ -15,8 +15,8 @@ type Props = {
 };
 
 const baseWrapperClass = "px-4 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden";
-const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
-const SECTION_SUBTITLE = "mt-2 mb-8 text-sm text-slate-500";
+const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
+const SECTION_SUBTITLE = "mt-2 mb-4 text-sm text-slate-500";
 const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
 
 export default function LatestProjectsByLocation({
@@ -51,19 +51,7 @@ export default function LatestProjectsByLocation({
         <p className={SECTION_SUBTITLE}>{resolvedDescription}</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 mt-8 md:grid-cols-2">
-        {projects.map((project, index) => (
-          <div
-            key={project.slug}
-            className="motion-safe:animate-lp-fade-in"
-            style={{ animationDelay: `${index * 60}ms` }}
-          >
-            <ProjectArchiveCard project={project} />
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-12 text-center">
+      <div className="text-right">
         <SmartLink
           href={ctaHref}
           className={lessFatCta}
@@ -74,6 +62,18 @@ export default function LatestProjectsByLocation({
           {ctaLabel}
           <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
         </SmartLink>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2 lg:grid-cols-4">
+        {projects.map((project, index) => (
+          <div
+            key={project.slug}
+            className="motion-safe:animate-lp-fade-in"
+            style={{ animationDelay: `${index * 60}ms` }}
+          >
+            <ProjectArchiveCard project={project} />
+          </div>
+        ))}
       </div>
     </section>
   );

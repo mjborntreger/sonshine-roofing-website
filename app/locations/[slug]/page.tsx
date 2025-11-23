@@ -21,8 +21,7 @@ import LatestProjectsByLocation from "@/components/dynamic-content/project/Lates
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import Section from "@/components/layout/Section";
 import LocalPartnershipsSection from "@/components/location/LocalPartnershipsSection";
-import ServiceAreaMap from "@/components/location/ServiceAreaMap";
-import NeighborhoodsServedSection from "@/components/location/NeighborhoodsServedSection";
+import ServiceAreaSection from "@/components/location/ServiceAreaSection";
 import type { Metadata } from "next";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
@@ -54,9 +53,9 @@ export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
 }
 
 // ===== STYLE CONSTANTS ===== //
-const leadFormLayout = "mx-auto w-full bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent";
+const leadFormLayout = "mx-auto w-full";
 const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
-const narrowLayout = "mx-auto w-full max-w-[1280px]";
+const narrowLayout = "bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent mx-auto w-full";
 const FALLBACK_REVIEW_INTERVAL_SECONDS = 60;
 const MAX_LOCATION_REVIEWS = 10;
 const SARASOTA_SLUG = "sarasota";
@@ -299,32 +298,25 @@ export default async function LocationPage({ params }: { params: Promise<Params>
       <Hero title={`The Best Roofing Company in ${location.locationName} for Over 38 Years`} />
       <div className={reviewsLayout}>
         <HeroTrustBar heading={heroTrustHeading} />
-        {hasDisplayReviews ? (
-          <ReviewsCarousel
-            reviews={displayReviews}
-            showBusinessProfileLink={true}
-            showDisclaimer={true}
-            limit={carouselLimit}
-            fallbackToRemote={true}
-          />
-        ) : (
-          <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
-        )}
-      </div>
-      <div className={leadFormLayout}>
-        <div className="max-w-[1280px] mx-auto py-16 gap-8">
-          <LeadFormSection />
+        <div className="bg-blue-200/50 border border-t-blue-200 border-b-blue-200">
+          {hasDisplayReviews ? (
+            <ReviewsCarousel
+              reviews={displayReviews}
+              showBusinessProfileLink={true}
+              showDisclaimer={true}
+              limit={carouselLimit}
+              fallbackToRemote={true}
+            />
+          ) : (
+            <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
+          )}
         </div>
       </div>
 
       <main className={narrowLayout}>
-        <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
+        <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] max-w-[1280px] mx-auto items-start">
           <div className="min-w-0">
             <div className="mx-2">
-              <LatestProjectsByLocation
-                projects={locationProjects}
-                locationName={location.locationName}
-              />
               <WhyHomeownersChooseUs
                 title={`Family-owned ${location.locationName} Roofing Company`}
                 highlightText={location.locationName ? `${location.locationName} Roofing Company` : undefined}
@@ -336,9 +328,8 @@ export default async function LocationPage({ params }: { params: Promise<Params>
                 emptyMessage="No sponsored partners yet."
               />
               <BestOfTheBest title={botbTitle} highlightText={botbHighlight} />
-              <LatestPostsFilter posts={posts} initial={4} />
               <section className="mt-12 mx-2 p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-blue-200">
-                <h2 className="text-xl md:text-3xl">{`A Special Message to ${location.locationName} Homeowners:`}</h2>
+                <h2 className="text-xl text-slate-700 md:text-3xl">{`A Special Message to ${location.locationName} Homeowners:`}</h2>
                 <p className="italic text-slate-400">{`Updated: ${modifiedDisplay}`}</p>
 
                 {location.contentHtml ? (
@@ -347,12 +338,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
                   <p className="mt-4">No WordPress editor content provided for this location.</p>
                 )}
               </section>
-              <ServiceAreaMap
-                mapImage={location.mapImage}
-                landmarks={location.nearbyLandmarks}
-                locationName={location.locationName}
-                fallbackLocationLabel={location.title || slug}
-              />
             </div>
           </div>
 
@@ -364,10 +349,26 @@ export default async function LocationPage({ params }: { params: Promise<Params>
 
         </div>
 
-        <NeighborhoodsServedSection 
+        <div className={leadFormLayout}>
+          <div className="max-w-[1280px] mx-auto pt-16 gap-8">
+            <LatestProjectsByLocation
+              projects={locationProjects}
+              locationName={location.locationName}
+            />
+            <LeadFormSection />
+            <LatestPostsFilter posts={posts} initial={4} />
+          </div>
+        </div>
+
+        <ServiceAreaSection
+          mapImage={location.mapImage}
           neighborhoods={location.neighborhoodsServed}
-          eyebrow={`During our 38-year tenure in ${location.locationName}, we've always kept prices competitive without sacrificing on a quality roofing experience. We adapt to your neighborhood, not the other way around.`} 
+          landmarks={location.nearbyLandmarks}
+          locationName={location.locationName}
+          fallbackLocationLabel={location.title || slug}
           heading={`Affordable Roofing Services in ${location.locationName}`}
+          eyebrow={`During our 38-year tenure in ${location.locationName}, we've always kept prices competitive without sacrificing on a quality roofing experience. We adapt to your neighborhood, not the other way around.`}
+          className="py-12"
         />
         <Section>
           <FaqInlineList

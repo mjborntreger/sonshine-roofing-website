@@ -95,10 +95,12 @@ export default async function Page({ params }: { params: Promise<Params> }) {
       <Hero />
       <div className={reviewsLayout}>
         <HeroTrustBar />
-        <ReviewsCarousel />
+        <div className="bg-blue-200/50 border border-t-blue-200 border-b-blue-200">
+          <ReviewsCarousel />
+        </div>
       </div>
       <div className={narrowLayout}>
-        <div className="py-24 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] max-w-[1280px] mx-auto items-start">
+        <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] max-w-[1280px] mx-auto items-start">
           <div className="min-w-0">
             <div className="mx-2">
               <WhyHomeownersChooseUs highlightText="Family-owned" />
@@ -121,10 +123,6 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         <div className="max-w-[1280px] pt-16 mx-auto">
           <LatestProjectsFilter projects={projects} initial={4} />
           <LeadFormSection />
-        </div>
-      </div>
-      <div className={leadFormLayout}>
-        <div className="max-w-[1280px] pt-16 mx-auto">
           <LatestPostsFilters posts={posts} initial={4} />
         </div>
       </div>

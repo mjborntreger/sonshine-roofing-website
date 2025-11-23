@@ -26,7 +26,7 @@ type HeroTrustBarProps = {
 };
 
 // REVIEW LINK STYLES
-const REVIEW_SMARTLINK_CONTAINER_STYLES = "h-full group inline-flex w-full max-w-md mx-auto items-start gap-4 rounded-3xl border border-blue-100 bg-white/80 px-4 py-4 text-left shadow-lg transition hover:border-[--brand-cyan] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--brand-cyan]";
+const REVIEW_SMARTLINK_CONTAINER_STYLES = "h-full w-full group inline-flex w-full mx-auto items-start gap-4 rounded-3xl border border-blue-100 bg-white/80 px-4 py-4 text-left shadow-lg transition hover:border-[--brand-cyan] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--brand-cyan]";
 const REVIEW_SMARTLINK_ARROWUPRIGHT_STYLES = "icon-affordance text-[--brand-blue] absolute h-4 w-4 top-0 right-0";
 const REVIEW_LINK_TITLE_BAR = "mb-2 flex flex-col px-2 justify-start";
 const LOGO_STYLES = "h-8 w-8 rounded-full border border-blue-100 bg-white object-contain p-1 shadow-sm";
@@ -81,7 +81,7 @@ const REVIEW_LINKS = [
     accentClass: TITLE_ACCENT_GOOGLE,
     accentHex: "#2563eb",
     quote:
-      "\u201CIt’s one thing for me to give a good review as a customer which I am. But I talked to a roofer in our neighborhood and he gave Sonshine Roofing a compliment. He saw the job done on the under layment and said it was very well done. The layment was tucked under the eves. I figured that was a better testament to job well done. Because it was from someone in the industry.\u201D -Adam B.",
+      "\u201CIt’s one thing for me to give a good review as a customer which I am. But I talked to a roofer in our neighborhood and he gave SonShine Roofing a compliment. He saw the job done on the under layment and said it was very well done. The layment was tucked under the eves. I figured that was a better testament to job well done. Because it was from someone in the industry.\u201D -Adam B.",
   },
   {
     id: "yelp",

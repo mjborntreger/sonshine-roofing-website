@@ -12,7 +12,7 @@ import {
 } from "@/components/dynamic-content/latest-filters/latest-tab-config";
 import { renderHighlight } from "@/components/utils/renderHighlight";
 
-const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
+const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
 const pStyles = "my-4 mb-6 text-center text-slate-500 justify-center text-sm md:text-md";
 
 type TabPayload = {
@@ -93,7 +93,7 @@ export default function LatestPostsFilter({
   const renderedHeading = renderHighlight(heading, "Roofing Insights");
 
   return (
-    <div className="px-4 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="px-4 py-16 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
       {showHeader ? (
         <div className="text-center">
           <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
@@ -102,6 +102,21 @@ export default function LatestPostsFilter({
         </div>
       ) : (
         renderFilterTabs()
+      )}
+
+      {showHeader && (
+        <div className="mt-6 text-right">
+          <SmartLink
+            href={ctaHref}
+            className={lessFatCta}
+            title={ctaLabel}
+            data-icon-affordance="right"
+            proseGuard
+          >
+            {ctaLabel}
+            <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
+          </SmartLink>
+        </div>
       )}
 
       <div key={selected} className="grid gap-6 mt-8 md:grid-cols-4">
@@ -121,20 +136,6 @@ export default function LatestPostsFilter({
             })
           : emptyState}
       </div>
-
-      {showHeader && (
-        <div className="mt-12 text-center">
-          <SmartLink
-            href={ctaHref}
-            className={lessFatCta}
-            title={ctaLabel}
-            data-icon-affordance="right"
-          >
-            {ctaLabel}
-            <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
-          </SmartLink>
-        </div>
-      )}
 
       <style jsx global>{`
         @keyframes lp-fade-in {

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Section from "@/components/layout/Section";
 import SimpleLeadForm from "@/components/lead-capture/lead-form/SimpleLeadForm";
 import SmartLink from "@/components/utils/SmartLink";
-import { Phone, MapPin, ShieldCheck, BadgeCheck, Banknote, Star } from "lucide-react";
+import { Phone, ShieldCheck, BadgeCheck, Banknote, Star, ArrowUpRight } from "lucide-react";
 import Image from 'next/image';
 import SocialMediaProfiles from "@/components/global-nav/static-pages/SocialMediaProfiles";
 import type { Metadata } from 'next';
@@ -40,8 +40,8 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const contactInfoPillStyles = "not-prose inline-flex w-full sm:w-auto max-w-full items-center gap-3 rounded-full border border-blue-200 bg-white px-4 py-2 shadow-sm text-left text-slate-700 transition hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 whitespace-normal break-words overflow-hidden";
-const contactInfoIconStyles = "h-5 w-5 shrink-0 text-[--brand-blue]";
+const contactInfoPillBase = "btn btn-md mt-4 shadow-md btn-brand-blue not-prose px-3 py-2 justify-start px-4 phone-affordance w-fit";
+const contactInfoIconStyles = "h-5 w-5 inline mr-2 shrink-0 text-blue-50 h-6 w-6 phone-affordance-icon";
 const h1Styles = "text-3xl md:text-5xl text-slate-900";
 const h2Styles = "text-xl md:text-2xl text-slate-800";
 const pStyles = "text-md py-2 text-slate-700";
@@ -118,43 +118,39 @@ export default async function Page() {
                     You’ll likely talk to <span className="inline text-[--brand-blue]">Tara</span>
                   </p>
                   <p className="text-md text-slate-600">She’s friendly, fast, and hates leaks.</p>
+                  <SmartLink
+                    href="tel:+19418664320"
+                    className={contactInfoPillBase}
+                    title="Call SonShine Roofing"
+                    proseGuard
+                  >
+                    <Phone className={contactInfoIconStyles} aria-hidden="true" />
+                    <p className="font-semibold">(941) 866-4320</p>
+                  </SmartLink>
                 </div>
               </div>
-              {/* Phone */}
               <div className="my-8 flex flex-wrap gap-3">
-                <SmartLink
-                  href="tel:+19418664320"
-                  className={`${contactInfoPillStyles} w-full phone-affordance`}
-                  title="Call SonShine Roofing"
-                  proseGuard
-                >
-                  <Phone className={`${contactInfoIconStyles} phone-affordance-icon`} aria-hidden="true" />
-                  <span className="font-semibold min-w-0 break-words">(941) 866-4320</span>
-                </SmartLink>
-
                 {/* Address */}
                 <SmartLink
                   href="https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${contactInfoPillStyles} w-full`}
                   title="Open in Google Maps"
                   proseGuard
+                  className="hover:text-slate-600 transition-colors"
                 >
-                  <MapPin className={contactInfoIconStyles} aria-hidden="true" />
-                  <span className="font-semibold min-w-0 break-words">2555 Porter Lake Dr STE 109, Sarasota, Florida 34240</span>
+                  <p
+                    className="font-semibold"
+                  >
+                    2555 Porter Lake Dr STE 109, Sarasota, Florida 34240
+                    <ArrowUpRight className="h-4 w-4 inline ml-1" />
+                  </p>
                 </SmartLink>
               </div>
 
               <h2 className={h2Styles}>Whatever you need, we&rsquo;ve got you covered.</h2>
-              <p className={pStyles}>Whether you need to schedule an appointment with one our
-                expert Roofing Specialists to come to your home, or if you
-                just have a few questions, we&rsquo;re here to help! Give us a call
-                or complete the form below to contact our office.
-              </p>
+              <p className={pStyles}>Whether you want to schedule an appointment with one our expert Roofing Specialists or if you just have a few questions, we&rsquo;re here to help! Give us a call or complete the form below to contact our office.</p>
             </div>
-
-            <FinancingBand />
 
             <div className="mt-8">
               <Suspense
@@ -171,6 +167,7 @@ export default async function Page() {
               >
                 <SimpleLeadForm />
               </Suspense>
+              <FinancingBand />
             </div>
           </div>
 

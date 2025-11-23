@@ -56,7 +56,7 @@ export default function Footer() {
         href="#page-top"
         className="text-center hover:text-slate-600"
         data-icon-affordance="up"
-        aria-label="return to top of page"
+        aria-label="Return to top of page"
       >
         Return to Top
         <ArrowUp className="inline w-4 h-4 ml-2 icon-affordance" />

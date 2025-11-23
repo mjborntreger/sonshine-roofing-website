@@ -853,7 +853,7 @@ export default function LeadFormWizard({
                     <ProjectTestimonial
                       customerName="Pasquale A."
                       formattedDate="November 4th, 2025"
-                      customerReview="Sonshine roofing did an excellent job of replacing our entire roof. Their staff was professional in every aspect. We received multiple updates on the progress, including house calls. Whenever we had a question and called the office, the staff was always polite, and we were immediately put through to the production manager. This company was very easy to work with and came in with a very fair price for the job. We would highly recommend them."
+                      customerReview="SonShine roofing did an excellent job of replacing our entire roof. Their staff was professional in every aspect. We received multiple updates on the progress, including house calls. Whenever we had a question and called the office, the staff was always polite, and we were immediately put through to the production manager. This company was very easy to work with and came in with a very fair price for the job. We would highly recommend them."
                       reviewUrl="https://www.google.com/maps/contrib/103054944051170712920/place/ChIJIyB9mBBHw4gRWOl1sU9ZGFM/@27.3105727,-83.1061407,311254m/data=!3m1!1e3!4m6!1m5!8m4!1e1!2s103054944051170712920!3m1!1e1?hl=en&entry=ttu&g_ep=EgoyMDI1MTEwNC4xIKXMDSoASAFQAw%3D%3D"
                       ownerReply="Hi Pat! Thanks for trusting us to perform a tile roof replacement on your Sarasota home. We pride ourselves on great communication, so we're glad to see that it shows."
                       reviewPlatform="google"
@@ -1119,7 +1119,7 @@ export default function LeadFormWizard({
                     <span>
                       <div className="text-xs text-slate-500">
                         By submitting this form, you agree to receive transactional and promotional
-                        communications from Sonshine Roofing. Message frequency may vary. Message and
+                        communications from SonShine Roofing. Message frequency may vary. Message and
                         data rates may apply. Reply STOP to opt out at any time.
                       </div>
                     </span>

@@ -104,7 +104,7 @@ export default async function Page() {
           <p>
             While it may be tempting to ignore your roof’s maintenance needs, doing so can shorten 
             its lifespan and lead to major expenses down the road. Roofing materials are built to 
-            last, but only when they’re properly maintained. That’s why Sonshine Roofing strongly 
+            last, but only when they’re properly maintained. That’s why SonShine Roofing strongly 
             recommends following a roof maintenance schedule and sticking with it year after year.
             <br></br><br></br>
             Routine roof inspections are critical to catching these hidden problems early—before 

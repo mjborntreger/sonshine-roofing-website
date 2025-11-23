@@ -5,7 +5,7 @@ import { ArrowDown, ArrowRight, ArrowUp, HelpCircle } from "lucide-react";
 import { Accordion } from "@/components/ui/Accordion";
 import SmartLink from "../../utils/SmartLink";
 
-const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
+const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
 
 type Item = {
   slug: string;
@@ -119,12 +119,13 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
           ))}
         </div>
       </div>
-      <div className="mt-12 text-center md:text-right">
+      <div className="mt-12 text-right">
         <SmartLink
           href={seeMoreHref}
           className={lessFatCta}
           title="See All FAQs"
           data-icon-affordance="right"
+          proseGuard
         >
           See All FAQs
           <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />

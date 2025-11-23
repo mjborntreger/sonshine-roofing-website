@@ -324,7 +324,7 @@ export default function SimpleLeadForm() {
         <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
         <div className="mx-auto w-full max-w-3xl rounded-3xl border border-blue-100 bg-white shadow-md">
           <div className="border-b rounded-t-3xl border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
-            <h2 className="flex items-center text-xl md:text-2xl font-bold gap-2">
+            <h2 className="flex items-center text-2xl md:text-3xl font-bold gap-2">
               <SquareMenu className="h-5 w-5 md:h-6 md:w-6 text-[--brand-blue]" aria-hidden="true" />
               <span>{renderHighlight('Contact Our Office', 'Our Office')}</span>
             </h2>
@@ -605,7 +605,7 @@ export default function SimpleLeadForm() {
                     className="mt-1 h-4 w-4 rounded border-slate-300 text-[--brand-blue] focus:ring-[--brand-blue]"
                   />
                   <span>
-                    By submitting this form, you agree to receive transactional and promotional communications from Sonshine Roofing. Message
+                    By submitting this form, you agree to receive transactional and promotional communications from SonShine Roofing. Message
                     frequency may vary. Message and data rates may apply. Reply STOP to opt out at any time.
                   </span>
                 </label>

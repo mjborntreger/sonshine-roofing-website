@@ -244,9 +244,9 @@ export default function ReviewsSlider({
                 type="button"
                 onClick={() => openModal(i)}
                 aria-label={`Open full review by ${r.author_name}`}
-                className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_80%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none bg-transparent p-0 m-0 text-left cursor-pointer"
+                className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_80%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none py-4 m-0 text-left cursor-pointer"
               >
-                <article className="h-fit rounded-3xl border border-slate-200 bg-cyan-50 p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
+                <article className="h-full rounded-3xl border border-blue-300 bg-cyan-50 p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -271,12 +271,12 @@ export default function ReviewsSlider({
                         <div className="mt-1 text-xs text-slate-500">{formattedDate}</div>
                       )}
                     </div>
-                    <Quote className="flex-none w-10 h-10 mt-1 text-slate-300" aria-hidden />
+                    <Quote className="flex-none w-10 h-10 mt-1 text-[--brand-cyan]" aria-hidden />
                   </div>
                 </header>
                 <p className="text-md md:text-lg text-slate-700">{text}</p>
                 {r.ownerReply ? (
-                  <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
                     <div className="flex items-start gap-3">
                       <Image
                         src={OWNER_RESPONSE_IMAGE}
@@ -318,17 +318,17 @@ export default function ReviewsSlider({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="review-title"
-                className="relative w-full max-w-[720px] mx-4 md:mx-0 overflow-hidden rounded-3xl border border-slate-300 bg-white shadow-2xl"
+                className="relative w-full max-w-[720px] mx-4 md:mx-0 overflow-hidden rounded-3xl border border-blue-300 bg-white shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
                   ref={closeBtnRef}
                   type="button"
                   aria-label="Close review"
-                  className="absolute flex items-center justify-center w-8 h-8 right-3 top-3 text-slate-800"
+                  className="absolute flex items-center justify-center w-8 h-8 right-3 top-3"
                   onClick={closeModal}
                 >
-                  <svg viewBox="0 0 24 24" className="w-6 h-6" aria-hidden>
+                  <svg viewBox="0 0 24 24" className="text-red-600 w-6 h-6" aria-hidden>
                     <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                 </button>
@@ -361,7 +361,7 @@ export default function ReviewsSlider({
                 <div className="max-h-[60vh] overflow-auto px-5 pb-4 pt-1 space-y-4">
                   <p className="m-0 leading-7 whitespace-pre-wrap text-md md:text-lg text-slate-700">{r.text || ''}</p>
                   {r.ownerReply ? (
-                    <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
+                    <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
                       <div className="flex items-start gap-3">
                         <Image
                           src={OWNER_RESPONSE_IMAGE}
@@ -380,7 +380,7 @@ export default function ReviewsSlider({
                     </div>
                   ) : null}
                 </div>
-                <div className="flex justify-end gap-2 p-4 border-t border-slate-300">
+                <div className="flex justify-end gap-2 p-4 border-t border-blue-300">
                   <SmartLink
                     href={href}
                     target="_blank"

@@ -24,7 +24,7 @@ export async function HoursAndInformation() {
         {/* Hours */}
         <Accordion
           icon={<Clock className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-lg">Business Hours</h3>}
+          summary={<h3 className="text-2xl">Business Hours</h3>}
           radius="2xl"
           proseBody={false}
           defaultOpen
