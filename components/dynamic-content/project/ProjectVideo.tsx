@@ -178,7 +178,7 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
                   type="button"
                   aria-label="Close"
                   onClick={(e) => { e.stopPropagation(); setOpen(false); }}
-                  className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] md:top-[max(1.25rem,env(safe-area-inset-top))] md:right-[max(1.25rem,env(safe-area-inset-right))] rounded-full bg-slate-900/80 text-white p-2.5 shadow-lg backdrop-blur-sm transition hover:bg-slate-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue]"
+                  className="fixed z-50 top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] md:top-[max(1.25rem,env(safe-area-inset-top))] md:right-[max(1.25rem,env(safe-area-inset-right))] border border-blue-200 rounded-full hover:bg-white/80 bg-white/40 text-blue-200 hover:text-red-600 p-2.5 shadow-lg backdrop-blur-sm transition focus:outline-none focus-visible:ring-2"
                 >
                   <X className="h-5 w-5" aria-hidden="true" />
                 </button>
@@ -191,7 +191,7 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
                 >
                   <motion.div
                     ref={modalRef}
-                    className="relative aspect-video w-full max-w-4xl overflow-hidden rounded-2xl bg-black shadow-xl"
+                    className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-2xl"
                     initial={A.modal.initial}
                     animate={A.modal.animate}
                     exit={A.modal.exit}

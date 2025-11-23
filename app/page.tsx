@@ -95,7 +95,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
       <Hero />
       <div className={reviewsLayout}>
         <HeroTrustBar />
-        <div className="bg-blue-200/50 border border-t-blue-200 border-b-blue-200">
+        <div className="bg-blue-200/50 border border-t-blue-300 border-b-blue-300">
           <ReviewsCarousel />
         </div>
       </div>

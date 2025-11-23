@@ -56,17 +56,34 @@ export async function HoursAndInformation() {
           
         >
           <ul className={pStyles}>
-            <li>Sarasota</li>
-            <li>Bradenton</li>
-            <li>Palmetto</li>
-            <li>Parrish</li>
-            <li>Venice</li>
-            <li>Nokomis</li>
-            <li>North Port</li>
-            <li>Port Charlotte</li>
-            <li>Punta Gorda</li>
-            <li>Englewood</li>
-            <li>Myakka City</li>
+            <li>
+              <SmartLink href="/locations/sarasota" title="Sarasota, FL Service Area">
+                Sarasota, FL
+              </SmartLink>
+            </li>
+            <li>
+              <SmartLink href="/locations/venice" title="Venice, FL Service Area">
+                Venice, FL
+              </SmartLink>
+            </li>
+            <li>
+              <SmartLink href="/locations/north-port" title="North Port, FL Service Area">
+                North Port, FL
+              </SmartLink>
+            </li>
+            <li>
+              <SmartLink href="/locations/lakewood-ranch" title="Lakewood Ranch, FL Service Area">
+                Lakewood Ranch, FL
+              </SmartLink>
+            </li>
+            <li>Bradenton, FL</li>
+            <li>Palmetto, FL</li>
+            <li>Parrish, FL</li>
+            <li>Nokomis, FL</li>
+            <li>Port Charlotte, FL</li>
+            <li>Punta Gorda, FL</li>
+            <li>Englewood, FL</li>
+            <li>Myakka City, FL</li>
           </ul>
         </Accordion>
 

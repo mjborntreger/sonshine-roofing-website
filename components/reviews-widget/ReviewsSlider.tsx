@@ -246,7 +246,7 @@ export default function ReviewsSlider({
                 aria-label={`Open full review by ${r.author_name}`}
                 className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_80%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none py-4 m-0 text-left cursor-pointer"
               >
-                <article className="h-full rounded-3xl border border-blue-300 bg-cyan-50 p-5 shadow-md transition-transform duration-200 ease-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
+                <article className="h-full rounded-3xl border border-blue-300 bg-cyan-50 p-5 shadow-md transition-transform duration-300 ease-in-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
                   <header className="mb-2">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
@@ -265,38 +265,38 @@ export default function ReviewsSlider({
                             <svg key={j} viewBox="0 0 24 24" className="w-6 h-6 fill-current" aria-hidden>
                               <path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.336 24 12 20.125 4.664 24 6 15.6 0 9.753l8.332-1.735z" />
                             </svg>
-                        ))}
+                          ))}
+                        </div>
+                        {formattedDate && (
+                          <div className="mt-1 text-xs text-slate-500">{formattedDate}</div>
+                        )}
                       </div>
-                      {formattedDate && (
-                        <div className="mt-1 text-xs text-slate-500">{formattedDate}</div>
-                      )}
+                      <Quote className="flex-none w-10 h-10 mt-1 text-[--brand-cyan]" aria-hidden />
                     </div>
-                    <Quote className="flex-none w-10 h-10 mt-1 text-[--brand-cyan]" aria-hidden />
-                  </div>
-                </header>
-                <p className="text-md md:text-lg text-slate-700">{text}</p>
-                {r.ownerReply ? (
-                  <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
-                    <div className="flex items-start gap-3">
-                      <Image
-                        src={OWNER_RESPONSE_IMAGE}
-                        alt="Owner response avatar"
-                        width={48}
-                        height={48}
-                        className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
-                        loading="lazy"
-                      />
-                      <div>
-                        <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
-                        <span className="pb-2 text-xs text-slate-500">Owner</span>
+                  </header>
+                  <p className="text-md md:text-lg text-slate-700">{text}</p>
+                  {r.ownerReply ? (
+                    <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
+                      <div className="flex items-start gap-3">
+                        <Image
+                          src={OWNER_RESPONSE_IMAGE}
+                          alt="Owner response avatar"
+                          width={48}
+                          height={48}
+                          className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
+                          loading="lazy"
+                        />
+                        <div>
+                          <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+                          <span className="pb-2 text-xs text-slate-500">Owner</span>
+                        </div>
                       </div>
+                      <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{r.ownerReply}</p>
                     </div>
-                    <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{r.ownerReply}</p>
-                  </div>
-                ) : null}
-              </article>
-            </button>
-          );
+                  ) : null}
+                </article>
+              </button>
+            );
           })}
         </div>
       </div>
@@ -325,44 +325,58 @@ export default function ReviewsSlider({
                   ref={closeBtnRef}
                   type="button"
                   aria-label="Close review"
-                  className="absolute flex items-center justify-center w-8 h-8 right-3 top-3"
+                  className="absolute flex items-center transition-colors rounded-full hover:bg-white justify-center w-8 h-8 right-3 top-3"
                   onClick={closeModal}
                 >
                   <svg viewBox="0 0 24 24" className="text-red-600 w-6 h-6" aria-hidden>
                     <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
                   </svg>
                 </button>
-                <header className="px-5 pt-4 pb-2">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <h4 id="review-title" className="flex items-center gap-2 m-0 text-2xl font-bold text-slate-700">
-                        <Image
-                          src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
-                          alt="Google logo"
-                          width={40}
-                          height={40}
-                          className="flex-none w-5 h-5"
-                        />
-                        <span>{r.author_name}</span>
-                      </h4>
-                      <div className="my-3 flex gap-1 text-[#fb9216]">
-                        {Array.from({ length: 5 }).map((_, j) => (
-                          <svg key={j} viewBox="0 0 24 24" className="fill-current h-7 w-7" aria-hidden>
-                            <path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.336 24 12 20.125 4.664 24 6 15.6 0 9.753l8.332-1.735z" />
-                          </svg>
-                        ))}
+                <header className="px-5 pt-4 bg-blue-50 pb-2 border border-b-blue-200">
+                  <SmartLink
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    data-icon-affordance="up-right"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-start items-center gap-2">
+                          <h4 id="review-title" className="flex items-center gap-2 m-0 text-2xl font-bold text-slate-700">
+                            <Image
+                              src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
+                              alt="Google logo"
+                              width={40}
+                              height={40}
+                              className="flex-none w-5 h-5"
+                            />
+                            <span>{r.author_name}</span>
+                          </h4>
+                          <p className="text-sm font-semibold text-slate-500">
+                            View on Google
+                            <ArrowUpRight className="inline w-4 h-4 ml-2 icon-affordance" />
+                          </p>
+                        </div>
+                        <div className="my-3 flex gap-1 text-[#fb9216]">
+                          {Array.from({ length: 5 }).map((_, j) => (
+                            <svg key={j} viewBox="0 0 24 24" className="fill-current h-7 w-7" aria-hidden>
+                              <path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.336 24 12 20.125 4.664 24 6 15.6 0 9.753l8.332-1.735z" />
+                            </svg>
+                          ))}
+                        </div>
+                        {formattedDate && (
+                          <div className="mt-1 text-xs md:text-sm text-slate-500">{formattedDate}</div>
+                        )}
                       </div>
-                      {formattedDate && (
-                        <div className="mt-1 text-xs md:text-sm text-slate-500">{formattedDate}</div>
-                      )}
                     </div>
-                  </div>
+                  </SmartLink>
+
                 </header>
-                <div className="max-h-[60vh] overflow-auto px-5 pb-4 pt-1 space-y-4">
-                  <p className="m-0 leading-7 whitespace-pre-wrap text-md md:text-lg text-slate-700">{r.text || ''}</p>
+                <div className="max-h-[80vh] overflow-auto px-5 py-4 bg-amber-50/50 space-y-4">
+                  <p className="m-0 whitespace-pre-wrap text-md md:text-lg text-slate-700">{r.text || ''}</p>
                   {r.ownerReply ? (
                     <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
-                      <div className="flex items-start gap-3">
+                      <SmartLink href="/person/nathan-borntreger" title="Nathan Borntreger's Profile" className="flex items-start gap-3">
                         <Image
                           src={OWNER_RESPONSE_IMAGE}
                           alt="Owner response avatar"
@@ -372,25 +386,13 @@ export default function ReviewsSlider({
                           loading="lazy"
                         />
                         <div>
-                          <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+                          <p className="transition-colors pt-2 text-md font-semibold text-slate-700 hover:text-[--brand-blue]">Nathan Borntreger</p>
                           <span className="pb-2 text-xs text-slate-500">Owner</span>
                         </div>
-                      </div>
+                      </SmartLink>
                       <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{r.ownerReply}</p>
                     </div>
                   ) : null}
-                </div>
-                <div className="flex justify-end gap-2 p-4 border-t border-blue-300">
-                  <SmartLink
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
-                    className="inline-flex items-center rounded-full bg-[--brand-blue] px-4 py-2 font-semibold text-white hover:opacity-90"
-                    data-icon-affordance="up-right"
-                  >
-                    View on Google
-                    <ArrowUpRight className="inline w-4 h-4 ml-2 icon-affordance" />
-                  </SmartLink>
                 </div>
               </div>
             </div>
