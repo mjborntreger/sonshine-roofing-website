@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     siteName: "SonShine Roofing",
     title: "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte",
     description: "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!",
-    images: [{ url: "/og-default.png", width: 1200, height: 630, alt: "SonShine Roofing" }],
+    images: [{ url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630, alt: "SonShine Roofing, Sarasota, FL" }],
   },
   twitter: {
     card: "summary_large_image",
@@ -50,7 +50,7 @@ const PHONE_E164 = '+1-941-866-4320';
 const LOGO_URL_512 = 'https://sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png'; // 512×512
 // Aggregate rating (editable constants)
 const AGG_RATING_VALUE = 4.8;
-const AGG_RATING_COUNT = 202;
+const AGG_RATING_COUNT = 211;
 
 function getGlobalSchema() {
   const providerId = `${BASE_URL}/#roofingcontractor`;

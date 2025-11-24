@@ -41,7 +41,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       "Nokomis roof repair",
       "Gulf Gate roof repair",
     ],
-    image: { url: "/og-default.png", width: 1200, height: 630 },
+    image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
     breadcrumbs: [
       { name: "Home", path: "/" },
       { name: "Roof Repair", path: "/roof-repair" },
@@ -68,7 +68,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       "Manatee County roofing",
       "Charlotte County roofing",
     ],
-    image: { url: "/og-default.png", width: 1200, height: 630 },
+    image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
     breadcrumbs: [
       { name: "Home", path: "/" },
       { name: "Roof Replacement", path: "/roof-replacement-sarasota-fl" },
@@ -93,8 +93,17 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       "Venice Roofing",
       "Manatee County roofing",
       "Charlotte County roofing",
+      "flexible roof financing",
+      "flexible financing",
+      "financing",
+      "PACE financing for roof",
+      "loan for a new roof",
+      "financing for a new roof",
+      "finance a new roof",
+      "finance a roof replacement",
+      "Roofer with financing",
     ],
-    image: { url: "/og-default.png", width: 1200, height: 630 },
+    image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
     breadcrumbs: [
       { name: "Home", path: "/" },
       { name: "Financing", path: "/financing" },
@@ -116,7 +125,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       "Manatee County roofing",
       "Charlotte County roofing",
     ],
-    image: { url: "/og-default.png", width: 1200, height: 630 },
+    image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
     breadcrumbs: [
       { name: "Home", path: "/" },
       { name: "Roof Maintenance", path: "/roof-maintenance" },
@@ -139,7 +148,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       "Manatee County roofing",
       "Charlotte County roofing",
     ],
-    image: { url: "/og-default.png", width: 1200, height: 630 },
+    image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
     breadcrumbs: [
       { name: "Home", path: "/" },
       { name: "Roof Inspection", path: "/roof-inspection" },
@@ -164,7 +173,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       "manatee county",
       "charlotte county",
     ],
-    image: { url: "/og-default.png", width: 1200, height: 630 },
+    image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
     breadcrumbs: [
       { name: "Home", path: "/" },
       { name: "About SonShine Roofing", path: "/about-sonshine-roofing" },
@@ -186,7 +195,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       "roof repair",
       "roof replacement",
     ],
-    image: { url: "/og-default.png", width: 1200, height: 630 },
+    image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
     breadcrumbs: [
       { name: "Home", path: "/" },
       { name: "Contact", path: "/contact-us" },

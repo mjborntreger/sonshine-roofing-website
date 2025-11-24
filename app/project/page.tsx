@@ -13,9 +13,9 @@ export const revalidate = 900; // 15 minutes ISR
 export const dynamic = "force-static";
 
 const PAGE_PATH = "/project";
-const PAGE_TITLE = "Project Gallery | Sarasota, Manatee & Charlotte Counties | SonShine Roofing";
-const PAGE_DESCRIPTION = "Browse recent roof installations across Southwest Florida. Filter by material, color, and service area to find real projects like yours.";
-const PAGE_IMAGE = "/og-default.png";
+const PAGE_TITLE = "Roofing Project Gallery | SonShine Roofing";
+const PAGE_DESCRIPTION = "Browse photos and videos of our recent roof replacement projects in Sarasota and surrounding areas. Filter by material, color, and service area to find real projects like yours.";
+const PAGE_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Project-Gallery-OpenGraph-Compressed.png";
 const PAGE_SIZE = 6;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,15 +24,21 @@ export async function generateMetadata(): Promise<Metadata> {
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,
     keywords: [
-      "roofing projects",
+      "roofing photo gallery",
+      "roofing video gallery",
+      "roofing photos",
+      "roofing videos",
+      "new metal roof",
+      "new shingle roof",
+      "new tile roof",
+      "roof replacement projects sarasota",
       "project gallery",
       "roof replacement photos",
-      "shingle roof projects",
-      "tile roof projects",
-      "metal roof projects",
-      "Sarasota roofing",
-      "Manatee County roofing",
-      "Charlotte County roofing",
+      "roof replacement video",
+      "shingle roof replacement photos",
+      "tile roof replacement photos",
+      "metal roof replacement photos",
+      "Sarasota roofing project gallery",
     ],
     image: { url: PAGE_IMAGE, width: 1200, height: 630 },
   });
