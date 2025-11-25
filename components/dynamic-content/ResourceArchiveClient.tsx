@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { RotateCcw, Search } from "lucide-react";
+import { ArrowUp, Minus, Plus, RotateCcw, Search } from "lucide-react";
 
 import FilterTabs from "@/components/dynamic-content/FilterTabs";
 import GridLoadingState from "@/components/layout/GridLoadingState";
@@ -58,8 +58,6 @@ const areSelectionMapsEqual = (a: SelectionMap, b: SelectionMap): boolean => {
 
 type ResourceArchiveClientProps<Item> = {
   kind: ResourceKind;
-  title: string;
-  description?: string;
   apiPath: string;
   pageSize: number;
   initialResult: ResourceArchiveResult<Item>;
@@ -68,7 +66,6 @@ type ResourceArchiveClientProps<Item> = {
     selections: SelectionMap;
   };
   groups: FilterGroupConfig[];
-  searchPlaceholder: string;
   labels: {
     itemSingular: string;
     itemPlural: string;
@@ -104,14 +101,11 @@ type ResourceArchiveClientProps<Item> = {
 
 export default function ResourceArchiveClient<Item>({
   kind,
-  title,
-  description,
   apiPath,
   pageSize,
   initialResult,
   initialFilters,
   groups,
-  searchPlaceholder,
   labels,
   emptyState,
   minSearchLength = 2,
@@ -146,8 +140,8 @@ export default function ResourceArchiveClient<Item>({
     typeof initialResult.meta?.overallTotal === "number"
       ? initialResult.meta.overallTotal
       : typeof initialResult.total === "number"
-      ? initialResult.total
-      : initialResult.items.length
+        ? initialResult.total
+        : initialResult.items.length
   );
 
   const debouncedSearch = useDebouncedValue(searchInput, 300);
@@ -258,10 +252,15 @@ export default function ResourceArchiveClient<Item>({
     });
   }, [facetMap, groups, sortedSelections]);
 
+  const hasActiveSelections = useMemo(
+    () => groups.some((group) => (sortedSelections[group.key] ?? []).length > 0),
+    [groups, sortedSelections]
+  );
+
   const hasActiveFilters = useMemo(() => {
     if (searchForRequest) return true;
-    return groups.some((group) => (sortedSelections[group.key] ?? []).length > 0);
-  }, [groups, searchForRequest, sortedSelections]);
+    return hasActiveSelections;
+  }, [groups, hasActiveSelections, searchForRequest, sortedSelections]);
 
   const filteredCount = typeof result.total === "number" ? result.total : result.items.length;
   const overallTotal = typeof result.meta?.overallTotal === "number"
@@ -444,89 +443,142 @@ export default function ResourceArchiveClient<Item>({
   }, []);
 
   const loadingMessage = loadingOverlayMessage ?? `Loading ${labels.itemPlural.toLowerCase()}…`;
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const filtersAccordionRef = useRef<HTMLDetailsElement | null>(null);
+  const filtersPanelId = `${kind}-filters-panel`;
+
+  const handleFiltersKeyDown = useCallback((event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (filtersAccordionRef.current) {
+        filtersAccordionRef.current.open = !filtersAccordionRef.current.open;
+        setFiltersOpen(filtersAccordionRef.current.open);
+      }
+    }
+  }, []);
 
   return (
     <div>
-      <h1 className="text-3xl md:text-5xl font-semibold text-center tracking-tight text-slate-900 mb-12">{title}</h1>
-      {description ? (
-        <p className="text-slate-600 max-w-3xl text-center mb-8 mx-auto">{description}</p>
-      ) : null}
-
       <div
         ref={filtersRef}
         className="rounded-3xl border border-blue-300 bg-white p-4 shadow-md md:p-6"
         role="search"
       >
         <div className="flex flex-col gap-4">
+          <div>
+            <Search className="h-5 inline w-5 align-text-top mr-2 text-[--brand-blue]" />
+            <h2 className="text-2xl inline">{`Search ${labels.itemPlural}`}</h2>
+          </div>
           <div className="inline-flex w-full items-start">
             <label htmlFor={`${kind}-search`} className="sr-only">Search {labels.itemPlural}</label>
-            <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
             <input
               id={`${kind}-search`}
               type="search"
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
-              placeholder={searchPlaceholder}
-              className="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
+              placeholder="Start typing to search..."
+              className="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
             />
           </div>
 
           {groups.length > 0 ? (
-            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-blue-200 pt-3">
-              <h2 className="text-sm font-semibold text-slate-600">Filters</h2>
-              <button
-                type="button"
-                onClick={clearFilters}
-                disabled={!hasActiveFilters}
-                className="inline-flex items-center gap-1 rounded-full border border-blue-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-slate-100"
-              >
-                Reset filters
-                <RotateCcw className="h-4 w-4 inline ml-2" />
-              </button>
-            </div>
-          ) : null}
+            <div className="border-t border-blue-200 pt-3">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <details
+                  ref={filtersAccordionRef}
+                  className="group/filter-accordion flex-1 min-w-0 [&_summary::-webkit-details-marker]:hidden"
+                  onToggle={(event) => setFiltersOpen(event.currentTarget.open)}
+                >
+                  <summary
+                    className="flex w-full cursor-pointer select-none items-center justify-between rounded-xl border border-blue-200 bg-cyan-50 px-3 py-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2"
+                    aria-controls={filtersPanelId}
+                    aria-expanded={filtersOpen}
+                    onKeyDown={handleFiltersKeyDown}
+                  >
+                    <span className="flex flex-col">
+                      <span className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                        Filters
+                        {hasActiveSelections ? (
+                          <span
+                            aria-hidden
+                            className="inline-flex h-2 w-2 items-center justify-center rounded-full bg-[--brand-blue] shadow ring-[3px] ring-white"
+                          />
+                        ) : null}
+                        <span className="sr-only">
+                          {hasActiveSelections ? "Filters selected" : "No filters selected"}
+                        </span>
+                      </span>
+                      <span className="text-xs md:text-sm text-slate-500">Choose filters to sort results</span>
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          clearFilters();
+                        }}
+                        disabled={!hasActiveFilters}
+                        className="inline-flex items-center gap-1 rounded-full border border-blue-300 px-3 py-1.5 text-xs font-medium text-slate-700 transition disabled:cursor-not-allowed disabled:opacity-50 hover:bg-slate-100"
+                      >
+                        Reset
+                        <RotateCcw className="h-4 w-4" aria-hidden />
+                      </button>
+                      <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-blue-200 bg-white text-[--brand-blue]">
+                        <Plus className="h-4 w-4 transition-opacity duration-150 ease-out group-open/filter-accordion:hidden" aria-hidden />
+                        <Minus className="hidden h-4 w-4 transition-opacity duration-150 ease-out group-open/filter-accordion:block" aria-hidden />
+                      </span>
+                    </span>
+                  </summary>
+                  <div id={filtersPanelId} className="accordion-motion">
+                    <div className="mt-3">
+                      <FilterTabs
+                        tabs={tabs}
+                        activeKey={activeTabKey as string}
+                        onTabChange={setActiveTabKey}
+                        isLoading={loading}
+                        ariaLabel="Project filters"
+                      >
+                        {(tabKey) => {
+                          const group = groups.find((g) => g.key === tabKey);
+                          const tab = tabs.find((t) => t.key === tabKey);
+                          if (!group || !tab) return null;
 
-          {groups.length > 0 ? (
-            <FilterTabs
-              tabs={tabs}
-              activeKey={activeTabKey as string}
-              onTabChange={setActiveTabKey}
-              isLoading={loading}
-              ariaLabel="Project filters"
-            >
-              {(tabKey) => {
-                const group = groups.find((g) => g.key === tabKey);
-                const tab = tabs.find((t) => t.key === tabKey);
-                if (!group || !tab) return null;
-
-                return (
-                  <div className="flex flex-wrap gap-2">
-                    {tab.terms.map((term) => {
-                      const active = (sortedSelections[group.key] ?? []).includes(term.slug);
-                      const disabled = term.count === 0 && !active;
-                      return (
-                        <button
-                          key={term.slug}
-                          type="button"
-                          onClick={() => toggleSelection(group.key, term.slug)}
-                          disabled={disabled}
-                          className={`px-3 py-1.5 rounded-full border text-sm transition select-none ${
-                            active
-                              ? "border-[--brand-blue] bg-[--brand-blue] text-white"
-                              : disabled
-                                ? "border-blue-200 bg-slate-100 text-slate-400 cursor-not-allowed"
-                                : "border-blue-200 bg-cyan-50 text-slate-700 hover:border-[--brand-blue]"
-                          }`}
-                          aria-pressed={active}
-                        >
-                          {term.name} ({term.count})
-                        </button>
-                      );
-                    })}
+                          return (
+                            <div>
+                              <p className="text-xs md:text-sm my-2 mx-2 text-slate-500">Tap to select / deselect</p>
+                              <div className="flex flex-wrap gap-2">
+                                {tab.terms.map((term) => {
+                                  const active = (sortedSelections[group.key] ?? []).includes(term.slug);
+                                  const disabled = term.count === 0 && !active;
+                                  return (
+                                    <button
+                                      key={term.slug}
+                                      type="button"
+                                      onClick={() => toggleSelection(group.key, term.slug)}
+                                      disabled={disabled}
+                                      className={`px-3 py-1.5 rounded-full border text-sm transition select-none ${active
+                                        ? "border-[--brand-blue] bg-[--brand-blue] text-white"
+                                        : disabled
+                                          ? "border-blue-200 bg-slate-100 text-slate-400 cursor-not-allowed"
+                                          : "border-blue-200 bg-cyan-50 text-slate-700 hover:border-[--brand-blue]"
+                                        }`}
+                                      aria-pressed={active}
+                                    >
+                                      {term.name} ({term.count})
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          );
+                        }}
+                      </FilterTabs>
+                    </div>
                   </div>
-                );
-              }}
-            </FilterTabs>
+                </details>
+              </div>
+            </div>
           ) : null}
         </div>
       </div>
@@ -591,10 +643,10 @@ export default function ResourceArchiveClient<Item>({
         <button
           type="button"
           onClick={scrollToFilters}
-          className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-[--brand-blue] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[--brand-blue]/30 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
+          className="pointer-events-auto inline-flex items-center gap-2 rounded-full bg-[--brand-blue] px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-[--brand-blue]/30 focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] focus:ring-offset-2"
         >
-          <span className="h-2 w-2 rounded-full bg-white" aria-hidden />
-          Filters
+          To Filters
+          <ArrowUp className="h-4 w-4" />
         </button>
       </div>
     </div>

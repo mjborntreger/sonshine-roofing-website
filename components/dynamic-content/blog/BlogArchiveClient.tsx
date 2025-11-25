@@ -35,8 +35,6 @@ export default function BlogArchiveClient({ initialResult, categories, pageSize,
   return (
     <ResourceArchiveClient
       kind="blog"
-      title="Roofing Blog"
-      description="Enjoy these handcrafted articles and step-by-step guides from our team that discuss a wide variety of roofing topics (and a few extras, from our family to yours)."
       apiPath="/api/resources/blog"
       pageSize={pageSize}
       initialResult={initialResult}
@@ -45,7 +43,6 @@ export default function BlogArchiveClient({ initialResult, categories, pageSize,
         selections: { category: initialFilters.categorySlugs ?? [] },
       }}
       groups={groups}
-      searchPlaceholder="Search posts..."
       labels={{ itemSingular: "post", itemPlural: "posts" }}
       emptyState={{
         title: "No results found.",

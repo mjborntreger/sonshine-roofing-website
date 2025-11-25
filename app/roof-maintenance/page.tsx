@@ -5,13 +5,13 @@ import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import RoofCareClub from "@/components/marketing/service-pages/RoofCareClub";
 import type { Metadata } from 'next';
-import FinancingBand from "@/components/cta/FinancingBand";
 import ServicesAside from "@/components/global-nav/static-pages/ServicesAside";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import Hero from "@/components/ui/Hero";
 
 const SERVICE_PATH = "/roof-maintenance";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -68,76 +68,93 @@ export default async function Page() {
   );
 
   return (
-    <Section>
-      <div className="grid px-2 gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-        <div id="article-root" className="prose min-w-0">
-          <h1>Roof Maintenance</h1>
-          {/* JSON-LD: WebPage + BreadcrumbList */}
-          <JsonLd data={webPageLd} />
-          <JsonLd data={breadcrumbsLd} />
-          <h2>
-            Undoubtedly, lack of maintenance is among the top reasons why roofs fail.
-          </h2>
-          <p>
-            Whether it’s a large hole or a small leak, water that seeps below the top 
-            layer of a roof can destroy everything in its path. Small leaks, in particular, 
-            are dangerous because the damage often goes undetected for years. This hidden 
-            moisture leads to rotting wood sheathing and trusses, increased utility costs, 
-            and serious health risks due to mold and mildew growth. In fact, such damage can 
-            silently erode your safety, comfort, and security—sometimes for as long as 13 years 
-            before it becomes visible inside the home.
-          </p>
+    <>
+      <Hero
+        title="Roof Maintenance"
+        subtitle="For over 38 years, we've prioritized maintaining your current roof over upselling you on a replacement you don't need. We understand that committment, loyalty, and trust contribute more to our success than making a quick buck. To get the full lifespan out of your roof, we genuinely recommend that you join our 'Roof Care Club.' For just a few hundred dollars a year, your roof is guaranteed to live its full life, potentially saving you thousands in costly repairs or premature replacement. The choice is yours. Call us today to discuss a plan that works for you."
+        eyelash="Residential Roof Maintenance in Sarasota, FL and Surrounding Areas"
+        badges={[
 
-          <figure className="not-prose">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-              <Image
-                src="https://next.sonshineroofing.com/wp-content/uploads/taking-care-of-your-roof-maintenance-saves-moneybak.webp"
-                alt="taking care of your roof maintenance saves you money"
-                fill
-                className="object-cover mb-2"
-                sizes="(max-width: 768px) 100vw, 800px"
-                loading="lazy"
-              />
+        ]}
+        justifyStart
+        children={(
+          <div className="flex gap-6 flex-wrap max-w-3xl">
+            <div>
+              <p className="italic text-sm text-slate-300">Starting at just</p>
+              <p className="text-blue-400 mt-2 text-4xl"><span className="line-through text-slate-400 items-start text-lg mr-1">$199 </span>$169<span className="text-slate-200 ml-1 text-lg">/ per year</span></p>
             </div>
-          </figure>
+          </div>
+        )}
+      />
+      <Section>
+        <div className="grid px-2 gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+          <div id="article-root" className="prose min-w-0">
+            {/* JSON-LD: WebPage + BreadcrumbList */}
+            <JsonLd data={webPageLd} />
+            <JsonLd data={breadcrumbsLd} />
 
-          <p>
-            While it may be tempting to ignore your roof’s maintenance needs, doing so can shorten 
-            its lifespan and lead to major expenses down the road. Roofing materials are built to 
-            last, but only when they’re properly maintained. That’s why SonShine Roofing strongly 
-            recommends following a roof maintenance schedule and sticking with it year after year.
-            <br></br><br></br>
-            Routine roof inspections are critical to catching these hidden problems early—before 
-            they escalate into major roof repairs, structural rot, or indoor health hazards that 
-            threaten your home and well-being.
-          </p>
+            <h2 className="mt-0">
+              Undoubtedly, lack of maintenance is among the top reasons why roofs fail.
+            </h2>
+            <p>
+              Whether it’s a large hole or a small leak, water that seeps below the top
+              layer of a roof can destroy everything in its path. Small leaks, in particular,
+              are dangerous because the damage often goes undetected for years. This hidden
+              moisture leads to rotting wood sheathing and trusses, increased utility costs,
+              and serious health risks due to mold and mildew growth. In fact, such damage can
+              silently erode your safety, comfort, and security—sometimes for as long as 13 years
+              before it becomes visible inside the home.
+            </p>
 
-          <FinancingBand />
+            <figure className="not-prose">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <Image
+                  src="https://next.sonshineroofing.com/wp-content/uploads/taking-care-of-your-roof-maintenance-saves-moneybak.webp"
+                  alt="taking care of your roof maintenance saves you money"
+                  fill
+                  className="object-cover mb-2"
+                  sizes="(max-width: 768px) 100vw, 800px"
+                  loading="lazy"
+                />
+              </div>
+            </figure>
 
-          <RoofCareClub origin={origin} />
+            <p>
+              While it may be tempting to ignore your roof’s maintenance needs, doing so can shorten
+              its lifespan and lead to major expenses down the road. Roofing materials are built to
+              last, but only when they’re properly maintained. That’s why SonShine Roofing strongly
+              recommends following a roof maintenance schedule and sticking with it year after year.
+              <br></br><br></br>
+              Routine roof inspections are critical to catching these hidden problems early—before
+              they escalate into major roof repairs, structural rot, or indoor health hazards that
+              threaten your home and well-being.
+            </p>
 
+            <RoofCareClub origin={origin} />
+
+          </div>
+
+          <ServicesAside activePath={SERVICE_PATH} />
         </div>
 
-        <ServicesAside activePath={SERVICE_PATH} />
-      </div>
+        <div data-toc-exclude>
+          <YouMayAlsoLike
+            posts={pool}
+            category="roof-maintenance-services"
+            excludeSlug={''}
+            heading="Learn More About Roof Maintenance Services"
+          />
+        </div>
 
-      <div data-toc-exclude>
-        <YouMayAlsoLike
-          posts={pool}
-          category="roof-maintenance-services"
-          excludeSlug={''}
-          heading="Learn More About Roof Maintenance Services"
+        {/* FAQs (dynamic) */}
+        <FaqInlineList
+          heading="Roof Maintenance FAQs"
+          topicSlug="roof-maintenance"
+          limit={8}
+          initialItems={faqs}
+          seeMoreHref="/faq"
         />
-      </div>
-
-      {/* FAQs (dynamic) */}
-      <FaqInlineList
-        heading="Roof Maintenance FAQs"
-        topicSlug="roof-maintenance"
-        limit={8}
-        initialItems={faqs}
-        seeMoreHref="/faq"
-      />
-    </Section>
+      </Section>
+    </>
   );
 }

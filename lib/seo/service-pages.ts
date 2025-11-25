@@ -134,19 +134,20 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
   "/roof-inspection": {
     title: "Roof Inspection in Sarasota, Manatee & Charlotte Counties | SonShine Roofing",
     description:
-      "Licensed residential roofing inspections to catch hidden leaks and extend roof life. Serving Southwest Florida since 1987.",
+      "Licensed residential roof inspections to catch hidden leaks and extend roof life. Serving Sarasota and surrounding areas since 1987.",
     keywords: [
+      "residential roof inspection",
+      "residential roof inspection Sarasota",
+      "real estate roof inspection",
+      "affordable roof inspection",
       "roof inspection",
+      "roof inspection Sarasota",
+      "wind mitigation",
       "roof evaluation",
       "leak detection",
       "roof checkup",
       "why do I need a roof inspection",
       "tip top roof checkup",
-      "Sarasota roofing",
-      "North Port Roofing",
-      "Venice Roofing",
-      "Manatee County roofing",
-      "Charlotte County roofing",
     ],
     image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
     breadcrumbs: [

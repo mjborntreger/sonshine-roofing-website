@@ -15,6 +15,7 @@ import type { Metadata } from "next";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import Hero from "@/components/ui/Hero";
 
 export const revalidate = 900;
 export const dynamic = "force-static";
@@ -218,32 +219,40 @@ export default async function VideoLibraryPage() {
   };
 
   return (
-    <Section>
-      <div className="container-edge py-4">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-          <div>
-            <JsonLd data={collectionLd} />
-            <JsonLd data={breadcrumbsLd} />
-            <VideoShareBar collectionUrl={collectionUrl} />
+    <>
+      <Hero
+        title="Video Library"
+        eyelash="See Us in Action"
+        subtitle="Browse our latest short explainers, tutorials in the field, drone footage of completed roofs, and more."
 
-            <VideoLibraryClient
-              initialResult={initialResult}
-              bucketOptions={BUCKET_OPTIONS}
-              materialOptions={materialOptions}
-              serviceOptions={serviceOptions}
-              pageSize={PAGE_SIZE}
-              initialFilters={initialFilters}
-            />
+      />
+
+      <Section>
+        <div className="container-edge py-4">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+            <div>
+              <JsonLd data={collectionLd} />
+              <JsonLd data={breadcrumbsLd} />
+              <VideoShareBar collectionUrl={collectionUrl} />
+
+              <VideoLibraryClient
+                initialResult={initialResult}
+                bucketOptions={BUCKET_OPTIONS}
+                materialOptions={materialOptions}
+                serviceOptions={serviceOptions}
+                pageSize={PAGE_SIZE}
+                initialFilters={initialFilters}
+              />
+            </div>
+
+            <ResourcesAside activePath={CANONICAL} />
           </div>
-
-          <ResourcesAside activePath={CANONICAL} />
         </div>
-      </div>
 
-      <script
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: `(() => {
+        <script
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: `(() => {
             function setVParam(slug) {
               try {
                 const url = new URL(window.location.href);
@@ -276,8 +285,9 @@ export default async function VideoLibraryPage() {
             });
             window.addEventListener('video:close', () => setVParam(null));
           })();`,
-        }}
-      />
-    </Section>
+          }}
+        />
+      </Section>
+    </>
   );
 }

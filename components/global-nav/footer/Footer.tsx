@@ -141,7 +141,7 @@ export default function Footer() {
             {/* Resources */}
             <div>
               <h3 className={h3Styles}>
-                Resources
+                Our Work
               </h3>
               <ul className="mt-4 space-y-3 text-sm">
                 {NAV_RESOURCES.map((r) => (

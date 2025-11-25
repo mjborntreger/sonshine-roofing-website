@@ -6,7 +6,7 @@ import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import { Accordion } from "@/components/ui/Accordion";
-import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, Lightbulb, CircleCheckBig } from "lucide-react";
+import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, Lightbulb, CircleCheckBig, HandCoins, CheckCircle, Ban } from "lucide-react";
 import RepairVsReplace from "@/components/marketing/service-pages/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/cta/FinancingBand";
@@ -15,6 +15,7 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, howToSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import Hero from "@/components/ui/Hero";
 
 const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
@@ -96,16 +97,27 @@ export default async function Page() {
   });
   return (
     <>
+      <Hero
+        title="Roof Replacement"
+        subtitle="For nearly 40 years, we've been Sarasota's premier roofing company providing long‑lasting shingle, tile, flat and metal roof replacements with robust workmanship warranties, flexible financing, and a team you can trust. Schedule an appointment with a Roofing Specialist today to learn more."
+        eyelash="Residential Roof Replacement Services in Sarasota, FL and surrounding areas"
+        badges={[
+          { icon: CheckCircle, label: "GAF Master Elite Contractor" },
+          { icon: Ban, label: "No Subcontractors" },
+          { icon: ShieldCheck, label: "25-year Warranty" },
+          { icon: HandCoins, label: "Flexible Financing" }
+        ]}
+        justifyStart
+        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/2-Treedale-Glen-Lakewood-Ranch-FL-Roof-Replacement.webp"
+      />
       <Section>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start px-2">
           <div id="article-root" className="prose min-w-0">
-            <h1>Roof Replacement</h1>
             {/* JSON-LD: WebPage + BreadcrumbList + HowTo */}
             <JsonLd data={webPageLd} />
             <JsonLd data={breadcrumbsLd} />
             <JsonLd data={howToLd} />
-
-            <h2>How do you know if you need a roof replacement?</h2>
+            <h2 className="mt-0">How do you know if you need a roof replacement?</h2>
             <p>
               The thought of replacing your roof may feel overwhelming,
               but we’re here to help. Our Roofing Specialists and Production
@@ -169,30 +181,30 @@ export default async function Page() {
               radius="2xl"
               proseBody={false}
             >
-                <p>
-                  There are many roofing material options available to choose from,
-                  and we’re here to help you determine what’s best for your home. As
-                  with any roof replacement or home improvement project, material selection
-                  plays a key role in the lifespan and performance of your roof.
-                  <br /><br />
-                  Elements like the type of nails used, quality of the underlayment, and
-                  balanced, efficient attic ventilation all contribute to a successful
-                  roof system. At SonShine Roofing, we take the time to walk you through
-                  every material option and answer your questions thoroughly.
-                </p>
+              <p>
+                There are many roofing material options available to choose from,
+                and we’re here to help you determine what’s best for your home. As
+                with any roof replacement or home improvement project, material selection
+                plays a key role in the lifespan and performance of your roof.
+                <br /><br />
+                Elements like the type of nails used, quality of the underlayment, and
+                balanced, efficient attic ventilation all contribute to a successful
+                roof system. At SonShine Roofing, we take the time to walk you through
+                every material option and answer your questions thoroughly.
+              </p>
 
-                <figure className={figureStyles}>
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-                    <Image
-                      src="https://next.sonshineroofing.com/wp-content/uploads/difference-between-tile-vs-metal-vs-shingle-roofs.jpg"
-                      alt="Roof replacement choices"
-                      fill
-                      className="object-cover mb-2"
-                      sizes="(max-width: 768px) 100vw, 800px"
-                      loading="lazy"
-                    />
-                  </div>
-                </figure>
+              <figure className={figureStyles}>
+                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+                  <Image
+                    src="https://next.sonshineroofing.com/wp-content/uploads/difference-between-tile-vs-metal-vs-shingle-roofs.jpg"
+                    alt="Roof replacement choices"
+                    fill
+                    className="object-cover mb-2"
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    loading="lazy"
+                  />
+                </div>
+              </figure>
 
               <p>
                 It’s not just about the materials themselves — proper installation is equally
@@ -208,19 +220,19 @@ export default async function Page() {
               radius="2xl"
               proseBody={false}
             >
-                <p>
-                  There are usually two types of warranty that come with your new roof: workmanship and manufacturer.
-                  <br /><br />
-                </p>
+              <p>
+                There are usually two types of warranty that come with your new roof: workmanship and manufacturer.
+                <br /><br />
+              </p>
 
-                <h4>Workmanship Warranty</h4>
-                {/* Inline callout (#6) */}
+              <h4>Workmanship Warranty</h4>
+              {/* Inline callout (#6) */}
               <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
-                <strong 
+                <strong
                   className="uppercase block font-display text-[1rem] text-slate-800 mb-1"
-                  >
-                    <CircleCheckBig className="h-4 w-4 mr-2 text-[--brand-blue] inline" />
-                    Fact:
+                >
+                  <CircleCheckBig className="h-4 w-4 mr-2 text-[--brand-blue] inline" />
+                  Fact:
                 </strong>
                 <p className="m-0 text-slate-700">
                   The vast majority of roof failures are caused by poor workmanship, and
@@ -269,27 +281,27 @@ export default async function Page() {
               radius="2xl"
               proseBody={false}
             >
-                <p>
-                  A roof replacement is a major investment—but that doesn’t mean your new roof is “set
-                  it and forget it.” Regular maintenance is the key to protecting your roof’s longevity
-                  and your home’s safety. Even the highest quality roofing materials need routine care
-                  to withstand Florida’s heat, storms, and humidity. Without regular checkups, small
-                  issues like clogged gutters or cracked flashing can quickly snowball into expensive
-                  repairs or premature failure.
-                </p>
+              <p>
+                A roof replacement is a major investment—but that doesn’t mean your new roof is “set
+                it and forget it.” Regular maintenance is the key to protecting your roof’s longevity
+                and your home’s safety. Even the highest quality roofing materials need routine care
+                to withstand Florida’s heat, storms, and humidity. Without regular checkups, small
+                issues like clogged gutters or cracked flashing can quickly snowball into expensive
+                repairs or premature failure.
+              </p>
 
-                <figure className={figureStyles}>
-                  <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-                    <Image
-                      src="https://next.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
-                      alt="The importance of roof maintenance"
-                      fill
-                      className="object-cover mb-2"
-                      sizes="(max-width: 768px) 100vw, 800px"
-                      loading="lazy"
-                    />
-                  </div>
-                </figure>
+              <figure className={figureStyles}>
+                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+                  <Image
+                    src="https://next.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
+                    alt="The importance of roof maintenance"
+                    fill
+                    className="object-cover mb-2"
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    loading="lazy"
+                  />
+                </div>
+              </figure>
               <p>
                 At SonShine Roofing, we’ve seen it all—shingles lifted by summer storms, debris buildup
                 that traps moisture, and flashing that’s been slowly leaking for months. The good news?
@@ -304,11 +316,11 @@ export default async function Page() {
 
               {/* Inline callout (#6) */}
               <div className="my-4 rounded-3xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Pro tip">
-                <strong 
+                <strong
                   className="uppercase text-[1rem] font-display block text-slate-800 mb-1"
-                  >
-                    <Lightbulb className="text-[--brand-orange] h-4 w-4 mr-2 inline"/>
-                    Pro Tip:
+                >
+                  <Lightbulb className="text-[--brand-orange] h-4 w-4 mr-2 inline" />
+                  Pro Tip:
                 </strong>
                 <p className="m-0 text-slate-700">Annual inspections keep warranties valid and catch small issues before they become leaks.</p>
               </div>
@@ -354,7 +366,7 @@ export default async function Page() {
           </div>
 
           <ServicesAside activePath={SERVICE_PATH} />
-          
+
         </div>
 
         <div data-toc-exclude>
@@ -371,11 +383,11 @@ export default async function Page() {
           heading="Roof Replacement FAQs"
           topicSlug="roof-replacement"
           limit={8}
-        initialItems={faqs}
-        seeMoreHref="/faq"
-      />
+          initialItems={faqs}
+          seeMoreHref="/faq"
+        />
 
-    </Section>
-  </>
+      </Section>
+    </>
   );
 }

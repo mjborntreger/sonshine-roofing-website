@@ -200,7 +200,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
   );
 
   return (
-    <div aria-labelledby="roof-care-club" className="mt-24 py-8 not-prose">
+    <div aria-labelledby="roof-care-club" className="mt-24 not-prose">
       <div className="text-center max-w-3xl mx-auto">
         <h2 id="roof-care-club" className="text-3xl md:text-4xl font-semibold tracking-tight">
           Roof Care Club

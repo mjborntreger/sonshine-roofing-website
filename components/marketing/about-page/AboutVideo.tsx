@@ -11,7 +11,7 @@ export async function AboutVideo() {
   const thumbnailUrl = meta ? selectBestThumbnailUrl(meta.thumbnails) ?? undefined : undefined;
 
   return (
-    <div className="mt-20">
+    <div className="my-8">
       <VideoWithSchema
         videoId={ABOUT_VIDEO_ID}
         title="About SonShine Roofing"

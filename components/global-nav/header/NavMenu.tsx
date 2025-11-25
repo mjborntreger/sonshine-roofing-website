@@ -17,6 +17,7 @@ import {
   Newspaper,
   BookOpen,
   HelpCircle,
+  Eye,
   Home as HomeIcon,
   Image as ImageIcon,
   HardHat,
@@ -40,7 +41,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "Roof Repair": Wrench,
   "Roof Inspection": Search,
   "Roof Maintenance": ShieldCheck,
-  Resources: Wrench,
+  "Our Work": Eye,
   "Project Gallery": ImageIcon,
   "Video Library": PlayCircle,
   Blog: Newspaper,
@@ -49,7 +50,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   Home: HomeIcon,
 };
 
-const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Resources"]);
+const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);
 const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
 
 function MenuToggleIcon({ open }: { open: boolean }) {

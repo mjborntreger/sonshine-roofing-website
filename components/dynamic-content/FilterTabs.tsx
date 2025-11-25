@@ -78,11 +78,11 @@ export default function FilterTabs({
   const activeIndex = indexMap[activeKey];
 
   return (
-    <div className="mt-2">
+    <div>
       <div
         role="tablist"
         aria-label={ariaLabel}
-        className="flex-wrap items-center w-fit justify-start gap-1 rounded-full border border-orange-300 bg-amber-50/50 p-1"
+        className="flex-wrap items-center w-fit justify-start gap-1 rounded-xl border border-blue-200 bg-amber-50/50 p-1"
       >
         {orderedTabs.map((tab) => {
           const selected = tab.key === activeKey;
@@ -102,36 +102,35 @@ export default function FilterTabs({
             ? "h-3 w-3 text-white transition-colors flex-wrap mr-1"
             : "h-3 w-3 text-[--brand-orange] transition-colors flex-wrap mr-1";
           return (
-            <button
-              key={tab.key}
-              role="tab"
-              aria-selected={selected}
-              aria-controls={`project-tab-panel-${tab.key}`}
-              data-tab={tab.key}
-              onClick={() => onTabChange(tab.key)}
-              aria-label={`${tab.label} tab. ${totalMessage}. ${selectionMessage}.`}
-              className={`relative rounded-full px-2 py-1.5 text-sm font-display font-bold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[--brand-orange] ${
-                selected
+              <button
+                key={tab.key}
+                role="tab"
+                aria-selected={selected}
+                aria-controls={`project-tab-panel-${tab.key}`}
+                data-tab={tab.key}
+                onClick={() => onTabChange(tab.key)}
+                aria-label={`${tab.label} tab. ${totalMessage}. ${selectionMessage}.`}
+                className={`relative rounded-lg px-2 py-1.5 text-sm font-display font-bold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[--brand-orange] ${selected
                   ? "border-[--brand-orange] bg-[--brand-orange] text-white shadow-sm"
                   : "border-[--brand-orange]/40 bg-[--brand-orange]/10 text-slate-500 hover:bg-[--brand-orange]/20"
-              }`}
-            >
-              <span className="flex whitespace-normal text-pretty leading-tight tracking-tight flex-row items-center gap-1">
-                <Icon aria-hidden="true" className={iconClass} />
-                <span className="w-auto whitespace-normal">{tab.label}</span>
-              </span>
-              {tab.selectedCount > 0 && (
-                <span
-                  aria-hidden="true"
-                  className="absolute -top-1.5 -right-1.5 inline-flex h-2 w-2 items-center justify-center rounded-full bg-[--brand-blue] shadow ring-[3px] ring-white"
-                />
-              )}
-            </button>
+                  }`}
+              >
+                <span className="flex whitespace-normal text-pretty leading-tight tracking-tight flex-row items-center gap-1">
+                  <Icon aria-hidden="true" className={iconClass} />
+                  <span className="w-auto whitespace-normal">{tab.label}</span>
+                </span>
+                {tab.selectedCount > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -top-1.5 -right-1.5 inline-flex h-2 w-2 items-center justify-center rounded-full bg-[--brand-blue] shadow ring-[3px] ring-white"
+                  />
+                )}
+              </button>
           );
         })}
       </div>
 
-      <div ref={panelRef} className="relative mt-4 overflow-hidden">
+      <div ref={panelRef} className="relative mt-2 overflow-hidden">
         {orderedTabs.map((tab) => {
           const active = tab.key === activeKey;
           const tabIndex = indexMap[tab.key];
@@ -143,9 +142,8 @@ export default function FilterTabs({
               id={`project-tab-panel-${tab.key}`}
               role="tabpanel"
               aria-hidden={!active}
-              className={`absolute inset-0 transition-all duration-200 ease-out ${transformClasses} ${
-                active ? "pointer-events-auto" : "pointer-events-none"
-              }`}
+              className={`absolute inset-0 transition-all duration-200 ease-out ${transformClasses} ${active ? "pointer-events-auto" : "pointer-events-none"
+                }`}
               tabIndex={active ? 0 : -1}
             >
               {children(tab.key)}

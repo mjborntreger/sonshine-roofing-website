@@ -107,8 +107,6 @@ export default function VideoLibraryClient({
   return (
     <ResourceArchiveClient
       kind="video"
-      title="Video Library"
-      description="Highlights from our projects, commercials, and short video explainers."
       apiPath="/api/resources/video"
       pageSize={pageSize}
       initialResult={initialResult}
@@ -121,7 +119,6 @@ export default function VideoLibraryClient({
         },
       }}
       groups={groups}
-      searchPlaceholder="Search videos..."
       labels={{ itemSingular: "video", itemPlural: "videos" }}
       emptyState={{
         title: "No results found.",

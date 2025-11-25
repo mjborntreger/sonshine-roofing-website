@@ -1,4 +1,4 @@
-import { Image as ImageIcon, PlayCircle, Newspaper, BookOpen, HelpCircle, Wrench } from "lucide-react";
+import { Image as ImageIcon, PlayCircle, Newspaper, BookOpen, HelpCircle, Eye } from "lucide-react";
 
 import QuickLinksPanel, { type QuickLinkItem, type QuickLinksPalette } from "@/components/global-nav/static-pages/QuickLinksPanel";
 
@@ -58,8 +58,8 @@ export default function ResourcesQuickLinks({ activePath = "/" }: ResourcesQuick
   return (
     <QuickLinksPanel
       className="my-4"
-      title="Resources"
-      titleIcon={Wrench}
+      title="See Our Work"
+      titleIcon={Eye}
       links={LINKS}
       palette={PALETTE}
       activePath={activePath}

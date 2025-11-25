@@ -32,7 +32,7 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
   const groups: FilterGroupConfig[] = [
     {
       key: "roof",
-      label: "Roof Color",
+      label: "Color",
       facet: "roof_color",
       paramKey: "rc",
       icon: Palette,
@@ -48,7 +48,7 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
     },
     {
       key: "area",
-      label: "Service Area",
+      label: "Location",
       facet: "service_area",
       paramKey: "sa",
       icon: MapPin,
@@ -59,8 +59,6 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
   return (
     <ResourceArchiveClient
       kind="project"
-      title="Roofing Project Gallery"
-      description="Explore our latest major roof replacements in Sarasota, Bradenton, Venice, North Port, and more. Filter by material (shingle, metal, tile), roof color, and service area — or search by phrase to find a specific project."
       apiPath="/api/resources/project"
       pageSize={pageSize}
       initialResult={initialResult}
@@ -73,7 +71,6 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
         },
       }}
       groups={groups}
-      searchPlaceholder="Search roof replacement projects..."
       labels={{ itemSingular: "project", itemPlural: "projects" }}
       emptyState={{
         title: "No results found.",

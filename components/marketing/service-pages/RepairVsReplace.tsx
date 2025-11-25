@@ -91,7 +91,7 @@ export default async function RepairVsReplace() {
                     <div key={id} className={cardStyles}>
                         <span className="flex items-center gap-2">
                             <Icon className={iconStyles} aria-hidden="true" />
-                            <h3 className="m-0">{heading}</h3>
+                            <h3 className="m-0 not-prose text-xl">{heading}</h3>
                         </span>
                         <div className="mt-2 space-y-2">
                             {items.map(({ summary, description }) => (

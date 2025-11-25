@@ -1,5 +1,5 @@
 import SmartLink from "@/components/utils/SmartLink";
-import { ListChecks, ListOrdered, HelpCircle, Phone, ArrowDown, HandCoins, Timer, Percent, MapPin, CheckCircle, ArrowLeftRight, ChevronRight } from "lucide-react";
+import { ListChecks, ListOrdered, HelpCircle, Phone, Timer, Percent, CheckCircle, ArrowLeftRight, ChevronRight, DollarSign } from "lucide-react";
 import ProgramCard from '@/components/marketing/financing/ProgramCard';
 import MonthlyEstimator from '../../components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
@@ -11,6 +11,7 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, serviceSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import Hero from "@/components/ui/Hero";
 
 const SERVICE_PATH = "/financing";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -35,13 +36,9 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const h2 = 'mb-16 mt-40 text-3xl md:text-4xl text-center font-semibold text-slate-900';
+const h2 = 'mb-16 mt-24 text-3xl md:text-4xl text-center font-semibold text-slate-900';
 const h2Icon = "inline mr-4 h-7 w-7 md:h-10 md:w-10 text-[--brand-blue]";
 const h3 = 'text-xl md:text-2xl font-semibold text-slate-900 flex items-center';
-const lead = 'text-lg text-slate-700';
-const pill =
-  'inline-flex items-center gap-2 rounded-full border border-[--brand-orange] bg-white px-3 py-1 text-sm text-slate-800';
-const heroPillIcon = 'inline h-3 w-3 text-[--brand-blue]';
 
 const checkList = "flex items-start gap-2";
 const checkIconYgrene = 'mt-0.5 h-4 w-4 text-[--brand-orange] flex-none';
@@ -49,9 +46,6 @@ const checkIconServiceFinance = 'mt-0.5 h-4 w-4 text-[--brand-cyan] flex-none';
 // Icon style for section headings (fits me / expect / questions)
 const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
 const ctaSecondary = 'btn w-full btn-brand-blue btn-lg phone-affordance';
-const ctaPrimary = "btn btn-brand-orange btn-lg"
-const contactInfoPillStyles = "inline-flex items-center gap-3 rounded-full border-blue-200 bg-white px-4 py-2 shadow-sm text-slate-800 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0";
-const contactInfoIconStyles = "h-5 w-5 text-slate-500";
 
 export default async function FinancingPage() {
   // Dynamic FAQs for topic "financing-payment" (max 8)
@@ -118,208 +112,184 @@ export default async function FinancingPage() {
   const per10kYgrene = "$124/mo per $10k";
 
   return (
-    <section className="mx-auto max-w-8xl">
-      <div className="container-edge py-10 md:py-16">
-        {/* Hero */}
-        <div className="mx-auto max-w-3xl mt-12 text-center">
-          <h1 className="text-3xl md:text-5xl font-semibold tracking-tight text-slate-900">
-            Roof Financing <span className="text-[--brand-blue]">Made Simple</span>
-            <HandCoins className="h-7 w-7 md:h-12 md:w-12 text-[--brand-blue] inline ml-4"/>
-          </h1>
-          <p className={`${lead} mt-4`}>
-            Finance your roof with comfortable monthly payment plans customized to fit your needs. Choose from <strong>equity‑based</strong> (home‑secured) or <strong>credit‑based</strong> plans — both with <span className="font-bold text-[--brand-blue]">same-day approvals</span> and clear terms. When you talk to one of our roofing specialists, we&rsquo;ll guide you through the entire process every step of the way.
-          </p>
-
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            {/* Hero benefit pills with icons */}
-            <span className={pill}>
-              <Timer className={heroPillIcon} aria-hidden="true" />
-              Fast approval
-            </span>
-            <span className={pill}>
-              <Percent className={heroPillIcon} aria-hidden="true" />
-              Fixed‑rate options
-            </span>
-            <span className={pill}>
-              <MapPin className={heroPillIcon} aria-hidden="true" />
-              Local &amp; trusted
-            </span>
-          </div>
-
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <SmartLink
-              href="#get-started"
-              className={ctaPrimary}
-              title="Get Started"
-              data-icon-affordance="down"
-              proseGuard
-            >
-              Get Started
-              <ArrowDown className="icon-affordance h-5 w-5 inline ml-2 text-white" aria-hidden="true" />
-            </SmartLink>
-            <SmartLink
-              href="tel:+19418664320"
-              className={`${contactInfoPillStyles} phone-affordance`}
-              title="Call SonShine Roofing"
-              proseGuard
-              >
-              <Phone className={`${contactInfoIconStyles} phone-affordance-icon`} aria-hidden="true" />
-              <span className="font-semibold">(941) 866-4320</span>
-              </SmartLink>
-          </div>
-        </div>
-
-        <div className="gradient-divider mt-10" />
-
-        <h2 id="get-started" className='mt-16 mb-4 text-3xl md:text-4xl text-center font-semibold text-slate-900'>
-          Free <span className="text-[--brand-blue]">Roof Financing</span> Monthly Payment Estimator
-        </h2>
-        <p className="text-center mx-auto max-w-3xl text-slate-600 mb-8 text-sm md:text-md">Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.</p>
-        <MonthlyEstimator />
-
-        {/* Two programs (plan cards) */}
-        <h2 className={h2} id="pick-a-plan">
-          <ArrowLeftRight className={h2Icon} />
-          Choose a Roof Financing Plan
-        </h2>
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ProgramCard
-            id="ygrene-program-card"
-            theme="orange"
-            title="YGrene PACE Financing (Equity‑based)"
-            subtitle="House‑secured. Payments typically included in your property‑tax bill."
-            logoUrl="https://next.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
-            chips={["No credit check", "Tax‑bill payments", "Equity‑based", "Fast approval"]}
-            keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
-            sampleMonthly={`${sampleMonthly849} on ${currency(defaultAmount)} (15yr @ 8.49%)`}
-            bullets={[
-              "Fixed rate throughout the term",
-              "Simple escrow alignment when payments begin",
-              "Fast approvals with property‑tax history",
-              "Secured by your home",
-            ]}
-            eligibility={[
-              "No bankruptcies in the last 3 years",
-              "No late property‑tax payments in the last 3 years",
-              "Sufficient home equity to cover the project",
-            ]}
-            finePrint="Subject to approval and municipal availability. Terms may vary."
-            cta={{ href: "https://prequalification.ygrene.com/ContractorApply/XYFMHC", label: "Get pre-approved", title: "Ask about YGrene", className: "btn-brand-blue" }}
-          />
-
-          <ProgramCard
-            id="service-finance-program-card"
-            theme="cyan"
-            title="Service Finance (Credit‑based)"
-            subtitle="Signature loan with flexible terms. No lien on your property."
-            logoUrl="https://next.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
-            chips={["Signature loan", "Fixed term", "Fast approval"]}
-            keyFigures={["0% for 12 months", "From 7.9% fixed", per10kService]}
-            sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
-            bullets={[
-              "No property lien",
-              "Same‑as‑cash and deferred‑interest promos",
-              "Popular 10‑ and 15‑year fixed terms",
-              "Quick application with credit check",
-            ]}
-            eligibility={["Basic identity + credit", "Estimated project total", "Income/employment basics"]}
-            finePrint="Final terms provided in loan documents. Promos subject to lender programs."
-            cta={{ href: "/contact-us", label: "Call for details", title: "Call for details", className: "btn-outline" }}
-          />
-        </div>
-
-        {/* Comparison / how it works (custom panels with icons) */}
-        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Which option fits me? */}
-          <section className="rounded-2xl shadow-sm border border-blue-300 bg-white p-4">
-            <h3 className={h3}>
-              <ListChecks className={sectionIcon} aria-hidden="true" />
-              Which option fits me?
-            </h3>
-            <ul className="mt-3 list-disc pl-5 space-y-2 text-slate-700">
-              <li>
-                <strong>Want no credit check?</strong> YGrene’s equity‑based program focuses on your
-                home equity and tax payment history.
-              </li>
-              <li>
-                <strong>Prefer a traditional loan?</strong> Service Financing offers same‑as‑cash and
-                fixed‑term choices.
-              </li>
-              <li>
-                <strong>Need time before payments start?</strong> YGrene offers 18–24 month deferral.
-              </li>
-            </ul>
-          </section>
-
-          {/* What&rsquo;s Next */}
-          <section id="whats-next" className="rounded-2xl border shadow-sm border-blue-300 bg-white p-4">
-            <h3 className={h3}>
-              <ListOrdered className={sectionIcon} aria-hidden="true" />
-              What&rsquo;s next?
-            </h3>
-            <ol className="mt-3 list-decimal pl-5 space-y-2 text-slate-700">
-              <li>
-                <SmartLink
-                  href="#get-started"
-                  className="text-[--brand-blue]"
-                  data-icon-affordance="right"
-                  proseGuard
-                >
-                  Take our free Roof Financing Quiz to discover the ideal plan for you.
-                  <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
-                </SmartLink>
-              </li>
-              <li>
-                <SmartLink
-                  href="/contact-us#book-an-appointment"
-                  className="text-[--brand-blue]"
-                  data-icon-affordance="right"
-                  proseGuard
-                >
-                  Know what documents you&rsquo;ll need
-                  <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
-                </SmartLink>
-              </li>
-              <li>We&rsquo;ll reach out same day or next (if after hours) and schedule a time to meet. Check your email after taking the quiz for additional personalized resources.</li>
-            </ol>
-          </section>
-
-          {/* Questions? */}
-          <section className="rounded-2xl border shadow-sm border-blue-300 bg-white p-4 h-full flex flex-col">
-            <h3 className={h3}>
-              <HelpCircle className={sectionIcon} aria-hidden="true" />
-              Questions?
-            </h3>
-            <p className="mt-3 text-slate-700 flex-1">
-              Our team has helped Sarasota homeowners finance roofs for decades. We’ll walk you
-              through monthly payments, timelines, and total costs — candidly and clearly. Just give us a call and we&rsquo;ll sort it out.
-            </p>
-            <div className="pt-2">
-              <SmartLink
-                href="tel:19418664320"
-                className={ctaSecondary}
-                title="Call SonShine Roofing"
-                proseGuard
-              >
-                <Phone className="phone-affordance-icon inline mr-2 h-4 w-4" />
-                (941) 866‑4320
-              </SmartLink>
+    <>
+      <Hero
+        title="Roof Financing Made Simple"
+        subtitle="Finance your roof with comfortable monthly payment plans customized to fit your needs. Choose from equity‑based (home‑secured) or credit‑based plans — both with same-day approvals and clear terms. When you talk to one of our roofing specialists, we’ll guide you through the entire process every step of the way."
+        badges={[
+          { icon: Timer, label: "Same-day Approval" },
+          { icon: Percent, label: "Equity-based Options" },
+          { icon: DollarSign, label: "Credit-based Options" },
+        ]}
+        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp"
+        children={(
+          <div className="flex justify-center gap-6 flex-wrap mx-auto max-w-3xl">
+            <div>
+              <p className="italic text-sm text-slate-300">Rates as low as</p>
+              <p className="text-blue-400 mt-2 text-4xl">0%</p>
+              <p className="mt-1 text-slate-200">for 12 months</p>
             </div>
-          </section>
-        </div>
+            <div>
+              <p className="italic text-sm text-slate-300">Payments as low as</p>
+              <p className= "text-blue-400 mt-2 text-4xl">$96<span className="text-2xl">/mo</span></p>
+              <p className="mt-1 text-slate-200">per $10,000 financed</p>
+            </div>
+          </div>
+        )}
 
-        {/* Documents checklist (non-interactive) */}
+      />
+
+      <section className="mx-auto max-w-8xl">
+        <div className="container-edge py-10 md:py-16">
+          <h2 id="get-started" className='mb-4 mt-6 text-3xl md:text-4xl text-center font-semibold text-slate-900'>
+            Free <span className="text-[--brand-blue]">Roof Financing</span> Monthly Payment Estimator
+          </h2>
+          <p className="text-center mx-auto max-w-3xl text-slate-600 mb-8 text-sm md:text-md">Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.</p>
+          <MonthlyEstimator />
+
+          {/* Two programs (plan cards) */}
+          <h2 className={h2} id="pick-a-plan">
+            <ArrowLeftRight className={h2Icon} />
+            Choose a Roof Financing Plan
+          </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ProgramCard
+              id="ygrene-program-card"
+              theme="orange"
+              title="YGrene PACE Financing (Equity‑based)"
+              subtitle="House‑secured. Payments typically included in your property‑tax bill."
+              logoUrl="https://next.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
+              chips={["No credit check", "Tax‑bill payments", "Equity‑based", "Fast approval"]}
+              keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
+              sampleMonthly={`${sampleMonthly849} on ${currency(defaultAmount)} (15yr @ 8.49%)`}
+              bullets={[
+                "Fixed rate throughout the term",
+                "Simple escrow alignment when payments begin",
+                "Fast approvals with property‑tax history",
+                "Secured by your home",
+              ]}
+              eligibility={[
+                "No bankruptcies in the last 3 years",
+                "No late property‑tax payments in the last 3 years",
+                "Sufficient home equity to cover the project",
+              ]}
+              finePrint="Subject to approval and municipal availability. Terms may vary."
+              cta={{ href: "https://prequalification.ygrene.com/ContractorApply/XYFMHC", label: "Get pre-approved", title: "Ask about YGrene", className: "btn-brand-blue" }}
+            />
+
+            <ProgramCard
+              id="service-finance-program-card"
+              theme="cyan"
+              title="Service Finance (Credit‑based)"
+              subtitle="Signature loan with flexible terms. No lien on your property."
+              logoUrl="https://next.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
+              chips={["Signature loan", "Fixed term", "Fast approval"]}
+              keyFigures={["0% for 12 months", "From 7.9% fixed", per10kService]}
+              sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
+              bullets={[
+                "No property lien",
+                "Same‑as‑cash and deferred‑interest promos",
+                "Popular 10‑ and 15‑year fixed terms",
+                "Quick application with credit check",
+              ]}
+              eligibility={["Basic identity + credit", "Estimated project total", "Income/employment basics"]}
+              finePrint="Final terms provided in loan documents. Promos subject to lender programs."
+              cta={{ href: "/contact-us", label: "Call for details", title: "Call for details", className: "btn-outline" }}
+            />
+          </div>
+
+          {/* Comparison / how it works (custom panels with icons) */}
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+            {/* Which option fits me? */}
+            <section className="rounded-2xl shadow-sm border border-blue-300 bg-white p-4">
+              <h3 className={h3}>
+                <ListChecks className={sectionIcon} aria-hidden="true" />
+                Which option fits me?
+              </h3>
+              <ul className="mt-3 list-disc pl-5 space-y-2 text-slate-700">
+                <li>
+                  <strong>Want no credit check?</strong> YGrene’s equity‑based program focuses on your
+                  home equity and tax payment history.
+                </li>
+                <li>
+                  <strong>Prefer a traditional loan?</strong> Service Financing offers same‑as‑cash and
+                  fixed‑term choices.
+                </li>
+                <li>
+                  <strong>Need time before payments start?</strong> YGrene offers 18–24 month deferral.
+                </li>
+              </ul>
+            </section>
+
+            {/* What&rsquo;s Next */}
+            <section id="whats-next" className="rounded-2xl border shadow-sm border-blue-300 bg-white p-4">
+              <h3 className={h3}>
+                <ListOrdered className={sectionIcon} aria-hidden="true" />
+                What&rsquo;s next?
+              </h3>
+              <ol className="mt-3 list-decimal pl-5 space-y-2 text-slate-700">
+                <li>
+                  <SmartLink
+                    href="#get-started"
+                    className="text-[--brand-blue]"
+                    data-icon-affordance="right"
+                    proseGuard
+                  >
+                    Take our free Roof Financing Quiz to discover the ideal plan for you.
+                    <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
+                  </SmartLink>
+                </li>
+                <li>
+                  <SmartLink
+                    href="/contact-us#book-an-appointment"
+                    className="text-[--brand-blue]"
+                    data-icon-affordance="right"
+                    proseGuard
+                  >
+                    Know what documents you&rsquo;ll need
+                    <ChevronRight className="icon-affordance h-4 w-4 inline ml-1 text-slate-600" />
+                  </SmartLink>
+                </li>
+                <li>We&rsquo;ll reach out same day or next (if after hours) and schedule a time to meet. Check your email after taking the quiz for additional personalized resources.</li>
+              </ol>
+            </section>
+
+            {/* Questions? */}
+            <section className="rounded-2xl border shadow-sm border-blue-300 bg-white p-4 h-full flex flex-col">
+              <h3 className={h3}>
+                <HelpCircle className={sectionIcon} aria-hidden="true" />
+                Questions?
+              </h3>
+              <p className="mt-3 text-slate-700 flex-1">
+                Our team has helped Sarasota homeowners finance roofs for decades. We’ll walk you
+                through monthly payments, timelines, and total costs — candidly and clearly. Just give us a call and we&rsquo;ll sort it out.
+              </p>
+              <div className="pt-2">
+                <SmartLink
+                  href="tel:19418664320"
+                  className={ctaSecondary}
+                  title="Call SonShine Roofing"
+                  proseGuard
+                >
+                  <Phone className="phone-affordance-icon inline mr-2 h-4 w-4" />
+                  (941) 866‑4320
+                </SmartLink>
+              </div>
+            </section>
+          </div>
+
+          {/* Documents checklist (non-interactive) */}
           <h2 className={h2} id="docs">
             <ListChecks className={h2Icon} />
             Documents You&rsquo;ll Need
           </h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            <section 
-              aria-labelledby="ygrene-docs" 
+            <section
+              aria-labelledby="ygrene-docs"
               className="rounded-2xl shadow-md border border-[--brand-orange] bg-white p-4">
               <div className="flex justify-between">
-                <h3 
-                  id="ygrene-docs" 
+                <h3
+                  id="ygrene-docs"
                   className="text-xl font-semibold text-slate-900">YGrene PACE Financing (Equity‑based)
                 </h3>
                 <Image
@@ -355,24 +325,24 @@ export default async function FinancingPage() {
               </ul>
             </section>
 
-            <section 
-              aria-labelledby="service-docs" 
+            <section
+              aria-labelledby="service-docs"
               className="rounded-2xl shadow-md border border-[--brand-cyan] bg-white p-4">
               <div className="flex justify-between">
-                <h3 
-                id="service-docs" 
-                className="text-xl font-semibold text-slate-900"
+                <h3
+                  id="service-docs"
+                  className="text-xl font-semibold text-slate-900"
                 >
-                Service Finance (Credit‑based)
-              </h3>
-              <Image
+                  Service Finance (Credit‑based)
+                </h3>
+                <Image
                   src="https://next.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
                   title="Service Finance Logo"
                   alt="Service Finance Logo"
                   className="h-8 w-auto opacity-70"
                   width={180}
                   height={64}
-              />
+                />
               </div>
               <ul className="mt-3 space-y-2 text-slate-700">
                 <li className={checkList}>
@@ -399,25 +369,26 @@ export default async function FinancingPage() {
             </section>
           </div>
 
-        {/* Compliance */}
-        <p className="italic mt-10 text-xs text-slate-500">
-          Rates, terms, and eligibility subject to change and based on lender approval. SonShine
-          Roofing is not a lender. Program availability may vary by municipality. Final terms will be
-          provided in your financing documents.
-        </p>
+          {/* Compliance */}
+          <p className="italic mt-10 text-xs text-slate-500">
+            Rates, terms, and eligibility subject to change and based on lender approval. SonShine
+            Roofing is not a lender. Program availability may vary by municipality. Final terms will be
+            provided in your financing documents.
+          </p>
 
-        <FaqInlineList
-          heading="Financing FAQs"
-          topicSlug="financing-payment"
-          limit={8}
-          initialItems={faqs}
-          seeMoreHref="/faq"
-        />
+          <FaqInlineList
+            heading="Financing FAQs"
+            topicSlug="financing-payment"
+            limit={8}
+            initialItems={faqs}
+            seeMoreHref="/faq"
+          />
 
-        <JsonLd data={serviceLd} />
-        <JsonLd data={breadcrumbsLd} />
-        <JsonLd data={webPageLd} />
-      </div>
-    </section>
+          <JsonLd data={serviceLd} />
+          <JsonLd data={breadcrumbsLd} />
+          <JsonLd data={webPageLd} />
+        </div>
+      </section>
+    </>
   );
 }

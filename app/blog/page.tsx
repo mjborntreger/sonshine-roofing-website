@@ -7,6 +7,7 @@ import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import Hero from "@/components/ui/Hero";
 
 export const revalidate = 900;
 
@@ -26,9 +27,16 @@ export async function generateMetadata(): Promise<Metadata> {
       "roofing tips",
       "roof repair advice",
       "roof replacement guide",
-      "Sarasota roofing",
-      "Manatee County roofing",
-      "Charlotte County roofing",
+      "Sarasota roofing blog",
+      "Manatee County roofing blog",
+      "Charlotte County roofing blog",
+      "North Port roofing blog",
+      "roofing insights",
+      "roofing news",
+      "Venice roofing blog",
+      "roof replacement advice",
+      "roof replacement tips",
+      "roof repair guide",
     ],
     image: { url: PAGE_IMAGE, width: 1200, height: 630 },
   });
@@ -69,24 +77,32 @@ export default async function BlogArchivePage() {
   );
 
   return (
-    <Section>
-      <div className="container-edge py-8">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-          <div>
-            <JsonLd data={collectionLd} />
-            <JsonLd data={breadcrumbsLd} />
+    <>
+      <Hero
+        title="SonShine Roofing Blog"
+        eyelash="Latest Roofing Insights"
+        subtitle="Enjoy these handcrafted articles and step-by-step guides from our team that discuss a wide variety of roofing topics (and a few extras, from our family to yours)."
+      />
 
-            <BlogArchiveClient
-              initialResult={initialResult}
-              categories={filteredCategories}
-              pageSize={PAGE_SIZE}
-              initialFilters={initialFilters}
-            />
+      <Section>
+        <div className="container-edge py-8">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+            <div>
+              <JsonLd data={collectionLd} />
+              <JsonLd data={breadcrumbsLd} />
+
+              <BlogArchiveClient
+                initialResult={initialResult}
+                categories={filteredCategories}
+                pageSize={PAGE_SIZE}
+                initialFilters={initialFilters}
+              />
+            </div>
+
+            <ResourcesAside activePath={PAGE_PATH} />
           </div>
-
-          <ResourcesAside activePath={PAGE_PATH} />
         </div>
-      </div>
-    </Section>
+      </Section>
+    </>
   );
 }

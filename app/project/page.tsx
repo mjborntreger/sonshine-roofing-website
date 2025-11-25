@@ -8,6 +8,7 @@ import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import Hero from "@/components/ui/Hero";
 
 export const revalidate = 900; // 15 minutes ISR
 export const dynamic = "force-static";
@@ -77,22 +78,31 @@ export default async function ProjectArchivePage() {
   );
 
   return (
-    <Section>
-      <div className="container-edge py-4">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-          <div>
-            <JsonLd data={collectionLd} />
-            <JsonLd data={breadcrumbsLd} />
-            <ProjectArchiveClient
-              initialResult={initialResult}
-              filterTerms={filterTerms}
-              pageSize={PAGE_SIZE}
-              initialFilters={initialFilters}
-            />
+    <>
+      <Hero
+        title="Roofing Project Gallery"
+        eyelash="See Our Past Work"
+        subtitle="Explore our latest major roof replacements in Sarasota, Bradenton, Venice, North Port, and more. Filter by material (shingle, metal, tile), roof color, and service area — or search by phrase to find a specific project."
+        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/See-Our-Past-Work.webp"
+        
+      />
+      <Section>
+        <div className="container-edge py-4">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
+            <div>
+              <JsonLd data={collectionLd} />
+              <JsonLd data={breadcrumbsLd} />
+              <ProjectArchiveClient
+                initialResult={initialResult}
+                filterTerms={filterTerms}
+                pageSize={PAGE_SIZE}
+                initialFilters={initialFilters}
+              />
+            </div>
+            <ResourcesAside activePath={PAGE_PATH} />
           </div>
-          <ResourcesAside activePath={PAGE_PATH} />
         </div>
-      </div>
-    </Section>
+      </Section>
+    </>
   );
 }

@@ -7,7 +7,7 @@ type GridProps = React.HTMLAttributes<HTMLDivElement> & {
   useCanonical?: boolean;
 };
 
-const canonicalClasses = "grid grid-cols-1 gap-4";
+const canonicalClasses = "grid grid-cols-1 lg:grid-cols-2 gap-4";
 
 const Grid = React.forwardRef<HTMLDivElement, GridProps>(function Grid(
   { className, children, useCanonical = true, ...props },

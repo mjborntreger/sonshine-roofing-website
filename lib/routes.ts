@@ -131,7 +131,7 @@ export const NAV_MAIN: ReadonlyArray<NavItem> = [
     })),
   },
   {
-    label: 'Resources',
+    label: 'Our Work',
     children: [
       { label: 'Project Gallery', href: ROUTES.project },
       { label: 'Video Library', href: ROUTES.videoLibrary },

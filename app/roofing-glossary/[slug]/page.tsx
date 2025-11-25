@@ -14,6 +14,38 @@ function escapeRegExp(s: string) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function decodeHtmlEntities(input: string): string {
+  if (!input) return "";
+  const namedEntityMap: Record<string, string> = {
+    amp: "&",
+    lt: "<",
+    gt: ">",
+    quot: '"',
+    apos: "'",
+    nbsp: " ",
+    rsquo: "’",
+    lsquo: "‘",
+    ldquo: "“",
+    rdquo: "”",
+    ndash: "–",
+    mdash: "—",
+    hellip: "…",
+  };
+  return input
+    .replace(/&#(\d+);/g, (_, dec: string) => {
+      const codePoint = Number.parseInt(dec, 10);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : "";
+    })
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => {
+      const codePoint = Number.parseInt(hex, 16);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : "";
+    })
+    .replace(/&([a-zA-Z]+);/g, (_, name: string) => {
+      const mapped = namedEntityMap[name.toLowerCase()];
+      return mapped ?? `&${name};`;
+    });
+}
+
 /**
  * Auto-link occurrences of glossary terms in an HTML string.
  * - Skips the current term
@@ -172,6 +204,103 @@ function parseHtmlToTree(html: string): HtmlNode[] {
   return root.children;
 }
 
+const ALLOWED_TAGS = new Set([
+  'p', 'ul', 'ol', 'li', 'strong', 'em', 'b', 'i', 'a', 'code', 'sup', 'sub', 'br'
+]);
+const DROP_TAGS = new Set(['script', 'style', 'iframe', 'object', 'embed', 'template', 'noscript']);
+
+function sanitizeHref(href: string): string | null {
+  const trimmed = href.trim();
+  if (!trimmed) return null;
+  const lower = trimmed.toLowerCase();
+  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) return null;
+
+  // Allow https/http/mailto/tel schemes, otherwise require relative/hash links
+  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) {
+    const scheme = trimmed.split(':', 1)[0].toLowerCase();
+    if (scheme === 'https' || scheme === 'http' || scheme === 'mailto' || scheme === 'tel') {
+      return trimmed;
+    }
+    return null;
+  }
+
+  return trimmed;
+}
+
+function sanitizeGlossaryNodes(nodes: HtmlNode[]): HtmlNode[] {
+  const out: HtmlNode[] = [];
+  for (const node of nodes) {
+    if (node.type === 'text') {
+      out.push({ type: 'text', content: decodeHtmlEntities(node.content) });
+      continue;
+    }
+
+    const tag = node.tag.toLowerCase();
+    if (DROP_TAGS.has(tag)) continue;
+
+    const children = sanitizeGlossaryNodes(node.children);
+
+    if (!ALLOWED_TAGS.has(tag)) {
+      out.push(...children);
+      continue;
+    }
+
+    if (tag === 'br') {
+      out.push({ type: 'element', tag, attrs: {}, children: [] });
+      continue;
+    }
+
+    if (tag === 'a') {
+      const href = typeof node.attrs.href === 'string' ? sanitizeHref(node.attrs.href) : null;
+      if (!href) {
+        out.push(...children);
+        continue;
+      }
+      const attrs: Record<string, string> = { href };
+      if (typeof node.attrs.title === 'string') attrs.title = node.attrs.title;
+      if (typeof node.attrs.class === 'string') attrs.class = node.attrs.class;
+      out.push({ type: 'element', tag, attrs, children });
+      continue;
+    }
+
+    out.push({ type: 'element', tag, attrs: {}, children });
+  }
+  return out;
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function escapeAttribute(value: string) {
+  return escapeHtml(value).replace(/"/g, '&quot;');
+}
+
+function serializeNodes(nodes: HtmlNode[]): string {
+  return nodes
+    .map((node) => {
+      if (node.type === 'text') return escapeHtml(node.content);
+      const attrs = Object.entries(node.attrs ?? {})
+        .map(([name, value]) => `${name}="${escapeAttribute(String(value))}"`)
+        .join(' ');
+      const openTag = attrs ? `<${node.tag} ${attrs}>` : `<${node.tag}>`;
+      if (VOID_ELEMENTS.has(node.tag)) return openTag;
+      const children = serializeNodes(node.children || []);
+      return `${openTag}${children}</${node.tag}>`;
+    })
+    .join('');
+}
+
+function sanitizeGlossaryHtml(html: string): string {
+  if (!html) return '';
+  const parsed = parseHtmlToTree(html);
+  const sanitized = sanitizeGlossaryNodes(parsed);
+  return serializeNodes(sanitized);
+}
+
 const dashedToCamel = (prop: string) => prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
 
 function parseStyle(value: string) {
@@ -204,6 +333,9 @@ function attributeNameToProp(name: string) {
 function attributesToProps(attrs: Record<string, string>) {
   const props: Record<string, unknown> = {};
   for (const [name, rawValue] of Object.entries(attrs)) {
+    const lower = name.toLowerCase();
+    if (lower === 'style') continue; // strip inline styles
+    if (lower.startsWith('on')) continue; // drop event handlers
     const propName = attributeNameToProp(name);
     if (propName === 'style') {
       props.style = parseStyle(rawValue);
@@ -266,9 +398,11 @@ function renderGlossaryHtml(
   currentSlug: string
 ): ReactNode {
   if (!html) return null;
-  const linked = autoLinkGlossary(html, index, currentSlug);
+  const sanitized = sanitizeGlossaryHtml(html);
+  const linked = autoLinkGlossary(sanitized, index, currentSlug);
   const nodes = parseHtmlToTree(linked);
-  return renderNodes(nodes);
+  const safeNodes = sanitizeGlossaryNodes(nodes);
+  return renderNodes(safeNodes);
 }
 
 export const revalidate = 86400;

@@ -2,7 +2,7 @@ import SmartLink from "@/components/utils/SmartLink";
 import { Accordion } from "@/components/ui/Accordion";
 import { Clock, Tag, Users, Languages, CreditCard, Hammer, MapPin, BadgePercent, ArrowDown } from "lucide-react";
 
-const h2Styles = "mb-8 text-4xl text-center"
+const h2Styles = "mb-8 text-4xl"
 const pillarsGrid = "mt-6 grid grid-cols-1 gap-4 items-stretch";
 const pStyles = "text-md list-disc pl-5 space-y-1 marker:text-slate-400";
 const linkStyles = "text-[--brand-blue] icon-affordance"
