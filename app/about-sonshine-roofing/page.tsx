@@ -96,8 +96,8 @@ export default async function Page() {
         justifyStart
         imageSrc="https://next.sonshineroofing.com/wp-content/uploads/About-Us-Collage-new.png"
         badges={[
-          { icon: ShieldCheck, label: "Licensed &amp; Insured" },
-          { icon: MapPin, label: "Local &amp; Family-owned" },
+          { icon: ShieldCheck, label: "Licensed & Insured" },
+          { icon: MapPin, label: "Local & Family-owned" },
           { icon: HardHat, label: "4 Decades of Experience" },
           { icon: Heart, label: "Faith-based Values" },
           { icon: Users, label: "Community Sponsor" },
@@ -134,10 +134,7 @@ export default async function Page() {
                 defaultOpen
               >
                 <p>
-                  We specialize in <strong>residential roofing services</strong>, including <strong>roof repair</strong>, <strong>roof replacement</strong>,
-                  <strong>roof inspections</strong>, and our <strong>Roof Care Club</strong>, which is our preventative maintenance program uniquely
-                  designed for Sarasota-area homeowners. We work with a wide variety of materials, including
-                  <strong>asphalt shingles</strong>, <strong>metal panels</strong>, <strong>concrete tiles</strong>, and even some <strong>flat roofs</strong>.
+                  We specialize in <strong>residential roofing services</strong>, including <strong>roof repair</strong>, <strong>roof replacement</strong>, <strong>roof inspections</strong>, and our <strong>Roof Care Club</strong>, which is our preventative maintenance program uniquely designed for Sarasota-area homeowners. We work with a wide variety of materials, including <strong>asphalt shingles</strong>, <strong>metal panels</strong>, <strong>concrete tiles</strong>, and even some <strong>flat roofs</strong>.
                 </p>
                 <AboutVideo />
                 <p>
