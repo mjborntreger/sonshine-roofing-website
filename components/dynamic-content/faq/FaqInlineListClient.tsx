@@ -71,13 +71,27 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
   return (
     <div className="mb-8 mt-24 px-2" data-toc-exclude>
       <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="flex items-center gap-2 text-center text-3xl font-semibold text-slate-800 sm:text-left md:text-4xl">
-          <HelpCircle
-            className="mr-1 inline h-7 w-7 text-[--brand-blue] md:h-9 md:w-9"
-            aria-hidden="true"
-          />
-          {heading}
-        </h2>
+        <div className="flex items-start justify-start gap-4">
+          <h2 className="flex items-center gap-2 text-center text-3xl font-semibold text-slate-800 sm:text-left md:text-4xl">
+            <HelpCircle
+              className="mr-1 inline h-7 w-7 text-[--brand-blue] md:h-9 md:w-9"
+              aria-hidden="true"
+            />
+            {heading}
+          </h2>
+          <div className="text-right">
+            <SmartLink
+              href={seeMoreHref}
+              className={lessFatCta}
+              title="See All FAQs"
+              data-icon-affordance="right"
+              proseGuard
+            >
+              See All FAQs
+              <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
+            </SmartLink>
+          </div>
+        </div>
         <button
           type="button"
           onClick={handleToggleAll}
@@ -85,13 +99,13 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
         >
           {allOpen ? (
             <>
-            Collapse all
-            <ArrowUp className="h-4 w-4" aria-hidden="true" />
+              Collapse all
+              <ArrowUp className="h-4 w-4" aria-hidden="true" />
             </>
           ) : (
             <>
-             Expand all
-             <ArrowDown className="h-4 w-4" aria-hidden="true" />
+              Expand all
+              <ArrowDown className="h-4 w-4" aria-hidden="true" />
             </>
           )}
         </button>
@@ -119,18 +133,6 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
           ))}
         </div>
       </div>
-      <div className="mt-12 text-right">
-        <SmartLink
-          href={seeMoreHref}
-          className={lessFatCta}
-          title="See All FAQs"
-          data-icon-affordance="right"
-          proseGuard
-        >
-          See All FAQs
-          <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
-        </SmartLink>
-      </div>
     </div>
   );
 }
@@ -147,7 +149,7 @@ const FaqItem = forwardRef<HTMLDetailsElement, FaqItemProps>(function FaqItem(
   return (
     <Accordion
       ref={ref}
-      summary={<h3 className="text-[1.2rem]">{title}</h3>}
+      summary={<h3 className="text-xl text-slate-800">{title}</h3>}
       size="md"
       tone="soft"
       radius="2xl"
@@ -155,6 +157,7 @@ const FaqItem = forwardRef<HTMLDetailsElement, FaqItemProps>(function FaqItem(
     >
       <div
         dangerouslySetInnerHTML={{ __html: contentHtml || "" }}
+        className="text-[1rem] leading-loose text-slate-700"
       />
     </Accordion>
   );

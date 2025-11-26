@@ -17,7 +17,7 @@ const PAGE_PATH = '/faq';
 export async function generateMetadata(): Promise<Metadata> {
   // EDIT: FAQ archive SEO title/description/copy here (applies to prod + staging)
   const title = 'Roofing FAQs | SonShine Roofing';
-  const description = 'Clear, no-nonsense answers to the most common roofing questions in Sarasota, Manatee, and Charlotte Counties. Get the facts before you climb a ladder.';
+  const description = 'Clear, no-nonsense answers to the most common roofing questions in Sarasota, Manatee, and Charlotte Counties. Get the facts before you buy.';
 
   return {
     title,
@@ -110,7 +110,7 @@ export default async function FAQArchivePage(_: PageProps) {
             <JsonLd data={faqLd} />
             <JsonLd data={breadcrumbsLd} />
 
-            {/* Search (client-side, exact phrase like Blog) */}
+            {/* Search */}
             <div className="mt-6" role="search">
               <div className="rounded-2xl border border-blue-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
                 <div className="inline-flex w-full items-start">
@@ -119,7 +119,7 @@ export default async function FAQArchivePage(_: PageProps) {
                     id="faq-search"
                     type="search"
                     defaultValue={q}
-                    placeholder="Search questions..."
+                    placeholder="Start typing..."
                     aria-label="Search FAQs"
                     autoComplete="off"
                     className="w-full rounded-md border border-blue-400 bg-white px-3 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:outline-none"
@@ -147,7 +147,7 @@ export default async function FAQArchivePage(_: PageProps) {
             </div>
 
             {/* Client-driven No results panel */}
-            <div id="faq-no-results" className="mt-6 hidden rounded-md border border-blue-400 bg-white p-4">
+            <div id="faq-no-results" className="mt-6 hidden rounded-md border border-blue-200 bg-white p-4">
               <p className="text-sm text-slate-700">
                 No results for <span id="faq-query" className="font-semibold"></span>.
               </p>
@@ -168,9 +168,9 @@ export default async function FAQArchivePage(_: PageProps) {
                   <section key={slug} id={`topic-${slug}`}>
                     <Accordion
                       className="faq-topic"
-                      icon={<HelpCircle className="h-4 w-4" aria-hidden="true" />}
+                      icon={<HelpCircle className="h-5 w-5" aria-hidden="true" />}
                       summary={
-                        <h2 className="text-sm text-slate-700" data-topic-name={title}>
+                        <h2 className="text-2xl" data-topic-name={title}>
                           {title}
                         </h2>
                       }
@@ -181,8 +181,8 @@ export default async function FAQArchivePage(_: PageProps) {
                           </span>
                         </span>
                       }
-                      radius="2xl"
-                      tone="medium"
+                      radius="3xl"
+                      tone="soft"
                       size="sm"
                       proseBody={false}
                       defaultOpen
@@ -191,17 +191,17 @@ export default async function FAQArchivePage(_: PageProps) {
                         <Accordion
                           key={f.slug}
                           id={`faq-${f.slug}`}
-                          className="faq-item mb-2"
+                          className="faq-item mb-4"
                           data-title={(f.title || '').toString()}
                           data-topic={title}
                           data-excerpt=""
-                          summary={<h3 className="text-[1.2rem]">{f.title}</h3>}
+                          summary={<h3 className="text-xl text-slate-800">{f.title}</h3>}
                           radius="2xl"
                           tone="soft"
                           size="sm"
                           proseBody={false}
                         >
-                          <div dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }} />
+                          <div className="text-[1rem] leading-loose text-slate-700" dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }} />
                         </Accordion>
                       ))}
                     </Accordion>

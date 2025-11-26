@@ -17,8 +17,9 @@ import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { creativeWorkSchema, projectReviewSchema, videoObjectSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
-import { List, Rows3 } from "lucide-react";
+import { List } from "lucide-react";
 import BackToProjectsButton from "@/components/dynamic-content/project/BackToProjectsButton";
+import Hero from "@/components/ui/Hero";
 
 type OgImageRecord = {
   url?: unknown;
@@ -91,7 +92,7 @@ function getYouTubeId(url?: string | null): string | null {
 }
 
 const Badge = ({ children }: { children: React.ReactNode }) => (
-  <span className="inline-block px-2 py-1 text-xs rounded-full bg-[--brand-orange] text-white">
+  <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-slate-700">
     {children}
   </span>
 );
@@ -116,11 +117,15 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       : null;
 
   const videoId = getYouTubeId(project.youtubeUrl);
-  const hasAnyBadges =
-    (project.materialTypes?.length ?? 0) +
-    (project.roofColors?.length ?? 0) +
-    (project.serviceAreas?.length ?? 0) >
-    0;
+  const heroImageUrl = project.heroImage?.url ?? undefined;
+  const heroImageAlt = project.heroImage?.altText || project.title;
+  const heroBadges = [
+    ...(project.materialTypes ?? []).map((t) => ({ label: t.name })),
+    ...(project.roofColors ?? []).map((t) => ({ label: t.name })),
+    ...(project.serviceAreas ?? []).map((t) => ({ label: t.name })),
+    { label: "Roof Replacement" },
+  ].filter((badge) => badge.label);
+  const hasAnyBadges = heroBadges.length > 0;
 
   const origin = SITE_ORIGIN;
   const shareUrl = `${origin}/project/${slug}`;
@@ -131,14 +136,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const ogImgMaybe =
     (ogImageSecondary && typeof ogImageSecondary.secureUrl === "string" && ogImageSecondary.secureUrl) ||
     (ogImageSecondary && typeof ogImageSecondary.url === "string" && ogImageSecondary.url) ||
-    project.heroImage?.url ||
+    heroImageUrl ||
     "/og-default.png";
   const ogImgAbs = ogImgMaybe.startsWith("http") ? ogImgMaybe : `${origin}${ogImgMaybe}`;
 
   const areaServed = (project.serviceAreas || []).map((t) => t.name);
   const materials = (project.materialTypes || []).map((t) => t.name);
   const colors = (project.roofColors || []).map((t) => t.name);
-  const posterUrl = project.heroImage?.url ? ogImgAbs : undefined;
+  const posterUrl = heroImageUrl ? ogImgAbs : undefined;
 
   const seenGalleryUrls = new Set<string>();
   const galleryImageObjects: Array<Record<string, unknown>> = [];
@@ -169,7 +174,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   addImageObject(
     ogImgAbs,
-    project.heroImage?.altText ?? project.title,
+    heroImageAlt,
     project.heroImage?.width ?? PROJECT_GALLERY_DEFAULT_WIDTH,
     project.heroImage?.height ?? PROJECT_GALLERY_DEFAULT_HEIGHT,
     "primary"
@@ -233,147 +238,147 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         testimonial: project.customerTestimonial,
         projectName: project.title,
         projectUrl: shareUrl,
-        projectImage: project.heroImage?.url,
+        projectImage: heroImageUrl,
         origin,
       })
       : null;
 
   return (
-    <Section>
-      {videoSchema ? <JsonLd id="project-video" data={videoSchema} /> : null}
-      <JsonLd data={projectSchema} />
-      {reviewSchema ? <JsonLd id="project-review" data={reviewSchema} /> : null}
-
-      {/* Title + gradient stripe */}
-      <div>
-        <BackToProjectsButton />
-        <h1 className="mb-8 mt-4 text-3xl md:text-5xl">{project.title}</h1>
-      </div>
-      <ShareWhatYouThink urlOverride={shareUrl} />
-
-      <div className="h-1 w-full mt-6 mb-2 rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
-
-      {/* Two-column layout */}
-      <div className="mt-6 grid grid-cols-1 items-start gap-8 lg:grid-cols-[4fr_2fr]">
-        {/* Left column: Video facade (fallback to image) + badges */}
+    <>
+      <Hero 
+        title={project.title}
+        subtitle=""
+        imageSrc={heroImageUrl}
+        justifyStart
+        badges={heroBadges}
+      >
+      </Hero>
+      <Section>
+        {videoSchema ? <JsonLd id="project-video" data={videoSchema} /> : null}
+        <JsonLd data={projectSchema} />
+        {reviewSchema ? <JsonLd id="project-review" data={reviewSchema} /> : null}
         <div>
-          {videoId ? (
-            <ProjectVideo
-              title={project.title}
-              videoId={videoId}
-              posterUrl={posterUrl}
-              posterAlt={project.heroImage?.altText || project.title}
-            />
-          ) : (
-            project.heroImage?.url && (
-              <Image
-                src={project.heroImage.url}
-                alt={project.heroImage.altText || project.title}
-                width={1280}
-                height={720}
-                sizes="(max-width: 1280px) 100vw, 768px"
-                className="rounded-2xl bg-neutral-50"
-                priority
-                fetchPriority="high"
-                loading="eager"
+          <BackToProjectsButton />
+        </div>
+
+        {/* Two-column layout */}
+        <div className="mt-6 grid grid-cols-1 items-start gap-8 lg:grid-cols-[4fr_2fr]">
+          {/* Left column: Video facade (fallback to image) + badges */}
+          <div>
+            {videoId ? (
+              <ProjectVideo
+                title={project.title}
+                videoId={videoId}
+                posterUrl={posterUrl}
+                posterAlt={heroImageAlt}
               />
-            )
-          )}
-          {hasAnyBadges && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {project.materialTypes?.map((t) => (
-                <Badge key={`mt-${t.slug}`}>{t.name}</Badge>
-              ))}
-              {project.roofColors?.map((t) => (
-                <Badge key={`rc-${t.slug}`}>{t.name}</Badge>
-              ))}
-              {project.serviceAreas?.map((t) => (
-                <Badge key={`sa-${t.slug}`}>{t.name}</Badge>
-              ))}
-              <Badge>Roof Replacement</Badge>
-            </div>
-          )}
+            ) : (
+              heroImageUrl && (
+                <Image
+                  src={heroImageUrl}
+                  alt={heroImageAlt}
+                  width={1280}
+                  height={720}
+                  sizes="(max-width: 1280px) 100vw, 768px"
+                  className="rounded-2xl bg-neutral-50"
+                  priority
+                  fetchPriority="high"
+                  loading="eager"
+                />
+              )
+            )}
+            {hasAnyBadges && (
+              <div className="flex flex-wrap gap-2 mt-4">
+                {heroBadges.map((badge, index) => (
+                  <Badge key={`hero-badge-${index}`}>{badge.label}</Badge>
+                ))}
+              </div>
+            )}
 
-          {/* Customer Testimonial */}
-          {project.customerTestimonial ? (
-            <ProjectTestimonial testimonial={project.customerTestimonial} className="my-8" />
-          ) : null}
+            <ShareWhatYouThink urlOverride={shareUrl} />
 
-          {/* Gallery */}
-          <ProjectGallery images={project.projectImages} projectTitle={project.title} />
+            {/* Customer Testimonial */}
+            {project.customerTestimonial ? (
+              <ProjectTestimonial testimonial={project.customerTestimonial} className="my-8" />
+            ) : null}
+
+            {/* Gallery */}
+            <ProjectGallery images={project.projectImages} projectTitle={project.title} />
+          </div>
+
+          {/* Right column: Project Details + Products */}
+          <div className="sticky top-24 prose bg-amber-50/50 shadow-sm rounded-3xl border border-blue-200">
+            {project.projectDescription && (
+              <>
+                <div className="rounded-t-3xl px-6 border-b border-blue-200 overflow-hidden bg-blue-50">
+                  <h3 className="text-2xl mt-6">
+                    About This Project
+                  </h3>
+
+                </div>
+                <div className="px-6">
+                  <h4 className="mt-4 text-slate-600">
+                    Summary
+                  </h4>
+                  <p>{project.projectDescription}</p>
+                </div>
+
+              </>
+            )}
+
+            {project.productLinks?.length > 0 && (
+              <>
+                <div className="rounded-b-3xl px-6 border-t border-blue-200 overflow-hidden bg-blue-50">
+                  <h4 className="mt-4 text-slate-600">
+                    <List className="text-[--brand-blue] mr-2 inline h-4 w-4" />
+                    Products Used
+                  </h4>
+                  <ul className="pl-5 list-disc not-prose pb-4 text-sm">
+                    {project.productLinks.map((p, i) => (
+                      <li key={i}>
+                        {p.productLink ? (
+                          <SmartLink
+                            href={p.productLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[--brand-blue] transition-colors hover:text-blue-800"
+                            showExternalIcon
+                          >
+                            {p.productName}
+                          </SmartLink>
+                        ) : (
+                          <span>{p.productName}</span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Block Editor Field */}
+          {project.contentHtml && (
+            <div className="mt-6 prose" dangerouslySetInnerHTML={{ __html: project.contentHtml }} />
+          )}
         </div>
 
-        {/* Right column: Project Details + Products */}
-        <div className="sticky top-24 prose bg-amber-50/50 shadow-sm rounded-3xl border border-blue-200">
-          {project.projectDescription && (
-            <>
-              <div className="rounded-t-3xl px-6 border-b border-blue-200 overflow-hidden bg-blue-50">
-                <h3 className="text-2xl mt-6">
-                  About This Project
-                </h3>
+        <YouMayAlsoLike
+          variant="project"
+          projects={projectPool}
+          serviceAreaSlug={serviceAreaSlugs}
+          serviceAreaName={primaryServiceAreaName}
+          excludeSlug={project.slug}
+        />
 
-              </div>
-              <div className="px-6">
-                <h4 className="mt-4 text-slate-600">
-                  Summary
-                </h4>
-                <p>{project.projectDescription}</p>
-              </div>
-
-            </>
-          )}
-
-          {project.productLinks?.length > 0 && (
-            <>
-              <div className="rounded-b-3xl px-6 border-t border-blue-200 overflow-hidden bg-blue-50">
-                <h4 className="mt-4 text-slate-600">
-                  <List className="text-[--brand-blue] mr-2 inline h-4 w-4" />
-                  Products Used
-                </h4>
-                <ul className="pl-5 list-disc not-prose pb-4 text-sm">
-                  {project.productLinks.map((p, i) => (
-                    <li key={i}>
-                      {p.productLink ? (
-                        <SmartLink
-                          href={p.productLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[--brand-blue] transition-colors hover:text-blue-800"
-                        >
-                          {p.productName}
-                        </SmartLink>
-                      ) : (
-                        <span>{p.productName}</span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Block Editor Field */}
-        {project.contentHtml && (
-          <div className="mt-6 prose" dangerouslySetInnerHTML={{ __html: project.contentHtml }} />
-        )}
-      </div>
-
-      <YouMayAlsoLike
-        variant="project"
-        projects={projectPool}
-        serviceAreaSlug={serviceAreaSlugs}
-        serviceAreaName={primaryServiceAreaName}
-        excludeSlug={project.slug}
-      />
-
-      <FaqInlineList
-        heading="Roof Replacement FAQs"
-        topicSlug="roof-replacement"
-        limit={8}
-        initialItems={faqs}
-        seeMoreHref="/faq"
-      />
-    </Section >
+        <FaqInlineList
+          heading="Roof Replacement FAQs"
+          topicSlug="roof-replacement"
+          limit={8}
+          initialItems={faqs}
+          seeMoreHref="/faq"
+        />
+      </Section >
+    </>
   );
 }

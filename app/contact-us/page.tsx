@@ -10,7 +10,6 @@ import LiteMap from "@/components/utils/LiteMap";
 import { renderHighlight } from "@/components/utils/renderHighlight";
 import OpenOrClosed from "@/components/utils/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks";
-import FinancingBand from "@/components/cta/FinancingBand";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
@@ -167,7 +166,6 @@ export default async function Page() {
               >
                 <SimpleLeadForm />
               </Suspense>
-              <FinancingBand />
             </div>
           </div>
 

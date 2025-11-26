@@ -18,6 +18,6 @@ export const PROJECT_TAB_CONFIG: Array<TabConfig<MaterialKey>> = [
 
 export const POST_TAB_CONFIG: Array<TabConfig<CategoryKey>> = [
   { key: "education", label: "Education", icon: GraduationCap },
-  { key: "hurricane-preparation", label: "Hurricane Preparation", icon: Wind },
-  { key: "energy-efficient-roofing", label: "Energy-Efficient Roofing", icon: Sun },
+  { key: "hurricane-preparation", label: "Hurricane Prep", icon: Wind },
+  { key: "energy-efficient-roofing", label: "Energy-Efficiency", icon: Sun },
 ];

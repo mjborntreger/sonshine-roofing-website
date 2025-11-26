@@ -122,22 +122,20 @@ export default async function FinancingPage() {
           { icon: DollarSign, label: "Credit-based Options" },
         ]}
         imageSrc="https://next.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp"
-        children={(
-          <div className="flex justify-center gap-6 flex-wrap mx-auto max-w-3xl">
-            <div>
-              <p className="italic text-sm text-slate-300">Rates as low as</p>
-              <p className="text-blue-400 mt-2 text-4xl">0%</p>
-              <p className="mt-1 text-slate-200">for 12 months</p>
-            </div>
-            <div>
-              <p className="italic text-sm text-slate-300">Payments as low as</p>
-              <p className= "text-blue-400 mt-2 text-4xl">$96<span className="text-2xl">/mo</span></p>
-              <p className="mt-1 text-slate-200">per $10,000 financed</p>
-            </div>
+      >
+        <div className="flex justify-center gap-6 flex-wrap mx-auto max-w-3xl">
+          <div>
+            <p className="italic text-sm text-slate-300">Rates as low as</p>
+            <p className="text-blue-400 mt-2 text-4xl">0%</p>
+            <p className="mt-1 text-slate-200">for 12 months</p>
           </div>
-        )}
-
-      />
+          <div>
+            <p className="italic text-sm text-slate-300">Payments as low as</p>
+            <p className="text-blue-400 mt-2 text-4xl">$96<span className="text-2xl">/mo</span></p>
+            <p className="mt-1 text-slate-200">per $10,000 financed</p>
+          </div>
+        </div>
+      </Hero>
 
       <section className="mx-auto max-w-8xl">
         <div className="container-edge py-10 md:py-16">

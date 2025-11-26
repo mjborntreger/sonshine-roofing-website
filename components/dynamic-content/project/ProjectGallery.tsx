@@ -4,7 +4,8 @@ import * as React from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
-import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
+import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import Skeleton from "@/components/ui/Skeleton";
 import type { WpImage } from "@/lib/content/wp";
 import { PROJECT_GALLERY_DEFAULT_HEIGHT, PROJECT_GALLERY_DEFAULT_WIDTH } from "./galleryConfig";
@@ -163,18 +164,14 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
                   exit={{ opacity: 0 }}
                 />
 
-                <button
+                <ModalCloseButton
                   ref={closeBtnRef}
-                  type="button"
-                  aria-label="Close"
+                  ariaLabel="Close"
                   onClick={(e) => {
                     e.stopPropagation();
                     closeModal();
                   }}
-                  className="fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] md:top-[max(1.25rem,env(safe-area-inset-top))] md:right-[max(1.25rem,env(safe-area-inset-right))] rounded-full bg-slate-900/80 text-white p-2.5 shadow-lg backdrop-blur-sm transition hover:bg-slate-900/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue]"
-                >
-                  <X className="h-5 w-5" aria-hidden="true" />
-                </button>
+                />
 
                 <div
                   className="absolute inset-0 flex items-center justify-center p-4"
@@ -223,13 +220,13 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
   if (!hasImages) return null;
 
   return (
-    <section aria-label="Project Photos" className="not-prose space-y-4 mt-16 p-6 bg-white rounded-3xl shadow-md border border-blue-200">
+    <section aria-label="Project Photos" className="mt-8 p-6 bg-white rounded-3xl shadow-md border border-blue-200">
       <h2 className="text-xl md:text-3xl">Photo Gallery</h2>
       <p className="text-xs flex items-center gap-2 md:text-sm text-slate-500" aria-live="off">
         <span>Tap to expand an image</span>
         <Expand className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
       </p>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 mt-4 gap-6">
         {images.map((image, index) => (
           <GalleryImage
             key={`${image.url}-${index}`}

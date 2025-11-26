@@ -2173,6 +2173,7 @@ export async function listVideoItemsPaged({
     facets,
     meta: {
       overallTotal: total,
+      fullTotal: all.length,
     },
   } as PageResult<VideoItem> & { facets: FacetGroup[] };
 }
@@ -2361,7 +2362,8 @@ export async function listPostsPaged({
       $offsetPagination: OffsetPagination
       $search: String
       $taxQuery: TaxQuery
-      $facetTaxonomies: [FacetInput!]!
+      $facetTaxonomiesFiltered: [FacetInput!]!
+      $facetTaxonomiesAll: [FacetInput!]!
     ) {
       posts(
         where: {
@@ -2388,11 +2390,11 @@ export async function listPostsPaged({
           }
         }
       }
-      facetCounts(
+      facetCountsFiltered: facetCounts(
         postType: "post"
         search: $search
         taxQuery: $taxQuery
-        taxonomies: $facetTaxonomies
+        taxonomies: $facetTaxonomiesFiltered
       ) {
         total
         facets {
@@ -2404,6 +2406,12 @@ export async function listPostsPaged({
           }
         }
       }
+      facetCountsAll: facetCounts(
+        postType: "post"
+        taxonomies: $facetTaxonomiesAll
+      ) {
+        total
+      }
     }
   `;
 
@@ -2411,7 +2419,8 @@ export async function listPostsPaged({
     offsetPagination: { offset, size },
     search: search ?? undefined,
     taxQuery: taxArray.length ? { relation: 'AND', taxArray } : undefined,
-    facetTaxonomies: [{ taxonomy: 'category' }],
+    facetTaxonomiesFiltered: [{ taxonomy: 'category' }],
+    facetTaxonomiesAll: [{ taxonomy: 'category' }],
   };
 
   type BlogArchiveResponse = {
@@ -2419,9 +2428,12 @@ export async function listPostsPaged({
       nodes?: UnknownRecord[];
       pageInfo?: { offsetPagination?: { total?: number; hasMore?: boolean } | null };
     };
-    facetCounts?: {
+    facetCountsFiltered?: {
       total?: number;
       facets?: UnknownRecord[];
+    };
+    facetCountsAll?: {
+      total?: number;
     };
   };
 
@@ -2477,9 +2489,9 @@ export async function listPostsPaged({
     endCursor: hasMore ? String(nextOffset) : null,
   };
 
-  const facetGroups = mapFacetGroupsFromWp(data?.facetCounts?.facets);
-
-  const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
+  const facetGroups = mapFacetGroupsFromWp(data?.facetCountsFiltered?.facets);
+  const facetTotal = typeof data?.facetCountsFiltered?.total === 'number' ? data.facetCountsFiltered.total : total;
+  const fullTotal = typeof data?.facetCountsAll?.total === 'number' ? data.facetCountsAll.total : facetTotal;
 
   return {
     items,
@@ -2488,6 +2500,7 @@ export async function listPostsPaged({
     facets: facetGroups,
     meta: {
       overallTotal: facetTotal,
+      fullTotal,
     },
   } satisfies PageResult<PostCard> & { facets: FacetGroup[] };
 }
@@ -2808,19 +2821,20 @@ export async function listProjectsPaged({
   }
 
   const taxQuery = taxArray.length ? { relation: 'AND', taxArray } : undefined;
+  const orderByClause = search ? '' : 'orderby: { field: DATE, order: DESC }';
 
   const query = /* GraphQL */ `
     query ProjectArchive(
       $offsetPagination: OffsetPagination
       $search: String
       $taxQuery: TaxQuery
-      $facetTaxonomies: [FacetInput!]!
+      $facetTaxonomiesFiltered: [FacetInput!]!
+      $facetTaxonomiesAll: [FacetInput!]!
     ) {
       projects(
         where: {
           status: PUBLISH
-          orderby: { field: DATE, order: DESC }
-          search: $search
+          ${orderByClause ? `${orderByClause}\n          ` : ''}search: $search
           offsetPagination: $offsetPagination
           taxQuery: $taxQuery
         }
@@ -2851,11 +2865,11 @@ export async function listProjectsPaged({
           }
         }
       }
-      facetCounts(
+      facetCountsFiltered: facetCounts(
         postType: "project"
         search: $search
         taxQuery: $taxQuery
-        taxonomies: $facetTaxonomies
+        taxonomies: $facetTaxonomiesFiltered
       ) {
         total
         facets {
@@ -2867,6 +2881,12 @@ export async function listProjectsPaged({
           }
         }
       }
+      facetCountsAll: facetCounts(
+        postType: "project"
+        taxonomies: $facetTaxonomiesAll
+      ) {
+        total
+      }
     }
   `;
 
@@ -2874,10 +2894,15 @@ export async function listProjectsPaged({
     offsetPagination: { offset, size },
     search: search ?? undefined,
     taxQuery,
-    facetTaxonomies: [
+    facetTaxonomiesFiltered: [
       mtSlugs.length ? { taxonomy: 'material_type', slugs: mtSlugs } : { taxonomy: 'material_type' },
       rcSlugs.length ? { taxonomy: 'roof_color', slugs: rcSlugs } : { taxonomy: 'roof_color' },
       saSlugs.length ? { taxonomy: 'service_area', slugs: saSlugs } : { taxonomy: 'service_area' },
+    ],
+    facetTaxonomiesAll: [
+      { taxonomy: 'material_type' },
+      { taxonomy: 'roof_color' },
+      { taxonomy: 'service_area' },
     ],
   };
 
@@ -2886,9 +2911,12 @@ export async function listProjectsPaged({
       nodes?: UnknownRecord[];
       pageInfo?: { offsetPagination?: { total?: number; hasMore?: boolean } | null };
     };
-    facetCounts?: {
+    facetCountsFiltered?: {
       total?: number;
       facets?: UnknownRecord[];
+    };
+    facetCountsAll?: {
+      total?: number;
     };
   };
 
@@ -2928,8 +2956,8 @@ export async function listProjectsPaged({
     endCursor: hasMore ? String(nextOffset) : null,
   };
 
-  const facetGroups: FacetGroup[] = Array.isArray(data?.facetCounts?.facets)
-    ? data.facetCounts.facets.map((facetNode) => {
+  const facetGroups: FacetGroup[] = Array.isArray(data?.facetCountsFiltered?.facets)
+    ? data.facetCountsFiltered.facets.map((facetNode) => {
       const facetRecord = asRecord(facetNode);
       const bucketsSource = facetRecord?.buckets;
       const bucketsNodes = Array.isArray(bucketsSource) ? bucketsSource : extractNodes(bucketsSource);
@@ -2950,7 +2978,8 @@ export async function listProjectsPaged({
     })
     : [];
 
-  const facetTotal = typeof data?.facetCounts?.total === 'number' ? data.facetCounts.total : total;
+  const facetTotal = typeof data?.facetCountsFiltered?.total === 'number' ? data.facetCountsFiltered.total : total;
+  const fullTotal = typeof data?.facetCountsAll?.total === 'number' ? data.facetCountsAll.total : facetTotal;
 
   return {
     items,
@@ -2959,6 +2988,7 @@ export async function listProjectsPaged({
     facets: facetGroups,
     meta: {
       overallTotal: facetTotal,
+      fullTotal,
     },
   };
 }

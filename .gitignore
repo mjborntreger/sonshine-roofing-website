@@ -38,6 +38,7 @@ acf-export-2025-09-17.json
 
 # WordPress
 ss-lead-endpoint.php
+graphql-relevanssi-bridge.php
 sonshine-headless-cleanup.php
 ACF-to-GraphQL-manifest.json
 

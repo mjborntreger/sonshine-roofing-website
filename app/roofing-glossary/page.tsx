@@ -130,7 +130,7 @@ export default async function GlossaryArchivePage() {
                         <li key={t.slug}>
                           <SmartLink
                             href={`/roofing-glossary/${t.slug}`}
-                            className="block rounded-md border border-blue-300 bg-white px-3 py-2 text-slate-800 hover:bg-slate-50"
+                            className="block rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-800 hover:bg-slate-50"
                           >
                             {t.title}
                           </SmartLink>

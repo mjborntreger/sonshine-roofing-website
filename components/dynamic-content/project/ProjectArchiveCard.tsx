@@ -16,7 +16,7 @@ type Props = {
 };
 
 const pillClass =
-  "inline-flex min-w-0 max-w-full items-center rounded-full font-semibold tracking-tight bg-[--brand-orange] px-2.5 py-1 text-[0.75rem] sm:text-xs text-white sm:px-3 sm:py-1 sm:text-sm";
+  "inline-flex min-w-0 max-w-full items-center rounded-full font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-[0.75rem] sm:text-xs text-slate-600 sm:px-3 sm:py-1 sm:text-sm";
 const pillLabelClass = "block max-w-full truncate";
 
 export default function ProjectArchiveCard({ project, style, className }: Props) {

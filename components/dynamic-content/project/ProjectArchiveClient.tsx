@@ -94,6 +94,7 @@ export default function ProjectArchiveClient({ initialResult, filterTerms, pageS
           filters={listFilters}
           pageSize={pageSize}
           gridClass="mt-8"
+          gridLayoutClassName="grid-cols-1 gap-6"
         />
       )}
       loadingOverlayMessage="Loading roof replacement projects…"

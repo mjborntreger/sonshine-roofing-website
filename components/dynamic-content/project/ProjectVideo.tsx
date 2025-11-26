@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
-import { PlayCircle, X } from "lucide-react";
+import { Eye, X } from "lucide-react";
 
 type Props = {
   title: string;
@@ -124,11 +124,16 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
   return (
     <>
       {/* Facade */}
+      <h2 className="text-xl md:text-3xl">Drone Video</h2>
+      <p className="flex items-center gap-2 text-sm text-slate-500" aria-live="off">
+        <span>Tap to watch</span>
+        <Eye className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+      </p>
       <button
         type="button"
         aria-label={`Play video: ${title}`}
         onClick={() => setOpen(true)}
-        className={`relative block w-full shadow-blue-500 shadow-md overflow-hidden rounded-2xl ${className ?? ""}`}
+        className={`relative block w-full shadow-blue-500 shadow-md overflow-hidden mt-4 rounded-2xl ${className ?? ""}`}
       >
         <Image
           src={facadeSrc}
@@ -148,10 +153,6 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
           </span>
         </span>
       </button>
-      <p className="flex items-center gap-2 text-sm text-slate-500 my-4" aria-live="off">
-        <span>Tap to watch video</span>
-        <PlayCircle className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
-      </p>
 
       {/* Modal (portaled to body so it covers header/footer and ignores transformed ancestors) */}
       {mounted &&

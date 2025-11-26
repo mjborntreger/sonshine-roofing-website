@@ -9,17 +9,6 @@ import GridLoadingState from "@/components/layout/GridLoadingState";
 import type { FacetGroup, TermLite } from "@/lib/content/wp";
 import type { PageResult, ResourceKind } from "@/lib/ui/pagination";
 
-function useDebouncedValue<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = useState(value);
-
-  useEffect(() => {
-    const handle = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(handle);
-  }, [value, delay]);
-
-  return debounced;
-}
-
 type ResourceFacetGroup = FacetGroup;
 
 type ResourceArchiveResult<Item> = PageResult<Item> & {
@@ -123,6 +112,7 @@ export default function ResourceArchiveClient<Item>({
   const paramsSignature = searchParams?.toString() ?? "";
 
   const [searchInput, setSearchInput] = useState(initialFilters.search ?? "");
+  const [committedSearch, setCommittedSearch] = useState(initialFilters.search ?? "");
   const [selections, setSelections] = useState<SelectionMap>(() => {
     const clone: SelectionMap = {};
     for (const group of groups) {
@@ -136,17 +126,18 @@ export default function ResourceArchiveClient<Item>({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const overallTotalRef = useRef<number | null>(
-    typeof initialResult.meta?.overallTotal === "number"
-      ? initialResult.meta.overallTotal
-      : typeof initialResult.total === "number"
-        ? initialResult.total
-        : initialResult.items.length
+  const fullTotalRef = useRef<number | null>(
+    typeof initialResult.meta?.fullTotal === "number"
+      ? initialResult.meta.fullTotal
+      : typeof initialResult.meta?.overallTotal === "number"
+        ? initialResult.meta.overallTotal
+        : typeof initialResult.total === "number"
+          ? initialResult.total
+          : initialResult.items.length
   );
 
-  const debouncedSearch = useDebouncedValue(searchInput, 300);
-  const normalizedSearch = debouncedSearch.trim();
-  const searchForRequest = normalizedSearch.length >= minSearchLength ? normalizedSearch : "";
+  const normalizedCommittedSearch = committedSearch.trim();
+  const searchForRequest = normalizedCommittedSearch.length >= minSearchLength ? normalizedCommittedSearch : "";
 
   useEffect(() => {
     if (!normalizeSelections) return;
@@ -182,6 +173,9 @@ export default function ResourceArchiveClient<Item>({
 
   const listFilters = useMemo(() => filtersPayload, [filtersPayload]);
   const listKey = useMemo(() => JSON.stringify(listFilters), [listFilters]);
+  const [pendingSignature, setPendingSignature] = useState<string | null>(null);
+  const [appliedSignature, setAppliedSignature] = useState<string | null>(listKey);
+  const loadingStartedAtRef = useRef<number>(0);
 
   const facetMap = useMemo(() => {
     const map = new Map<string, Map<string, FacetBucketInfo>>();
@@ -257,21 +251,33 @@ export default function ResourceArchiveClient<Item>({
     [groups, sortedSelections]
   );
 
-  const hasActiveFilters = useMemo(() => {
-    if (searchForRequest) return true;
-    return hasActiveSelections;
-  }, [groups, hasActiveSelections, searchForRequest, sortedSelections]);
+  const hasActiveFilters = searchForRequest ? true : hasActiveSelections;
 
-  const filteredCount = typeof result.total === "number" ? result.total : result.items.length;
-  const overallTotal = typeof result.meta?.overallTotal === "number"
+  const filteredCount = typeof result.meta?.overallTotal === "number"
     ? result.meta.overallTotal
-    : overallTotalRef.current ?? filteredCount;
+    : typeof result.total === "number"
+      ? result.total
+      : result.items.length;
+  const rawFullTotal =
+    typeof result.meta?.fullTotal === "number"
+      ? result.meta.fullTotal
+      : typeof result.meta?.overallTotal === "number"
+        ? result.meta.overallTotal
+        : null;
+  const fullTotal = rawFullTotal ?? fullTotalRef.current ?? filteredCount;
+  const displayTotal = Math.max(filteredCount, fullTotal ?? filteredCount);
+  const overlayActive = loading || (pendingSignature && pendingSignature !== appliedSignature);
 
   useEffect(() => {
-    if (typeof result.meta?.overallTotal === "number") {
-      overallTotalRef.current = result.meta.overallTotal;
+    const next = typeof result.meta?.fullTotal === "number"
+      ? result.meta.fullTotal
+      : typeof result.meta?.overallTotal === "number"
+        ? result.meta.overallTotal
+        : null;
+    if (typeof next === "number") {
+      fullTotalRef.current = Math.max(fullTotalRef.current ?? 0, next);
     } else if (typeof result.total === "number") {
-      overallTotalRef.current = result.total;
+      fullTotalRef.current = Math.max(fullTotalRef.current ?? 0, result.total);
     }
   }, [result]);
 
@@ -298,13 +304,14 @@ export default function ResourceArchiveClient<Item>({
     const normalizedSelections = normalizeSelections ? normalizeSelections(nextSelections) : nextSelections;
 
     setSearchInput((prev) => (prev === urlSearchValue ? prev : urlSearchValue));
+    setCommittedSearch((prev) => (prev === urlSearchValue ? prev : urlSearchValue));
     setSelections((prev) => (areSelectionMapsEqual(prev, normalizedSelections) ? prev : normalizedSelections));
   }, [groups, normalizeSelections, paramsSignature, searchParamKey]);
 
   useEffect(() => {
     const params = new URLSearchParams();
-    if (normalizedSearch.length >= minSearchLength) {
-      params.set(searchParamKey, normalizedSearch);
+    if (normalizedCommittedSearch.length >= minSearchLength) {
+      params.set(searchParamKey, normalizedCommittedSearch);
     }
 
     for (const group of groups) {
@@ -326,7 +333,7 @@ export default function ResourceArchiveClient<Item>({
     lastQueryRef.current = next;
     const href = next ? `${pathname}?${next}` : pathname;
     router.replace(href as Parameters<typeof router.replace>[0], { scroll: false });
-  }, [buildQueryParams, groups, minSearchLength, normalizedSearch, pathname, router, searchParamKey, searchForRequest, sortedSelections]);
+  }, [buildQueryParams, groups, minSearchLength, normalizedCommittedSearch, pathname, router, searchParamKey, searchForRequest, sortedSelections]);
 
   const abortRef = useRef<AbortController | null>(null);
   const firstRunRef = useRef(true);
@@ -337,6 +344,8 @@ export default function ResourceArchiveClient<Item>({
       return;
     }
 
+    loadingStartedAtRef.current = Date.now();
+    setPendingSignature(listKey);
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -359,6 +368,7 @@ export default function ResourceArchiveClient<Item>({
       })
       .then((json) => {
         setResult(json as ResourceArchiveResult<Item>);
+        setAppliedSignature(listKey);
       })
       .catch((err: unknown) => {
         if (err instanceof Error && err.name === "AbortError") return;
@@ -369,11 +379,19 @@ export default function ResourceArchiveClient<Item>({
         if (abortRef.current === controller) {
           abortRef.current = null;
         }
-        setLoading(false);
+        const MIN_SHOW_MS = 600;
+        const elapsed = Date.now() - loadingStartedAtRef.current;
+        const delay = Math.max(0, MIN_SHOW_MS - elapsed);
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            setLoading(false);
+            setPendingSignature(null);
+          }, delay);
+        });
       });
 
     return () => controller.abort();
-  }, [apiPath, filtersPayload, pageSize]);
+  }, [apiPath, filtersPayload, listKey, pageSize]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
@@ -388,6 +406,7 @@ export default function ResourceArchiveClient<Item>({
 
   const clearFilters = useCallback(() => {
     setSearchInput("");
+    setCommittedSearch("");
     setSelections(() => {
       const reset: SelectionMap = {};
       for (const group of groups) reset[group.key] = [];
@@ -395,13 +414,24 @@ export default function ResourceArchiveClient<Item>({
     });
   }, [groups]);
 
+  const submitThrottleRef = useRef<number>(0);
+  const handleSearchSubmit = useCallback(() => {
+    const now = Date.now();
+    if (now - submitThrottleRef.current < 150) return;
+    submitThrottleRef.current = now;
+    setCommittedSearch(searchInput);
+  }, [searchInput]);
+
   const chips = useMemo(() => {
     const out: Array<{ key: string; label: string; onRemove: () => void }> = [];
-    if (normalizedSearch.length >= minSearchLength) {
+    if (normalizedCommittedSearch.length >= minSearchLength) {
       out.push({
-        key: `search:${normalizedSearch}`,
-        label: `Search: “${normalizedSearch}”`,
-        onRemove: () => setSearchInput(""),
+        key: `search:${normalizedCommittedSearch}`,
+        label: `Search: “${normalizedCommittedSearch}”`,
+        onRemove: () => {
+          setSearchInput("");
+          setCommittedSearch("");
+        },
       });
     }
 
@@ -427,7 +457,7 @@ export default function ResourceArchiveClient<Item>({
     }
 
     return out;
-  }, [chipsLabel, groups, minSearchLength, normalizedSearch, sortedSelections, toggleSelection]);
+  }, [chipsLabel, groups, minSearchLength, normalizedCommittedSearch, sortedSelections, toggleSelection]);
 
   const [activeTabKey, setActiveTabKey] = useState<string>(groups[0]?.key ?? "");
   useEffect(() => {
@@ -469,17 +499,40 @@ export default function ResourceArchiveClient<Item>({
             <Search className="h-5 inline w-5 align-text-top mr-2 text-[--brand-blue]" />
             <h2 className="text-2xl inline">{`Search ${labels.itemPlural}`}</h2>
           </div>
-          <div className="inline-flex w-full items-start">
-            <label htmlFor={`${kind}-search`} className="sr-only">Search {labels.itemPlural}</label>
-            <input
-              id={`${kind}-search`}
-              type="search"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Start typing to search..."
-              className="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
-            />
-          </div>
+            <form
+              className="w-full"
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleSearchSubmit();
+              }}
+            >
+              <div className="flex flex-row gap-2 sm:flex-row sm:items-center">
+                <label htmlFor={`${kind}-search`} className="sr-only">Search {labels.itemPlural}</label>
+                <input
+                  id={`${kind}-search`}
+                  type="search"
+                  value={searchInput}
+                  onChange={(event) => setSearchInput(event.target.value)}
+                  placeholder="Type here..."
+                  className="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      handleSearchSubmit();
+                    }
+                  }}
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={handleSearchSubmit}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[--brand-blue] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[--brand-blue]/90 focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] focus:ring-offset-2"
+                  >
+                    Search
+                  </button>
+                </div>
+              </div>
+            </form>
 
           {groups.length > 0 ? (
             <div className="border-t border-blue-200 pt-3">
@@ -585,7 +638,7 @@ export default function ResourceArchiveClient<Item>({
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <span className="text-sm text-slate-700">
-          Showing {filteredCount} of {overallTotal} {filteredCount === 1 ? labels.itemSingular : labels.itemPlural}
+          Showing {filteredCount} of {displayTotal} {filteredCount === 1 ? labels.itemSingular : labels.itemPlural}
         </span>
         {loading && (
           <span className="inline-flex items-center gap-2 rounded-full border border-[--brand-blue]/40 bg-[--brand-blue]/10 px-3 py-1 text-xs font-medium text-[--brand-blue]">
@@ -616,12 +669,12 @@ export default function ResourceArchiveClient<Item>({
         <div className="mt-8 rounded-xl border border-amber-400 bg-white p-6 text-slate-700">
           <p className="mb-2 font-medium">{emptyState.title}</p>
           <p className="text-sm">
-            {normalizedSearch.length >= minSearchLength && emptyState.description.withSearch
-              ? emptyState.description.withSearch
-              : emptyState.description.default}
-          </p>
-          {hasActiveFilters && emptyState.actionLabel ? (
-            <button
+            {normalizedCommittedSearch.length >= minSearchLength && emptyState.description.withSearch
+                  ? emptyState.description.withSearch
+                  : emptyState.description.default}
+              </p>
+              {hasActiveFilters && emptyState.actionLabel ? (
+                <button
               type="button"
               onClick={clearFilters}
               className="mt-4 rounded-md border border-amber-300 px-3 py-1.5 text-sm hover:bg-slate-50"
@@ -632,8 +685,8 @@ export default function ResourceArchiveClient<Item>({
         </div>
       ) : (
         <div className="relative">
-          {loading && <GridLoadingState mode="overlay" message={loadingMessage} />}
-          <div className={loading ? "pointer-events-none" : ""}>
+          {overlayActive && <GridLoadingState mode="overlay" message={loadingMessage} />}
+          <div className={overlayActive ? "pointer-events-none opacity-60 transition" : ""}>
             {renderResults({ result, listFilters, listKey, loading })}
           </div>
         </div>

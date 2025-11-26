@@ -96,27 +96,27 @@ export default async function Page() {
         justifyStart
         imageSrc="https://next.sonshineroofing.com/wp-content/uploads/About-Us-Collage-new.png"
         badges={[
-          { icon: ShieldCheck, label: "Licensed & Insured" },
-          { icon: MapPin, label: "Local & Family-owned" },
+          { icon: ShieldCheck, label: "Licensed &amp; Insured" },
+          { icon: MapPin, label: "Local &amp; Family-owned" },
           { icon: HardHat, label: "4 Decades of Experience" },
           { icon: Heart, label: "Faith-based Values" },
           { icon: Users, label: "Community Sponsor" },
         ]}
-        children={(
-          <div className="not-prose mt-2 mb-4 flex flex-wrap items-center gap-2">
-            <SmartLink
-              href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="View Florida contractor license #CCC1331483 on myfloridalicense.com (opens in a new tab)"
-              className="btn btn-brand-blue btn-md inline-flex items-center"
-            >
-              <span>Lic. #CCC1331483</span>
-              <ExternalLink className="ml-1 inline h-3 w-3" aria-hidden="true" />
-            </SmartLink>
-          </div>
-        )}
-      />
+      >
+        <div className="not-prose mt-2 mb-4 flex flex-wrap items-center gap-2">
+          <SmartLink
+            href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&amp;id=601EB27C16D2369E36FD9B81C20A0755"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="View Florida contractor license #CCC1331483 on myfloridalicense.com (opens in a new tab)"
+            className="btn btn-brand-blue btn-md inline-flex items-center"
+          >
+            <span>Lic. #CCC1331483</span>
+            <ExternalLink className="ml-1 inline h-3 w-3" aria-hidden="true" />
+          </SmartLink>
+        </div>
+      </Hero>
+    
       <Section>
         <div className="py-4">
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
@@ -141,23 +141,23 @@ export default async function Page() {
                 </p>
                 <AboutVideo />
                 <p>
-                  We’ve learned that <strong>superior customer service</strong> and <strong>honesty</strong> with clients are the most reliable ways to
+                  We&rsquo;ve learned that <strong>superior customer service</strong> and <strong>honesty</strong> with clients are the most reliable ways to
                   stay in business long term. The majority of our work is based on referrals and word-of-mouth, which
-                  we are very proud of, and you'll quickly see why that's the case.
+                  we are very proud of, and you&apos;ll quickly see why that&apos;s the case.
                 </p>
                 <p className="mt-4">
-                  By the way, when you ask us to inspect your roof, we’ll tell you the <strong>flat-out honest truth&mdash;period</strong>.
+                  By the way, when you ask us to inspect your roof, we&rsquo;ll tell you the <strong>flat-out honest truth&mdash;period</strong>.
                   Many of the other guys will prioritize their big-ticket customers during storm season, leaving budget-conscious and savvy homeowners out to dry.
                   Not us.
                   We always give our expert recommendation based on our <strong>38+ years</strong> of professional experience in the Sarasota area,
-                  and we will <strong>NEVER</strong> sell you something you don't need.
+                  and we will <strong>NEVER</strong> sell you something you don&apos;t need.
                 </p>
 
               </Accordion>
 
               <Accordion
                 icon={<MapPin className="h-5 w-5" aria-hidden="true" />}
-                summary={<h2 className="text-2xl">Local & Family-owned</h2>}
+                summary={<h2 className="text-2xl">Local &amp; Family-owned</h2>}
                 className="mb-4"
                 radius="2xl"
                 proseBody={false}
@@ -166,7 +166,7 @@ export default async function Page() {
                 <p className="prose">
                   Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.
                   Since we are keenly attuned to unpredictable nature of hurricane season, we focus
-                  on <strong>quality</strong> over 'quick fixes,' offering durable roofing solutions backed by
+                  on <strong>quality</strong> over &lsquo;quick fixes,&rsquo; offering durable roofing solutions backed by
                   in-house crews, exclusive manufacturer warranties and our own 25-year Leak Free Guarantee.
                 </p>
                 <div className="flex items-center justify-self-center">
@@ -181,7 +181,7 @@ export default async function Page() {
                 </div>
                 <p>
                   When you choose SonShine Roofing, you are showing that you value honesty,
-                  reliable service, and unbeatable quality. We trust that you’ll make <strong>the right choice</strong>.
+                  reliable service, and unbeatable quality. We trust that you&rsquo;ll make <strong>the right choice</strong>.
                 </p>
               </Accordion>
 

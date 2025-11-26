@@ -139,10 +139,10 @@ export default function VideoLibraryClient({
       normalizeSelections={normalizeSelections}
       renderResults={({ result, listFilters, listKey }) => (
         <VideoGrid
-          key={listKey}
           initial={result}
           filters={listFilters}
           pageSize={pageSize}
+          listKey={listKey}
         />
       )}
       loadingOverlayMessage="Loading videos…"

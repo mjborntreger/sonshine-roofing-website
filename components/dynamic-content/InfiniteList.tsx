@@ -30,6 +30,7 @@ type Props<T> = {
     filters: Record<string, unknown>;
     pageSize?: number;
     gridClass?: string;
+    gridLayoutClassName?: string;
     renderItem?: (item: T, i: number) => ReactNode;
     skeletonCount?: number;
     onVideoOpen?: (item: T) => void;
@@ -386,6 +387,7 @@ export default function InfiniteList<T>({
     filters,
     pageSize = 24,
     gridClass = "",
+    gridLayoutClassName,
     renderItem,
     skeletonCount,
     onVideoOpen,
@@ -528,7 +530,11 @@ export default function InfiniteList<T>({
 
     return (
         <>
-            <Grid className={gridClass} data-loading={loading ? "true" : "false"}>
+            <Grid 
+                className={gridClass} 
+                layoutClassName={gridLayoutClassName}
+                data-loading={loading ? "true" : "false"}
+            >
                 {items.map((item, index) => {
                     const uniqueKey = resolveItemKey(item, index);
                     return (
@@ -544,6 +550,7 @@ export default function InfiniteList<T>({
                     variant={loaderVariant}
                     count={skeletonCountEff}
                     className={gridClass}
+                    layoutClassName={gridLayoutClassName}
                 />
             )}
 

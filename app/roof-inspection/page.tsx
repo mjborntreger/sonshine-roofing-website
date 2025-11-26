@@ -83,19 +83,18 @@ export default async function Page() {
           { icon: Zap, label: "Hurricane Preparation" },
         ]}
         imageSrc="https://next.sonshineroofing.com/wp-content/uploads/need-an-inspection-report.webp"
-        children={(
-          <div className="flex gap-6 flex-wrap max-w-3xl">
-            <div>
-              <p className="italic text-sm text-slate-300">Tip Top Roof Check-up</p>
-              <p className="text-blue-400 mt-2 text-4xl"><span className="line-through text-slate-400 items-start text-lg mr-1">$199 </span>$169</p>
-            </div>
-            <div>
-              <p className="italic text-sm text-slate-300">Real-estate Inspection</p>
-              <p className= "text-blue-100 mt-2 text-4xl">$199+</p>
-            </div>
+      >
+        <div className="flex gap-6 flex-wrap max-w-3xl">
+          <div>
+            <p className="italic text-sm text-slate-300">Tip Top Roof Check-up</p>
+            <p className="text-blue-400 mt-2 text-4xl"><span className="line-through text-slate-400 items-start text-lg mr-1">$199 </span>$169</p>
           </div>
-        )}
-      />
+          <div>
+            <p className="italic text-sm text-slate-300">Real-estate Inspection</p>
+            <p className="text-blue-100 mt-2 text-4xl">$199+</p>
+          </div>
+        </div>
+      </Hero>
       <Section>
         <div className="grid gap-4 px-2 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           <div id="article-root" className="prose min-w-0">
