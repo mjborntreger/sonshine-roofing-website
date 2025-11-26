@@ -334,7 +334,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             width={1600}
             height={900}
             className="object-cover w-full h-auto"
-            priority={false}
+            priority
           />
         </div>
       ) : null}

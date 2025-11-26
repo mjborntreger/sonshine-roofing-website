@@ -206,9 +206,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${inter.variable} ${allura.variable} ${candara.variable}`}
     >
       <head>
-        {/* Preconnects for faster YouTube thumbs & embeds */}
-        <link rel="preconnect" href="https://i.ytimg.com" crossOrigin="" />
-        <link rel="preconnect" href="https://www.youtube-nocookie.com" crossOrigin="" />
+        {/* Preconnects for common asset storage */}
+        <link rel="preconnect" href="https://next.sonshineroofing.com" crossOrigin="" />
+        <link rel="preconnect" href="https://sonshineroofing.com" crossOrigin="" />
 
         {/* Facebook Share Button Attribution */}
         <meta property="fb:app_id" content="1087269253041713" />

@@ -33,6 +33,8 @@ export const inter = localFont({
   preload: true,
 });
 
+
+
 export const allura = localFont({
   src: [
     {

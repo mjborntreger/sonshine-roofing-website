@@ -54,8 +54,7 @@ export default async function bestOfTheBest({
             height={imageHeight}
             width={imageWidth}
             sizes="(max-width: 175px) 15vw, 366px"
-            priority
-            loading="eager"
+            loading="lazy"
             decoding="async"
             alt="Best of the Best 2021 Award"
             className={imageClasses}

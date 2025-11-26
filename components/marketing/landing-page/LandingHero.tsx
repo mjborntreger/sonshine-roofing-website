@@ -1,28 +1,91 @@
 "use client";
 
+import Head from "next/head";
+import { useEffect, useRef, useState } from "react";
 import { Phone, ShieldCheck } from "lucide-react";
 import ShinyText from "./ShinyText";
 import SmartLink from "@/components/utils/SmartLink";
+import Image from "next/image";
+
+const VIDEO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/Landing-Page-Hero-Spin-Effect-2025.webm";
+const POSTER_SRC = "https://next.sonshineroofing.com/wp-content/uploads/landing-hero-fallback.webp";
 
 type HeroProps = {
   title?: string
 };
 
 export default function Hero({ title = "The Best Roofing Company in Sarasota, Manatee, and Charlotte Counties for Over 38 Years" }: HeroProps) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [shouldShowVideo, setShouldShowVideo] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReducedMotion) return;
+
+    const target = sectionRef.current;
+    if (!target) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setShouldShowVideo(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px 0px" }
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!shouldShowVideo) return;
+    const el = videoRef.current;
+    if (!el) return;
+    if (!el.src) {
+      el.src = VIDEO_SRC;
+      el.load();
+    }
+    el.play().catch(() => {
+      /* ignore autoplay failures */
+    });
+  }, [shouldShowVideo]);
+
   return (
     <>
+      <Head>
+        <link rel="preload" as="image" href={POSTER_SRC} />
+      </Head>
+
       <section
+        ref={sectionRef}
         className="relative h-auto overflow-hidden text-white isolate">
-        {/* Background video */}
+        {/* Fallback image (paints immediately; video swaps in after intersection) */}
+        <Image
+          src={POSTER_SRC}
+          alt="Landing Page Hero Poster Fallback"
+          aria-hidden="true"
+          className="absolute inset-0 object-cover w-full h-full -z-10"
+          width={1280}
+          height={720}
+          loading="eager"
+          decoding="async"
+        />
+
+        {/* Background video (lazy-loaded via IntersectionObserver) */}
         <video
+          ref={videoRef}
           className="absolute inset-0 object-cover w-full h-full pointer-events-none -z-10"
-          src="https://next.sonshineroofing.com/wp-content/uploads/HarborProfessionalCenter3-ezgif.com-gif-maker-1.webm"
           autoPlay
           muted
           loop
+          preload="none"
           playsInline
           aria-hidden="true"
-        // poster="/fallback.jpg" // optional: add a poster for faster first paint
+          poster={POSTER_SRC}
         />
 
         {/* Content */}
