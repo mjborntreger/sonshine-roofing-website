@@ -27,10 +27,10 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
 
         {/* Content */}
         <div className="px-4 pt-8 mx-auto text-center text-white max-w-8xl not-prose">
-          <div className="mt-4 mb-12">
+          <div className="mt-4">
             <ShinyText
               text="SonShine Roofing"
-              className="mt-16 text-5xl font-script lg:text-7xl"
+              className="mt-8 text-5xl font-script lg:text-6xl"
               disabled={false}
               speed={2.5}
             >
@@ -38,12 +38,12 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
             <p className="font-display md:text-lg font-semibold text-blue-400">Since 1987, we&apos;ve got you covered</p>
           </div>
 
-          <h1 className="mb-8 max-w-6xl mx-auto text-4xl md:text-5xl lg:text-7xl justify-center md:leading-[5rem] lg:leading-[6rem] text-blue-50">
+          <h1 className="my-8 max-w-6xl mx-auto text-4xl md:text-5xl lg:text-7xl justify-center md:leading-[5rem] lg:leading-[6rem] text-blue-50">
             {title}
           </h1>
 
           <SmartLink
-            className="block hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 py-4 px-6 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 mb-[12rem]"
+            className="block hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 py-4 px-6 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 mb-[11rem]"
             href="/contact-us"
             title="Contact SonShine Roofing"
             aria-label="Contact SonShine Roofing"
