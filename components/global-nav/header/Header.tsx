@@ -144,27 +144,28 @@ export default function Header() {
       <div
         className={cn(
           "mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 transition-all duration-200",
-          collapsed ? "py-[0.125rem]" : "py-4"
+          collapsed ? "py-[0.125rem]" : "py-[0.4rem]"
         )}
       >
         <SmartLink
           href={logoHref}
-          className={cn(
-            "flex items-center gap-2 transition-transform duration-200 ease-out",
-            collapsed ? "scale-[0.7]" : "scale-100"
+          className={cn("flex items-center gap-2 transition-transform duration-200 ease-out",
+            collapsed ? "scale-[0.8]" : "scale-100"
           )}
+            
+         
         >
           <Image
             src={logoSrc}
             alt="SonShine Roofing Logo"
             aria-label="SonShine Roofing Logo"
-            width={120}
-            height={50}
+            width={96}
+            height={40}
             sizes="(max-width: 120px) 20vw, 768px"
             loading="eager"
             priority
             fetchPriority="high"
-            className="h-[50px]"
+            className="h-[40px]"
           />
         </SmartLink>
         <NavMenu transparent={isTransparent} />

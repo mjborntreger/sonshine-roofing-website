@@ -27,14 +27,17 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
 
         {/* Content */}
         <div className="px-4 pt-8 mx-auto text-center text-white max-w-8xl not-prose">
-
-          <ShinyText
-            text="Since 1987 we've got you covered"
-            className="mt-16 mb-12 text-3xl lg:mb-24 font-script md:text-3xl lg:text-7xl"
+          <div className="mt-4 mb-12">
+            <ShinyText
+            text="SonShine Roofing"
+            className="mt-16 text-5xl font-script lg:text-7xl"
             disabled={false}
             speed={2.5}
           >
           </ShinyText>
+          <p className="font-display md:text-lg font-semibold text-blue-400">Since 1987, we&apos;ve got you covered</p>
+          </div>
+          
           <h1 className="mb-8 max-w-6xl mx-auto text-4xl md:text-5xl lg:text-7xl justify-center md:leading-[5rem] lg:leading-[6rem] text-blue-50">
             {title}
           </h1>
