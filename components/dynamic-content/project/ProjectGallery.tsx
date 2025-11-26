@@ -18,7 +18,7 @@ type ProjectGalleryProps = {
 const imageClassBase =
   "pointer-events-none select-none object-cover transition-opacity duration-500 ease-out";
 
-const containerBase = "relative overflow-hidden rounded-3xl border border-blue-200 bg-slate-100";
+const containerBase = "relative overflow-hidden rounded-xl shadow-xl border border-blue-200 bg-slate-100";
 
 export default function ProjectGallery({ images, projectTitle }: ProjectGalleryProps) {
   const [mounted, setMounted] = React.useState(false);
@@ -185,7 +185,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
                 >
                   <motion.div
                     ref={modalRef}
-                    className="relative flex w-full max-w-5xl items-center justify-center overflow-hidden rounded-2xl bg-slate-950 shadow-xl"
+                    className="relative flex w-full max-w-5xl items-center justify-center overflow-hidden rounded-xl bg-slate-950 shadow-xl"
                     initial={{ opacity: 0, scale: 0.96, y: 8 }}
                     animate={{
                       opacity: 1,
@@ -226,7 +226,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
         <span>Tap to expand an image</span>
         <Expand className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
       </p>
-      <div className="grid grid-cols-2 mt-4 gap-6">
+      <div className="grid grid-cols-2 mt-4 gap-4 md:gap-6">
         {images.map((image, index) => (
           <GalleryImage
             key={`${image.url}-${index}`}
@@ -338,7 +338,7 @@ function NavButton({ side, ariaLabel, onClick, children }: NavButtonProps) {
         e.stopPropagation();
         onClick();
       }}
-      className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-white/80 p-3 text-slate-900 shadow-lg transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${positionClass}`}
+      className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-white/40 hover:bg-white/80 p-1 backdrop-blur-sm sm:p-2 md:p-3 lg:p-4 text-blue-200 border border-blue-100 hover:text-blue-500 shadow-lg transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${positionClass}`}
     >
       {children}
     </button>

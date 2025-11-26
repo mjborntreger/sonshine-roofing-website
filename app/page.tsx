@@ -113,7 +113,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           </div>
 
           {/* Sticky Section */}
-          <div className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-24">
+          <div className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-16">
             <ServicesQuickLinks activePath="/" />
             <ResourcesQuickLinks activePath="/" />
           </div>

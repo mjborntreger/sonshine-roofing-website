@@ -1,13 +1,15 @@
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, type ReactNode, type DetailsHTMLAttributes } from "react";
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+
+type BaseDetailsProps = Omit<DetailsHTMLAttributes<HTMLDetailsElement>, "children" | "className" | "id" | "open">;
 
 type AccordionSize = "sm" | "md";
 type AccordionTone = "soft" | "medium" | "strong";
 type AccordionRadius = "lg" | "xl" | "2xl" | "3xl";
 
-export type AccordionProps = {
+export type AccordionProps = BaseDetailsProps & {
   children: ReactNode;
   summary: ReactNode;
   icon?: ReactNode;
@@ -86,6 +88,7 @@ export const Accordion = forwardRef<HTMLDetailsElement, AccordionProps>(function
     metaClassName,
     chevronClassName,
     contentClassName,
+    ...rest
   },
   ref,
 ) {
@@ -96,6 +99,7 @@ export const Accordion = forwardRef<HTMLDetailsElement, AccordionProps>(function
       id={id}
       open={detailOpen}
       ref={ref}
+      {...rest}
       className={cn(
         DETAIL_BASE,
         RADIUS_MAP[radius],

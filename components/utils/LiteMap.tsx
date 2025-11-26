@@ -56,7 +56,7 @@ export default function LiteMap() {
     : `https://maps.google.com/maps?q=${encodeURIComponent(ADDRESS_QUERY)}&output=embed`;
 
   return (
-    <div ref={ref} id="map-lite" className="mt-2 card overflow-hidden">
+    <div ref={ref} id="map-lite" className="card overflow-hidden">
       {active ? (
         <iframe
           src={src}

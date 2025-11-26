@@ -41,7 +41,7 @@ export default function BackToProjectsButton({
       aria-label="Back to Project Gallery"
     >
       <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
-      <span>Back to Project Gallery</span>
+      <span>Back</span>
     </button>
   );
 }

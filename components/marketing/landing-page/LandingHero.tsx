@@ -29,35 +29,34 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
         <div className="px-4 pt-8 mx-auto text-center text-white max-w-8xl not-prose">
           <div className="mt-4 mb-12">
             <ShinyText
-            text="SonShine Roofing"
-            className="mt-16 text-5xl font-script lg:text-7xl"
-            disabled={false}
-            speed={2.5}
-          >
-          </ShinyText>
-          <p className="font-display md:text-lg font-semibold text-blue-400">Since 1987, we&apos;ve got you covered</p>
+              text="SonShine Roofing"
+              className="mt-16 text-5xl font-script lg:text-7xl"
+              disabled={false}
+              speed={2.5}
+            >
+            </ShinyText>
+            <p className="font-display md:text-lg font-semibold text-blue-400">Since 1987, we&apos;ve got you covered</p>
           </div>
-          
+
           <h1 className="mb-8 max-w-6xl mx-auto text-4xl md:text-5xl lg:text-7xl justify-center md:leading-[5rem] lg:leading-[6rem] text-blue-50">
             {title}
           </h1>
 
-          <SmartLink 
-            className="hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 font-semibold block py-4 px-6 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 text-2xl md:text-4xl tracking-wider text-blue-100 mb-[12rem]"
+          <SmartLink
+            className="block hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 py-4 px-6 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 mb-[12rem]"
             href="/contact-us"
             title="Contact SonShine Roofing"
             aria-label="Contact SonShine Roofing"
           >
-            <Phone className="phone-affordance-icon text-[--brand-cyan] h-5 w-5 md:h-8 md:w-8 inline mr-2" />
-            (941) 866-4320
 
-            <span
-              className="mt-2 block font-extralight text-xs tracking-wider text-green-400"
-            >
+            <p className="mb-2 font-semibold text-2xl md:text-4xl tracking-wider text-blue-100 hover:scale-[1.02] transition-transform">
+              <Phone className="phone-affordance-icon text-[--brand-cyan] h-5 w-5 md:h-8 md:w-8 inline mr-2" />
+              (941) 866-4320
+            </p>
+            <p className="mb-1 items-start font-extralight text-xs tracking-wider text-green-400">
               <ShieldCheck className="text-[--brand-cyan] h-3 w-3 inline mr-1" />
               INSURED | LICENSE #CCC1331483
-
-            </span>
+            </p>
           </SmartLink>
         </div>
       </section>

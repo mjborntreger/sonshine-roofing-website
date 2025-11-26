@@ -342,7 +342,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
           </div>
 
           {/* Sticky Section */}
-          <aside className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-24">
+          <aside className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-16">
             <ServicesQuickLinks activePath="/" locationSlug={slug} />
             <ResourcesQuickLinks activePath="/" />
           </aside>

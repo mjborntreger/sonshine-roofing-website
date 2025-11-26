@@ -17,7 +17,7 @@ export const routes = [
   { href: "/financing", label: "Financing" },
 
   // Contact & legal
-  { href: "/contact-us", label: "Contact Us" },
+  { href: "/contact-us", label: "Contact" },
   { href: "/privacy-policy", label: "Privacy Policy" },
 
   // Miscellaneous (developer/internal)
@@ -122,7 +122,6 @@ export type NavItem = { label: string; href?: Route; children?: NavItem[] };
 
 export const NAV_MAIN: ReadonlyArray<NavItem> = [
   { label: 'About', href: ROUTES.about },
-  { label: 'Financing', href: ROUTES.financing },
   {
     label: 'Roofing Services',
     children: SERVICE_ROUTE_DEFINITIONS.map(({ label, key }) => ({
@@ -140,7 +139,9 @@ export const NAV_MAIN: ReadonlyArray<NavItem> = [
       { label: 'FAQ', href: ROUTES.faq },
     ],
   },
-];
+  { label: 'Financing', href: ROUTES.financing },
+  { label: 'Contact', href: ROUTES.contact },
+] as const;
 
 export const NAV_COMPANY: ReadonlyArray<{ label: string; href: Route }> = [
   { label: 'Home', href: ROUTES.home },

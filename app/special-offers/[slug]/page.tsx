@@ -191,7 +191,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
                         )}
                     </article>
 
-                    <div className="sticky top-24 space-y-6">
+                    <div className="sticky top-16 space-y-6">
             {!expired && offer.offerCode ? (
               <Suspense
                 fallback={

@@ -58,7 +58,7 @@ export default function Hero({
           aria-hidden="true"
         />
 
-        <div className="container-edge relative z-10 py-16 md:py-24 lg:py-32">
+        <div className="container-edge relative z-10 py-12 sm:py-16 md:py-20 lg:py-24">
           <div className={TEXT_CONTAINER}>
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-white">
               {title}

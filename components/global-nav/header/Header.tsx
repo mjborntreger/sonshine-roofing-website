@@ -123,7 +123,7 @@ export default function Header() {
         ready
           ? "transition-[background-color,border-color,backdrop-filter,box-shadow] duration-200 ease-out"
           : "transition-none",
-        collapsed ? "shadow-md" : "shadow-none"
+        collapsed ? "shadow-sm" : "shadow-none"
       )}
       style={{
         backgroundColor: headerBackground,
@@ -143,7 +143,7 @@ export default function Header() {
       </div>
       <div
         className={cn(
-          "mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 transition-all duration-200",
+          "mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 transition-all duration-300 ease-in-out",
           collapsed ? "py-[0.125rem]" : "py-[0.4rem]"
         )}
       >

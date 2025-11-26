@@ -8,7 +8,6 @@ import SmartLink from "@/components/utils/SmartLink";
 import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/content/wp";
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
-import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
 import TocFromHeadings from "@/components/global-nav/static-pages/TocFromHeadings";
 import SidebarCta from "@/components/cta/SidebarCta";
 import { notFound } from "next/navigation";
@@ -315,13 +314,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               {post.categories.map((c) => (
                 <span
                   key={c}
-                  className="inline-flex min-w-0 max-w-full items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700"
+                  className="inline-flex min-w-0 max-w-full items-center rounded-full bg-blue-200 px-2.5 py-0.5 text-xs font-semibold text-slate-700"
                 >
                   <span className="block max-w-full truncate">{c}</span>
                 </span>
               ))}
             </div>
-            <ShareWhatYouThink />
           </>
         ) : null}
       </div>

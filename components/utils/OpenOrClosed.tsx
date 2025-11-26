@@ -121,7 +121,7 @@ export default function OpenOrClosed({
   }, [now, timeZone, hours]);
 
   const baseStyles =
-    'inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-sm font-medium';
+    'inline-flex items-center gap-2 rounded-xl border px-2.5 py-1 font-medium';
   const openStyles =
     'border-green-200 bg-green-50 text-green-700';
   const closedStyles =
@@ -129,22 +129,29 @@ export default function OpenOrClosed({
 
   if (!status) {
     return (
-      <span
-        className={`${baseStyles} border-slate-200 bg-slate-50 text-slate-600 ${className}`}
+      <div
+        className={`flex flex-wrap items-center gap-3 ${className}`}
         aria-live="polite"
       >
-        <span className="h-2 w-2 rounded-full bg-slate-400" />
-        Checking hours…
-      </span>
+        <span
+          className={`${baseStyles} border-slate-200 bg-slate-50 text-slate-600`}
+        >
+          <span className="h-2 w-2 rounded-full bg-slate-400" />
+          Checking hours…
+        </span>
+      </div>
     );
   }
 
   if (status.kind === 'open') {
     const closes = formatTime(status.closesAt, timeZone);
     return (
-      <>
+      <div
+        className={`flex flex-wrap items-center gap-x-3 gap-y-2 ${className}`}
+        aria-live="polite"
+      >
         <span
-          className={`${baseStyles} ${openStyles} ${className}`}
+          className={`${baseStyles} ${openStyles}`}
           aria-label={`Open now, closes at ${closes}. We are in the office and ready to take your call.`}
         >
           <span className="h-2 w-2 rounded-full bg-green-500 open-or-closed__dot" />
@@ -152,7 +159,7 @@ export default function OpenOrClosed({
           <span className="text-green-600/70">·</span>
           <span className="text-green-700/80">until {closes}</span>
         </span>
-        <span className="block sm:inline-block mt-2 sm:mt-0 sm:ml-3 text-xs text-slate-700/90">
+        <span className="text-sm md:text-base text-slate-700/90">
           We are in the office and ready to take your call
         </span>
         <style jsx>{`
@@ -169,7 +176,7 @@ export default function OpenOrClosed({
             animation: open-or-closed-blink 1.8s ease-in-out infinite;
           }
         `}</style>
-      </>
+      </div>
     );
   }
 
@@ -185,9 +192,12 @@ export default function OpenOrClosed({
     : 'Closed';
 
   return (
-    <>
+    <div
+      className={`flex flex-wrap items-center gap-x-3 gap-y-2 ${className}`}
+      aria-live="polite"
+    >
       <span
-        className={`${baseStyles} ${closedStyles} ${className}`}
+        className={`${baseStyles} ${closedStyles}`}
         aria-label={`Closed now. ${next ? nextText + '. ' : ''}Fill out the form below and we will get back to you ASAP.`}
       >
         <span className="h-2 w-2 rounded-full bg-red-500" />
@@ -199,9 +209,9 @@ export default function OpenOrClosed({
           </>
         )}
       </span>
-      <span className="block sm:inline-block mt-2 sm:mt-0 sm:ml-3 text-xs text-slate-700/90">
+      <span className="text-sm md:text-base text-slate-700/90">
         Fill out the form below and we will get back to you ASAP
       </span>
-    </>
+    </div>
   );
 }

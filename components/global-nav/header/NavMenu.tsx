@@ -6,7 +6,6 @@ import {
   ChevronDown,
   ChevronRight,
   Phone,
-  Zap,
   UserSearch,
   HandCoins,
   Hammer,
@@ -25,10 +24,10 @@ import {
   X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/lib/routes";
 import { NAV_MAIN, ROUTES } from "@/lib/routes";
+import { InstantQuoteCTA } from "./InstantQuoteCTA";
 
 type Item = NavItem;
 const NAV: Item[] = NAV_MAIN as Item[]; // service links resolve through buildServiceHref for future location variants
@@ -48,9 +47,12 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "Roofing Glossary": BookOpen,
   FAQ: HelpCircle,
   Home: HomeIcon,
+  Contact: Phone,
+  "Contact Us": Phone,
 };
 
 const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);
+const CONTACT_LABELS = new Set(["Contact", "Contact Us"]);
 const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
@@ -119,7 +121,6 @@ const LEVEL_BONUS_MS = 20;       // extra delay per nested level (deeper = later
 // Mobile-only: top-level staggering and CTA offsets
 const MOBILE_TOP_STAGGER_BASE_MS = 70;
 const MOBILE_CTA1_DELAY_MS = 70;  // "Free 60-second Quote"
-const MOBILE_CTA2_DELAY_MS = 100; // "Contact Us"
 
 /* ===== Desktop (fixed) ===== */
 function DesktopMenu({ transparent }: { transparent: boolean }) {
@@ -156,20 +157,25 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
               <SmartLink
                 href={item.href}
                 className={cn(
-                  "px-2 py-2 whitespace-nowrap flex items-center gap-1 transition-colors duration-200",
-                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]"
+                  "relative flex items-center whitespace-nowrap px-2 py-2 transition-colors duration-200",
+                  item.children && "pr-5",
+                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]",
+                  CONTACT_LABELS.has(item.label) && "phone-affordance"
                 )}
               >
                 <LabelWithIcon
                   label={item.label}
-                  iconClassName={transparent ? "text-[--brand-orange]" : "text-[--brand-blue]"}
+                  iconClassName={cn(
+                    transparent ? "text-[--brand-orange]" : "text-[--brand-blue]",
+                    CONTACT_LABELS.has(item.label) && "phone-affordance-icon"
+                  )}
                 />
                 {item.children && (
                   <>
                     {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
                     <ChevronDown
                       className={cn(
-                        "h-4 w-4 opacity-70 transition-transform duration-200",
+                        "pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 opacity-70 transition-transform duration-200",
                         openIndex === i ? "rotate-180" : "rotate-0",
                         transparent ? "text-white" : "text-slate-400"
                       )}
@@ -183,7 +189,8 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
               <button
                 type="button"
                 className={cn(
-                  "px-2 py-2 whitespace-nowrap flex items-center gap-1 cursor-default transition-colors duration-200",
+                  "relative flex items-center whitespace-nowrap px-2 py-2 cursor-default transition-colors duration-200",
+                  item.children && "pr-5",
                   transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]"
                 )}
                 aria-haspopup={item.children ? "menu" : undefined}
@@ -198,7 +205,7 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
                     {/* ANIM: Caret rotation speed — edit CARET_DURATION_MS (and/or Tailwind duration class) */}
                     <ChevronDown
                       className={cn(
-                        "h-4 w-4 opacity-70 transition-transform duration-200",
+                        "pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 h-4 w-4 opacity-70 transition-transform duration-200",
                         openIndex === i ? "rotate-180" : "rotate-0",
                         transparent ? "text-white" : "text-slate-400"
                       )}
@@ -231,25 +238,7 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
         ))}
 
         <li className="pl-2">
-          <Button asChild size="sm" variant="outline" className="bg-neutral-900/60 text-white backdrop-blur hover:bg-neutral-900/90">
-            <SmartLink
-              href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
-              className="flex items-center gap-2"
-              external={false}
-            >
-              <Zap className="h-4 w-4 text-[--brand-orange]" aria-hidden="true" />
-              Instant Quote
-            </SmartLink>
-          </Button>
-        </li>
-
-        <li className="pl-2">
-          <Button asChild size="sm" variant="brandBlue">
-            <SmartLink href={ROUTES.contact} className="phone-affordance flex items-center gap-2">
-              <Phone className="phone-affordance-icon h-4 w-4 text-white" aria-hidden="true" />
-              Contact Us
-            </SmartLink>
-          </Button>
+          <InstantQuoteCTA />
         </li>
       </ul>
     </>
@@ -620,35 +609,13 @@ function MobileMenu() {
                 // ANIM: Mobile CTA1 stagger — base + NAV length step
                 style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
               >
-                <Button asChild className="w-full h-8 mt-4" variant="brandOrange" size="lg">
-                  <SmartLink
-                    href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
-                    onClick={() => setOpen(false)}
-                    className="flex items-center justify-center gap-x-2"
-                  >
-                    <Zap className="w-4 h-4 text-white" aria-hidden="true" />
-                    Instant Quote
-                  </SmartLink>
-                </Button>
-              </li>
-              <li
-                className={cn(
-                  "transition-all duration-150 ease-out",
-                  enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
-                )}
-                // ANIM: Mobile CTA2 stagger — base + NAV length step
-                style={{ transitionDelay: `${Math.min(420, MOBILE_CTA2_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
-              >
-                <Button asChild className="w-full h-8 mt-1 mb-2" variant="brandBlue">
-                  <SmartLink
-                    href={ROUTES.contact}
-                    onClick={() => setOpen(false)}
-                    className="phone-affordance flex items-center justify-center gap-x-2"
-                  >
-                    <Phone className="phone-affordance-icon w-4 h-4 shrink-0 text-white" aria-hidden="true" />
-                    Contact Us
-                  </SmartLink>
-                </Button>
+                <InstantQuoteCTA
+                  size="sm"
+                  buttonClassName="w-full mt-4"
+                  linkClassName="w-full justify-center gap-x-2"
+                  iconClassName="w-4 h-4"
+                  onClick={() => setOpen(false)}
+                />
               </li>
             </ul>
           </div>

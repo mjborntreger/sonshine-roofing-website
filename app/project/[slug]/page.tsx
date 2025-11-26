@@ -307,7 +307,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </div>
 
           {/* Right column: Project Details + Products */}
-          <div className="sticky top-24 prose bg-amber-50/50 shadow-sm rounded-3xl border border-blue-200">
+          <div className="sticky top-16 prose bg-amber-50/50 shadow-sm rounded-3xl border border-blue-200">
             {project.projectDescription && (
               <>
                 <div className="rounded-t-3xl px-6 border-b border-blue-200 overflow-hidden bg-blue-50">

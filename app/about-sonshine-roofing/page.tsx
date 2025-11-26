@@ -116,83 +116,81 @@ export default async function Page() {
           </SmartLink>
         </div>
       </Hero>
-    
+
       <Section>
-        <div className="py-4">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
-            <div className="prose max-w-full min-w-0">
-              {/* JSON-LD: Breadcrumbs + WebPage */}
-              <JsonLd data={breadcrumbsLd} />
-              <JsonLd data={webPageLd} />
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
+          <div className="prose max-w-full min-w-0">
+            {/* JSON-LD: Breadcrumbs + WebPage */}
+            <JsonLd data={breadcrumbsLd} />
+            <JsonLd data={webPageLd} />
 
-              <Accordion
-                icon={<UserRoundSearch className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />}
-                summary={<h2 className="text-2xl">What we do</h2>}
-                className="mb-4"
-                radius="2xl"
-                proseBody={false}
-                defaultOpen
-              >
-                <p>
-                  We specialize in <strong>residential roofing services</strong>, including <strong>roof repair</strong>, <strong>roof replacement</strong>, <strong>roof inspections</strong>, and our <strong>Roof Care Club</strong>, which is our preventative maintenance program uniquely designed for Sarasota-area homeowners. We work with a wide variety of materials, including <strong>asphalt shingles</strong>, <strong>metal panels</strong>, <strong>concrete tiles</strong>, and even some <strong>flat roofs</strong>.
-                </p>
-                <AboutVideo />
-                <p>
-                  We&rsquo;ve learned that <strong>superior customer service</strong> and <strong>honesty</strong> with clients are the most reliable ways to
-                  stay in business long term. The majority of our work is based on referrals and word-of-mouth, which
-                  we are very proud of, and you&apos;ll quickly see why that&apos;s the case.
-                </p>
-                <p className="mt-4">
-                  By the way, when you ask us to inspect your roof, we&rsquo;ll tell you the <strong>flat-out honest truth&mdash;period</strong>.
-                  Many of the other guys will prioritize their big-ticket customers during storm season, leaving budget-conscious and savvy homeowners out to dry.
-                  Not us.
-                  We always give our expert recommendation based on our <strong>38+ years</strong> of professional experience in the Sarasota area,
-                  and we will <strong>NEVER</strong> sell you something you don&apos;t need.
-                </p>
+            <Accordion
+              icon={<UserRoundSearch className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />}
+              summary={<h2 className="text-2xl">What we do</h2>}
+              className="mb-4"
+              radius="2xl"
+              proseBody={false}
+              defaultOpen
+            >
+              <p>
+                We specialize in <strong>residential roofing services</strong>, including <strong>roof repair</strong>, <strong>roof replacement</strong>, <strong>roof inspections</strong>, and our <strong>Roof Care Club</strong>, which is our preventative maintenance program uniquely designed for Sarasota-area homeowners. We work with a wide variety of materials, including <strong>asphalt shingles</strong>, <strong>metal panels</strong>, <strong>concrete tiles</strong>, and even some <strong>flat roofs</strong>.
+              </p>
+              <AboutVideo />
+              <p>
+                We&rsquo;ve learned that <strong>superior customer service</strong> and <strong>honesty</strong> with clients are the most reliable ways to
+                stay in business long term. The majority of our work is based on referrals and word-of-mouth, which
+                we are very proud of, and you&apos;ll quickly see why that&apos;s the case.
+              </p>
+              <p className="mt-4">
+                By the way, when you ask us to inspect your roof, we&rsquo;ll tell you the <strong>flat-out honest truth&mdash;period</strong>.
+                Many of the other guys will prioritize their big-ticket customers during storm season, leaving budget-conscious and savvy homeowners out to dry.
+                Not us.
+                We always give our expert recommendation based on our <strong>38+ years</strong> of professional experience in the Sarasota area,
+                and we will <strong>NEVER</strong> sell you something you don&apos;t need.
+              </p>
 
-              </Accordion>
+            </Accordion>
 
-              <Accordion
-                icon={<MapPin className="h-5 w-5" aria-hidden="true" />}
-                summary={<h2 className="text-2xl">Local &amp; Family-owned</h2>}
-                className="mb-4"
-                radius="2xl"
-                proseBody={false}
-                defaultOpen
-              >
-                <p className="prose">
-                  Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.
-                  Since we are keenly attuned to unpredictable nature of hurricane season, we focus
-                  on <strong>quality</strong> over &lsquo;quick fixes,&rsquo; offering durable roofing solutions backed by
-                  in-house crews, exclusive manufacturer warranties and our own 25-year Leak Free Guarantee.
-                </p>
-                <div className="flex items-center justify-self-center">
-                  <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/About-Us-Collage-new.png"
-                    alt="Team collage for SonShine Roofing, the best roofing company in Sarasota"
-                    title="SonShine Roofing Team"
-                    width={800}
-                    height={225}
-                    className="my-6"
-                  />
-                </div>
-                <p>
-                  When you choose SonShine Roofing, you are showing that you value honesty,
-                  reliable service, and unbeatable quality. We trust that you&rsquo;ll make <strong>the right choice</strong>.
-                </p>
-              </Accordion>
+            <Accordion
+              icon={<MapPin className="h-5 w-5" aria-hidden="true" />}
+              summary={<h2 className="text-2xl">Local &amp; Family-owned</h2>}
+              className="mb-4"
+              radius="2xl"
+              proseBody={false}
+              defaultOpen
+            >
+              <p className="prose">
+                Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.
+                Since we are keenly attuned to unpredictable nature of hurricane season, we focus
+                on <strong>quality</strong> over &lsquo;quick fixes,&rsquo; offering durable roofing solutions backed by
+                in-house crews, exclusive manufacturer warranties and our own 25-year Leak Free Guarantee.
+              </p>
+              <div className="flex items-center justify-self-center">
+                <Image
+                  src="https://next.sonshineroofing.com/wp-content/uploads/About-Us-Collage-new.png"
+                  alt="Team collage for SonShine Roofing, the best roofing company in Sarasota"
+                  title="SonShine Roofing Team"
+                  width={800}
+                  height={225}
+                  className="my-6"
+                />
+              </div>
+              <p>
+                When you choose SonShine Roofing, you are showing that you value honesty,
+                reliable service, and unbeatable quality. We trust that you&rsquo;ll make <strong>the right choice</strong>.
+              </p>
+            </Accordion>
 
 
-              <HoursAndInformation />
-
-            </div>
-
-            <aside className="lg:sticky top-16 self-start lg:h-fit">
-              <SocialMediaProfiles />
-              <ResourcesQuickLinks activePath={SERVICE_PATH} />
-            </aside>
+            <HoursAndInformation />
 
           </div>
+
+          <aside className="lg:sticky top-16 self-start lg:h-fit">
+            <SocialMediaProfiles />
+            <ResourcesQuickLinks activePath={SERVICE_PATH} />
+          </aside>
+
         </div>
       </Section>
 
