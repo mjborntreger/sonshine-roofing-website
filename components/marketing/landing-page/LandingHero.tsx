@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
-import { Phone, ShieldCheck } from "lucide-react";
+import { ArrowRight, Phone, ShieldCheck } from "lucide-react";
 import ShinyText from "./ShinyText";
 import SmartLink from "@/components/utils/SmartLink";
 import Image from "next/image";
@@ -106,17 +106,19 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
           </h1>
 
           <SmartLink
-            className="block hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 py-4 px-6 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 mb-[11rem]"
+            className="block hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 py-4 px-10 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 mb-[11rem]"
             href="/contact-us"
             title="Contact SonShine Roofing"
             aria-label="Contact SonShine Roofing"
+            data-icon-affordance="right"
           >
 
-            <p className="mb-2 font-semibold text-2xl md:text-4xl tracking-wider text-blue-100 hover:scale-[1.02] transition-transform">
-              <Phone className="phone-affordance-icon text-[--brand-cyan] h-5 w-5 md:h-8 md:w-8 inline mr-2" />
-              (941) 866-4320
+            <p className="items-center mb-2 font-semibold text-3xl md:text-4xl tracking-wider text-blue-100 hover:scale-[1.02] transition-transform">
+              
+              Contact Us
+              <ArrowRight className="icon-affordance items-center text-[--brand-cyan] h-6 w-6 md:h-8 md:w-8 inline ml-2" />
             </p>
-            <p className="mb-1 items-start font-extralight text-xs tracking-wider text-green-400">
+            <p className="mb-1 font-extralight text-xs tracking-wider text-green-400">
               <ShieldCheck className="text-[--brand-cyan] h-3 w-3 inline mr-1" />
               INSURED | LICENSE #CCC1331483
             </p>
