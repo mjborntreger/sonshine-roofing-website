@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description: desc,
     path: `/faq/${slug}`,
   });
-  metadata.robots = { index: false, follow: true };
+  metadata.robots = { index: true, follow: true };
   return metadata;
 }
 

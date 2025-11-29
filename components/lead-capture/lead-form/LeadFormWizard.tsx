@@ -58,12 +58,12 @@ const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-for
 });
 
 const INPUT_BASE_CLASS =
-  'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
+  'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
 const INPUT_DEFAULT_CLASS = 'border-blue-200';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
 
 const SELECTION_PILL_BASE_CLASS =
-  'rounded-full border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+  'rounded-xl border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 const SELECTION_PILL_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue] text-white shadow';
 const SELECTION_PILL_UNSELECTED_CLASS = 'border-blue-200 bg-white text-slate-700 hover:border-blue-300';
 
@@ -673,7 +673,7 @@ export default function LeadFormWizard({
   }
 
   return (
-    <form ref={formRef} className="px-4 md:px-10 pb-12" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="px-4 py-16 mb-8" onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <input type="hidden" name="projectType" value={form.projectType} />
       <input type="hidden" name="helpTopics" value={helpSummary} />

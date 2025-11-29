@@ -4,7 +4,6 @@ import SimpleLeadForm from "@/components/lead-capture/lead-form/SimpleLeadForm";
 import SmartLink from "@/components/utils/SmartLink";
 import { Phone, ShieldCheck, BadgeCheck, Star, HandCoins } from "lucide-react";
 import Image from 'next/image';
-import SocialMediaProfiles from "@/components/global-nav/static-pages/SocialMediaProfiles";
 import type { Metadata } from 'next';
 import LiteMap from "@/components/utils/LiteMap";
 import OpenOrClosed from "@/components/utils/OpenOrClosed";
@@ -15,7 +14,7 @@ import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
-import CopyPhoneButton from "@/components/utils/CopyPhoneButton";
+import CopyButton from "@/components/utils/CopyButton";
 
 const SERVICE_PATH = "/contact-us";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -42,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const contactInfoPillBase = "btn btn-lg mb-2 rounded-xl btn-brand-blue not-prose px-3 py-2 justify-start phone-affordance w-fit";
+const contactInfoPillBase = "btn btn-lg rounded-xl btn-brand-blue not-prose px-3 py-2 justify-start phone-affordance w-fit";
 const contactInfoIconStyles = "h-5 w-5 inline mr-2 text-blue-50 h-6 w-6 phone-affordance-icon";
 
 export default async function Page() {
@@ -73,6 +72,7 @@ export default async function Page() {
       <Hero
         title="Contact Us"
         eyelash="Whatever you need, we've got you covered"
+        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp"
         subtitle="Whether you want to schedule an appointment with one our expert Roofing Specialists or if you just have a few questions, we’re here to help! Give us a call or complete the form below to contact our office."
         badges={[
           { icon: ShieldCheck, label: "Licensed & Insured" },
@@ -84,72 +84,119 @@ export default async function Page() {
 
       </Hero>
       <Section>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] items-start max-w-full">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           {/* Main content */}
-          <div className="prose max-w-full min-w-0">
+          <div className="max-w-full min-w-0">
+
             <JsonLd data={webPageLd} />
             <JsonLd data={breadcrumbsLd} />
 
-            {/* “You'll talk to…” human tile */}
-            <div className="not-prose rounded-3xl border border-blue-200 bg-white p-6 shadow-sm max-w-full">
-              <OpenOrClosed />
-              <div className="grid grid-cols-1 sm:grid-cols-[auto,1fr] mt-8 gap-4 items-center min-w-0">
-                <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
-                  alt="Tara – Project Support Specialist"
-                  width={75}
-                  height={107.25}
-                  className="mb-2 block h-[107.25px] w-auto rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-xl font-semibold text-slate-900">
-                    You’ll likely talk to <span className="text-[--brand-blue]">Tara</span>
-                  </p>
-                  <p className="text-md text-slate-600 mb-2">Fast, friendly & reliable.</p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <SmartLink
-                      href={`tel:${PHONE_E164}`}
-                      className={contactInfoPillBase}
-                      title="Call SonShine Roofing"
-                      proseGuard
-                    >
-                      <Phone className={contactInfoIconStyles} aria-hidden="true" />
-                      <p className="font-semibold">{PHONE_DISPLAY}</p>
-                    </SmartLink>
-                    <CopyPhoneButton number={PHONE_DISPLAY} />
+            <div className="flex gap-6 mb-6 lg:hidden">
+              {/* “You'll talk to…” human tile */}
+              <div className="not-prose rounded-3xl w-full border border-blue-200 bg-white p-6 shadow-sm max-w-full">
+                <div className="flex-col gap-6">
+                  <div className="mb-4">
+                    <OpenOrClosed />
                   </div>
-                  <p className="lg:hidden text-xs md:text-sm text-slate-500">Tap to call</p>
+                  <Image
+                    src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
+                    alt="Tara – Project Support Specialist"
+                    width={75}
+                    height={107.25}
+                    className="mb-2 block h-[107.25px] w-auto rounded-xl object-cover"
+                  />
+
+                  <div className="mt-4">
+                    <h2 className="text-2xl font-semibold text-slate-800">
+                      You&apos;ll likely talk to <span className="text-[--brand-blue]">Tara</span>
+                    </h2>
+                    <p className="text-md text-slate-600 mb-2">Fast, friendly & reliable.</p>
+                  </div>
+
+                  <div>
+                    <div className="flex flex-row items-center gap-2">
+                      <SmartLink
+                        href={`tel:${PHONE_E164}`}
+                        className={contactInfoPillBase}
+                        title="Call SonShine Roofing"
+                        proseGuard
+                      >
+                        <Phone className={contactInfoIconStyles} aria-hidden="true" />
+                        <p className="font-semibold">{PHONE_DISPLAY}</p>
+                      </SmartLink>
+                      <CopyButton copyContent={PHONE_DISPLAY} ariaLabel="Copy phone number" />
+                    </div>
+                    <p className="mt-2 lg:hidden text-xs md:text-sm text-slate-500">Tap to call</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="mt-8">
-              <Suspense
-                fallback={
-                  <div className="mx-auto w-full max-w-3xl rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
-                    <div className="h-6 w-32 animate-pulse rounded-full bg-slate-200" />
-                    <div className="mt-4 space-y-3">
-                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
-                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
-                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
-                    </div>
+            <Suspense
+              fallback={
+                <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+                  <div className="h-6 w-32 animate-pulse rounded-full bg-slate-200" />
+                  <div className="mt-4 space-y-3">
+                    <div className="h-4 animate-pulse rounded-full bg-slate-200" />
+                    <div className="h-4 animate-pulse rounded-full bg-slate-200" />
+                    <div className="h-4 animate-pulse rounded-full bg-slate-200" />
                   </div>
-                }
-              >
-                <SimpleLeadForm />
-              </Suspense>
+                </div>
+              }
+            >
+              <SimpleLeadForm />
+            </Suspense>
+          </div>
+          <div className="lg:sticky top-16 self-start">
+            <div className="hidden lg:flex gap-6 w-full mb-6">
+              {/* “You'll talk to…” human tile */}
+              <div className="not-prose rounded-3xl border border-blue-200 bg-white p-6 shadow-sm max-w-full">
+                <div className="flex-col gap-6">
+                  <div className="mb-4">
+                    <OpenOrClosed />
+                  </div>
+                  <Image
+                    src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
+                    alt="Tara – Project Support Specialist"
+                    width={75}
+                    height={107.25}
+                    className="mb-2 block h-[107.25px] w-auto rounded-xl object-cover"
+                  />
+
+                  <div className="mt-4">
+                    <h2 className="text-2xl font-semibold text-slate-800">
+                      You&apos;ll likely talk to <span className="text-[--brand-blue]">Tara</span>
+                    </h2>
+                    <p className="text-md text-slate-600 mb-2">Fast, friendly & reliable.</p>
+                  </div>
+
+                  <div>
+                    <div className="flex flex-row items-center gap-2">
+                      <SmartLink
+                        href={`tel:${PHONE_E164}`}
+                        className={contactInfoPillBase}
+                        title="Call SonShine Roofing"
+                        proseGuard
+                      >
+                        <Phone className={contactInfoIconStyles} aria-hidden="true" />
+                        <p className="font-semibold">{PHONE_DISPLAY}</p>
+                      </SmartLink>
+                      <CopyButton copyContent={PHONE_DISPLAY} ariaLabel="Copy phone number" />
+                    </div>
+                    <p className="lg:hidden text-xs md:text-sm text-slate-500">Tap to call</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="mt-8">
-              <LiteMap />
+            <div>
+              <ResourcesQuickLinks />
             </div>
             
           </div>
-
-          {/* Floating/sticky */}
-          <aside className="lg:sticky top-16 self-start lg:h-fit">
-            <SocialMediaProfiles />
-            <ResourcesQuickLinks activePath={SERVICE_PATH} />
-          </aside>
+          
+        </div>
+        <div className="mt-6">
+          <LiteMap />
         </div>
       </Section>
     </>

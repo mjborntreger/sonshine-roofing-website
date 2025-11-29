@@ -105,7 +105,7 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
   return (
     <div id="get-started">
       {!showWizard && (
-        <div className="px-4 md:px-10 pb-12" ref={containerRef}>
+        <div className="px-4 py-16 mb-8" ref={containerRef}>
           <LeadFormStepShell
             stepLabel="Step 1 of 4"
             title={stepZeroHeading}

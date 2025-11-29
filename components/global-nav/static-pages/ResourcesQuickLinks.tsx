@@ -57,7 +57,6 @@ export type ResourcesQuickLinksProps = {
 export default function ResourcesQuickLinks({ activePath = "/" }: ResourcesQuickLinksProps) {
   return (
     <QuickLinksPanel
-      className="my-4"
       title="See Our Work"
       titleIcon={Eye}
       links={LINKS}

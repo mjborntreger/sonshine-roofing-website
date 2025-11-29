@@ -4,7 +4,7 @@ import type { PostCard, ProjectSummary } from "@/lib/content/wp";
 import { ArrowRight, Sparkles } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 
-const lessFatCta = "btn btn-brand-blue btn-lg w-full sm:w-auto";
+const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
 
 // Minimal blog post shape expected from wp.ts
 type BlogPoolItem = {
@@ -41,10 +41,6 @@ type BaseProps = {
   className?: string;
   /** Optional custom heading to override defaults */
   heading?: string;
-  /** Override CTA href */
-  ctaHref?: string;
-  /** Override CTA label text */
-  ctaLabel?: string;
 };
 
 type BlogVariantProps = BaseProps & {
@@ -88,9 +84,9 @@ const toPostCard = (item: BlogPoolItem): PostCard => {
     categories,
     featuredImage: item.featuredImage?.url
       ? {
-          url: item.featuredImage.url,
-          altText: item.featuredImage.altText ?? null,
-        }
+        url: item.featuredImage.url,
+        altText: item.featuredImage.altText ?? null,
+      }
       : undefined,
     excerpt: item.excerpt ?? undefined,
     contentPlain: item.contentPlain ?? undefined,
@@ -121,9 +117,9 @@ function toProjectSummary(item: ProjectPoolItem): ProjectSummary {
     year: parseYear(),
     heroImage: item.heroImage?.url
       ? {
-          url: item.heroImage.url,
-          altText: item.heroImage.altText ?? item.title,
-        }
+        url: item.heroImage.url,
+        altText: item.heroImage.altText ?? item.title,
+      }
       : null,
     projectDescription: item.projectDescription ?? null,
     reviewSnippet: item.reviewSnippet ?? null,
@@ -245,9 +241,9 @@ const buildProjectHeading = (heading: string | undefined, fallbackName?: string 
 };
 
 export default function YouMayAlsoLike(props: Props) {
-  const { className, excludeSlug, ctaHref, ctaLabel } = props;
+  const { className, excludeSlug } = props;
   const limit = props.limit ?? 4;
-  const baseClassName = ["mt-32 not-prose px-2", className].filter(Boolean).join(" ");
+  const baseClassName = ["not-prose px-2", className].filter(Boolean).join(" ");
   if (props.variant === "project") {
     const projectItems = selectProjects(props.projects, {
       serviceAreaSlug: props.serviceAreaSlug,
@@ -258,16 +254,26 @@ export default function YouMayAlsoLike(props: Props) {
     if (!projectItems.length) return null;
 
     const finalHeading = buildProjectHeading(props.heading, props.serviceAreaName, props.serviceAreaSlug);
-    const finalCtaHref = ctaHref || "/project";
-    const finalCtaLabel = ctaLabel || "See All Projects";
 
     return (
       <section className={baseClassName} aria-labelledby="ymal-heading">
-        <div className="flex justify-start mb-12 mt-36">
+        <div className="flex flex-col md:justify-between mt-16 mb-4">
           <h2 id="ymal-heading" className="text-3xl md:text-4xl">
             <Sparkles className="inline h-7 w-7 md:h-10 md:w-10 text-[--brand-blue] mr-3" />
             {finalHeading}
           </h2>
+          <div className="text-right">
+            <SmartLink
+              href="/project"
+              className={lessFatCta}
+              title="See Full Project Gallery"
+              data-icon-affordance="right"
+              proseGuard
+            >
+              See Full Project Gallery
+              <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
+            </SmartLink>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
@@ -279,19 +285,6 @@ export default function YouMayAlsoLike(props: Props) {
               style={{ animationDelay: `${index * 60}ms` }}
             />
           ))}
-        </div>
-
-        <div className="mt-12 text-center md:text-right">
-          <SmartLink
-            href={finalCtaHref}
-            className={lessFatCta}
-            title={finalCtaLabel}
-            data-icon-affordance="right"
-            proseGuard
-          >
-            {finalCtaLabel}
-            <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
-          </SmartLink>
         </div>
       </section>
     );
@@ -306,16 +299,26 @@ export default function YouMayAlsoLike(props: Props) {
   if (!blogItems.length) return null;
 
   const finalHeading = props.heading ?? "Learn More";
-  const finalCtaHref = ctaHref || "/blog";
-  const finalCtaLabel = ctaLabel || "See All Posts";
 
   return (
     <section className={baseClassName} aria-labelledby="ymal-heading">
-      <div className="flex justify-start mb-12 mt-36">
+      <div className="grid mt-36 mb-4">
         <h2 id="ymal-heading" className="text-3xl md:text-4xl">
           <Sparkles className="inline h-7 w-7 md:h-10 md:w-10 text-[--brand-blue] mr-3" />
           {finalHeading}
         </h2>
+        <div className="text-right">
+          <SmartLink
+            href="/blog"
+            className={lessFatCta}
+            title="See Full Blog"
+            data-icon-affordance="right"
+            proseGuard
+          >
+            See Full Blog
+            <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
+          </SmartLink>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
@@ -327,19 +330,6 @@ export default function YouMayAlsoLike(props: Props) {
             style={{ animationDelay: `${index * 60}ms` }}
           />
         ))}
-      </div>
-
-      <div className="mt-12 text-center md:text-right">
-        <SmartLink
-          href={finalCtaHref}
-          className={lessFatCta}
-          title={finalCtaLabel}
-          data-icon-affordance="right"
-          proseGuard
-        >
-          {finalCtaLabel}
-          <ArrowRight className="inline w-4 h-4 ml-2 icon-affordance" />
-        </SmartLink>
       </div>
     </section>
   );

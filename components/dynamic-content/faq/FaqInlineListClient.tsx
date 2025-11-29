@@ -95,7 +95,7 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
         <button
           type="button"
           onClick={handleToggleAll}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-[--brand-blue] bg-white px-4 py-2 text-sm font-semibold text-[--brand-blue] transition hover:bg-[--brand-blue]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 sm:w-auto"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[--brand-blue] bg-white px-4 py-2 text-sm font-semibold text-[--brand-blue] transition hover:bg-[--brand-blue]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 sm:w-auto"
         >
           {allOpen ? (
             <>

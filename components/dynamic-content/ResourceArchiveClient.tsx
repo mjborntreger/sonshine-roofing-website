@@ -539,11 +539,11 @@ export default function ResourceArchiveClient<Item>({
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <details
                   ref={filtersAccordionRef}
-                  className="group/filter-accordion flex-1 min-w-0 [&_summary::-webkit-details-marker]:hidden"
+                  className="group/filter-accordion flex-1 min-w-0 overflow-hidden rounded-xl border border-blue-200 bg-cyan-50 [&_summary::-webkit-details-marker]:hidden"
                   onToggle={(event) => setFiltersOpen(event.currentTarget.open)}
                 >
                   <summary
-                    className="flex w-full cursor-pointer select-none items-center justify-between rounded-xl border border-blue-200 bg-cyan-50 px-3 py-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2"
+                    className="flex w-full cursor-pointer select-none items-center justify-between px-3 py-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2"
                     aria-controls={filtersPanelId}
                     aria-expanded={filtersOpen}
                     onKeyDown={handleFiltersKeyDown}
@@ -583,51 +583,49 @@ export default function ResourceArchiveClient<Item>({
                       </span>
                     </span>
                   </summary>
-                  <div id={filtersPanelId} className="accordion-motion">
-                    <div className="mt-3">
-                      <FilterTabs
-                        tabs={tabs}
-                        activeKey={activeTabKey as string}
-                        onTabChange={setActiveTabKey}
-                        isLoading={loading}
-                        ariaLabel="Project filters"
-                      >
-                        {(tabKey) => {
-                          const group = groups.find((g) => g.key === tabKey);
-                          const tab = tabs.find((t) => t.key === tabKey);
-                          if (!group || !tab) return null;
+                  <div id={filtersPanelId} className="accordion-motion border-t border-blue-100/70 px-3 pb-3 pt-3">
+                    <FilterTabs
+                      tabs={tabs}
+                      activeKey={activeTabKey as string}
+                      onTabChange={setActiveTabKey}
+                      isLoading={loading}
+                      ariaLabel="Project filters"
+                    >
+                      {(tabKey) => {
+                        const group = groups.find((g) => g.key === tabKey);
+                        const tab = tabs.find((t) => t.key === tabKey);
+                        if (!group || !tab) return null;
 
-                          return (
-                            <div>
-                              <p className="text-xs md:text-sm my-2 mx-2 text-slate-500">Tap to select / deselect</p>
-                              <div className="flex flex-wrap gap-2">
-                                {tab.terms.map((term) => {
-                                  const active = (sortedSelections[group.key] ?? []).includes(term.slug);
-                                  const disabled = term.count === 0 && !active;
-                                  return (
-                                    <button
-                                      key={term.slug}
-                                      type="button"
-                                      onClick={() => toggleSelection(group.key, term.slug)}
-                                      disabled={disabled}
-                                      className={`px-3 py-1.5 rounded-full border text-sm transition select-none ${active
-                                        ? "border-[--brand-blue] bg-[--brand-blue] text-white"
-                                        : disabled
-                                          ? "border-blue-200 bg-slate-100 text-slate-400 cursor-not-allowed"
-                                          : "border-blue-200 bg-cyan-50 text-slate-700 hover:border-[--brand-blue]"
-                                        }`}
-                                      aria-pressed={active}
-                                    >
-                                      {term.name} ({term.count})
-                                    </button>
-                                  );
-                                })}
-                              </div>
+                        return (
+                          <div>
+                            <p className="text-xs md:text-sm my-2 text-slate-500">Tap to select / deselect</p>
+                            <div className="flex flex-wrap gap-2">
+                              {tab.terms.map((term) => {
+                                const active = (sortedSelections[group.key] ?? []).includes(term.slug);
+                                const disabled = term.count === 0 && !active;
+                                return (
+                                  <button
+                                    key={term.slug}
+                                    type="button"
+                                    onClick={() => toggleSelection(group.key, term.slug)}
+                                    disabled={disabled}
+                                    className={`px-3 py-1.5 rounded-xl border text-sm transition select-none ${active
+                                      ? "border-[--brand-blue] bg-[--brand-blue] text-white"
+                                      : disabled
+                                        ? "border-blue-200 bg-slate-100 text-slate-400 cursor-not-allowed"
+                                        : "border-blue-200 bg-white/70 text-slate-700 hover:border-[--brand-blue]"
+                                      }`}
+                                    aria-pressed={active}
+                                  >
+                                    {term.name} ({term.count})
+                                  </button>
+                                );
+                              })}
                             </div>
-                          );
-                        }}
-                      </FilterTabs>
-                    </div>
+                          </div>
+                        );
+                      }}
+                    </FilterTabs>
                   </div>
                 </details>
               </div>

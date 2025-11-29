@@ -82,7 +82,7 @@ export default function ServicesQuickLinks({
 
   return (
     <QuickLinksPanel
-      className="mt-4"
+      className="mb-4"
       title="Roofing Services"
       titleIcon={HardHat}
       links={links}

@@ -117,9 +117,9 @@ export function validateContactIdentityDraft(draft: ContactIdentityDraft): Recor
   const errors: Record<string, string> = {};
   if (!draft.firstName.trim()) errors.firstName = 'Enter your first name.';
   if (!draft.lastName.trim()) errors.lastName = 'Enter your last name.';
-  if (!validateEmail(draft.email)) errors.email = 'Enter a valid email (example@domain.com).';
+  if (!validateEmail(draft.email)) errors.email = 'Enter a valid email (example@gmail.com).';
   if (!isUsPhoneComplete(draft.phone)) {
-    errors.phone = 'Enter a valid phone number (10 digits, optional country code).';
+    errors.phone = 'Enter a valid 10-digit phone number';
   }
   return errors;
 }

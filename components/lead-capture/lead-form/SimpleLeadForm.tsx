@@ -41,6 +41,12 @@ import {
   ProjectOptionCardContent,
 } from '@/components/lead-capture/lead-form/ProjectOptionCard';
 
+// STYLES
+const INPUT_BASE_CLASS = 'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
+const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
+const SECTION_TITLE_BASE_CLASS = "text-lg sm:text-2xl font-semibold tracking-wide text-slate-700";
+const SECTION_EYELASH = "text-xs my-1 text-slate-500";
+
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
   ssr: false,
@@ -320,181 +326,29 @@ export default function SimpleLeadForm() {
   return (
     <>
       <div id="book-an-appointment" className="h-0" aria-hidden="true" />
-      <form className="not-prose mt-8" onSubmit={handleSubmit} noValidate>
+      <form className="not-prose" onSubmit={handleSubmit} noValidate>
+        {/* SECRET CIA HONEYPOT */}
         <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
-        <div className="mx-auto w-full max-w-3xl rounded-3xl border border-blue-100 bg-white shadow-md">
+        {/* OK, BACK TO THE SHOW */}
+        <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white shadow-md">
           <div className="border-b rounded-t-3xl border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
             <h2 className="flex items-center text-2xl md:text-3xl font-bold gap-2">
               <SquareMenu className="h-5 w-5 md:h-6 md:w-6 text-[--brand-blue]" aria-hidden="true" />
               <span>{renderHighlight('Contact Our Office', 'Our Office')}</span>
             </h2>
-            <p className="text-slate-500 mt-1 text-xs pb-2">We respond within 30 minutes during business hours</p>
+            <p className="text-slate-500 mt-1 text-xs pb-2">We respond within 30 minutes during business hours. After hours, we&apos;ll contact you in the next business day.</p>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
+
             {globalError && (
               <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{globalError}</div>
             )}
 
-            <div className="grid gap-6">
+            <div className="grid gap-12">
               <section>
-                <section className="grid my-4 gap-4 md:grid-cols-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    First name
-                    <input
-                      type="text"
-                      name="firstName"
-                      autoComplete="given-name"
-                      value={form.firstName}
-                      onChange={(event) => setField('firstName', event.target.value)}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200',
-                        errors.firstName && 'border-red-300 focus:border-red-400 focus:ring-red-200'
-                      )}
-                    />
-                    {errors.firstName && <span className="mt-1 text-xs text-red-600">{errors.firstName}</span>}
-                  </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Last name
-                    <input
-                      type="text"
-                      name="lastName"
-                      autoComplete="family-name"
-                      value={form.lastName}
-                      onChange={(event) => setField('lastName', event.target.value)}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200',
-                        errors.lastName && 'border-red-300 focus:border-red-400 focus:ring-red-200'
-                      )}
-                    />
-                    {errors.lastName && <span className="mt-1 text-xs text-red-600">{errors.lastName}</span>}
-                  </label>
-                </section>
-
-                <section className="grid gap-4 md:grid-cols-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Email
-                    <input
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      value={form.email}
-                      onChange={(event) => setField('email', event.target.value)}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200',
-                        errors.email && 'border-red-300 focus:border-red-400 focus:ring-red-200'
-                      )}
-                    />
-                    {errors.email && <span className="mt-1 text-xs text-red-600">{errors.email}</span>}
-                  </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Phone
-                    <input
-                      type="tel"
-                      name="phone"
-                      autoComplete="tel"
-                      value={form.phone}
-                      onChange={(event) => setField('phone', sanitizePhoneInput(event.target.value))}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200',
-                        errors.phone && 'border-red-300 focus:border-red-400 focus:ring-red-200'
-                      )}
-                      inputMode="tel"
-                    />
-                    <p className="mt-1 text-xs text-slate-500">Digits only, US numbers. Example: {formatPhoneExample(form.phone)}</p>
-                    {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
-                  </label>
-                </section>
-
-                <section className="grid gap-4 md:grid-cols-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Address
-                    <input
-                      type="text"
-                      name="address1"
-                      autoComplete="address-line1"
-                      value={form.address1}
-                      onChange={(event) => setField('address1', event.target.value)}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200',
-                        errors.address1 && 'border-red-300 focus:border-red-400 focus:ring-red-200'
-                      )}
-                    />
-                    {errors.address1 && <span className="mt-1 text-xs text-red-600">{errors.address1}</span>}
-                  </label>
-                  <label className="md:col-span-2 block text-sm font-medium text-slate-700">
-                    Apt, suite, etc. (optional)
-                    <input
-                      type="text"
-                      name="address2"
-                      autoComplete="address-line2"
-                      value={form.address2}
-                      onChange={(event) => setField('address2', event.target.value)}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200'
-                      )}
-                    />
-                  </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    City
-                    <input
-                      type="text"
-                      name="city"
-                      autoComplete="address-level2"
-                      value={form.city}
-                      onChange={(event) => setField('city', event.target.value)}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200',
-                        errors.city && 'border-red-300 focus:border-red-400 focus:ring-red-200'
-                      )}
-                    />
-                    {errors.city && <span className="mt-1 text-xs text-red-600">{errors.city}</span>}
-                  </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    State
-                    <input
-                      type="text"
-                      name="state"
-                      autoComplete="address-level1"
-                      value={form.state}
-                      onChange={(event) => setField('state', normalizeState(event.target.value))}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200',
-                        errors.state && 'border-red-300 focus:border-red-400 focus:ring-red-200'
-                      )}
-                      maxLength={2}
-                    />
-                    {errors.state && <span className="mt-1 text-xs text-red-600">{errors.state}</span>}
-                  </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    ZIP
-                    <input
-                      type="text"
-                      name="zip"
-                      autoComplete="postal-code"
-                      value={form.zip}
-                      onChange={(event) => setField('zip', normalizeZip(event.target.value))}
-                      className={cn(
-                        'mt-2 w-full rounded-full border px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30',
-                        'border-slate-200',
-                        errors.zip && 'border-red-300 focus:border-red-400 focus:ring-red-200'
-                      )}
-                      inputMode="numeric"
-                      maxLength={10}
-                    />
-                    {errors.zip && <span className="mt-1 text-xs text-red-600">{errors.zip}</span>}
-                  </label>
-                </section>
-
-                <p className="text-xs mt-8 font-semibold uppercase tracking-wide text-slate-500">What do you need?</p>
+                <h3 className={SECTION_TITLE_BASE_CLASS}>How can we help?</h3>
+                <p className={SECTION_EYELASH}>Select an option to continue</p>
                 <div className="mt-3 grid gap-4 md:grid-cols-2">
                   {SIMPLE_PROJECT_OPTIONS.map((option) => {
                     const selected = form.projectType === option.value;
@@ -518,7 +372,8 @@ export default function SimpleLeadForm() {
               </section>
 
               <section>
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500 mt-8">How soon do you need help?</p>
+                <h3 className={SECTION_TITLE_BASE_CLASS}>How soon would you like to start?</h3>
+                <p className={SECTION_EYELASH}>Select an option to continue</p>
                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
                   {STANDARD_TIMELINE_OPTIONS.map(({ value, label }) => {
                     const selected = form.timeline === value;
@@ -528,7 +383,7 @@ export default function SimpleLeadForm() {
                         type="button"
                         onClick={() => setField('timeline', value)}
                         className={cn(
-                          'rounded-full border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                          'font-medium text-slate-600 rounded-xl border px-4 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                           selected
                             ? 'border-[--brand-blue] bg-[--brand-blue] text-white shadow'
                             : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
@@ -544,7 +399,8 @@ export default function SimpleLeadForm() {
               </section>
 
               <section>
-                <p className="text-xs mt-8 font-semibold uppercase tracking-wide text-slate-500">What type of roof do you currently have?</p>
+                <h3 className={SECTION_TITLE_BASE_CLASS}>What type of roof do you currently have?</h3>
+                <p className={SECTION_EYELASH}>Select an option to continue</p>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
                   {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
                     const selected = form.roofType === value;
@@ -583,8 +439,143 @@ export default function SimpleLeadForm() {
               </section>
 
               <section>
-                <label className="block mt-2 text-md font-medium text-slate-700">
-                  Anything else you’d like us to know?
+                <div>
+                  <h3 className={SECTION_TITLE_BASE_CLASS}>How can we reach you?</h3>
+                  <p className={SECTION_EYELASH}>Enter your contact info to continue</p>
+                </div>
+                <div className="grid my-4 gap-4 md:grid-cols-2">
+                  <label className="block text-sm font-medium text-slate-700">
+                    First Name
+                    <input
+                      type="text"
+                      name="firstName"
+                      autoComplete="given-name"
+                      value={form.firstName}
+                      onChange={(event) => setField('firstName', event.target.value)}
+                      className={cn(INPUT_BASE_CLASS, errors.firstName && INPUT_ERROR_CLASS)}
+                      placeholder="First Name"
+                    />
+                    {errors.firstName && <span className="mt-1 text-xs text-red-600">{errors.firstName}</span>}
+                  </label>
+                  <label className="block text-sm font-medium text-slate-700">
+                    Last Name
+                    <input
+                      type="text"
+                      name="lastName"
+                      autoComplete="family-name"
+                      value={form.lastName}
+                      onChange={(event) => setField('lastName', event.target.value)}
+                      className={cn(INPUT_BASE_CLASS, errors.lastName && INPUT_ERROR_CLASS)}
+                      placeholder="Last Name"
+                    />
+                    {errors.lastName && <span className="mt-1 text-xs text-red-600">{errors.lastName}</span>}
+                  </label>
+                </div>
+
+                <section className="grid gap-4 md:grid-cols-2">
+                  <label className="block text-sm font-medium text-slate-700">
+                    Email
+                    <input
+                      type="email"
+                      name="email"
+                      autoComplete="email"
+                      value={form.email}
+                      onChange={(event) => setField('email', event.target.value)}
+                      className={cn(INPUT_BASE_CLASS, errors.email && INPUT_ERROR_CLASS)}
+                      placeholder="example@domain.com"
+                    />
+                    {errors.email && <span className="mt-1 text-xs text-red-600">{errors.email}</span>}
+                  </label>
+                  <label className="block text-sm font-medium text-slate-700">
+                    Phone
+                    <input
+                      type="tel"
+                      name="phone"
+                      autoComplete="tel"
+                      value={form.phone}
+                      onChange={(event) => setField('phone', sanitizePhoneInput(event.target.value))}
+                      className={cn(INPUT_BASE_CLASS, errors.phone && INPUT_ERROR_CLASS)}
+                      inputMode="tel"
+                      placeholder={`Example: ${formatPhoneExample(form.phone)}`}
+                    />
+                    {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
+                  </label>
+                </section>
+
+                <section className="mt-4 grid gap-4 md:grid-cols-2">
+                  <label className="block text-sm font-medium text-slate-700">
+                    Address
+                    <input
+                      type="text"
+                      name="address1"
+                      autoComplete="address-line1"
+                      value={form.address1}
+                      onChange={(event) => setField('address1', event.target.value)}
+                      className={cn(INPUT_BASE_CLASS, errors.address1 && INPUT_ERROR_CLASS)}
+                      placeholder="123 Sesame St."
+                    />
+                    {errors.address1 && <span className="mt-1 text-xs text-red-600">{errors.address1}</span>}
+                  </label>
+                  <label className="block text-sm text-slate-500">
+                    Apt, suite, etc. (optional)
+                    <input
+                      type="text"
+                      name="address2"
+                      autoComplete="address-line2"
+                      value={form.address2}
+                      onChange={(event) => setField('address2', event.target.value)}
+                      className={cn(INPUT_BASE_CLASS)}
+                    />
+                  </label>
+                </section>
+                <section className="mt-4 flex flex-row w-full gap-2">
+                  <label className="block text-sm font-medium text-slate-700">
+                    City
+                    <input
+                      type="text"
+                      name="city"
+                      autoComplete="address-level2"
+                      value={form.city}
+                      onChange={(event) => setField('city', event.target.value)}
+                      className={cn(INPUT_BASE_CLASS, errors.city && INPUT_ERROR_CLASS)}
+                      placeholder="City"
+                    />
+                    {errors.city && <span className="mt-1 text-xs text-red-600">{errors.city}</span>}
+                  </label>
+                  <label className="block text-sm font-medium text-slate-700">
+                    State
+                    <input
+                      type="text"
+                      name="state"
+                      autoComplete="address-level1"
+                      value={form.state}
+                      onChange={(event) => setField('state', normalizeState(event.target.value))}
+                      className={cn(INPUT_BASE_CLASS, errors.state && INPUT_ERROR_CLASS)}
+                      maxLength={2}
+                    />
+                    {errors.state && <span className="mt-1 text-xs text-red-600">{errors.state}</span>}
+                  </label>
+                  <label className="block text-sm font-medium text-slate-700">
+                    ZIP
+                    <input
+                      type="text"
+                      name="zip"
+                      autoComplete="postal-code"
+                      value={form.zip}
+                      onChange={(event) => setField('zip', normalizeZip(event.target.value))}
+                      className={cn(INPUT_BASE_CLASS, errors.zip && INPUT_ERROR_CLASS)}
+                      inputMode="numeric"
+                      maxLength={10}
+                      placeholder="ZIP"
+                    />
+                    {errors.zip && <span className="mt-1 text-xs text-red-600">{errors.zip}</span>}
+                  </label>
+                </section>
+              </section>
+
+              <section>
+                <label className="block ">
+                  <h3 className="text-lg sm:text-xl font-semibold text-slate-600">Anything else you’d like us to know? (optional) </h3>
                   <textarea
                     name="notes"
                     rows={4}

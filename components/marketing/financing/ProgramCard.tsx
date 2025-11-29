@@ -3,12 +3,14 @@ import Image from "next/image";
 import { Accordion } from "@/components/ui/Accordion";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, Percent, Landmark, HelpCircle, ArrowRight } from "lucide-react";
+import SmartLink from "@/components/utils/SmartLink";
 
 type CTA = { href: string; label: string; title?: string; className?: string };
 
 type ProgramCardProps = {
   title: string;
   subtitle?: string;
+  eyelash?: string;
   chips?: string[];
   keyFigures: string[]; // 2–4 short highlights like "From 7.9% APR"
   bullets: string[];    // 5–7 benefits
@@ -29,6 +31,7 @@ export default function ProgramCard({
   id,
   title,
   subtitle,
+  eyelash,
   chips = [],
   keyFigures,
   bullets,
@@ -201,7 +204,10 @@ export default function ProgramCard({
         {/* Footer CTA + compliance */}
         <div className="px-4 pt-0 pb-4 mt-auto">
           <div className="flex justify-end">
-            <a
+            <p className="text-slate-500 italic text-xs mb-2">{eyelash}</p>
+          </div>
+          <div className="flex justify-end">
+            <SmartLink
               href={cta.href}
               className={cn(
                 "btn btn-lg inline-flex items-center",
@@ -214,7 +220,7 @@ export default function ProgramCard({
             >
               {cta.label}
               <ArrowRight className="icon-affordance ml-2 h-4 w-4" aria-hidden />
-            </a>
+            </SmartLink>
           </div>
           {finePrint ? (
             <p className="mt-8 text-xs italic text-slate-500">{finePrint}</p>

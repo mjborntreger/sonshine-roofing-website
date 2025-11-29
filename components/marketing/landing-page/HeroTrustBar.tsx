@@ -246,7 +246,7 @@ export default function HeroTrustBar({
             ))}
           </div>
 
-          <div className="mt-20">
+          <div className="mt-16">
             <h2 className="text-center md:text-4xl text-2xl">Expert <span className="text-[--brand-blue]">Residential Roofing Company</span></h2>
             <p className="text-center text-slate-600 mt-1 mb-8">
               No subcontractors – our in-house crews use the utmost care and precision when working on your home.

@@ -22,6 +22,7 @@ export function GET() {
   <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <sitemap><loc>${BASE}/sitemap_index/static</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/blog</loc></sitemap>
+    <sitemap><loc>${BASE}/sitemap_index/faq</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/project</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/location</loc></sitemap>
     <sitemap><loc>${BASE}/sitemap_index/roofing-glossary</loc></sitemap>

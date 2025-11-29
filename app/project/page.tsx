@@ -87,7 +87,7 @@ export default async function ProjectArchivePage() {
         
       />
       <Section>
-        <div className="container-edge py-4">
+        <div className="container-edge">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
             <div>
               <JsonLd data={collectionLd} />

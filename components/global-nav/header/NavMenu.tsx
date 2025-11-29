@@ -448,7 +448,7 @@ function MobileMenu() {
       <button
         type="button"
         ref={buttonRef}
-        className="flex items-center gap-2 rounded-full border px-4 py-2 text-white bg-[--brand-blue]"
+        className="flex items-center gap-2 rounded-xl border px-4 py-2 text-white bg-[--brand-blue]"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="mobile-nav"

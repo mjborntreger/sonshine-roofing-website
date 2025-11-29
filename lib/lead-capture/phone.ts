@@ -81,12 +81,12 @@ export function formatPhoneForDisplay(value: string): string {
 }
 
 export function formatPhoneExample(sample?: string): string {
-  const source = sample ?? '9415551234';
+  const source = sample ?? '9418675309';
   const normalized = normalizePhoneForSubmit(source);
-  if (normalized.length !== 11) return '+1 (941) 555-1234';
+  if (normalized.length !== 11) return '(941) 867-5309';
   const core = normalized.slice(1);
   const area = core.slice(0, 3);
   const mid = core.slice(3, 6);
   const last = core.slice(6, 10);
-  return `+1 (${area}) ${mid}-${last}`;
+  return `(${area}) ${mid}-${last}`;
 }

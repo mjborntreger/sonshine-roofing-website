@@ -5,7 +5,6 @@ import WhyHomeownersChooseUs from "@/components/marketing/landing-page/WhyHomeow
 import LatestProjectsFilter from "@/components/dynamic-content/latest-filters/LatestProjectsFilter";
 import { listRecentProjectsPoolForFilters, listRecentPostsPoolForFilters, listFaqsWithContent, listSponsorFeaturesByServiceArea } from '@/lib/content/wp';
 import LatestPostsFilters from "@/components/dynamic-content/latest-filters/LatestPostsFilter";
-import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks"
 import ServicesQuickLinks from "@/components/global-nav/static-pages/ServicesQuickLinks";
 import BestOfTheBest from "@/components/marketing/landing-page/BestOfTheBest";
 import Section from "@/components/layout/Section";
@@ -13,6 +12,7 @@ import type { Metadata } from 'next';
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import LeadFormSection from "@/components/lead-capture/lead-form/LeadFormSection";
 import LocalPartnershipsSection from "@/components/location/LocalPartnershipsSection";
+import SidebarCta from "@/components/cta/SidebarCta";
 
 // ===== STYLE CONSTANTS ===== //
 const leadFormLayout = "mx-auto w-full";
@@ -115,7 +115,8 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           {/* Sticky Section */}
           <div className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-16">
             <ServicesQuickLinks activePath="/" />
-            <ResourcesQuickLinks activePath="/" />
+            <div className="h-[1px] w-full bg-blue-100 my-4" />
+            <SidebarCta />
           </div>
         </div>
       </div>

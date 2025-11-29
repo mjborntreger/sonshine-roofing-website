@@ -2,6 +2,16 @@
 
 import { useEffect, useMemo, useState } from 'react';
 
+// STYLES
+  const baseStyles =
+    'inline-flex w-fit items-center gap-2 rounded-xl border px-2.5 py-1 text-sm font-medium';
+  const openStyles =
+    'border-green-200 bg-green-50 text-green-700';
+  const closedStyles =
+    'border-red-200 bg-red-50 text-red-700';
+  const helperTextStyles = 
+    'block my-1 text-xs text-slate-500';
+
 type Interval = { open: string; close: string }; // 24h "HH:mm"
 type WeeklyHours = Record<number, Interval[]>; // 0 = Sunday ... 6 = Saturday
 
@@ -19,6 +29,10 @@ type OpenOrClosedProps = {
    * Optional wrapper className.
    */
   className?: string;
+  /**
+   * Hide helper text so only the status pill renders.
+   */
+  hideHelperText?: boolean;
 };
 
 /**
@@ -105,6 +119,7 @@ export default function OpenOrClosed({
   hours = DEFAULT_HOURS,
   timeZone = DEFAULT_TZ,
   className = '',
+  hideHelperText = false,
 }: OpenOrClosedProps) {
   const [now, setNow] = useState<Date | null>(null);
 
@@ -120,17 +135,10 @@ export default function OpenOrClosed({
     return computeStatus(now, timeZone, hours);
   }, [now, timeZone, hours]);
 
-  const baseStyles =
-    'inline-flex items-center gap-2 rounded-xl border px-2.5 py-1 font-medium';
-  const openStyles =
-    'border-green-200 bg-green-50 text-green-700';
-  const closedStyles =
-    'border-red-200 bg-red-50 text-red-700';
-
   if (!status) {
     return (
       <div
-        className={`flex flex-wrap items-center gap-3 ${className}`}
+        className={`grid items-center gap-3 ${className}`}
         aria-live="polite"
       >
         <span
@@ -147,21 +155,23 @@ export default function OpenOrClosed({
     const closes = formatTime(status.closesAt, timeZone);
     return (
       <div
-        className={`flex flex-wrap items-center gap-x-3 gap-y-2 ${className}`}
+        className={`text-[1.05rem] grid items-center gap-x-3 gap-y-2 ${className}`}
         aria-live="polite"
       >
         <span
           className={`${baseStyles} ${openStyles}`}
-          aria-label={`Open now, closes at ${closes}. We are in the office and ready to take your call.`}
+          aria-label={`We are in the office and ready to take your call! Open until ${closes}.`}
         >
           <span className="h-2 w-2 rounded-full bg-green-500 open-or-closed__dot" />
           <span>Open now</span>
           <span className="text-green-600/70">·</span>
           <span className="text-green-700/80">until {closes}</span>
         </span>
-        <span className="text-sm md:text-base text-slate-700/90">
-          We are in the office and ready to take your call
-        </span>
+        {!hideHelperText && (
+          <span className={helperTextStyles}>
+            We are in the office and ready to take your call!
+          </span>
+        )}
         <style jsx>{`
           @keyframes open-or-closed-blink {
             0%, 55% {
@@ -193,7 +203,7 @@ export default function OpenOrClosed({
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-x-3 gap-y-2 ${className}`}
+      className={`grid items-center gap-x-3 gap-y-2 ${className}`}
       aria-live="polite"
     >
       <span
@@ -209,9 +219,11 @@ export default function OpenOrClosed({
           </>
         )}
       </span>
-      <span className="text-sm md:text-base text-slate-700/90">
-        Fill out the form below and we will get back to you ASAP
-      </span>
+      {!hideHelperText && (
+        <span className={helperTextStyles}>
+          Fill out the form below and we will get back to you ASAP
+        </span>
+      )}
     </div>
   );
 }

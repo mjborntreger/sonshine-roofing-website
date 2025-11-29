@@ -9,13 +9,14 @@ import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/content/w
 import type { Metadata } from "next";
 import { buttonVariants } from "@/components/ui/button";
 import TocFromHeadings from "@/components/global-nav/static-pages/TocFromHeadings";
-import SidebarCta from "@/components/cta/SidebarCta";
 import { notFound } from "next/navigation";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { blogPostingSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
+import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
+import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks";
 
 export const revalidate = 900;
 
@@ -294,114 +295,119 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <Section>
-      <JsonLd data={postSchema} />
+      <div className="mx-2 lg:mx-0">
+        <JsonLd data={postSchema} />
 
-      {/* Title + gradient stripe */}
-      <div className="prose">
-        <h1 className="mb-2">{post.title}</h1>
-      </div>
-      <div className="h-1 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
-
-      {/* Meta row */}
-      <div className="flex flex-wrap items-center mt-3 text-sm gap-x-4 gap-y-2 text-slate-600">
-        <span>{dateStr}</span>
-        <span>•</span>
-        <span>{readingMinutes} min read</span>
-        {post.categories?.length ? (
-          <>
-            <span>•</span>
-            <div className="flex flex-wrap gap-2">
-              {post.categories.map((c) => (
-                <span
-                  key={c}
-                  className="inline-flex min-w-0 max-w-full items-center rounded-full bg-blue-200 px-2.5 py-0.5 text-xs font-semibold text-slate-700"
-                >
-                  <span className="block max-w-full truncate">{c}</span>
-                </span>
-              ))}
-            </div>
-          </>
-        ) : null}
-      </div>
-
-      {/* Featured image */}
-      {post.featuredImage?.url ? (
-        <div className="mt-5 overflow-hidden rounded-2xl bg-neutral-100">
-          <Image
-            src={post.featuredImage.url}
-            alt={post.featuredImage.altText || post.title}
-            sizes="(max-width: 1600px) 100vw, 1600px"
-            width={1600}
-            height={900}
-            className="object-cover w-full h-auto"
-            priority
-          />
+        {/* Title + gradient stripe */}
+        <div className="prose">
+          <h1 className="mb-2">{post.title}</h1>
         </div>
-      ) : null}
+        <div className="h-1 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
 
-      {/* Layout: content + TOC */}
-      <div className="mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <TocFromHeadings
-          root="#article-root"
-          levels={[2, 3]}
-          offset={100}
-          mobile
-        />
-        {/* Article (single SSR block to avoid hydration mismatches) */}
-        <article
-          id="article-root"
-          className="px-2 prose"
-          dangerouslySetInnerHTML={{ __html: htmlWithCta }}
-        />
+        {/* Meta row */}
+        <div className="flex flex-wrap items-center mt-3 text-sm gap-x-4 gap-y-2 text-slate-600">
+          <span>{dateStr}</span>
+          <span>•</span>
+          <span>{readingMinutes} min read</span>
+          {post.categories?.length ? (
+            <>
+              <span>•</span>
+              <div className="flex flex-wrap gap-2">
+                {post.categories.map((c) => (
+                  <span
+                    key={c}
+                    className="inline-flex min-w-0 max-w-full items-center rounded-full bg-blue-200 px-2.5 py-0.5 text-xs font-semibold text-slate-700"
+                  >
+                    <span className="block max-w-full truncate">{c}</span>
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : null}
+        </div>
 
-        {/* Sidebar (desktop, sticky) */}
-        <aside>
-          <div className="sticky grid grid-cols-1 top-16">
+        {/* Featured image */}
+        {post.featuredImage?.url ? (
+          <div className="mt-5 overflow-hidden rounded-2xl bg-neutral-100">
+            <Image
+              src={post.featuredImage.url}
+              alt={post.featuredImage.altText || post.title}
+              sizes="(max-width: 1600px) 100vw, 1600px"
+              width={1600}
+              height={900}
+              className="object-cover w-full h-auto"
+              priority
+            />
+          </div>
+        ) : null}
+        <div className="mb-8">
+          <ShareWhatYouThink />
+        </div>
+
+
+        {/* Layout: content + TOC */}
+        <div className="grid lg:mt-4 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+          <TocFromHeadings
+            root="#article-root"
+            levels={[2, 3]}
+            offset={100}
+            mobile
+          />
+          {/* Article (single SSR block to avoid hydration mismatches) */}
+          <article
+            id="article-root"
+            className="px-2 prose"
+            dangerouslySetInnerHTML={{ __html: htmlWithCta }}
+          />
+
+          {/* Sidebar (desktop, sticky) */}
+          <aside className="sticky grid grid-cols-1 top-16 h-fit">
             <TocFromHeadings
               root="#article-root"
               levels={[2, 3]}
               offset={100}
             />
-            <SidebarCta />
-          </div>
-        </aside>
+            <ResourcesQuickLinks />
+
+          </aside>
+        </div>
+
+        {/* Prev / Next */}
+        {(prev || next) && (
+          <nav className="grid gap-4 p-4 mt-12 bg-white border shadow-sm rounded-2xl border-blue-200 sm:grid-cols-2">
+            {prev ? (
+              <SmartLink href={`/${prev.slug}`} className="block p-3 rounded-xl hover:bg-slate-50">
+                <div className="text-xs tracking-wide uppercase text-slate-500">Previous</div>
+                <div className="mt-1 font-medium text-slate-900">{prev.title}</div>
+              </SmartLink>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <SmartLink href={`/${next.slug}`} className="block p-3 text-right rounded-xl hover:bg-slate-50">
+                <div className="text-xs tracking-wide uppercase text-slate-500">Next</div>
+                <div className="mt-1 font-medium text-slate-900">{next.title}</div>
+              </SmartLink>
+            ) : (
+              <span />
+            )}
+          </nav>
+        )}
+
+        <YouMayAlsoLike
+          posts={pool}
+          category={primaryCategorySlug}
+          excludeSlug={post.slug}
+        />
+
+        <FaqInlineList
+          heading="General FAQs"
+          topicSlug="general"
+          limit={8}
+          initialItems={generalFaqs}
+          seeMoreHref="/faq"
+        />
       </div>
-
-      {/* Prev / Next */}
-      {(prev || next) && (
-        <nav className="grid gap-4 p-4 mt-12 bg-white border shadow-sm rounded-2xl border-blue-200 sm:grid-cols-2">
-          {prev ? (
-            <SmartLink href={`/${prev.slug}`} className="block p-3 rounded-xl hover:bg-slate-50">
-              <div className="text-xs tracking-wide uppercase text-slate-500">Previous</div>
-              <div className="mt-1 font-medium text-slate-900">{prev.title}</div>
-            </SmartLink>
-          ) : (
-            <span />
-          )}
-          {next ? (
-            <SmartLink href={`/${next.slug}`} className="block p-3 text-right rounded-xl hover:bg-slate-50">
-              <div className="text-xs tracking-wide uppercase text-slate-500">Next</div>
-              <div className="mt-1 font-medium text-slate-900">{next.title}</div>
-            </SmartLink>
-          ) : (
-            <span />
-          )}
-        </nav>
-      )}
-      
-      <YouMayAlsoLike
-        posts={pool}
-        category={primaryCategorySlug}
-        excludeSlug={post.slug}
-      />
-
-      <FaqInlineList
-        heading="General FAQs"
-        topicSlug="general"
-        limit={8}
-        initialItems={generalFaqs}
-        seeMoreHref="/faq"
-      />
     </Section>
   );
 }

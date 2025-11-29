@@ -9,13 +9,14 @@
     "start": "next start",
     "lint": "eslint .",
     "test:phone": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/phone-helpers.test.ts",
+    "test:copy-button": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/copy-button.test.ts",
     "test:forms": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/form-phone-integration.test.ts",
     "test:facets": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/verify-facets.ts",
     "test:video-schema": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/video-schema-uploaddate.test.ts",
     "test:faq-schema": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/faq-schema-plaintext.test.ts",
     "test:review-schema": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/review-schema-defaults.test.ts",
     "test:image-sitemap": "ts-node --project tsconfig.json --compiler-options '{\"module\":\"CommonJS\"}' --require tsconfig-paths/register tests/image-sitemap-serialization.test.ts",
-    "test": "npm run test:phone && npm run test:forms && npm run test:facets && npm run test:video-schema && npm run test:faq-schema && npm run test:review-schema && npm run test:image-sitemap"
+    "test": "npm run test:copy-button && npm run test:phone && npm run test:forms && npm run test:facets && npm run test:video-schema && npm run test:faq-schema && npm run test:review-schema && npm run test:image-sitemap"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "1.0.5",

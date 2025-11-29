@@ -93,11 +93,13 @@ export default function LatestPostsFilter({
   const renderedHeading = renderHighlight(heading, "Roofing Insights");
 
   return (
-    <div className="px-4 py-16 md:px-12 max-w-[1600px] mx-auto overflow-hidden">
+    <div className="px-4 max-w-[1600px] mx-auto">
       {showHeader ? (
         <div className="text-center">
           <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
-          <p className={pStyles}>{description}</p>
+          <div className="max-w-3xl mx-auto text-center">
+            <p className={pStyles}>{description}</p>
+          </div>
           {renderFilterTabs()}
         </div>
       ) : (
@@ -119,7 +121,7 @@ export default function LatestPostsFilter({
         </div>
       )}
 
-      <div key={selected} className="grid gap-6 mt-8 md:grid-cols-4">
+      <div key={selected} className="grid gap-6 mt-8 sm:grid-cols-2 md:grid-cols-4">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];

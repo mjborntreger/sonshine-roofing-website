@@ -49,9 +49,9 @@ export default function QuickLinksPanel({
 }: QuickLinksPanelProps) {
   return (
     <div className={cn("rounded-3xl border border-blue-200 bg-white p-4 shadow-sm", className)}>
-      <h2 className="not-prose mb-3 font-display text-center text-[1rem] leading-none font-bold uppercase tracking-wide text-slate-600">
-        <TitleIcon className={cn("mr-2 inline h-4 w-4", palette.titleIconClassName)} />
+      <h2 className="not-prose items-center mb-3 font-display text-center text-[1rem] leading-none font-bold uppercase tracking-wide text-slate-600">
         {title}
+        <TitleIcon className={cn("ml-2 inline h-4 w-4", palette.titleIconClassName)} />
       </h2>
 
       <ul className="space-y-2">

@@ -93,11 +93,13 @@ export default function LatestProjectsFilter({
   const renderedHeading = renderHighlight(heading, "Roof Replacement Projects");
 
   return (
-    <div className="px-4 py-16 md:px-12 max-w-[1600px] mx-auto">
+    <div className="px-4 max-w-[1600px] mx-auto">
       {showHeader ? (
         <div className="text-center">
           <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
-          <p className={pStyles}>{description}</p>
+          <div className="max-w-3xl mx-auto text-center">
+            <p className={pStyles}>{description}</p>
+          </div>   
           {renderFilterTabs()}
         </div>
       ) : (
@@ -119,7 +121,7 @@ export default function LatestProjectsFilter({
         </div>
       )}
 
-      <div key={selected} className="grid gap-6 mt-8 grid-cols-1 md:grid-cols-4">
+      <div key={selected} className="grid gap-6 mt-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];

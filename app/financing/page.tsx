@@ -1,5 +1,5 @@
 import SmartLink from "@/components/utils/SmartLink";
-import { ListChecks, ListOrdered, HelpCircle, Phone, Timer, Percent, CheckCircle, ArrowLeftRight, ChevronRight, DollarSign } from "lucide-react";
+import { ListChecks, ListOrdered, HelpCircle, Phone, Timer, Percent, CheckCircle, ArrowLeftRight, ChevronRight, DollarSign, ArrowRight } from "lucide-react";
 import ProgramCard from '@/components/marketing/financing/ProgramCard';
 import MonthlyEstimator from '../../components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
@@ -172,6 +172,7 @@ export default async function FinancingPage() {
                 "Sufficient home equity to cover the project",
               ]}
               finePrint="Subject to approval and municipal availability. Terms may vary."
+              eyelash="Takes you to Ygrene.com"
               cta={{ href: "https://prequalification.ygrene.com/ContractorApply/XYFMHC", label: "Get pre-approved", title: "Ask about YGrene", className: "btn-brand-blue" }}
             />
 
@@ -192,7 +193,7 @@ export default async function FinancingPage() {
               ]}
               eligibility={["Basic identity + credit", "Estimated project total", "Income/employment basics"]}
               finePrint="Final terms provided in loan documents. Promos subject to lender programs."
-              cta={{ href: "/contact-us", label: "Call for details", title: "Call for details", className: "btn-outline" }}
+              cta={{ href: "/contact-us", label: "Contact us for details", title: "Contact us for details", className: "btn-outline" }}
             />
           </div>
 
@@ -264,13 +265,15 @@ export default async function FinancingPage() {
               </p>
               <div className="pt-2">
                 <SmartLink
-                  href="tel:19418664320"
+                  href="/contact-us"
                   className={ctaSecondary}
                   title="Call SonShine Roofing"
                   proseGuard
+                  data-icon-affordance="right"
                 >
                   <Phone className="phone-affordance-icon inline mr-2 h-4 w-4" />
-                  (941) 866‑4320
+                  Contact Us
+                  <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
                 </SmartLink>
               </div>
             </section>

@@ -2,7 +2,6 @@ import Section from "@/components/layout/Section";
 import { AboutVideo } from "../../components/marketing/about-page/AboutVideo";
 import { listPersons, listPersonsBySlugs } from '@/lib/content/wp';
 import PersonGrid from "../../components/dynamic-content/person/PersonGrid";
-import SocialMediaProfiles from "@/components/global-nav/static-pages/SocialMediaProfiles";
 import { HoursAndInformation } from "../../components/marketing/about-page/HoursAndInformation";
 import { Accordion } from "@/components/ui/Accordion";
 import { UserRoundSearch, ExternalLink, ShieldCheck, MapPin, HardHat, Heart, Users } from "lucide-react";
@@ -16,6 +15,7 @@ import { SITE_ORIGIN } from "@/lib/seo/site";
 import Image from "next/image";
 import Hero from "@/components/ui/Hero";
 import SmartLink from "@/components/utils/SmartLink";
+import SidebarCta from "@/components/cta/SidebarCta";
 
 const SERVICE_PATH = "/about-sonshine-roofing";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -181,14 +181,14 @@ export default async function Page() {
               </p>
             </Accordion>
 
-
             <HoursAndInformation />
 
           </div>
 
           <aside className="lg:sticky top-16 self-start lg:h-fit">
-            <SocialMediaProfiles />
             <ResourcesQuickLinks activePath={SERVICE_PATH} />
+            <div className="h-[1px] w-full bg-blue-100 my-4" />
+            <SidebarCta />
           </aside>
 
         </div>

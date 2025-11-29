@@ -1,9 +1,8 @@
 "use client";
-import Image from "next/image";
-import React from "react";
 import { useRouter } from "next/navigation";
-import { Copy, Check, Pencil, Share2 } from "lucide-react";
+import { Pencil, Share } from "lucide-react";
 import type { Route } from "next";
+import CopyButton from "../utils/CopyButton";
 
 type Props = {
   /** Path to your review page (relative to site root) */
@@ -19,9 +18,6 @@ export default function ShareWhatYouThink({
   text = "@SonShine Roofing — Sarasota’s trusted roofing pros.",
   urlOverride,
 }: Props) {
-  const [copied, setCopied] = React.useState(false);
-  const FACEBOOK_LOGO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/facebook-logo-for-reviews.webp";
-
   function getCanonicalWithUTM(override?: string | URL) {
     try {
       if (override) {
@@ -67,17 +63,6 @@ export default function ShareWhatYouThink({
     }
   }
 
-  async function copyUrlToClipboard() {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 1600);
-    } catch {
-      // Silently fail; we won't show a blocking alert per request
-      setCopied(false);
-    }
-  }
-
   function goToReviews() {
     try {
       router.push(reviewPath);
@@ -106,65 +91,33 @@ export default function ShareWhatYouThink({
     openPopup(fb);
   }
 
-  const facebookBtn = "btn btn-xs md:btn-md btn-press inline-flex items-center gap-2 text-white bg-[#1877F2] hover:bg-[#1c65d6]";
-  const copyBtn = "btn btn-outline btn-xs md:btn-md btn-press inline-flex items-center gap-2 text-slate-800";
-  const reviewBtn = "btn btn-ghost btn-xs md:btn-md btn-press inline-flex items-center gap-2 text-slate-700";
+  const shareBtn = "btn btn-lg inline-flex items-center gap-2 text-white bg-[--brand-blue]";
+  const reviewBtn = "btn btn-ghost btn-md md:btn-lg inline-flex items-center gap-2 text-slate-700";
 
   return (
-    <section className="mt-8 px-4">
-      <div className="mb-4 flex items-center gap-3">
-        <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-blue-100 bg-white shadow-sm">
-          <Image
-            src={FACEBOOK_LOGO_SRC}
-            alt="Facebook"
-            width={28}
-            height={28}
-            loading="lazy"
-            decoding="async"
-            className="h-7 w-7 object-contain"
+    <section className="mt-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-row gap-3">
+          <button
+            type="button"
+            onClick={handleShareFacebook}
+            className={shareBtn}
+            title="Share on Facebook or via native share"
+          >
+            <Share className="inline-flex h-5 w-5 items-center justify-center" />
+            Share
+          </button>
+
+          <CopyButton
+            copyContent={shareUrl}
+            ariaLabel="Copy share link"
+            srLabel="Copy share link"
+            copiedSrText="Share link copied"
+            emptyContentSrText="No share link available to copy"
+            copiedDurationMs={1600}
           />
-        </span>
-        <div className="space-y-0.5">
-          <p 
-            className="text-sm md:text-lg font-semibold text-slate-700"
-            >
-              Share what you think
-              <Share2 className="h-3 w-3 md:h-4 md:w-4 inline ml-2" />
-          </p>
-          <p className="text-xs md:text-sm text-slate-600">Spread the word or drop a quick review.</p>
         </div>
-      </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={handleShareFacebook}
-          className={facebookBtn}
-          title="Share on Facebook or via native share"
-        >
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
-            <Image
-              src={FACEBOOK_LOGO_SRC}
-              alt="Facebook Logo"
-              width={18}
-              height={18}
-              loading="lazy"
-              decoding="async"
-              className="h-4 w-4 object-contain"
-            />
-          </span>
-          Share
-        </button>
-
-        <button
-          type="button"
-          onClick={copyUrlToClipboard}
-          className={copyBtn}
-          title="Copy URL to Clipboard"
-        >
-          {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}
-          {copied ? "Copied!" : "Copy URL"}
-        </button>
 
         <button
           type="button"
@@ -175,14 +128,6 @@ export default function ShareWhatYouThink({
           <Pencil className="h-4 w-4" aria-hidden="true" />
           Leave a review
         </button>
-
-        <span
-          aria-live="polite"
-          className={`inline-flex items-center gap-1 text-xs font-semibold text-green-600 transition-opacity duration-300 ${copied ? "opacity-100" : "opacity-0"}`}
-        >
-          <Check className="h-3 w-3" aria-hidden="true" />
-          Link copied
-        </span>
       </div>
     </section>
   );

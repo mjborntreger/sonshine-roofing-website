@@ -16,7 +16,7 @@ type ProjectGalleryProps = {
 };
 
 const imageClassBase =
-  "pointer-events-none select-none object-cover transition-opacity duration-500 ease-out";
+  "select-none object-cover hover:scale-[1.06] transition-all duration-500 ease-out";
 
 const containerBase = "relative overflow-hidden rounded-xl shadow-xl border border-blue-200 bg-slate-100";
 
