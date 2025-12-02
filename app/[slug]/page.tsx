@@ -210,7 +210,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     (ogImage && typeof ogImage.secureUrl === "string" && ogImage.secureUrl) ||
     (ogImage && typeof ogImage.url === "string" && ogImage.url) ||
     post.featuredImage?.url ||
-    "/og-default.png";
+    "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png";
   const ogWidth = ogImage && typeof ogImage.width === "number" ? ogImage.width : 1200;
   const ogHeight = ogImage && typeof ogImage.height === "number" ? ogImage.height : 630;
 
@@ -263,7 +263,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     (ogImageJsonLd && typeof ogImageJsonLd.secureUrl === "string" && ogImageJsonLd.secureUrl) ||
     (ogImageJsonLd && typeof ogImageJsonLd.url === "string" && ogImageJsonLd.url) ||
     post.featuredImage?.url ||
-    "/og-default.png";
+    "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png";
   const ogImgAbs = ogImgCandidate.startsWith("http") ? ogImgCandidate : `${origin}${ogImgCandidate}`;
 
   const postSchema = blogPostingSchema({

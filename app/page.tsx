@@ -50,7 +50,7 @@ const SEO_KEYWORDS_HOME = [
   'roofing company',
 ];
 const SEO_CANONICAL_HOME = '/';
-const SEO_OG_IMAGE_DEFAULT = '/og-default.png';
+const SEO_OG_IMAGE_DEFAULT = 'https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {

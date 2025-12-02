@@ -106,14 +106,14 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
           </h1>
 
           <SmartLink
-            className="block hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 py-4 px-10 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 mb-[11rem]"
+            className="block hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 py-3 md:py-6 px-6 md:px-10 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 mb-[11rem]"
             href="/contact-us"
             title="Contact SonShine Roofing"
             aria-label="Contact SonShine Roofing"
             data-icon-affordance="right"
           >
 
-            <p className="items-center mb-2 font-semibold text-3xl md:text-4xl tracking-wider text-blue-100 hover:scale-[1.02] transition-transform">
+            <p className="items-center font-display mb-2 font-semibold text-3xl md:text-5xl tracking-wider text-blue-100 hover:scale-[1.02] transition-transform">
               
               Contact Us
               <ArrowRight className="icon-affordance items-center text-[--brand-cyan] h-6 w-6 md:h-8 md:w-8 inline ml-2" />
