@@ -233,7 +233,7 @@ function selectProjects(
 const buildProjectHeading = (heading: string | undefined, fallbackName?: string | null, slug?: string | string[] | null) => {
   if (heading && heading.trim()) return heading;
   const preferred = fallbackName?.trim();
-  if (preferred) return `Explore More Roofing Projects near ${preferred}`;
+  if (preferred) return `Explore More Roofing Projects Near ${preferred}`;
 
   const firstSlug = Array.isArray(slug) ? slug[0] : slug;
   const formatted = formatServiceArea(firstSlug);
