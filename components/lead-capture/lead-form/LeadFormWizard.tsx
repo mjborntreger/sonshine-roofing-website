@@ -213,28 +213,7 @@ const STEP_FIELD_KEYS: Record<StepId, ReadonlyArray<keyof FormState>> = {
 
 function validateStep(step: StepId, data: FormState): FieldErrors {
   const errors: FieldErrors = {};
-  if (step === 'need') {
-    if (!data.projectType) errors.projectType = 'Pick the option that fits best.';
-  }
-  if (step === 'context') {
-    const journey = getJourneyConfig(data.projectType);
-    if (!journey) {
-      errors.projectType = 'Pick the option that fits best.';
-    } else {
-      if (journey.showHelpMulti && (!Array.isArray(data.helpTopics) || data.helpTopics.length === 0)) {
-        errors.helpTopics = 'Select at least one option.';
-      }
-      if (journey.showTimeline && !data.timeline) {
-        errors.timeline = 'Choose when you’d like help.';
-      }
-      if (journey.requireNotes && !data.notes.trim()) {
-        errors.notes = 'Tell us a bit more about your situation.';
-      }
-    }
-  }
   if (step === 'contact') {
-    if (!data.firstName.trim()) errors.firstName = 'Enter your first name.';
-    if (!data.lastName.trim()) errors.lastName = 'Enter your last name.';
     const identityErrors = validateContactIdentityDraft({
       firstName: data.firstName,
       lastName: data.lastName,
@@ -252,7 +231,6 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
       zip: data.zip,
     });
     Object.assign(errors, addressErrors);
-    if (!data.bestTime) errors.bestTime = 'Pick the time that works best.';
   }
   return errors;
 }
@@ -560,24 +538,25 @@ export default function LeadFormWizard({
     }
 
     setStatus('success');
-    setErrors({});
-    setGlobalError(null);
-    const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
-    const timelineLabelDisplay = timelineLabel || getTimelineLabelForDisplay(form.projectType, form.timeline) || null;
-    const successPayload: LeadSuccessCookiePayload = {
-      projectType: form.projectType,
-      helpTopics: form.helpTopics,
-      helpTopicLabels,
-      timeline: form.timeline,
-      timelineLabel: timelineLabelDisplay || undefined,
-      timestamp: new Date().toISOString(),
-    };
-    persistLeadSuccessCookie(successPayload);
-    setSuccessMeta({
-      projectType: form.projectType,
-      helpTopicLabels,
-      timelineLabel: timelineLabelDisplay,
-    });
+      setErrors({});
+      setGlobalError(null);
+      const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
+      const timelineLabelDisplay = timelineLabel || getTimelineLabelForDisplay(form.projectType, form.timeline) || null;
+      const projectTypeForSuccess = form.projectType || 'contact';
+      const successPayload: LeadSuccessCookiePayload = {
+        projectType: projectTypeForSuccess,
+        helpTopics: form.helpTopics,
+        helpTopicLabels,
+        timeline: form.timeline,
+        timelineLabel: timelineLabelDisplay || undefined,
+        timestamp: new Date().toISOString(),
+      };
+      persistLeadSuccessCookie(successPayload);
+      setSuccessMeta({
+        projectType: projectTypeForSuccess,
+        helpTopicLabels,
+        timelineLabel: timelineLabelDisplay,
+      });
   };
 
   const getStepMeta = (stepId: StepId) => {
@@ -606,7 +585,7 @@ export default function LeadFormWizard({
         return {
           title: 'Where are you located?',
           highlightText: 'Where',
-          description: 'Confirm the service address and the best time to connect.',
+          description: 'Share the service address and the best time to connect (optional).',
         };
       default:
         return { title: '', description: '', highlightText: null };
@@ -746,7 +725,7 @@ export default function LeadFormWizard({
                   <div>
                     {!journey && (
                       <p className="px-4 py-3 text-sm border rounded-xl border-amber-200 bg-amber-50 text-amber-700">
-                        Pick an option to get started above and we&rsquo;ll guide you from there.
+                        Pick an option above if you want tailored suggestions — you can also continue without selecting one.
                       </p>
                     )}
 
@@ -1002,7 +981,7 @@ export default function LeadFormWizard({
               {activeStepId === 'schedule' && (
                 <div className="grid gap-4 py-2 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700 md:col-span-2">
-                    Street address*
+                    Street address (optional)
                     <input
                       type="text"
                       name="address1"
@@ -1031,7 +1010,7 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    City*
+                    City (optional)
                     <input
                       type="text"
                       name="city"
@@ -1048,7 +1027,7 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    State*
+                    State (optional)
                     <input
                       type="text"
                       name="state"
@@ -1066,7 +1045,7 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    ZIP*
+                    ZIP (optional)
                     <input
                       type="text"
                       name="zip"

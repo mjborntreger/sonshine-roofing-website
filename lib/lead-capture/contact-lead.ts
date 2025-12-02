@@ -92,15 +92,15 @@ export type ContactIdentityDraft = {
 };
 
 export type ContactAddressDraft = {
-  address1: string;
+  address1?: string;
   address2?: string;
-  city: string;
-  state: string;
-  zip: string;
+  city?: string;
+  state?: string;
+  zip?: string;
 };
 
 export type ContactLeadPayloadDraft = {
-  projectType: string;
+  projectType?: string;
   helpSummary?: string;
   timelineLabel?: string;
   notes?: string;
@@ -126,12 +126,15 @@ export function validateContactIdentityDraft(draft: ContactIdentityDraft): Recor
 
 export function validateContactAddressDraft(draft: ContactAddressDraft): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!draft.address1.trim()) errors.address1 = 'Enter your street address.';
-  if (!draft.city.trim()) errors.city = 'City is required.';
-  const stateValue = normalizeState(draft.state);
-  if (!isValidState(stateValue)) errors.state = 'Use the two-letter state code.';
-  const zipValue = normalizeZip(draft.zip);
-  if (!isValidZip(zipValue)) errors.zip = 'ZIP should be 5 digits.';
+  const stateValueRaw = draft.state ?? '';
+  const zipValueRaw = draft.zip ?? '';
+  const stateValue = normalizeState(stateValueRaw);
+  const zipValue = normalizeZip(zipValueRaw);
+
+  if (draft.address1 && !draft.address1.trim()) errors.address1 = 'Enter your street address.';
+  if (draft.city && !draft.city.trim()) errors.city = 'City is required.';
+  if (stateValueRaw.trim() && !isValidState(stateValue)) errors.state = 'Use the two-letter state code.';
+  if (zipValueRaw.trim() && !isValidZip(zipValue)) errors.zip = 'ZIP should be 5 digits.';
   return errors;
 }
 
@@ -155,9 +158,10 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
   } = draft;
 
   const trimmedNotes = notes?.trim();
+  const projectTypeValue = projectType?.trim();
   const payload: ContactLeadCorePayload = {
     type: 'contact-lead',
-    projectType: projectType.trim(),
+    projectType: projectTypeValue || undefined,
     helpTopics: helpSummary?.trim() || undefined,
     timeline: timelineLabel?.trim() || undefined,
     notes: trimmedNotes || undefined,
@@ -165,16 +169,22 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
     lastName: identity.lastName.trim(),
     email: identity.email.trim(),
     phone: normalizePhoneForSubmit(identity.phone),
-    address1: address.address1.trim(),
-    address2: address.address2?.trim() ? address.address2.trim() : undefined,
-    city: address.city.trim(),
-    state: normalizeState(address.state),
-    zip: normalizeZip(address.zip),
     preferredContact: normalizePreferredContact(preferredContact),
     bestTime: bestTimeLabel?.trim() || undefined,
     consentSms: Boolean(consentSms),
     page,
   };
+
+  const address1Value = address.address1?.trim();
+  if (address1Value) payload.address1 = address1Value;
+  const address2Value = address.address2?.trim();
+  if (address2Value) payload.address2 = address2Value;
+  const cityValue = address.city?.trim();
+  if (cityValue) payload.city = cityValue;
+  const stateValue = normalizeState(address.state ?? '');
+  if (stateValue) payload.state = stateValue;
+  const zipValue = normalizeZip(address.zip ?? '');
+  if (zipValue) payload.zip = zipValue;
 
   if (resourceLinks && resourceLinks.length) {
     payload.resourceLinks = resourceLinks.map((link) => ({

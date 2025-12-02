@@ -179,8 +179,6 @@ export default function SimpleLeadForm() {
     if (status === 'submitting') return;
 
     const validation: Record<string, string> = {};
-    if (!form.projectType) validation.projectType = 'Pick the option that fits best.';
-    if (!form.timeline) validation.timeline = 'Choose when you’d like help.';
     const identityErrors = validateContactIdentityDraft({
       firstName: form.firstName,
       lastName: form.lastName,
@@ -199,7 +197,7 @@ export default function SimpleLeadForm() {
 
     if (Object.keys(validation).length) {
       setErrors(validation);
-      setGlobalError('Double-check the highlighted fields.');
+      setGlobalError('Please double-check your contact details (highlighted fields).');
       return;
     }
 
@@ -290,7 +288,7 @@ export default function SimpleLeadForm() {
     }
 
     const successPayload: LeadSuccessCookiePayload = {
-      projectType: form.projectType,
+      projectType: form.projectType || 'contact',
       helpTopics: [],
       helpTopicLabels: [],
       timeline: form.timeline,
@@ -347,101 +345,9 @@ export default function SimpleLeadForm() {
 
             <div className="grid gap-12">
               <section>
-                <h3 className={SECTION_TITLE_BASE_CLASS}>How can we help?</h3>
-                <p className={SECTION_EYELASH}>Select an option to continue</p>
-                <div className="mt-3 grid gap-4 md:grid-cols-2">
-                  {SIMPLE_PROJECT_OPTIONS.map((option) => {
-                    const selected = form.projectType === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => setField('projectType', option.value)}
-                        className={cn(
-                          PROJECT_OPTION_CARD_BASE_CLASS,
-                          selected ? PROJECT_OPTION_CARD_SELECTED_CLASS : PROJECT_OPTION_CARD_UNSELECTED_CLASS
-                        )}
-                        aria-pressed={selected}
-                      >
-                        <ProjectOptionCardContent option={option} />
-                      </button>
-                    );
-                  })}
-                  {errors.projectType && <p className="md:col-span-2 text-sm font-medium text-red-600">{errors.projectType}</p>}
-                </div>
-              </section>
-
-              <section>
-                <h3 className={SECTION_TITLE_BASE_CLASS}>How soon would you like to start?</h3>
-                <p className={SECTION_EYELASH}>Select an option to continue</p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  {STANDARD_TIMELINE_OPTIONS.map(({ value, label }) => {
-                    const selected = form.timeline === value;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setField('timeline', value)}
-                        className={cn(
-                          'font-medium text-slate-600 rounded-xl border px-4 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                          selected
-                            ? 'border-[--brand-blue] bg-[--brand-blue] text-white shadow'
-                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                        )}
-                        aria-pressed={selected}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-                </div>
-                {errors.timeline && <p className="mt-2 text-sm font-medium text-red-600">{errors.timeline}</p>}
-              </section>
-
-              <section>
-                <h3 className={SECTION_TITLE_BASE_CLASS}>What type of roof do you currently have?</h3>
-                <p className={SECTION_EYELASH}>Select an option to continue</p>
-                <div className="mt-3 grid gap-3 md:grid-cols-2">
-                  {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
-                    const selected = form.roofType === value;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        onClick={() => setField('roofType', value)}
-                        className={cn(
-                          'group flex flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
-                          selected
-                            ? 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]'
-                            : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md'
-                        )}
-                        aria-pressed={selected}
-                      >
-                        <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 aspect-[5/2]">
-                          <Image
-                            src={imageSrc}
-                            alt={imageAlt}
-                            fill
-                            sizes="(min-width: 768px) 320px, 100vw"
-                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                          />
-                        </div>
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-semibold text-slate-900">{label}</p>
-                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
-                            <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </section>
-
-              <section>
                 <div>
                   <h3 className={SECTION_TITLE_BASE_CLASS}>How can we reach you?</h3>
-                  <p className={SECTION_EYELASH}>Enter your contact info to continue</p>
+                  <p className={SECTION_EYELASH}>Required so we can respond quickly</p>
                 </div>
                 <div className="grid my-4 gap-4 md:grid-cols-2">
                   <label className="block text-sm font-medium text-slate-700">
@@ -504,7 +410,7 @@ export default function SimpleLeadForm() {
 
                 <section className="mt-4 grid gap-4 md:grid-cols-2">
                   <label className="block text-sm font-medium text-slate-700">
-                    Address
+                    Address (optional)
                     <input
                       type="text"
                       name="address1"
@@ -530,7 +436,7 @@ export default function SimpleLeadForm() {
                 </section>
                 <section className="mt-4 flex flex-row w-full gap-2">
                   <label className="block text-sm font-medium text-slate-700">
-                    City
+                    City (optional)
                     <input
                       type="text"
                       name="city"
@@ -543,7 +449,7 @@ export default function SimpleLeadForm() {
                     {errors.city && <span className="mt-1 text-xs text-red-600">{errors.city}</span>}
                   </label>
                   <label className="block text-sm font-medium text-slate-700">
-                    State
+                    State (optional)
                     <input
                       type="text"
                       name="state"
@@ -556,7 +462,7 @@ export default function SimpleLeadForm() {
                     {errors.state && <span className="mt-1 text-xs text-red-600">{errors.state}</span>}
                   </label>
                   <label className="block text-sm font-medium text-slate-700">
-                    ZIP
+                    ZIP (optional)
                     <input
                       type="text"
                       name="zip"
@@ -571,6 +477,97 @@ export default function SimpleLeadForm() {
                     {errors.zip && <span className="mt-1 text-xs text-red-600">{errors.zip}</span>}
                   </label>
                 </section>
+              </section>
+              <section>
+                <h3 className={SECTION_TITLE_BASE_CLASS}>How can we help?</h3>
+                <p className={SECTION_EYELASH}>Optional, but helps us route you faster</p>
+                <div className="mt-3 grid gap-4 md:grid-cols-2">
+                  {SIMPLE_PROJECT_OPTIONS.map((option) => {
+                    const selected = form.projectType === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => setField('projectType', option.value)}
+                        className={cn(
+                          PROJECT_OPTION_CARD_BASE_CLASS,
+                          selected ? PROJECT_OPTION_CARD_SELECTED_CLASS : PROJECT_OPTION_CARD_UNSELECTED_CLASS
+                        )}
+                        aria-pressed={selected}
+                      >
+                        <ProjectOptionCardContent option={option} />
+                      </button>
+                    );
+                  })}
+                  {errors.projectType && <p className="md:col-span-2 text-sm font-medium text-red-600">{errors.projectType}</p>}
+                </div>
+              </section>
+
+              <section>
+                <h3 className={SECTION_TITLE_BASE_CLASS}>How soon would you like to start?</h3>
+                <p className={SECTION_EYELASH}>Optional — share a timeline if you have one</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {STANDARD_TIMELINE_OPTIONS.map(({ value, label }) => {
+                    const selected = form.timeline === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setField('timeline', value)}
+                        className={cn(
+                          'font-medium text-slate-600 rounded-xl border px-4 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                          selected
+                            ? 'border-[--brand-blue] bg-[--brand-blue] text-white shadow'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                        )}
+                        aria-pressed={selected}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+                {errors.timeline && <p className="mt-2 text-sm font-medium text-red-600">{errors.timeline}</p>}
+              </section>
+
+              <section>
+                <h3 className={SECTION_TITLE_BASE_CLASS}>What type of roof do you currently have?</h3>
+                <p className={SECTION_EYELASH}>Optional — helps us prep for your project</p>
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
+                    const selected = form.roofType === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => setField('roofType', value)}
+                        className={cn(
+                          'group flex flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+                          selected
+                            ? 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]'
+                            : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md'
+                        )}
+                        aria-pressed={selected}
+                      >
+                        <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 aspect-[5/2]">
+                          <Image
+                            src={imageSrc}
+                            alt={imageAlt}
+                            fill
+                            sizes="(min-width: 768px) 320px, 100vw"
+                            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                          />
+                        </div>
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-semibold text-slate-900">{label}</p>
+                          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
+                            <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </section>
 
               <section>

@@ -291,22 +291,32 @@ const leadContactSchema = leadBaseSchema
     lastName: z.preprocess(trim, z.string().min(1, 'Last name is required').max(MAX_NAME)),
     email: leadFeedbackEmailSchema,
     phone: financingPhoneSchema,
-    projectType: z.preprocess(trim, z.string().min(1, 'Project type is required').max(80)),
+    projectType: optionalTrimmedString(80),
     helpTopics: optionalTrimmedString(MAX_CONTACT_HELP),
     timeline: optionalTrimmedString(MAX_CONTACT_TIMELINE),
     notes: optionalTrimmedString(MAX_CONTACT_NOTES),
-    preferredContact: z.preprocess(trim, z.string().min(1, 'Preferred contact method is required').max(MAX_CONTACT_PREF)),
+    preferredContact: optionalTrimmedString(MAX_CONTACT_PREF),
     bestTime: optionalTrimmedString(MAX_CONTACT_PREF),
     consentSms: z.boolean().optional(),
-    address1: z.preprocess(trim, z.string().min(1, 'Street address is required').max(MAX_FINANCING_ADDRESS)),
-    address2: z.preprocess(trim, z.string().max(MAX_FINANCING_ADDRESS)).optional(),
-    city: z.preprocess(trim, z.string().min(1, 'City is required').max(MAX_FINANCING_CITY)),
+    address1: optionalTrimmedString(MAX_FINANCING_ADDRESS),
+    address2: optionalTrimmedString(MAX_FINANCING_ADDRESS),
+    city: optionalTrimmedString(MAX_FINANCING_CITY),
     state: z
-      .preprocess(trim, z.string().min(2, 'State is required').max(MAX_FINANCING_STATE))
-      .refine((value) => /^[A-Za-z]{2}$/.test(String(value)), { message: 'State must be two letters' }),
+      .preprocess((value) => {
+        if (typeof value !== 'string') return undefined;
+        const trimmed = value.trim();
+        return trimmed ? trimmed : undefined;
+      }, z.string().min(2, 'State must be two letters').max(MAX_FINANCING_STATE))
+      .refine((value) => /^[A-Za-z]{2}$/.test(String(value)), { message: 'State must be two letters' })
+      .optional(),
     zip: z
-      .preprocess(trim, z.string().min(1, 'ZIP is required').max(MAX_FINANCING_ZIP))
-      .refine((value) => digitsOnly(value).length === 5, { message: 'ZIP must be 5 digits' }),
+      .preprocess((value) => {
+        if (typeof value !== 'string') return undefined;
+        const trimmed = value.trim();
+        return trimmed ? trimmed : undefined;
+      }, z.string().max(MAX_FINANCING_ZIP))
+      .refine((value) => digitsOnly(value).length === 5, { message: 'ZIP must be 5 digits' })
+      .optional(),
     resourceLinks: z.array(contactResourceLinkSchema).max(10).optional(),
   })
   .passthrough();

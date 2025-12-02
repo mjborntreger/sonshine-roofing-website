@@ -2,7 +2,7 @@
 
 import Head from "next/head";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Phone, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 import ShinyText from "./ShinyText";
 import SmartLink from "@/components/utils/SmartLink";
 import Image from "next/image";

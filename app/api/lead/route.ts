@@ -9,6 +9,7 @@ import {
   type ContactLeadInput,
 } from '@/lib/lead-capture/validation';
 import { formatPhoneUSForDisplay } from '@/lib/lead-capture/phone';
+import { DEFAULT_PREFERRED_CONTACT } from '@/lib/lead-capture/contact-lead';
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -266,18 +267,18 @@ function buildContactPayload(data: ContactLeadInput) {
     email: data.email,
     phone: data.phone,
     phoneDisplay,
-    projectType: data.projectType,
+    projectType: data.projectType || '',
     helpTopics: data.helpTopics || '',
     timeline: data.timeline || '',
     notes: data.notes || '',
-    preferredContact: data.preferredContact,
+    preferredContact: data.preferredContact || DEFAULT_PREFERRED_CONTACT,
     bestTime: data.bestTime || '',
     consentSms: Boolean(data.consentSms),
-    address1: data.address1,
+    address1: data.address1 || '',
     address2: data.address2 || '',
-    city: data.city,
-    state: data.state,
-    zip: data.zip,
+    city: data.city || '',
+    state: data.state || '',
+    zip: data.zip || '',
     page: data.page || '/contact-us',
     resourceLinks: (data.resourceLinks || []).map((link) => ({
       label: link.label,
