@@ -6,6 +6,7 @@ import AnalyticsScripts from "@/lib/telemetry/analytics";
 import { inter, allura, candara } from "@/lib/ui/fonts";
 import BrevoChatLoader from "@/components/lead-capture/brevo-chatbot/BrevoChatLoader";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
@@ -226,6 +227,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           selection:bg-[#0045d7] selection:text-white
         "
       >
+        <Script strategy="afterInteractive" src="https://qq.leadsbyquickquote.com/roofs/integration"></Script>
         <AnalyticsScripts />
         <Header />
         <main className="flex-1">{children}</main>
