@@ -14,6 +14,7 @@ Sitemaps & Robots
   - You can enable sitemap preview endpoints by setting:
     - NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true
   - Preview adds `X-Robots-Tag: noindex, nofollow` on sitemap responses.
+  - FAQ sitemap is disabled by default; set `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP=true` to expose `/sitemap_index/faq` and list it in the index.
 
 Static sitemap (pages not in CMS)
 - Generated at build by `scripts/make-static-sitemap.mjs` → `public/__sitemaps/static-routes.json`.

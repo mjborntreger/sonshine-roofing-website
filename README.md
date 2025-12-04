@@ -8,6 +8,7 @@ Runbook (Staging vs Prod)
 - Sitemaps
   - Preview on staging: set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`
   - Static manifest generated prebuild to `public/__sitemaps/static-routes.json`
+  - FAQ sitemap is off by default; set `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP=true` to expose `/sitemap_index/faq`.
 - Security
   - CSP enforced on staging, report-only on production
 - GTM
@@ -68,6 +69,7 @@ Quick Checks
   - `/sitemap_index` lists child sitemaps.
   - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
   - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
+  - `/sitemap_index/faq` only appears when `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP=true`.
 - GTM
   - `NEXT_PUBLIC_GTM_ID` set; GA4 Enhanced Measurement is enabled for page views.
 

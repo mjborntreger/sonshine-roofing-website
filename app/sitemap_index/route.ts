@@ -11,24 +11,28 @@ const ENABLED =
 const PREVIEW =
   process.env.NEXT_PUBLIC_ENV !== 'production' &&
   process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
+const FAQ_ENABLED = process.env.NEXT_PUBLIC_ENABLE_FAQ_SITEMAP === 'true';
 
 export function GET() {
   if (!ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
+  const sitemaps = [
+    `${BASE}/sitemap_index/static`,
+    `${BASE}/sitemap_index/blog`,
+    ...(FAQ_ENABLED ? [`${BASE}/sitemap_index/faq`] : []),
+    `${BASE}/sitemap_index/project`,
+    `${BASE}/sitemap_index/location`,
+    `${BASE}/sitemap_index/roofing-glossary`,
+    `${BASE}/sitemap_index/person`,
+    `${BASE}/sitemap_index/video`,
+    `${BASE}/sitemap_index/image`,
+  ];
   const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
   ].join('');
   const xml = `${head}
   <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <sitemap><loc>${BASE}/sitemap_index/static</loc></sitemap>
-    <sitemap><loc>${BASE}/sitemap_index/blog</loc></sitemap>
-    <sitemap><loc>${BASE}/sitemap_index/faq</loc></sitemap>
-    <sitemap><loc>${BASE}/sitemap_index/project</loc></sitemap>
-    <sitemap><loc>${BASE}/sitemap_index/location</loc></sitemap>
-    <sitemap><loc>${BASE}/sitemap_index/roofing-glossary</loc></sitemap>
-    <sitemap><loc>${BASE}/sitemap_index/person</loc></sitemap>
-    <sitemap><loc>${BASE}/sitemap_index/video</loc></sitemap>
-    <sitemap><loc>${BASE}/sitemap_index/image</loc></sitemap>
+${sitemaps.map((loc) => `    <sitemap><loc>${loc}</loc></sitemap>`).join('\n')}
   </sitemapindex>`;
   return new NextResponse(xml, {
     headers: {

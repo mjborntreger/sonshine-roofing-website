@@ -10,6 +10,7 @@ Quick Checks
   - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
   - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
   - `/sitemap_index/image` surfaces primary blog/project/location images.
+  - `/sitemap_index/faq` only renders when `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP=true` (default: off).
 - GTM
   - `NEXT_PUBLIC_GTM_ID` set and GA4 Enhanced Measurement enabled for page views.
 

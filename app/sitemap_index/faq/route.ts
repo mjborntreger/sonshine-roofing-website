@@ -13,6 +13,7 @@ const ENABLED =
 const PREVIEW =
   process.env.NEXT_PUBLIC_ENV !== 'production' &&
   process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
+const FAQ_ENABLED = process.env.NEXT_PUBLIC_ENABLE_FAQ_SITEMAP === 'true';
 
 type Node = { uri: string; modifiedGmt?: string | null };
 
@@ -56,7 +57,7 @@ const getFaqUrls = unstable_cache(
 );
 
 export async function GET() {
-  if (!ENABLED) {
+  if (!ENABLED || !FAQ_ENABLED) {
     return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
   }
 
