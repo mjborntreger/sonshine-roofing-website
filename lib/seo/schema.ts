@@ -239,57 +239,6 @@ export function collectionPageSchema({
   return base;
 }
 
-export type ServiceSchemaInput = {
-  name: string;
-  description?: string;
-  url: string;
-  provider?: SchemaInit | string;
-  areaServed?: string[];
-  offers?: SchemaInit[];
-  serviceType?: string;
-  id?: string;
-  origin?: string;
-  withContext?: boolean;
-};
-
-export function serviceSchema({
-  name,
-  description,
-  url,
-  provider,
-  areaServed,
-  offers,
-  serviceType,
-  id,
-  origin = SITE_ORIGIN,
-  withContext = true,
-}: ServiceSchemaInput) {
-  const schema: SchemaInit = {
-    "@type": "Service",
-    name,
-    url: ensureAbsoluteUrl(url, origin),
-  };
-
-  if (description) schema.description = description;
-  if (id) schema["@id"] = ensureAbsoluteUrl(id, origin);
-  if (serviceType) schema.serviceType = serviceType;
-  if (provider) {
-    schema.provider =
-      typeof provider === "string"
-        ? { "@id": ensureAbsoluteUrl(provider, origin) }
-        : provider;
-  }
-  if (areaServed?.length) {
-    schema.areaServed = areaServed.map((name) => ({
-      "@type": "AdministrativeArea",
-      name,
-    }));
-  }
-  if (offers?.length) schema.hasOfferCatalog = { "@type": "OfferCatalog", itemListElement: offers };
-
-  return applyContext(schema, withContext);
-}
-
 export type HowToStep = {
   name: string;
   text?: string;
@@ -354,56 +303,65 @@ export function howToSchema({
   return applyContext(schema, withContext);
 }
 
-export type CreativeWorkSchemaInput = {
+export type ServiceSchemaInput = {
   name: string;
   description?: string;
   url: string;
-  image?: string;
-  datePublished?: string;
-  dateModified?: string;
-  inLanguage?: string;
+  image?: string | SchemaInit | Array<string | SchemaInit>;
+  serviceType?: string;
+  areaServed?: string[];
   material?: string[];
   about?: string[];
-  areaServed?: string[];
-  isPartOf?: SchemaInit | string;
-  publisher?: SchemaInit;
+  provider?: SchemaInit | string;
+  subjectOf?: SchemaInit | SchemaInit[];
+  offers?: SchemaInit[];
+  id?: string;
   origin?: string;
   withContext?: boolean;
   additionalProperties?: SchemaInit;
 };
 
-export function creativeWorkSchema({
+export function serviceSchema({
   name,
   description,
   url,
   image,
-  datePublished,
-  dateModified,
-  inLanguage,
+  serviceType,
+  areaServed,
   material,
   about,
-  areaServed,
-  isPartOf,
-  publisher,
+  provider,
+  subjectOf,
+  offers,
+  id,
   origin = SITE_ORIGIN,
   withContext = true,
   additionalProperties,
-}: CreativeWorkSchemaInput) {
+}: ServiceSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "CreativeWork",
+    "@type": "Service",
     name,
     url: ensureAbsoluteUrl(url, origin),
   };
 
   if (description) schema.description = description;
-  if (image) {
-    const absoluteImage = ensureAbsoluteUrl(image, origin);
-    schema.image = absoluteImage;
-    schema.thumbnailUrl = absoluteImage;
+  if (id) schema["@id"] = ensureAbsoluteUrl(id, origin);
+
+  const normalizeImage = (value: string | SchemaInit | null | undefined) => {
+    if (!value) return null;
+    if (typeof value === "string") return ensureAbsoluteUrl(value, origin);
+    return value;
+  };
+
+  if (Array.isArray(image)) {
+    const images = image.map((value) => normalizeImage(value)).filter(compact);
+    if (images.length) schema.image = images;
+  } else {
+    const normalized = normalizeImage(image);
+    if (normalized) schema.image = normalized;
   }
-  if (datePublished) schema.datePublished = datePublished;
-  if (dateModified) schema.dateModified = dateModified;
-  if (inLanguage) schema.inLanguage = inLanguage;
+
+  if (serviceType) schema.serviceType = serviceType;
   if (material?.length) schema.material = material;
   if (about?.length) schema.about = about;
   if (areaServed?.length) {
@@ -412,11 +370,19 @@ export function creativeWorkSchema({
       name,
     }));
   }
-  if (isPartOf) {
-    schema.isPartOf =
-      typeof isPartOf === "string" ? ensureAbsoluteUrl(isPartOf, origin) : isPartOf;
-  }
-  if (publisher) schema.publisher = publisher;
+
+  const resolvedProvider: SchemaInit =
+    typeof provider === "string"
+      ? { "@id": ensureAbsoluteUrl(provider, origin) }
+      : provider ?? {
+        "@type": DEFAULT_BUSINESS_TYPE,
+        name: DEFAULT_BUSINESS_NAME,
+        url: origin,
+      };
+  schema.provider = resolvedProvider;
+
+  if (subjectOf) schema.subjectOf = subjectOf;
+  if (offers?.length) schema.hasOfferCatalog = { "@type": "OfferCatalog", itemListElement: offers };
   if (additionalProperties) {
     Object.assign(schema, additionalProperties);
   }
@@ -872,9 +838,15 @@ export function projectReviewSchema({
     : canonicalProjectUrl;
 
   const itemReviewed: SchemaInit = {
-    "@type": "CreativeWork",
+    "@type": "Service",
     name: projectName,
     url: canonicalProjectUrl,
+    provider: {
+      "@type": DEFAULT_BUSINESS_TYPE,
+      name: DEFAULT_BUSINESS_NAME,
+      url: origin,
+    },
+    serviceType: "Roof Replacement",
   };
 
   if (projectImage) {

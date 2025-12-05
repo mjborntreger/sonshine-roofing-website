@@ -15,7 +15,7 @@ import ProjectTestimonial from "@/components/dynamic-content/project/ProjectTest
 import type { Metadata } from "next";
 import { buildArticleMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
-import { creativeWorkSchema, projectReviewSchema, videoObjectSchema } from "@/lib/seo/schema";
+import { projectReviewSchema, serviceSchema, videoObjectSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import { List } from "lucide-react";
 import BackToProjectsButton from "@/components/dynamic-content/project/BackToProjectsButton";
@@ -208,28 +208,23 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     ? videoObjectSchema({ ...videoSchemaInput, withContext: false })
     : undefined;
 
-  const projectAdditionalProps: Record<string, unknown> = {};
-  if (videoSchemaNoContext) projectAdditionalProps.video = videoSchemaNoContext;
-  if (galleryImageObjects.length > 0) projectAdditionalProps.image = galleryImageObjects;
-
-  const projectSchema = creativeWorkSchema({
+  const projectSchema = serviceSchema({
     name: project.title,
     description: (project.seo?.description || project.projectDescription || "").slice(0, 160),
     url: shareUrl,
-    image: ogImgAbs,
-    datePublished: project.date || undefined,
-    dateModified: project.modified || undefined,
+    image: galleryImageObjects.length > 0 ? galleryImageObjects : ogImgAbs,
+    serviceType: "Roof Replacement",
     material: materials,
     about: colors,
     areaServed,
     origin,
-    isPartOf: { "@type": "CollectionPage", "@id": `${origin}/project`, name: "Project Gallery" },
-    publisher: {
-      "@type": "Organization",
+    subjectOf: videoSchemaNoContext ? [videoSchemaNoContext] : undefined,
+    provider: {
+      "@type": "RoofingContractor",
       name: "SonShine Roofing",
+      url: origin,
       logo: { "@type": "ImageObject", url: `${origin}/icon.png` },
     },
-    additionalProperties: Object.keys(projectAdditionalProps).length ? projectAdditionalProps : undefined,
   });
 
   const reviewSchema =
