@@ -227,7 +227,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           selection:bg-[#0045d7] selection:text-white
         "
       >
-        <Script strategy="afterInteractive" src="https://qq.leadsbyquickquote.com/roofs/integration"></Script>
+        {/* // Waiting for QuickQuote to respond //
+        <Script strategy="afterInteractive" src="https://qq.leadsbyquickquote.com/roofs/integration"></Script>*/}
         <AnalyticsScripts />
         <Header />
         <main className="flex-1">{children}</main>
