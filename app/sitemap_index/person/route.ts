@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch } from '@/lib/content/wp';
-import { formatLastmod, normalizeEntryPath } from '../utils';
+import { buildAlternateLinks, formatLastmod, localizePath, normalizeEntryPath } from '../utils';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600; // safety net; tag-based revalidation will be faster
@@ -64,6 +64,9 @@ export async function GET() {
 
   const targetPath = '/person/nathan-borntreger';
   const items = (await getPersonUrls()).filter((n) => normalizeEntryPath(n.uri) === targetPath);
+  const lastmodIso = formatLastmod(items[0]?.modifiedGmt);
+  const lastmod = lastmodIso ? `<lastmod>${lastmodIso}</lastmod>` : '';
+  const alternates = buildAlternateLinks(BASE, targetPath);
 
   const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
@@ -71,12 +74,10 @@ export async function GET() {
   ].join('');
   const body = [
     head,
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-    ...items.map((n) => {
-      const loc = `${BASE}${targetPath}`;
-      const isoLastmod = formatLastmod(n.modifiedGmt);
-      const lastmod = isoLastmod ? `<lastmod>${isoLastmod}</lastmod>` : '';
-      return `<url><loc>${loc}</loc>${lastmod}</url>`;
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
+    ...localizePath(targetPath).map(({ loc }) => {
+      const fullLoc = `${BASE}${loc}`;
+      return `<url><loc>${fullLoc}</loc>${lastmod}${alternates.join('')}</url>`;
     }),
     `</urlset>`,
   ].join('');

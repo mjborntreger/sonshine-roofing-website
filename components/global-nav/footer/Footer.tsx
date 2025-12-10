@@ -16,6 +16,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from "@/lib/routes";
+import { DEFAULT_LOCALE, prefixPathWithLocale, type Locale } from "@/lib/i18n/locale";
+import { FooterLocaleSwitch } from "@/components/global-nav/footer/FooterLocaleSwitch";
 
 type SocialLink = {
   href: string;
@@ -34,6 +36,47 @@ const SOCIALS: SocialLink[] = [
   { href: "https://x.com/ssroofinginc", label: "X (Twitter)", icon: Twitter },
 ];
 
+const LINK_TRANSLATIONS: Record<Locale, Record<string, string>> = {
+  en: {},
+  es: {
+    Home: "Inicio",
+    About: "Acerca de",
+    Contact: "Contacto",
+    Financing: "Financiamiento",
+    "Roof Replacement": "Reemplazo de techo",
+    "Roof Repair": "Reparacion de techo",
+    "Roof Inspection": "Inspeccion de techo",
+    "Roof Maintenance": "Mantenimiento de techo",
+    "Project Gallery": "Galeria de proyectos",
+    "Video Library": "Biblioteca de videos",
+    "Roofing Glossary": "Glosario de techado",
+    Blog: "Blog",
+    FAQ: "Preguntas frecuentes",
+    Reviews: "Resenas",
+    "Privacy Policy": "Politica de privacidad",
+    "XML Sitemap": "Mapa del sitio XML",
+  },
+};
+
+const FOOTER_COPY = {
+  en: {
+    roofingServices: "Roofing Services",
+    ourWork: "Our Work",
+    serviceAreas: "Service Areas",
+    hours: "Hours of Operation",
+    returnToTop: "Return to Top",
+    leaveReview: "Leave a Review",
+  },
+  es: {
+    roofingServices: "Servicios de techado",
+    ourWork: "Nuestros trabajos",
+    serviceAreas: "Areas de servicio",
+    hours: "Horas de operacion",
+    returnToTop: "Volver arriba",
+    leaveReview: "Dejar una resena",
+  },
+} satisfies Record<Locale, { roofingServices: string; ourWork: string; serviceAreas: string; hours: string; returnToTop: string; leaveReview: string }>;
+
 const linkStyles = "text-xs md:text-sm text-slate-600 hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]";
 const h3Styles = "text-sm md:text-md font-bold uppercase tracking-wider text-[--brand-blue]";
 const hoursStyles = "text-xs md:text-sm text-slate-600"
@@ -49,16 +92,21 @@ const FooterBadges = dynamic(() => import("@/components/global-nav/footer/Footer
   ),
 });
 
-export default function Footer() {
+export default function Footer({ locale = DEFAULT_LOCALE }: { locale?: Locale }) {
+  const activeLocale = locale ?? DEFAULT_LOCALE;
+  const copy = FOOTER_COPY[activeLocale] ?? FOOTER_COPY.en;
+  const translate = (label: string) => LINK_TRANSLATIONS[activeLocale]?.[label] ?? label;
+  const localizeHref = (href: string) => (/^[a-z]+:/i.test(href) ? href : prefixPathWithLocale(href, activeLocale));
+
   return (
     <>
       <SmartLink
         href="#page-top"
         className="text-center hover:text-slate-600"
         data-icon-affordance="up"
-        aria-label="Return to top of page"
+        aria-label={copy.returnToTop}
       >
-        Return to Top
+        {copy.returnToTop}
         <ArrowUp className="inline w-4 h-4 ml-2 icon-affordance" />
       </SmartLink>
 
@@ -76,7 +124,7 @@ export default function Footer() {
             {/* Company */}
             <div>
               <SmartLink
-                href={ROUTES.home}
+                href={localizeHref(ROUTES.home)}
                 aria-label="SonShine Roofing Logo"
                 title="SonShine Roofing Logo"
               >
@@ -113,8 +161,8 @@ export default function Footer() {
                 </li>
                 {NAV_COMPANY.map((r) => (
                   <li key={r.href}>
-                    <SmartLink href={r.href} className={linkStyles}>
-                      {r.label}
+                    <SmartLink href={localizeHref(r.href)} className={linkStyles}>
+                      {translate(r.label)}
                     </SmartLink>
                   </li>
                 ))}
@@ -124,14 +172,14 @@ export default function Footer() {
             {/* Roofing Services */}
             <div>
               <h3 className={h3Styles}>
-                Roofing Services
+                {copy.roofingServices}
               </h3>
               <ul className="mt-4 space-y-3 text-sm">
                 {/* NAV_SERVICES pulls from buildServiceHref; supply location slug once scoped pages exist. */}
                 {NAV_SERVICES.map((r) => (
                   <li key={r.href}>
-                    <SmartLink href={r.href} className={linkStyles}>
-                      {r.label}
+                    <SmartLink href={localizeHref(r.href)} className={linkStyles}>
+                      {translate(r.label)}
                     </SmartLink>
                   </li>
                 ))}
@@ -141,13 +189,13 @@ export default function Footer() {
             {/* Resources */}
             <div>
               <h3 className={h3Styles}>
-                Our Work
+                {copy.ourWork}
               </h3>
               <ul className="mt-4 space-y-3 text-sm">
                 {NAV_RESOURCES.map((r) => (
                   <li key={r.href}>
-                    <SmartLink href={r.href} className={linkStyles}>
-                      {r.label}
+                    <SmartLink href={localizeHref(r.href)} className={linkStyles}>
+                      {translate(r.label)}
                     </SmartLink>
                   </li>
                 ))}
@@ -156,11 +204,11 @@ export default function Footer() {
 
             {/* Locations */}
             <div>
-              <h3 className={h3Styles}>Service Areas</h3>
+              <h3 className={h3Styles}>{copy.serviceAreas}</h3>
               <ul className="mt-4 space-y-3 text-sm">
                 {NAV_LOCATIONS.map((r) => (
                   <li key={r.href}>
-                    <SmartLink href={r.href} className={linkStyles}>
+                    <SmartLink href={localizeHref(r.href)} className={linkStyles}>
                       {r.label}
                     </SmartLink>
                   </li>
@@ -172,7 +220,7 @@ export default function Footer() {
             {/* Hours */}
             <div>
               <h3 className={h3Styles}>
-                Hours of Operation
+                {copy.hours}
               </h3>
               <dl className="grid grid-cols-2 pr-8 mt-4 text-sm gap-x-1 gap-y-3">
                 <dt className={hoursStyles}>Mon.</dt>
@@ -196,12 +244,12 @@ export default function Footer() {
 
           <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
             <SmartLink
-              href="/reviews"
+              href={localizeHref("/reviews")}
               className="px-3 py-2 text-sm text-white md:text-md btn btn-brand-orange"
               data-icon-affordance="up-right"
             >
               <Star className="w-3 h-3 mr-2 text-white md:h-4 md:w-4" />
-              Leave a Review
+              {copy.leaveReview}
               <ArrowUpRight className="inline w-3 h-3 ml-1 text-white md:h-4 md:w-4 icon-affordance" />
             </SmartLink>
 
@@ -234,8 +282,9 @@ export default function Footer() {
             </div>
 
             <nav className="flex items-center justify-end gap-4 text-xs font-semibold text-slate-500">
-              <SmartLink href={ROUTES.privacyPolicy}>Privacy Policy</SmartLink>
-              <SmartLink href={ROUTES.sitemapIndex}>XML Sitemap</SmartLink>
+              <SmartLink href={localizeHref(ROUTES.privacyPolicy)}>{translate("Privacy Policy")}</SmartLink>
+              <SmartLink href={localizeHref(ROUTES.sitemapIndex)}>{translate("XML Sitemap")}</SmartLink>
+              <FooterLocaleSwitch locale={activeLocale} />
             </nav>
           </div>
           <div className="py-4">

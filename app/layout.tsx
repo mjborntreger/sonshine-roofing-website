@@ -7,6 +7,9 @@ import { inter, allura, candara } from "@/lib/ui/fonts";
 import BrevoChatLoader from "@/components/lead-capture/brevo-chatbot/BrevoChatLoader";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Script from "next/script";
+import { DEFAULT_LOCALE, getLocaleFromPath, resolveLocale, type Locale } from "@/lib/i18n/locale";
+import { headers } from "next/headers";
+import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
@@ -21,7 +24,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     creator: "@ssroofinginc",
   },
-  alternates: { canonical: "./" },
+  alternates: {
+    canonical: "./",
+    languages: {
+      en: "/",
+      es: "/es",
+      "x-default": "/",
+    },
+  },
   title: "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte",
   description:
     "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!",
@@ -49,6 +59,7 @@ export const viewport: Viewport = {
 const BASE_URL = SITE_ORIGIN;
 const PHONE_E164 = '+1-941-866-4320';
 const LOGO_URL_512 = 'https://sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png'; // 512×512
+const AVAILABLE_LANGUAGES = ['en', 'es'] as const;
 // Aggregate rating (editable constants)
 const AGG_RATING_VALUE = 4.8;
 const AGG_RATING_COUNT = 211;
@@ -72,7 +83,7 @@ function getGlobalSchema() {
         '@type': 'ContactPoint',
         contactType: 'customer service',
         telephone: PHONE_E164,
-        availableLanguage: ['en'],
+        availableLanguage: AVAILABLE_LANGUAGES,
         areaServed: [
           { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
           { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
@@ -89,7 +100,7 @@ function getGlobalSchema() {
         '@type': 'ContactPoint',
         contactType: 'sales',
         telephone: PHONE_E164,
-        availableLanguage: ['en'],
+        availableLanguage: AVAILABLE_LANGUAGES,
         areaServed: [
           { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
           { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
@@ -199,10 +210,12 @@ function getGlobalSchema() {
   } as const;
 }
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+type RootLayoutProps = { children: React.ReactNode; locale?: Locale };
+
+export function AppLayout({ children, locale = DEFAULT_LOCALE }: RootLayoutProps) {
   return (
     <html
-      lang="en"
+      lang={locale}
       data-scroll-behavior="smooth"
       className={`${inter.variable} ${allura.variable} ${candara.variable}`}
     >
@@ -229,9 +242,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       >
         <Script strategy="afterInteractive" src="https://qq.leadsbyquickquote.com/roofs/integration"></Script>
         <AnalyticsScripts />
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <LocaleProvider value={locale} key={locale}>
+          <Header locale={locale} />
+          <main className="flex-1">{children}</main>
+          <Footer locale={locale} />
+        </LocaleProvider>
         {/* Global JSON-LD (RoofingContractor + Services) */}
         <script
           type="application/ld+json"
@@ -242,4 +257,16 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </body>
     </html>
   );
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const hdrs = await headers();
+  const headerLocale = resolveLocale(hdrs.get("x-locale") ?? undefined);
+  const path =
+    hdrs.get("x-invoke-path") ??
+    hdrs.get("x-matched-path") ??
+    hdrs.get("x-next-url") ??
+    "/";
+  const locale = headerLocale ?? getLocaleFromPath(path);
+  return <AppLayout locale={locale}>{children}</AppLayout>;
 }

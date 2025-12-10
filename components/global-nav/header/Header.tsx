@@ -3,31 +3,39 @@
 import SmartLink from "@/components/utils/SmartLink";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useSelectedLayoutSegments } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { NavMenu } from "./NavMenu";
 import { cn } from "@/lib/utils";
+import { DEFAULT_LOCALE, prefixPathWithLocale, stripLocaleFromPath, type Locale } from "@/lib/i18n/locale";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 const HEADER_COLLAPSE_THRESHOLD = 140; // tweak this to adjust when the header compresses
 const HEADER_EXPAND_THRESHOLD = 60; // below this scroll position the header expands again
 const UTILITY_BREAKPOINT_CLASS = "flex"; // tweak this Tailwind breakpoint for the utility strip visibility
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-export default function Header() {
+export default function Header({ locale }: { locale?: Locale }) {
+  const contextLocale = useLocale();
+  const activeLocale = locale ?? contextLocale ?? DEFAULT_LOCALE;
   const ref = useRef<HTMLElement>(null);
-  const segments = useSelectedLayoutSegments();
+  const pathname = usePathname() || "/";
+  const { pathname: localeStrippedPath } = stripLocaleFromPath(pathname);
+  const pathSegments = localeStrippedPath.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean);
   const locationSlug =
-    segments[0] === "locations" && typeof segments[1] === "string" ? segments[1] : null;
+    pathSegments[0] === "locations" && typeof pathSegments[1] === "string" ? pathSegments[1] : null;
   // Keep the hero logo pointed at the active location so nested location routes stay scoped.
-  const logoHref = locationSlug ? `/locations/${locationSlug}` : "/";
-  const initialLanding = segments.length === 0;
+  const logoHref = locationSlug
+    ? prefixPathWithLocale(`/locations/${locationSlug}`, activeLocale)
+    : prefixPathWithLocale("/", activeLocale);
+  const initialLanding = pathSegments.length === 0;
   const [scrollState, setScrollState] = useState(() => ({
     collapsed: false,
     progress: initialLanding ? 0 : 1,
   }));
   const stateRef = useRef(scrollState);
-  const isLanding = 
-    segments.length === 0 || 
-    (segments[0] === "locations" && segments.length === 2);
+  const isLanding =
+    pathSegments.length === 0 ||
+    (pathSegments[0] === "locations" && pathSegments.length === 2);
 
   useEffect(() => {
     stateRef.current = scrollState;
@@ -168,7 +176,7 @@ export default function Header() {
             className="h-[40px]"
           />
         </SmartLink>
-        <NavMenu transparent={isTransparent} />
+        <NavMenu transparent={isTransparent} locale={locale} />
       </div>
     </header>
   );

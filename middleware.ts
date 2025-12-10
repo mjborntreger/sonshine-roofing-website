@@ -1,41 +1,59 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { getLocaleFromPath } from './lib/i18n/locale';
 
-// 410 Gone for legacy/gone content.
-// Use matcher (below) to target only these paths.
-export function middleware(_req: NextRequest) {
-  return new NextResponse('Gone', {
-    status: 410,
-    headers: {
-      'Content-Type': 'text/plain; charset=utf-8',
-      // cache for a day at edge/CDN; adjust as desired
-      'Cache-Control': 'public, max-age=86400',
+const GONE_PATHS: Array<RegExp | string> = [
+  // Category/project legacy prefixes
+  /^\/project_category\/ellenton(?:\/|$)/,
+  /^\/project_category\/englewood(?:\/|$)/,
+  /^\/project_category\/parrish(?:\/|$)/,
+  /^\/project-category\/ellenton(?:\/|$)/,
+  /^\/project-category\/englewood(?:\/|$)/,
+  /^\/project-category\/parrish(?:\/|$)/,
+  /^\/parrish-roofing-contractor(?:\/|$)/,
+  /^\/ellenton-roofing-contractor(?:\/|$)/,
+  /^\/englewood-roofing-contractor(?:\/|$)/,
+
+  // Specific retired pages
+  /^\/about\/tony(?:\/|$)/,
+  /^\/about\/adam-2(?:\/|$)/,
+  /^\/about\/stephanie(?:\/|$)/,
+  /^\/open-for-business-update-covid-19-safety-measures(?:\/|$)/,
+  /^\/know-about-tile-roof-repair(?:\/|$)/,
+  /^\/seven-ways-to-make-sure-your-roofing-contractor-will-rip-you-off(?:\/|$)/,
+  /^\/about\/kris-marszalek(?:\/|$)/,
+  /^\/the-right-place(?:\/|$)/,
+  /^\/sonshine-roofing(?:\/|$)/,
+];
+
+const isGonePath = (pathname: string) =>
+  GONE_PATHS.some((rule) => (rule instanceof RegExp ? rule.test(pathname) : pathname.startsWith(rule)));
+
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+
+  if (isGonePath(pathname)) {
+    return new NextResponse('Gone', {
+      status: 410,
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        // cache for a day at edge/CDN; adjust as desired
+        'Cache-Control': 'public, max-age=86400',
+      },
+    });
+  }
+
+  const requestHeaders = new Headers(req.headers);
+  const locale = getLocaleFromPath(pathname);
+  requestHeaders.set('x-locale', locale);
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
     },
   });
 }
 
-// Apply only to the gone routes. Trailing segments with :path* cover optional trailing slashes.
+// Run for all routes except _next/static, _next/image and assets.
 export const config = {
-  matcher: [
-    // Category/project legacy prefixes
-    '/project_category/ellenton/:path*',
-    '/project_category/englewood/:path*',
-    '/project_category/parrish/:path*',
-    '/project-category/ellenton/:path*',
-    '/project-category/englewood/:path*',
-    '/project-category/parrish/:path*',
-    '/parrish-roofing-contractor/:path*',
-    '/ellenton-roofing-contractor/:path*',
-    '/englewood-roofing-contractor/:path*',
-
-    // Specific retired pages
-    '/about/tony/:path*',
-    '/about/adam-2/:path*',
-    '/about/stephanie/:path*',
-    '/open-for-business-update-covid-19-safety-measures/:path*',
-    '/know-about-tile-roof-repair/:path*',
-    '/seven-ways-to-make-sure-your-roofing-contractor-will-rip-you-off/:path*',
-    '/about/kris-marszalek/:path*',
-    '/the-right-place/:path*',
-    '/sonshine-roofing/:path*',
-  ],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.[^.]+$).*)'],
 };

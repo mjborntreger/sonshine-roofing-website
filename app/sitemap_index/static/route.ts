@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { buildAlternateLinks, localizePath, stripLocalePrefix } from '../utils';
 
 // The manifest is generated at build time to: public/__sitemaps/static-routes.json
 // We fetch it from the current origin so this works on prod and staging without hardcoding.
 
-type StaticManifest = { generatedAt?: string; routes: { loc: string; lastmod?: string }[] };
+type StaticRoute = { loc: string; lastmod?: string; locale?: string | null };
+type StaticManifest = { generatedAt?: string; routes: StaticRoute[] };
 
 const ENABLED =
   process.env.NEXT_PUBLIC_ENV === 'production' ||
@@ -34,13 +36,31 @@ export async function GET(req: Request) {
     `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
   ].join('');
 
+  const routes = Array.isArray(manifest.routes) ? manifest.routes : [];
+  const seenBases = new Set<string>();
+  const expanded: Array<StaticRoute & { alternates: string[] }> = [];
+  routes.forEach((route) => {
+    const basePath = stripLocalePrefix(route.loc);
+    if (seenBases.has(basePath)) return;
+    seenBases.add(basePath);
+    const alternates = buildAlternateLinks(origin, basePath);
+    localizePath(basePath).forEach(({ loc }) => {
+      expanded.push({
+        loc,
+        locale: route.locale,
+        lastmod: route.lastmod,
+        alternates,
+      });
+    });
+  });
+
   const body = [
     head,
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-    ...manifest.routes.map((r) => {
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
+    ...expanded.map((r) => {
       const loc = `${origin}${r.loc}`;
       const lastmod = r.lastmod ? `<lastmod>${r.lastmod}</lastmod>` : '';
-      return `<url><loc>${loc}</loc>${lastmod}</url>`;
+      return `<url><loc>${loc}</loc>${lastmod}${r.alternates.join('')}</url>`;
     }),
     `</urlset>`,
   ].join('');

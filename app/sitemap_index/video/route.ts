@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch, stripHtml, youtubeThumb } from '@/lib/content/wp';
-import { formatLastmod, normalizeEntryPath, xmlEscape, trimTo } from '../utils';
+import { buildAlternateLinks, formatLastmod, localizePath, normalizeEntryPath, xmlEscape, trimTo } from '../utils';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600; // safety net; tag-based revalidation should refresh sooner
@@ -286,6 +286,21 @@ export async function GET() {
   }
 
   const items = await buildVideoItems();
+  const localizedItems = items.flatMap((item) => {
+    let path = normalizeEntryPath(item.loc.replace(BASE, ''));
+    try {
+      const url = new URL(item.loc);
+      path = normalizeEntryPath(url.pathname);
+    } catch {
+      // fallback to simple replacement
+    }
+    const alternates = buildAlternateLinks(BASE, path);
+    return localizePath(path).map(({ loc }) => ({
+      ...item,
+      loc: `${BASE}${loc}`,
+      alternates,
+    }));
+  });
   const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
@@ -293,8 +308,8 @@ export async function GET() {
 
   const body = [
     head,
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="${VIDEO_NAMESPACE}">`,
-    ...items.map((item) => {
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:video="${VIDEO_NAMESPACE}">`,
+    ...localizedItems.map((item) => {
       const lastmod = item.lastmod ? `<lastmod>${item.lastmod}</lastmod>` : '';
       const publication = item.publicationDate
         ? `<video:publication_date>${item.publicationDate}</video:publication_date>`
@@ -302,11 +317,13 @@ export async function GET() {
       const tagsXml = item.tags
         .map((tag) => `<video:tag>${xmlEscape(tag)}</video:tag>`)
         .join('');
+      const alternates = item.alternates?.join('') ?? '';
 
       return [
         `<url>`,
         `<loc>${xmlEscape(item.loc)}</loc>`,
         lastmod,
+        alternates,
         `<video:video>`,
         `<video:thumbnail_loc>${xmlEscape(item.thumbnailUrl)}</video:thumbnail_loc>`,
         `<video:title>${xmlEscape(trimTo(item.title, 100))}</video:title>`,

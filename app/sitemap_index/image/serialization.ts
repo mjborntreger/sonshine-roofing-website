@@ -8,6 +8,7 @@ export type ImageSitemapEntry = {
   loc: string;
   lastmod?: string | null;
   images: WpImage[];
+  alternates?: string[];
 };
 
 export const sanitizeAltText = (value?: string | null) => {
@@ -53,5 +54,6 @@ export const serializeImageEntry = (
     .join('');
 
   const lastmod = entry.lastmod ? `<lastmod>${entry.lastmod}</lastmod>` : '';
-  return `<url><loc>${baseUrl}${entry.loc}</loc>${lastmod}${imageXml}</url>`;
+  const alternates = entry.alternates?.join('') ?? '';
+  return `<url><loc>${baseUrl}${entry.loc}</loc>${lastmod}${alternates}${imageXml}</url>`;
 };

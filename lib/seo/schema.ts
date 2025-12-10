@@ -12,6 +12,11 @@ function applyContext<T extends SchemaInit>(schema: T, includeContext: boolean) 
   return { "@context": SCHEMA_CONTEXT, ...schema };
 }
 
+function applyInLanguage(schema: SchemaInit, locale?: string | null | undefined) {
+  const lang = typeof locale === "string" ? locale.trim() : "";
+  if (lang) schema.inLanguage = lang;
+}
+
 function compact<T>(value: T | null | undefined): value is T {
   if (value === null || value === undefined) return false;
   if (typeof value === "string") return value.trim().length > 0;
@@ -124,11 +129,12 @@ export type FaqSchemaOptions = {
   origin?: string;
   url?: string;
   withContext?: boolean;
+  inLanguage?: string;
 };
 
 export function faqSchema(
   items: FaqSchemaItem[],
-  { origin = SITE_ORIGIN, url, withContext = true }: FaqSchemaOptions = {},
+  { origin = SITE_ORIGIN, url, withContext = true, inLanguage }: FaqSchemaOptions = {},
 ) {
   const mainEntity = items.map((item) => {
     const answerText = stripToPlainText(item.answerHtml) ?? "";
@@ -147,6 +153,7 @@ export function faqSchema(
   };
 
   if (url) schema.url = ensureAbsoluteUrl(url, origin);
+  applyInLanguage(schema, inLanguage);
 
   return applyContext(schema, withContext);
 }
@@ -159,11 +166,12 @@ export type BreadcrumbSchemaItem = {
 export type BreadcrumbSchemaOptions = {
   origin?: string;
   withContext?: boolean;
+  inLanguage?: string;
 };
 
 export function breadcrumbSchema(
   breadcrumbs: BreadcrumbSchemaItem[],
-  { origin = SITE_ORIGIN, withContext = true }: BreadcrumbSchemaOptions = {},
+  { origin = SITE_ORIGIN, withContext = true, inLanguage }: BreadcrumbSchemaOptions = {},
 ) {
   const itemListElement = breadcrumbs.map((crumb, index) => ({
     "@type": "ListItem",
@@ -177,6 +185,7 @@ export function breadcrumbSchema(
     itemListElement,
   };
 
+  applyInLanguage(schema, inLanguage);
   return applyContext(schema, withContext);
 }
 
@@ -188,6 +197,7 @@ export type WebPageSchemaInput = {
   primaryImage?: string;
   isPartOf?: SchemaInit;
   withContext?: boolean;
+  inLanguage?: string;
 };
 
 export function webPageSchema({
@@ -198,6 +208,7 @@ export function webPageSchema({
   primaryImage,
   isPartOf,
   withContext = true,
+  inLanguage,
 }: WebPageSchemaInput) {
   const schema: SchemaInit = {
     "@type": "WebPage",
@@ -212,6 +223,7 @@ export function webPageSchema({
       url: ensureAbsoluteUrl(primaryImage, origin),
     };
   if (isPartOf) schema.isPartOf = isPartOf;
+  applyInLanguage(schema, inLanguage);
 
   return applyContext(schema, withContext);
 }
@@ -257,6 +269,7 @@ export type HowToSchemaInput = {
   url?: string;
   origin?: string;
   withContext?: boolean;
+  inLanguage?: string;
 };
 
 export function howToSchema({
@@ -267,6 +280,7 @@ export function howToSchema({
   url,
   origin = SITE_ORIGIN,
   withContext = true,
+  inLanguage,
 }: HowToSchemaInput) {
   const schema: SchemaInit = {
     "@type": "HowTo",
@@ -299,6 +313,7 @@ export function howToSchema({
 
   if (description) schema.description = description;
   if (url) schema.url = ensureAbsoluteUrl(url, origin);
+  applyInLanguage(schema, inLanguage);
 
   return applyContext(schema, withContext);
 }
@@ -319,6 +334,7 @@ export type ServiceSchemaInput = {
   origin?: string;
   withContext?: boolean;
   additionalProperties?: SchemaInit;
+  inLanguage?: string;
 };
 
 export function serviceSchema({
@@ -337,6 +353,7 @@ export function serviceSchema({
   origin = SITE_ORIGIN,
   withContext = true,
   additionalProperties,
+  inLanguage,
 }: ServiceSchemaInput) {
   const schema: SchemaInit = {
     "@type": "Service",
@@ -386,6 +403,7 @@ export function serviceSchema({
   if (additionalProperties) {
     Object.assign(schema, additionalProperties);
   }
+  applyInLanguage(schema, inLanguage);
 
   return applyContext(schema, withContext);
 }
@@ -401,6 +419,7 @@ export type BlogPostingSchemaInput = {
   publisher?: SchemaInit;
   origin?: string;
   withContext?: boolean;
+  inLanguage?: string;
 };
 
 export function blogPostingSchema({
@@ -414,6 +433,7 @@ export function blogPostingSchema({
   publisher,
   origin = SITE_ORIGIN,
   withContext = true,
+  inLanguage,
 }: BlogPostingSchemaInput) {
   const schema: SchemaInit = {
     "@type": "BlogPosting",
@@ -427,6 +447,7 @@ export function blogPostingSchema({
   if (dateModified) schema.dateModified = dateModified;
   if (author) schema.author = author;
   if (publisher) schema.publisher = publisher;
+  applyInLanguage(schema, inLanguage);
 
   return applyContext(schema, withContext);
 }
@@ -444,6 +465,7 @@ export type VideoObjectSchemaInput = {
   publisherName?: string;
   potentialAction?: SchemaInit;
   isFamilyFriendly?: boolean;
+  inLanguage?: string;
 };
 
 export function videoObjectSchema({
@@ -459,6 +481,7 @@ export function videoObjectSchema({
   publisherName = "SonShine Roofing",
   potentialAction,
   isFamilyFriendly,
+  inLanguage,
 }: VideoObjectSchemaInput) {
   const schema: SchemaInit = {
     "@type": "VideoObject",
@@ -486,6 +509,7 @@ export function videoObjectSchema({
   }
 
   if (potentialAction) schema.potentialAction = potentialAction;
+  applyInLanguage(schema, inLanguage);
 
   return applyContext(schema, withContext);
 }
@@ -497,6 +521,7 @@ export type DefinedTermSchemaInput = {
   inDefinedTermSet?: string;
   origin?: string;
   withContext?: boolean;
+  inLanguage?: string;
 };
 
 export function definedTermSchema({
@@ -506,6 +531,7 @@ export function definedTermSchema({
   inDefinedTermSet,
   origin = SITE_ORIGIN,
   withContext = true,
+  inLanguage,
 }: DefinedTermSchemaInput) {
   const schema: SchemaInit = {
     "@type": "DefinedTerm",
@@ -517,6 +543,7 @@ export function definedTermSchema({
   if (inDefinedTermSet) {
     schema.inDefinedTermSet = ensureAbsoluteUrl(inDefinedTermSet, origin);
   }
+  applyInLanguage(schema, inLanguage);
 
   return applyContext(schema, withContext);
 }
@@ -531,6 +558,7 @@ export type PersonSchemaInput = {
   sameAs?: string[];
   origin?: string;
   withContext?: boolean;
+  inLanguage?: string;
 };
 
 export function personSchema({
@@ -543,6 +571,7 @@ export function personSchema({
   sameAs,
   origin = SITE_ORIGIN,
   withContext = true,
+  inLanguage,
 }: PersonSchemaInput) {
   const schema: SchemaInit = {
     "@type": "Person",
@@ -557,9 +586,10 @@ export function personSchema({
     schema.worksFor =
       typeof worksFor === "string"
         ? { "@id": ensureAbsoluteUrl(worksFor, origin) }
-        : worksFor;
+      : worksFor;
   }
   if (sameAs?.length) schema.sameAs = sameAs;
+  applyInLanguage(schema, inLanguage);
 
   return applyContext(schema, withContext);
 }

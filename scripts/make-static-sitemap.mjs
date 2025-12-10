@@ -3,12 +3,15 @@ import { statSync, writeFileSync, mkdirSync } from 'node:fs';
 import { join, sep } from 'node:path';
 
 const ROOT = process.cwd();
+const SUPPORTED_LOCALES = ["en", "es"];
+const DEFAULT_LOCALE = "en";
 
 const files = await fg(['app/**/page.@(tsx|jsx|mdx)'], {
   dot: false,
   onlyFiles: true,
   ignore: [
     'app/**/api/**',
+    'app/es/**',
     'app/**/sitemap_index/**',
     'app/**/robots.ts',
     'app/**/route.ts',          // non-page routes
@@ -45,11 +48,34 @@ const items = files.map((f) => {
 
 // Exclude specific routes from the static sitemap
 const EXCLUDE = new Set(["/calendly-test", "/reviews", "/tell-us-why"]);
-const filtered = items.filter(({ loc }) => !EXCLUDE.has(loc));
+
+const stripLocale = (path) => {
+  if (typeof path !== "string") return "/";
+  if (path.startsWith("/es")) {
+    const remainder = path.slice(3) || "/";
+    return remainder.startsWith("/") ? remainder : `/${remainder}`;
+  }
+  return path;
+};
+
+const prefixLocale = (path, locale) => {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  if (locale === DEFAULT_LOCALE) return normalized;
+  return normalized === "/" ? "/es" : `/es${normalized}`;
+};
+
+const filtered = items.filter(({ loc }) => !EXCLUDE.has(stripLocale(loc)));
 
 // Optionally fallback to commit time
 const commitTs = process.env.VERCEL_GIT_COMMIT_TIMESTAMP;
-const routes = filtered.map(({ loc, lastmod }) => ({ loc, lastmod: commitTs || lastmod }));
+const routes = filtered.flatMap(({ loc, lastmod }) => {
+  const base = stripLocale(loc);
+  return SUPPORTED_LOCALES.map((locale) => ({
+    loc: prefixLocale(base, locale),
+    locale,
+    lastmod: commitTs || lastmod,
+  }));
+});
 
 const outDir = join(ROOT, 'public', '__sitemaps');
 const outPath = join(outDir, 'static-routes.json');

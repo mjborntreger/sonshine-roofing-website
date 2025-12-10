@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch, mapImages, type WpImageNode } from '@/lib/content/wp';
-import { formatLastmod, normalizeEntryPath } from '../utils';
+import { buildAlternateLinks, formatLastmod, localizePath, normalizeEntryPath } from '../utils';
 import { serializeImageEntry, type ImageSitemapEntry } from './serialization';
 
 export const dynamic = 'force-static';
@@ -386,19 +386,27 @@ export async function GET() {
   }
 
   const entries = await buildImageEntries();
+  const localizedEntries = entries.flatMap((entry) => {
+    const alternates = buildAlternateLinks(BASE, entry.loc);
+    return localizePath(entry.loc).map(({ loc }) => ({
+      ...entry,
+      loc,
+      alternates,
+    }));
+  });
 
   const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
   ].join('');
 
-  const urls = entries
+  const urls = localizedEntries
     .map((entry) => serializeImageEntry(BASE, entry))
     .filter((entry): entry is string => Boolean(entry));
 
   const body = [
     head,
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">`,
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">`,
     ...urls,
     `</urlset>`,
   ].join('');

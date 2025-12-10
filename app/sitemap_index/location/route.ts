@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch } from '@/lib/content/wp';
-import { formatLastmod, normalizeEntryPath } from '../utils';
+import { buildAlternateLinks, formatLastmod, localizePath, normalizeEntryPath } from '../utils';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600; // safety net; tag-based revalidation will be faster
@@ -70,20 +70,26 @@ export async function GET() {
     `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
   ].join('');
 
+  const entries = items.flatMap((node) => {
+    const rawPath = normalizeEntryPath(node.uri);
+    const path = rawPath.startsWith('/location/')
+      ? rawPath.replace('/location/', '/locations/')
+      : rawPath;
+    if (path === '/') return [];
+    const isoLastmod = formatLastmod(node.modifiedGmt);
+    const lastmod = isoLastmod ? `<lastmod>${isoLastmod}</lastmod>` : '';
+    const alternates = buildAlternateLinks(BASE, path);
+    return localizePath(path).map(({ loc }) => ({
+      loc: `${BASE}${loc}`,
+      lastmod,
+      alternates,
+    }));
+  });
+
   const body = [
     head,
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-    ...items.map((node) => {
-      const rawPath = normalizeEntryPath(node.uri);
-      const path = rawPath.startsWith('/location/')
-        ? rawPath.replace('/location/', '/locations/')
-        : rawPath;
-      if (path === '/') return null;
-      const loc = `${BASE}${path}`;
-      const isoLastmod = formatLastmod(node.modifiedGmt);
-      const lastmod = isoLastmod ? `<lastmod>${isoLastmod}</lastmod>` : '';
-      return `<url><loc>${loc}</loc>${lastmod}</url>`;
-    }).filter(Boolean),
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
+    ...entries.map((entry) => `<url><loc>${entry.loc}</loc>${entry.lastmod}${entry.alternates.join('')}</url>`),
     `</urlset>`,
   ].join('');
 

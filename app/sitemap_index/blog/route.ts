@@ -1,7 +1,7 @@
 // app/sitemap_index/blog/route.ts
 import { NextResponse } from 'next/server';
 import { wpFetch } from '@/lib/content/wp';
-import { formatLastmod, normalizeEntryPath } from '../utils';
+import { buildAlternateLinks, formatLastmod, localizePath, normalizeEntryPath } from '../utils';
 import { unstable_cache } from 'next/cache';
 
 export const dynamic = 'force-static';
@@ -53,13 +53,22 @@ export async function GET() {
     `<?xml version="1.0" encoding="UTF-8"?>`,
     `<?xml-stylesheet type="text/xsl" href="/__sitemaps/sitemap.xsl"?>`,
   ].join('');
+  const entries = items.flatMap(n => {
+    const path = normalizeEntryPath(n.uri);
+    const lastmod = formatLastmod(n.modifiedGmt);
+    const alternates = buildAlternateLinks(BASE, path);
+    return localizePath(path).map(({ loc }) => ({
+      loc: `${BASE}${loc}`,
+      lastmod,
+      alternates,
+    }));
+  });
   const body = [
     head,
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
-    ...items.map(n => {
-      const path = normalizeEntryPath(n.uri);
-      const lastmod = formatLastmod(n.modifiedGmt);
-      return `<url><loc>${BASE}${path}</loc>${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">`,
+    ...entries.map((entry) => {
+      const lastmod = entry.lastmod ? `<lastmod>${entry.lastmod}</lastmod>` : '';
+      return `<url><loc>${entry.loc}</loc>${lastmod}${entry.alternates.join('')}</url>`;
     }),
     `</urlset>`
   ].join('');

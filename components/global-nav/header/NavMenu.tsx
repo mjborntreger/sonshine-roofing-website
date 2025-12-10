@@ -28,6 +28,8 @@ import { cn } from "@/lib/utils";
 import type { NavItem } from "@/lib/routes";
 import { NAV_MAIN, ROUTES } from "@/lib/routes";
 import { InstantQuoteCTA } from "./InstantQuoteCTA";
+import { DEFAULT_LOCALE, prefixPathWithLocale, type Locale } from "@/lib/i18n/locale";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 
 type Item = NavItem;
 const NAV: Item[] = NAV_MAIN as Item[]; // service links resolve through buildServiceHref for future location variants
@@ -50,6 +52,45 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   Contact: Phone,
   "Contact Us": Phone,
 };
+
+const NAV_LABEL_TRANSLATIONS: Record<Locale, Record<string, string>> = {
+  en: {},
+  es: {
+    About: "Acerca de",
+    "Roofing Services": "Servicios",
+    "Roof Replacement": "Reemplazo de techo",
+    "Roof Repair": "Reparación de techo",
+    "Roof Inspection": "Inspección de techo",
+    "Roof Maintenance": "Mantenimiento de techo",
+    "Our Work": "Nuestra obra",
+    "Project Gallery": "Galeria de proyectos",
+    "Video Library": "Videoteca",
+    Blog: "Blog",
+    "Roofing Glossary": "Glosario de techado",
+    FAQ: "Preguntas frecuentes",
+    Financing: "Financiamiento",
+    Contact: "Contacto",
+    "Contact Us": "Contactarnos",
+    Home: "Inicio",
+  },
+};
+
+const UI_COPY = {
+  en: {
+    menuLabel: "Menu",
+    homeLabel: "Home",
+  },
+  es: {
+    menuLabel: "Más",
+    homeLabel: "Inicio",
+  },
+} satisfies Record<Locale, { menuLabel: string; homeLabel: string }>;
+
+const translateLabel = (label: string, locale: Locale) =>
+  NAV_LABEL_TRANSLATIONS[locale]?.[label] ?? label;
+
+const localizeHref = (href: Item["href"], locale: Locale) =>
+  href ? (prefixPathWithLocale(href, locale) as Item["href"]) : href;
 
 const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);
 const CONTACT_LABELS = new Set(["Contact", "Contact Us"]);
@@ -92,8 +133,12 @@ function MenuToggleIcon({ open }: { open: boolean }) {
   );
 }
 
-function LabelWithIcon({ label, iconClassName }: { label: string; iconClassName?: string }) {
-  const Icon = NAV_ICONS[label];
+function LabelWithIcon({
+  label,
+  iconClassName,
+  iconLabel,
+}: { label: string; iconClassName?: string; iconLabel?: string }) {
+  const Icon = NAV_ICONS[iconLabel ?? label];
   return (
     <span className="inline-flex font-display text-lg items-center">
       {Icon && (
@@ -123,7 +168,7 @@ const MOBILE_TOP_STAGGER_BASE_MS = 70;
 const MOBILE_CTA1_DELAY_MS = 70;  // "Free 60-second Quote"
 
 /* ===== Desktop (fixed) ===== */
-function DesktopMenu({ transparent }: { transparent: boolean }) {
+function DesktopMenu({ transparent, locale }: { transparent: boolean; locale: Locale }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [enteredPanel, setEnteredPanel] = useState(false);
@@ -146,16 +191,19 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
   return (
     <>
       <ul className="hidden lg:flex items-center gap-4">
-        {NAV.map((item, i) => (
-          <li
-            key={item.label}
-            className="relative"
-            onMouseEnter={() => holdOpen(i)}
-            onMouseLeave={scheduleClose}
-          >
-            {item.href ? (
+        {NAV.map((item, i) => {
+          const label = translateLabel(item.label, locale);
+          const href = localizeHref(item.href, locale);
+          return (
+            <li
+              key={item.label}
+              className="relative"
+              onMouseEnter={() => holdOpen(i)}
+              onMouseLeave={scheduleClose}
+            >
+            {href ? (
               <SmartLink
-                href={item.href}
+                href={href}
                 className={cn(
                   "relative flex items-center whitespace-nowrap px-2 py-2 transition-colors duration-200",
                   item.children && "pr-5",
@@ -164,7 +212,8 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
                 )}
               >
                 <LabelWithIcon
-                  label={item.label}
+                  label={label}
+                  iconLabel={item.label}
                   iconClassName={cn(
                     transparent ? "text-[--brand-orange]" : "text-[--brand-blue]",
                     CONTACT_LABELS.has(item.label) && "phone-affordance-icon"
@@ -197,7 +246,8 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
                 aria-expanded={openIndex === i || undefined}
               >
                 <LabelWithIcon
-                  label={item.label}
+                  label={label}
+                  iconLabel={item.label}
                   iconClassName={transparent ? "text-[--brand-orange]" : "text-[--brand-blue]"}
                 />
                 {item.children && (
@@ -230,15 +280,16 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
                   onMouseEnter={() => holdOpen(i)}
                   onMouseLeave={scheduleClose}
                 >
-                  <MenuLevel items={item.children} level={1} parentLabel={item.label} />
+                  <MenuLevel items={item.children} level={1} parentLabel={item.label} locale={locale} />
                 </div>
               </>
             )}
           </li>
-        ))}
+        );
+        })}
 
         <li className="pl-2">
-          <InstantQuoteCTA />
+          <InstantQuoteCTA locale={locale} />
         </li>
       </ul>
     </>
@@ -246,7 +297,12 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
 }
 
 /* ===== Nested menu list (scoped hover) ===== */
-function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number; parentLabel?: string }) {
+function MenuLevel({
+  items,
+  level,
+  parentLabel,
+  locale,
+}: { items: Item[]; level: number; parentLabel?: string; locale: Locale }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [entered, setEntered] = useState(false);
@@ -269,6 +325,8 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
       {items.map((child, i) => {
         const hasKids = !!child.children?.length;
         const showChevron = !hasKids && TARGET_CHILD_PARENTS.has(parentLabel ?? "");
+        const label = translateLabel(child.label, locale);
+        const href = localizeHref(child.href, locale);
 
         return (
           <li
@@ -281,13 +339,13 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
             onMouseEnter={() => holdOpen(i)}
             onMouseLeave={scheduleClose}
           >
-            {child.href ? (
+            {href ? (
               <SmartLink
-                href={child.href}
+                href={href}
                 className="flex items-center justify-between gap-2 px-3 py-2 text-md text-slate-700 hover:bg-[#0045d7]/5 hover:text-[--brand-blue]"
                 data-icon-affordance={showChevron ? "right" : undefined}
               >
-                <LabelWithIcon label={child.label} />
+                <LabelWithIcon label={label} iconLabel={child.label} />
                 {hasKids ? (
                   <>
                     {/* ANIM: Nested caret rotation — edit CARET_DURATION_MS */}
@@ -314,7 +372,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
                 aria-expanded={openIndex === i || undefined}
                 onClick={() => holdOpen(i)}
               >
-                <LabelWithIcon label={child.label} />
+                <LabelWithIcon label={label} iconLabel={child.label} />
                 {hasKids && (
                   <>
                     {/* ANIM: Nested caret rotation — edit CARET_DURATION_MS */}
@@ -354,6 +412,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
                       items={child.children!}
                       level={level + 1}
                       parentLabel={child.label}
+                      locale={locale}
                     />
                   </div>
                 </div>
@@ -367,13 +426,14 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
 }
 
 /* ===== Mobile ===== */
-function MobileMenu() {
+function MobileMenu({ locale }: { locale: Locale }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [entered, setEntered] = useState<Record<string, boolean>>({});
   const [enteredTop, setEnteredTop] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const copy = UI_COPY[locale] ?? UI_COPY.en;
 
   // lock scroll when open
   const prevOverflow = useRef<string>("");
@@ -443,6 +503,9 @@ function MobileMenu() {
       return next;
     });
 
+  const homeHref = localizeHref(ROUTES.home, locale) ?? ROUTES.home;
+  const homeLabel = translateLabel("Home", locale);
+
   return (
     <div className="lg:hidden ml-auto">
       <button
@@ -455,7 +518,7 @@ function MobileMenu() {
         aria-haspopup="menu"
         data-open={open}
       >
-        <span className="font-display text-xl font-bold leading-none">Menu</span>
+        <span className="font-display text-xl font-bold leading-none">{copy.menuLabel}</span>
         <MenuToggleIcon open={open} />
       </button>
 
@@ -490,17 +553,19 @@ function MobileMenu() {
                 style={{ transitionDelay: `${MOBILE_TOP_STAGGER_BASE_MS}ms` }}
               >
                 <SmartLink
-                  href={ROUTES.home}
+                  href={homeHref}
                   className="flex w-full px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
                   onClick={() => setOpen(false)}
                 >
-                  <LabelWithIcon label="Home" />
+                  <LabelWithIcon label={homeLabel} iconLabel="Home" />
                 </SmartLink>
               </li>
               <hr className="my-1 border-blue-100" />
               {NAV.map((item, i) => {
                 const k = `lv1-${i}`;
                 const hasChildren = !!item.children?.length;
+                const label = translateLabel(item.label, locale);
+                const href = localizeHref(item.href, locale);
                 return (
                   <li
                     key={k}
@@ -511,23 +576,23 @@ function MobileMenu() {
                     // ANIM: Mobile top-level stagger — base + per-item step
                     style={{ transitionDelay: `${Math.min(300, MOBILE_TOP_STAGGER_BASE_MS + i * ITEM_STAGGER_STEP_MS)}ms` }}
                   >
-                    {!hasChildren && item.href ? (
+                    {!hasChildren && href ? (
                       <SmartLink
-                        href={item.href}
+                        href={href}
                         className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
                         onClick={() => setOpen(false)}
                       >
-                        <LabelWithIcon label={item.label} />
+                        <LabelWithIcon label={label} iconLabel={item.label} />
                       </SmartLink>
                     ) : (
                       <div className="flex items-center justify-between">
-                        {item.href ? (
+                        {href ? (
                           <SmartLink
-                            href={item.href}
+                            href={href}
                             className="block flex-1 min-w-0 text-left px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
                             onClick={() => setOpen(false)}
                           >
-                            <LabelWithIcon label={item.label} />
+                            <LabelWithIcon label={label} iconLabel={item.label} />
                           </SmartLink>
                         ) : (
                           <button
@@ -537,7 +602,7 @@ function MobileMenu() {
                             aria-controls={`section-${k}`}
                             className="px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200 text-left flex-1"
                           >
-                            <LabelWithIcon label={item.label} />
+                            <LabelWithIcon label={label} iconLabel={item.label} />
                           </button>
                         )}
                         {hasChildren && (
@@ -566,6 +631,8 @@ function MobileMenu() {
                           const ck = `lv2-${i}-${j}`;
                           const childHasKids = !!c.children?.length;
                           const showChevron = !childHasKids && TARGET_CHILD_PARENTS.has(item.label);
+                          const childLabel = translateLabel(c.label, locale);
+                          const childHref = localizeHref(c.href, locale);
                           return (
                             <li
                               key={ck}
@@ -576,21 +643,21 @@ function MobileMenu() {
                               // ANIM: Mobile child stagger — base + per-item step
                               style={{ transitionDelay: `${Math.min(300, ITEM_STAGGER_BASE_MS + j * ITEM_STAGGER_STEP_MS)}ms` }}
                             >
-                              {c.href ? (
+                              {childHref ? (
                                 <SmartLink
-                                  href={c.href}
+                                  href={childHref}
                                   className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-700 hover:bg-slate-200"
                                   data-icon-affordance={showChevron ? "right" : undefined}
                                   onClick={() => setOpen(false)}
                                 >
-                                  <LabelWithIcon label={c.label} />
+                                  <LabelWithIcon label={childLabel} iconLabel={c.label} />
                                   {showChevron ? (
                                     <ChevronRight className={CHILD_CHEVRON_CLASS} aria-hidden="true" />
                                   ) : null}
                                 </SmartLink>
                               ) : (
                                 <span className="block px-3 py-2 text-slate-700">
-                                  <LabelWithIcon label={c.label} />
+                                  <LabelWithIcon label={childLabel} iconLabel={c.label} />
                                 </span>
                               )}
                             </li>
@@ -606,6 +673,14 @@ function MobileMenu() {
                   "transition-all duration-150 ease-out",
                   enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
                 )}
+                style={{ transitionDelay: `${Math.min(360, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
+              >
+                </li>
+              <li
+                className={cn(
+                  "transition-all duration-150 ease-out",
+                  enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                )}
                 // ANIM: Mobile CTA1 stagger — base + NAV length step
                 style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
               >
@@ -615,6 +690,7 @@ function MobileMenu() {
                   linkClassName="w-full justify-center gap-x-2"
                   iconClassName="w-4 h-4"
                   onClick={() => setOpen(false)}
+                  locale={locale}
                 />
               </li>
             </ul>
@@ -627,13 +703,16 @@ function MobileMenu() {
 
 type NavMenuProps = {
   transparent: boolean;
+  locale?: Locale;
 };
 
-export function NavMenu({ transparent }: NavMenuProps) {
+export function NavMenu({ transparent, locale = DEFAULT_LOCALE }: NavMenuProps) {
+  const contextLocale = useLocale();
+  const activeLocale = locale ?? contextLocale ?? DEFAULT_LOCALE;
   return (
     <nav className="ml-auto flex items-center gap-3">
-      <DesktopMenu transparent={transparent} />
-      <MobileMenu />
+      <DesktopMenu transparent={transparent} locale={activeLocale} />
+      <MobileMenu locale={activeLocale} />
     </nav>
   );
 }
