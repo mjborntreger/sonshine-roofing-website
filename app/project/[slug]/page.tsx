@@ -240,7 +240,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   return (
     <>
-      <Hero 
+      <Hero
         title={project.title}
         subtitle=""
         imageSrc={heroImageUrl}

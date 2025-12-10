@@ -111,7 +111,7 @@ export default async function Page() {
             <p>
               Roof leak repair costs vary depending on several factors, including
               the extent of the damage, the type of materials needed, any special
-              equipment, and the geographic location of the home. Elements such as
+              equipment, and the<SmartLink href="https://www.cnynicheteam.com/blog/cny-neighborhood-comparison-everyday-living/" title="Central New York Neighborhood Comparison" aria-label="Central New York Neighborhood Comparison"> geographic location of the home</SmartLink>. Elements such as
               flashing, sheathing, underlayment, and gutters may also need attention
               when addressing problem areas—these should all be considered when
               estimating the true repair cost.
