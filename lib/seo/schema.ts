@@ -838,7 +838,7 @@ export function projectReviewSchema({
     : canonicalProjectUrl;
 
   const itemReviewed: SchemaInit = {
-    "@type": "Service",
+    "@type": "LocalBusiness",
     name: projectName,
     url: canonicalProjectUrl,
     provider: {
