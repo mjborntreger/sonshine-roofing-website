@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import SmartLink from "@/components/utils/SmartLink";
 import FooterBadges from "@/components/global-nav/footer/FooterBadges";
@@ -16,6 +18,7 @@ import {
 } from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from "@/lib/routes";
 import { DEFAULT_LOCALE, prefixPathWithLocale, type Locale } from "@/lib/i18n/locale";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
 import { FooterLocaleSwitch } from "@/components/global-nav/footer/FooterLocaleSwitch";
 
 type SocialLink = {
@@ -83,7 +86,8 @@ const hoursStyles = "text-xs md:text-sm text-slate-600"
 const logoSrc = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp";
 
 export default function Footer({ locale }: { locale?: Locale }) {
-  const activeLocale = locale ?? DEFAULT_LOCALE;
+  const contextLocale = useLocale();
+  const activeLocale = contextLocale ?? locale ?? DEFAULT_LOCALE;
   const copy = FOOTER_COPY[activeLocale] ?? FOOTER_COPY.en;
   const translate = (label: string) => LINK_TRANSLATIONS[activeLocale]?.[label] ?? label;
   const localizeHref = (href: string) => (/^[a-z]+:/i.test(href) ? href : prefixPathWithLocale(href, activeLocale));
