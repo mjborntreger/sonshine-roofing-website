@@ -1,6 +1,6 @@
 import Image from "next/image";
-import dynamic from "next/dynamic";
 import SmartLink from "@/components/utils/SmartLink";
+import FooterBadges from "@/components/global-nav/footer/FooterBadges";
 import {
   ArrowUpRight,
   ArrowUp,
@@ -83,16 +83,7 @@ const hoursStyles = "text-xs md:text-sm text-slate-600"
 
 const logoSrc = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp";
 
-const FooterBadges = dynamic(() => import("@/components/global-nav/footer/FooterBadges"), {
-  loading: () => (
-    <div
-      aria-hidden="true"
-      className="w-full h-24 my-10 rounded-lg animate-pulse bg-slate-300/40"
-    />
-  ),
-});
-
-export default function Footer({ locale = DEFAULT_LOCALE }: { locale?: Locale }) {
+export default function Footer({ locale }: { locale?: Locale }) {
   const activeLocale = locale ?? DEFAULT_LOCALE;
   const copy = FOOTER_COPY[activeLocale] ?? FOOTER_COPY.en;
   const translate = (label: string) => LINK_TRANSLATIONS[activeLocale]?.[label] ?? label;
@@ -242,17 +233,7 @@ export default function Footer({ locale = DEFAULT_LOCALE }: { locale?: Locale })
 
           </nav>
 
-          <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
-            <SmartLink
-              href={localizeHref("/reviews")}
-              className="px-3 py-2 text-sm text-white md:text-md btn btn-brand-orange"
-              data-icon-affordance="up-right"
-            >
-              <Star className="w-3 h-3 mr-2 text-white md:h-4 md:w-4" />
-              {copy.leaveReview}
-              <ArrowUpRight className="inline w-3 h-3 ml-1 text-white md:h-4 md:w-4 icon-affordance" />
-            </SmartLink>
-
+          <div className="flex flex-wrap justify-between gap-6 mt-24">
             {/* Socials Badges Row */}
             <div className="flex items-center gap-2">
               {SOCIALS.map((s) => {
@@ -272,28 +253,25 @@ export default function Footer({ locale = DEFAULT_LOCALE }: { locale?: Locale })
                 );
               })}
             </div>
-
+            <nav className="flex items-center justify-end gap-4 text-xs font-semibold text-slate-500">
+              <FooterLocaleSwitch locale={activeLocale} />
+              <SmartLink href={localizeHref(ROUTES.privacyPolicy)}>{translate("Privacy Policy")}</SmartLink>
+              <SmartLink href={localizeHref(ROUTES.sitemapIndex)}>{translate("XML Sitemap")}</SmartLink>
+            </nav>
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 mt-3 border-t border-slate-300">
-            <div className="text-xs text-slate-500">
+          <div className="pt-3 md:pt-6 mt-3 md:mt-6 border-t border-slate-300 text-xs text-slate-500">
+            <div>
               © {new Date().getFullYear()} SonShine Roofing — Since 1987 we’ve got you covered. | All Rights Reserved
             </div>
-
-            <nav className="flex items-center justify-end gap-4 text-xs font-semibold text-slate-500">
-              <SmartLink href={localizeHref(ROUTES.privacyPolicy)}>{translate("Privacy Policy")}</SmartLink>
-              <SmartLink href={localizeHref(ROUTES.sitemapIndex)}>{translate("XML Sitemap")}</SmartLink>
-              <FooterLocaleSwitch locale={activeLocale} />
-            </nav>
-          </div>
-          <div className="py-4">
-            <div className="text-xs font-semibold text-right text-slate-500">
+            <div className="py-4">
               <SmartLink href="https://michaelborntreger.life">Website created by: Michael Borntreger</SmartLink>
             </div>
           </div>
         </div>
       </footer>
+      <div className="bg-blue-300 h-[8px]" />
     </>
   );
 }

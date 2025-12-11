@@ -16,7 +16,7 @@ const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : us
 
 export default function Header({ locale }: { locale?: Locale }) {
   const contextLocale = useLocale();
-  const activeLocale = locale ?? contextLocale ?? DEFAULT_LOCALE;
+  const activeLocale = contextLocale ?? locale ?? DEFAULT_LOCALE;
   const ref = useRef<HTMLElement>(null);
   const pathname = usePathname() || "/";
   const { pathname: localeStrippedPath } = stripLocaleFromPath(pathname);
@@ -151,13 +151,13 @@ export default function Header({ locale }: { locale?: Locale }) {
       </div>
       <div
         className={cn(
-          "mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 transition-all duration-300 ease-in-out",
+          "mx-auto flex w-full max-w-7xl items-center justify-between gap-1 px-4 transition-all duration-300 ease-in-out",
           collapsed ? "py-[0.125rem]" : "py-[0.4rem]"
         )}
       >
         <SmartLink
           href={logoHref}
-          className={cn("flex items-center gap-2 transition-transform duration-200 ease-out",
+          className={cn("flex items-center gap-1 transition-transform duration-200 ease-out",
             collapsed ? "scale-[0.8]" : "scale-100"
           )}
             
@@ -173,10 +173,10 @@ export default function Header({ locale }: { locale?: Locale }) {
             loading="eager"
             priority
             fetchPriority="high"
-            className="h-[40px]"
+            className="h-[40px] w-[96px]"
           />
         </SmartLink>
-        <NavMenu transparent={isTransparent} locale={locale} />
+        <NavMenu transparent={isTransparent} locale={activeLocale} />
       </div>
     </header>
   );

@@ -8,5 +8,5 @@ type FooterLocaleSwitchProps = {
 };
 
 export function FooterLocaleSwitch({ locale }: FooterLocaleSwitchProps) {
-  return <LanguageToggle locale={locale} variant="footer" />;
+  return <LanguageToggle locale={locale} />;
 }

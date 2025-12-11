@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useMemo } from "react";
-import { DEFAULT_LOCALE, type Locale } from "./locale";
+import { usePathname } from "next/navigation";
+import { DEFAULT_LOCALE, getLocaleFromPath, type Locale } from "./locale";
 
 type LocaleContextValue = {
   locale: Locale;
@@ -15,7 +16,10 @@ type LocaleProviderProps = {
 };
 
 export function LocaleProvider({ value, children }: LocaleProviderProps) {
-  const contextValue = useMemo<LocaleContextValue>(() => ({ locale: value }), [value]);
+  const pathname = usePathname();
+  const pathLocale = useMemo<Locale>(() => getLocaleFromPath(pathname), [pathname]);
+  const activeLocale = pathLocale ?? value ?? DEFAULT_LOCALE;
+  const contextValue = useMemo<LocaleContextValue>(() => ({ locale: activeLocale }), [activeLocale]);
   return <LocaleContext.Provider value={contextValue}>{children}</LocaleContext.Provider>;
 }
 

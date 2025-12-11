@@ -58,11 +58,11 @@ const NAV_LABEL_TRANSLATIONS: Record<Locale, Record<string, string>> = {
   es: {
     About: "Acerca de",
     "Roofing Services": "Servicios",
-    "Roof Replacement": "Reemplazo de techo",
+    "Roof Replacement": "Instalación de techo",
     "Roof Repair": "Reparación de techo",
     "Roof Inspection": "Inspección de techo",
     "Roof Maintenance": "Mantenimiento de techo",
-    "Our Work": "Nuestra obra",
+    "Our Work": "Obra",
     "Project Gallery": "Galeria de proyectos",
     "Video Library": "Videoteca",
     Blog: "Blog",
@@ -507,7 +507,7 @@ function MobileMenu({ locale }: { locale: Locale }) {
   const homeLabel = translateLabel("Home", locale);
 
   return (
-    <div className="lg:hidden ml-auto">
+    <div className="lg:hidden ml-auto flex items-center gap-2">
       <button
         type="button"
         ref={buttonRef}
@@ -706,9 +706,9 @@ type NavMenuProps = {
   locale?: Locale;
 };
 
-export function NavMenu({ transparent, locale = DEFAULT_LOCALE }: NavMenuProps) {
+export function NavMenu({ transparent, locale }: NavMenuProps) {
   const contextLocale = useLocale();
-  const activeLocale = locale ?? contextLocale ?? DEFAULT_LOCALE;
+  const activeLocale = contextLocale ?? locale ?? DEFAULT_LOCALE;
   return (
     <nav className="ml-auto flex items-center gap-3">
       <DesktopMenu transparent={transparent} locale={activeLocale} />
