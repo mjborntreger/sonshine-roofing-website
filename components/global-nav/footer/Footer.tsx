@@ -4,7 +4,6 @@ import FooterBadges from "@/components/global-nav/footer/FooterBadges";
 import {
   ArrowUpRight,
   ArrowUp,
-  Star,
   Facebook,
   Instagram,
   Youtube,
