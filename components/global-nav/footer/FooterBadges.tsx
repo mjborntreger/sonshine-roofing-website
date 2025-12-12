@@ -51,21 +51,11 @@ const badges = [
     title: "Expertise.com",
     src: "https://res.cloudinary.com/expertise-com/image/upload/remote_media/awards/fl_sarasota_roofing_2025_transparent.svg",
   },
-  {
-    href: "https://tricountymetals.com",
-    title: "Official Tri-County Metals Installer",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/tri-county-metals-logo-transparent-bg.webp",
-  },
-  {
-    href: "https://modernize.com",
-    title: "Modernize Home Services",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/modernizelogo-bg-transparent-ezgif.com-optiwebp.webp",
-  },
 ];
 
 export default function FooterBadges() {
   return (
-    <div className="mx-auto max-w-6xl px-10 grid grid-cols-3 lg:grid-cols-11 place-items-center justify-center gap-3 my-20">
+    <div className="mx-auto max-w-6xl px-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 place-items-center justify-center gap-3 my-20">
       {badges.map((badge) => (
         <SmartLink
           key={badge.href}
