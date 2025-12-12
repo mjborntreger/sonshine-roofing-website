@@ -1,13 +1,11 @@
 // app/[slug]/page.tsx
 import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
-import { cn } from "@/lib/utils";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import Image from "next/image";
 import Section from "@/components/layout/Section";
 import SmartLink from "@/components/utils/SmartLink";
 import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/content/wp";
 import type { Metadata } from "next";
-import { buttonVariants } from "@/components/ui/button";
 import TocFromHeadings from "@/components/global-nav/static-pages/TocFromHeadings";
 import { notFound } from "next/navigation";
 import { buildArticleMetadata } from "@/lib/seo/meta";
