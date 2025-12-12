@@ -142,45 +142,6 @@ function decorateExternalAnchors(html: string, baseHost: string) {
   });
 }
 
-// Inject CTA after the 3rd paragraph (server-side, hydration-safe)
-function injectCtaAfterNthParagraph(html: string, n = 3) {
-  const btn = cn(buttonVariants({ variant: "brandOrange" }), "justify-end"); // add { size: "sm" } if you want
-
-  const cta = `
-<div class="my-8 rounded-3xl border border-blue-200 bg-white p-6 shadow-sm relative overflow-hidden">
-  <span class="pointer-events-none absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]"></span>
-  <h3 class="m-0 text-xl text-slate-900">Take the first step</h3>
-  <p class="mt-2 text-slate-600 italic">Schedule a fast, no-pressure visit. Since 1987 we’ve got you covered.</p>
-  <a
-    href="/contact-us/#book-an-appointment"
-    data-button="true"
-    class="${btn} mt-4 items-center no-underline"
-    data-icon-affordance="right"
-  >
-    Get started
-    <svg
-      xmlns="https://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      class="h-4 w-4 icon-affordance inline ml-2"
-      aria-hidden="true"
-    >
-      <path d="M5 12h14" />
-      <path d="m12 5 7 7-7 7" />
-    </svg>
-  </a>
-</div>  
-`.trim();
-
-  let count = 0;
-  return html.replace(/<\/p>/gi, (m) => (++count === n ? `${m}\n${cta}` : m));
-}
 
 // -------- Static params --------
 export async function generateStaticParams() {
@@ -282,11 +243,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     origin,
   });
 
-  // Build TOC + decorate + inject CTA (all on the server)
-  const safeHtml = sanitizeHtml(post.contentHtml || "");
-  const withIds = ensureHeadingIds(safeHtml);
-  const withAnchors = decorateExternalAnchors(withIds, new URL(origin).hostname);
-  const htmlWithCta = injectCtaAfterNthParagraph(withAnchors, 3);
+  // Build TOC + decorate (all on the server)
+  const articleHtml = decorateExternalAnchors(
+    ensureHeadingIds(sanitizeHtml(post.contentHtml || "")),
+    new URL(origin).hostname,
+  );
 
   // prev/next using lightweight nav list (slug + title + date)
   const idx = all.findIndex((p) => p.slug === slug);
@@ -346,7 +307,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
 
         {/* Layout: content + TOC */}
-        <div className="grid lg:mt-4 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="grid lg:mt-4 grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px]">
           <TocFromHeadings
             root="#article-root"
             levels={[2, 3]}
@@ -357,7 +318,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <article
             id="article-root"
             className="px-2 prose"
-            dangerouslySetInnerHTML={{ __html: htmlWithCta }}
+            dangerouslySetInnerHTML={{ __html: articleHtml }}
           />
 
           {/* Sidebar (desktop, sticky) */}
