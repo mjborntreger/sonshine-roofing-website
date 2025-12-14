@@ -85,7 +85,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'retail',
-    label: 'Roof replacement or new construction',
+    label: 'Roof Replacement',
     description: 'Ready for a full re-roof and want a free estimate / compare options',
     icon: Hammer,
     accent: 'border-amber-200 bg-amber-50 text-amber-600',
@@ -95,7 +95,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'maintenance',
-    label: 'Roof inspections, maintenance',
+    label: 'Roof Inspection',
     description: 'Light roof repair, annual roof inspections, real estate inspections, prepare my roof for hurricane season',
     icon: Wrench,
     accent: 'border-emerald-200 bg-emerald-50 text-emerald-600',
@@ -105,7 +105,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'financing-link',
-    label: 'Flexible financing options',
+    label: 'Flexible Financing',
     description: 'Payment deferrals, flexible pay schedule, low APR, fast approval, home-secured options',
     icon: HandCoins,
     accent: 'border-sky-200 bg-sky-50 text-sky-600',
@@ -116,7 +116,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'project-gallery',
-    label: 'See our past work',
+    label: 'See Our Past Work',
     description: 'Browse our roofing project gallery, learn more about material and color options for our new roof installations in Sarasota, Bradenton, Venice, North Port, and beyond',
     icon: Star,
     accent: 'border-purple-200 bg-purple-50 text-purple-600',
@@ -420,6 +420,11 @@ export function restoreLeadSuccessState(rawCookie?: string | null): LeadSuccessR
     typeof parsed.timelineLabel === 'string' && parsed.timelineLabel
       ? parsed.timelineLabel
       : getTimelineLabelForDisplay(projectType, timeline);
+  const notes = typeof parsed.notes === 'string' ? parsed.notes : null;
+  const roofTypeLabel =
+    typeof parsed.roofTypeLabel === 'string' && parsed.roofTypeLabel
+      ? parsed.roofTypeLabel
+      : null;
 
   return {
     formPreset: {
@@ -431,6 +436,8 @@ export function restoreLeadSuccessState(rawCookie?: string | null): LeadSuccessR
       projectType,
       helpTopicLabels,
       timelineLabel: timelineLabel || null,
+      notes,
+      roofTypeLabel,
     },
   };
 }

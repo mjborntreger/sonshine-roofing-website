@@ -22,6 +22,11 @@ const SUCCESS_LINK_ICON_WRAPPER_CLASS =
 
 export default function LeadFormSuccess({ successMeta, onReset, maxWidthClassName = 'max-w-3xl' }: LeadFormSuccessProps) {
   const successLinks = useMemo(() => getSuccessLinks(successMeta.projectType), [successMeta.projectType]);
+  const hasSharedDetails =
+    Boolean(successMeta.timelineLabel) ||
+    successMeta.helpTopicLabels.length > 0 ||
+    Boolean(successMeta.roofTypeLabel) ||
+    Boolean(successMeta.notes);
 
   return (
     <div className="mt-8 flex justify-center px-4">
@@ -42,7 +47,7 @@ export default function LeadFormSuccess({ successMeta, onReset, maxWidthClassNam
             </a>
             .
           </p>
-          {(successMeta.helpTopicLabels.length || successMeta.timelineLabel) && (
+          {hasSharedDetails && (
             <div className="mt-6 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-left">
               <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-600">What you shared</h4>
               {successMeta.timelineLabel && (
@@ -60,6 +65,17 @@ export default function LeadFormSuccess({ successMeta, onReset, maxWidthClassNam
                   </ul>
                 </div>
               ) : null}
+              {successMeta.roofTypeLabel && (
+                <p className="mt-3 text-sm text-slate-600">
+                  <span className="font-semibold text-slate-700">Roof type:</span> {successMeta.roofTypeLabel}
+                </p>
+              )}
+              {successMeta.notes && (
+                <div className="mt-3">
+                  <p className="text-sm font-semibold text-slate-700">Notes:</p>
+                  <p className="mt-2 whitespace-pre-line text-sm text-slate-600">{successMeta.notes}</p>
+                </div>
+              )}
             </div>
           )}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">

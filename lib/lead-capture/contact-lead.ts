@@ -30,6 +30,8 @@ export type LeadSuccessCookiePayload = {
   helpTopicLabels?: string[];
   timeline?: string;
   timelineLabel?: string;
+  notes?: string;
+  roofTypeLabel?: string;
   timestamp?: string;
 };
 
@@ -37,6 +39,8 @@ export interface SuccessMeta {
   projectType: string;
   helpTopicLabels: string[];
   timelineLabel: string | null;
+  notes: string | null;
+  roofTypeLabel: string | null;
 }
 
 export type ContactLeadResourceLink = NonNullable<ContactLeadInput['resourceLinks']>[number];
@@ -243,6 +247,14 @@ export function parseLeadSuccessCookie(rawCookie?: string | null): LeadSuccessCo
 
     if (typeof parsed.timelineLabel === 'string') {
       payload.timelineLabel = parsed.timelineLabel;
+    }
+
+    if (typeof parsed.notes === 'string') {
+      payload.notes = parsed.notes;
+    }
+
+    if (typeof parsed.roofTypeLabel === 'string') {
+      payload.roofTypeLabel = parsed.roofTypeLabel;
     }
 
     if (typeof parsed.timestamp === 'string') {

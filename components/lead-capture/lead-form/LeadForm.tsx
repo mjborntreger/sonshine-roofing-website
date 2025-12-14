@@ -105,7 +105,7 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
   return (
     <div id="get-started">
       {!showWizard && (
-        <div className="px-4 py-16 mb-8" ref={containerRef}>
+        <div className="px-4 py-16" ref={containerRef}>
           <LeadFormStepShell
             stepLabel="Step 1 of 4"
             title={stepZeroHeading}
@@ -113,9 +113,9 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
             bottomSlot={renderNavigationControls()}
           >
             {renderNavigationControls('mb-6')}
-            <p className="text-slate-600 inline-flex mt-2 mb-4 text-xs">Select an option, then hit &ldquo;continue.&rdquo;</p>
+            <p className="text-slate-600 inline-flex mt-2 mb-4 text-sm sm:text-base">Select an option, then hit &ldquo;continue.&rdquo;</p>
 
-            <div className="grid gap-4 1 md:grid-cols-3">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
               {PROJECT_OPTIONS.map((option) => {
                 const { value, action, href } = option;
                 const journeyValue = isJourneyKey(value) ? value : null;

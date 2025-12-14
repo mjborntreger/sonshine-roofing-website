@@ -93,7 +93,7 @@ export default function LatestPostsFilter({
   const renderedHeading = renderHighlight(heading, "Roofing Insights");
 
   return (
-    <div className="px-4 max-w-[1600px] mx-auto">
+    <div className="mt-24 px-4 max-w-[1600px] mx-auto">
       {showHeader ? (
         <div className="text-center">
           <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>

@@ -98,6 +98,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         <div className="bg-blue-200/50 border border-t-blue-300 border-b-blue-300">
           <ReviewsCarousel />
         </div>
+        <LeadFormSection />
       </div>
       <div className={narrowLayout}>
         <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] max-w-[1280px] mx-auto items-start">
@@ -123,7 +124,6 @@ export default async function Page({ params }: { params: Promise<Params> }) {
       <div className={leadFormLayout}>
         <div className="max-w-[1280px] pt-16 mx-auto">
           <LatestProjectsFilter projects={projects} initial={4} />
-          <LeadFormSection />
           <LatestPostsFilters posts={posts} initial={4} />
         </div>
       </div>

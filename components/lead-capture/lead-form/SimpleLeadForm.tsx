@@ -143,11 +143,18 @@ function buildSuccessMetaFromPayload(payload: LeadSuccessCookiePayload): Success
     typeof payload.timelineLabel === 'string' && payload.timelineLabel
       ? payload.timelineLabel
       : getTimelineLabelForDisplay(payload.projectType, payload.timeline || '') || null;
+  const notes = typeof payload.notes === 'string' ? payload.notes : null;
+  const roofTypeLabel =
+    typeof payload.roofTypeLabel === 'string' && payload.roofTypeLabel
+      ? payload.roofTypeLabel
+      : null;
 
   return {
     projectType: payload.projectType,
     helpTopicLabels,
     timelineLabel,
+    notes,
+    roofTypeLabel,
   };
 }
 
@@ -293,6 +300,8 @@ export default function SimpleLeadForm() {
       helpTopicLabels: [],
       timeline: form.timeline,
       timelineLabel: timelineLabel || undefined,
+      notes: notes || undefined,
+      roofTypeLabel: roofTypeLabel || undefined,
       timestamp: new Date().toISOString(),
     };
     persistLeadSuccessCookie(successPayload);
