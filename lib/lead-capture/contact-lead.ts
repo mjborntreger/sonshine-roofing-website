@@ -167,6 +167,12 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
 
   const trimmedNotes = notes?.trim();
   const projectTypeValue = projectType?.trim();
+  const address1Value = address.address1.trim();
+  const address2Value = address.address2?.trim();
+  const cityValue = address.city.trim();
+  const stateValue = normalizeState(address.state ?? '');
+  const zipValue = normalizeZip(address.zip ?? '');
+
   const payload: ContactLeadCorePayload = {
     type: 'contact-lead',
     projectType: projectTypeValue || undefined,
@@ -181,18 +187,13 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
     bestTime: bestTimeLabel?.trim() || undefined,
     consentSms: Boolean(consentSms),
     page,
+    address1: address1Value,
+    city: cityValue,
+    state: stateValue,
+    zip: zipValue,
   };
 
-  const address1Value = address.address1.trim();
-  payload.address1 = address1Value;
-  const address2Value = address.address2?.trim();
   if (address2Value) payload.address2 = address2Value;
-  const cityValue = address.city.trim();
-  payload.city = cityValue;
-  const stateValue = normalizeState(address.state ?? '');
-  payload.state = stateValue;
-  const zipValue = normalizeZip(address.zip ?? '');
-  payload.zip = zipValue;
 
   if (resourceLinks && resourceLinks.length) {
     payload.resourceLinks = resourceLinks.map((link) => ({
