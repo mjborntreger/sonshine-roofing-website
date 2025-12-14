@@ -57,7 +57,7 @@ export default function LocalPartnershipsSection({
               </div>
               {feature.contentHtml ? (
                 <div
-                  className="space-y-2 text-sm text-slate-600"
+                  className="space-y-2 text-lg text-slate-600"
                   dangerouslySetInnerHTML={{ __html: feature.contentHtml }}
                 />
               ) : null}

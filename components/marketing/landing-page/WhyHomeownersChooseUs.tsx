@@ -19,7 +19,7 @@ import {
 
 const SECTION_CONTAINER = "px-2";
 const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
-const SECTION_SUBTITLE = "mt-4 mb-8 text-sm text-slate-500"
+const SECTION_SUBTITLE = "mt-4 mb-8 md:text-lg text-slate-500"
 const FEATURE_PILL_CLASS = "inline-flex items-center gap-2 badge badge--accent";
 const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
 const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
@@ -28,7 +28,7 @@ const CARD_SHELL_BASE = "overflow-hidden rounded-3xl bg-white/95 backdrop-blur-s
 const ACCORDION_SHELL_BASE = `group ${CARD_SHELL_BASE}`;
 const CARD_SUMMARY_BASE = "flex cursor-pointer select-none items-center justify-between gap-3 rounded-t-3xl px-6 py-5 text-left text-lg font-semibold text-slate-900 transition-colors";
 const CARD_HEADER_BASE = "flex items-center gap-3 rounded-t-4xl px-6 pt-6 pb-4 text-lg font-semibold text-slate-900";
-const CARD_BODY_BASE = "flex-1 rounded-b-4xl px-6 pb-6 pt-4 text-sm leading-relaxed";
+const CARD_BODY_BASE = "flex-1 rounded-b-4xl md:text-lg px-6 pb-6 pt-4 leading-relaxed";
 const ICON_BASE = "grid h-10 w-10 place-items-center rounded-full transition-transform duration-200";
 const CHEVRON_BASE =
   "h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open/accordion:rotate-180";
@@ -202,7 +202,7 @@ export default async function WhyHomeownersChooseUs({
                   <div className="flex justify-end mt-6">
                     <SmartLink
                       href={pillar.cta.href}
-                      className="mt-2 btn btn-brand-orange btn-md btn-press"
+                      className="mt-2 btn btn-brand-orange btn-lg btn-press"
                       title={pillar.cta.title}
                       data-icon-affordance="right"
                     >

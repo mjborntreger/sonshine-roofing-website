@@ -4,13 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 
 // STYLES
   const baseStyles =
-    'inline-flex w-fit items-center gap-2 rounded-xl border px-2.5 py-1 text-sm font-medium';
+    'inline-flex w-fit items-center gap-2 rounded-xl border px-2.5 py-1 font-medium';
   const openStyles =
     'border-green-200 bg-green-50 text-green-700';
   const closedStyles =
     'border-red-200 bg-red-50 text-red-700';
   const helperTextStyles = 
-    'block my-1 text-xs text-slate-500';
+    'block my-1 text-sm text-slate-500';
 
 type Interval = { open: string; close: string }; // 24h "HH:mm"
 type WeeklyHours = Record<number, Interval[]>; // 0 = Sunday ... 6 = Saturday

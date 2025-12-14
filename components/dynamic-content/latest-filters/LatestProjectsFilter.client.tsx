@@ -13,7 +13,7 @@ import {
 import { renderHighlight } from "@/components/utils/renderHighlight";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
-const pStyles = "mt-4 mb-6 text-slate-500 text-center justify-center text-sm md:text-md";
+const pStyles = "mt-4 mb-6 text-slate-500 text-center justify-center md:text-lg";
 
 type TabPayload = {
   key: MaterialKey;
@@ -121,7 +121,7 @@ export default function LatestProjectsFilter({
         </div>
       )}
 
-      <div key={selected} className="grid gap-6 mt-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+      <div key={selected} className="grid gap-6 mt-8 grid-cols-1 sm:grid-cols-2">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];

@@ -13,7 +13,7 @@ import {
 import { renderHighlight } from "@/components/utils/renderHighlight";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
-const pStyles = "my-4 mb-6 text-center text-slate-500 justify-center text-sm md:text-md";
+const pStyles = "my-4 mb-6 text-center text-slate-500 justify-center md:text-lg";
 
 type TabPayload = {
   key: CategoryKey;
