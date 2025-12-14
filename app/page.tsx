@@ -100,7 +100,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         </div>
       </div>
       <div className={narrowLayout}>
-        <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] max-w-[1280px] mx-auto items-start">
+        <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] max-w-[1280px] mx-auto items-start">
           <div className="min-w-0">
             <div className="mx-2">
               <WhyHomeownersChooseUs highlightText="Family-owned" />
