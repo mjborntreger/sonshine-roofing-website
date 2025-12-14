@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import Skeleton from "@/components/ui/Skeleton";
 import type { WpImage } from "@/lib/content/wp";
+import { useQuickQuoteHidden } from "@/lib/quickquote";
 import { PROJECT_GALLERY_DEFAULT_HEIGHT, PROJECT_GALLERY_DEFAULT_WIDTH } from "./galleryConfig";
 
 type ProjectGalleryProps = {
@@ -33,6 +34,8 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
   const hasImages = totalImages > 0;
   const isOpen = activeIndex !== null;
   const currentImage = typeof activeIndex === "number" ? images[activeIndex] : null;
+
+  useQuickQuoteHidden(isOpen);
 
   React.useEffect(() => {
     setMounted(true);

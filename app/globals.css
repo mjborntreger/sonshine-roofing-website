@@ -55,6 +55,21 @@
     padding-right: var(--scroll-lock-offset);
     margin-right: calc(-1 * var(--scroll-lock-offset));
   }
+
+  html.nav-locked,
+  body.nav-locked {
+    overflow: hidden;
+    touch-action: none;
+    overscroll-behavior: contain;
+  }
+
+  html.qq-hide-quickquote .qq-slideout-trigger,
+  html.qq-hide-quickquote #qq-slideout-portal-root,
+  html.qq-hide-quickquote .qq-slideout-root,
+  html.qq-hide-quickquote .qq-slideout-overlay,
+  html.qq-hide-quickquote .qq-slideout-panel {
+    display: none !important;
+  }
 }
 
 /* ---------------------------------------

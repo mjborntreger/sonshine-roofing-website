@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { Eye, X } from "lucide-react";
+import { useQuickQuoteHidden } from "@/lib/quickquote";
 
 type Props = {
   title: string;
@@ -21,6 +22,8 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
   useEffect(() => { setMounted(true); }, []);
 
   const scrollYRef = useRef(0);
+
+  useQuickQuoteHidden(open);
 
   // focus trap refs
   const modalRef = useRef<HTMLDivElement | null>(null);

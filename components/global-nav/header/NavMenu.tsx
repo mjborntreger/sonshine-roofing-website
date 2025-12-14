@@ -54,6 +54,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
 const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);
 const CONTACT_LABELS = new Set(["Contact", "Contact Us"]);
 const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
+const NAV_SCROLL_LOCK_CLASS = "nav-locked";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
   const prefersReducedMotion = useReducedMotion();
@@ -375,18 +376,6 @@ function MobileMenu() {
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // lock scroll when open
-  const prevOverflow = useRef<string>("");
-  useEffect(() => {
-    if (open) {
-      prevOverflow.current = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = prevOverflow.current || "";
-    }
-    return () => { document.body.style.overflow = prevOverflow.current || ""; };
-  }, [open]);
-
   // Close on click outside or ESC
   useEffect(() => {
     if (!open) return;
@@ -422,6 +411,24 @@ function MobileMenu() {
       return () => cancelAnimationFrame(id);
     }
     setEnteredTop(false);
+  }, [open]);
+
+  // lock scroll via class to avoid conflicting inline styles
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    const body = document.body;
+    if (open) {
+      root.classList.add(NAV_SCROLL_LOCK_CLASS);
+      body.classList.add(NAV_SCROLL_LOCK_CLASS);
+    } else {
+      root.classList.remove(NAV_SCROLL_LOCK_CLASS);
+      body.classList.remove(NAV_SCROLL_LOCK_CLASS);
+    }
+    return () => {
+      root.classList.remove(NAV_SCROLL_LOCK_CLASS);
+      body.classList.remove(NAV_SCROLL_LOCK_CLASS);
+    };
   }, [open]);
 
   const toggle = (key: string) =>
