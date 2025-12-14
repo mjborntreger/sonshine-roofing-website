@@ -92,11 +92,11 @@ export type ContactIdentityDraft = {
 };
 
 export type ContactAddressDraft = {
-  address1?: string;
+  address1: string;
   address2?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
+  city: string;
+  state: string;
+  zip: string;
 };
 
 export type ContactLeadPayloadDraft = {
@@ -131,10 +131,18 @@ export function validateContactAddressDraft(draft: ContactAddressDraft): Record<
   const stateValue = normalizeState(stateValueRaw);
   const zipValue = normalizeZip(zipValueRaw);
 
-  if (draft.address1 && !draft.address1.trim()) errors.address1 = 'Enter your street address.';
-  if (draft.city && !draft.city.trim()) errors.city = 'City is required.';
-  if (stateValueRaw.trim() && !isValidState(stateValue)) errors.state = 'Use the two-letter state code.';
-  if (zipValueRaw.trim() && !isValidZip(zipValue)) errors.zip = 'ZIP should be 5 digits.';
+  if (!draft.address1 || !draft.address1.trim()) errors.address1 = 'Enter your street address.';
+  if (!draft.city || !draft.city.trim()) errors.city = 'Enter your city.';
+  if (!stateValueRaw.trim()) {
+    errors.state = 'State is required.';
+  } else if (!isValidState(stateValue)) {
+    errors.state = 'Use the two-letter state code.';
+  }
+  if (!zipValueRaw.trim()) {
+    errors.zip = 'ZIP is required.';
+  } else if (!isValidZip(zipValue)) {
+    errors.zip = 'ZIP should be 5 digits.';
+  }
   return errors;
 }
 
@@ -175,16 +183,16 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
     page,
   };
 
-  const address1Value = address.address1?.trim();
-  if (address1Value) payload.address1 = address1Value;
+  const address1Value = address.address1.trim();
+  payload.address1 = address1Value;
   const address2Value = address.address2?.trim();
   if (address2Value) payload.address2 = address2Value;
-  const cityValue = address.city?.trim();
-  if (cityValue) payload.city = cityValue;
+  const cityValue = address.city.trim();
+  payload.city = cityValue;
   const stateValue = normalizeState(address.state ?? '');
-  if (stateValue) payload.state = stateValue;
+  payload.state = stateValue;
   const zipValue = normalizeZip(address.zip ?? '');
-  if (zipValue) payload.zip = zipValue;
+  payload.zip = zipValue;
 
   if (resourceLinks && resourceLinks.length) {
     payload.resourceLinks = resourceLinks.map((link) => ({

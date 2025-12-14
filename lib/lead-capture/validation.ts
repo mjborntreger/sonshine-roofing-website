@@ -298,25 +298,16 @@ const leadContactSchema = leadBaseSchema
     preferredContact: optionalTrimmedString(MAX_CONTACT_PREF),
     bestTime: optionalTrimmedString(MAX_CONTACT_PREF),
     consentSms: z.boolean().optional(),
-    address1: optionalTrimmedString(MAX_FINANCING_ADDRESS),
+    address1: z
+      .preprocess(trim, z.string().min(1, 'Address is required').max(MAX_FINANCING_ADDRESS)),
     address2: optionalTrimmedString(MAX_FINANCING_ADDRESS),
-    city: optionalTrimmedString(MAX_FINANCING_CITY),
+    city: z.preprocess(trim, z.string().min(1, 'City is required').max(MAX_FINANCING_CITY)),
     state: z
-      .preprocess((value) => {
-        if (typeof value !== 'string') return undefined;
-        const trimmed = value.trim();
-        return trimmed ? trimmed : undefined;
-      }, z.string().min(2, 'State must be two letters').max(MAX_FINANCING_STATE))
-      .refine((value) => /^[A-Za-z]{2}$/.test(String(value)), { message: 'State must be two letters' })
-      .optional(),
+      .preprocess(trim, z.string().min(2, 'State is required').max(MAX_FINANCING_STATE))
+      .refine((value) => /^[A-Za-z]{2}$/.test(String(value)), { message: 'State must be two letters' }),
     zip: z
-      .preprocess((value) => {
-        if (typeof value !== 'string') return undefined;
-        const trimmed = value.trim();
-        return trimmed ? trimmed : undefined;
-      }, z.string().max(MAX_FINANCING_ZIP))
-      .refine((value) => digitsOnly(value).length === 5, { message: 'ZIP must be 5 digits' })
-      .optional(),
+      .preprocess(trim, z.string().min(1, 'ZIP is required').max(MAX_FINANCING_ZIP))
+      .refine((value) => digitsOnly(value).length === 5, { message: 'ZIP must be 5 digits' }),
     resourceLinks: z.array(contactResourceLinkSchema).max(10).optional(),
   })
   .passthrough();

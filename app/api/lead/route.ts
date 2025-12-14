@@ -250,6 +250,15 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
     page: data.page || `/special-offers/${data.offerSlug}`,
   };
 
+  const passthroughAddressFields = ['address1', 'city', 'state', 'zip'] as const;
+  const extraFields = data as Record<string, unknown>;
+  for (const field of passthroughAddressFields) {
+    const value = extraFields[field];
+    if (typeof value === 'string') {
+      payload[field] = value;
+    }
+  }
+
   attachTracking(payload, data);
 
   return payload;
@@ -267,26 +276,29 @@ function buildContactPayload(data: ContactLeadInput) {
     email: data.email,
     phone: data.phone,
     phoneDisplay,
-    projectType: data.projectType || '',
-    helpTopics: data.helpTopics || '',
-    timeline: data.timeline || '',
-    notes: data.notes || '',
     preferredContact: data.preferredContact || DEFAULT_PREFERRED_CONTACT,
-    bestTime: data.bestTime || '',
     consentSms: Boolean(data.consentSms),
-    address1: data.address1 || '',
-    address2: data.address2 || '',
-    city: data.city || '',
-    state: data.state || '',
-    zip: data.zip || '',
+    address1: data.address1,
+    city: data.city,
+    state: data.state,
+    zip: data.zip,
     page: data.page || '/contact-us',
-    resourceLinks: (data.resourceLinks || []).map((link) => ({
+  };
+
+  if (data.projectType) payload.projectType = data.projectType;
+  if (data.helpTopics) payload.helpTopics = data.helpTopics;
+  if (data.timeline) payload.timeline = data.timeline;
+  if (data.notes) payload.notes = data.notes;
+  if (data.address2) payload.address2 = data.address2;
+  if (data.bestTime) payload.bestTime = data.bestTime;
+  if (data.resourceLinks?.length) {
+    payload.resourceLinks = data.resourceLinks.map((link) => ({
       label: link.label,
       description: link.description || '',
       href: link.href,
       external: Boolean(link.external),
-    })),
-  };
+    }));
+  }
 
   attachTracking(payload, data);
 

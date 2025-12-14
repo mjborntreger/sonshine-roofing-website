@@ -585,7 +585,7 @@ export default function LeadFormWizard({
         return {
           title: 'Where are you located?',
           highlightText: 'Where',
-          description: 'Share the service address and the best time to connect (optional).',
+          description: 'Share the service address and the best time to connect (time optional).',
         };
       default:
         return { title: '', description: '', highlightText: null };
@@ -981,11 +981,12 @@ export default function LeadFormWizard({
               {activeStepId === 'schedule' && (
                 <div className="grid gap-4 py-2 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700 md:col-span-2">
-                    Street address (optional)
+                    Street address*
                     <input
                       type="text"
                       name="address1"
                       autoComplete="street-address"
+                      required
                       value={form.address1}
                       onChange={(event) => onSelect('address1', event.target.value)}
                       className={cn(
@@ -1010,11 +1011,12 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    City (optional)
+                    City*
                     <input
                       type="text"
                       name="city"
                       autoComplete="address-level2"
+                      required
                       value={form.city}
                       onChange={(event) => onSelect('city', event.target.value)}
                       className={cn(
@@ -1027,11 +1029,12 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    State (optional)
+                    State*
                     <input
                       type="text"
                       name="state"
                       autoComplete="address-level1"
+                      required
                       value={form.state}
                       onChange={(event) => onSelect('state', normalizeState(event.target.value))}
                       className={cn(
@@ -1045,13 +1048,14 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    ZIP (optional)
+                    ZIP*
                     <input
                       type="text"
                       name="zip"
                       inputMode="numeric"
                       maxLength={5}
                       autoComplete="postal-code"
+                      required
                       value={form.zip}
                       onChange={(event) => onSelect('zip', normalizeZip(event.target.value))}
                       className={cn(
