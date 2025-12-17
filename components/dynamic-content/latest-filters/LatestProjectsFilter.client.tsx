@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import FilterTabs from "@/components/dynamic-content/FilterTabs";
 import SmartLink from "@/components/utils/SmartLink";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeftRight, ArrowRight } from "lucide-react";
 import {
   PROJECT_TAB_CONFIG,
   type MaterialKey,
@@ -77,7 +77,7 @@ export default function LatestProjectsFilter({
   }, [selected, tabs]);
 
   const renderFilterTabs = () => (
-    <div className={`flex justify-center ${showHeader ? "mt-6" : "mb-8"}`}>
+    <div className={`flex justify-center ${showHeader ? "mt-3" : "mb-8"}`}>
       <FilterTabs
         tabs={computedTabs}
         activeKey={selected}
@@ -99,7 +99,11 @@ export default function LatestProjectsFilter({
           <h2 className={SECTION_HEADING}>{renderedHeading}</h2>
           <div className="max-w-3xl mx-auto text-center">
             <p className={SECTION_SUBTITLE}>{description}</p>
-          </div>   
+          </div>
+          <p className="text-slate-500 text-xs leading-none uppercase font-semibold">
+            <ArrowLeftRight className="h-3 w-3 mr-1 text-[--brand-blue] inline" />
+            Filter by Material
+          </p>   
           {renderFilterTabs()}
         </div>
       ) : (
