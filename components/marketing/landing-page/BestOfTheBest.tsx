@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { BestOfTheBestVideo } from "@/components/marketing/landing-page/BestOfTheBestVideo";
+import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
 
 
@@ -36,10 +37,10 @@ export default async function bestOfTheBest({
         id="botb-title"
       >
         <div className="text-center">
-          <h2 className="text-3xl md:text-5xl text-slate-700">
+          <h2 className={SECTION_HEADING}>
             {renderedTitle}
           </h2>
-          <p className="mt-2 mb-8 md:text-lg text-slate-500" >SonShine Roofing is a five-time winner of the National Best of the Best Award which recognizes local roofing contractors with excellent reviews, top-rated customer service, and superior workmanship.</p>
+          <p className={SECTION_SUBTITLE} >SonShine Roofing is a five-time winner of the National Best of the Best Award which recognizes local roofing contractors with excellent reviews, top-rated customer service, and superior workmanship.</p>
         </div>
       </div>
 

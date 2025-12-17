@@ -183,9 +183,9 @@
     @apply text-slate-900;
   }
   h1 { @apply text-5xl md:text-6xl lg:text-7xl tracking-tight leading-loose; }
-  h2 { @apply text-3xl md:text-4xl lg:text-5xl leading-relaxed; }
-  h3 { @apply text-xl md:text-2xl lg:text-3xl leading-relaxed; }
-  h4 { @apply md:text-lg lg:text-xl leading-relaxed; }
+  h2 { @apply text-4xl md:text-5xl lg:text-6xl leading-relaxed; }
+  h3 { @apply text-3xl md:text-4xl lg:text-5xl leading-relaxed; }
+  h4 { @apply text-2xl md:text-3xl lg:text-4xl leading-relaxed; }
 
   /* Cards */
   .card { @apply rounded-2xl border border-blue-200 bg-amber-50/50; box-shadow: var(--elev-1); }

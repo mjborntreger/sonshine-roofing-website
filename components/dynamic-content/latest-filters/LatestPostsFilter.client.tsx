@@ -11,9 +11,9 @@ import {
   type TabConfig,
 } from "@/components/dynamic-content/latest-filters/latest-tab-config";
 import { renderHighlight } from "@/components/utils/renderHighlight";
+import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
-const pStyles = "my-4 mb-6 text-center text-slate-500 justify-center md:text-lg";
 
 type TabPayload = {
   key: CategoryKey;
@@ -96,9 +96,9 @@ export default function LatestPostsFilter({
     <div className="mt-24 px-4 max-w-[1600px] mx-auto">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
+          <h2 className={SECTION_HEADING}>{renderedHeading}</h2>
           <div className="max-w-3xl mx-auto text-center">
-            <p className={pStyles}>{description}</p>
+            <p className={SECTION_SUBTITLE}>{description}</p>
           </div>
           {renderFilterTabs()}
         </div>

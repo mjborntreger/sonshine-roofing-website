@@ -252,19 +252,23 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const prev = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null; // older
   const next = idx > 0 ? all[idx - 1] : null; // newer
 
+  // Rendered author name
+  const renderedAuthorName = post.authorName || "SonShine Roofing"
+
   return (
     <Section>
       <div className="mx-2 lg:mx-0">
         <JsonLd data={postSchema} />
 
         {/* Title + gradient stripe */}
-        <div className="prose">
-          <h1 className="mb-2">{post.title}</h1>
+        <div className="">
+          <h1 className="mb-0 text-3xl sm:text-4xl md:text-6xl">{post.title}</h1>
         </div>
-        <div className="h-1 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
+        <div className="h-[2px] my-4 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
+        <p className="mb-3 font-medium text-slate-600 md:text-lg">{`Written By: ${renderedAuthorName}`}</p>
 
         {/* Meta row */}
-        <div className="flex flex-wrap items-center mt-3 text-sm gap-x-4 gap-y-2 text-slate-600">
+        <div className="flex flex-wrap items-center text-sm gap-x-4 gap-y-2 text-slate-600">
           <span>{dateStr}</span>
           <span>•</span>
           <span>{readingMinutes} min read</span>

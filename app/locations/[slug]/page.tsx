@@ -311,6 +311,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
             <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
           )}
         </div>
+        <LeadFormSection />
       </div>
 
       <main className={narrowLayout}>
@@ -355,7 +356,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
               projects={locationProjects}
               locationName={location.locationName}
             />
-            <LeadFormSection />
             <LatestPostsFilter posts={posts} initial={4} />
           </div>
         </div>

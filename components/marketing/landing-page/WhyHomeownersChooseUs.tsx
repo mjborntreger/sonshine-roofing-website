@@ -16,10 +16,9 @@ import {
   Banknote,
   ArrowRight,
 } from "lucide-react";
+import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
 const SECTION_CONTAINER = "px-2";
-const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
-const SECTION_SUBTITLE = "mt-4 mb-8 md:text-lg text-slate-500"
 const FEATURE_PILL_CLASS = "inline-flex items-center gap-2 badge badge--accent";
 const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
 const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
