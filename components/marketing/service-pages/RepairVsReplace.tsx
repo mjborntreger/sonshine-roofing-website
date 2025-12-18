@@ -95,8 +95,8 @@ export default async function RepairVsReplace() {
                         </span>
                         <div className="mt-2 space-y-2">
                             {items.map(({ summary, description }) => (
-                                <Accordion key={summary} summary={<h4>{summary}</h4>} {...accordionDefaults}>
-                                    <p className="m-0">{description}</p>
+                                <Accordion key={summary} summary={<h4 className="text-xl">{summary}</h4>} {...accordionDefaults}>
+                                    <p className="prose text-base text-slate-700 m-0">{description}</p>
                                 </Accordion>
                             ))}
                         </div>
