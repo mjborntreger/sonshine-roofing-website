@@ -312,7 +312,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
                 </div>
                 <div className="px-6">
-                  <h4 className="mt-4 text-slate-600">
+                  <h4 className="mt-4 text-xl text-slate-600">
                     Summary
                   </h4>
                   <p>{project.projectDescription}</p>
@@ -324,7 +324,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             {project.productLinks?.length > 0 && (
               <>
                 <div className="rounded-b-3xl px-6 border-t border-blue-200 overflow-hidden bg-blue-50">
-                  <h4 className="mt-4 text-slate-600">
+                  <h4 className="mt-4 text-xl text-slate-600">
                     <List className="text-[--brand-blue] mr-2 inline h-4 w-4" />
                     Products Used
                   </h4>
