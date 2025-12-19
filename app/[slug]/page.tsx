@@ -155,6 +155,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Use unified post fetcher (deduped with page) that now includes RankMath SEO
   const post = await getPostBySlug(slug);
   if (!post) notFound();
+  const rawAuthorName = post.authorName?.trim();
+  const renderedAuthorName = rawAuthorName || "SonShine Roofing";
 
   const seo = post.seo ?? {};
   const og = seo.openGraph ?? {};
@@ -180,7 +182,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     image: { url: ogUrl, width: ogWidth, height: ogHeight },
     publishedTime: post.date ?? undefined,
     modifiedTime: post.modified ?? undefined,
-    authors: post.authorName ? [post.authorName] : undefined,
+    authors: [renderedAuthorName],
   });
 }
 
@@ -214,6 +216,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     day: "numeric",
   });
   const readingMinutes = calcReadingMinutes(post.contentHtml);
+  const rawAuthorName = post.authorName?.trim();
+  const renderedAuthorName = rawAuthorName || "SonShine Roofing";
 
   // JSON-LD (BlogPosting) using the same post object
   const descSeo = (post.seo?.description || post.seo?.openGraph?.description || stripHtml(sanitizeHtml(post.excerpt || ""))).slice(0, 160);
@@ -232,7 +236,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     image: ogImgAbs,
     datePublished: post.date,
     dateModified: post.modified,
-    author: post.authorName ? { "@type": "Person", name: post.authorName } : { "@type": "Organization", name: "SonShine Roofing" },
+    author: rawAuthorName ? { "@type": "Person", name: rawAuthorName } : { "@type": "Organization", name: "SonShine Roofing" },
     publisher: {
       "@type": "Organization",
       name: "SonShine Roofing",
@@ -252,9 +256,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const prev = idx >= 0 && idx < all.length - 1 ? all[idx + 1] : null; // older
   const next = idx > 0 ? all[idx - 1] : null; // newer
 
-  // Rendered author name
-  const renderedAuthorName = post.authorName || "SonShine Roofing"
-
   return (
     <Section>
       <div className="mx-2 lg:mx-0">
@@ -265,11 +266,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           <h1 className="mb-0 text-3xl sm:text-4xl md:text-6xl">{post.title}</h1>
         </div>
         <div className="h-[2px] my-4 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
-        <p className="mb-3 font-medium text-slate-600 md:text-lg">{`Written By: ${renderedAuthorName}`}</p>
 
         {/* Meta row */}
         <div className="flex flex-wrap items-center text-sm gap-x-4 gap-y-2 text-slate-600">
           <span>{dateStr}</span>
+          <span>•</span>
+          <span>By {renderedAuthorName}</span>
           <span>•</span>
           <span>{readingMinutes} min read</span>
           {post.categories?.length ? (

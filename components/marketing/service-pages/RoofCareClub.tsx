@@ -333,12 +333,11 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                   return (
                     <li key={fid}>
                       <Accordion
-                        summary={<h4>{f.label}</h4>}
+                        summary={<h4 className="text-xl">{f.label}</h4>}
                         radius="2xl"
                         tone="soft"
                         size="md"
                         proseBody={false}
-                        summaryClassName='text-[1rem]'
                       >
                         {f.why ? (
                           <div className="m-0">
