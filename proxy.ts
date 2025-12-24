@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 // 410 Gone for legacy/gone content.
 // Use matcher (below) to target only these paths.
-export function middleware(_req: NextRequest) {
+export function proxy(_req: NextRequest) {
   return new NextResponse('Gone', {
     status: 410,
     headers: {
