@@ -131,6 +131,8 @@ export default async function Page() {
               radius="2xl"
               proseBody={false}
               defaultOpen
+              contentClassName="text-lg bg-amber-50/50/25 leading-loose"
+              summaryClassName="bg-amber-50/25"
             >
               <p>
                 We specialize in <strong>residential roofing services</strong>, including <strong>roof repair</strong>, <strong>roof replacement</strong>, <strong>roof inspections</strong>, and our <strong>Roof Care Club</strong>, which is our preventative maintenance program uniquely designed for Sarasota-area homeowners. We work with a wide variety of materials, including <strong>asphalt shingles</strong>, <strong>metal panels</strong>, <strong>concrete tiles</strong>, and even some <strong>flat roofs</strong>.
@@ -158,8 +160,10 @@ export default async function Page() {
               radius="2xl"
               proseBody={false}
               defaultOpen
+              summaryClassName="bg-sky-50"
+              contentClassName="bg-sky-50 text-lg leading-loose"
             >
-              <p className="prose">
+              <p>
                 Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.
                 Since we are keenly attuned to unpredictable nature of hurricane season, we focus
                 on <strong>quality</strong> over &lsquo;quick fixes,&rsquo; offering durable roofing solutions backed by

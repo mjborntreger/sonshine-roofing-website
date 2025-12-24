@@ -42,8 +42,8 @@ const TITLE_AND_LOGO = "flex flex-row justify-start";
 const REVIEW_COUNT = "text-xs text-slate-500 mb-2";
 
 // BADGES STYLES
-const BADGE_TITLE_STYLES = "text-md md:text-xl text-slate-800";
-const BADGE_SUBTITLE_STYLES = "text-slate-600 text-xs mb-4";
+const BADGE_TITLE_STYLES = "text-xl text-slate-800";
+const BADGE_SUBTITLE_STYLES = "text-slate-600 text-base mb-4";
 const BADGE_CARD_STYLES = "flex-col items-center gap-2 rounded-2xl border border border-blue-100 bg-[#fb9216]/5 p-6 text-center shadow-inner transition hover:-translate-y-1 hover:border-[--brand-blue]/40 hover:shadow-lg";
 const BADGE_IMAGE_WRAPPER = "relative flex h-32 w-full items-center justify-center";
 const BADGE_IMAGE_CLASS = "h-full w-auto max-w-[300px] object-contain drop-shadow-sm";

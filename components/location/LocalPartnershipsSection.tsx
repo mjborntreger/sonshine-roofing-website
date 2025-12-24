@@ -3,6 +3,7 @@ import { Facebook, Globe, Instagram } from "lucide-react";
 import type { SponsorFeature } from "@/lib/content/wp";
 import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 import { renderHighlight } from "@/components/utils/renderHighlight";
+import { Accordion } from "@/components/ui/Accordion";
 import SmartLink from "../utils/SmartLink";
 
 type LocalPartnershipsSectionProps = {
@@ -55,12 +56,6 @@ export default function LocalPartnershipsSection({
                   {feature.title || `Sponsor ${index + 1}`}
                 </h3>
               </div>
-              {feature.contentHtml ? (
-                <div
-                  className="space-y-2 text-lg text-slate-600"
-                  dangerouslySetInnerHTML={{ __html: feature.contentHtml }}
-                />
-              ) : null}
               {feature.links ? (
                 <ul className="flex flex-wrap gap-5 text-sm">
                   {feature.links.facebookUrl ? (
@@ -103,6 +98,16 @@ export default function LocalPartnershipsSection({
                     </li>
                   ) : null}
                 </ul>
+              ) : null}
+              {feature.contentHtml ? (
+                <Accordion
+                  summary="See details"
+                  proseBody={false}
+                  contentClassName="space-y-2 mb-4 bg-sky-50 text-lg text-slate-600 max-h-56 overflow-y-auto"
+                  summaryClassName="bg-sky-50"
+                >
+                  <div dangerouslySetInnerHTML={{ __html: feature.contentHtml }} />
+                </Accordion>
               ) : null}
             </article>
           ))}

@@ -82,7 +82,7 @@ export default async function Page() {
           { icon: HardHat, label: "Expert Opinion" },
           { icon: Zap, label: "Hurricane Preparation" },
         ]}
-        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/need-an-inspection-report.webp"
+        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/Roof-Inspection-Hero-Image.webp"
       >
         <div className="flex gap-6 flex-wrap max-w-3xl">
           <div>

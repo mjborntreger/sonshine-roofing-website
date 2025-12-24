@@ -4,7 +4,7 @@ import { Clock, Tag, Users, Languages, CreditCard, Hammer, MapPin, BadgePercent,
 
 const h2Styles = "mb-8 text-center text-4xl"
 const pillarsGrid = "mt-4 grid grid-cols-1 gap-4 items-stretch";
-const pStyles = "text-md list-disc pl-5 space-y-1 marker:text-slate-400";
+const pStyles = "text-lg list-disc pl-5 space-y-1 marker:text-slate-400";
 const linkStyles = "text-[--brand-blue] icon-affordance"
 
 export async function HoursAndInformation() {
@@ -28,8 +28,9 @@ export async function HoursAndInformation() {
           radius="2xl"
           proseBody={false}
           defaultOpen
+          tone="soft"
         >
-          <dl className="mt-2 grid grid-cols-[max-content_auto] gap-x-1 gap-y-2 text-sm text-slate-700">
+          <dl className="mt-2 grid grid-cols-[max-content_auto] gap-x-1 gap-y-2 text-lg text-slate-700">
             <dt className="text-slate-600">Monday</dt>
             <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
             <dt className="text-slate-600">Tuesday</dt>
@@ -50,29 +51,30 @@ export async function HoursAndInformation() {
         {/* Service Areas */}
         <Accordion
           icon={<MapPin className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-lg">Service Areas</h3>}
+          summary={<h3 className="text-2xl">Service Areas</h3>}
           radius="2xl"
           proseBody={false}
+          tone="soft"
           
         >
           <ul className={pStyles}>
             <li>
-              <SmartLink href="/locations/sarasota" title="Sarasota, FL Service Area">
+              <SmartLink className={linkStyles} href="/locations/sarasota" title="Sarasota, FL Service Area">
                 Sarasota, FL
               </SmartLink>
             </li>
             <li>
-              <SmartLink href="/locations/venice" title="Venice, FL Service Area">
+              <SmartLink className={linkStyles} href="/locations/venice" title="Venice, FL Service Area">
                 Venice, FL
               </SmartLink>
             </li>
             <li>
-              <SmartLink href="/locations/north-port" title="North Port, FL Service Area">
+              <SmartLink className={linkStyles} href="/locations/north-port" title="North Port, FL Service Area">
                 North Port, FL
               </SmartLink>
             </li>
             <li>
-              <SmartLink href="/locations/lakewood-ranch" title="Lakewood Ranch, FL Service Area">
+              <SmartLink className={linkStyles} href="/locations/lakewood-ranch" title="Lakewood Ranch, FL Service Area">
                 Lakewood Ranch, FL
               </SmartLink>
             </li>
@@ -90,9 +92,10 @@ export async function HoursAndInformation() {
         {/* Brands */}
         <Accordion
           icon={<Tag className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-lg">Brands</h3>}
+          summary={<h3 className="text-2xl">Brands</h3>}
           radius="2xl"
           proseBody={false}
+          tone="soft"
           
         >
           <ul className={pStyles}>
@@ -174,9 +177,10 @@ export async function HoursAndInformation() {
         {/* Associations */}
         <Accordion
           icon={<Users className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-lg">Associations</h3>}
+          summary={<h3 className="text-2xl">Associations</h3>}
           radius="2xl"
           proseBody={false}
+          tone="soft"
           
         >
           <ul className={pStyles}>
@@ -282,9 +286,10 @@ export async function HoursAndInformation() {
         {/* Payment Types */}
         <Accordion
           icon={<CreditCard className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-lg">Payment Types</h3>}
+          summary={<h3 className="text-2xl">Payment Types</h3>}
           radius="2xl"
           proseBody={false}
+          tone="soft"
           
         >
           <ul className={pStyles}>
@@ -321,9 +326,10 @@ export async function HoursAndInformation() {
         {/* Roofing Services */}
         <Accordion
           icon={<Hammer className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-lg">Roofing Services</h3>}
+          summary={<h3 className="text-2xl">Roofing Services</h3>}
           radius="2xl"
           proseBody={false}
+          tone="soft"
           
         >
           <ul className={pStyles}>
@@ -397,9 +403,10 @@ export async function HoursAndInformation() {
         {/* Languages */}
         <Accordion
           icon={<Languages className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-lg">Languages</h3>}
+          summary={<h3 className="text-2xl">Languages</h3>}
           radius="2xl"
           proseBody={false}
+          tone="soft"
           
         >
           <ul className={pStyles}>
@@ -411,9 +418,10 @@ export async function HoursAndInformation() {
         {/* Discounts */}
         <Accordion
           icon={<BadgePercent className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-lg">Discounts</h3>}
+          summary={<h3 className="text-2xl">Discounts</h3>}
           radius="2xl"
           proseBody={false}
+          tone="soft"
           
         >
           <ul className={pStyles}>
