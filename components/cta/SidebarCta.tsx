@@ -13,8 +13,8 @@ export default function SidebarCta() {
     return (
         <div className="mt-4 rounded-3xl border border-blue-200 bg-white p-4 shadow-sm not-prose">
             <OpenOrClosed
-                holidayClosures={['2026-11-26', '2026-11-27']}
-                recurringClosures={['12-24', '12-25', '12-26', '07-04']}
+                holidayClosures={['2026-11-26', '2026-11-27', '2026-01-02']}
+                recurringClosures={['12-24', '12-25', '12-26', '07-04', '01-01']}
             />
             <SmartLink
                 href="/contact-us#book-an-appointment"

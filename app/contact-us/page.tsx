@@ -96,7 +96,11 @@ export default async function Page() {
               <div className="not-prose rounded-3xl w-full border border-blue-200 bg-white p-6 shadow-sm max-w-full">
                 <div className="flex-col gap-6">
                   <div className="mb-4">
-                    <OpenOrClosed />
+                    <OpenOrClosed
+                      holidayClosures={['2026-11-26', '2026-11-27', '2026-01-02']}
+                      recurringClosures={['12-24', '12-25', '12-26', '07-04', '01-01']}
+                    />
+
                   </div>
                   <Image
                     src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
@@ -194,9 +198,9 @@ export default async function Page() {
             <div>
               <ResourcesQuickLinks />
             </div>
-            
+
           </div>
-          
+
         </div>
         <div className="mt-6">
           <LiteMap />
