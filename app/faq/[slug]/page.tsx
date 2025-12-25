@@ -12,7 +12,11 @@ import SmartLink from '@/components/utils/SmartLink';
 export const revalidate = 3600; // 1h
 
 function stripTags(html: string): string {
-  return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  return html
+    .replace(/<[^>]*>/g, '')
+    .replace(/[<>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 export async function generateStaticParams() {
