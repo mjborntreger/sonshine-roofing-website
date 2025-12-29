@@ -213,6 +213,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         {/* Facebook Share Button Attribution */}
         <meta property="fb:app_id" content="1087269253041713" />
+        <meta name="facebook-domain-verification" content="wrgyk374pn09qej89okes7upeqbqkf" />
 
         {/* Google Site Verification */}
         <meta name="google-site-verification" content="HHGHDsk0P2Er4L1Eqvt7NEY2cTVzyN5AFU7-6GM2RvI" />
