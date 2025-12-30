@@ -117,7 +117,7 @@ export default async function Page() {
             <JsonLd data={webPageLd} />
             <JsonLd data={breadcrumbsLd} />
             <JsonLd data={howToLd} />
-            <h2 className="mt-0">How do you know if you need a roof replacement?</h2>
+            <h2 className="mt-0">How do you know if you need new roof installation?</h2>
             <p>
               The thought of replacing your roof may feel overwhelming,
               but we’re here to help. Our Roofing Specialists and Production

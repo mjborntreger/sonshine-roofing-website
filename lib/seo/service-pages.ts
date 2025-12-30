@@ -77,7 +77,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
   "/financing": {
     title: "Roof Financing | SonShine Roofing",
     description:
-      "Get approved today! | (941) 866-4320 | Easy, convenient financing options for your next roof | ",
+      "Get approved today! | (941) 866-4320 | 0% APR for 12 mo. | Credit-based & Equity-based | Easy, convenient financing options for your next roof",
     keywords: [
       "roof financing",
       "roof loans",

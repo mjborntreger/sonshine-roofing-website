@@ -7,6 +7,7 @@ import { inter, allura, candara } from "@/lib/ui/fonts";
 import BrevoChatLoader from "@/components/lead-capture/brevo-chatbot/BrevoChatLoader";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Script from "next/script";
+import PhoneClickListener from "@/components/telemetry/PhoneClickListener";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
@@ -229,6 +230,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         "
       >
         <Script strategy="afterInteractive" src="https://qq.leadsbyquickquote.com/roofs/integration"></Script>
+        <PhoneClickListener />
         <AnalyticsScripts />
         <Header />
         <main className="flex-1">{children}</main>

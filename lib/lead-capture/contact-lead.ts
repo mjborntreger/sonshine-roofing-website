@@ -1,5 +1,6 @@
 import { deleteCookie, readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
 import { pushToDataLayer } from '@/lib/telemetry/gtm';
+import { trackMetaPixel, type MetaStandardEvent } from '@/lib/telemetry/meta';
 import { normalizePhoneForSubmit, isUsPhoneComplete } from '@/lib/lead-capture/phone';
 import type { ContactLeadInput, LeadInput } from '@/lib/lead-capture/validation';
 
@@ -286,9 +287,19 @@ export type SubmitLeadOptions = {
   contactReadyCookie?: boolean;
   contactReadyCookieMaxAge?: number;
   gtmEvent?: Record<string, unknown>;
+  metaPixelEvents?: MetaStandardEvent | MetaStandardEvent[];
 };
 
 const DEFAULT_ENDPOINT = '/api/lead';
+
+function fireMetaPixelEvents(events?: MetaStandardEvent | MetaStandardEvent[]) {
+  if (!events) return;
+  const list = Array.isArray(events) ? events : [events];
+
+  for (const event of list) {
+    trackMetaPixel(event);
+  }
+}
 
 export async function submitLead<T extends LeadInput>(
   payload: T,
@@ -300,6 +311,7 @@ export async function submitLead<T extends LeadInput>(
     contactReadyCookie = true,
     contactReadyCookieMaxAge = CONTACT_READY_MAX_AGE,
     gtmEvent,
+    metaPixelEvents,
   } = options;
 
   try {
@@ -322,6 +334,7 @@ export async function submitLead<T extends LeadInput>(
         writeCookie(CONTACT_READY_COOKIE, '1', contactReadyCookieMaxAge);
       }
       if (gtmEvent) pushToDataLayer(gtmEvent);
+      fireMetaPixelEvents(metaPixelEvents);
       return { ok: true, status: response.status, data: json };
     }
 

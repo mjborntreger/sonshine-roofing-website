@@ -197,6 +197,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
         offer_slug: offerSlug,
         offer_code: offerCode,
       },
+      metaPixelEvents: 'Lead',
       contactReadyCookie: false,
     });
 

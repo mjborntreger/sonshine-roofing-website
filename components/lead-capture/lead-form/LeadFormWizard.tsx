@@ -509,6 +509,7 @@ export default function LeadFormWizard({
         projectType: form.projectType,
         helpTopics: helpSummary,
       },
+      metaPixelEvents: ['Lead', 'Contact'],
     });
 
     if (!result.ok) {

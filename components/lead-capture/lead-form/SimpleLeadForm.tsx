@@ -272,6 +272,7 @@ export default function SimpleLeadForm() {
         projectType: form.projectType,
         helpTopics: '',
       },
+      metaPixelEvents: ['Lead', 'Contact'],
     });
 
     if (!result.ok) {

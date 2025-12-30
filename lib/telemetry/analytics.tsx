@@ -87,6 +87,8 @@ export default function AnalyticsScripts() {
           'https://connect.facebook.net/en_US/fbevents.js');
           fbq('init', '${META_PIXEL_ID}');
           fbq('track', 'PageView');
+          fbq('track', 'Contact');
+          fbq('track', 'Lead');
         `}
       </Script>
       {/* Google Tag Manager (noscript) – place near start of body */}
