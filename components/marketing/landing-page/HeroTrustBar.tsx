@@ -49,8 +49,9 @@ const BADGE_IMAGE_WRAPPER = "relative flex h-32 w-full items-center justify-cent
 const BADGE_IMAGE_CLASS = "h-full w-auto max-w-[300px] object-contain drop-shadow-sm";
 const BADGE_IMAGE_SIZES = "(min-width: 1280px) 200px, (min-width: 1024px) 180px, (min-width: 768px) 33vw, 50vw";
 
-const DEFAULT_HEADING = "Top-rated Local Roofing Contractor in Sarasota and Surrounding Areas";
-const DEFAULT_HEADING_HIGHLIGHT = "Local Roofing Contractor";
+// HEADINGS
+const DEFAULT_HEADING = "Top-Rated Roofer Near Me? That's us.";
+const DEFAULT_HEADING_HIGHLIGHT = "That's us";
 
 const hexToRgba = (hex: string, alpha: number) => {
   const normalizedHex = hex.replace("#", "");
@@ -150,7 +151,7 @@ const BADGES = [
   {
     id: "badge-1",
     label: "GAF Master Elite Cerified",
-    subtitle: "Industry-leading warranties and premium products you can rely on.",
+    subtitle: "Industry-leading warranties and premium roofing materials you can rely on.",
     href: "https://www.gaf.com/en-us/roofing-contractors/residential/sonshine-roofing-inc-1104247",
     src: "https://next.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp",
     alt: "GAF Master Elite Contractor Seal",
@@ -158,7 +159,7 @@ const BADGES = [
   {
     id: "badge-4",
     label: "My Safe FL Home Certified",
-    subtitle: "Save thousands in insurance costs and wind mitigation services.",
+    subtitle: "Prepare for hurricane season and save thousands in insurance costs and wind mitigation services.",
     href: "https://mysafeflhome.com",
     src: "https://next.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
     alt: "My Safe FL Home Certified Roofing Contractor in Florida",
@@ -174,7 +175,7 @@ const BADGES = [
   {
     id: "badge-2",
     label: "Best Roofers in Sarasota Award (2025)",
-    subtitle: "Best-in-class customer service and workmanship, guaranteed.",
+    subtitle: "Forbes affiliate Expertise.com has recognized our best-in-class customer service and workmanship.",
     href: "https://www.expertise.com/fl/sarasota/roofing",
     src: "https://res.cloudinary.com/expertise-com/image/upload/remote_media/awards/fl_sarasota_roofing_2025_transparent.svg",
     alt: "Expertise.com Best Roofers in Sarasota Award (2025)",
@@ -199,7 +200,7 @@ export default function HeroTrustBar({
               <p className="text-xs md:text-md font-semibold uppercase tracking-wider text-slate-500">
                 38+ YEARS OF ROOFING EXCELLENCE
               </p>
-              <h2 className="mt-4 text-2xl font-semibold text-slate-900 md:text-4xl">
+              <h2 className="mt-4 text-2xl font-semibold text-slate-900 md:text-3xl">
                 {renderedHeading}
               </h2>
               <p className="my-3 text-slate-600 md:text-lg">
@@ -247,9 +248,9 @@ export default function HeroTrustBar({
           </div>
 
           <div className="mt-16">
-            <h2 className="text-center md:text-4xl text-2xl">Expert <span className="text-[--brand-blue]">Residential Roofing Company</span></h2>
+            <h2 className="text-center md:text-4xl text-2xl">Expert <span className="text-[--brand-blue]">Residential Roofing Contractor</span></h2>
             <p className="text-center text-slate-600 mt-1 mb-8">
-              No subcontractors – our in-house crews use the utmost care and precision when working on your home.
+              We never use subcontractors&mdash;period. Our expert in-house roofing crews use the utmost care and proven techniques when working on your home.
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {BADGES.map((badge) => (

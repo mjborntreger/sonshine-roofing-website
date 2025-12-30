@@ -192,11 +192,11 @@ export default async function LocationPage({ params }: { params: Promise<Params>
 
   if (!location) notFound();
 
-  const botbTitle = `Voted Best ${location.locationName} Roofer for 5 Years`;
-  const botbHighlight = `Best ${location.locationName} Roofer`;
+  const botbTitle = `Voted Best Roofer in ${location.locationName} for 5 Years`;
+  const botbHighlight = `Best Roofer in ${location.locationName}`;
   const heroTrustHeadingTarget = location.locationName || location.title || slug;
   const heroTrustHeading = heroTrustHeadingTarget
-    ? `Top-rated Local Roofing Contractor in ${heroTrustHeadingTarget} and Surrounding Areas`
+    ? `Top-rated Roofer in ${heroTrustHeadingTarget}? That's us.`
     : undefined;
 
   const formatDate = (input: string | null | undefined) => {
@@ -295,7 +295,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   return (
     <>
       {structuredData ? <JsonLd data={structuredData} /> : null}
-      <Hero title={`The Best Roofing Company in ${location.locationName} for Over 38 Years`} />
+      <Hero title={`One of The Best Roofing Companies in ${location.locationName} for Over 38 Years`} />
       <div className={reviewsLayout}>
         <HeroTrustBar heading={heroTrustHeading} />
         <div className="bg-blue-200/50 border border-t-blue-200 border-b-blue-200">
