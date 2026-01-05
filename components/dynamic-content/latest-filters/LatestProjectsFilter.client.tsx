@@ -89,8 +89,8 @@ export default function LatestProjectsFilter({
       </FilterTabs>
     </div>
   );
-  const heading = "Latest Roof Replacement Projects";
-  const renderedHeading = renderHighlight(heading, "Roof Replacement Projects");
+  const heading = "Shingle, Metal & Tile Roof Replacement";
+  const renderedHeading = renderHighlight(heading, "Roof Replacement");
 
   return (
     <div className="px-4 max-w-[1600px] mx-auto">

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import { Pencil, Share } from "lucide-react";
 import type { Route } from "next";
 import CopyButton from "../utils/CopyButton";
+import { SITE_ORIGIN } from "@/lib/seo/site";
 
 type Props = {
   /** Path to your review page (relative to site root) */
@@ -29,7 +30,7 @@ export default function ShareWhatYouThink({
         return `${origin}${pathname}?utm_source=SonShine+Roofing&utm_medium=website`;
       }
     } catch { }
-    const fallback = (process.env.NEXT_PUBLIC_SITE_URL || "https://sonshineroofing.com").replace(/\/$/, "");
+    const fallback = SITE_ORIGIN;
     return `${fallback}?utm_source=SonShine+Roofing&utm_medium=website`;
   }
 

@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next';
+import { SITE_ORIGIN, isProdEnv } from '@/lib/seo/site';
+
 export default function robots(): MetadataRoute.Robots {
-  const isProd = process.env.NEXT_PUBLIC_ENV === 'production';
-  if (!isProd) {
+  if (!isProdEnv()) {
     return { rules: [{ userAgent: '*', disallow: '/' }], sitemap: [] };
   }
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://sonshineroofing.com';
-  return { rules: [{ userAgent: '*', allow: '/' }], sitemap: [`${base}/sitemap_index`] };
+  return { rules: [{ userAgent: '*', allow: '/' }], sitemap: [`${SITE_ORIGIN}/sitemap_index`] };
 }

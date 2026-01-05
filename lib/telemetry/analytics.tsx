@@ -2,10 +2,11 @@
 
 import { useEffect } from "react";
 import Script from "next/script";
-
+import { envFlagTrue, isProdEnv, isSiteHost, SITE_HOST, requireEnv } from "@/lib/seo/site";
 import type { GtmWindow } from "@/lib/telemetry/gtm";
 
-const META_PIXEL_ID = "2016926932216879";
+const GTM = requireEnv("NEXT_PUBLIC_GTM_ID", { prodOnly: true });
+const META_PIXEL_ID = requireEnv("META_PIXEL_ID", { prodOnly: true });
 
 function ensureGtmGlobals(win: GtmWindow) {
   win.dataLayer = win.dataLayer ?? [];
@@ -31,19 +32,19 @@ export function flushQueuedEvents(win: GtmWindow) {
 }
 
 export default function AnalyticsScripts() {
-  const GTM = process.env.NEXT_PUBLIC_GTM_ID;
-  // Enable only in production by default; allow preview on staging if explicitly toggled
+  // Enable only in production by default; allow preview on staging if explicitly toggled and host is allowed
+  const HOST_ALLOWED =
+    typeof window !== "undefined" ? isSiteHost(window.location.hostname) : isSiteHost(SITE_HOST);
   const ENABLED =
-    process.env.NEXT_PUBLIC_ENV === "production" ||
-    process.env.NEXT_PUBLIC_ENABLE_GTM_PREVIEW === "true";
-
+    HOST_ALLOWED &&
+    (isProdEnv() || envFlagTrue("NEXT_PUBLIC_ENABLE_GTM_PREVIEW"));
   useEffect(() => {
     if (typeof window === "undefined") return;
     const win = window as GtmWindow;
     ensureGtmGlobals(win);
   }, []);
 
-  if (!GTM || !ENABLED) return null;
+  if (!GTM || !META_PIXEL_ID || !ENABLED) return null;
 
   return (
     <>
@@ -99,11 +100,13 @@ export default function AnalyticsScripts() {
         />
       </noscript>
       <noscript>
+        {/* eslint-disable-next-line */}
         <img
           height="1"
           width="1"
           style={{ display: "none" }}
           src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
+          alt=""
         />
       </noscript>
     </>

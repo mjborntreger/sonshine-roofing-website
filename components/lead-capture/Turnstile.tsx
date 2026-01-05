@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import { requireEnv } from "@/lib/seo/site";
 
 type TurnstileCallback = (token: string) => void;
 
@@ -48,7 +49,7 @@ type TurnstileProps = {
   autoRefreshOnExpire?: boolean; // default true
 };
 
-const PUBLIC_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+const PUBLIC_SITE_KEY = (requireEnv("NEXT_PUBLIC_TURNSTILE_SITE_KEY", { prodOnly: true }) || "").trim();
 
 export default function Turnstile({
   siteKey = PUBLIC_SITE_KEY,

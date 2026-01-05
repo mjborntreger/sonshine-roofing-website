@@ -1,25 +1,22 @@
 import { NextResponse } from 'next/server';
+import { resolveSiteOrigin, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 // The manifest is generated at build time to: public/__sitemaps/static-routes.json
 // We fetch it from the current origin so this works on prod and staging without hardcoding.
 
 type StaticManifest = { generatedAt?: string; routes: { loc: string; lastmod?: string }[] };
 
-const ENABLED =
-  process.env.NEXT_PUBLIC_ENV === 'production' ||
-  process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
-const PREVIEW =
-  process.env.NEXT_PUBLIC_ENV !== 'production' &&
-  process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
+const SITEMAPS_ENABLED = sitemapEnabled();
+const PREVIEW_HEADERS = sitemapPreviewHeaders();
 
 // Important: render dynamically so we always read the latest manifest
 export const dynamic = 'force-dynamic';
 // (No revalidate; handled by reading the JSON at request time)
 
 export async function GET(req: Request) {
-  if (!ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
+  if (!SITEMAPS_ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
 
-  const origin = new URL(req.url).origin;
+  const origin = resolveSiteOrigin(req.headers);
   let manifest: StaticManifest = { routes: [] };
 
   try {
@@ -48,7 +45,7 @@ export async function GET(req: Request) {
   return new NextResponse(body, {
     headers: {
       'content-type': 'application/xml; charset=utf-8',
-      ...(PREVIEW ? { 'X-Robots-Tag': 'noindex, nofollow' } : {}),
+      ...PREVIEW_HEADERS,
     },
   });
 }

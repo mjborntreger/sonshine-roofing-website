@@ -25,8 +25,8 @@ Environments
 
 Sitemaps & Robots
 - Production
-  - robots.txt: Allow all, sitemap at `${NEXT_PUBLIC_SITE_URL}/sitemap_index`.
-  - app/robots.ts builds from `NEXT_PUBLIC_SITE_URL`.
+  - robots.txt: Allow all, sitemap at `${NEXT_PUBLIC_BASE_URL}/sitemap_index`.
+  - app/robots.ts builds from `NEXT_PUBLIC_BASE_URL`.
 - Staging
   - robots.txt: Disallow all. Sitemap endpoints exist but are not to be crawled.
   - You can enable sitemap preview endpoints by setting:
@@ -119,7 +119,7 @@ SEO Guide
 Canonicals & Metadata
 - Base metadata in `app/layout.tsx`.
 - Per-page metadata in each route’s `generateMetadata`.
-- Use `NEXT_PUBLIC_SITE_URL` for absolute canonical urls if needed.
+- Use `NEXT_PUBLIC_BASE_URL` for absolute canonical urls if needed.
 
 Robots
 - Staging: `Disallow: /` (non-prod).

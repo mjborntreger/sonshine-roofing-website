@@ -1,20 +1,16 @@
 
-
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch } from '@/lib/content/wp';
 import { formatLastmod, normalizeEntryPath } from '../utils';
+import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600; // safety net; tag-based revalidation will be faster
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://sonshineroofing.com';
-const ENABLED =
-  process.env.NEXT_PUBLIC_ENV === 'production' ||
-  process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
-const PREVIEW =
-  process.env.NEXT_PUBLIC_ENV !== 'production' &&
-  process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
+const BASE = SITE_ORIGIN;
+const SITEMAPS_ENABLED = sitemapEnabled();
+const PREVIEW_HEADERS = sitemapPreviewHeaders();
 
 // Minimal node shape for sitemap entries
 interface Node { uri: string; modifiedGmt?: string | null }
@@ -60,7 +56,7 @@ const getGlossaryUrls = unstable_cache(
 );
 
 export async function GET() {
-  if (!ENABLED) {
+  if (!SITEMAPS_ENABLED) {
     return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
   }
 
@@ -89,7 +85,7 @@ export async function GET() {
   return new NextResponse(body, {
     headers: {
       'content-type': 'application/xml; charset=utf-8',
-      ...(PREVIEW ? { 'X-Robots-Tag': 'noindex, nofollow' } : {}),
+      ...PREVIEW_HEADERS,
     },
   });
 }

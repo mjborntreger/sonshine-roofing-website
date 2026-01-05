@@ -3,17 +3,14 @@ import { NextResponse } from 'next/server';
 import { wpFetch } from '@/lib/content/wp';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { unstable_cache } from 'next/cache';
+import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 export const dynamic = 'force-static';
 export const revalidate = 3600; // safety net; tag-based revalidation will be faster
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL!;
-const ENABLED =
-  process.env.NEXT_PUBLIC_ENV === 'production' ||
-  process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
-const PREVIEW =
-  process.env.NEXT_PUBLIC_ENV !== 'production' &&
-  process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
+const BASE = SITE_ORIGIN;
+const SITEMAPS_ENABLED = sitemapEnabled();
+const PREVIEW_HEADERS = sitemapPreviewHeaders();
 
 type Node = { uri: string; modifiedGmt?: string | null };
 
@@ -46,7 +43,7 @@ const getPostUrls = unstable_cache(async () => {
 }, ['sitemap-blog'], { revalidate: 3600, tags: ['sitemap', 'sitemap:blog'] });
 
 export async function GET() {
-  if (!ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
+  if (!SITEMAPS_ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
 
   const items = await getPostUrls();
   const head = [
@@ -66,7 +63,7 @@ export async function GET() {
   return new NextResponse(body, {
     headers: {
       'content-type': 'application/xml; charset=utf-8',
-      ...(PREVIEW ? { 'X-Robots-Tag': 'noindex, nofollow' } : {}),
+      ...PREVIEW_HEADERS,
     },
   });
 }

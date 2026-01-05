@@ -5,6 +5,7 @@ import type { UrlObject } from "url";
 import { ArrowUpRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { SITE_HOST_ALIASES } from "@/lib/seo/site";
 
 type AnchorProps = React.AnchorHTMLAttributes<HTMLAnchorElement>;
 type NextLinkProps = Parameters<typeof NextLink>[0];
@@ -28,16 +29,6 @@ export type SmartLinkProps = Omit<AnchorProps, "href" | "children"> &
     unstyled?: boolean;
     proseGuard?: boolean;
   };
-
-function getEnvSiteHost(): string | null {
-  const host = (process.env.NEXT_PUBLIC_SITE_HOST || "").trim();
-  if (host) return host.toLowerCase();
-  const url = (process.env.NEXT_PUBLIC_SITE_URL || "").trim();
-  try {
-    if (url) return new URL(url).hostname.toLowerCase();
-  } catch {}
-  return null;
-}
 
 function isUrlObjectCandidate(value: unknown): value is UrlObject {
   if (!value || typeof value !== "object") return false;
@@ -132,12 +123,12 @@ const SmartLink = React.forwardRef<HTMLAnchorElement, SmartLinkProps>(function S
   const special = hrefStr ? isSpecialScheme(hrefStr) : false;
   const hasDownload = "download" in anchorProps && anchorProps.download !== undefined;
 
-  const envHost = getEnvSiteHost();
   const hostList = React.useMemo(() => {
+    const envHosts = Array.from(SITE_HOST_ALIASES);
     const hosts = ensureArray(internalHosts);
-    const combined = envHost ? Array.from(new Set([envHost, ...hosts])) : hosts;
+    const combined = Array.from(new Set([...envHosts, ...hosts]));
     return combined.map((h) => h.toLowerCase().split(":")[0]);
-  }, [envHost, internalHosts]);
+  }, [internalHosts]);
 
   const inferredExternal = React.useMemo(() => {
     if (typeof external === "boolean") return external;

@@ -4,7 +4,7 @@ SEO Guide
 Canonicals & Metadata
 - Base metadata in `app/layout.tsx`.
 - Per-page metadata in each route’s `generateMetadata`.
-- Use `NEXT_PUBLIC_SITE_URL` for absolute canonical urls if needed.
+- Use `NEXT_PUBLIC_BASE_URL` for absolute canonical urls if needed.
 
 Robots
 - Staging: `Disallow: /` (non-prod) + `X-Robots-Tag: noindex, nofollow, noimageindex` on the staging host.
