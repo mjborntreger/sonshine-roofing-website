@@ -2,8 +2,8 @@
 
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { FormEvent, useMemo, useState } from 'react';
-import { ArrowRight, ArrowUpRight, SquareMenu, Check } from 'lucide-react';
+import { FormEvent, useState } from 'react';
+import { ArrowRight, ArrowUpRight, Check } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import { Button } from '@/components/ui/button';
 import { deleteCookie } from '@/lib/telemetry/client-cookies';
@@ -16,7 +16,6 @@ import {
   formatPhoneExample,
   normalizeState,
   normalizeZip,
-  parseLeadSuccessCookie,
   persistLeadSuccessCookie,
   sanitizePhoneInput,
   submitLead,
@@ -25,27 +24,16 @@ import {
   validateContactIdentityDraft,
 } from '@/lib/lead-capture/contact-lead';
 import { cn } from '@/lib/utils';
-import {
-  PROJECT_OPTIONS,
-  STANDARD_TIMELINE_OPTIONS,
-  type JourneyKey,
-  type ProjectOption,
-  getTimelineLabelForDisplay,
-} from '@/components/lead-capture/lead-form/config';
+import { STANDARD_TIMELINE_OPTIONS, type JourneyKey, getTimelineLabelForDisplay } from '@/components/lead-capture/lead-form/config';
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { renderHighlight } from '@/components/utils/renderHighlight';
-import {
-  PROJECT_OPTION_CARD_BASE_CLASS,
-  PROJECT_OPTION_CARD_SELECTED_CLASS,
-  PROJECT_OPTION_CARD_UNSELECTED_CLASS,
-  ProjectOptionCardContent,
-} from '@/components/lead-capture/lead-form/ProjectOptionCard';
 
 // STYLES
-const INPUT_BASE_CLASS = 'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
+const INPUT_BASE_CLASS =
+  'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
-const SECTION_TITLE_BASE_CLASS = "text-xl sm:text-2xl font-semibold tracking-wide text-slate-700";
-const SECTION_EYELASH = "text-sm my-1 text-slate-500";
+const SECTION_TITLE_BASE_CLASS = 'text-xl sm:text-2xl font-semibold tracking-wide text-slate-700';
+const SECTION_EYELASH = 'text-sm my-1 text-slate-500';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
@@ -56,7 +44,7 @@ const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-for
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
 type FormState = {
-  projectType: JourneyKey | '';
+  projectType: JourneyKey;
   timeline: string;
   notes: string;
   roofType: RoofTypeValue | '';
@@ -71,27 +59,6 @@ type FormState = {
   zip: string;
   consentSms: boolean;
 };
-
-const INITIAL_STATE: FormState = {
-  projectType: '',
-  timeline: '',
-  notes: '',
-  roofType: '',
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  address1: '',
-  address2: '',
-  city: '',
-  state: 'FL',
-  zip: '',
-  consentSms: false,
-};
-
-const SIMPLE_PROJECT_OPTIONS = PROJECT_OPTIONS.filter(
-  (option): option is ProjectOption & { action: 'advance'; value: JourneyKey } => option.action === 'advance'
-);
 
 type RoofTypeValue = 'shingle' | 'metal' | 'tile' | 'flat';
 
@@ -129,6 +96,25 @@ const ROOF_TYPE_OPTIONS: RoofTypeOption[] = [
   },
 ];
 
+function buildInitialState(projectType: JourneyKey): FormState {
+  return {
+    projectType,
+    timeline: '',
+    notes: '',
+    roofType: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: 'FL',
+    zip: '',
+    consentSms: false,
+  };
+}
+
 function getRoofTypeLabel(value: RoofTypeValue | ''): string | null {
   if (!value) return null;
   const option = ROOF_TYPE_OPTIONS.find((item) => item.value === value);
@@ -158,15 +144,32 @@ function buildSuccessMetaFromPayload(payload: LeadSuccessCookiePayload): Success
   };
 }
 
-export default function SimpleLeadForm() {
-  const parsedCookie = useMemo(() => parseLeadSuccessCookie(), []);
-  const [form, setForm] = useState<FormState>(INITIAL_STATE);
+type Props = {
+  projectType: JourneyKey;
+  page?: string;
+  title?: string;
+  titleHighlight?: string;
+  description?: string;
+};
+
+const DEFAULT_TITLE = 'Contact Our Office';
+const DEFAULT_TITLE_HIGHLIGHT = 'Our Office';
+const DEFAULT_DESCRIPTION =
+  "We respond within 30 minutes during business hours. After hours, we'll contact you in the next business day.";
+
+export default function EvenSimplerLeadForm({
+  projectType = 'retail',
+  page,
+  title,
+  titleHighlight,
+  description,
+}: Props) {
+  const initialProjectType = projectType || 'retail';
+  const [form, setForm] = useState<FormState>(() => buildInitialState(initialProjectType));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [status, setStatus] = useState<Status>(parsedCookie ? 'success' : 'idle');
-  const [successMeta, setSuccessMeta] = useState<SuccessMeta | null>(
-    parsedCookie ? buildSuccessMetaFromPayload(parsedCookie) : null
-  );
+  const [status, setStatus] = useState<Status>('idle');
+  const [successMeta, setSuccessMeta] = useState<SuccessMeta | null>(null);
 
   const utmParams = useUtmParams();
 
@@ -248,7 +251,7 @@ export default function SimpleLeadForm() {
         state: form.state,
         zip: form.zip,
       },
-      page: '/contact-us',
+      page: page || '/contact-us',
     });
 
     const contactPayload: ContactLeadInput = {
@@ -296,7 +299,7 @@ export default function SimpleLeadForm() {
     }
 
     const successPayload: LeadSuccessCookiePayload = {
-      projectType: form.projectType || 'contact',
+      projectType: form.projectType,
       helpTopics: [],
       helpTopicLabels: [],
       timeline: form.timeline,
@@ -308,7 +311,7 @@ export default function SimpleLeadForm() {
     persistLeadSuccessCookie(successPayload);
     setSuccessMeta(buildSuccessMetaFromPayload(successPayload));
 
-    setForm(INITIAL_STATE);
+    setForm(buildInitialState(initialProjectType));
     setErrors({});
     setGlobalError(null);
     setStatus('success');
@@ -319,7 +322,7 @@ export default function SimpleLeadForm() {
     setSuccessMeta(null);
     setStatus('idle');
     setGlobalError(null);
-    setForm(INITIAL_STATE);
+    setForm(buildInitialState(initialProjectType));
   };
 
   if (status === 'success' && successMeta) {
@@ -341,16 +344,18 @@ export default function SimpleLeadForm() {
         <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white shadow-md">
           <div className="border-b rounded-t-3xl border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
             <h2 className="flex items-center text-3xl font-bold gap-2">
-              <SquareMenu className="h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
-              <span>{renderHighlight('Contact Our Office', 'Our Office')}</span>
+              <span>{renderHighlight(title ?? DEFAULT_TITLE, titleHighlight ?? DEFAULT_TITLE_HIGHLIGHT)}</span>
             </h2>
-            <p className="text-slate-500 mt-1 text-sm md:text-base pb-2">We respond within 30 minutes during business hours. After hours, we&apos;ll contact you in the next business day.</p>
+            <p className="text-slate-500 mt-1 text-sm md:text-base pb-2">
+              {description ?? DEFAULT_DESCRIPTION}
+            </p>
           </div>
 
           <div className="p-4 sm:p-6">
-
             {globalError && (
-              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{globalError}</div>
+              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {globalError}
+              </div>
             )}
 
             <div className="grid gap-8">
@@ -483,30 +488,6 @@ export default function SimpleLeadForm() {
                     {errors.zip && <span className="mt-1 text-xs text-red-600">{errors.zip}</span>}
                   </label>
                 </section>
-              </section>
-              <section>
-                <h3 className={SECTION_TITLE_BASE_CLASS}>How can we help?</h3>
-                <p className={SECTION_EYELASH}>Helps us route you faster</p>
-                <div className="mt-3 grid grid-cols-2 gap-4 md:grid-cols-4">
-                  {SIMPLE_PROJECT_OPTIONS.map((option) => {
-                    const selected = form.projectType === option.value;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => setField('projectType', option.value)}
-                        className={cn(
-                          PROJECT_OPTION_CARD_BASE_CLASS,
-                          selected ? PROJECT_OPTION_CARD_SELECTED_CLASS : PROJECT_OPTION_CARD_UNSELECTED_CLASS
-                        )}
-                        aria-pressed={selected}
-                      >
-                        <ProjectOptionCardContent option={option} />
-                      </button>
-                    );
-                  })}
-                  {errors.projectType && <p className="md:col-span-2 text-sm font-medium text-red-600">{errors.projectType}</p>}
-                </div>
               </section>
 
               <section>

@@ -221,7 +221,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                 ))}
             </div>
 
-            <div className="mx-auto mt-4 max-w-3xl rounded-3xl border border-blue-200 bg-blue-50 p-4 text-center shadow-sm">
+            <div className="mx-auto my-8 max-w-3xl rounded-3xl border border-blue-200 bg-blue-50 p-4 text-center shadow-sm">
                 <p className="text-lg text-slate-700">
                     You’ll get a written summary of findings, photos where helpful, and a clear plan to
                     extend the life of your roof—or a straight‑shooting estimate if replacement makes more sense.

@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelectedLayoutSegments } from "next/navigation";
 import { NavMenu } from "./NavMenu";
 import { cn } from "@/lib/utils";
+import { Phone } from "lucide-react";
 
 const HEADER_COLLAPSE_THRESHOLD = 140; // tweak this to adjust when the header compresses
 const HEADER_EXPAND_THRESHOLD = 60; // below this scroll position the header expands again
@@ -25,8 +26,8 @@ export default function Header() {
     progress: initialLanding ? 0 : 1,
   }));
   const stateRef = useRef(scrollState);
-  const isLanding = 
-    segments.length === 0 || 
+  const isLanding =
+    segments.length === 0 ||
     (segments[0] === "locations" && segments.length === 2);
 
   useEffect(() => {
@@ -143,7 +144,7 @@ export default function Header() {
       </div>
       <div
         className={cn(
-          "mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 transition-all duration-300 ease-in-out",
+          "mx-auto flex max-w-7xl items-center flex-row gap-4 px-4 transition-all duration-300 ease-in-out",
           collapsed ? "py-[0.125rem]" : "py-[0.4rem]"
         )}
       >
@@ -152,8 +153,8 @@ export default function Header() {
           className={cn("flex items-center gap-2 transition-transform duration-200 ease-out",
             collapsed ? "scale-[0.8]" : "scale-100"
           )}
-            
-         
+
+
         >
           <Image
             src={logoSrc}
@@ -167,6 +168,12 @@ export default function Header() {
             fetchPriority="high"
             className="h-[40px]"
           />
+        </SmartLink>
+        <SmartLink className="align-baseline phone-affordance" href="tel:+19418664320">
+          <div className="bg-orange-500 hover:bg-orange-400 transition-colors text-white border shadow-sm sm:hidden border-white font-medium rounded-xl px-3 py-1">
+            <Phone className="phone-icon-affordance inline h-4 w-4 mr-2" />
+            Call (941) 866-4320
+          </div>
         </SmartLink>
         <NavMenu transparent={isTransparent} />
       </div>

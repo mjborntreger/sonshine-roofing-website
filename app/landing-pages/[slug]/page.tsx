@@ -78,7 +78,7 @@ function HeroSection({ config }: { config: LandingPageConfig }) {
   const { hero, serviceArea, city } = config;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-[#0f4c81] via-[#0f6fab] to-[#0f4c81] text-white">
+    <section className="relative overflow-hidden text-white">
       <div className="absolute inset-0 opacity-20">
         <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-white/10 blur-3xl" aria-hidden="true" />
         <div className="absolute right-0 bottom-0 h-80 w-80 rounded-full bg-[#fb9216]/10 blur-3xl" aria-hidden="true" />
@@ -87,7 +87,7 @@ function HeroSection({ config }: { config: LandingPageConfig }) {
         <div className="space-y-6">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-100/80">{serviceArea}</p>
           <div className="space-y-3">
-            <h1 className="text-4xl font-bold leading-tight md:text-5xl">
+            <h1 className="text-white text-4xl font-bold leading-tight md:text-5xl">
               {renderHighlight(hero.headline, city)}
             </h1>
             <p className="text-lg text-blue-50/80 md:text-xl">{hero.subhead}</p>
@@ -119,7 +119,7 @@ function HeroSection({ config }: { config: LandingPageConfig }) {
               </SmartLink>
             </div>
             <p className="text-sm text-blue-100/80">
-              Form-first CTA for faster scheduling. Prefer to talk? Tap to call and mention you saw this ad.
+              Prefer to talk? Tap to call.
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">

@@ -16,6 +16,7 @@ import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
+import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
 
 const figureStyles = "not-prose py-8";
 const ACCORDION_TITLE = "text-xl";
@@ -124,6 +125,13 @@ export default async function Page() {
             </p>
 
             <FinancingBand />
+
+            <EvenSimplerLeadForm 
+              projectType="repair" 
+              page="/roof-repair" 
+              title="Free Roof Repair Estimate" 
+              titleHighlight="Roof Repair"
+            />
 
             <h2>Common Roof Repairs</h2>
             <Accordion

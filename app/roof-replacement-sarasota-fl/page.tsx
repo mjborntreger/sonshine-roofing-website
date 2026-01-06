@@ -16,6 +16,7 @@ import { breadcrumbSchema, howToSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
+import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
 
 const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
@@ -130,6 +131,13 @@ export default async function Page() {
             </p>
 
             <FinancingBand />
+
+            <EvenSimplerLeadForm 
+              projectType="retail" 
+              page="/roof-replacement-sarasota-fl" 
+              title="Free Roof Replacement Estimate"
+              titleHighlight="Roof Replacement"
+            />
 
             <h2>What Should You Know Before Getting a Roof Replacement?</h2>
             <Accordion

@@ -14,6 +14,7 @@ import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
 import { HandCoins, HardHat, MapPin, Zap } from "lucide-react";
+import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
 
 const SERVICE_PATH = "/roof-inspection";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -103,6 +104,13 @@ export default async function Page() {
             <JsonLd data={breadcrumbsLd} />
 
             <TipTopRoofCheckup origin={origin} />
+
+            <EvenSimplerLeadForm 
+              projectType="maintenance"
+              page="/roof-inspection"
+              title="Book a Roof Inspection"
+              titleHighlight="Roof Inspection"
+            />
 
             <h2>Why Do I Need a Roof Inspection?</h2>
             <p>

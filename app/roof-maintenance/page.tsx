@@ -12,6 +12,7 @@ import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
+import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
 
 const SERVICE_PATH = "/roof-maintenance";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -130,6 +131,14 @@ export default async function Page() {
             </p>
 
             <RoofCareClub origin={origin} />
+
+            <EvenSimplerLeadForm 
+              projectType="maintenance"
+              title="Join the Roof Care Club"
+              titleHighlight="Roof Care Club"
+              page="roof-maintenance"
+              description="Once you submit, our office will review your information and reach out with next steps."
+            />
 
           </div>
 

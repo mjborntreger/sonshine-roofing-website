@@ -354,7 +354,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
           );
         })}
       </div>
-      <p className="mt-3 text-center text-sm text-slate-500 italic">
+      <p className="mt-3 mb-8 text-center text-sm text-slate-500 italic">
         <small>**Includes up to 90 minutes to perform any combination of these three services during your annual roof inspection.</small>
       </p>
     </div>
