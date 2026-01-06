@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -149,7 +150,11 @@ function HeroSection({ config }: { config: LandingPageConfig }) {
             id="estimate-form"
             className="rounded-3xl border border-white/20 bg-white text-slate-900 shadow-2xl shadow-black/10"
           >
-            <SimpleLeadForm />
+            <Suspense
+              fallback={<div className="p-6 text-sm text-slate-500">Loading form…</div>}
+            >
+              <SimpleLeadForm />
+            </Suspense>
           </div>
         </div>
       </div>
