@@ -2,11 +2,16 @@
 
 import { useEffect } from "react";
 import Script from "next/script";
-import { envFlagTrue, isProdEnv, isSiteHost, SITE_HOST, requireEnv } from "@/lib/seo/site";
+import { envFlagTrue, isProdEnv, isSiteHost, SITE_HOST } from "@/lib/seo/site";
 import type { GtmWindow } from "@/lib/telemetry/gtm";
 
-const GTM = requireEnv("NEXT_PUBLIC_GTM_ID", { prodOnly: true });
-const META_PIXEL_ID = requireEnv("NEXT_PUBLIC_META_PIXEL_ID", { prodOnly: true });
+const GTM = (process.env.NEXT_PUBLIC_GTM_ID || "").trim();
+const META_PIXEL_ID = (process.env.NEXT_PUBLIC_META_PIXEL_ID || "").trim();
+
+if (isProdEnv() && typeof console !== "undefined" && typeof console.error === "function") {
+  if (!GTM) console.error("[env] Missing required environment variable: NEXT_PUBLIC_GTM_ID");
+  if (!META_PIXEL_ID) console.error("[env] Missing required environment variable: NEXT_PUBLIC_META_PIXEL_ID");
+}
 
 function ensureGtmGlobals(win: GtmWindow) {
   win.dataLayer = win.dataLayer ?? [];
