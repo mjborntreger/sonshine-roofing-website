@@ -17,6 +17,7 @@ import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
 import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
+import { Suspense } from "react";
 
 const figureStyles = "not-prose py-8";
 const liStyles = "relative pl-4";
@@ -132,12 +133,14 @@ export default async function Page() {
 
             <FinancingBand />
 
-            <EvenSimplerLeadForm 
-              projectType="retail" 
-              page="/roof-replacement-sarasota-fl" 
-              title="Free Roof Replacement Estimate"
-              titleHighlight="Roof Replacement"
-            />
+            <Suspense fallback={null}>
+              <EvenSimplerLeadForm
+                projectType="retail"
+                page="/roof-replacement-sarasota-fl"
+                title="Free Roof Replacement Estimate"
+                titleHighlight="Roof Replacement"
+              />
+            </Suspense>
 
             <h2>What Should You Know Before Getting a Roof Replacement?</h2>
             <Accordion

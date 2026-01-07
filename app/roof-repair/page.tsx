@@ -17,6 +17,7 @@ import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
 import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
+import { Suspense } from "react";
 
 const figureStyles = "not-prose py-8";
 const ACCORDION_TITLE = "text-xl";
@@ -126,12 +127,14 @@ export default async function Page() {
 
             <FinancingBand />
 
-            <EvenSimplerLeadForm 
-              projectType="repair" 
-              page="/roof-repair" 
-              title="Free Roof Repair Estimate" 
-              titleHighlight="Roof Repair"
-            />
+            <Suspense fallback={null}>
+              <EvenSimplerLeadForm
+                projectType="repair"
+                page="/roof-repair"
+                title="Free Roof Repair Estimate"
+                titleHighlight="Roof Repair"
+              />
+            </Suspense>
 
             <h2>Common Roof Repairs</h2>
             <Accordion

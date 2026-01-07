@@ -73,6 +73,7 @@ export default function Hero({ title = "One of The Best Roofing Companies in Sar
           height={720}
           loading="eager"
           decoding="async"
+          fetchPriority="high"
         />
 
         {/* Background video (lazy-loaded via IntersectionObserver) */}

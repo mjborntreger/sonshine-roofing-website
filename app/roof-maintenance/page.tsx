@@ -13,6 +13,7 @@ import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
 import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
+import { Suspense } from "react";
 
 const SERVICE_PATH = "/roof-maintenance";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -132,13 +133,15 @@ export default async function Page() {
 
             <RoofCareClub origin={origin} />
 
-            <EvenSimplerLeadForm 
-              projectType="maintenance"
-              title="Join the Roof Care Club"
-              titleHighlight="Roof Care Club"
-              page="roof-maintenance"
-              description="Once you submit, our office will review your information and reach out with next steps."
-            />
+            <Suspense fallback={null}>
+              <EvenSimplerLeadForm
+                projectType="maintenance"
+                title="Join the Roof Care Club"
+                titleHighlight="Roof Care Club"
+                page="roof-maintenance"
+                description="Once you submit, our office will review your information and reach out with next steps."
+              />
+            </Suspense>
 
           </div>
 
