@@ -6,7 +6,7 @@ import { envFlagTrue, isProdEnv, isSiteHost, SITE_HOST, requireEnv } from "@/lib
 import type { GtmWindow } from "@/lib/telemetry/gtm";
 
 const GTM = requireEnv("NEXT_PUBLIC_GTM_ID", { prodOnly: true });
-const META_PIXEL_ID = requireEnv("META_PIXEL_ID", { prodOnly: true });
+const META_PIXEL_ID = requireEnv("NEXT_PUBLIC_META_PIXEL_ID", { prodOnly: true });
 
 function ensureGtmGlobals(win: GtmWindow) {
   win.dataLayer = win.dataLayer ?? [];
