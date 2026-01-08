@@ -3,7 +3,7 @@ import Section from "@/components/layout/Section";
 import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside";
 import { listProjectsPaged, listProjectFilterTerms } from "@/lib/content/wp";
 import type { Metadata } from "next";
-import ProjectArchiveClient from "../../components/dynamic-content/project/ProjectArchiveClient";
+import ProjectArchiveClient from "@/components/dynamic-content/project/ProjectArchiveClient";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";

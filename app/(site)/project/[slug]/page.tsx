@@ -5,7 +5,7 @@ import SmartLink from "@/components/utils/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
 import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/content/wp";
-import ProjectVideo from "../../../components/dynamic-content/project/ProjectVideo";
+import ProjectVideo from "@/components/dynamic-content/project/ProjectVideo";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
 import ProjectGallery from "@/components/dynamic-content/project/ProjectGallery";

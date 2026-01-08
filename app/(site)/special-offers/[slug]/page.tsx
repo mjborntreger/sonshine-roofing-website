@@ -6,7 +6,7 @@ import { cookies } from 'next/headers';
 
 import Section from '@/components/layout/Section';
 import Container from '@/components/layout/Container';
-import SpecialOfferForm from '../../../components/lead-capture/special-offer/SpecialOfferForm';
+import SpecialOfferForm from '@/components/lead-capture/special-offer/SpecialOfferForm';
 import { getSpecialOfferBySlug, listSpecialOfferSlugs, stripHtml } from '@/lib/content/wp';
 import isExpired from '@/lib/lead-capture/isExpired';
 import { formatSpecialOfferExpiration } from '@/lib/lead-capture/specialOfferDates';

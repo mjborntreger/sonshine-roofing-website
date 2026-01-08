@@ -6,7 +6,7 @@ import ResourceSearchController from '@/components/dynamic-content/ResourceSearc
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
 import { Accordion } from '@/components/ui/Accordion';
-import FaqBulkToggleClient from '../../components/dynamic-content/faq/FaqBulkToggleClient';
+import FaqBulkToggleClient from '@/components/dynamic-content/faq/FaqBulkToggleClient';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';

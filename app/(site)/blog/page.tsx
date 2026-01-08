@@ -1,6 +1,6 @@
 import Section from "@/components/layout/Section";
 import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside";
-import BlogArchiveClient from "../../components/dynamic-content/blog/BlogArchiveClient";
+import BlogArchiveClient from "@/components/dynamic-content/blog/BlogArchiveClient";
 import { listBlogCategories, listPostsPaged } from "@/lib/content/wp";
 import type { Metadata } from "next";
 import { buildBasicMetadata } from "@/lib/seo/meta";
