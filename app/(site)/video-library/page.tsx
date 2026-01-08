@@ -2,8 +2,8 @@ import { cache } from "react";
 
 import Section from "@/components/layout/Section";
 import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside";
-import VideoLibraryClient from "../../components/dynamic-content/video/VideoLibraryClient";
-import VideoShareBar from "../../components/dynamic-content/video/VideoShareBar";
+import VideoLibraryClient from "@/components/dynamic-content/video/VideoLibraryClient";
+import VideoShareBar from "@/components/dynamic-content/video/VideoShareBar";
 import {
   listRecentVideoEntries,
   listProjectVideos,

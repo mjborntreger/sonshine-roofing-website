@@ -1,8 +1,8 @@
 import Section from "@/components/layout/Section";
-import { AboutVideo } from "../../components/marketing/about-page/AboutVideo";
+import { AboutVideo } from "@/components/marketing/about-page/AboutVideo";
 import { listPersons, listPersonsBySlugs } from '@/lib/content/wp';
-import PersonGrid from "../../components/dynamic-content/person/PersonGrid";
-import { HoursAndInformation } from "../../components/marketing/about-page/HoursAndInformation";
+import PersonGrid from "@/components/dynamic-content/person/PersonGrid";
+import { HoursAndInformation } from "@/components/marketing/about-page/HoursAndInformation";
 import { Accordion } from "@/components/ui/Accordion";
 import { UserRoundSearch, ExternalLink, ShieldCheck, MapPin, HardHat, Heart, Users } from "lucide-react";
 import type { Metadata } from 'next';

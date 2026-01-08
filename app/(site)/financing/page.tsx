@@ -1,7 +1,7 @@
 import SmartLink from "@/components/utils/SmartLink";
 import { ListChecks, ListOrdered, HelpCircle, Phone, Timer, Percent, CheckCircle, ArrowLeftRight, ChevronRight, DollarSign, ArrowRight } from "lucide-react";
 import ProgramCard from '@/components/marketing/financing/ProgramCard';
-import MonthlyEstimator from '../../components/lead-capture/financing/MonthlyEstimator';
+import MonthlyEstimator from '@/components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
 import Image from "next/image";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";

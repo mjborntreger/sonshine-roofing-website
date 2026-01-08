@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import TellUsWhyForm from '../../components/lead-capture/feedback/TellUsWhyForm';
+import TellUsWhyForm from '@/components/lead-capture/feedback/TellUsWhyForm';
 
 export const dynamic = 'force-static';
 
