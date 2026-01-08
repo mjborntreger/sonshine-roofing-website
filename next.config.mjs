@@ -3,7 +3,7 @@ const csp = `
   default-src 'self' https://connect.facebook.net https://storage.googleapis.com https://next.sonshineroofing.com;
   base-uri 'self';
   form-action 'self' https://*.acculynx.com;
-  frame-ancestors 'none';
+  frame-ancestors 'none' https://www.google.com;
   frame-src https://connect.facebook.net https://www.youtube-nocookie.com quickquote.iife.js.map https://www.facebook.com https://www.instagram.com https://www.youtube.com https://*.acculynx.com https://challenges.cloudflare.com https://vercel.live https://www.google.com https://maps.google.com https://www.googletagmanager.com https://www.googleadservices.com https://insight.adsrvr.org https://ct.pinterest.com https://tag.brandcdn.com https://adservices.brandcdn.com https://d1eoo1tco6rr5e.cloudfront.net https://calendly.com https://conversations-widget.brevo.com https://*.brevo.com;
   img-src 'self' data: blob: https: https://connect.facebook.net https://*.amazon-adsystem.com https://*.brandcdn.com https://assets.calendly.com https://conversations-widget.brevo.com https://*.brevo.com;
   font-src 'self' https://fonts.gstatic.com https://assets.calendly.com https://conversations-widget.brevo.com https://*.brevo.com data:;
