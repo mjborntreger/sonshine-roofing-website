@@ -130,7 +130,7 @@ export default async function Page() {
               Current Price <span className="text-slate-400 not-italic text-sm">(Cash only, no trades)</span>
             </p>
             <p className="text-blue-400 mt-2 text-5xl">
-              <span className="line-through text-slate-400 items-start text-lg mr-1">$100,000</span>$90,000
+              $75,000
             </p>
             <p className="mt-3 text-sm text-slate-200">
               This is not a truck for joy rides or casual test drives.
@@ -154,16 +154,18 @@ export default async function Page() {
                 and a Denali interior you actually want to sit in every day.
               </p>
               <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
-                <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/denalileftfront-ezgif.com-optiwebp.webp"
-                  alt="2020 GMC Sierra 1500 Denali"
-                  width={1600}
-                  height={900}
-                  className="h-auto w-full object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 960px"
-                  priority
-                />
+                <div className="relative aspect-[16/9] w-full">
+                  <Image
+                    src="https://next.sonshineroofing.com/wp-content/uploads/denalileftfront-ezgif.com-optiwebp.webp"
+                    alt="2020 GMC Sierra 1500 Denali"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 960px"
+                    priority
+                  />
+                </div>
               </div>
+
               <p className="text-base leading-relaxed text-slate-700">
                 Plenty of single-cab 5.0 F-150s with twin turbos make huge numbers, but most are not daily-drivable.
                 This build is different. It was engineered to live on the road, not on a trailer, and it does it with all
