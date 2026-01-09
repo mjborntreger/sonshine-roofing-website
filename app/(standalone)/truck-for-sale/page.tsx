@@ -1,7 +1,7 @@
 import Section from "@/components/layout/Section";
 import Hero from "@/components/ui/Hero";
 import Image from "next/image";
-import { ChartSpline, Map, Truck, Zap } from "lucide-react";
+import { ArrowUpRight, ChartSpline, Map, Truck, Zap } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import { VideoWithSchema } from "@/components/utils/VideoWithSchema";
 
@@ -92,40 +92,42 @@ const galleryImages = [
 export default async function Page() {
   return (
     <>
-      <Hero
-        title="Performance Truck for Sale"
-        subtitle="Real-world 800-wheel-horsepower GMC Sierra Denali that can be driven every day—comfort, 4WD traction, and a professionally built ProCharged 6.2L."
-        eyelash="The 'Frankenstein Truck'"
-        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/denalileftfront-ezgif.com-optiwebp-1.webp"
-        justifyStart
-        badges={[
-          { icon: Map, label: "53,334 chassis miles" },
-          { icon: Truck, label: "4WD" },
-          { icon: ChartSpline, label: "~1,025 - 1,070 hp (est.)" },
-          { icon: Zap, label: "~800 whp (real)" },
-        ]}
-      >
-        <div className="flex gap-6 flex-wrap max-w-3xl">
-          <div>
-            <p className="italic text-xl text-slate-300">
-              Current Price <span className="text-slate-400 not-italic text-sm">(Cash only, no trades)</span>
-            </p>
-            <p className="text-blue-400 mt-2 text-5xl">
-              {PRICE}
-            </p>
-            <p className="mt-3 text-sm text-slate-200">
-              This is not a truck for joy rides or casual test drives.
-            </p>
-            <p className="mt-6 text-2xl font-semibold">
-              Interested? Call or Text Nathan Borntreger: <SmartLink href="+19417354947" className="text-blue-400 font-bold">(941) 735-4947</SmartLink>
-            </p>
+      <div id="truck-offer" className="scroll-mt-24">
+        <Hero
+          title="Performance Truck for Sale"
+          subtitle="Real-world 800-wheel-horsepower GMC Sierra Denali that can be driven every day—comfort, 4WD traction, and a professionally built ProCharged 6.2L."
+          eyelash="The 'Frankenstein Truck'"
+          imageSrc="https://next.sonshineroofing.com/wp-content/uploads/denalileftfront-ezgif.com-optiwebp-1.webp"
+          justifyStart
+          badges={[
+            { icon: Map, label: "53,334 chassis miles" },
+            { icon: Truck, label: "4WD" },
+            { icon: ChartSpline, label: "~1,025 - 1,070 hp (est.)" },
+            { icon: Zap, label: "~800 whp (real)" },
+          ]}
+        >
+          <div className="flex gap-6 flex-wrap max-w-3xl">
+            <div>
+              <p className="italic text-xl text-slate-300">
+                Current Price <span className="text-slate-400 not-italic text-sm">(Cash only, no trades)</span>
+              </p>
+              <p className="text-blue-400 mt-2 text-5xl">
+                {PRICE}
+              </p>
+              <p className="mt-3 text-sm text-slate-200">
+                This is not a truck for joy rides or casual test drives.
+              </p>
+              <p className="mt-6 text-2xl font-semibold">
+                Interested? Call or Text Nathan Borntreger: <SmartLink href="+19417354947" className="text-blue-400 font-bold">(941) 735-4947</SmartLink>
+              </p>
+            </div>
           </div>
-        </div>
-      </Hero>
+        </Hero>
+      </div>
 
       <Section>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-          <div className="space-y-8">
+        <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+          <div className="space-y-8 min-w-0">
             <div className="space-y-4">
               <h2 className="text-3xl font-semibold text-slate-900">Why this truck commands the price</h2>
               <p className="text-base leading-relaxed text-slate-700">
@@ -135,12 +137,14 @@ export default async function Page() {
                 and a Denali interior you actually want to sit in every day.
               </p>
 
-              <VideoWithSchema
-                videoId="aODl4r7ftfc"
-                title="2020 GMC Sierra 1500 Denali"
-                className="aspect-[9/16]"
-                query={{ autoplay: 0, mute: 0, controls: 1, loop: 0 }}
-              />
+              <div className="max-w-full overflow-hidden rounded-xl border border-slate-200">
+                <VideoWithSchema
+                  videoId="aODl4r7ftfc"
+                  title="2020 GMC Sierra 1500 Denali"
+                  className="w-full rounded-none aspect-[9/16]"
+                  query={{ autoplay: 0, mute: 0, controls: 1, loop: 0 }}
+                />
+              </div>
 
               <p className="text-base leading-relaxed text-slate-700">
                 Plenty of single-cab 5.0 F-150s with twin turbos make huge numbers, but most are not daily-drivable.
@@ -172,7 +176,7 @@ export default async function Page() {
                 <h3 className="text-xl font-semibold text-slate-900">Performance comparison (real-world)</h3>
                 <p className="text-sm text-slate-600">Wheel horsepower numbers matter—brochures do not.</p>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto w-full">
                 <table className="min-w-full divide-y divide-slate-200 text-left text-sm text-slate-800">
                   <thead className="bg-slate-50">
                     <tr>
@@ -199,12 +203,14 @@ export default async function Page() {
               </div>
             </div>
 
-            <VideoWithSchema
-              videoId="85KrYY_U6N4"
-              title="2020 GMC Sierra 1500 Denali"
-              className="aspect-video"
-              query={{ autoplay: 0, mute: 0, controls: 1, loop: 0 }}
-            />
+            <div className="max-w-full overflow-hidden rounded-xl border border-slate-200">
+              <VideoWithSchema
+                videoId="85KrYY_U6N4"
+                title="2020 GMC Sierra 1500 Denali"
+                className="aspect-video"
+                query={{ autoplay: 0, mute: 0, controls: 1, loop: 0 }}
+              />
+            </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -229,7 +235,7 @@ export default async function Page() {
             </div>
           </div>
 
-          <div className="space-y-6 sticky self-start top-8">
+          <div className="space-y-6 sticky self-start top-8 min-w-0">
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-semibold text-slate-900">Truck snapshot</h3>
               <p className="mt-2 text-sm text-slate-700">
@@ -322,6 +328,20 @@ export default async function Page() {
               />
             </div>
           ))}
+        </div>
+      </Section>
+
+      <Section className="bg-slate-900">
+        <div className="flex flex-col items-center gap-4 text-center text-white">
+          <p className="text-lg font-semibold">Ready to feel 800 wheel horsepower again?</p>
+          <p className="text-sm text-slate-200">Jump back to the price and contact details at the top.</p>
+          <SmartLink
+            href="#truck-offer"
+            className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300"
+          >
+            Back to the offer
+            <ArrowUpRight className="h-4 w-4" aria-hidden />
+          </SmartLink>
         </div>
       </Section>
     </>
