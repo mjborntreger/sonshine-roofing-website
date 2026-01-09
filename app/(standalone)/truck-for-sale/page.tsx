@@ -3,6 +3,7 @@ import Hero from "@/components/ui/Hero";
 import Image from "next/image";
 import { ChartSpline, Map, Truck, Zap } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
+import { VideoWithSchema } from "@/components/utils/VideoWithSchema";
 
 const PLACEHOLDER_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Fallback-Hero.webp";
 
@@ -68,46 +69,24 @@ const buildSheet = [
 ];
 
 const galleryImages = [
-  // TODO: Replace with front three-quarter exterior shot
-  { alt: "Front three-quarter view showing the lowered Denali stance.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with rear three-quarter exterior shot
-  { alt: "Rear angle highlighting the exhaust and bed.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with driver side profile
-  { alt: "Side profile of the truck on level ground.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with passenger side profile
-  { alt: "Passenger side profile with Denali trim details.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with cabin overview
-  { alt: "Denali interior showing dash and seating.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with gauge cluster
-  { alt: "Gauge cluster with performance readouts.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with engine bay wide shot
-  { alt: "Engine bay with the ProCharger setup.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with ProCharger close-up
-  { alt: "Close-up of the ProCharger D-1X.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with fuel system close-up
-  { alt: "Dual fuel pump and braided fuel line setup.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with methanol system
-  { alt: "AlkyControl methanol dual-spray injection hardware.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with header detail
-  { alt: "Kooks long tube headers installed.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with exhaust detail
-  { alt: "Full exhaust by Boral with no cats.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with driveshaft
-  { alt: "Carbon fiber driveshaft by Gulfcoast Driveshaft.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with suspension setup
-  { alt: "IHC 3/5 lowering kit and air-adjustable rear bags.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with traction bars
-  { alt: "Heavy duty tie rods and traction bars.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with wheel/tire setup
-  { alt: "Wheel and tire detail with the lowered stance.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with underbody/driveline
-  { alt: "Underbody showing driveline upgrades.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with 4WD launch action shot
-  { alt: "Launch in 4WD to showcase traction and violence off the line.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with daily-driver shot
-  { alt: "Truck in daily-driver context to show drivability.", src: PLACEHOLDER_IMAGE },
-  // TODO: Replace with paperwork/dyno sheet
-  { alt: "Dyno sheet or build documentation.", src: PLACEHOLDER_IMAGE },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/DenaliSideView-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalirear-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalirightside-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalifrontview-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denaliinteriorfront-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denaliinteriorrear-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalimpgproof-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denaliliftgate-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalisupercharger-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denaliunderthehood2-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denaliunderthehood3-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denaliinfotainment2-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalidriveshaft-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalibelow2-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalibelow-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalidocs2-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/denalidocs-ezgif.com-optiwebp.webp" },
+  { alt: "", src: "https://next.sonshineroofing.com/wp-content/uploads/Denali-Dynoresults-ezgif.com-optiwebp.webp" },
 ];
 
 export default async function Page() {
@@ -155,6 +134,21 @@ export default async function Page() {
                 put down what this truck does in the real world: around 800 horsepower at the wheels, backed by 4WD traction
                 and a Denali interior you actually want to sit in every day.
               </p>
+
+              <VideoWithSchema
+                videoId="aODl4r7ftfc"
+                title="2020 GMC Sierra 1500 Denali"
+                className="aspect-[9/16]"
+                query={{ autoplay: 0, mute: 0, controls: 1, loop: 0 }}
+              />
+
+              <p className="text-base leading-relaxed text-slate-700">
+                Plenty of single-cab 5.0 F-150s with twin turbos make huge numbers, but most are not daily-drivable.
+                This build is different. It was engineered to live on the road, not on a trailer, and it does it with all
+                the factory comforts intact. Drop it into 4WD, feel the truck shake at idle, listen to the supercharger whine
+                and the exhaust note, then experience the violence when you get into it—something you will not find from a
+                stock truck or stripped-down race build.
+              </p>
               <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
                 <div className="relative aspect-[16/9] w-full">
                   <Image
@@ -167,14 +161,6 @@ export default async function Page() {
                   />
                 </div>
               </div>
-
-              <p className="text-base leading-relaxed text-slate-700">
-                Plenty of single-cab 5.0 F-150s with twin turbos make huge numbers, but most are not daily-drivable.
-                This build is different. It was engineered to live on the road, not on a trailer, and it does it with all
-                the factory comforts intact. Drop it into 4WD, feel the truck shake at idle, listen to the supercharger whine
-                and the exhaust note, then experience the violence when you get into it—something you will not find from a
-                stock truck or stripped-down race build.
-              </p>
               <p className="text-base leading-relaxed text-slate-700">
                 Real 800-wheel horsepower, real drivability, and real build quality. You can spend more on a factory badge
                 with less power and be average, or choose the combination that does it all.
@@ -213,6 +199,13 @@ export default async function Page() {
               </div>
             </div>
 
+            <VideoWithSchema
+              videoId="85KrYY_U6N4"
+              title="2020 GMC Sierra 1500 Denali"
+              className="aspect-video"
+              query={{ autoplay: 0, mute: 0, controls: 1, loop: 0 }}
+            />
+
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
                 <h3 className="text-lg font-semibold text-slate-900">Built to be driven</h3>
@@ -236,7 +229,7 @@ export default async function Page() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 sticky self-start top-8">
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="text-xl font-semibold text-slate-900">Truck snapshot</h3>
               <p className="mt-2 text-sm text-slate-700">
@@ -260,10 +253,10 @@ export default async function Page() {
 
             <div className="rounded-xl border border-slate-200 bg-slate-900 p-6 text-white shadow-sm">
               <h3 className="text-2xl text-white font-semibold">Price & terms</h3>
-              <p className="text-sm text-slate-200">
+              <p className="text-slate-200">
                 {`Asking ${PRICE} — cash only — no trades. Vehicle is sold as-is with no warranty expressed or implied.`}
               </p>
-              <p className="mt-3 text-sm text-slate-200">
+              <p className="mt-3 text-slate-200">
                 Serious interest only. This is not a truck for joy rides or casual test drives.
               </p>
               <h3 className="mt-6 text-2xl text-white font-semibold">Interested?</h3>
@@ -282,19 +275,32 @@ export default async function Page() {
             <p className="mt-2 text-base text-slate-700">
               All engine and performance work was completed professionally—no shortcuts. Additional supporting upgrades and select OEM parts are included beyond what is listed here.
             </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            {buildSheet.map((section) => (
-              <div key={section.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="text-lg font-semibold text-slate-900">{section.title}</h3>
-                <ul className="mt-3 space-y-2 text-sm text-slate-700">
-                  {section.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+            <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 my-8">
+              <div className="relative aspect-[16/9] w-full">
+                <Image
+                  src="https://next.sonshineroofing.com/wp-content/uploads/denaliunderhood-ezgif.com-optiwebp.webp"
+                  alt="2020 GMC Sierra 1500 Denali"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 960px"
+                  priority
+                />
               </div>
-            ))}
+            </div>
+
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {buildSheet.map((section) => (
+                <div key={section.title} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <h3 className="text-lg font-semibold text-slate-900">{section.title}</h3>
+                  <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                    {section.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </Section>
