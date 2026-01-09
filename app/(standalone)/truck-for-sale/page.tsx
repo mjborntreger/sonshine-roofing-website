@@ -6,6 +6,8 @@ import SmartLink from "@/components/utils/SmartLink";
 
 const PLACEHOLDER_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Fallback-Hero.webp";
 
+const PRICE = "$75,000"
+
 const comparisonRows = [
   { truck: "GMC Sierra Denali (ProCharged 6.2L)*", drivetrain: "4WD", whp: "~800 whp", crank: "~1,025 - 1,070 hp (est.)" },
   { truck: "Ram TRX*", drivetrain: "4WD", whp: "~580 - 590 whp", crank: "702 hp" },
@@ -130,7 +132,7 @@ export default async function Page() {
               Current Price <span className="text-slate-400 not-italic text-sm">(Cash only, no trades)</span>
             </p>
             <p className="text-blue-400 mt-2 text-5xl">
-              $75,000
+              {PRICE}
             </p>
             <p className="mt-3 text-sm text-slate-200">
               This is not a truck for joy rides or casual test drives.
@@ -259,7 +261,7 @@ export default async function Page() {
             <div className="rounded-xl border border-slate-200 bg-slate-900 p-6 text-white shadow-sm">
               <h3 className="text-2xl text-white font-semibold">Price & terms</h3>
               <p className="text-sm text-slate-200">
-                Asking $90,000 — cash only — no trades. Vehicle is sold as-is with no warranty expressed or implied.
+                {`Asking ${PRICE} — cash only — no trades. Vehicle is sold as-is with no warranty expressed or implied.`}
               </p>
               <p className="mt-3 text-sm text-slate-200">
                 Serious interest only. This is not a truck for joy rides or casual test drives.
