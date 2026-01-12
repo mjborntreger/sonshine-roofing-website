@@ -5,8 +5,6 @@ import { ArrowUpRight, ChartSpline, Map, Truck, Zap } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import { VideoWithSchema } from "@/components/utils/VideoWithSchema";
 
-const PLACEHOLDER_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Fallback-Hero.webp";
-
 const PRICE = "$75,000"
 
 const comparisonRows = [

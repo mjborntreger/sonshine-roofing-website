@@ -109,8 +109,8 @@ export default function Header() {
   const headerBackground = `rgba(236, 254, 255, ${backgroundOpacity})`;
   const headerBorder = `rgba(191, 219, 254, ${backgroundOpacity})`;
   const backdropBlur = backgroundOpacity > 0 ? `blur(${6 + backgroundOpacity * 6}px)` : "blur(0px)";
-  const expandedLogo = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-final-1.webp";
-  const collapsedLogo = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-2.webp";
+  const expandedLogo = "https://next.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Blue.webp";
+  const collapsedLogo = "https://next.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Orange.webp";
   const logoSrc = !collapsed && isLanding
     ? collapsedLogo
     : expandedLogo;
@@ -160,7 +160,7 @@ export default function Header() {
             src={logoSrc}
             alt="SonShine Roofing Logo"
             aria-label="SonShine Roofing Logo"
-            width={96}
+            width={106}
             height={40}
             sizes="(max-width: 120px) 20vw, 768px"
             loading="eager"
