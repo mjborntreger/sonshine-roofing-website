@@ -13,6 +13,7 @@
     --brand-blue:  #0045d7; /* primary */
     --brand-cyan:  #00e3fe; /* gradient partner */
     --brand-orange: #fb9216; /* accent/CTA */
+    --link-hover: #01024a; /* prose link hover */
 
     /* Neutrals */
     --ink-900: #0b1220;
@@ -172,7 +173,7 @@
     color: var(--brand-blue);
   }
   .prose :where(a):not(:where(.not-prose *), [data-button], .btn, .button, [data-ui-link]):hover {
-    color: var(--brand-cyan);
+    color: var(--link-hover);
   }
 
 
