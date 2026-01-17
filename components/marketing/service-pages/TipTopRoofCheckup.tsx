@@ -10,7 +10,7 @@ import { ArrowLeftRight } from 'lucide-react';
 
 type Item = { label: string; why: string };
 
-type GroupKey = 'interior' | 'attic' | 'exterior';
+type GroupKey = 'interior' | 'attic' | 'exterior' | 'safety';
 
 const CHECKLIST: Record<GroupKey, { title: string; blurb: string; items: Item[] }> = {
     interior: {
@@ -66,12 +66,28 @@ const CHECKLIST: Record<GroupKey, { title: string; blurb: string; items: Item[] 
             { label: 'Damaged caulking', why: 'Dried or cracked sealant fails under sun and rain. We note and recommend touch‑ups.' },
         ],
     },
+    safety: {
+        title: 'Other Safety Concerns',
+        blurb:
+            'We note non-roof issues that could affect safety or the home, so you can address them early.',
+        items: [
+            {
+                label: 'Noticeable structural and/or environmental concerns',
+                why: 'We flag visible issues like sagging framing, storm damage, or unsafe access conditions so you can address them quickly.',
+            },
+            {
+                label: 'Noticeable evidence of any non-roof related concerns',
+                why: 'If we see problems outside the roof scope, we document them so you can route them to the right trade.',
+            },
+        ],
+    },
 };
 
 const PILLS: { key: GroupKey; label: string }[] = [
     { key: 'interior', label: 'Interior' },
     { key: 'attic', label: 'Attic' },
     { key: 'exterior', label: 'Exterior' },
+    { key: 'safety', label: 'Safety' },
 ];
 
 type TipTopRoofCheckupProps = {
