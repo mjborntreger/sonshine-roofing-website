@@ -89,11 +89,11 @@ export default async function Page() {
         <div className="flex gap-6 flex-wrap max-w-3xl">
           <div>
             <p className="italic text-sm text-slate-300">Tip Top Roof Check-up</p>
-            <p className="text-blue-400 mt-2 text-4xl"><span className="line-through text-slate-400 items-start text-lg mr-1">$199 </span>$169</p>
+            <p className="text-blue-400 mt-2 text-4xl"><span className="line-through text-slate-400 items-start text-lg mr-1">$249 </span>$209</p>
           </div>
           <div>
             <p className="italic text-sm text-slate-300">Real-estate Inspection</p>
-            <p className="text-blue-100 mt-2 text-4xl">$199+</p>
+            <p className="text-blue-100 mt-2 text-4xl">$249+</p>
           </div>
         </div>
       </Hero>

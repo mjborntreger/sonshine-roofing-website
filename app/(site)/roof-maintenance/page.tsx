@@ -83,7 +83,7 @@ export default async function Page() {
         <div className="flex gap-6 flex-wrap max-w-3xl">
           <div>
             <p className="italic text-sm text-slate-300">Starting at just</p>
-            <p className="text-blue-400 mt-2 text-4xl"><span className="line-through text-slate-400 items-start text-lg mr-1">$199 </span>$169<span className="text-slate-200 ml-1 text-lg">/ per year</span></p>
+            <p className="text-blue-400 mt-2 text-4xl"><span className="line-through text-slate-400 items-start text-lg mr-1">$189 </span>$169<span className="text-slate-200 ml-1 text-lg">/ per year</span></p>
           </div>
         </div>
       </Hero>
