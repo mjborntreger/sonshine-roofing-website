@@ -178,7 +178,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
         </h2>
         <p className="mt-4 text-lg text-slate-600">
           Select a membership term. Longer terms lower the annual cost and unlock larger
-          discounts—<span className="font-medium text-slate-800">memberships are billed annually</span>.
+          discounts.
         </p>
         <JsonLd data={serviceLd} />
       </div>
@@ -194,9 +194,14 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
               {/* Header */}
               <div className="not-prose px-6 py-5 bg-[#0045d7] text-white">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-2xl font-semibold leading-tight text-white">
-                    Roof Care Club Membership
-                  </h3>
+                  <div>
+                    <h3 className="text-2xl font-semibold leading-tight text-white">
+                      Roof Care Club Membership
+                    </h3>
+                    <p className="font-medium italic text-slate-200">All membership terms are billed upfront</p>
+                  </div>
+
+
                   {/* Toggles */}
                   <div className="flex flex-col items-center gap-3">
                     <p className="uppercase font-semibold text-slate-200 text-sm">
@@ -216,7 +221,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                             'px-4 py-1.5 text-sm transition duration-300',
                             term === t
                               ? 'bg-[var(--brand-orange)] text-white font-semibold'
-                              : 'hover:bg-[#fb9216]/50 font-semibold text-slate-800',
+                              : 'hover:bg-[#fb9216]/20 font-semibold text-slate-800',
                           ].join(' ')}
                         >
                           {t}-year
