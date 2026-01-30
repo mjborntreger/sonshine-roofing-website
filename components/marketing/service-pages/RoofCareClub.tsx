@@ -203,7 +203,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                       Select Term
                       <ArrowLeftRight className="inline ml-2 text-white h-4 w-4" />
                     </p>
-                    
+
                     {/* Duration */}
                     <div className="inline-flex overflow-hidden rounded-lg bg-cyan-50 shadow-sm">
                       {[1, 2, 3].map((t) => (
