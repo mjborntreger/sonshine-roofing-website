@@ -5,6 +5,7 @@ import { Accordion } from '@/components/ui/Accordion';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
+import { ArrowLeftRight, CircleCheck } from 'lucide-react';
 
 // -----------------------------
 // Types & Data
@@ -175,35 +176,11 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
         <h2 id="roof-care-club" className="text-3xl md:text-4xl font-semibold tracking-tight">
           Roof Care Club
         </h2>
-        <p className="mt-4 text-slate-600">
+        <p className="mt-4 text-lg text-slate-600">
           Select a membership term. Longer terms lower the annual cost and unlock larger
           discounts—<span className="font-medium text-slate-800">memberships are billed annually</span>.
         </p>
         <JsonLd data={serviceLd} />
-      </div>
-
-      {/* Toggles */}
-      <div className="mt-6 flex flex-col items-center gap-3">
-        {/* Duration */}
-        <div className="inline-flex rounded-full border border-blue-200 bg-white p-1 shadow-sm">
-          {[1, 2, 3].map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTerm(t as Term)}
-              aria-pressed={term === t}
-              className={[
-                'px-4 py-1.5 text-sm rounded-full transition',
-                term === t
-                  ? 'bg-[var(--brand-blue,#0045d7)] text-white shadow'
-                  : 'text-slate-700 hover:bg-slate-50',
-              ].join(' ')}
-            >
-              {t}-year
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-slate-500">All memberships are billed up front.</p>
       </div>
 
       {/* Cards */}
@@ -217,31 +194,52 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
               {/* Header */}
               <div className="not-prose px-6 py-5 bg-[#0045d7] text-white">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <h3 className="text-xl md:text-2xl font-semibold leading-tight text-white">
+                  <h3 className="text-2xl font-semibold leading-tight text-white">
                     Roof Care Club Membership
                   </h3>
-                  <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-white/15 text-white">
-                    {selected.term}-year term
-                  </span>
+                  {/* Toggles */}
+                  <div className="flex flex-col items-center gap-3">
+                    <p className="uppercase font-semibold text-slate-200 text-sm">
+                      Select Term
+                      <ArrowLeftRight className="inline ml-2 text-white h-4 w-4" />
+                    </p>
+                    
+                    {/* Duration */}
+                    <div className="inline-flex overflow-hidden rounded-lg bg-cyan-50 shadow-sm">
+                      {[1, 2, 3].map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setTerm(t as Term)}
+                          aria-pressed={term === t}
+                          className={[
+                            'px-4 py-1.5 text-sm transition duration-300',
+                            term === t
+                              ? 'bg-[var(--brand-orange)] text-white font-semibold'
+                              : 'hover:bg-[#fb9216]/50 font-semibold text-slate-800',
+                          ].join(' ')}
+                        >
+                          {t}-year
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-                <p className="mt-2 text-sm text-white/90">
-                  Longer terms lower the annual rate and increase discounts.
-                </p>
               </div>
 
               {/* Price */}
               <div className="px-6 pt-5">
                 <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-3xl font-semibold tracking-tight">
+                  <span className="text-4xl font-semibold tracking-tight">
                     {currency(selected.annual)}/yr
                   </span>
-                  <span className="text-slate-500">
+                  <span className="text-slate-500 text-lg">
                     {currency(selected.total)} total for {selected.term} year
                     {selected.term > 1 ? 's' : ''}
                   </span>
                 </div>
                 {term > 1 && savings && savings.saved > 0 && (
-                  <div className="mt-1 text-sm text-emerald-600">
+                  <div className="mt-1 text-emerald-600">
                     Save {currency(savings.saved)} ({savings.pct}%) versus renewing annually
                   </div>
                 )}
@@ -249,14 +247,14 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
 
               {/* Benefits */}
               <div className="mt-6 border-t border-slate-200 px-6 pt-5">
-                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+                <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
                   Included with every membership
                 </h4>
                 <ul className="mt-3 space-y-3 list-none">
                   {BENEFITS.map((benefit) => (
                     <li key={benefit.id}>
                       <Accordion
-                        summary={<h5 className="text-lg">{benefit.label}</h5>}
+                        summary={<h5 className="text-lg"><CircleCheck className="inline mr-2 text-green-600 h-5 w-5" />{benefit.label}</h5>}
                         radius="2xl"
                         tone="soft"
                         size="md"
@@ -276,10 +274,10 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
 
               {/* Discounts */}
               <div className="mt-6 border-t border-slate-200 px-6 pt-5">
-                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+                <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
                   Term-based discounts
                 </h4>
-                <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 text-sm">
+                <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 text-lg">
                   <div className="grid grid-cols-3 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
                     <div className="px-3 py-2">Term</div>
                     <div className="px-3 py-2">Repair discount</div>
@@ -303,10 +301,10 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
 
               {/* Inclusion rules */}
               <div className="mt-6 border-t border-slate-200 px-6 pt-5 pb-6">
-                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
+                <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
                   Automatic membership for customers
                 </h4>
-                <ul className="mt-3 list-disc pl-5 text-sm text-slate-600">
+                <ul className="mt-3 list-disc pl-5 text-lg text-slate-600">
                   {INCLUSION_RULES.map((rule) => (
                     <li key={rule}>{rule}</li>
                   ))}
