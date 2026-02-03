@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
 import type { VideoItem } from "@/lib/content/wp";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
-import { useQuickQuoteHidden } from "@/lib/quickquote";
 
 type Props = {
   video: VideoItem | null;
@@ -36,8 +35,6 @@ export default function VideoModal({ video, isOpen, onClose }: Props) {
     () => video?.youtubeId ?? video?.slug ?? video?.id ?? "video-modal",
     [video?.id, video?.slug, video?.youtubeId]
   );
-
-  useQuickQuoteHidden(isOpen);
 
   useEffect(() => {
     if (!isOpen || !video) return undefined;

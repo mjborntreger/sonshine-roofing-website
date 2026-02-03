@@ -206,7 +206,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         selection:bg-[#0045d7] selection:text-white
       "
     >
-      <Script strategy="afterInteractive" src="https://qq.leadsbyquickquote.com/roofs/integration"></Script>
       <PhoneClickListener />
       <AnalyticsScripts />
       <Header />
