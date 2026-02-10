@@ -174,7 +174,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
     <div aria-labelledby="roof-care-club" className="mt-24 mb-12 not-prose">
       <div className="text-center max-w-3xl mx-auto">
         <h2 id="roof-care-club" className="text-3xl md:text-4xl font-semibold tracking-tight">
-          Roof Care Club
+          The Roof Care Club
         </h2>
         <p className="mt-4 text-lg text-slate-600">
           Select a membership term. Longer terms lower the annual cost and unlock larger

@@ -94,6 +94,18 @@ export default async function Page() {
             <JsonLd data={webPageLd} />
             <JsonLd data={breadcrumbsLd} />
 
+            <RoofCareClub origin={origin} />
+
+            <Suspense fallback={null}>
+              <EvenSimplerLeadForm
+                projectType="maintenance"
+                title="Join The Roof Care Club"
+                titleHighlight="Roof Care Club"
+                page="roof-maintenance"
+                description="Once you submit, our office will review your information and reach out with next steps."
+              />
+            </Suspense>
+
             <h2 className="mt-0">
               Undoubtedly, lack of maintenance is among the top reasons why roofs fail.
             </h2>
@@ -130,18 +142,6 @@ export default async function Page() {
               they escalate into major roof repairs, structural rot, or indoor health hazards that
               threaten your home and well-being.
             </p>
-
-            <RoofCareClub origin={origin} />
-
-            <Suspense fallback={null}>
-              <EvenSimplerLeadForm
-                projectType="maintenance"
-                title="Join the Roof Care Club"
-                titleHighlight="Roof Care Club"
-                page="roof-maintenance"
-                description="Once you submit, our office will review your information and reach out with next steps."
-              />
-            </Suspense>
 
           </div>
 
