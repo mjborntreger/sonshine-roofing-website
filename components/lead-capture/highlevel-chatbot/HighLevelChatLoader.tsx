@@ -2,43 +2,34 @@
 
 import { useEffect } from 'react';
 
-type BrevoConversationsFn = ((...args: unknown[]) => void) & { q?: unknown[][] };
-
 declare global {
   interface Window {
-    __brevoConversationsLoaded?: boolean;
-    BrevoConversationsID?: string;
-    BrevoConversations?: {
-      (...args: unknown[]): void;
-      q?: unknown[][];
-    };
+    __highLevelChatLoaded?: boolean;
   }
 }
 
-export default function BrevoChatLoader() {
+const HIGHLEVEL_WIDGET_ID = '6976efd1572f858de7e8d5b3';
+const HIGHLEVEL_SCRIPT_SRC = 'https://widgets.leadconnectorhq.com/loader.js';
+const HIGHLEVEL_RESOURCES_URL = 'https://widgets.leadconnectorhq.com/chat-widget/loader.js';
+
+export default function HighLevelChatLoader() {
   useEffect(() => {
-    if (typeof window === 'undefined' || window.__brevoConversationsLoaded) return undefined;
+    if (typeof window === 'undefined' || window.__highLevelChatLoaded) return undefined;
 
     const injectScript = () => {
-      if (window.__brevoConversationsLoaded) return;
-      window.__brevoConversationsLoaded = true;
+      if (window.__highLevelChatLoaded) return;
+      window.__highLevelChatLoaded = true;
 
       try {
-        window.BrevoConversationsID = '68507bf3bb6bfc804b0cadfc';
-        if (!window.BrevoConversations) {
-          const queueingFunction: BrevoConversationsFn = (...args: unknown[]) => {
-            (queueingFunction.q = queueingFunction.q || []).push(args);
-          };
-          window.BrevoConversations = queueingFunction;
-        }
-
         const script = document.createElement('script');
         script.async = true;
-        script.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
+        script.src = HIGHLEVEL_SCRIPT_SRC;
+        script.setAttribute('data-resources-url', HIGHLEVEL_RESOURCES_URL);
+        script.setAttribute('data-widget-id', HIGHLEVEL_WIDGET_ID);
 
         document.head?.appendChild(script);
       } catch {
-        window.__brevoConversationsLoaded = false;
+        window.__highLevelChatLoaded = false;
       }
     };
 
@@ -48,7 +39,7 @@ export default function BrevoChatLoader() {
     let listenersActive = false;
 
     const scheduleInjection = () => {
-      if (window.__brevoConversationsLoaded) return;
+      if (window.__highLevelChatLoaded) return;
       if (idleHandle !== undefined || idleFallbackHandle !== undefined) return;
 
       if (typeof window.requestIdleCallback === 'function') {
@@ -83,7 +74,7 @@ export default function BrevoChatLoader() {
     };
 
     function handleFirstEngagement() {
-      if (window.__brevoConversationsLoaded) {
+      if (window.__highLevelChatLoaded) {
         cleanupListeners();
         return;
       }

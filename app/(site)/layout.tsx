@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Header from "@/components/global-nav/header/Header";
 import Footer from "@/components/global-nav/footer/Footer";
 import AnalyticsScripts from "@/lib/telemetry/analytics";
-import BrevoChatLoader from "@/components/lead-capture/brevo-chatbot/BrevoChatLoader";
+import HighLevelChatLoader from "@/components/lead-capture/highlevel-chatbot/HighLevelChatLoader";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Script from "next/script";
 import PhoneClickListener from "@/components/telemetry/PhoneClickListener";
@@ -216,7 +216,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
         dangerouslySetInnerHTML={{ __html: JSON.stringify(getGlobalSchema()) }}
       />
-      <BrevoChatLoader />
+      <HighLevelChatLoader />
     </div>
   );
 }
