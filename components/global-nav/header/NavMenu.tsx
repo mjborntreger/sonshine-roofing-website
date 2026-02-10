@@ -61,9 +61,9 @@ function MenuToggleIcon({ open }: { open: boolean }) {
 
   if (prefersReducedMotion) {
     return open ? (
-      <X className="h-3 w-3 text-white" aria-hidden="true" />
+      <X className="h-2 w-2 text-white" aria-hidden="true" />
     ) : (
-      <Menu className="h-3 w-3 text-white" aria-hidden="true" />
+      <Menu className="h-2 w-2 text-white" aria-hidden="true" />
     );
   }
 
@@ -462,7 +462,7 @@ function MobileMenu() {
         aria-haspopup="menu"
         data-open={open}
       >
-        <span className="font-display text-xl font-bold leading-none">Menu</span>
+        <span className="font-display font-semibold text-sm leading-none">Menu</span>
         <MenuToggleIcon open={open} />
       </button>
 

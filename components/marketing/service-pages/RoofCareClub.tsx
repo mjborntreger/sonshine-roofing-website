@@ -1,12 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type MouseEvent } from 'react';
 import { Accordion } from '@/components/ui/Accordion';
+import SmartLink from '@/components/utils/SmartLink';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
-import { ArrowLeftRight, ArrowUpRight, CircleCheck } from 'lucide-react';
-import SmartLink from '@/components/utils/SmartLink';
+import { pushToDataLayer } from '@/lib/telemetry/gtm';
+import { ArrowLeftRight, ArrowUpRight, CircleCheck, ShieldCheck } from 'lucide-react';
 
 // -----------------------------
 // Types & Data
@@ -81,6 +82,17 @@ const TERM_PLANS: TermPlan[] = [
     inspectionDiscount: 100,
   },
 ];
+
+const TERMS_URL = '/roof-maintenance/roof-care-club-terms-and-conditions';
+
+const PAYMENT_LINKS: Record<Term, string> = {
+  // TODO: Replace with Stripe Payment Link for 1-year membership.
+  1: 'https://links.sonshineroofing.com/payment-link/6979440dc80eafcdc68d16f8',
+  // TODO: Replace with Stripe Payment Link for 2-year membership.
+  2: 'https://links.sonshineroofing.com/payment-link/69810ad2353338c241c0ab52',
+  // TODO: Replace with Stripe Payment Link for 3-year membership.
+  3: 'https://links.sonshineroofing.com/payment-link/69810b38c80eaffba597a04d',
+};
 
 const INCLUSION_RULES = [
   'Roof replacement customers receive 2 years of Roof Care Club membership at no cost.',
@@ -179,29 +191,45 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
         {(() => {
           const selected = TERM_PLANS.find((plan) => plan.term === term) ?? TERM_PLANS[0];
           const savings = savingsVsOneYear(TERM_PLANS, term);
+          const paymentLink = PAYMENT_LINKS[selected.term];
+
+          const handlePaymentClick = (event: MouseEvent<HTMLAnchorElement>) => {
+            if (!paymentLink) {
+              event.preventDefault();
+              return;
+            }
+
+            pushToDataLayer({
+              event: 'roof_care_club_purchase_click',
+              term_years: selected.term,
+              value: selected.total,
+              annual_price: selected.annual,
+              currency: 'USD',
+            });
+          };
 
           return (
             <div className="relative flex flex-col overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm z-0">
               {/* Header */}
               <div className="not-prose px-6 py-5 bg-[#0045d7] text-white">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-center md:text-left text-2xl md:text-3xl font-semibold leading-tight text-white">
+                  <div className="justify-center text-center sm:text-left sm:justify-start mx-auto sm:mx-0">
+                    <h3 className="text-3xl md:text-4xl font-semibold leading-tight text-white">
                       The Roof Care Club
                     </h3>
-                    <p className="text-center md:text-left ont-medium italic text-slate-200 md:text-lg">All membership terms are billed upfront</p>
+                    <p className="italic justify-center md:justify-start mx-auto md:mx-0 leading-tight text-slate-200 align-middle">
+                      The Proactive Side of Home-Ownership
+                    </p>
                   </div>
-
-
                   {/* Toggles */}
-                  <div className="flex flex-col items-center gap-3 justify-center md:justify-end">
-                    <p className="justify-center md:justify-end uppercase font-semibold text-slate-200 text-sm">
+                  <div className="flex flex-col mx-auto md:mx-0 items-center gap-3">
+                    <p className="uppercase font-semibold text-slate-200 text-sm md:text-lg">
                       Select Term
-                      <ArrowLeftRight className="inline ml-2 text-white h-4 w-4" />
+                      <ArrowLeftRight className="inline ml-2 text-white h-4 md:h-5 w-4 md:w-5" />
                     </p>
 
                     {/* Duration */}
-                    <div className="inline-flex justify-center md:justify-end overflow-hidden rounded-lg bg-cyan-50 shadow-sm">
+                    <div className="inline-flex justify-center overflow-hidden rounded-lg bg-cyan-50 shadow-sm">
                       {[1, 2, 3].map((t) => (
                         <button
                           key={t}
@@ -209,7 +237,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                           onClick={() => setTerm(t as Term)}
                           aria-pressed={term === t}
                           className={[
-                            'px-4 py-1.5 text-sm transition duration-300',
+                            'px-4 py-1.5 text-sm md:text-lg transition duration-300',
                             term === t
                               ? 'bg-[var(--brand-orange)] text-white font-semibold'
                               : 'hover:bg-[#fb9216]/20 font-semibold text-slate-800',
@@ -225,20 +253,46 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
 
               {/* Price */}
               <div className="px-6 pt-5">
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-4xl font-semibold tracking-tight">
-                    {currency(selected.annual)}/yr
-                  </span>
-                  <span className="text-slate-500 text-lg">
-                    {currency(selected.total)} total for {selected.term} year
-                    {selected.term > 1 ? 's' : ''}
-                  </span>
-                </div>
-                {term > 1 && savings && savings.saved > 0 && (
-                  <div className="mt-1 text-emerald-600">
-                    Save {currency(savings.saved)} ({savings.pct}%) versus renewing annually
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      <span className="text-4xl font-semibold tracking-tight">
+                        {currency(selected.annual)}/yr
+                      </span>
+                      <span className="text-slate-500 text-lg">
+                        {currency(selected.total)} total for {selected.term} year
+                        {selected.term > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    {term > 1 && savings && savings.saved > 0 && (
+                      <div className="mt-1 text-emerald-600">
+                        Save {currency(savings.saved)} ({savings.pct}%) versus renewing annually
+                      </div>
+                    )}
                   </div>
-                )}
+                  <div>
+                  <SmartLink
+                    href={paymentLink || '#'}
+                    openInNewTab={false}
+                    onClick={handlePaymentClick}
+                    className="btn btn-brand-blue btn-xl whitespace-nowrap"
+                  >
+                    Join the Roof Care Club
+                    <ShieldCheck className="h-6 w-6 inline ml-2" />
+                  </SmartLink>
+                  <p className="text-center mt-2 text-xs font-semibold uppercase text-slate-600">
+                    Takes you to a secure sign-up link
+                    <ArrowUpRight className="inline ml-1 h-3 w-3" />
+                  </p>
+                  </div>
+                </div>
+                <p className="mt-3 text-sm text-slate-500">
+                  Billed upfront. Membership applies to one property. Taxes/fees may apply.{' '}
+                  <SmartLink data-icon-affordance="up-right" href={TERMS_URL}>
+                    See terms
+                    <ArrowUpRight className="icon-affordance inline h-3 w-3 ml-1" />
+                  </SmartLink>
+                </p>
               </div>
 
               {/* Benefits */}
@@ -305,12 +359,6 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                     <li key={rule}>{rule}</li>
                   ))}
                 </ul>
-                <p className="mt-6 text-lg text-[--brand-blue] text-right">
-                  <SmartLink data-icon-affordance="up-right" href="/roof-maintenance/roof-care-club-terms-and-conditions">
-                    View Roof Care Club Terms and Conditions
-                    <ArrowUpRight className="icon-affordance inline h-4 w-4 ml-1" />
-                  </SmartLink>
-                </p>
               </div>
             </div>
           );
