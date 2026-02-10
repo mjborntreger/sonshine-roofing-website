@@ -26,8 +26,8 @@ export default function RoofCareClubTermsPage() {
           <h1>Roof Care Club Terms and Conditions</h1>
           <p><strong>Effective Date:</strong> 02/10/2026</p>
           <p>
-            These Terms and Conditions ("Terms") govern participation in the Roof Care Club
-            maintenance membership ("Membership") offered by SonShine Roofing Inc. ("SonShine Roofing").
+            These Terms and Conditions (&quot;Terms&quot;) govern participation in the Roof Care Club
+            maintenance membership (&quot;Membership&quot;) offered by SonShine Roofing Inc. (&quot;SonShine Roofing&quot;).
             By enrolling, scheduling service, or paying for a Membership, you agree to these
             Terms. If you have a signed agreement or proposal that conflicts with these Terms,
             the signed agreement controls.

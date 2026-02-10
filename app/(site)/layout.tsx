@@ -3,7 +3,6 @@ import Header from "@/components/global-nav/header/Header";
 import Footer from "@/components/global-nav/footer/Footer";
 import AnalyticsScripts from "@/lib/telemetry/analytics";
 import { SITE_ORIGIN } from "@/lib/seo/site";
-import Script from "next/script";
 import PhoneClickListener from "@/components/telemetry/PhoneClickListener";
 
 export const metadata: Metadata = {
