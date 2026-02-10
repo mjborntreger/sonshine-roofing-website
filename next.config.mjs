@@ -1,6 +1,6 @@
 // Security headers (CSP enforced in all environments)
 const csp = `
-  default-src 'self' https://connect.facebook.net https://storage.googleapis.com https://next.sonshineroofing.com;
+  default-src 'self' https://widgets.leadconnectorhq.com https://connect.facebook.net https://storage.googleapis.com https://next.sonshineroofing.com;
   base-uri 'self';
   form-action 'self' https://*.acculynx.com;
   frame-ancestors https://www.google.com;
