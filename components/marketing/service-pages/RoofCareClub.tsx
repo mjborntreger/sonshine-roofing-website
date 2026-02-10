@@ -5,7 +5,8 @@ import { Accordion } from '@/components/ui/Accordion';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
-import { ArrowLeftRight, CircleCheck } from 'lucide-react';
+import { ArrowLeftRight, ArrowUpRight, CircleCheck } from 'lucide-react';
+import SmartLink from '@/components/utils/SmartLink';
 
 // -----------------------------
 // Types & Data
@@ -171,20 +172,10 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
   );
 
   return (
-    <div aria-labelledby="roof-care-club" className="mt-24 mb-12 not-prose">
-      <div className="text-center max-w-3xl mx-auto">
-        <h2 id="roof-care-club" className="text-3xl md:text-4xl font-semibold tracking-tight">
-          The Roof Care Club
-        </h2>
-        <p className="mt-4 text-lg text-slate-600">
-          Select a membership term. Longer terms lower the annual cost and unlock larger
-          discounts.
-        </p>
-        <JsonLd data={serviceLd} />
-      </div>
-
+    <div aria-labelledby="roof-care-club" className="mt-2 mb-12 not-prose">
+      <JsonLd data={serviceLd} />
       {/* Cards */}
-      <div className="not-prose mt-8 max-w-4xl mx-auto">
+      <div className="not-prose max-w-4xl mx-auto">
         {(() => {
           const selected = TERM_PLANS.find((plan) => plan.term === term) ?? TERM_PLANS[0];
           const savings = savingsVsOneYear(TERM_PLANS, term);
@@ -195,22 +186,22 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
               <div className="not-prose px-6 py-5 bg-[#0045d7] text-white">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <h3 className="text-2xl font-semibold leading-tight text-white">
-                      Roof Care Club Membership
+                    <h3 className="text-center md:text-left text-2xl md:text-3xl font-semibold leading-tight text-white">
+                      The Roof Care Club
                     </h3>
-                    <p className="font-medium italic text-slate-200">All membership terms are billed upfront</p>
+                    <p className="text-center md:text-left ont-medium italic text-slate-200 md:text-lg">All membership terms are billed upfront</p>
                   </div>
 
 
                   {/* Toggles */}
-                  <div className="flex flex-col items-center gap-3">
-                    <p className="uppercase font-semibold text-slate-200 text-sm">
+                  <div className="flex flex-col items-center gap-3 justify-center md:justify-end">
+                    <p className="justify-center md:justify-end uppercase font-semibold text-slate-200 text-sm">
                       Select Term
                       <ArrowLeftRight className="inline ml-2 text-white h-4 w-4" />
                     </p>
 
                     {/* Duration */}
-                    <div className="inline-flex overflow-hidden rounded-lg bg-cyan-50 shadow-sm">
+                    <div className="inline-flex justify-center md:justify-end overflow-hidden rounded-lg bg-cyan-50 shadow-sm">
                       {[1, 2, 3].map((t) => (
                         <button
                           key={t}
@@ -307,13 +298,19 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
               {/* Inclusion rules */}
               <div className="mt-6 border-t border-slate-200 px-6 pt-5 pb-6">
                 <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
-                  Automatic membership for customers
+                  FREE TRIAL membership for existing customers
                 </h4>
                 <ul className="mt-3 list-disc pl-5 text-lg text-slate-600">
                   {INCLUSION_RULES.map((rule) => (
                     <li key={rule}>{rule}</li>
                   ))}
                 </ul>
+                <p className="mt-6 text-lg text-[--brand-blue] text-right">
+                  <SmartLink data-icon-affordance="up-right" href="/roof-maintenance/roof-care-club-terms-and-conditions">
+                    View Roof Care Club Terms and Conditions
+                    <ArrowUpRight className="icon-affordance inline h-4 w-4 ml-1" />
+                  </SmartLink>
+                </p>
               </div>
             </div>
           );

@@ -12,8 +12,6 @@ import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
-import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
-import { Suspense } from "react";
 
 const SERVICE_PATH = "/roof-maintenance";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -73,7 +71,7 @@ export default async function Page() {
     <>
       <Hero
         title="Roof Maintenance"
-        subtitle="For over 38 years, we've prioritized maintaining your current roof over upselling you on a replacement you don't need. We understand that committment, loyalty, and trust contribute more to our success than making a quick buck. To get the full lifespan out of your roof, we genuinely recommend that you join our 'Roof Care Club.' For just a few hundred dollars a year, your roof is guaranteed to live its full life, potentially saving you thousands in costly repairs or premature replacement. The choice is yours. Call us today to discuss a plan that works for you."
+        subtitle="For over 38 years, we've prioritized maintaining your current roof over upselling you on a replacement you don't need. We understand that committment, loyalty, and trust contribute more to our success than making a quick buck. To get the full lifespan out of your roof, we genuinely recommend that you join our 'Roof Care Club.' For less than $200 per year, your roof is guaranteed to live its full life, potentially saving you thousands in costly repairs or premature replacement. The choice is yours. Call us today to discuss a plan that works for you."
         eyelash="Residential Roof Maintenance in Sarasota, FL and Surrounding Areas"
         badges={[
 
@@ -96,19 +94,7 @@ export default async function Page() {
 
             <RoofCareClub origin={origin} />
 
-            <Suspense fallback={null}>
-              <EvenSimplerLeadForm
-                projectType="maintenance"
-                title="Join The Roof Care Club"
-                titleHighlight="Roof Care Club"
-                page="roof-maintenance"
-                description="Once you submit, our office will review your information and reach out with next steps."
-              />
-            </Suspense>
-
-            <h2 className="mt-0">
-              Undoubtedly, lack of maintenance is among the top reasons why roofs fail.
-            </h2>
+            <h2 className="text-3xl">Undoubtedly, lack of maintenance is among the top reasons why roofs fail.</h2>
             <p>
               Whether it’s a large hole or a small leak, water that seeps below the top
               layer of a roof can destroy everything in its path. Small leaks, in particular,
