@@ -180,6 +180,24 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
       { name: "About SonShine Roofing", path: "/about-sonshine-roofing" },
     ],
   },
+  "/homeowner-referral-program": {
+    title: "Homeowner Referral Program | SonShine Roofing",
+    description:
+      "Earn $250 per qualified roof replacement referral and share the SonShine Roofing experience.",
+    keywords: [
+      "homeowner referral program",
+      "roofing referral program",
+      "SonShine Roofing referral",
+      "earn $250 referral",
+      "roof replacement referral",
+      "Sarasota roofing referrals",
+    ],
+    image: { url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630 },
+    breadcrumbs: [
+      { name: "Home", path: "/" },
+      { name: "Homeowner Referral Program", path: "/homeowner-referral-program" },
+    ],
+  },
   "/contact-us": {
     title: "Contact SonShine Roofing | Sarasota Roofing Company",
     description:
@@ -207,4 +225,3 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
 export function getServicePageConfig(path: string): ServicePageConfig | null {
   return SERVICE_PAGE_CONFIG[path] ?? null;
 }
-

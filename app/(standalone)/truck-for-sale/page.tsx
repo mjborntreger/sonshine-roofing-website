@@ -5,7 +5,7 @@ import { ArrowUpRight, ChartSpline, Map, Truck, Zap } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import { VideoWithSchema } from "@/components/utils/VideoWithSchema";
 
-const PRICE = "$55,000"
+const PRICE = "$63,500"
 
 const comparisonRows = [
   { truck: "GMC Sierra Denali (ProCharged 6.2L)*", drivetrain: "4WD", whp: "~800 whp", crank: "~1,025 - 1,070 hp (est.)" },
