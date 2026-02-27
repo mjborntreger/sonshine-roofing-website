@@ -7,7 +7,7 @@ import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { pushToDataLayer } from '@/lib/telemetry/gtm';
-import { ArrowLeftRight, ArrowUpRight, CircleCheck } from 'lucide-react';
+import { ArrowLeftRight, ArrowUpRight, CircleCheck, Phone } from 'lucide-react';
 
 // -----------------------------
 // Types & Data
@@ -271,8 +271,14 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                     )}
                   </div>
                 </div>
+                <SmartLink className="phone-affordance mt-4 w-full not-prose" href="tel:+19418664320">
+                  <div className="btn btn-md btn-brand-blue w-full">
+                    <Phone className="phone-affordance-icon inline h-4 w-4 mr-2" />
+                    Call (941) 866-4320
+                  </div>
+                </SmartLink>
                 <p className="mt-3 text-sm text-slate-500">
-                  Billed upfront. Membership applies to one property. Taxes/fees may apply.{' '}
+                  Billed upfront. Membership applies to one property.{' '}
                   <SmartLink data-icon-affordance="up-right" href={TERMS_URL}>
                     See terms
                     <ArrowUpRight className="icon-affordance inline h-3 w-3 ml-1" />
