@@ -42,10 +42,10 @@ import {
 } from '@/components/lead-capture/lead-form/ProjectOptionCard';
 
 // STYLES
-const INPUT_BASE_CLASS = 'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
+const INPUT_BASE_CLASS = 'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
-const SECTION_TITLE_BASE_CLASS = "text-lg sm:text-2xl font-semibold tracking-wide text-slate-700";
-const SECTION_EYELASH = "text-xs my-1 text-slate-500";
+const SECTION_TITLE_BASE_CLASS = "text-xl sm:text-2xl font-semibold tracking-wide text-slate-700";
+const SECTION_EYELASH = "text-sm my-1 text-slate-500";
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
@@ -143,11 +143,18 @@ function buildSuccessMetaFromPayload(payload: LeadSuccessCookiePayload): Success
     typeof payload.timelineLabel === 'string' && payload.timelineLabel
       ? payload.timelineLabel
       : getTimelineLabelForDisplay(payload.projectType, payload.timeline || '') || null;
+  const notes = typeof payload.notes === 'string' ? payload.notes : null;
+  const roofTypeLabel =
+    typeof payload.roofTypeLabel === 'string' && payload.roofTypeLabel
+      ? payload.roofTypeLabel
+      : null;
 
   return {
     projectType: payload.projectType,
     helpTopicLabels,
     timelineLabel,
+    notes,
+    roofTypeLabel,
   };
 }
 
@@ -265,6 +272,7 @@ export default function SimpleLeadForm() {
         projectType: form.projectType,
         helpTopics: '',
       },
+      metaPixelEvents: ['Lead', 'Contact'],
     });
 
     if (!result.ok) {
@@ -293,6 +301,8 @@ export default function SimpleLeadForm() {
       helpTopicLabels: [],
       timeline: form.timeline,
       timelineLabel: timelineLabel || undefined,
+      notes: notes || undefined,
+      roofTypeLabel: roofTypeLabel || undefined,
       timestamp: new Date().toISOString(),
     };
     persistLeadSuccessCookie(successPayload);
@@ -330,11 +340,11 @@ export default function SimpleLeadForm() {
         {/* OK, BACK TO THE SHOW */}
         <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white shadow-md">
           <div className="border-b rounded-t-3xl border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
-            <h2 className="flex items-center text-2xl md:text-3xl font-bold gap-2">
-              <SquareMenu className="h-5 w-5 md:h-6 md:w-6 text-[--brand-blue]" aria-hidden="true" />
+            <h2 className="flex items-center text-3xl font-bold gap-2">
+              <SquareMenu className="h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
               <span>{renderHighlight('Contact Our Office', 'Our Office')}</span>
             </h2>
-            <p className="text-slate-500 mt-1 text-xs pb-2">We respond within 30 minutes during business hours. After hours, we&apos;ll contact you in the next business day.</p>
+            <p className="text-slate-500 mt-1 text-sm md:text-base pb-2">We respond within 30 minutes during business hours. After hours, we&apos;ll contact you in the next business day.</p>
           </div>
 
           <div className="p-4 sm:p-6">
@@ -343,15 +353,11 @@ export default function SimpleLeadForm() {
               <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{globalError}</div>
             )}
 
-            <div className="grid gap-12">
+            <div className="grid gap-8">
               <section>
-                <div>
-                  <h3 className={SECTION_TITLE_BASE_CLASS}>How can we reach you?</h3>
-                  <p className={SECTION_EYELASH}>Required so we can respond quickly</p>
-                </div>
                 <div className="grid my-4 gap-4 md:grid-cols-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    First Name
+                  <label className="block font-medium text-slate-700">
+                    First Name*
                     <input
                       type="text"
                       name="firstName"
@@ -363,8 +369,8 @@ export default function SimpleLeadForm() {
                     />
                     {errors.firstName && <span className="mt-1 text-xs text-red-600">{errors.firstName}</span>}
                   </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Last Name
+                  <label className="block font-medium text-slate-700">
+                    Last Name*
                     <input
                       type="text"
                       name="lastName"
@@ -379,8 +385,8 @@ export default function SimpleLeadForm() {
                 </div>
 
                 <section className="grid gap-4 md:grid-cols-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Email
+                  <label className="block font-medium text-slate-700">
+                    Email*
                     <input
                       type="email"
                       name="email"
@@ -392,8 +398,8 @@ export default function SimpleLeadForm() {
                     />
                     {errors.email && <span className="mt-1 text-xs text-red-600">{errors.email}</span>}
                   </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    Phone
+                  <label className="block font-medium text-slate-700">
+                    Phone*
                     <input
                       type="tel"
                       name="phone"
@@ -409,8 +415,8 @@ export default function SimpleLeadForm() {
                 </section>
 
                 <section className="mt-4 grid gap-4 md:grid-cols-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    Address (optional)
+                  <label className="block font-medium text-slate-700">
+                    Address*
                     <input
                       type="text"
                       name="address1"
@@ -422,7 +428,7 @@ export default function SimpleLeadForm() {
                     />
                     {errors.address1 && <span className="mt-1 text-xs text-red-600">{errors.address1}</span>}
                   </label>
-                  <label className="block text-sm text-slate-500">
+                  <label className="block text-slate-500">
                     Apt, suite, etc. (optional)
                     <input
                       type="text"
@@ -435,8 +441,8 @@ export default function SimpleLeadForm() {
                   </label>
                 </section>
                 <section className="mt-4 flex flex-row w-full gap-2">
-                  <label className="block text-sm font-medium text-slate-700">
-                    City (optional)
+                  <label className="block font-medium text-slate-700">
+                    City*
                     <input
                       type="text"
                       name="city"
@@ -448,8 +454,8 @@ export default function SimpleLeadForm() {
                     />
                     {errors.city && <span className="mt-1 text-xs text-red-600">{errors.city}</span>}
                   </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    State (optional)
+                  <label className="block font-medium text-slate-700">
+                    State*
                     <input
                       type="text"
                       name="state"
@@ -461,8 +467,8 @@ export default function SimpleLeadForm() {
                     />
                     {errors.state && <span className="mt-1 text-xs text-red-600">{errors.state}</span>}
                   </label>
-                  <label className="block text-sm font-medium text-slate-700">
-                    ZIP (optional)
+                  <label className="block font-medium text-slate-700">
+                    ZIP*
                     <input
                       type="text"
                       name="zip"
@@ -480,8 +486,8 @@ export default function SimpleLeadForm() {
               </section>
               <section>
                 <h3 className={SECTION_TITLE_BASE_CLASS}>How can we help?</h3>
-                <p className={SECTION_EYELASH}>Optional, but helps us route you faster</p>
-                <div className="mt-3 grid gap-4 md:grid-cols-2">
+                <p className={SECTION_EYELASH}>Helps us route you faster</p>
+                <div className="mt-3 grid grid-cols-2 gap-4 md:grid-cols-4">
                   {SIMPLE_PROJECT_OPTIONS.map((option) => {
                     const selected = form.projectType === option.value;
                     return (
@@ -505,8 +511,8 @@ export default function SimpleLeadForm() {
 
               <section>
                 <h3 className={SECTION_TITLE_BASE_CLASS}>How soon would you like to start?</h3>
-                <p className={SECTION_EYELASH}>Optional — share a timeline if you have one</p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <p className={SECTION_EYELASH}>Share a timeline if you have one</p>
+                <div className="mt-3 grid gap-3 grid-cols-3 sm:grid-cols-6">
                   {STANDARD_TIMELINE_OPTIONS.map(({ value, label }) => {
                     const selected = form.timeline === value;
                     return (
@@ -532,8 +538,8 @@ export default function SimpleLeadForm() {
 
               <section>
                 <h3 className={SECTION_TITLE_BASE_CLASS}>What type of roof do you currently have?</h3>
-                <p className={SECTION_EYELASH}>Optional — helps us prep for your project</p>
-                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <p className={SECTION_EYELASH}>Helps us prep for your project</p>
+                <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-4">
                   {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
                     const selected = form.roofType === value;
                     return (
@@ -559,7 +565,7 @@ export default function SimpleLeadForm() {
                           />
                         </div>
                         <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-semibold text-slate-900">{label}</p>
+                          <p className="font-semibold text-slate-900">{label}</p>
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
                             <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
                           </div>
@@ -612,8 +618,8 @@ export default function SimpleLeadForm() {
               </section>
 
               <div className="flex justify-end">
-                <Button type="submit" variant="brandOrange" disabled={status === 'submitting'}>
-                  {status === 'submitting' ? 'Sending…' : 'Submit request'}
+                <Button type="submit" size="xl" variant="brandOrange" disabled={status === 'submitting'}>
+                  {status === 'submitting' ? 'Sending…' : 'Submit Request'}
                   <ArrowRight className="ml-2 h-4 w-4 inline" />
                 </Button>
               </div>

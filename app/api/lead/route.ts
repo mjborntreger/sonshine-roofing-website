@@ -10,11 +10,27 @@ import {
 } from '@/lib/lead-capture/validation';
 import { formatPhoneUSForDisplay } from '@/lib/lead-capture/phone';
 import { DEFAULT_PREFERRED_CONTACT } from '@/lib/lead-capture/contact-lead';
+import { SITE_ORIGIN, isProdEnv, requireEnv } from '@/lib/seo/site';
 
 type UnknownRecord = Record<string, unknown>;
 
 const isRecord = (value: unknown): value is UnknownRecord =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const TURNSTILE_SECRET = requireEnv('TURNSTILE_SECRET_KEY', { prodOnly: true });
+const HAS_FORWARD_CONFIG =
+  !!(
+    (process.env.LEAD_ENDPOINT_URL && process.env.LEAD_FORWARD_SECRET) ||
+    (process.env.FINANCING_LEAD_ENDPOINT_URL && process.env.FINANCING_LEAD_FORWARD_SECRET) ||
+    (process.env.FEEDBACK_ENDPOINT_URL && process.env.FEEDBACK_FORWARD_SECRET) ||
+    (process.env.SPECIAL_OFFER_ENDPOINT_URL && process.env.SPECIAL_OFFER_FORWARD_SECRET)
+  );
+
+if (!HAS_FORWARD_CONFIG && isProdEnv()) {
+  console.error(
+    '[env] Missing lead forwarding configuration. Set LEAD_ENDPOINT_URL/LEAD_FORWARD_SECRET or per-type endpoints.'
+  );
+}
 
 function getAllowedOrigins(): string[] {
   const raw = process.env.ALLOWED_ORIGIN || '';
@@ -46,7 +62,7 @@ function json(status: number, body: unknown, headers: Record<string, string> = {
 type TurnstileResponse = { success: boolean; 'error-codes'?: string[] };
 
 async function verifyTurnstile(token: string, remoteip?: string | null) {
-  const secret = process.env.TURNSTILE_SECRET_KEY;
+  const secret = TURNSTILE_SECRET || process.env.TURNSTILE_SECRET_KEY;
   if (!secret) return { ok: false, error: 'Server misconfigured (Turnstile secret)' } as const;
 
   const body = new URLSearchParams();
@@ -117,8 +133,10 @@ function resolveForwardConfig(type: LeadInput['type']): ForwardConfig | null {
   };
 
   const resolved = typeSpecific[type] ?? null;
-  if (!resolved && process.env.NODE_ENV !== 'production') {
-    console.warn(`Lead forward config missing for type "${type}". Check environment variables.`);
+  if (!resolved) {
+    const msg = `Lead forward config missing for type "${type}". Check environment variables.`;
+    if (isProdEnv()) console.error(msg);
+    else console.warn(msg);
   }
   return resolved;
 }
@@ -250,6 +268,15 @@ function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
     page: data.page || `/special-offers/${data.offerSlug}`,
   };
 
+  const passthroughAddressFields = ['address1', 'city', 'state', 'zip'] as const;
+  const extraFields = data as Record<string, unknown>;
+  for (const field of passthroughAddressFields) {
+    const value = extraFields[field];
+    if (typeof value === 'string') {
+      payload[field] = value;
+    }
+  }
+
   attachTracking(payload, data);
 
   return payload;
@@ -267,26 +294,29 @@ function buildContactPayload(data: ContactLeadInput) {
     email: data.email,
     phone: data.phone,
     phoneDisplay,
-    projectType: data.projectType || '',
-    helpTopics: data.helpTopics || '',
-    timeline: data.timeline || '',
-    notes: data.notes || '',
     preferredContact: data.preferredContact || DEFAULT_PREFERRED_CONTACT,
-    bestTime: data.bestTime || '',
     consentSms: Boolean(data.consentSms),
-    address1: data.address1 || '',
-    address2: data.address2 || '',
-    city: data.city || '',
-    state: data.state || '',
-    zip: data.zip || '',
+    address1: data.address1,
+    city: data.city,
+    state: data.state,
+    zip: data.zip,
     page: data.page || '/contact-us',
-    resourceLinks: (data.resourceLinks || []).map((link) => ({
+  };
+
+  if (data.projectType) payload.projectType = data.projectType;
+  if (data.helpTopics) payload.helpTopics = data.helpTopics;
+  if (data.timeline) payload.timeline = data.timeline;
+  if (data.notes) payload.notes = data.notes;
+  if (data.address2) payload.address2 = data.address2;
+  if (data.bestTime) payload.bestTime = data.bestTime;
+  if (data.resourceLinks?.length) {
+    payload.resourceLinks = data.resourceLinks.map((link) => ({
       label: link.label,
       description: link.description || '',
       href: link.href,
       external: Boolean(link.external),
-    })),
-  };
+    }));
+  }
 
   attachTracking(payload, data);
 
@@ -309,7 +339,7 @@ async function forwardToWP(type: LeadInput['type'], payload: Record<string, unkn
       headers: {
         'content-type': 'application/json',
         'x-ss-secret': resolved.secret,
-        origin: process.env.NEXT_PUBLIC_SITE_URL || 'https://sonshineroofing.com',
+        origin: SITE_ORIGIN,
       },
       body: JSON.stringify(payload),
       signal: controller.signal,

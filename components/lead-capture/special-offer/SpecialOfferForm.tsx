@@ -175,6 +175,10 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       cfToken,
       hp_field: honeypot || undefined,
       page: `/special-offers/${offerSlug}`,
+      address1: '',
+      city: '',
+      state: '',
+      zip: '',
       submittedAt: new Date().toISOString(),
     };
 
@@ -193,6 +197,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
         offer_slug: offerSlug,
         offer_code: offerCode,
       },
+      metaPixelEvents: 'Lead',
       contactReadyCookie: false,
     });
 

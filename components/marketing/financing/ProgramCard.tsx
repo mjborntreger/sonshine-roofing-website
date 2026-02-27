@@ -214,7 +214,6 @@ export default function ProgramCard({
                 isOrange ? "bg-[--brand-orange] hover:bg-[--brand-orange]/90" : undefined,
                 cta.className,
               )}
-              target="_blank"
               title={cta.title || cta.label}
               data-icon-affordance="right"
             >

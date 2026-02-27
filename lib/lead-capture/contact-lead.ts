@@ -1,5 +1,6 @@
 import { deleteCookie, readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
 import { pushToDataLayer } from '@/lib/telemetry/gtm';
+import { trackMetaPixel, type MetaStandardEvent } from '@/lib/telemetry/meta';
 import { normalizePhoneForSubmit, isUsPhoneComplete } from '@/lib/lead-capture/phone';
 import type { ContactLeadInput, LeadInput } from '@/lib/lead-capture/validation';
 
@@ -30,6 +31,8 @@ export type LeadSuccessCookiePayload = {
   helpTopicLabels?: string[];
   timeline?: string;
   timelineLabel?: string;
+  notes?: string;
+  roofTypeLabel?: string;
   timestamp?: string;
 };
 
@@ -37,6 +40,8 @@ export interface SuccessMeta {
   projectType: string;
   helpTopicLabels: string[];
   timelineLabel: string | null;
+  notes: string | null;
+  roofTypeLabel: string | null;
 }
 
 export type ContactLeadResourceLink = NonNullable<ContactLeadInput['resourceLinks']>[number];
@@ -92,11 +97,11 @@ export type ContactIdentityDraft = {
 };
 
 export type ContactAddressDraft = {
-  address1?: string;
+  address1: string;
   address2?: string;
-  city?: string;
-  state?: string;
-  zip?: string;
+  city: string;
+  state: string;
+  zip: string;
 };
 
 export type ContactLeadPayloadDraft = {
@@ -131,10 +136,18 @@ export function validateContactAddressDraft(draft: ContactAddressDraft): Record<
   const stateValue = normalizeState(stateValueRaw);
   const zipValue = normalizeZip(zipValueRaw);
 
-  if (draft.address1 && !draft.address1.trim()) errors.address1 = 'Enter your street address.';
-  if (draft.city && !draft.city.trim()) errors.city = 'City is required.';
-  if (stateValueRaw.trim() && !isValidState(stateValue)) errors.state = 'Use the two-letter state code.';
-  if (zipValueRaw.trim() && !isValidZip(zipValue)) errors.zip = 'ZIP should be 5 digits.';
+  if (!draft.address1 || !draft.address1.trim()) errors.address1 = 'Enter your street address.';
+  if (!draft.city || !draft.city.trim()) errors.city = 'Enter your city.';
+  if (!stateValueRaw.trim()) {
+    errors.state = 'State is required.';
+  } else if (!isValidState(stateValue)) {
+    errors.state = 'Use the two-letter state code.';
+  }
+  if (!zipValueRaw.trim()) {
+    errors.zip = 'ZIP is required.';
+  } else if (!isValidZip(zipValue)) {
+    errors.zip = 'ZIP should be 5 digits.';
+  }
   return errors;
 }
 
@@ -159,6 +172,12 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
 
   const trimmedNotes = notes?.trim();
   const projectTypeValue = projectType?.trim();
+  const address1Value = address.address1.trim();
+  const address2Value = address.address2?.trim();
+  const cityValue = address.city.trim();
+  const stateValue = normalizeState(address.state ?? '');
+  const zipValue = normalizeZip(address.zip ?? '');
+
   const payload: ContactLeadCorePayload = {
     type: 'contact-lead',
     projectType: projectTypeValue || undefined,
@@ -173,18 +192,13 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
     bestTime: bestTimeLabel?.trim() || undefined,
     consentSms: Boolean(consentSms),
     page,
+    address1: address1Value,
+    city: cityValue,
+    state: stateValue,
+    zip: zipValue,
   };
 
-  const address1Value = address.address1?.trim();
-  if (address1Value) payload.address1 = address1Value;
-  const address2Value = address.address2?.trim();
   if (address2Value) payload.address2 = address2Value;
-  const cityValue = address.city?.trim();
-  if (cityValue) payload.city = cityValue;
-  const stateValue = normalizeState(address.state ?? '');
-  if (stateValue) payload.state = stateValue;
-  const zipValue = normalizeZip(address.zip ?? '');
-  if (zipValue) payload.zip = zipValue;
 
   if (resourceLinks && resourceLinks.length) {
     payload.resourceLinks = resourceLinks.map((link) => ({
@@ -236,6 +250,14 @@ export function parseLeadSuccessCookie(rawCookie?: string | null): LeadSuccessCo
       payload.timelineLabel = parsed.timelineLabel;
     }
 
+    if (typeof parsed.notes === 'string') {
+      payload.notes = parsed.notes;
+    }
+
+    if (typeof parsed.roofTypeLabel === 'string') {
+      payload.roofTypeLabel = parsed.roofTypeLabel;
+    }
+
     if (typeof parsed.timestamp === 'string') {
       payload.timestamp = parsed.timestamp;
     }
@@ -265,9 +287,19 @@ export type SubmitLeadOptions = {
   contactReadyCookie?: boolean;
   contactReadyCookieMaxAge?: number;
   gtmEvent?: Record<string, unknown>;
+  metaPixelEvents?: MetaStandardEvent | MetaStandardEvent[];
 };
 
 const DEFAULT_ENDPOINT = '/api/lead';
+
+function fireMetaPixelEvents(events?: MetaStandardEvent | MetaStandardEvent[]) {
+  if (!events) return;
+  const list = Array.isArray(events) ? events : [events];
+
+  for (const event of list) {
+    trackMetaPixel(event);
+  }
+}
 
 export async function submitLead<T extends LeadInput>(
   payload: T,
@@ -279,6 +311,7 @@ export async function submitLead<T extends LeadInput>(
     contactReadyCookie = true,
     contactReadyCookieMaxAge = CONTACT_READY_MAX_AGE,
     gtmEvent,
+    metaPixelEvents,
   } = options;
 
   try {
@@ -301,6 +334,7 @@ export async function submitLead<T extends LeadInput>(
         writeCookie(CONTACT_READY_COOKIE, '1', contactReadyCookieMaxAge);
       }
       if (gtmEvent) pushToDataLayer(gtmEvent);
+      fireMetaPixelEvents(metaPixelEvents);
       return { ok: true, status: response.status, data: json };
     }
 

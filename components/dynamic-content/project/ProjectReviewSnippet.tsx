@@ -25,7 +25,7 @@ export default function ProjectReviewSnippet({ review, author, className }: Prop
   return (
     <div className={cn("mt-5 space-y-2", className)}>
       <ReviewStarRow />
-      <div className="text-sm italic text-slate-500" style={clampStyle}>
+      <div className="italic text-slate-500" style={clampStyle}>
         &ldquo;{content}&rdquo;
         {resolvedAuthor ? (
           <span className="not-italic text-slate-600"> — {resolvedAuthor}</span>

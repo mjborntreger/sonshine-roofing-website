@@ -11,6 +11,18 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      typography: {
+        DEFAULT: {
+          css: {
+            p: { fontSize: "1.2rem", lineHeight: "1.85rem" },
+          },
+        },
+        lg: {
+          css: {
+            p: { fontSize: "1.1rem", lineHeight: "1.85rem" },
+          },
+        },
+      },
       colors: {
         brand: {
           blue: "#0045d7",

@@ -4,16 +4,16 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import FilterTabs from "@/components/dynamic-content/FilterTabs";
 import SmartLink from "@/components/utils/SmartLink";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeftRight, ArrowRight } from "lucide-react";
 import {
   PROJECT_TAB_CONFIG,
   type MaterialKey,
   type TabConfig,
 } from "@/components/dynamic-content/latest-filters/latest-tab-config";
 import { renderHighlight } from "@/components/utils/renderHighlight";
+import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
-const pStyles = "mt-4 mb-6 text-slate-500 text-center justify-center text-sm md:text-md";
 
 type TabPayload = {
   key: MaterialKey;
@@ -77,7 +77,7 @@ export default function LatestProjectsFilter({
   }, [selected, tabs]);
 
   const renderFilterTabs = () => (
-    <div className={`flex justify-center ${showHeader ? "mt-6" : "mb-8"}`}>
+    <div className={`flex justify-center ${showHeader ? "mt-3" : "mb-8"}`}>
       <FilterTabs
         tabs={computedTabs}
         activeKey={selected}
@@ -89,17 +89,21 @@ export default function LatestProjectsFilter({
       </FilterTabs>
     </div>
   );
-  const heading = "Latest Roof Replacement Projects";
-  const renderedHeading = renderHighlight(heading, "Roof Replacement Projects");
+  const heading = "Shingle, Metal & Tile Roof Replacement";
+  const renderedHeading = renderHighlight(heading, "Roof Replacement");
 
   return (
     <div className="px-4 max-w-[1600px] mx-auto">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
+          <h2 className={SECTION_HEADING}>{renderedHeading}</h2>
           <div className="max-w-3xl mx-auto text-center">
-            <p className={pStyles}>{description}</p>
-          </div>   
+            <p className={SECTION_SUBTITLE}>{description}</p>
+          </div>
+          <p className="text-slate-500 text-xs leading-none uppercase font-semibold">
+            <ArrowLeftRight className="h-3 w-3 mr-1 text-[--brand-blue] inline" />
+            Filter by Material
+          </p>   
           {renderFilterTabs()}
         </div>
       ) : (
@@ -121,7 +125,7 @@ export default function LatestProjectsFilter({
         </div>
       )}
 
-      <div key={selected} className="grid gap-6 mt-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+      <div key={selected} className="grid gap-6 mt-8 grid-cols-1 sm:grid-cols-2">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];

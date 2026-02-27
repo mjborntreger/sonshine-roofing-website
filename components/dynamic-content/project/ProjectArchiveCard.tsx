@@ -16,8 +16,8 @@ type Props = {
 };
 
 const pillClass =
-  "inline-flex min-w-0 max-w-full items-center rounded-full font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-[0.75rem] sm:text-xs text-slate-600 sm:px-3 sm:py-1 sm:text-sm";
-const pillLabelClass = "block max-w-full truncate";
+  "inline-flex min-w-0 max-w-full items-center rounded-xl font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-sm text-slate-600 sm:px-3 sm:py-1 sm:text-sm";
+const pillLabelClass = "block max-w-full";
 
 export default function ProjectArchiveCard({ project, style, className }: Props) {
   const href =
@@ -50,7 +50,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
       >
         <Card className="overflow-hidden transition proj-card hover:shadow-lg">
           <CardHeader className="px-5 pt-5 pb-5 sm:px-6 sm:pt-6">
-            <CardTitle className="font-bold">{project.title}</CardTitle>
+            <CardTitle className="text-2xl font-bold">{project.title}</CardTitle>
           </CardHeader>
 
           {project.heroImage?.url ? (
@@ -72,7 +72,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
 
           <CardContent className="px-5 pt-5 pb-4 sm:px-6 sm:pb-6">
             {summary && (
-              <p className="text-sm text-slate-600" style={lineClampStyle}>
+              <p className="text-slate-600" style={lineClampStyle}>
                 {summary}
               </p>
             )}
@@ -95,7 +95,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
           </CardContent>
 
           <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
-            <span className="items-center gap-2 text-md font-semibold tracking-wide">
+            <span className="items-center gap-2 text-lg font-semibold tracking-wide">
               View project
               <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
             </span>

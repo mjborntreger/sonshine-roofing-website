@@ -1,20 +1,17 @@
 // app/sitemap_index/route.ts
 import { NextResponse } from 'next/server';
+import { envFlagTrue, SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 export const dynamic = 'force-static'; // can be cached by ISR
 export const revalidate = 3600;        // safety net (1h) – revalidateTag will bust sooner
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL!;
-const ENABLED =
-  process.env.NEXT_PUBLIC_ENV === 'production' ||
-  process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
-const PREVIEW =
-  process.env.NEXT_PUBLIC_ENV !== 'production' &&
-  process.env.NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW === 'true';
-const FAQ_ENABLED = process.env.NEXT_PUBLIC_ENABLE_FAQ_SITEMAP === 'true';
+const BASE = SITE_ORIGIN;
+const SITEMAPS_ENABLED = sitemapEnabled();
+const PREVIEW_HEADERS = sitemapPreviewHeaders();
+const FAQ_ENABLED = envFlagTrue('NEXT_PUBLIC_ENABLE_FAQ_SITEMAP');
 
 export function GET() {
-  if (!ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
+  if (!SITEMAPS_ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
   const sitemaps = [
     `${BASE}/sitemap_index/static`,
     `${BASE}/sitemap_index/blog`,
@@ -37,7 +34,7 @@ ${sitemaps.map((loc) => `    <sitemap><loc>${loc}</loc></sitemap>`).join('\n')}
   return new NextResponse(xml, {
     headers: {
       'content-type': 'application/xml; charset=utf-8',
-      ...(PREVIEW ? { 'X-Robots-Tag': 'noindex, nofollow' } : {}),
+      ...PREVIEW_HEADERS,
     },
   });
 }

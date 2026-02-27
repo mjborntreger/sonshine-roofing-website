@@ -60,9 +60,18 @@ const formatReviewDate = (time?: number | null, fallback?: string | null): strin
   return fallback?.trim() || null;
 };
 
-const createFallbackId = (): string => `reviews-fallback-${Math.random().toString(36).slice(2, 10)}`;
+const sanitizeId = (value: string): string => value.replace(/[^A-Za-z0-9_-]/g, "");
+
+const createFallbackBaseId = (): string => {
+  const cryptoApi = typeof globalThis.crypto !== "undefined" ? globalThis.crypto : null;
+  if (cryptoApi && typeof cryptoApi.randomUUID === "function") {
+    return cryptoApi.randomUUID();
+  }
+  return `reviews-${Math.random().toString(36).slice(2, 10)}`;
+};
 
 export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
+  const fallbackBaseId = createFallbackBaseId();
   const {
     reviews: injectedReviews,
     gbpUrl: injectedGbpUrl,
@@ -112,7 +121,7 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
   if (filtered.length === 0) return null;
 
   const googleLinkAriaLabel = 'See All Google Reviews';
-  const fallbackId = createFallbackId();
+  const fallbackId = `reviews-fallback-${sanitizeId(fallbackBaseId) || "default"}`;
 
   const fallbackReviews = (
     <div

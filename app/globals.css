@@ -13,6 +13,7 @@
     --brand-blue:  #0045d7; /* primary */
     --brand-cyan:  #00e3fe; /* gradient partner */
     --brand-orange: #fb9216; /* accent/CTA */
+    --link-hover: #01024a; /* prose link hover */
 
     /* Neutrals */
     --ink-900: #0b1220;
@@ -55,6 +56,14 @@
     padding-right: var(--scroll-lock-offset);
     margin-right: calc(-1 * var(--scroll-lock-offset));
   }
+
+  html.nav-locked,
+  body.nav-locked {
+    overflow: hidden;
+    touch-action: none;
+    overscroll-behavior: contain;
+  }
+
 }
 
 /* ---------------------------------------
@@ -157,7 +166,7 @@
     color: var(--brand-blue);
   }
   .prose :where(a):not(:where(.not-prose *), [data-button], .btn, .button, [data-ui-link]):hover {
-    color: var(--brand-cyan);
+    color: var(--link-hover);
   }
 
 
@@ -168,16 +177,16 @@
     @apply text-slate-900;
   }
   h1 { @apply text-5xl md:text-6xl lg:text-7xl tracking-tight leading-loose; }
-  h2 { @apply text-3xl md:text-4xl lg:text-5xl leading-relaxed; }
-  h3 { @apply text-xl md:text-2xl lg:text-3xl leading-relaxed; }
-  h4 { @apply md:text-lg lg:text-xl leading-relaxed; }
+  h2 { @apply text-4xl md:text-5xl lg:text-6xl leading-relaxed; }
+  h3 { @apply text-3xl md:text-4xl lg:text-5xl leading-relaxed; }
+  h4 { @apply text-base md:text-lg lg:text-2xl leading-relaxed; }
 
   /* Cards */
   .card { @apply rounded-2xl border border-blue-200 bg-amber-50/50; box-shadow: var(--elev-1); }
   .card:hover { box-shadow: var(--elev-2); }
 
   /* Badges */
-  .badge { @apply inline-block border border-[--brand-orange] rounded-full bg-slate-100 px-2.5 py-1 text-sm text-slate-700; }
+  .badge { @apply inline-block border border-[--brand-orange] rounded-full bg-slate-100 px-2.5 py-1 text-xs sm:text-sm text-slate-700; }
   .badge--brand { color:#fff; background-image: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan)); }
   .badge--accent { background: white; color: #1f2937; }
 

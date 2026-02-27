@@ -3,9 +3,7 @@
 import SmartLink from "@/components/utils/SmartLink";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { openQuickQuoteSlideout } from "@/lib/quickquote";
 import { Zap } from "lucide-react";
-import { useCallback, type MouseEvent } from "react";
 
 export const INSTANT_QUOTE_CTA = {
   href: "https://www.myquickroofquote.com/contractors/sonshine-roofing",
@@ -30,17 +28,6 @@ export function InstantQuoteCTA({
   size = "sm",
   onClick,
 }: InstantQuoteCTAProps) {
-  const handleClick = useCallback(
-    (event: MouseEvent<HTMLAnchorElement>) => {
-      const opened = openQuickQuoteSlideout();
-      if (opened) {
-        event.preventDefault();
-      }
-      onClick?.();
-    },
-    [onClick]
-  );
-
   return (
     <Button
       asChild
@@ -51,8 +38,7 @@ export function InstantQuoteCTA({
       <SmartLink
         href={INSTANT_QUOTE_CTA.href}
         className={cn(INSTANT_QUOTE_CTA.linkClassName, linkClassName)}
-        onClick={handleClick}
-        external={false}
+        onClick={onClick}
       >
         <Zap className={cn(INSTANT_QUOTE_CTA.iconClassName, iconClassName)} aria-hidden="true" />
         {INSTANT_QUOTE_CTA.label}

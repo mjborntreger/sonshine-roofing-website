@@ -598,7 +598,8 @@ export default function ResourceArchiveClient<Item>({
 
                         return (
                           <div>
-                            <p className="text-xs md:text-sm my-2 text-slate-500">Tap to select / deselect</p>
+                            <p className="md:hidden text-xs md:text-sm my-2 text-slate-500">Tap to select / deselect</p>
+                            <p className="hidden md:block text-xs md:text-sm my-2 text-slate-500">Click to select / deselect</p>
                             <div className="flex flex-wrap gap-2">
                               {tab.terms.map((term) => {
                                 const active = (sortedSelections[group.key] ?? []).includes(term.slug);
@@ -609,7 +610,7 @@ export default function ResourceArchiveClient<Item>({
                                     type="button"
                                     onClick={() => toggleSelection(group.key, term.slug)}
                                     disabled={disabled}
-                                    className={`px-3 py-1.5 rounded-xl border text-sm transition select-none ${active
+                                    className={`px-3 py-1.5 rounded-xl border text-sm md:text-base transition select-none ${active
                                       ? "border-[--brand-blue] bg-[--brand-blue] text-white"
                                       : disabled
                                         ? "border-blue-200 bg-slate-100 text-slate-400 cursor-not-allowed"

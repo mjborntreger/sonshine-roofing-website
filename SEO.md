@@ -4,13 +4,13 @@ SEO Guide
 Canonicals & Metadata
 - Base metadata in `app/layout.tsx`.
 - Per-page metadata in each route’s `generateMetadata`.
-- Use `NEXT_PUBLIC_SITE_URL` for absolute canonical urls if needed.
+- Use `NEXT_PUBLIC_BASE_URL` for absolute canonical urls if needed.
 
 Robots
 - Staging: `Disallow: /` (non-prod) + `X-Robots-Tag: noindex, nofollow, noimageindex` on the staging host.
 - Production: `Allow: /` with sitemap at `/sitemap_index`.
 - Page-level robots overrides:
-  - `noindex, follow`: `/reviews`, `/tell-us-why` (and children), `/calendly-test`, `/special-offers/[slug]`, `/person/[slug]` except `nathan-borntreger`.
+  - `noindex, follow`: `/reviews`, `/tell-us-why` (and children), `/special-offers/[slug]`, `/person/[slug]` except `nathan-borntreger`.
   - `index, follow`: `/roofing-glossary/[slug]`, `/faq/[slug]` (FAQ detail pages are indexable).
 
 Sitemaps

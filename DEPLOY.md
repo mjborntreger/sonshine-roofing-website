@@ -7,8 +7,8 @@ Environments
 
 Sitemaps & Robots
 - Production
-  - robots.txt: Allow all, sitemap at `${NEXT_PUBLIC_SITE_URL}/sitemap_index`.
-  - app/robots.ts builds from `NEXT_PUBLIC_SITE_URL`.
+  - robots.txt: Allow all, sitemap at `${NEXT_PUBLIC_BASE_URL}/sitemap_index`.
+  - app/robots.ts builds from `NEXT_PUBLIC_BASE_URL`.
 - Staging
   - robots.txt: Disallow all. Sitemap endpoints exist but are not to be crawled.
   - You can enable sitemap preview endpoints by setting:

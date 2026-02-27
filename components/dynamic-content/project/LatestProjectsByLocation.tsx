@@ -3,6 +3,7 @@ import SmartLink from "@/components/utils/SmartLink";
 import { ArrowRight } from "lucide-react";
 import type { ProjectSummary } from "@/lib/content/wp";
 import { renderHighlight } from "@/components/utils/renderHighlight";
+import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
 type Props = {
   projects: ProjectSummary[];
@@ -14,10 +15,8 @@ type Props = {
   className?: string;
 };
 
-const baseWrapperClass = "px-4 pb-24 md:px-12 max-w-[1600px] mx-auto overflow-hidden";
+const baseWrapperClass = "px-4 max-w-[1600px] mx-auto";
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
-const SECTION_SUBTITLE = "mt-2 mb-4 text-sm text-slate-500";
-const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
 
 export default function LatestProjectsByLocation({
   projects,
@@ -64,7 +63,7 @@ export default function LatestProjectsByLocation({
         </SmartLink>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 mt-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
         {projects.map((project, index) => (
           <div
             key={project.slug}

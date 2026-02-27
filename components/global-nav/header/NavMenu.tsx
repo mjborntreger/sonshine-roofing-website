@@ -54,15 +54,16 @@ const NAV_ICONS: Record<string, LucideIcon> = {
 const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);
 const CONTACT_LABELS = new Set(["Contact", "Contact Us"]);
 const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
+const NAV_SCROLL_LOCK_CLASS = "nav-locked";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
   const prefersReducedMotion = useReducedMotion();
 
   if (prefersReducedMotion) {
     return open ? (
-      <X className="h-3 w-3 text-white" aria-hidden="true" />
+      <X className="h-2 w-2 text-white" aria-hidden="true" />
     ) : (
-      <Menu className="h-3 w-3 text-white" aria-hidden="true" />
+      <Menu className="h-2 w-2 text-white" aria-hidden="true" />
     );
   }
 
@@ -95,7 +96,7 @@ function MenuToggleIcon({ open }: { open: boolean }) {
 function LabelWithIcon({ label, iconClassName }: { label: string; iconClassName?: string }) {
   const Icon = NAV_ICONS[label];
   return (
-    <span className="inline-flex font-display text-lg items-center">
+    <span className="inline-flex font-display text-xl font-medium items-center">
       {Icon && (
         <Icon
           className={cn("h-4 w-4 inline mr-2", iconClassName ?? "text-[--brand-blue]")}
@@ -222,7 +223,7 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
                 {/* ANIM: Panel fade+lift speed — edit PANEL_DURATION_MS (and/or Tailwind 'duration-150') */}
                 <div
                   className={cn(
-                    "absolute left-0 top-full mt-2 min-w-[240px] rounded-3xl border bg-white border-blue-200 shadow-lg origin-top",
+                    "absolute left-0 top-full mt-2 min-w-[300px] rounded-3xl border bg-white border-blue-200 shadow-lg origin-top",
                     "transition-all duration-150 ease-out",
                     enteredPanel ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
                   )}
@@ -284,7 +285,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
             {child.href ? (
               <SmartLink
                 href={child.href}
-                className="flex items-center justify-between gap-2 px-3 py-2 text-md text-slate-700 hover:bg-[#0045d7]/5 hover:text-[--brand-blue]"
+                className="flex items-center justify-between gap-2 px-3 py-2 text-slate-700 hover:bg-[#0045d7]/5 hover:text-[--brand-blue]"
                 data-icon-affordance={showChevron ? "right" : undefined}
               >
                 <LabelWithIcon label={child.label} />
@@ -309,7 +310,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
             ) : (
               <button
                 type="button"
-                className="w-full text-left flex items-center justify-between gap-2 px-3 py-2 text-md text-slate-700 hover:bg-slate-50 hover:text-brand-blue rounded-xl"
+                className="w-full text-left flex items-center justify-between gap-2 px-3 py-2 text-xl text-slate-700 hover:bg-slate-50 hover:text-brand-blue rounded-xl"
                 aria-haspopup={hasKids ? "menu" : undefined}
                 aria-expanded={openIndex === i || undefined}
                 onClick={() => holdOpen(i)}
@@ -375,18 +376,6 @@ function MobileMenu() {
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  // lock scroll when open
-  const prevOverflow = useRef<string>("");
-  useEffect(() => {
-    if (open) {
-      prevOverflow.current = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = prevOverflow.current || "";
-    }
-    return () => { document.body.style.overflow = prevOverflow.current || ""; };
-  }, [open]);
-
   // Close on click outside or ESC
   useEffect(() => {
     if (!open) return;
@@ -424,6 +413,24 @@ function MobileMenu() {
     setEnteredTop(false);
   }, [open]);
 
+  // lock scroll via class to avoid conflicting inline styles
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const root = document.documentElement;
+    const body = document.body;
+    if (open) {
+      root.classList.add(NAV_SCROLL_LOCK_CLASS);
+      body.classList.add(NAV_SCROLL_LOCK_CLASS);
+    } else {
+      root.classList.remove(NAV_SCROLL_LOCK_CLASS);
+      body.classList.remove(NAV_SCROLL_LOCK_CLASS);
+    }
+    return () => {
+      root.classList.remove(NAV_SCROLL_LOCK_CLASS);
+      body.classList.remove(NAV_SCROLL_LOCK_CLASS);
+    };
+  }, [open]);
+
   const toggle = (key: string) =>
     setExpanded((s) => {
       const next = { ...s, [key]: !s[key] };
@@ -455,7 +462,7 @@ function MobileMenu() {
         aria-haspopup="menu"
         data-open={open}
       >
-        <span className="font-display text-xl font-bold leading-none">Menu</span>
+        <span className="font-display font-semibold text-sm leading-none">Menu</span>
         <MenuToggleIcon open={open} />
       </button>
 

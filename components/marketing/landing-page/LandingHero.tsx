@@ -14,7 +14,7 @@ type HeroProps = {
   title?: string
 };
 
-export default function Hero({ title = "The Best Roofing Company in Sarasota, Manatee, and Charlotte Counties for Over 38 Years" }: HeroProps) {
+export default function Hero({ title = "One of The Best Roofing Companies in Sarasota, Manatee, and Charlotte Counties for Over 38 Years" }: HeroProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [shouldShowVideo, setShouldShowVideo] = useState(false);
@@ -73,6 +73,7 @@ export default function Hero({ title = "The Best Roofing Company in Sarasota, Ma
           height={720}
           loading="eager"
           decoding="async"
+          fetchPriority="high"
         />
 
         {/* Background video (lazy-loaded via IntersectionObserver) */}

@@ -1,10 +1,13 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type MouseEvent } from 'react';
 import { Accordion } from '@/components/ui/Accordion';
+import SmartLink from '@/components/utils/SmartLink';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
+import { pushToDataLayer } from '@/lib/telemetry/gtm';
+import { ArrowLeftRight, ArrowUpRight, CircleCheck, ShieldCheck } from 'lucide-react';
 
 // -----------------------------
 // Types & Data
@@ -12,112 +15,89 @@ import { SITE_ORIGIN } from '@/lib/seo/site';
 
 type Term = 1 | 2 | 3;
 
-type PlanId = 'essentials' | 'plus' | 'ultra';
-
-type BadgeKey = 'most-popular' | 'best-value' | 'most-features';
-
-type Feature = {
+type Benefit = {
   id: string;
   label: string;
   why?: string; // short helpful explainer
-  includedIn: PlanId[];
 };
 
-type Plan = {
-  id: PlanId;
-  name: string;
-  color: 'light-blue' | 'orange' | 'blue';
-  prices: Record<Term, number>; // yearly pricing
-  badges?: BadgeKey[];
-  features: string[]; // feature ids in order for card view
+type TermPlan = {
+  term: Term;
+  annual: number;
+  total: number;
+  repairDiscount: number;
+  inspectionDiscount: number;
 };
 
-// Feature registry (expand/edit copy freely)
-const FEATURES: Feature[] = [
+const BENEFITS: Benefit[] = [
   {
     id: 'annual-checkup',
-    label: 'Annual Tip Top Roof Checkup',
+    label: 'One complimentary Tip Top Roof Check-up per year',
     why:
-      'We catch small issues before they become big problems—protecting your roof and budget.',
-    includedIn: ['essentials', 'plus', 'ultra'],
+      'Annual inspections catch early warning signs and help extend the life of your roof.',
   },
   {
-    id: 'priority-appt',
-    label: 'Priority appointments',
-    why: 'Skip the wait and get on the schedule faster when you need us most.',
-    includedIn: ['essentials', 'plus', 'ultra'],
+    id: 'inspection-checklist',
+    label: 'Standardized inspection checklist',
+    why: 'A consistent checklist keeps each visit thorough and comparable year over year.',
   },
   {
-    id: 'discount-repair',
-    label: '10% discount on future repair',
-    why: 'Members-only pricing on eligible repairs saves money over the life of your roof.',
-    includedIn: ['plus', 'ultra'],
+    id: 'photo-docs',
+    label: 'Photo documentation stored in your customer record',
+    why: 'Visual records help track changes and support insurance documentation.',
   },
   {
-    id: 'insurance-cert',
-    label: 'Written roof certification for insurance',
-    why: 'Documentation that your roof was professionally inspected can help with policies and claims.',
-    includedIn: ['plus', 'ultra'],
+    id: 'maintenance-notes',
+    label: 'Maintenance notes for planning and insurance reference',
+    why: 'Clear notes make upkeep decisions easier and keep records claim-ready.',
   },
   {
-    id: 'skylight',
-    label: 'Skylight cleaning**',
-    why: 'Keeps light clear and seals visible so we can spot issues early.',
-    includedIn: ['ultra'],
-  },
-  {
-    id: 'gutter',
-    label: 'Gutter cleaning**',
-    why: 'Clear flow prevents overflow and water intrusion at the fascia.',
-    includedIn: ['ultra'],
-  },
-  {
-    id: 'debris',
-    label: 'Large debris removal**',
-    why: 'Branches and heavy debris shorten a roof’s life—removal helps prevent damage.',
-    includedIn: ['ultra'],
+    id: 'giftable-inspection',
+    label: 'One complimentary giftable roof inspection per year',
+    why:
+      'Use for family, neighbors, or friends to create referral opportunities without pressure.',
   },
 ];
 
-const PLANS: Plan[] = [
+const TERM_PLANS: TermPlan[] = [
   {
-    id: 'essentials',
-    name: 'The Essentials',
-    color: 'light-blue',
-    prices: { 1: 169, 2: 311, 3: 446 },
-    features: ['annual-checkup', 'priority-appt'],
-  },
-    {
-    id: 'plus',
-    name: 'Essentials Plus',
-    color: 'blue',
-    prices: { 1: 275, 2: 522, 3: 726 },
-    badges: ['most-popular'],
-    features: ['annual-checkup', 'priority-appt', 'discount-repair', 'insurance-cert'],
+    term: 1,
+    annual: 189,
+    total: 189,
+    repairDiscount: 0,
+    inspectionDiscount: 0,
   },
   {
-    id: 'ultra',
-    name: 'Essentials Ultra',
-    color: 'orange',
-    prices: { 1: 389, 2: 739, 3: 1027 },
-    badges: ['best-value'],
-    features: [
-      'annual-checkup',
-      'priority-appt',
-      'discount-repair',
-      'insurance-cert',
-      'skylight',
-      'gutter',
-      'debris',
-    ],
+    term: 2,
+    annual: 179,
+    total: 358,
+    repairDiscount: 5,
+    inspectionDiscount: 50,
+  },
+  {
+    term: 3,
+    annual: 169,
+    total: 507,
+    repairDiscount: 10,
+    inspectionDiscount: 100,
   },
 ];
 
-const BADGE_LABEL: Record<BadgeKey, string> = {
-  'most-popular': 'Most popular',
-  'best-value': 'Best value',
-  'most-features': 'Most features',
+const TERMS_URL = '/roof-maintenance/roof-care-club-terms-and-conditions';
+
+const PAYMENT_LINKS: Record<Term, string> = {
+  // TODO: Replace with Stripe Payment Link for 1-year membership.
+  1: 'https://links.sonshineroofing.com/payment-link/6979440dc80eafcdc68d16f8',
+  // TODO: Replace with Stripe Payment Link for 2-year membership.
+  2: 'https://links.sonshineroofing.com/payment-link/69810ad2353338c241c0ab52',
+  // TODO: Replace with Stripe Payment Link for 3-year membership.
+  3: 'https://links.sonshineroofing.com/payment-link/69810b38c80eaffba597a04d',
 };
+
+const INCLUSION_RULES = [
+  'Roof replacement customers receive 2 years of Roof Care Club membership at no cost.',
+  'Roof repair customers receive 1 year of Roof Care Club membership at no cost.',
+] as const;
 
 // -----------------------------
 // Helpers
@@ -126,13 +106,21 @@ const BADGE_LABEL: Record<BadgeKey, string> = {
 const currency = (n: number) =>
   n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
-function savingsVsOneYear(plan: Plan, term: Term) {
+function savingsVsOneYear(plans: TermPlan[], term: Term) {
   if (term === 1) return null;
-  const base = plan.prices[1];
-  const chosen = plan.prices[term];
-  const saved = base * term - chosen;
-  const pct = saved > 0 ? Math.round((saved / (base * term)) * 100) : 0;
+  const base = plans.find((plan) => plan.term === 1);
+  const chosen = plans.find((plan) => plan.term === term);
+  if (!base || !chosen) return null;
+  const baseline = base.annual * term;
+  const saved = baseline - chosen.total;
+  const pct = saved > 0 ? Math.round((saved / baseline) * 100) : 0;
   return { saved, pct };
+}
+
+function formatDiscount(value: number) {
+  if (value === 0) return 'No discount';
+  if (value === 100) return 'Free';
+  return `${value}% off`;
 }
 
 // -----------------------------
@@ -144,35 +132,31 @@ type RoofCareClubProps = {
 };
 
 export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
-  // Default term: 1 year, per request
-  const [term, setTerm] = useState<Term>(1);
-  // Pricing display toggle
-  const [mode, setMode] = useState<'year' | 'month'>('year');
+  // Default term: 3 years
+  const [term, setTerm] = useState<Term>(3);
 
   const resolvedOrigin = origin ?? SITE_ORIGIN;
-
-  // Feature lookup for quick access
-  const featureById = useMemo(() => {
-    const map = new Map<string, Feature>();
-    FEATURES.forEach((f) => map.set(f.id, f));
-    return map;
-  }, []);
 
   const providerId = `${resolvedOrigin}/#roofingcontractor`;
 
   const offerItems = useMemo(
     () =>
-      PLANS.map((plan) => ({
+      TERM_PLANS.map((plan) => ({
         "@type": "Offer" as const,
-        name: plan.name,
-        category: plan.id,
+        name: `Roof Care Club - ${plan.term}-Year Membership`,
+        category: "Roof Care Club Membership",
+        price: plan.total,
         priceCurrency: "USD",
         offeredBy: { "@id": providerId },
         itemOffered: { "@type": "Service", name: "Roof Maintenance (Membership)" },
         additionalProperty: [
-          { "@type": "PropertyValue", name: "1-year", value: plan.prices[1] },
-          { "@type": "PropertyValue", name: "2-year", value: plan.prices[2] },
-          { "@type": "PropertyValue", name: "3-year", value: plan.prices[3] },
+          {
+            "@type": "PropertyValue",
+            name: "Term",
+            value: `${plan.term} year${plan.term > 1 ? "s" : ""}`,
+          },
+          { "@type": "PropertyValue", name: "Annual price", value: plan.annual },
+          { "@type": "PropertyValue", name: "Total price", value: plan.total },
         ],
       })),
     [providerId],
@@ -200,164 +184,186 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
   );
 
   return (
-    <div aria-labelledby="roof-care-club" className="mt-24 not-prose">
-      <div className="text-center max-w-3xl mx-auto">
-        <h2 id="roof-care-club" className="text-3xl md:text-4xl font-semibold tracking-tight">
-          Roof Care Club
-        </h2>
-        <p className="mt-4 text-slate-600">
-          Choose your plan and term. Switch to monthly view to see the equivalent cost—
-          <span className="font-medium text-slate-800">plans are billed annually</span>.
-        </p>
-        <JsonLd data={serviceLd} />
-      </div>
-
-      {/* Toggles */}
-      <div className="mt-6 flex flex-col items-center gap-3">
-        {/* Duration */}
-        <div className="inline-flex rounded-full border border-blue-200 bg-white p-1 shadow-sm">
-          {[1, 2, 3].map((t) => (
-            <button
-              key={t}
-              type="button"
-              onClick={() => setTerm(t as Term)}
-              aria-pressed={term === t}
-              className={[
-                'px-4 py-1.5 text-sm rounded-full transition',
-                term === t
-                  ? 'bg-[var(--brand-blue,#0045d7)] text-white shadow'
-                  : 'text-slate-700 hover:bg-slate-50',
-              ].join(' ')}
-            >
-              {t}-year
-            </button>
-          ))}
-        </div>
-
-        {/* Display mode */}
-        <div className="inline-flex rounded-full border border-blue-200 bg-white p-1 shadow-sm">
-          {(['year', 'month'] as const).map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => setMode(m)}
-              aria-pressed={mode === m}
-              className={[
-                'px-4 py-1.5 text-sm rounded-full transition',
-                mode === m
-                  ? 'bg-slate-900 text-white shadow'
-                  : 'text-slate-700 hover:bg-slate-50',
-              ].join(' ')}
-            >
-              {m === 'year' ? 'Yearly' : 'Monthly'}
-            </button>
-          ))}
-        </div>
-        <p className="text-xs text-slate-500">All plans are purchased on a yearly basis.</p>
-      </div>
-
+    <div aria-labelledby="roof-care-club" className="mt-2 mb-12 not-prose">
+      <JsonLd data={serviceLd} />
       {/* Cards */}
-      <div className="not-prose mt-8 max-w-4xl mx-auto grid grid-cols-1 gap-8">
-        {PLANS.map((plan) => {
-          const yearly = plan.prices[term];
-          const monthlyFromTerm = yearly / (term * 12);
-          const monthlyLabel = monthlyFromTerm.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            maximumFractionDigits: 0,
-          });
-          const priceLabel = mode === 'year' ? currency(yearly) : `${monthlyLabel}/mo`;
-          const savings = savingsVsOneYear(plan, term);
+      <div className="not-prose max-w-4xl mx-auto">
+        {(() => {
+          const selected = TERM_PLANS.find((plan) => plan.term === term) ?? TERM_PLANS[0];
+          const savings = savingsVsOneYear(TERM_PLANS, term);
+          const paymentLink = PAYMENT_LINKS[selected.term];
+
+          const handlePaymentClick = (event: MouseEvent<HTMLAnchorElement>) => {
+            if (!paymentLink) {
+              event.preventDefault();
+              return;
+            }
+
+            pushToDataLayer({
+              event: 'roof_care_club_purchase_click',
+              term_years: selected.term,
+              value: selected.total,
+              annual_price: selected.annual,
+              currency: 'USD',
+            });
+          };
 
           return (
-            <div
-              key={plan.id}
-              className="relative flex flex-col overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm z-0 min-w-[280px]"
-            >
+            <div className="relative flex flex-col overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm z-0">
               {/* Header */}
-              <div
-                className={[
-                  'not-prose px-6 py-5',
-                  plan.color === 'orange'
-                    ? 'bg-[#ff8a00] text-white'
-                    : plan.color === 'blue'
-                    ? 'bg-[#0045d7] text-white'
-                    : 'bg-[#316FE2] text-white',
-                ].join(' ')}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <h3
-                    className={[
-                      'text-xl md:text-2xl font-semibold leading-tight',
-                      plan.color === 'orange' || plan.color === 'blue' ? '!text-white' : 'text-white'
-                    ].join(' ')}
-                  >
-                    {plan.name}
-                  </h3>
-                  {plan.badges && plan.badges.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-2">
-                      {plan.badges.map((b) => (
-                        <span
-                          key={b}
+              <div className="not-prose px-6 py-5 bg-[#0045d7] text-white">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="justify-center text-center sm:text-left sm:justify-start mx-auto sm:mx-0">
+                    <h3 className="text-3xl md:text-4xl font-semibold leading-tight text-white">
+                      The Roof Care Club
+                    </h3>
+                    <p className="italic justify-center md:justify-start mx-auto md:mx-0 leading-tight text-slate-200 align-middle">
+                      The Proactive Side of Home-Ownership
+                    </p>
+                  </div>
+                  {/* Toggles */}
+                  <div className="flex flex-col mx-auto md:mx-0 items-center gap-3">
+                    <p className="uppercase font-semibold text-slate-200 text-sm md:text-lg">
+                      Select Term
+                      <ArrowLeftRight className="inline ml-2 text-white h-4 md:h-5 w-4 md:w-5" />
+                    </p>
+
+                    {/* Duration */}
+                    <div className="inline-flex justify-center overflow-hidden rounded-lg bg-cyan-50 shadow-sm">
+                      {[1, 2, 3].map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => setTerm(t as Term)}
+                          aria-pressed={term === t}
                           className={[
-                            'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium',
-                            plan.color === 'light-blue' ? 'bg-black/10 text-white' : 'bg-white/15 text-white',
+                            'px-4 py-1.5 text-sm md:text-lg transition duration-300',
+                            term === t
+                              ? 'bg-[var(--brand-orange)] text-white font-semibold'
+                              : 'hover:bg-[#fb9216]/20 font-semibold text-slate-800',
                           ].join(' ')}
                         >
-                          {BADGE_LABEL[b]}
-                        </span>
+                          {t}-year
+                        </button>
                       ))}
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
 
               {/* Price */}
               <div className="px-6 pt-5">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold tracking-tight">{priceLabel}</span>
-                  <span className="text-slate-500">{mode === 'year' ? 'total' : 'equivalent'}</span>
-                </div>
-                {term > 1 && savings && savings.saved > 0 && (
-                  <div className="mt-1 text-sm text-emerald-600">
-                    Save {currency(savings.saved)} ({savings.pct}%){' '}
-                    with the {term}-year term
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      <span className="text-4xl font-semibold tracking-tight">
+                        {currency(selected.annual)}/yr
+                      </span>
+                      <span className="text-slate-500 text-lg">
+                        {currency(selected.total)} total for {selected.term} year
+                        {selected.term > 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    {term > 1 && savings && savings.saved > 0 && (
+                      <div className="mt-1 text-emerald-600">
+                        Save {currency(savings.saved)} ({savings.pct}%) versus renewing annually
+                      </div>
+                    )}
                   </div>
-                )}
+                  <div>
+                  <SmartLink
+                    href={paymentLink || '#'}
+                    openInNewTab={false}
+                    onClick={handlePaymentClick}
+                    className="btn btn-brand-blue btn-xl whitespace-nowrap"
+                  >
+                    Join the Roof Care Club
+                    <ShieldCheck className="h-6 w-6 inline ml-2" />
+                  </SmartLink>
+                  <p className="text-center mt-2 text-xs font-semibold uppercase text-slate-600">
+                    Takes you to a secure sign-up link
+                    <ArrowUpRight className="inline ml-1 h-3 w-3" />
+                  </p>
+                  </div>
+                </div>
+                <p className="mt-3 text-sm text-slate-500">
+                  Billed upfront. Membership applies to one property. Taxes/fees may apply.{' '}
+                  <SmartLink data-icon-affordance="up-right" href={TERMS_URL}>
+                    See terms
+                    <ArrowUpRight className="icon-affordance inline h-3 w-3 ml-1" />
+                  </SmartLink>
+                </p>
               </div>
 
-              {/* Features */}
-              <ul className="mt-4 flex-1 space-y-3 px-6 pb-6 list-none">
-                {plan.features.map((fid) => {
-                  const f = featureById.get(fid)!;
-                  return (
-                    <li key={fid}>
+              {/* Benefits */}
+              <div className="mt-6 border-t border-slate-200 px-6 pt-5">
+                <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
+                  Included with every membership
+                </h4>
+                <ul className="mt-3 space-y-3 list-none">
+                  {BENEFITS.map((benefit) => (
+                    <li key={benefit.id}>
                       <Accordion
-                        summary={<h4>{f.label}</h4>}
+                        summary={<h5 className="text-lg"><CircleCheck className="inline mr-2 text-green-600 h-5 w-5" />{benefit.label}</h5>}
                         radius="2xl"
                         tone="soft"
                         size="md"
                         proseBody={false}
-                        summaryClassName='text-[1rem]'
                       >
-                        {f.why ? (
+                        {benefit.why ? (
                           <div className="m-0">
                             <span className="font-semibold text-slate-700">Why it matters: </span>
-                            {f.why}
+                            {benefit.why}
                           </div>
                         ) : null}
                       </Accordion>
                     </li>
-                  );
-                })}
-              </ul>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Discounts */}
+              <div className="mt-6 border-t border-slate-200 px-6 pt-5">
+                <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
+                  Term-based discounts
+                </h4>
+                <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200 text-lg">
+                  <div className="grid grid-cols-3 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
+                    <div className="px-3 py-2">Term</div>
+                    <div className="px-3 py-2">Repair discount</div>
+                    <div className="px-3 py-2">Additional inspections</div>
+                  </div>
+                  {TERM_PLANS.map((plan) => (
+                    <div
+                      key={plan.term}
+                      className={[
+                        'grid grid-cols-3 border-t border-slate-200',
+                        plan.term === term ? 'bg-blue-50' : 'bg-white',
+                      ].join(' ')}
+                    >
+                      <div className="px-3 py-2">{plan.term}-year</div>
+                      <div className="px-3 py-2">{formatDiscount(plan.repairDiscount)}</div>
+                      <div className="px-3 py-2">{formatDiscount(plan.inspectionDiscount)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Inclusion rules */}
+              <div className="mt-6 border-t border-slate-200 px-6 pt-5 pb-6">
+                <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
+                  FREE TRIAL membership for existing customers
+                </h4>
+                <ul className="mt-3 list-disc pl-5 text-lg text-slate-600">
+                  {INCLUSION_RULES.map((rule) => (
+                    <li key={rule}>{rule}</li>
+                  ))}
+                </ul>
+              </div>
             </div>
           );
-        })}
+        })()}
       </div>
-      <p className="mt-3 text-center text-sm text-slate-500 italic">
-        <small>**Includes up to 90 minutes to perform any combination of these three services during your annual roof inspection.</small>
-      </p>
     </div>
   );
 }

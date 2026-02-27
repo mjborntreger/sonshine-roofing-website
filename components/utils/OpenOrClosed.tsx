@@ -4,13 +4,13 @@ import { useEffect, useMemo, useState } from 'react';
 
 // STYLES
   const baseStyles =
-    'inline-flex w-fit items-center gap-2 rounded-xl border px-2.5 py-1 text-sm font-medium';
+    'inline-flex w-fit items-center gap-2 rounded-xl border px-2.5 py-1 font-medium';
   const openStyles =
     'border-green-200 bg-green-50 text-green-700';
   const closedStyles =
     'border-red-200 bg-red-50 text-red-700';
   const helperTextStyles = 
-    'block my-1 text-xs text-slate-500';
+    'block my-1 text-sm text-slate-500';
 
 type Interval = { open: string; close: string }; // 24h "HH:mm"
 type WeeklyHours = Record<number, Interval[]>; // 0 = Sunday ... 6 = Saturday
@@ -25,6 +25,14 @@ type OpenOrClosedProps = {
    * IANA time zone for business location. Sarasota uses America/New_York.
    */
   timeZone?: string;
+  /**
+   * YYYY-MM-DD dates that should be treated as closed, in the given timeZone.
+   */
+  holidayClosures?: string[];
+  /**
+   * MM-DD dates that should be treated as closed every year, in the given timeZone.
+   */
+  recurringClosures?: string[];
   /**
    * Optional wrapper className.
    */
@@ -79,25 +87,64 @@ function withTime(d: Date, tz: string, hhmm: string) {
   return base;
 }
 
+function dateKey(d: Date, tz: string) {
+  // YYYY-MM-DD string for the calendar date in the target timezone.
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: tz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(d);
+}
+
 type Status =
   | { kind: 'open'; closesAt: Date }
   | { kind: 'closed'; nextOpensAt: Date | null };
 
-function computeStatus(now: Date, tz: string, hours: WeeklyHours): Status {
+function isHolidayClosed(now: Date, tz: string, holidayClosures: string[]) {
+  if (!holidayClosures || holidayClosures.length === 0) return false;
+  return holidayClosures.includes(dateKey(now, tz));
+}
+
+function monthDayKey(d: Date, tz: string) {
+  // MM-DD string for the calendar date in the target timezone.
+  const base = new Date(d.toLocaleString('en-US', { timeZone: tz }));
+  const m = String(base.getMonth() + 1).padStart(2, '0');
+  const day = String(base.getDate()).padStart(2, '0');
+  return `${m}-${day}`;
+}
+
+function isRecurringClosed(now: Date, tz: string, recurringClosures: string[]) {
+  if (!recurringClosures || recurringClosures.length === 0) return false;
+  return recurringClosures.includes(monthDayKey(now, tz));
+}
+
+function computeStatus(
+  now: Date,
+  tz: string,
+  hours: WeeklyHours,
+  holidayClosures: string[],
+  recurringClosures: string[],
+): Status {
   const day = now.getDay();
   const minutesNow = now.getHours() * 60 + now.getMinutes();
+  const isClosedToday =
+    isHolidayClosed(now, tz, holidayClosures) ||
+    isRecurringClosed(now, tz, recurringClosures);
 
   // 1) Check today's intervals
-  const todays = hours[day] || [];
-  for (const itv of todays) {
-    const start = toMinutes(itv.open);
-    const end = toMinutes(itv.close);
-    if (minutesNow >= start && minutesNow < end) {
-      return { kind: 'open', closesAt: withTime(now, tz, itv.close) };
-    }
-    if (minutesNow < start) {
-      // still closed but opens later today
-      return { kind: 'closed', nextOpensAt: withTime(now, tz, itv.open) };
+  const todays = isClosedToday ? [] : (hours[day] || []);
+  if (!isClosedToday) {
+    for (const itv of todays) {
+      const start = toMinutes(itv.open);
+      const end = toMinutes(itv.close);
+      if (minutesNow >= start && minutesNow < end) {
+        return { kind: 'open', closesAt: withTime(now, tz, itv.close) };
+      }
+      if (minutesNow < start) {
+        // still closed but opens later today
+        return { kind: 'closed', nextOpensAt: withTime(now, tz, itv.open) };
+      }
     }
   }
 
@@ -107,7 +154,10 @@ function computeStatus(now: Date, tz: string, hours: WeeklyHours): Status {
     future.setDate(now.getDate() + i);
     const wd = future.getDay();
     const list = hours[wd] || [];
-    if (list.length > 0) {
+    const isFutureClosed =
+      isHolidayClosed(future, tz, holidayClosures) ||
+      isRecurringClosed(future, tz, recurringClosures);
+    if (!isFutureClosed && list.length > 0) {
       return { kind: 'closed', nextOpensAt: withTime(future, tz, list[0].open) };
     }
   }
@@ -118,6 +168,8 @@ function computeStatus(now: Date, tz: string, hours: WeeklyHours): Status {
 export default function OpenOrClosed({
   hours = DEFAULT_HOURS,
   timeZone = DEFAULT_TZ,
+  holidayClosures = [],
+  recurringClosures = [],
   className = '',
   hideHelperText = false,
 }: OpenOrClosedProps) {
@@ -132,8 +184,8 @@ export default function OpenOrClosed({
 
   const status: Status | null = useMemo(() => {
     if (!now) return null;
-    return computeStatus(now, timeZone, hours);
-  }, [now, timeZone, hours]);
+    return computeStatus(now, timeZone, hours, holidayClosures, recurringClosures);
+  }, [now, timeZone, hours, holidayClosures, recurringClosures]);
 
   if (!status) {
     return (

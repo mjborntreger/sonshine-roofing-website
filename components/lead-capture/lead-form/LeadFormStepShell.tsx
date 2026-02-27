@@ -30,9 +30,9 @@ export default function LeadFormStepShell({
           <div>
             <p className="text-xs uppercase tracking-wide text-[--brand-blue]">{stepLabel}</p>
             <h3 className="mt-3 mb-4 text-2xl font-semibold text-slate-900 md:text-3xl">{title}</h3>
-            <p className="mt-3 text-xs text-slate-600 md:text-sm">{description}</p>
+            <p className="mt-3 text-sm text-slate-600 md:text-base">{description}</p>
           </div>
-          <div className="relative mb-4 aspect-[21/9] h-[54px] w-[158px] shrink-0">
+          <div className="relative mb-4 aspect-[21/9] h-[27px] w-[79px] sm:h-[54px] sm:w-[158px] shrink-0">
             <Image
               src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
               alt="sonshine logo, no swoosh"

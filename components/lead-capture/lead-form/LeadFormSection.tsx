@@ -11,7 +11,9 @@ export default function LeadFormSection() {
   return (
     <div>
       <Suspense fallback={<LeadFormFallback />}>
-        <LeadForm restoredSuccess={restoredSuccess} />
+        <div className="max-w-[1280px] mx-auto">
+          <LeadForm restoredSuccess={restoredSuccess} />
+        </div>
       </Suspense>
     </div>
   );

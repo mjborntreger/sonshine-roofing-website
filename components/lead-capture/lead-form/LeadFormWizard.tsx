@@ -68,7 +68,7 @@ const SELECTION_PILL_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue] t
 const SELECTION_PILL_UNSELECTED_CLASS = 'border-blue-200 bg-white text-slate-700 hover:border-blue-300';
 
 const HELP_BUTTON_BASE_CLASS =
-  'group flex flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
+  'group flex flex-col gap-3 rounded-xl sm:rounded-2xl border p-3 sm:p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 const HELP_BUTTON_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]';
 const HELP_BUTTON_UNSELECTED_CLASS =
   'border-blue-200 bg-white hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md';
@@ -451,11 +451,11 @@ export default function LeadFormWizard({
       : '';
     const notesText = form.notes.trim();
     const roofTypeLabel = getRoofTypeLabel(form.roofType);
-    const combinedNotes = roofTypeLabel
-      ? [notesText, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
-      : notesText;
-    const resourceLinksForPayload: ContactLeadResourceLink[] = getSuccessLinks(form.projectType).map(
-      ({ label, description, href, external }) => ({
+      const combinedNotes = roofTypeLabel
+        ? [notesText, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
+        : notesText;
+      const resourceLinksForPayload: ContactLeadResourceLink[] = getSuccessLinks(form.projectType).map(
+        ({ label, description, href, external }) => ({
         label,
         description,
         href,
@@ -509,6 +509,7 @@ export default function LeadFormWizard({
         projectType: form.projectType,
         helpTopics: helpSummary,
       },
+      metaPixelEvents: ['Lead', 'Contact'],
     });
 
     if (!result.ok) {
@@ -549,6 +550,8 @@ export default function LeadFormWizard({
         helpTopicLabels,
         timeline: form.timeline,
         timelineLabel: timelineLabelDisplay || undefined,
+        notes: notesText || undefined,
+        roofTypeLabel: roofTypeLabel || undefined,
         timestamp: new Date().toISOString(),
       };
       persistLeadSuccessCookie(successPayload);
@@ -556,6 +559,8 @@ export default function LeadFormWizard({
         projectType: projectTypeForSuccess,
         helpTopicLabels,
         timelineLabel: timelineLabelDisplay,
+        notes: notesText || null,
+        roofTypeLabel: roofTypeLabel || null,
       });
   };
 
@@ -585,7 +590,7 @@ export default function LeadFormWizard({
         return {
           title: 'Where are you located?',
           highlightText: 'Where',
-          description: 'Share the service address and the best time to connect (optional).',
+          description: 'Share the service address and the best time to connect (time optional).',
         };
       default:
         return { title: '', description: '', highlightText: null };
@@ -652,7 +657,7 @@ export default function LeadFormWizard({
   }
 
   return (
-    <form ref={formRef} className="px-4 py-16 mb-8" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className="px-4 py-16" onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <input type="hidden" name="projectType" value={form.projectType} />
       <input type="hidden" name="helpTopics" value={helpSummary} />
@@ -694,7 +699,7 @@ export default function LeadFormWizard({
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={activeStepId} {...stepMotionProps}>
             {activeStepId === 'need' && (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                 {PROJECT_OPTIONS.map((option) => {
                   const { value, action } = option;
                   const selectable = action === 'advance' && isJourneyKey(value);
@@ -732,8 +737,8 @@ export default function LeadFormWizard({
                     {journey?.showHelpMulti && (
                       <div>
                         <div className="flex-col items-baseline justify-start">
-                          <h4 className="text-sm font-semibold tracking-wide uppercase text-slate-600">What&rsquo;s the situation?</h4>
-                          <p className="mt-2 mb-1 text-xs font-medium text-slate-500">Select all that apply</p>
+                          <h4 className="text-base font-semibold tracking-wide uppercase text-slate-600">What&rsquo;s the situation?</h4>
+                          <p className="mt-2 mb-1 text-sm font-medium text-slate-500">Select all that apply</p>
                         </div>
                         <div className="grid gap-3 mt-3 grid-cols-2 md:grid-cols-3">
                           {journey.helpOptions.map(({ value, label, description, icon: Icon, imageSrc, imageAlt }) => {
@@ -749,7 +754,7 @@ export default function LeadFormWizard({
                                 )}
                                 aria-pressed={selected}
                               >
-                                <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 aspect-[5/2]">
+                                <div className="relative w-full overflow-hidden rounded-lg sm:rounded-xl bg-slate-100 aspect-[5/2]">
                                   {imageSrc ? (
                                     <Image
                                       src={imageSrc}
@@ -766,8 +771,8 @@ export default function LeadFormWizard({
                                 </div>
                                 <div className="flex items-start justify-between gap-3">
                                   <div>
-                                    <p className="text-sm font-semibold text-slate-900">{label}</p>
-                                    <p className="mt-1 text-xs text-slate-500">{description}</p>
+                                    <p className="text-base font-semibold text-slate-900">{label}</p>
+                                    <p className="mt-1 text-xs sm:text-sm text-slate-500">{description}</p>
                                   </div>
                                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
                                     <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
@@ -844,8 +849,8 @@ export default function LeadFormWizard({
               {activeStepId === 'contact' && (
                 <div className="grid gap-4 py-2 md:grid-cols-2">
                   <div className="md:col-span-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">What type of roof do you have?</p>
-                    <div className="grid gap-3 mt-3 grid-cols-2 md:grid-cols-4">
+                    <p className="text-sm font-semibold uppercase text-slate-500">What type of roof do you currently have?</p>
+                    <div className="grid gap-3 my-3 grid-cols-2 md:grid-cols-4">
                       {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
                         const selected = form.roofType === value;
                         return (
@@ -947,7 +952,7 @@ export default function LeadFormWizard({
                     />
                     {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
                     <p className="mt-1 text-xs text-slate-500">
-                      Digits only, US numbers. Example: {formatPhoneExample(form.phone)}
+                      Ex: {formatPhoneExample(form.phone)}
                     </p>
                   </label>
 
@@ -981,11 +986,12 @@ export default function LeadFormWizard({
               {activeStepId === 'schedule' && (
                 <div className="grid gap-4 py-2 md:grid-cols-2">
                   <label className="flex flex-col text-sm font-medium text-slate-700 md:col-span-2">
-                    Street address (optional)
+                    Street address*
                     <input
                       type="text"
                       name="address1"
                       autoComplete="street-address"
+                      required
                       value={form.address1}
                       onChange={(event) => onSelect('address1', event.target.value)}
                       className={cn(
@@ -1010,11 +1016,12 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    City (optional)
+                    City*
                     <input
                       type="text"
                       name="city"
                       autoComplete="address-level2"
+                      required
                       value={form.city}
                       onChange={(event) => onSelect('city', event.target.value)}
                       className={cn(
@@ -1027,11 +1034,12 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    State (optional)
+                    State*
                     <input
                       type="text"
                       name="state"
                       autoComplete="address-level1"
+                      required
                       value={form.state}
                       onChange={(event) => onSelect('state', normalizeState(event.target.value))}
                       className={cn(
@@ -1045,13 +1053,14 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    ZIP (optional)
+                    ZIP*
                     <input
                       type="text"
                       name="zip"
                       inputMode="numeric"
                       maxLength={5}
                       autoComplete="postal-code"
+                      required
                       value={form.zip}
                       onChange={(event) => onSelect('zip', normalizeZip(event.target.value))}
                       className={cn(

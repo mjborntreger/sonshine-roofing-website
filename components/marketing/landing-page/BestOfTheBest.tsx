@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { BestOfTheBestVideo } from "@/components/marketing/landing-page/BestOfTheBestVideo";
+import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
 
 
@@ -12,7 +13,7 @@ type BestOfTheBestProps = {
   highlightText?: string;
 };
 
-const defaultHighlight = "Best Sarasota Roofer";
+const defaultHighlight = "Best Roofer in Sarasota";
 
 export default async function bestOfTheBest({
   title = `Voted ${defaultHighlight} for 5 Years`,
@@ -36,10 +37,10 @@ export default async function bestOfTheBest({
         id="botb-title"
       >
         <div className="text-center">
-          <h2 className="text-3xl md:text-5xl text-slate-700">
+          <h2 className={SECTION_HEADING}>
             {renderedTitle}
           </h2>
-          <p className="mt-2 mb-8 text-sm text-slate-500" >SonShine Roofing is a five-time winner of the National Best of the Best Award which recognizes local roofing contractors with excellent reviews, top-rated customer service, and superior workmanship.</p>
+          <p className={SECTION_SUBTITLE}>SonShine Roofing is a five-time winner of the National Best of the Best Award which recognizes local roofing contractors with excellent reviews, top-rated customer service, and superior workmanship.</p>
         </div>
       </div>
 
@@ -128,14 +129,14 @@ export default async function bestOfTheBest({
 
       <div className="grid items-start grid-cols-1 gap-8 mx-auto mt-16 md:grid-cols-2">
         <figure className="text-slate-900">
-          <blockquote className="italic text-md">
+          <blockquote className="italic leading-relaxed md:text-lg">
             <p>
               &ldquo;You found one of the most <strong>positively reviewed</strong> roofing companies anywhere,
               SonShine Roofing in Florida, which is now a 5-time winner of our national
               Best of the Best award.&rdquo;
             </p>
           </blockquote>
-          <figcaption className="mt-6 not-italic text-right text-md">—Rich Noonan, Best of the Best TV</figcaption>
+          <figcaption className="md:text-lg mt-6 not-italic text-right">—Rich Noonan, Best of the Best TV</figcaption>
         </figure>
 
         <div className="relative">

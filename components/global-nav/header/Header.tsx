@@ -6,6 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSelectedLayoutSegments } from "next/navigation";
 import { NavMenu } from "./NavMenu";
 import { cn } from "@/lib/utils";
+import { Phone } from "lucide-react";
 
 const HEADER_COLLAPSE_THRESHOLD = 140; // tweak this to adjust when the header compresses
 const HEADER_EXPAND_THRESHOLD = 60; // below this scroll position the header expands again
@@ -25,8 +26,8 @@ export default function Header() {
     progress: initialLanding ? 0 : 1,
   }));
   const stateRef = useRef(scrollState);
-  const isLanding = 
-    segments.length === 0 || 
+  const isLanding =
+    segments.length === 0 ||
     (segments[0] === "locations" && segments.length === 2);
 
   useEffect(() => {
@@ -108,8 +109,8 @@ export default function Header() {
   const headerBackground = `rgba(236, 254, 255, ${backgroundOpacity})`;
   const headerBorder = `rgba(191, 219, 254, ${backgroundOpacity})`;
   const backdropBlur = backgroundOpacity > 0 ? `blur(${6 + backgroundOpacity * 6}px)` : "blur(0px)";
-  const expandedLogo = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-final-1.webp";
-  const collapsedLogo = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-2.webp";
+  const expandedLogo = "https://next.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Blue.webp";
+  const collapsedLogo = "https://next.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Orange.webp";
   const logoSrc = !collapsed && isLanding
     ? collapsedLogo
     : expandedLogo;
@@ -143,7 +144,7 @@ export default function Header() {
       </div>
       <div
         className={cn(
-          "mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 transition-all duration-300 ease-in-out",
+          "mx-auto flex max-w-7xl items-center flex-row gap-4 px-4 transition-all duration-300 ease-in-out",
           collapsed ? "py-[0.125rem]" : "py-[0.4rem]"
         )}
       >
@@ -152,14 +153,14 @@ export default function Header() {
           className={cn("flex items-center gap-2 transition-transform duration-200 ease-out",
             collapsed ? "scale-[0.8]" : "scale-100"
           )}
-            
-         
+
+
         >
           <Image
             src={logoSrc}
             alt="SonShine Roofing Logo"
             aria-label="SonShine Roofing Logo"
-            width={96}
+            width={106}
             height={40}
             sizes="(max-width: 120px) 20vw, 768px"
             loading="eager"
@@ -167,6 +168,12 @@ export default function Header() {
             fetchPriority="high"
             className="h-[40px]"
           />
+        </SmartLink>
+        <SmartLink className="align-baseline phone-affordance text-right" href="tel:+19418664320">
+          <div className="bg-orange-500 hover:bg-orange-400 transition-colors text-white border shadow-sm md:hidden border-white text-xs font-medium rounded-lg px-3 py-1 phone">
+            <Phone className="phone-affordance-icon inline h-3 w-3 mr-1" />
+            (941) 866-4320
+          </div>
         </SmartLink>
         <NavMenu transparent={isTransparent} />
       </div>

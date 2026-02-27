@@ -76,7 +76,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'repair',
     label: 'Roof Repair',
-    description: 'Roof leak, water intrusion, ceiling spots, or visible damage to roof exterior',
+    description: 'FREE ESTIMATE | Fast, Friendly, & Professional.',
     icon: Droplets,
     accent: 'border-rose-200 bg-rose-50 text-rose-600',
     action: 'advance',
@@ -85,8 +85,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'retail',
-    label: 'Roof replacement or new construction',
-    description: 'Ready for a full re-roof and want a free estimate / compare options',
+    label: 'Roof Replacement',
+    description: 'FREE QUOTE | Shingle, Metal, Tile, & Flat,',
     icon: Hammer,
     accent: 'border-amber-200 bg-amber-50 text-amber-600',
     action: 'advance',
@@ -95,8 +95,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'maintenance',
-    label: 'Roof inspections, maintenance',
-    description: 'Light roof repair, annual roof inspections, real estate inspections, prepare my roof for hurricane season',
+    label: 'Roof Inspection',
+    description: 'TIP TOP ROOF CHECK-UP | 18-point Inspection.',
     icon: Wrench,
     accent: 'border-emerald-200 bg-emerald-50 text-emerald-600',
     action: 'advance',
@@ -105,8 +105,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'financing-link',
-    label: 'Flexible financing options',
-    description: 'Payment deferrals, flexible pay schedule, low APR, fast approval, home-secured options',
+    label: 'Browse Financing',
+    description: 'Take a short quiz to discover your ideal financing plan.',
     icon: HandCoins,
     accent: 'border-sky-200 bg-sky-50 text-sky-600',
     action: 'link',
@@ -116,8 +116,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'project-gallery',
-    label: 'See our past work',
-    description: 'Browse our roofing project gallery, learn more about material and color options for our new roof installations in Sarasota, Bradenton, Venice, North Port, and beyond',
+    label: 'See Our Past Work',
+    description: 'Roofing Project Gallery | Shingle, Metal, & Tile',
     icon: Star,
     accent: 'border-purple-200 bg-purple-50 text-purple-600',
     action: 'link',
@@ -127,8 +127,8 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   },
   {
     value: 'something-else',
-    label: 'Something else',
-    description: "Roof warranty claim, homeowner's insurance claim, skylight repair, skylight installation, or just have a few questions",
+    label: 'Something Else / Not Sure',
+    description: "Warranties, Skylights, or just have a few questions",
     icon: MessageCircle,
     accent: 'border-violet-200 bg-violet-50 text-violet-600',
     action: 'advance',
@@ -420,6 +420,11 @@ export function restoreLeadSuccessState(rawCookie?: string | null): LeadSuccessR
     typeof parsed.timelineLabel === 'string' && parsed.timelineLabel
       ? parsed.timelineLabel
       : getTimelineLabelForDisplay(projectType, timeline);
+  const notes = typeof parsed.notes === 'string' ? parsed.notes : null;
+  const roofTypeLabel =
+    typeof parsed.roofTypeLabel === 'string' && parsed.roofTypeLabel
+      ? parsed.roofTypeLabel
+      : null;
 
   return {
     formPreset: {
@@ -431,6 +436,8 @@ export function restoreLeadSuccessState(rawCookie?: string | null): LeadSuccessR
       projectType,
       helpTopicLabels,
       timelineLabel: timelineLabel || null,
+      notes,
+      roofTypeLabel,
     },
   };
 }

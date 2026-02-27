@@ -4,16 +4,16 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import FilterTabs from "@/components/dynamic-content/FilterTabs";
 import SmartLink from "@/components/utils/SmartLink";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeftRight, ArrowRight } from "lucide-react";
 import {
   POST_TAB_CONFIG,
   type CategoryKey,
   type TabConfig,
 } from "@/components/dynamic-content/latest-filters/latest-tab-config";
 import { renderHighlight } from "@/components/utils/renderHighlight";
+import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
-const pStyles = "my-4 mb-6 text-center text-slate-500 justify-center text-sm md:text-md";
 
 type TabPayload = {
   key: CategoryKey;
@@ -77,7 +77,7 @@ export default function LatestPostsFilter({
   }, [selected, tabs]);
 
   const renderFilterTabs = () => (
-    <div className={`flex justify-center ${showHeader ? "mt-6" : "mb-8"}`}>
+    <div className={`flex justify-center ${showHeader ? "mt-3" : "mb-8"}`}>
       <FilterTabs
         tabs={computedTabs}
         activeKey={selected}
@@ -93,13 +93,17 @@ export default function LatestPostsFilter({
   const renderedHeading = renderHighlight(heading, "Roofing Insights");
 
   return (
-    <div className="px-4 max-w-[1600px] mx-auto">
+    <div className="mt-24 px-4 max-w-[1600px] mx-auto">
       {showHeader ? (
         <div className="text-center">
-          <h2 className="mb-3 text-3xl text-slate-700 md:text-5xl md:mb-4">{renderedHeading}</h2>
+          <h2 className={SECTION_HEADING}>{renderedHeading}</h2>
           <div className="max-w-3xl mx-auto text-center">
-            <p className={pStyles}>{description}</p>
+            <p className={SECTION_SUBTITLE}>{description}</p>
           </div>
+          <p className="text-slate-500 text-xs leading-none uppercase font-semibold">
+            <ArrowLeftRight className="h-3 w-3 mr-1 text-[--brand-blue] inline" />
+            Filter by Category
+          </p>  
           {renderFilterTabs()}
         </div>
       ) : (

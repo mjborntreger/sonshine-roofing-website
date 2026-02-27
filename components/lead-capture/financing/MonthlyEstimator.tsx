@@ -801,6 +801,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
     const result = await submitLead(payload, {
       gtmEvent: { event: 'financing_calculator_submit', form: 'monthly_estimator' },
+      metaPixelEvents: 'Lead',
       contactReadyCookieMaxAge: CONTACT_READY_MAX_AGE,
     });
 

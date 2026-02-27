@@ -69,7 +69,7 @@ export async function POST(req: Request) {
     revalidated.paths.push(p);
   }
   for (const t of tags) {
-    revalidateTag(t);
+    revalidateTag(t, 'max');
     revalidated.tags.push(t);
   }
 
@@ -103,7 +103,7 @@ export async function GET(req: Request) {
     revalidated.paths.push(p);
   }
   for (const t of tags) {
-    revalidateTag(t);
+    revalidateTag(t, 'max');
     revalidated.tags.push(t);
   }
 

@@ -24,9 +24,9 @@ export default function PersonGrid({ people }: { people: Person[] }) {
               >
                 <Card className="overflow-hidden hover:shadow-lg transition">
                   <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-                    <CardTitle className="font-bold text-xl">{p.title}</CardTitle>
+                    <CardTitle className="font-semibold text-2xl">{p.title}</CardTitle>
                     {p.positionTitle && (
-                      <p className="mt-1 text-sm text-slate-600">{p.positionTitle}</p>
+                      <p className="mt-1 text-slate-700">{p.positionTitle}</p>
                     )}
                   </CardHeader>
 
@@ -47,9 +47,9 @@ export default function PersonGrid({ people }: { people: Person[] }) {
                     <div className="aspect-[4/3] w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
                   )}
 
-                  <CardContent className="px-5 pb-4 pt-5 text-sm text-slate-600 sm:px-6 sm:pb-6">
+                  <CardContent className="px-5 pb-4 pt-5 text-slate-600 sm:px-6 sm:pb-6">
                     {summary && (
-                      <p style={{ ...lineClampStyle, WebkitLineClamp: 2 }}>{summary}</p>
+                      <p style={{ ...lineClampStyle, WebkitLineClamp: 3 }}>{summary}</p>
                     )}
                   </CardContent>
 

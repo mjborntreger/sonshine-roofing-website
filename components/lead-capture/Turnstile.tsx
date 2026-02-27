@@ -48,7 +48,7 @@ type TurnstileProps = {
   autoRefreshOnExpire?: boolean; // default true
 };
 
-const PUBLIC_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "";
+const PUBLIC_SITE_KEY = (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "").trim();
 
 export default function Turnstile({
   siteKey = PUBLIC_SITE_KEY,

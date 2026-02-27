@@ -6,10 +6,11 @@ import { Accordion } from '@/components/ui/Accordion';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { howToSchema, serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
+import { ArrowLeftRight } from 'lucide-react';
 
 type Item = { label: string; why: string };
 
-type GroupKey = 'interior' | 'attic' | 'exterior';
+type GroupKey = 'interior' | 'attic' | 'exterior' | 'safety';
 
 const CHECKLIST: Record<GroupKey, { title: string; blurb: string; items: Item[] }> = {
     interior: {
@@ -65,12 +66,28 @@ const CHECKLIST: Record<GroupKey, { title: string; blurb: string; items: Item[] 
             { label: 'Damaged caulking', why: 'Dried or cracked sealant fails under sun and rain. We note and recommend touch‑ups.' },
         ],
     },
+    safety: {
+        title: 'Other Safety Concerns',
+        blurb:
+            'We note non-roof issues that could affect safety or the home, so you can address them early.',
+        items: [
+            {
+                label: 'Noticeable structural and/or environmental concerns',
+                why: 'We flag visible issues like sagging framing, storm damage, or unsafe access conditions so you can address them quickly.',
+            },
+            {
+                label: 'Noticeable evidence of any non-roof related concerns',
+                why: 'If we see problems outside the roof scope, we document them so you can route them to the right trade.',
+            },
+        ],
+    },
 };
 
 const PILLS: { key: GroupKey; label: string }[] = [
     { key: 'interior', label: 'Interior' },
     { key: 'attic', label: 'Attic' },
     { key: 'exterior', label: 'Exterior' },
+    { key: 'safety', label: 'Safety' },
 ];
 
 type TipTopRoofCheckupProps = {
@@ -129,26 +146,25 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
     return (
         <div className={clsx(className)}>
             <header className="text-center">
-                <h2 id="tip-top-roof-checkup" className="mt-8 text-3xl md:text-4xl font-semibold">Tip Top Roof Check‑up</h2>
-                <p className="mt-3 text-slate-600">
+                <h2 id="tip-top-roof-checkup" className="mt-8 text-3xl md:text-4xl text-slate-700 font-semibold">Tip Top Roof Check‑up</h2>
+                <p className="text-slate-600">
                     Our 18‑point inspection helps catch small issues before they become big problems.
                     Choose a category below to see what we check and why it matters.
                 </p>
-                <div className="mx-auto my-6 h-[3px] w-40 bg-gradient-to-r from-[#0045d7] to-[#00e3fe] rounded-full" />
             </header>
+            <div className="text-center mt-4 mb-8">
+                <p className="text-slate-500 text-sm leading-none uppercase font-semibold">
+                    <ArrowLeftRight className="h-3 w-3 mr-1 text-[--brand-blue] inline" />
+                    Filter by Category
+                </p>
+            </div>
+
 
             {/* JSON-LD: HowTo + Service for Tip Top Roof Check‑up */}
             <JsonLd data={howToLd} />
             <JsonLd data={serviceLd} />
 
-            <div className="mx-auto mt-4 max-w-3xl rounded-3xl border border-blue-200 bg-white p-4 text-center shadow-sm">
-                <p className="text-sm text-slate-700">
-                    You’ll get a written summary of findings, photos where helpful, and a clear plan to
-                    extend the life of your roof—or a straight‑shooting estimate if replacement makes more sense.
-                </p>
-            </div>
-
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-2">
                 {PILLS.map(({ key, label }) => {
                     const count = CHECKLIST[key].items.length;
                     const active = tab === key;
@@ -162,9 +178,9 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                             id={`tab-${key}`}
                             onClick={() => setTab(key)}
                             className={clsx(
-                                'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm shadow-sm transition',
+                                'inline-flex items-center gap-2 font-display font-semibold text-lg rounded-full border px-4 py-2 shadow-sm transition',
                                 active
-                                    ? 'bg-[var(--brand-blue)] text-white border-transparent'
+                                    ? 'bg-[var(--brand-orange)] text-white border-transparent'
                                     : 'bg-white text-slate-700 border-blue-200 hover:bg-slate-50'
                             )}
                             data-active={active}
@@ -172,7 +188,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                             <span>{label}</span>
                             <span
                                 className={clsx(
-                                    'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs',
+                                    'inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xl',
                                     active ? 'bg-white/15 text-white' : 'bg-slate-100 text-slate-700'
                                 )}
                             >
@@ -191,10 +207,10 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                         id={`panel-${key}`}
                         aria-labelledby={`tab-${key}`}
                         hidden={tab !== key}
-                        className="rounded-3xl border border-blue-200 bg-white p-4 shadow-sm"
+                        className="rounded-3xl border border-orange-200 bg-amber-50/50 p-4 md:p-6 shadow-sm"
                     >
-                        <h3>{CHECKLIST[key].title}</h3>
-                        <p className="mt-1 text-sm text-slate-600">{CHECKLIST[key].blurb}</p>
+                        <h3 className="mt-0 text-xl text-slate-700 md:text-2xl">{CHECKLIST[key].title}</h3>
+                        <p className="mt-1 text-lg text-slate-600">{CHECKLIST[key].blurb}</p>
 
                         <ul className="space-y-3 list-none not-prose p-0">
                             {CHECKLIST[key].items.map((it, idx) => {
@@ -202,15 +218,15 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                                 return (
                                     <li key={id} className="not-prose">
                                         <Accordion
-                                            summary={<h4>{it.label}</h4>}
+                                            summary={<h4 className="text-xl text-slate-700">{it.label}</h4>}
                                             radius="2xl"
-                                            tone="medium"
-                                            size="sm"
+                                            tone="soft"
+                                            size="md"
                                             proseBody={false}
-                                            summaryClassName='text-[1rem]'
+                                            summaryClassName='bg-cyan-50/50'
                                         >
                                             <p className="m-0">
-                                                <strong className="text-slate-900">Why we check this:</strong> {it.why}
+                                                <strong className="text-slate-700">Why we check this:</strong> {it.why}
                                             </p>
                                         </Accordion>
                                     </li>
@@ -219,6 +235,13 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                         </ul>
                     </div>
                 ))}
+            </div>
+
+            <div className="mx-auto my-8 max-w-3xl rounded-3xl border border-blue-200 bg-blue-50 p-4 text-center shadow-sm">
+                <p className="text-lg text-slate-700">
+                    You’ll get a written summary of findings, photos where helpful, and a clear plan to
+                    extend the life of your roof—or a straight‑shooting estimate if replacement makes more sense.
+                </p>
             </div>
         </div>
     );

@@ -16,19 +16,20 @@ import {
   Banknote,
   ArrowRight,
 } from "lucide-react";
+import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
 const SECTION_CONTAINER = "px-2";
-const SECTION_HEADING = "text-3xl md:text-5xl text-slate-700";
-const SECTION_SUBTITLE = "mt-4 mb-8 text-sm text-slate-500"
 const FEATURE_PILL_CLASS = "inline-flex items-center gap-2 badge badge--accent";
 const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
+const FEATURE_PILL_ICON_CLASS_BLUE = "h-4 w-4 text-[--brand-blue]";
+const FEATURE_PILL_ICON_CLASS_ORANGE = "h-4 w-4 text-amber-500";
 const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
 const GRID_LAYOUT_CLASS = "mt-8 grid grid-cols-2 gap-5 items-start auto-rows-fr";
 const CARD_SHELL_BASE = "overflow-hidden rounded-3xl bg-white/95 backdrop-blur-sm flex h-full flex-col";
 const ACCORDION_SHELL_BASE = `group ${CARD_SHELL_BASE}`;
 const CARD_SUMMARY_BASE = "flex cursor-pointer select-none items-center justify-between gap-3 rounded-t-3xl px-6 py-5 text-left text-lg font-semibold text-slate-900 transition-colors";
 const CARD_HEADER_BASE = "flex items-center gap-3 rounded-t-4xl px-6 pt-6 pb-4 text-lg font-semibold text-slate-900";
-const CARD_BODY_BASE = "flex-1 rounded-b-4xl px-6 pb-6 pt-4 text-sm leading-relaxed";
+const CARD_BODY_BASE = "flex-1 rounded-b-4xl md:text-lg px-6 pb-6 pt-4 leading-relaxed";
 const ICON_BASE = "grid h-10 w-10 place-items-center rounded-full transition-transform duration-200";
 const CHEVRON_BASE =
   "h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open/accordion:rotate-180";
@@ -91,6 +92,20 @@ type Pillar = {
 
 const pillars: Pillar[] = [
   {
+    id: "flexible-financing",
+    title: "Flexible Financing",
+    description:
+      "Compare YGrene’s equity-secured plans (tax-bill payments, 18–24 month deferrals) with Service Finance signature loans and 0% promos. We guide you through the quick quiz, paperwork, and monthly estimator so you know your payment before you ever sign.",
+    icon: HandCoins,
+    theme: "orange",
+    defaultOpen: true,
+    cta: {
+      href: "/financing",
+      label: "Get started",
+      title: "Get started with financing",
+    },
+  },
+  {
     id: "local-expertise",
     title: "Family-owned & Local",
     description:
@@ -114,20 +129,6 @@ const pillars: Pillar[] = [
     icon: Shield,
     theme: "blue",
   },
-  {
-    id: "flexible-financing",
-    title: "Flexible Financing",
-    description:
-      "Compare YGrene’s equity-secured plans (tax-bill payments, 18–24 month deferrals) with Service Finance signature loans and 0% promos. We guide you through the quick quiz, paperwork, and monthly estimator so you know your payment before you ever sign.",
-    icon: HandCoins,
-    theme: "orange",
-    defaultOpen: true,
-    cta: {
-      href: "/financing#get-started",
-      label: "Get started",
-      title: "Get started with financing",
-    },
-  },
 ];
 
 const DEFAULT_DESCRIPTION =
@@ -148,31 +149,31 @@ export default async function WhyHomeownersChooseUs({
         
         <div className={FEATURE_LIST_CLASS}>
           <span className={FEATURE_PILL_CLASS}>
-            <Award className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            <Award className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />
             GAF Master Elite Certified
           </span>
           <span className={FEATURE_PILL_CLASS}>
-            <CalendarDays className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            <CalendarDays className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />
             38+ Years Expertise
           </span>
           <span className={FEATURE_PILL_CLASS}>
-            <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            <BadgeCheck className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />
             A+ Rated with the BBB
           </span>
           <span className={FEATURE_PILL_CLASS}>
-            <Star className="w-4 h-4 text-amber-500" aria-hidden="true" />
+            <Star className={FEATURE_PILL_ICON_CLASS_ORANGE} aria-hidden="true" />
             4.8 on Google
           </span>
           <span className={FEATURE_PILL_CLASS}>
-            <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            <ShieldCheck className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />
             Licensed and Insured
           </span>
           <span className={FEATURE_PILL_CLASS}>
-            <BadgeCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            <BadgeCheck className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />
             25-year Warranty
           </span>
           <span className={FEATURE_PILL_CLASS}>
-            <Banknote className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+            <Banknote className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />
             Flexible Financing
           </span>
         </div>
@@ -202,7 +203,7 @@ export default async function WhyHomeownersChooseUs({
                   <div className="flex justify-end mt-6">
                     <SmartLink
                       href={pillar.cta.href}
-                      className="mt-2 btn btn-brand-orange btn-md btn-press"
+                      className="mt-2 btn btn-brand-orange btn-lg btn-press"
                       title={pillar.cta.title}
                       data-icon-affordance="right"
                     >

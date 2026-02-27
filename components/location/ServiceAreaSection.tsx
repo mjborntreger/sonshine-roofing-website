@@ -39,7 +39,7 @@ export default function ServiceAreaSection({
   emptyLandmarksMessage = "No landmarks captured yet.",
   emptyNeighborhoodsMessage = "No neighborhoods have been listed yet.",
 }: ServiceAreaSectionProps) {
-  const sectionClassName = className ? `px-4 ${className}` : "px-4";
+  const sectionClassName = className ? `mt-24 px-4 ${className}` : "mt-24 px-4";
   const locationLabel = locationName ?? fallbackLocationLabel;
   const computedHeading =
     heading ??
