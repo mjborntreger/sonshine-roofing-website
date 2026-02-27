@@ -26,8 +26,8 @@ export default function ReferralProgramTermsPage() {
           <h1>SonShine Roofing Referral Program - Terms & Conditions (2026)</h1>
           <p><strong>Effective Date:</strong> January 1, 2026</p>
           <p>
-            The SonShine Roofing Referral Program ("Program") is offered by SonShine
-            Roofing Inc. ("SonShine," "we," "us," or "our") to reward eligible past
+            The SonShine Roofing Referral Program (&quot;Program&quot;) is offered by SonShine
+            Roofing Inc. (&quot;SonShine,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) to reward eligible past
             customers for referring new roof replacement customers.
           </p>
           <p>
@@ -44,7 +44,7 @@ export default function ReferralProgramTermsPage() {
           <ul>
             <li>A new customer to SonShine Roofing (no prior contracts for roof replacement with SonShine).</li>
             <li>The legal owner of the property receiving the roof replacement.</li>
-            <li>Located within SonShine Roofing's service area.</li>
+            <li>Located within SonShine Roofing&rsquo;s service area.</li>
           </ul>
           <p>
             Employees of SonShine Roofing, their immediate family members, and
@@ -56,7 +56,7 @@ export default function ReferralProgramTermsPage() {
           <p>To qualify for a referral reward:</p>
           <p>The referred customer must:</p>
           <ul>
-            <li>Contact SonShine Roofing and explicitly mention the referrer's name at the time of initial contact.</li>
+            <li>Contact SonShine Roofing and explicitly mention the referrer&rsquo;s name at the time of initial contact.</li>
             <li>Schedule and complete a roof replacement estimate.</li>
             <li>Enter into a signed contract with SonShine Roofing for a full roof replacement.</li>
             <li>Successfully complete the roof replacement project.</li>
@@ -77,7 +77,7 @@ export default function ReferralProgramTermsPage() {
             (New Roof Care Club Whitepaper _...).
           </p>
           <p>
-            Payment will be made via ACH transfer (or other method at SonShine's discretion)
+            Payment will be made via ACH transfer (or other method at SonShine&rsquo;s discretion)
             within a reasonable processing period following project completion and full payment.
           </p>
           <p>The referrer is responsible for providing accurate payment information.</p>
@@ -100,7 +100,7 @@ export default function ReferralProgramTermsPage() {
             in its sole discretion, which referrer (if any) qualifies based on documentation and timing.
           </p>
           <p>
-            Referrals must be submitted before or at the time of the referred party's first
+            Referrals must be submitted before or at the time of the referred party&rsquo;s first
             contact with SonShine Roofing. Retroactive referrals will not be honored.
           </p>
 

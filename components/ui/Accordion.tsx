@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 type BaseDetailsProps = Omit<DetailsHTMLAttributes<HTMLDetailsElement>, "children" | "className" | "id" | "open">;
 
-type AccordionSize = "sm" | "md";
+type AccordionSize = "sm" | "md" | "lg";
 type AccordionTone = "soft" | "medium" | "strong";
 type AccordionRadius = "lg" | "xl" | "2xl" | "3xl";
 
@@ -44,11 +44,13 @@ const SUMMARY_BASE =
 const SUMMARY_SIZE: Record<AccordionSize, string> = {
   sm: "px-3.5 py-3 text-sm",
   md: "px-4 py-3 text-base",
+  lg: "px-4 py-3 text-lg",
 };
 
 const BODY_PADDING: Record<AccordionSize, string> = {
   sm: "accordion-motion px-3.5 pb-3.5 pt-0 text-sm text-slate-700",
   md: "accordion-motion px-4 pb-4 pt-0 text-slate-700",
+  lg: "accordion-motion px-4 pb-4 pt-0 text-slate-700"
 };
 
 const TONE_BORDER: Record<AccordionTone, string> = {

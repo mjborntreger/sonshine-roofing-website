@@ -7,7 +7,7 @@ import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { pushToDataLayer } from '@/lib/telemetry/gtm';
-import { ArrowLeftRight, ArrowUpRight, CircleCheck, ShieldCheck } from 'lucide-react';
+import { ArrowLeftRight, ArrowUpRight, CircleCheck } from 'lucide-react';
 
 // -----------------------------
 // Types & Data
@@ -269,21 +269,6 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                         Save {currency(savings.saved)} ({savings.pct}%) versus renewing annually
                       </div>
                     )}
-                  </div>
-                  <div>
-                  <SmartLink
-                    href={paymentLink || '#'}
-                    openInNewTab={false}
-                    onClick={handlePaymentClick}
-                    className="btn btn-brand-blue btn-xl whitespace-nowrap"
-                  >
-                    Join the Roof Care Club
-                    <ShieldCheck className="h-6 w-6 inline ml-2" />
-                  </SmartLink>
-                  <p className="text-center mt-2 text-xs font-semibold uppercase text-slate-600">
-                    Takes you to a secure sign-up link
-                    <ArrowUpRight className="inline ml-1 h-3 w-3" />
-                  </p>
                   </div>
                 </div>
                 <p className="mt-3 text-sm text-slate-500">

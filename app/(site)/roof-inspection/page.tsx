@@ -13,9 +13,7 @@ import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
-import { HandCoins, HardHat, MapPin, Zap } from "lucide-react";
-import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
-import { Suspense } from "react";
+import { ArrowRight, HandCoins, HardHat, HelpCircle, MapPin, Zap } from "lucide-react";
 
 const SERVICE_PATH = "/roof-inspection";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -106,79 +104,70 @@ export default async function Page() {
 
             <TipTopRoofCheckup origin={origin} />
 
-            <Suspense fallback={null}>
-              <EvenSimplerLeadForm
-                projectType="maintenance"
-                page="/roof-inspection"
-                title="Book a Roof Inspection"
-                titleHighlight="Roof Inspection"
-              />
-            </Suspense>
+            <div className="bg-slate-200 h-[1px] my-8" />
 
-            <h2>Why Do I Need a Roof Inspection?</h2>
-            <p>
-              Believe it or not, the average roof protects your home for about 20
-              years—but only if you stay on top of regular maintenance and address
-              minor damage early. Ignoring small issues today can lead to major expenses
-              tomorrow.
-              <br></br><br></br>
-              For most homeowners, spotting those early warning signs is difficult without
-              training. That’s why scheduling a professional roof inspection is one of the
-              smartest things you can do to protect your home and investment.
-              <br></br><br></br>
-              The cost of a roof evaluation is minimal compared to the cost of extensive roof
-              repairs or a full replacement. Wouldn’t you rather detect a hidden leak or
-              structural issue before it turns into an expensive problem?
-            </p>
-
-            <h2>Roofs Can Leak for Years Before You See Evidence</h2>
-            <p>
-              To add years of life to your roof, the National Roofing Contractors Association
-              (NRCA) recommends two roof inspections each year by a licensed roofing
-              professional to avoid premature roof failure. Studies show that small leaks are
-              the most damaging kind—when undetected, they can silently erode your home’s
-              structure, much like an undetected illness.
-            </p>
-            <figure className="not-prose">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
-                  alt="Nathan Borntreger, owner of SonShine Roofing, Roof Inspection Expert"
-                  fill
-                  className="object-cover mb-2"
-                  sizes="(max-width: 768px) 100vw, 800px"
-                  loading="lazy"
-                />
-              </div>
-              <figcaption className="mt-2 text-sm text-slate-600">
-                <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #CCC1331483 | <SmartLink className="text-[--brand-blue]" href="/person/nathan-borntreger">See full bio</SmartLink>
-              </figcaption>
-            </figure>
-            {/* Inline callout (#6) */}
-            <div className="my-4 rounded-xl border border-[#fb9216]/30 bg-[#fb9216]/5 p-4" role="note" aria-label="Important">
-              <p className="m-0 italic text-slate-700">
-                “Your roof could be leaking right now, and you don’t even know it…
-                roofs can leak for up to 13 years before you see evidence on the
-                inside of the house.”
-              </p>
-              <div className="text-right">
-                -Nathan Borntreger
-              </div>
+            <div className="not-prose flex flex-row justify-between">
+              <h3 className="mb-3 text-xl text-slate-700 md:text-2xl">
+                <HelpCircle className="text-[--brand-blue] h-5 w-5 inline mr-2" aria-hidden="true" />
+                Why Do I Need a Roof Inspection?
+              </h3>
             </div>
-
-            <p>
-              Comprehensive residential roof inspections become even more critical during tough economic times,
-              helping you maximize your roof’s service life and avoid premature roof replacement.
-              As we like to say: the only people who can afford to ignore their roof are those who
-              can afford to buy a new one.
-              <br></br><br></br>
-              While you can perform a preliminary inspection yourself—checking for shingles that are
-              curling, blistering, or missing; signs of wear around chimneys, pipes, and penetrations;
-              or broken and missing tiles—nothing compares to a professional inspection. A qualified
-              roofer knows how to walk your roof safely, identify hidden issues, and locate the kinds
-              of small leaks that lead to costly repairs if left unchecked. For optimal peace of mind,
-              pair this with a consistent roof maintenance routine by signing up for our Roof Care Club
-            </p>
+            <div className="text-lg prose">
+              <p>
+                A roof can protect your home for 20 years, but
+                only if someone is paying attention.
+                <br /><br />
+                Small leaks and worn flashing rarely announce themselves.
+                They work quietly. By the time water stains appear inside,
+                decking may already be rotting, insulation compromised,
+                and framing weakened.
+                <br /><br />
+                A professional inspection catches these issues early (when
+                they’re <strong>inexpensive to fix</strong>). The National Roofing Contractors
+                Association <SmartLink href="https://www.nrca.net">(nrca.net)</SmartLink> recommends
+                two inspections per year to prevent premature roof failure.
+              </p>
+              <figure className="not-prose mt-4">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                  <Image
+                    src="https://next.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
+                    alt="Nathan Borntreger, owner of SonShine Roofing, Roof Inspection Expert"
+                    fill
+                    className="object-cover mb-2"
+                    sizes="(max-width: 768px) 100vw, 800px"
+                    loading="lazy"
+                  />
+                </div>
+                <figcaption className="mt-2 text-sm text-slate-600">
+                  <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #CCC1331483 | <SmartLink className="text-[--brand-blue]" href="/person/nathan-borntreger">See full bio</SmartLink>
+                </figcaption>
+              </figure>
+              {/* Inline callout (#6) */}
+              <div className="shadow-sm my-4 rounded-xl border border-[#fb9216/5] bg-amber-50/50 p-4" role="note" aria-label="Important">
+                <p className="m-0 italic text-slate-700">
+                  &quot;Your roof could be leaking right now and you wouldn’t know it. Some leaks go years before they show up inside the house.&quot;
+                </p>
+                <div className="text-right">
+                  -Nathan Borntreger
+                </div>
+              </div>
+              <p>
+                You can spot obvious damage from the ground. But a trained
+                roofer can safely walk the roof, identify hidden entry points,
+                and prioritize repairs before they become major problems.
+                <br></br><br></br>
+                That’s why we built the <SmartLink href="/roof-maintenance">Roof Care Club</SmartLink> — a simple, consistent
+                maintenance plan designed to maximize the value of your
+                homeowner&rsquo;s insurance claims, extend the life of your roof, and
+                protect your home year after year.
+              </p>
+            </div>
+            <div className="my-6 flex flex-col gap-1">
+              <h4 className="mt-0">Ready to get started?</h4>
+              <SmartLink href="INSERT_STRIPE_LINK" className="font-normal text-lg font-sans align-bottom"> Book an inspection today
+                <ArrowRight className="inline h-4 w-4" />
+              </SmartLink>
+            </div>
           </div>
 
           <ServicesAside activePath={SERVICE_PATH} />

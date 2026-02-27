@@ -372,7 +372,7 @@
 @layer components {
   /* Base button reset */
   .btn {
-    @apply inline-flex items-center justify-center whitespace-nowrap
+    @apply inline-flex items-center justify-center
            rounded-xl font-semibold 
            transition duration-300 ease-in-out
            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-0
