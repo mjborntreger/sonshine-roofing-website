@@ -165,7 +165,7 @@ export default async function Page() {
             </div>
             <div className="my-6 flex flex-col gap-1">
               <h4 className="mt-0">Ready to get started?</h4>
-              <SmartLink href={STRIPE_PAYMENT_LINK} className="font-normal text-lg font-sans align-bottom"> Book an inspection today
+              <SmartLink target="_blank" href={STRIPE_PAYMENT_LINK} className="font-normal text-lg font-sans align-bottom"> Book an inspection today
                 <ArrowRight className="inline h-4 w-4" />
               </SmartLink>
             </div>
