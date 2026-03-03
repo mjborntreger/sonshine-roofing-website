@@ -11,6 +11,8 @@ import SmartLink from '@/components/utils/SmartLink';
 
 type Item = { label: string; why: string };
 
+export const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/28E28r98Ja2ncbS8Y89bO06"
+
 type GroupKey = 'interior' | 'attic' | 'exterior' | 'safety';
 
 const CHECKLIST: Record<GroupKey, { title: string; blurb: string; items: Item[] }> = {
@@ -158,7 +160,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                     <span>How it Works</span>
                 </h3>
                 <p className="text-base md:text-lg text-slate-700">
-                    1. You purchase a roof inspection <SmartLink href="INSERT_STRIPE_LINK">online</SmartLink> or by <SmartLink href="/contact-us">contacting our office</SmartLink>.
+                    1. You purchase a roof inspection <SmartLink href={STRIPE_PAYMENT_LINK}>online</SmartLink> or by <SmartLink href="/contact-us">contacting our office</SmartLink>.
                     <br /><br />
                     2. We reach out to the provided phone/email to confirm scheduling.
                     <br /><br />
@@ -169,15 +171,13 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                 </p>
             </div>
 
-            <div className="bg-slate-200 h-[1px] my-6" />
-
             <div className="text-center text-lg sm:text-2xl font-semibold my-4">
                 Book Your <span className="text-[--brand-blue]">Roof Inspection</span> Today
             </div>
             <div>
-                <SmartLink className="flex-row flex-nowrap gap-1 not-prose w-full py-4 btn btn-md btn-brand-blue" href="STRIPE_PAYMENT_LINK_HERE" data-icon-affordance="right" target="_blank" rel="noopener noreferrer">
+                <SmartLink className="flex-row flex-nowrap gap-1 not-prose w-full py-4 btn btn-md btn-brand-blue" href={STRIPE_PAYMENT_LINK} data-icon-affordance="right" target="_blank" rel="noopener noreferrer">
                     <span>Pay Securely with</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="30" fill-rule="evenodd" fill="#FFFFFF"><path d="M 50.7735 15.47 c 0 -2.9425 -1.425 -5.265 -4.15 -5.265 -2.735 0 -4.391 2.322 -4.391 5.2415 0 3.46 1.954 5.207 4.7585 5.207 1.368 0 2.4025 -0.31 3.184 -0.747 v -2.299 c -0.7815 0.391 -1.678 0.632 -2.816 0.632 -1.115 0 -2.1035 -0.391 -2.23 -1.747 h 5.62 c 0 -0.15 0.023 -0.747 0.023 -1.023 z M 45.1 14.3785 c 0 -1.299 0.793 -1.839 1.5175 -1.839 0.701 0 1.4485 0.54 1.4485 1.839 z m -7.2985 -4.1725 c -1.1265 0 -1.85 0.5285 -2.253 0.8965 l -0.15 -0.7125 H 32.865 v 13.4025 l 2.8735 -0.609 0.0115 -3.253 c 0.414 0.299 1.023 0.724 2.035 0.724 2.0575 0 3.931 -1.65 3.931 -5.299 -0.0115 -3.3335 -1.908 -5.15 -3.92 -5.15 z m -0.69 7.92 c -0.678 0 -1.08 -0.2415 -1.3565 -0.54 l -0.0115 -4.265 c 0.299 -0.3335 0.7125 -0.563 1.368 -0.563 1.046 0 1.77 1.1725 1.77 2.678 0 1.54 -0.7125 2.69 -1.77 2.69 z m -8.2 -8.598 l 2.885 -0.62 V 6.575 l -2.885 0.609 z m 0 0.8735 h 2.885 v 10.0575 h -2.885 z m -3.0925 0.85 l -0.184 -0.85 h -2.483 V 20.46 h 2.8735 V 13.643 c 0.678 -0.885 1.8275 -0.724 2.184 -0.5975 v -2.6435 c -0.368 -0.138 -1.7125 -0.391 -2.391 0.85 z m -5.747 -3.35 L 17.2675 8.5 l -0.0115 9.207 c 0 1.701 1.276 2.954 2.977 2.954 0.9425 0 1.632 -0.1725 2.0115 -0.38 v -2.3335 c -0.368 0.15 -2.184 0.678 -2.184 -1.023 V 12.85 h 2.184 v -2.4485 h -2.185 z m -7.77 5.414 c 0 -0.4485 0.368 -0.62 0.977 -0.62 a 6.425 6.425 0 0 1 2.85 0.735 V 10.735 c -0.954 -0.38 -1.8965 -0.5285 -2.85 -0.5285 -2.3335 0 -3.885 1.2185 -3.885 3.253 0 3.1725 4.368 2.6665 4.368 4.035 0 0.5285 -0.46 0.701 -1.1035 0.701 -0.954 0 -2.1725 -0.391 -3.138 -0.92 v 2.735 c 1.069 0.46 2.15 0.65 3.138 0.65 2.391 0 4.035 -1.184 4.035 -3.2415 -0.0115 -3.425 -4.391 -2.816 -4.391 -4.1035 z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="30" fillRule="evenodd" fill="#FFFFFF"><path d="M 50.7735 15.47 c 0 -2.9425 -1.425 -5.265 -4.15 -5.265 -2.735 0 -4.391 2.322 -4.391 5.2415 0 3.46 1.954 5.207 4.7585 5.207 1.368 0 2.4025 -0.31 3.184 -0.747 v -2.299 c -0.7815 0.391 -1.678 0.632 -2.816 0.632 -1.115 0 -2.1035 -0.391 -2.23 -1.747 h 5.62 c 0 -0.15 0.023 -0.747 0.023 -1.023 z M 45.1 14.3785 c 0 -1.299 0.793 -1.839 1.5175 -1.839 0.701 0 1.4485 0.54 1.4485 1.839 z m -7.2985 -4.1725 c -1.1265 0 -1.85 0.5285 -2.253 0.8965 l -0.15 -0.7125 H 32.865 v 13.4025 l 2.8735 -0.609 0.0115 -3.253 c 0.414 0.299 1.023 0.724 2.035 0.724 2.0575 0 3.931 -1.65 3.931 -5.299 -0.0115 -3.3335 -1.908 -5.15 -3.92 -5.15 z m -0.69 7.92 c -0.678 0 -1.08 -0.2415 -1.3565 -0.54 l -0.0115 -4.265 c 0.299 -0.3335 0.7125 -0.563 1.368 -0.563 1.046 0 1.77 1.1725 1.77 2.678 0 1.54 -0.7125 2.69 -1.77 2.69 z m -8.2 -8.598 l 2.885 -0.62 V 6.575 l -2.885 0.609 z m 0 0.8735 h 2.885 v 10.0575 h -2.885 z m -3.0925 0.85 l -0.184 -0.85 h -2.483 V 20.46 h 2.8735 V 13.643 c 0.678 -0.885 1.8275 -0.724 2.184 -0.5975 v -2.6435 c -0.368 -0.138 -1.7125 -0.391 -2.391 0.85 z m -5.747 -3.35 L 17.2675 8.5 l -0.0115 9.207 c 0 1.701 1.276 2.954 2.977 2.954 0.9425 0 1.632 -0.1725 2.0115 -0.38 v -2.3335 c -0.368 0.15 -2.184 0.678 -2.184 -1.023 V 12.85 h 2.184 v -2.4485 h -2.185 z m -7.77 5.414 c 0 -0.4485 0.368 -0.62 0.977 -0.62 a 6.425 6.425 0 0 1 2.85 0.735 V 10.735 c -0.954 -0.38 -1.8965 -0.5285 -2.85 -0.5285 -2.3335 0 -3.885 1.2185 -3.885 3.253 0 3.1725 4.368 2.6665 4.368 4.035 0 0.5285 -0.46 0.701 -1.1035 0.701 -0.954 0 -2.1725 -0.391 -3.138 -0.92 v 2.735 c 1.069 0.46 2.15 0.65 3.138 0.65 2.391 0 4.035 -1.184 4.035 -3.2415 -0.0115 -3.425 -4.391 -2.816 -4.391 -4.1035 z" /></svg>
                     <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
                 </SmartLink>
                 <p className="mt-2 text-xs sm:text-sm text-center">
@@ -193,7 +193,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                     <HandCoins className="text-[--brand-blue] h-4 w-4 mr-2 inline" />
                     Want it free instead?
                 </strong>
-                <p className="m-0 text-slate-700">
+                <div className="m-0 text-slate-700">
                     <span className="text-slate-600">Give us a call and mention you would like to join
                         the <SmartLink href="/roof-maintenance">Roof Care Club.</SmartLink>
                     </span>
@@ -203,7 +203,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                             Call (941) 866-4320
                         </div>
                     </SmartLink>
-                </p>
+                </div>
             </div>
 
             <div className="bg-slate-200 h-[1px] my-6" />

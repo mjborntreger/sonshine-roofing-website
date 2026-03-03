@@ -1,12 +1,11 @@
 'use client';
 
-import { useMemo, useState, type MouseEvent } from 'react';
+import { useMemo, useState } from 'react';
 import { Accordion } from '@/components/ui/Accordion';
 import SmartLink from '@/components/utils/SmartLink';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
-import { pushToDataLayer } from '@/lib/telemetry/gtm';
 import { ArrowLeftRight, ArrowUpRight, CircleCheck, Phone } from 'lucide-react';
 
 // -----------------------------
@@ -85,14 +84,6 @@ const TERM_PLANS: TermPlan[] = [
 
 const TERMS_URL = '/roof-maintenance/roof-care-club-terms-and-conditions';
 
-const PAYMENT_LINKS: Record<Term, string> = {
-  // TODO: Replace with Stripe Payment Link for 1-year membership.
-  1: 'https://links.sonshineroofing.com/payment-link/6979440dc80eafcdc68d16f8',
-  // TODO: Replace with Stripe Payment Link for 2-year membership.
-  2: 'https://links.sonshineroofing.com/payment-link/69810ad2353338c241c0ab52',
-  // TODO: Replace with Stripe Payment Link for 3-year membership.
-  3: 'https://links.sonshineroofing.com/payment-link/69810b38c80eaffba597a04d',
-};
 
 const INCLUSION_RULES = [
   'Roof replacement customers receive 2 years of Roof Care Club membership at no cost.',
@@ -191,23 +182,6 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
         {(() => {
           const selected = TERM_PLANS.find((plan) => plan.term === term) ?? TERM_PLANS[0];
           const savings = savingsVsOneYear(TERM_PLANS, term);
-          const paymentLink = PAYMENT_LINKS[selected.term];
-
-          const handlePaymentClick = (event: MouseEvent<HTMLAnchorElement>) => {
-            if (!paymentLink) {
-              event.preventDefault();
-              return;
-            }
-
-            pushToDataLayer({
-              event: 'roof_care_club_purchase_click',
-              term_years: selected.term,
-              value: selected.total,
-              annual_price: selected.annual,
-              currency: 'USD',
-            });
-          };
-
           return (
             <div className="relative flex flex-col overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm z-0">
               {/* Header */}

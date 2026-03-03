@@ -14,6 +14,7 @@ import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
 import { ArrowRight, HandCoins, HardHat, HelpCircle, MapPin, Zap } from "lucide-react";
+import { STRIPE_PAYMENT_LINK } from "@/components/marketing/service-pages/TipTopRoofCheckup";
 
 const SERVICE_PATH = "/roof-inspection";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -164,7 +165,7 @@ export default async function Page() {
             </div>
             <div className="my-6 flex flex-col gap-1">
               <h4 className="mt-0">Ready to get started?</h4>
-              <SmartLink href="INSERT_STRIPE_LINK" className="font-normal text-lg font-sans align-bottom"> Book an inspection today
+              <SmartLink href={STRIPE_PAYMENT_LINK} className="font-normal text-lg font-sans align-bottom"> Book an inspection today
                 <ArrowRight className="inline h-4 w-4" />
               </SmartLink>
             </div>
