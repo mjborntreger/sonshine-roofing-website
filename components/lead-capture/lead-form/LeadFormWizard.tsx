@@ -113,6 +113,13 @@ type LeadFormWizardProps = {
   utm?: LeadFormUtmParams;
 };
 
+const HISTORY_STATE_KEY = 'leadFormWizard' as const;
+
+type LeadFormHistoryState = {
+  [HISTORY_STATE_KEY]?: {
+    stepIndex: number;
+  };
+};
 
 
 
@@ -204,6 +211,8 @@ function formReducer(state: FormState, action: Action): FormState {
 
 const STEP_ORDER: StepId[] = ['need', 'context', 'contact', 'schedule'];
 
+const clampStepIndex = (stepIndex: number) => Math.min(Math.max(stepIndex, 0), STEP_ORDER.length - 1);
+
 const STEP_FIELD_KEYS: Record<StepId, ReadonlyArray<keyof FormState>> = {
   need: ['projectType'],
   context: ['helpTopics', 'timeline', 'notes'],
@@ -273,6 +282,8 @@ export default function LeadFormWizard({
   const prevStepRef = useRef(0);
   const delayScrollTimeoutRef = useRef<number | null>(null);
   const hasMountedRef = useRef(false);
+  const hasSyncedHistoryRef = useRef(false);
+  const isHandlingPopRef = useRef(false);
   const [successMeta, setSuccessMeta] = useState<SuccessMeta | null>(restoredSuccess?.meta ?? null);
 
   const activeStepId = STEP_ORDER[activeStepIndex];
@@ -288,6 +299,71 @@ export default function LeadFormWizard({
   useEffect(() => {
     hasMountedRef.current = true;
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePopState = (event: PopStateEvent) => {
+      const state = event.state as LeadFormHistoryState | null;
+      const stepIndex = state?.[HISTORY_STATE_KEY]?.stepIndex;
+      if (typeof stepIndex !== 'number') return;
+      const nextIndex = clampStepIndex(stepIndex);
+      setErrors({});
+      setGlobalError(null);
+      if (status === 'success') {
+        setStatus('idle');
+      }
+      if (nextIndex === activeStepIndex) return;
+      isHandlingPopRef.current = true;
+      setActiveStepIndex(nextIndex);
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeStepIndex, status]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const state = window.history.state as LeadFormHistoryState | null;
+    const currentStep = state?.[HISTORY_STATE_KEY]?.stepIndex;
+
+    if (!hasSyncedHistoryRef.current) {
+      if (typeof currentStep !== 'number') {
+        const baseState: LeadFormHistoryState = {
+          ...(window.history.state ?? {}),
+          [HISTORY_STATE_KEY]: { stepIndex: 0 },
+        };
+        window.history.replaceState(baseState, '', window.location.href);
+        for (let index = 1; index <= activeStepIndex; index += 1) {
+          const nextState: LeadFormHistoryState = {
+            ...baseState,
+            [HISTORY_STATE_KEY]: { stepIndex: index },
+          };
+          window.history.pushState(nextState, '', window.location.href);
+        }
+      } else if (currentStep !== activeStepIndex) {
+        const nextState: LeadFormHistoryState = {
+          ...(window.history.state ?? {}),
+          [HISTORY_STATE_KEY]: { stepIndex: activeStepIndex },
+        };
+        window.history.replaceState(nextState, '', window.location.href);
+      }
+      hasSyncedHistoryRef.current = true;
+      return;
+    }
+
+    if (isHandlingPopRef.current) {
+      isHandlingPopRef.current = false;
+      return;
+    }
+
+    const nextState: LeadFormHistoryState = {
+      ...(window.history.state ?? {}),
+      [HISTORY_STATE_KEY]: { stepIndex: activeStepIndex },
+    };
+    window.history.pushState(nextState, '', window.location.href);
+  }, [activeStepIndex]);
 
   const onSelect = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     dispatch({ type: 'update', field, value });
@@ -400,6 +476,13 @@ export default function LeadFormWizard({
   }, []);
 
   const handleBack = () => {
+    if (typeof window !== 'undefined') {
+      const state = window.history.state as LeadFormHistoryState | null;
+      if (state?.[HISTORY_STATE_KEY]) {
+        window.history.back();
+        return;
+      }
+    }
     setErrors({});
     setGlobalError(null);
     setActiveStepIndex((prev) => Math.max(prev - 1, 0));
