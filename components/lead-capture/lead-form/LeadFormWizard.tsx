@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { FormEvent, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight, CalendarClock, Check, ArrowUpRight } from 'lucide-react';
@@ -284,6 +284,9 @@ export default function LeadFormWizard({
   const hasMountedRef = useRef(false);
   const hasSyncedHistoryRef = useRef(false);
   const isHandlingPopRef = useRef(false);
+  const canGoForwardRef = useRef(false);
+  const pendingHistoryStepRef = useRef<number | null>(null);
+  const pendingHistoryFallbackTimeoutRef = useRef<number | null>(null);
   const [successMeta, setSuccessMeta] = useState<SuccessMeta | null>(restoredSuccess?.meta ?? null);
 
   const activeStepId = STEP_ORDER[activeStepIndex];
@@ -296,6 +299,49 @@ export default function LeadFormWizard({
 
   const utm = useMemo(() => utmProp ?? {}, [utmProp]);
 
+  const clearPendingHistoryNavigation = useCallback(() => {
+    pendingHistoryStepRef.current = null;
+    if (pendingHistoryFallbackTimeoutRef.current != null) {
+      clearTimeout(pendingHistoryFallbackTimeoutRef.current);
+      pendingHistoryFallbackTimeoutRef.current = null;
+    }
+  }, []);
+
+  const setStepIndex = useCallback((nextIndex: number) => {
+    const clamped = clampStepIndex(nextIndex);
+    setErrors({});
+    setGlobalError(null);
+    setActiveStepIndex(clamped);
+    canGoForwardRef.current = false;
+  }, []);
+
+  const attemptHistoryStepNavigation = useCallback(
+    (nextIndex: number, direction: 'back' | 'forward') => {
+      const clamped = clampStepIndex(nextIndex);
+      if (clamped === activeStepIndex) return;
+      if (typeof window === 'undefined') {
+        setStepIndex(clamped);
+        return;
+      }
+
+      clearPendingHistoryNavigation();
+      pendingHistoryStepRef.current = clamped;
+      pendingHistoryFallbackTimeoutRef.current = window.setTimeout(() => {
+        const fallbackStepIndex = pendingHistoryStepRef.current;
+        clearPendingHistoryNavigation();
+        if (typeof fallbackStepIndex !== 'number') return;
+        setStepIndex(fallbackStepIndex);
+      }, 180);
+
+      if (direction === 'back') {
+        window.history.back();
+        return;
+      }
+      window.history.forward();
+    },
+    [activeStepIndex, clearPendingHistoryNavigation, setStepIndex]
+  );
+
   useEffect(() => {
     hasMountedRef.current = true;
   }, []);
@@ -306,7 +352,16 @@ export default function LeadFormWizard({
     const handlePopState = (event: PopStateEvent) => {
       const state = event.state as LeadFormHistoryState | null;
       const stepIndex = state?.[HISTORY_STATE_KEY]?.stepIndex;
-      if (typeof stepIndex !== 'number') return;
+      if (typeof stepIndex !== 'number') {
+        const fallbackStepIndex = pendingHistoryStepRef.current;
+        if (typeof fallbackStepIndex === 'number') {
+          clearPendingHistoryNavigation();
+          setStepIndex(fallbackStepIndex);
+        }
+        return;
+      }
+
+      clearPendingHistoryNavigation();
       const nextIndex = clampStepIndex(stepIndex);
       setErrors({});
       setGlobalError(null);
@@ -314,13 +369,14 @@ export default function LeadFormWizard({
         setStatus('idle');
       }
       if (nextIndex === activeStepIndex) return;
+      canGoForwardRef.current = nextIndex < activeStepIndex;
       isHandlingPopRef.current = true;
       setActiveStepIndex(nextIndex);
     };
 
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
-  }, [activeStepIndex, status]);
+  }, [activeStepIndex, clearPendingHistoryNavigation, setStepIndex, status]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -329,7 +385,7 @@ export default function LeadFormWizard({
     const currentStep = state?.[HISTORY_STATE_KEY]?.stepIndex;
 
     if (!hasSyncedHistoryRef.current) {
-      if (typeof currentStep !== 'number') {
+      if (activeStepIndex > 0) {
         const baseState: LeadFormHistoryState = {
           ...(window.history.state ?? {}),
           [HISTORY_STATE_KEY]: { stepIndex: 0 },
@@ -342,14 +398,15 @@ export default function LeadFormWizard({
           };
           window.history.pushState(nextState, '', window.location.href);
         }
-      } else if (currentStep !== activeStepIndex) {
+      } else if (currentStep !== 0) {
         const nextState: LeadFormHistoryState = {
           ...(window.history.state ?? {}),
-          [HISTORY_STATE_KEY]: { stepIndex: activeStepIndex },
+          [HISTORY_STATE_KEY]: { stepIndex: 0 },
         };
         window.history.replaceState(nextState, '', window.location.href);
       }
       hasSyncedHistoryRef.current = true;
+      canGoForwardRef.current = false;
       return;
     }
 
@@ -358,11 +415,17 @@ export default function LeadFormWizard({
       return;
     }
 
+    if (currentStep === activeStepIndex) {
+      canGoForwardRef.current = false;
+      return;
+    }
+
     const nextState: LeadFormHistoryState = {
       ...(window.history.state ?? {}),
       [HISTORY_STATE_KEY]: { stepIndex: activeStepIndex },
     };
     window.history.pushState(nextState, '', window.location.href);
+    canGoForwardRef.current = false;
   }, [activeStepIndex]);
 
   const onSelect = <K extends keyof FormState>(field: K, value: FormState[K]) => {
@@ -383,9 +446,12 @@ export default function LeadFormWizard({
       setErrors(validation);
       return;
     }
-    setErrors({});
-    setGlobalError(null);
-    setActiveStepIndex((prev) => Math.min(prev + 1, totalSteps - 1));
+    const nextIndex = Math.min(activeStepIndex + 1, totalSteps - 1);
+    if (canGoForwardRef.current) {
+      attemptHistoryStepNavigation(nextIndex, 'forward');
+      return;
+    }
+    setStepIndex(nextIndex);
   };
 
   const handleProjectOption = (option: ProjectOption) => {
@@ -404,9 +470,11 @@ export default function LeadFormWizard({
           roofType: '',
         },
       });
-      setErrors({});
-      setGlobalError(null);
-      setActiveStepIndex(1);
+      if (canGoForwardRef.current) {
+        attemptHistoryStepNavigation(1, 'forward');
+        return;
+      }
+      setStepIndex(1);
     }
   };
 
@@ -472,20 +540,13 @@ export default function LeadFormWizard({
         window.clearTimeout(delayScrollTimeoutRef.current);
         delayScrollTimeoutRef.current = null;
       }
+      clearPendingHistoryNavigation();
     };
-  }, []);
+  }, [clearPendingHistoryNavigation]);
 
   const handleBack = () => {
-    if (typeof window !== 'undefined') {
-      const state = window.history.state as LeadFormHistoryState | null;
-      if (state?.[HISTORY_STATE_KEY]) {
-        window.history.back();
-        return;
-      }
-    }
-    setErrors({});
-    setGlobalError(null);
-    setActiveStepIndex((prev) => Math.max(prev - 1, 0));
+    if (activeStepIndex === 0) return;
+    attemptHistoryStepNavigation(Math.max(activeStepIndex - 1, 0), 'back');
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -683,6 +744,7 @@ export default function LeadFormWizard({
   const { title, description, highlightText } = getStepMeta(activeStepId);
   const renderedTitle = renderHighlight(title, highlightText);
   const progressPercent = ((activeStepIndex + 1) / totalSteps) * 100;
+  const showNavigationControls = activeStepId !== 'need';
 
   const renderNavigationControls = (className?: string) => (
     <LeadFormStepControls
@@ -769,7 +831,7 @@ export default function LeadFormWizard({
             </div>
           </>
         )}
-        bottomSlot={renderNavigationControls()}
+        bottomSlot={showNavigationControls ? renderNavigationControls() : undefined}
       >
         {globalError && (
           <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -777,7 +839,7 @@ export default function LeadFormWizard({
           </div>
         )}
 
-        {renderNavigationControls('mb-8')}
+        {showNavigationControls ? renderNavigationControls('mb-8') : null}
 
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={activeStepId} {...stepMotionProps}>
