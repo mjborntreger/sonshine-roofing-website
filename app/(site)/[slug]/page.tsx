@@ -15,6 +15,7 @@ import { SITE_ORIGIN } from "@/lib/seo/site";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
 import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks";
+import BlogPostInlineImageLightbox from "@/components/dynamic-content/blog/BlogPostInlineImageLightbox";
 
 export const revalidate = 900;
 
@@ -324,6 +325,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             className="px-2 prose"
             dangerouslySetInnerHTML={{ __html: articleHtml }}
           />
+          <BlogPostInlineImageLightbox rootSelector="#article-root" dialogLabel="Blog post image viewer" />
 
           {/* Sidebar (desktop, sticky) */}
           <aside className="sticky grid grid-cols-1 top-16 h-fit">

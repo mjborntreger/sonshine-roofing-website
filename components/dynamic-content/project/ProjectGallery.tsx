@@ -185,7 +185,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
                 >
                   <motion.div
                     ref={modalRef}
-                    className="relative flex w-full max-w-5xl items-center justify-center overflow-hidden rounded-xl bg-slate-950 shadow-xl"
+                    className="relative flex w-full max-w-[74rem] items-center justify-center md:px-12 lg:px-16"
                     initial={{ opacity: 0, scale: 0.96, y: 8 }}
                     animate={{
                       opacity: 1,
@@ -196,14 +196,43 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
                     exit={{ opacity: 0, scale: 0.98, y: 4, transition: { duration: 0.15 } }}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <LightboxImage image={currentImage} projectTitle={projectTitle} />
+                    <div className="relative flex w-full max-w-5xl items-center justify-center overflow-hidden rounded-xl bg-slate-950 shadow-xl">
+                      <LightboxImage image={currentImage} projectTitle={projectTitle} />
+
+                      {totalImages > 1 ? (
+                        <>
+                          <NavButton
+                            ariaLabel="Previous photo"
+                            onClick={goPrev}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 md:hidden"
+                          >
+                            <ChevronLeft className="h-6 w-6" aria-hidden="true" />
+                          </NavButton>
+                          <NavButton
+                            ariaLabel="Next photo"
+                            onClick={goNext}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 md:hidden"
+                          >
+                            <ChevronRight className="h-6 w-6" aria-hidden="true" />
+                          </NavButton>
+                        </>
+                      ) : null}
+                    </div>
 
                     {totalImages > 1 ? (
                       <>
-                        <NavButton side="left" ariaLabel="Previous photo" onClick={goPrev}>
+                        <NavButton
+                          ariaLabel="Previous photo"
+                          onClick={goPrev}
+                          className="absolute left-[max(0.5rem,env(safe-area-inset-left))] top-1/2 hidden -translate-y-1/2 md:inline-flex"
+                        >
                           <ChevronLeft className="h-6 w-6" aria-hidden="true" />
                         </NavButton>
-                        <NavButton side="right" ariaLabel="Next photo" onClick={goNext}>
+                        <NavButton
+                          ariaLabel="Next photo"
+                          onClick={goNext}
+                          className="absolute right-[max(0.5rem,env(safe-area-inset-right))] top-1/2 hidden -translate-y-1/2 md:inline-flex"
+                        >
                           <ChevronRight className="h-6 w-6" aria-hidden="true" />
                         </NavButton>
                       </>
@@ -319,17 +348,13 @@ function LightboxImage({ image, projectTitle }: { image: WpImage; projectTitle: 
 }
 
 type NavButtonProps = {
-  side: "left" | "right";
   ariaLabel: string;
   onClick: () => void;
   children: React.ReactNode;
+  className?: string;
 };
 
-function NavButton({ side, ariaLabel, onClick, children }: NavButtonProps) {
-  const positionClass =
-    side === "left"
-      ? "left-3 md:left-5"
-      : "right-3 md:right-5";
+function NavButton({ ariaLabel, onClick, children, className }: NavButtonProps) {
   return (
     <button
       type="button"
@@ -338,7 +363,7 @@ function NavButton({ side, ariaLabel, onClick, children }: NavButtonProps) {
         e.stopPropagation();
         onClick();
       }}
-      className={`absolute top-1/2 -translate-y-1/2 rounded-full bg-white/40 hover:bg-white/80 p-1 backdrop-blur-sm sm:p-2 md:p-3 lg:p-4 text-blue-200 border border-blue-100 hover:text-blue-500 shadow-lg transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${positionClass}`}
+      className={`inline-flex items-center justify-center rounded-full bg-white/40 hover:bg-white/80 p-1 backdrop-blur-sm sm:p-2 md:p-3 lg:p-4 text-blue-200 border border-blue-100 hover:text-blue-500 shadow-lg transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${className ?? ""}`}
     >
       {children}
     </button>

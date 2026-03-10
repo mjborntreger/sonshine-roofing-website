@@ -450,6 +450,76 @@
 
 .prose hr { @apply my-8 border-none h-[1px]; background: linear-gradient(90deg, var(--brand-blue), var(--brand-cyan)); }
 .prose img { @apply rounded-2xl; }
+.prose :where(.blog-inline-lightbox-wrap) {
+  position: relative;
+  max-width: 100%;
+  line-height: 0;
+}
+.prose :where([data-blog-inline-lightbox-trigger]) {
+  position: relative;
+  max-width: 100%;
+  cursor: zoom-in;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.prose :where(.blog-inline-lightbox-image) {
+  transition: transform 500ms ease-out;
+}
+.prose :where([data-blog-inline-lightbox-trigger]:is(:hover, :focus-visible, :active) .blog-inline-lightbox-image) {
+  transform: scale(1.06);
+}
+.prose :where([data-blog-inline-lightbox-trigger]:focus-visible) {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--brand-blue), 0 0 0 4px #fff;
+}
+.prose :where(.blog-inline-lightbox-overlay) {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.5), rgb(0 0 0 / 0.2), transparent);
+  transition: opacity 200ms ease-out;
+}
+.prose :where([data-blog-inline-lightbox-trigger]:is(:hover, :focus-visible, :active) .blog-inline-lightbox-overlay) {
+  opacity: 1;
+}
+.prose :where(.blog-inline-lightbox-icon) {
+  position: relative;
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 9999px;
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.3);
+  transition: transform 200ms ease-out;
+}
+.prose :where([data-blog-inline-lightbox-trigger]:is(:hover, :focus-visible, :active) .blog-inline-lightbox-icon) {
+  transform: scale(1.05);
+}
+.prose :where(.blog-inline-lightbox-icon)::before {
+  content: "";
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid rgb(15 23 42 / 0.95);
+  border-radius: 9999px;
+}
+.prose :where(.blog-inline-lightbox-icon)::after {
+  content: "";
+  position: absolute;
+  top: 1.6rem;
+  left: 1.55rem;
+  width: 0.55rem;
+  height: 2px;
+  border-radius: 9999px;
+  background: rgb(15 23 42 / 0.95);
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
 .prose :where(.wp-has-aspect-ratio) {
   position: relative;
   display: block;
