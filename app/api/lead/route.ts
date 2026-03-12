@@ -1,36 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  isHoneypotTripped,
-  parseLead,
-  type LeadInput,
-  type FinancingLeadInput,
-  type FeedbackLeadInput,
-  type SpecialOfferLeadInput,
-  type ContactLeadInput,
-} from '@/lib/lead-capture/validation';
-import { formatPhoneUSForDisplay } from '@/lib/lead-capture/phone';
-import { DEFAULT_PREFERRED_CONTACT } from '@/lib/lead-capture/contact-lead';
-import { SITE_ORIGIN, isProdEnv, requireEnv } from '@/lib/seo/site';
+import type { ZapierLeadPayloadV2 as LeadForwardPayloadV2 } from '@/lib/lead-capture/contact-lead';
+import { isProdEnv, requireEnv, SITE_ORIGIN } from '@/lib/seo/site';
 
 type UnknownRecord = Record<string, unknown>;
+type FieldErrors = Record<string, string[]>;
+
+const TURNSTILE_SECRET = requireEnv('TURNSTILE_SECRET_KEY', { prodOnly: true });
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || process.env.LEAD_ENDPOINT_URL;
+const N8N_WEBHOOK_SECRET = process.env.N8N_WEBHOOK_SECRET || process.env.LEAD_FORWARD_SECRET;
+
+const FORM_TYPES = new Set<LeadForwardPayloadV2['formType']>([
+  'contact-lead',
+  'financing-calculator',
+  'special-offer',
+  'feedback',
+]);
+
+const SMS_CHOICES = new Set<LeadForwardPayloadV2['smsConsent']['projectSms']>(['yes', 'no']);
+
+if ((!N8N_WEBHOOK_URL || !N8N_WEBHOOK_SECRET) && isProdEnv()) {
+  console.error('[env] Missing N8N_WEBHOOK_URL/N8N_WEBHOOK_SECRET (fallback: LEAD_ENDPOINT_URL/LEAD_FORWARD_SECRET).');
+}
 
 const isRecord = (value: unknown): value is UnknownRecord =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const TURNSTILE_SECRET = requireEnv('TURNSTILE_SECRET_KEY', { prodOnly: true });
-const HAS_FORWARD_CONFIG =
-  !!(
-    (process.env.LEAD_ENDPOINT_URL && process.env.LEAD_FORWARD_SECRET) ||
-    (process.env.FINANCING_LEAD_ENDPOINT_URL && process.env.FINANCING_LEAD_FORWARD_SECRET) ||
-    (process.env.FEEDBACK_ENDPOINT_URL && process.env.FEEDBACK_FORWARD_SECRET) ||
-    (process.env.SPECIAL_OFFER_ENDPOINT_URL && process.env.SPECIAL_OFFER_FORWARD_SECRET)
-  );
-
-if (!HAS_FORWARD_CONFIG && isProdEnv()) {
-  console.error(
-    '[env] Missing lead forwarding configuration. Set LEAD_ENDPOINT_URL/LEAD_FORWARD_SECRET or per-type endpoints.'
-  );
-}
 
 function getAllowedOrigins(): string[] {
   const raw = process.env.ALLOWED_ORIGIN || '';
@@ -52,11 +45,161 @@ function resolveRequestOrigin(req: NextRequest): string | null {
   }
 }
 
+function getClientIp(req: NextRequest): string | null {
+  const xf = req.headers.get('x-forwarded-for');
+  if (xf) return xf.split(',')[0]?.trim() || null;
+  const xr = req.headers.get('x-real-ip');
+  if (xr) return xr.trim();
+  const cf = req.headers.get('cf-connecting-ip');
+  if (cf) return cf.trim();
+  return null;
+}
+
 function json(status: number, body: unknown, headers: Record<string, string> = {}) {
   return new NextResponse(JSON.stringify(body), {
     status,
     headers: { 'content-type': 'application/json; charset=utf-8', ...headers },
   });
+}
+
+function trimString(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
+
+function addFieldError(errors: FieldErrors, key: string, message: string) {
+  (errors[key] ||= []).push(message);
+}
+
+function getOptionalTrimmed(record: UnknownRecord, key: string): string | undefined {
+  const value = trimString(record[key]);
+  return value || undefined;
+}
+
+function getRequiredTrimmed(record: UnknownRecord, key: string, path: string, errors: FieldErrors): string {
+  const value = trimString(record[key]);
+  if (!value) addFieldError(errors, path, 'Required');
+  return value;
+}
+
+function isHoneypotTrippedV2(raw: UnknownRecord): boolean {
+  const directHp = trimString(raw.hp_field);
+  const company = trimString(raw.company);
+  const website = trimString(raw.website);
+  const fax = trimString(raw.fax);
+
+  if (directHp || company || website || fax) return true;
+  if (!isRecord(raw.antiSpam)) return false;
+  return trimString(raw.antiSpam.hp_field).length > 0;
+}
+
+function normalizeDetails(raw: unknown): Record<string, unknown> {
+  return isRecord(raw) ? raw : {};
+}
+
+function validateLeadForwardPayload(input: unknown):
+  | { ok: true; data: LeadForwardPayloadV2 }
+  | { ok: false; message: string; fieldErrors: FieldErrors } {
+  const errors: FieldErrors = {};
+
+  if (!isRecord(input)) {
+    return {
+      ok: false,
+      message: 'Validation failed',
+      fieldErrors: { _: ['Expected object payload'] },
+    };
+  }
+
+  const versionRaw = trimString(input.version);
+  if (versionRaw !== 'v2') addFieldError(errors, 'version', 'Expected "v2".');
+
+  const formTypeRaw = trimString(input.formType);
+  if (!FORM_TYPES.has(formTypeRaw as LeadForwardPayloadV2['formType'])) {
+    addFieldError(errors, 'formType', 'Unsupported formType.');
+  }
+
+  const submittedAt = getRequiredTrimmed(input, 'submittedAt', 'submittedAt', errors);
+
+  const sourceRaw = isRecord(input.source) ? input.source : {};
+  const page = getRequiredTrimmed(sourceRaw, 'page', 'source.page', errors);
+  const utm_source = getOptionalTrimmed(sourceRaw, 'utm_source');
+  const utm_medium = getOptionalTrimmed(sourceRaw, 'utm_medium');
+  const utm_campaign = getOptionalTrimmed(sourceRaw, 'utm_campaign');
+  const ua = getOptionalTrimmed(sourceRaw, 'ua');
+  const tz = getOptionalTrimmed(sourceRaw, 'tz');
+
+  const contactRaw = isRecord(input.contact) ? input.contact : {};
+  const firstName = getRequiredTrimmed(contactRaw, 'firstName', 'contact.firstName', errors);
+  const lastName = getRequiredTrimmed(contactRaw, 'lastName', 'contact.lastName', errors);
+  const email = getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors);
+  const phone = getOptionalTrimmed(contactRaw, 'phone');
+
+  const smsRaw = isRecord(input.smsConsent) ? input.smsConsent : {};
+  const projectSmsRaw = trimString(smsRaw.projectSms);
+  const marketingSmsRaw = trimString(smsRaw.marketingSms);
+  if (!SMS_CHOICES.has(projectSmsRaw as LeadForwardPayloadV2['smsConsent']['projectSms'])) {
+    addFieldError(errors, 'smsConsent.projectSms', 'Expected "yes" or "no".');
+  }
+  if (!SMS_CHOICES.has(marketingSmsRaw as LeadForwardPayloadV2['smsConsent']['marketingSms'])) {
+    addFieldError(errors, 'smsConsent.marketingSms', 'Expected "yes" or "no".');
+  }
+
+  const antiSpamRaw = isRecord(input.antiSpam) ? input.antiSpam : {};
+  const cfToken = getRequiredTrimmed(antiSpamRaw, 'cfToken', 'antiSpam.cfToken', errors);
+  const hp_field = getOptionalTrimmed(antiSpamRaw, 'hp_field');
+
+  const addressRaw = isRecord(input.address) ? input.address : null;
+  const address1 = addressRaw ? getOptionalTrimmed(addressRaw, 'address1') : undefined;
+  const address2 = addressRaw ? getOptionalTrimmed(addressRaw, 'address2') : undefined;
+  const city = addressRaw ? getOptionalTrimmed(addressRaw, 'city') : undefined;
+  const state = addressRaw ? getOptionalTrimmed(addressRaw, 'state') : undefined;
+  const zip = addressRaw ? getOptionalTrimmed(addressRaw, 'zip') : undefined;
+
+  if (Object.keys(errors).length) {
+    return { ok: false, message: 'Validation failed', fieldErrors: errors };
+  }
+
+  const payload: LeadForwardPayloadV2 = {
+    version: 'v2',
+    formType: formTypeRaw as LeadForwardPayloadV2['formType'],
+    submittedAt,
+    source: {
+      page,
+      ...(utm_source ? { utm_source } : {}),
+      ...(utm_medium ? { utm_medium } : {}),
+      ...(utm_campaign ? { utm_campaign } : {}),
+      ...(ua ? { ua } : {}),
+      ...(tz ? { tz } : {}),
+    },
+    contact: {
+      firstName,
+      lastName,
+      email,
+      ...(phone ? { phone } : {}),
+    },
+    smsConsent: {
+      projectSms: projectSmsRaw as LeadForwardPayloadV2['smsConsent']['projectSms'],
+      marketingSms: marketingSmsRaw as LeadForwardPayloadV2['smsConsent']['marketingSms'],
+      disclosureVersion: 'sms-consent-v1',
+    },
+    details: normalizeDetails(input.details),
+    antiSpam: {
+      cfToken,
+      ...(hp_field ? { hp_field } : {}),
+    },
+  };
+
+  const hasAddress = Boolean(address1 || address2 || city || state || zip);
+  if (hasAddress) {
+    payload.address = {
+      ...(address1 ? { address1 } : {}),
+      ...(address2 ? { address2 } : {}),
+      ...(city ? { city } : {}),
+      ...(state ? { state } : {}),
+      ...(zip ? { zip } : {}),
+    };
+  }
+
+  return { ok: true, data: payload };
 }
 
 type TurnstileResponse = { success: boolean; 'error-codes'?: string[] };
@@ -92,253 +235,21 @@ async function verifyTurnstile(token: string, remoteip?: string | null) {
   return { ok: true } as const;
 }
 
-function getClientIp(req: NextRequest): string | null {
-  const xf = req.headers.get('x-forwarded-for');
-  if (xf) return xf.split(',')[0]?.trim() || null;
-  const xr = req.headers.get('x-real-ip');
-  if (xr) return xr.trim();
-  const cf = req.headers.get('cf-connecting-ip');
-  if (cf) return cf.trim();
-  return null;
-}
-
-type ForwardConfig = {
-  url: string;
-  secret: string;
-};
-
-function resolveForwardConfig(type: LeadInput['type']): ForwardConfig | null {
-  const sharedUrl = process.env.LEAD_ENDPOINT_URL;
-  const sharedSecret = process.env.LEAD_FORWARD_SECRET;
-  if (sharedUrl && sharedSecret) {
-    return { url: sharedUrl, secret: sharedSecret };
-  }
-
-  const typeSpecific: Partial<Record<LeadInput['type'], ForwardConfig | null>> = {
-    'financing-calculator':
-      process.env.FINANCING_LEAD_ENDPOINT_URL && process.env.FINANCING_LEAD_FORWARD_SECRET
-        ? { url: process.env.FINANCING_LEAD_ENDPOINT_URL, secret: process.env.FINANCING_LEAD_FORWARD_SECRET }
-        : null,
-    feedback:
-      process.env.FEEDBACK_ENDPOINT_URL && process.env.FEEDBACK_FORWARD_SECRET
-        ? { url: process.env.FEEDBACK_ENDPOINT_URL, secret: process.env.FEEDBACK_FORWARD_SECRET }
-        : null,
-    'special-offer':
-      process.env.SPECIAL_OFFER_ENDPOINT_URL && process.env.SPECIAL_OFFER_FORWARD_SECRET
-        ? { url: process.env.SPECIAL_OFFER_ENDPOINT_URL, secret: process.env.SPECIAL_OFFER_FORWARD_SECRET }
-        : process.env.FEEDBACK_ENDPOINT_URL && process.env.FEEDBACK_FORWARD_SECRET
-          ? { url: process.env.FEEDBACK_ENDPOINT_URL, secret: process.env.FEEDBACK_FORWARD_SECRET }
-          : null,
-    'contact-lead': null,
-  };
-
-  const resolved = typeSpecific[type] ?? null;
-  if (!resolved) {
-    const msg = `Lead forward config missing for type "${type}". Check environment variables.`;
-    if (isProdEnv()) console.error(msg);
-    else console.warn(msg);
-  }
-  return resolved;
-}
-
-function attachTracking(target: Record<string, unknown>, lead: LeadInput) {
-  if (lead.page) target.page = lead.page;
-  if (lead.utm_source) target.utm_source = lead.utm_source;
-  if (lead.utm_medium) target.utm_medium = lead.utm_medium;
-  if (lead.utm_campaign) target.utm_campaign = lead.utm_campaign;
-}
-
-function buildFinancingPayload(data: FinancingLeadInput) {
-  const fullName = `${data.firstName} ${data.lastName}`.trim();
-  const formattedAmount = Math.round(data.amount).toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  });
-  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
-
-  const quizSummary = Array.isArray(data.quizSummary)
-    ? data.quizSummary.map((item) => ({
-        id: item.id,
-        question: item.question,
-        answerLabel: item.answerLabel,
-        answerValue: item.answerValue,
-        answer: item.answer,
-      }))
-    : [];
-
-  const matchLabelMap: Record<string, string> = {
-    serviceFinance: 'Service Finance',
-    ygrene: 'YGrene PACE',
-  };
-
-  const messageLines = [
-    `Financing calculator unlock request from ${fullName} for ${data.address1}, ${data.city}, ${data.state} ${data.zip}. Estimated project total: ${formattedAmount}.`,
-  ];
-
-  const payload: Record<string, unknown> = {
-    type: 'financing-calculator',
-    name: fullName,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-    phone: data.phone,
-    phoneDisplay,
-    address1: data.address1,
-    address2: data.address2 || '',
-    city: data.city,
-    state: data.state,
-    zip: data.zip,
-    amount: data.amount,
-    page: data.page || '/financing',
-    message: messageLines.join('\n'),
-    quizSummary,
-  };
-
-  attachTracking(payload, data);
-
-  if (data.scores) {
-    payload.scores = data.scores;
-  } else if (data.match) {
-    payload.match = {
-      program: data.match.program,
-      label: matchLabelMap[data.match.program] || data.match.program,
-      score: data.match.score,
-      reasons: data.match.reasons,
-    };
-  }
-
-  return payload;
-}
-
-function buildFeedbackPayload(data: FeedbackLeadInput) {
-  const fullName = `${data.firstName} ${data.lastName}`.trim();
-  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
-
-  const payload: Record<string, unknown> = {
-    type: 'feedback',
-    name: fullName,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-    phone: data.phone,
-    phoneDisplay,
-    rating: String(data.rating),
-    message: data.message,
-    page: data.page || '/tell-us-why',
-    ua: data.ua || '',
-    tz: data.tz || '',
-  };
-
-  attachTracking(payload, data);
-
-  return payload;
-}
-
-function buildSpecialOfferPayload(data: SpecialOfferLeadInput) {
-  const fullName = `${data.firstName} ${data.lastName}`.trim();
-  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
-
-  const messageLines = [
-    `Special offer claim from ${fullName}.`,
-    `Offer code: ${data.offerCode}`,
-    `Offer slug: ${data.offerSlug}`,
-  ];
-
-  if (data.offerTitle) {
-    messageLines.push(`Offer title: ${data.offerTitle}`);
-  }
-
-  if (data.message) {
-    messageLines.push('', data.message);
-  }
-
-  const payload: Record<string, unknown> = {
-    type: 'special-offer',
-    name: fullName,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-    phone: data.phone,
-    phoneDisplay,
-    offerCode: data.offerCode,
-    offerSlug: data.offerSlug,
-    offerTitle: data.offerTitle,
-    message: messageLines.join('\n'),
-    page: data.page || `/special-offers/${data.offerSlug}`,
-  };
-
-  const passthroughAddressFields = ['address1', 'city', 'state', 'zip'] as const;
-  const extraFields = data as Record<string, unknown>;
-  for (const field of passthroughAddressFields) {
-    const value = extraFields[field];
-    if (typeof value === 'string') {
-      payload[field] = value;
-    }
-  }
-
-  attachTracking(payload, data);
-
-  return payload;
-}
-
-function buildContactPayload(data: ContactLeadInput) {
-  const fullName = `${data.firstName} ${data.lastName}`.trim();
-  const phoneDisplay = formatPhoneUSForDisplay(data.phone);
-
-  const payload: Record<string, unknown> = {
-    type: 'contact-lead',
-    name: fullName,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-    phone: data.phone,
-    phoneDisplay,
-    preferredContact: data.preferredContact || DEFAULT_PREFERRED_CONTACT,
-    consentSms: Boolean(data.consentSms),
-    address1: data.address1,
-    city: data.city,
-    state: data.state,
-    zip: data.zip,
-    page: data.page || '/contact-us',
-  };
-
-  if (data.projectType) payload.projectType = data.projectType;
-  if (data.helpTopics) payload.helpTopics = data.helpTopics;
-  if (data.timeline) payload.timeline = data.timeline;
-  if (data.notes) payload.notes = data.notes;
-  if (data.address2) payload.address2 = data.address2;
-  if (data.bestTime) payload.bestTime = data.bestTime;
-  if (data.resourceLinks?.length) {
-    payload.resourceLinks = data.resourceLinks.map((link) => ({
-      label: link.label,
-      description: link.description || '',
-      href: link.href,
-      external: Boolean(link.external),
-    }));
-  }
-
-  attachTracking(payload, data);
-
-  return payload;
-}
-
-async function forwardToWP(type: LeadInput['type'], payload: Record<string, unknown>) {
-  const resolved = resolveForwardConfig(type);
-  if (!resolved) {
-    console.error('forwardToWP: missing forward configuration', { type });
-    return { ok: false, status: 500, error: 'Server misconfigured (lead endpoint)' } as const;
+async function forwardToN8n(payload: LeadForwardPayloadV2) {
+  if (!N8N_WEBHOOK_URL || !N8N_WEBHOOK_SECRET) {
+    console.error('forwardToN8n: missing webhook configuration');
+    return { ok: false, status: 500, error: 'Server misconfigured (n8n webhook)' } as const;
   }
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 7000);
 
   try {
-    const res = await fetch(resolved.url, {
+    const res = await fetch(N8N_WEBHOOK_URL, {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
-        'x-ss-secret': resolved.secret,
+        'x-ss-secret': N8N_WEBHOOK_SECRET,
         origin: SITE_ORIGIN,
       },
       body: JSON.stringify(payload),
@@ -347,7 +258,7 @@ async function forwardToWP(type: LeadInput['type'], payload: Record<string, unkn
     });
     clearTimeout(timeout);
 
-    let data: unknown;
+    let data: unknown = null;
     try {
       data = await res.json();
     } catch {
@@ -355,14 +266,16 @@ async function forwardToWP(type: LeadInput['type'], payload: Record<string, unkn
     }
 
     const dataRecord = isRecord(data) ? data : {};
-    const upstreamOk = dataRecord.ok === true;
-    const errorMessage = typeof dataRecord.error === 'string' ? dataRecord.error : 'Upstream send failed';
+    const explicitFailure = dataRecord.ok === false;
+    const errorMessage =
+      typeof dataRecord.error === 'string'
+        ? dataRecord.error
+        : `Upstream send failed (${res.status})`;
 
-    if (!res.ok || !upstreamOk) {
-      console.error('forwardToWP: upstream rejected lead', {
-        type,
+    if (!res.ok || explicitFailure) {
+      console.error('forwardToN8n: upstream rejected lead', {
         status: res.status,
-        upstreamOk,
+        explicitFailure,
         error: errorMessage,
       });
       return { ok: false, status: res.status || 502, error: errorMessage } as const;
@@ -371,16 +284,12 @@ async function forwardToWP(type: LeadInput['type'], payload: Record<string, unkn
   } catch (err: unknown) {
     clearTimeout(timeout);
     if (err instanceof Error && err.name === 'AbortError') {
-      console.error('forwardToWP: upstream timeout', { type });
+      console.error('forwardToN8n: upstream timeout');
       return { ok: false, status: 504, error: 'Upstream timeout' } as const;
     }
     if (process.env.NODE_ENV !== 'production') {
       console.error('Lead forward error', err);
     }
-    console.error('forwardToWP: upstream error', {
-      type,
-      error: err instanceof Error ? err.message : String(err),
-    });
     return { ok: false, status: 502, error: 'Upstream error' } as const;
   }
 }
@@ -417,33 +326,21 @@ export async function POST(req: NextRequest) {
     return json(400, { ok: false, error: 'Invalid JSON' });
   }
 
-  if (isRecord(raw) && isHoneypotTripped(raw)) {
+  if (isRecord(raw) && isHoneypotTrippedV2(raw)) {
     return json(200, { ok: true });
   }
 
-  const parsed = parseLead(raw);
+  const parsed = validateLeadForwardPayload(raw);
   if (!parsed.ok) {
-    return json(parsed.status, { ok: false, error: parsed.message, fieldErrors: parsed.fieldErrors });
+    return json(400, { ok: false, error: parsed.message, fieldErrors: parsed.fieldErrors });
   }
-  const { data } = parsed;
 
-  const verify = await verifyTurnstile(data.cfToken, getClientIp(req));
+  const verify = await verifyTurnstile(parsed.data.antiSpam.cfToken, getClientIp(req));
   if (!verify.ok) {
     return json(400, { ok: false, error: verify.error || 'Turnstile verification failed' });
   }
 
-  let wpPayload: Record<string, unknown>;
-  if (data.type === 'financing-calculator') {
-    wpPayload = buildFinancingPayload(data);
-  } else if (data.type === 'feedback') {
-    wpPayload = buildFeedbackPayload(data);
-  } else if (data.type === 'special-offer') {
-    wpPayload = buildSpecialOfferPayload(data);
-  } else {
-    wpPayload = buildContactPayload(data);
-  }
-
-  const forwarded = await forwardToWP(data.type, wpPayload);
+  const forwarded = await forwardToN8n(parsed.data);
   if (!forwarded.ok) {
     return json(forwarded.status, { ok: false, error: forwarded.error });
   }

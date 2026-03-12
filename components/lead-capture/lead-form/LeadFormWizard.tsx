@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { FormEvent, useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import Image from 'next/image';
-import { ArrowLeft, ArrowRight, CalendarClock, Check, ArrowUpRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarClock, Check } from 'lucide-react';
 import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -22,13 +22,12 @@ import {
   normalizeZip,
   persistLeadSuccessCookie,
   submitLead,
-  type ContactLeadInput,
-  buildContactLeadPayload,
-  type ContactLeadResourceLink,
+  buildZapierLeadPayload,
+  type SmsConsentFieldValue,
   validateContactIdentityDraft,
   validateContactAddressDraft,
+  validateSmsConsentDraft,
 } from '@/lib/lead-capture/contact-lead';
-import SmartLink from '@/components/utils/SmartLink';
 import {
   BEST_TIME_OPTIONS,
   CONTACT_PREF_OPTIONS,
@@ -50,6 +49,7 @@ import {
   PROJECT_OPTION_CARD_UNSELECTED_CLASS,
   ProjectOptionCardContent,
 } from '@/components/lead-capture/lead-form/ProjectOptionCard';
+import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
 const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
@@ -154,7 +154,8 @@ interface FormState {
   zip: string;
   preferredContact: PreferredContactValue;
   bestTime: string;
-  consentSms: boolean;
+  smsProjectConsent: SmsConsentFieldValue;
+  smsMarketingConsent: SmsConsentFieldValue;
 }
 
 const INITIAL_STATE: FormState = {
@@ -174,7 +175,8 @@ const INITIAL_STATE: FormState = {
   zip: '',
   preferredContact: DEFAULT_PREFERRED_CONTACT,
   bestTime: '',
-  consentSms: false,
+  smsProjectConsent: '',
+  smsMarketingConsent: '',
 };
 
 interface FieldErrors {
@@ -217,7 +219,7 @@ const STEP_FIELD_KEYS: Record<StepId, ReadonlyArray<keyof FormState>> = {
   need: ['projectType'],
   context: ['helpTopics', 'timeline', 'notes'],
   contact: ['roofType', 'firstName', 'lastName', 'email', 'phone'],
-  schedule: ['address1', 'city', 'state', 'zip', 'bestTime'],
+  schedule: ['address1', 'city', 'state', 'zip', 'bestTime', 'smsProjectConsent', 'smsMarketingConsent'],
 };
 
 function validateStep(step: StepId, data: FormState): FieldErrors {
@@ -228,7 +230,7 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
       lastName: data.lastName,
       email: data.email,
       phone: data.phone,
-    });
+    }, { phoneRequired: false });
     Object.assign(errors, identityErrors);
   }
   if (step === 'schedule') {
@@ -240,6 +242,11 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
       zip: data.zip,
     });
     Object.assign(errors, addressErrors);
+    const smsErrors = validateSmsConsentDraft({
+      smsProjectConsent: data.smsProjectConsent,
+      smsMarketingConsent: data.smsMarketingConsent,
+    });
+    Object.assign(errors, smsErrors);
   }
   return errors;
 }
@@ -598,7 +605,7 @@ export default function LeadFormWizard({
       const combinedNotes = roofTypeLabel
         ? [notesText, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
         : notesText;
-      const resourceLinksForPayload: ContactLeadResourceLink[] = getSuccessLinks(form.projectType).map(
+      const resourceLinksForPayload = getSuccessLinks(form.projectType).map(
         ({ label, description, href, external }) => ({
         label,
         description,
@@ -607,15 +614,16 @@ export default function LeadFormWizard({
       })
     );
 
-    const basePayload = buildContactLeadPayload({
-      projectType: form.projectType,
-      helpSummary: helpSummary || undefined,
-      timelineLabel: timelineLabel || undefined,
-      notes: combinedNotes.trim() || undefined,
-      preferredContact: form.preferredContact,
-      bestTimeLabel: bestTimeLabel || undefined,
-      consentSms: form.consentSms,
-      identity: {
+    const payload = buildZapierLeadPayload({
+      formType: 'contact-lead',
+      submittedAt: new Date().toISOString(),
+      source: {
+        page: '/contact-us',
+        utm_source: utm.source || undefined,
+        utm_medium: utm.medium || undefined,
+        utm_campaign: utm.campaign || undefined,
+      },
+      contact: {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
@@ -628,24 +636,28 @@ export default function LeadFormWizard({
         state: form.state,
         zip: form.zip,
       },
-      resourceLinks: resourceLinksForPayload,
-      page: '/contact-us',
+      smsConsent: {
+        smsProjectConsent: form.smsProjectConsent,
+        smsMarketingConsent: form.smsMarketingConsent,
+      },
+      details: {
+        projectType: form.projectType || undefined,
+        helpTopics: form.helpTopics,
+        helpSummary: helpSummary || undefined,
+        timeline: form.timeline || undefined,
+        timelineLabel: timelineLabel || undefined,
+        notes: combinedNotes.trim() || undefined,
+        roofTypeLabel: roofTypeLabel || undefined,
+        preferredContact: form.phone ? form.preferredContact : 'email',
+        bestTime: form.bestTime || undefined,
+        bestTimeLabel: bestTimeLabel || undefined,
+        resourceLinks: resourceLinksForPayload,
+      },
+      antiSpam: {
+        cfToken,
+        hp_field: honeypot || undefined,
+      },
     });
-
-    const contactPayload: ContactLeadInput = {
-      ...basePayload,
-      cfToken,
-      hp_field: honeypot || undefined,
-    };
-
-    if (utm.source) contactPayload.utm_source = utm.source;
-    if (utm.medium) contactPayload.utm_medium = utm.medium;
-    if (utm.campaign) contactPayload.utm_campaign = utm.campaign;
-
-    const payload: ContactLeadInput & { submittedAt: string } = {
-      ...contactPayload,
-      submittedAt: new Date().toISOString(),
-    };
 
     const result = await submitLead(payload, {
       gtmEvent: {
@@ -839,7 +851,7 @@ export default function LeadFormWizard({
           </div>
         )}
 
-        {showNavigationControls ? renderNavigationControls('mb-8') : null}
+        {showNavigationControls && !isFinalStep ? renderNavigationControls('mb-8') : null}
 
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={activeStepId} {...stepMotionProps}>
@@ -1081,7 +1093,7 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    Phone*
+                    Phone
                     <input
                       type="tel"
                       name="phone"
@@ -1241,30 +1253,16 @@ export default function LeadFormWizard({
                     {errors.bestTime && <p className="mt-2 text-sm font-medium text-red-600">{errors.bestTime}</p>}
                   </div>
 
-                  <label className="flex items-center gap-3 px-4 py-3 text-xs border md:col-span-2 rounded-2xl border-blue-200 bg-slate-50 text-slate-600">
-                    <input
-                      type="checkbox"
-                      name="consentSms"
-                      checked={form.consentSms}
-                      onChange={(event) => onSelect('consentSms', event.target.checked)}
-                      className="h-4 w-4 cursor-pointer rounded border-blue-200 text-[--brand-blue] focus:ring-[--brand-blue]"
-                    />
-                    <span>
-                      <div className="text-xs text-slate-500">
-                        By submitting this form, you agree to receive transactional and promotional
-                        communications from SonShine Roofing. Message frequency may vary. Message and
-                        data rates may apply. Reply STOP to opt out at any time.
-                      </div>
-                    </span>
-                  </label>
-
-                  <p className="text-xs md:col-span-2 text-slate-500">
-                    For more information,{' '}
-                    <SmartLink href="/privacy-policy" className="font-semibold text-[--brand-blue] hover:underline">
-                      view our privacy policy
-                      <ArrowUpRight className="inline w-3 h-3 ml-1" />
-                    </SmartLink>
-                  </p>
+                  <SmsConsentFields
+                    className="md:col-span-2"
+                    smsProjectConsent={form.smsProjectConsent}
+                    smsMarketingConsent={form.smsMarketingConsent}
+                    onChange={(field, value) => onSelect(field, value)}
+                    errors={{
+                      smsProjectConsent: errors.smsProjectConsent,
+                      smsMarketingConsent: errors.smsMarketingConsent,
+                    }}
+                  />
 
                   <div className="md:col-span-2">
                     <Turnstile className="pt-1" action="lead-form" />

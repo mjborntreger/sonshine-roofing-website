@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
       <div className="container-edge py-10">
         <div className="prose">
           <h1>Privacy Policy</h1>
-          <p><strong>Effective Date:</strong> 07/14/2025</p>
+          <p><strong>Effective Date:</strong> 03/12/2026</p>
           <p>
             SonShine Roofing Inc. is committed to protecting your privacy. This Privacy Policy explains how we
             collect, use, and safeguard your information when you visit
@@ -85,9 +85,18 @@ export default function PrivacyPolicyPage() {
 
           <h2>5. Data Sharing</h2>
           <p>
-            We do not sell, rent, or trade your personal data. Information may be shared only with third-party
-            service providers listed above, solely for the purposes outlined.
+            We will never share your contact information for marketing purposes.
           </p>
+          <p>
+            We do not sell, rent, or trade your personal data.
+          </p>
+          <p>
+            We may disclose personal information only in the following limited situations:
+          </p>
+          <ul>
+            <li>When required by applicable law or in response to valid law enforcement requests.</li>
+            <li>In connection with a business transfer, merger, acquisition, or sale of assets.</li>
+          </ul>
 
           <h2>6. Data Retention</h2>
           <p>

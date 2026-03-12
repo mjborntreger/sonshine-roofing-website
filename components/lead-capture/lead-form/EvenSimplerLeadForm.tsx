@@ -3,8 +3,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { FormEvent, useState } from 'react';
-import { ArrowRight, ArrowUpRight, Check } from 'lucide-react';
-import SmartLink from '@/components/utils/SmartLink';
+import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import {
@@ -12,21 +11,23 @@ import {
   LEAD_SUCCESS_COOKIE,
   LeadSuccessCookiePayload,
   SuccessMeta,
-  buildContactLeadPayload,
+  buildZapierLeadPayload,
   formatPhoneExample,
   normalizeState,
   normalizeZip,
   persistLeadSuccessCookie,
   sanitizePhoneInput,
   submitLead,
-  type ContactLeadInput,
+  type SmsConsentFieldValue,
   validateContactAddressDraft,
   validateContactIdentityDraft,
+  validateSmsConsentDraft,
 } from '@/lib/lead-capture/contact-lead';
 import { cn } from '@/lib/utils';
 import { STANDARD_TIMELINE_OPTIONS, type JourneyKey, getTimelineLabelForDisplay } from '@/components/lead-capture/lead-form/config';
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { renderHighlight } from '@/components/utils/renderHighlight';
+import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 
 // STYLES
 const INPUT_BASE_CLASS =
@@ -57,7 +58,8 @@ type FormState = {
   city: string;
   state: string;
   zip: string;
-  consentSms: boolean;
+  smsProjectConsent: SmsConsentFieldValue;
+  smsMarketingConsent: SmsConsentFieldValue;
 };
 
 type RoofTypeValue = 'shingle' | 'metal' | 'tile' | 'flat';
@@ -111,7 +113,8 @@ function buildInitialState(projectType: JourneyKey): FormState {
     city: '',
     state: 'FL',
     zip: '',
-    consentSms: false,
+    smsProjectConsent: '',
+    smsMarketingConsent: '',
   };
 }
 
@@ -194,7 +197,7 @@ export default function EvenSimplerLeadForm({
       lastName: form.lastName,
       email: form.email,
       phone: form.phone,
-    });
+    }, { phoneRequired: false });
     const addressErrors = validateContactAddressDraft({
       address1: form.address1,
       address2: form.address2,
@@ -202,8 +205,12 @@ export default function EvenSimplerLeadForm({
       state: form.state,
       zip: form.zip,
     });
+    const smsErrors = validateSmsConsentDraft({
+      smsProjectConsent: form.smsProjectConsent,
+      smsMarketingConsent: form.smsMarketingConsent,
+    });
 
-    Object.assign(validation, identityErrors, addressErrors);
+    Object.assign(validation, identityErrors, addressErrors, smsErrors);
 
     if (Object.keys(validation).length) {
       setErrors(validation);
@@ -231,14 +238,16 @@ export default function EvenSimplerLeadForm({
       ? [notes, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
       : notes;
 
-    const basePayload = buildContactLeadPayload({
-      projectType: form.projectType,
-      timelineLabel: timelineLabel || undefined,
-      notes: combinedNotes.trim() || undefined,
-      preferredContact: DEFAULT_PREFERRED_CONTACT,
-      bestTimeLabel: 'No preference',
-      consentSms: form.consentSms,
-      identity: {
+    const payload = buildZapierLeadPayload({
+      formType: 'contact-lead',
+      submittedAt: new Date().toISOString(),
+      source: {
+        page: page || '/contact-us',
+        utm_source: utmParams.source || undefined,
+        utm_medium: utmParams.medium || undefined,
+        utm_campaign: utmParams.campaign || undefined,
+      },
+      contact: {
         firstName: form.firstName,
         lastName: form.lastName,
         email: form.email,
@@ -251,23 +260,24 @@ export default function EvenSimplerLeadForm({
         state: form.state,
         zip: form.zip,
       },
-      page: page || '/contact-us',
+      smsConsent: {
+        smsProjectConsent: form.smsProjectConsent,
+        smsMarketingConsent: form.smsMarketingConsent,
+      },
+      details: {
+        projectType: form.projectType,
+        timeline: form.timeline || undefined,
+        timelineLabel: timelineLabel || undefined,
+        notes: combinedNotes.trim() || undefined,
+        roofTypeLabel: roofTypeLabel || undefined,
+        preferredContact: form.phone ? DEFAULT_PREFERRED_CONTACT : 'email',
+        bestTime: 'No preference',
+      },
+      antiSpam: {
+        cfToken,
+        hp_field: honeypot || undefined,
+      },
     });
-
-    const contactPayload: ContactLeadInput = {
-      ...basePayload,
-      cfToken,
-      hp_field: honeypot || undefined,
-    };
-
-    if (utmParams.source) contactPayload.utm_source = utmParams.source;
-    if (utmParams.medium) contactPayload.utm_medium = utmParams.medium;
-    if (utmParams.campaign) contactPayload.utm_campaign = utmParams.campaign;
-
-    const payload: ContactLeadInput & { submittedAt: string } = {
-      ...contactPayload,
-      submittedAt: new Date().toISOString(),
-    };
 
     const result = await submitLead(payload, {
       gtmEvent: {
@@ -404,7 +414,7 @@ export default function EvenSimplerLeadForm({
                     {errors.email && <span className="mt-1 text-xs text-red-600">{errors.email}</span>}
                   </label>
                   <label className="block font-medium text-slate-700">
-                    Phone*
+                    Phone
                     <input
                       type="tel"
                       name="phone"
@@ -570,28 +580,15 @@ export default function EvenSimplerLeadForm({
                 </label>
               </section>
 
-              <section className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
-                <label className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    name="consentSms"
-                    checked={form.consentSms}
-                    onChange={(event) => setField('consentSms', event.target.checked)}
-                    className="mt-1 h-4 w-4 rounded border-slate-300 text-[--brand-blue] focus:ring-[--brand-blue]"
-                  />
-                  <span>
-                    By submitting this form, you agree to receive transactional and promotional communications from SonShine Roofing. Message
-                    frequency may vary. Message and data rates may apply. Reply STOP to opt out at any time.
-                  </span>
-                </label>
-                <p className="mt-2 text-xs text-right text-slate-500">
-                  For more information,{' '}
-                  <SmartLink href="/privacy-policy" data-icon-affordance="up-right" className="font-semibold text-[--brand-blue]">
-                    view our privacy policy
-                    <ArrowUpRight className="icon-affordance h-3 w-3 ml-1 inline" />
-                  </SmartLink>
-                </p>
-              </section>
+              <SmsConsentFields
+                smsProjectConsent={form.smsProjectConsent}
+                smsMarketingConsent={form.smsMarketingConsent}
+                onChange={(field, value) => setField(field, value)}
+                errors={{
+                  smsProjectConsent: errors.smsProjectConsent,
+                  smsMarketingConsent: errors.smsMarketingConsent,
+                }}
+              />
 
               <section>
                 <Turnstile className="pt-1" action="contact-lead" />

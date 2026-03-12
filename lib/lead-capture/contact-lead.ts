@@ -1,8 +1,8 @@
 import { deleteCookie, readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
 import { pushToDataLayer } from '@/lib/telemetry/gtm';
 import { trackMetaPixel, type MetaStandardEvent } from '@/lib/telemetry/meta';
-import { normalizePhoneForSubmit, isUsPhoneComplete } from '@/lib/lead-capture/phone';
-import type { ContactLeadInput, LeadInput } from '@/lib/lead-capture/validation';
+import { normalizePhoneForSubmit, isUsPhoneComplete, stripToPhoneDigits } from '@/lib/lead-capture/phone';
+import type { ContactLeadInput } from '@/lib/lead-capture/validation';
 
 export {
   stripToPhoneDigits as sanitizePhoneInput,
@@ -89,6 +89,195 @@ export function validateEmail(email: string): boolean {
   return regex.test(email.trim().toLowerCase());
 }
 
+export type SmsConsentChoice = 'yes' | 'no';
+export type SmsConsentFieldValue = SmsConsentChoice | '';
+
+export type SmsConsentDraft = {
+  smsProjectConsent: SmsConsentFieldValue;
+  smsMarketingConsent: SmsConsentFieldValue;
+};
+
+export function validateSmsConsentDraft(draft: SmsConsentDraft): Record<string, string> {
+  const errors: Record<string, string> = {};
+  if (draft.smsProjectConsent !== 'yes' && draft.smsProjectConsent !== 'no') {
+    errors.smsProjectConsent = 'Please choose Yes or No.';
+  }
+  if (draft.smsMarketingConsent !== 'yes' && draft.smsMarketingConsent !== 'no') {
+    errors.smsMarketingConsent = 'Please choose Yes or No.';
+  }
+  return errors;
+}
+
+export function normalizeSmsConsentFieldValue(value: string | null | undefined): SmsConsentFieldValue {
+  return value === 'yes' || value === 'no' ? value : '';
+}
+
+export function normalizeSmsConsent(value: SmsConsentFieldValue): SmsConsentChoice {
+  return value === 'yes' ? 'yes' : 'no';
+}
+
+export type ZapierLeadFormType = 'contact-lead' | 'financing-calculator' | 'special-offer' | 'feedback';
+
+export type ZapierLeadPayloadV2 = {
+  version: 'v2';
+  formType: ZapierLeadFormType;
+  submittedAt: string;
+  source: {
+    page: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    ua?: string;
+    tz?: string;
+  };
+  contact: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
+  address?: {
+    address1?: string;
+    address2?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+  };
+  smsConsent: {
+    projectSms: SmsConsentChoice;
+    marketingSms: SmsConsentChoice;
+    disclosureVersion: 'sms-consent-v1';
+  };
+  details: Record<string, unknown>;
+  antiSpam: {
+    cfToken: string;
+    hp_field?: string;
+  };
+};
+
+type BuildZapierLeadPayloadInput = {
+  formType: ZapierLeadFormType;
+  submittedAt?: string;
+  source: {
+    page: string;
+    utm_source?: string;
+    utm_medium?: string;
+    utm_campaign?: string;
+    ua?: string;
+    tz?: string;
+  };
+  contact: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
+  address?: {
+    address1?: string;
+    address2?: string;
+    city?: string;
+    state?: string;
+    zip?: string;
+  };
+  smsConsent: SmsConsentDraft;
+  details?: Record<string, unknown>;
+  antiSpam: {
+    cfToken: string;
+    hp_field?: string;
+  };
+};
+
+function cleanString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed || undefined;
+}
+
+function compactRecord(record: Record<string, unknown>): Record<string, unknown> {
+  const next: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(record)) {
+    if (value === undefined || value === null) continue;
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) continue;
+      next[key] = trimmed;
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      if (!value.length) continue;
+      next[key] = value;
+      continue;
+    }
+
+    if (typeof value === 'object') {
+      const compacted = compactRecord(value as Record<string, unknown>);
+      if (!Object.keys(compacted).length) continue;
+      next[key] = compacted;
+      continue;
+    }
+
+    next[key] = value;
+  }
+
+  return next;
+}
+
+export function buildZapierLeadPayload(input: BuildZapierLeadPayloadInput): ZapierLeadPayloadV2 {
+  const normalizedPhone = normalizePhoneForSubmit(input.contact.phone || '');
+
+  const source = compactRecord({
+    page: input.source.page,
+    utm_source: input.source.utm_source,
+    utm_medium: input.source.utm_medium,
+    utm_campaign: input.source.utm_campaign,
+    ua: input.source.ua,
+    tz: input.source.tz,
+  }) as ZapierLeadPayloadV2['source'];
+
+  const contact: ZapierLeadPayloadV2['contact'] = {
+    firstName: cleanString(input.contact.firstName) || '',
+    lastName: cleanString(input.contact.lastName) || '',
+    email: cleanString(input.contact.email) || '',
+  };
+  if (normalizedPhone) {
+    contact.phone = normalizedPhone;
+  }
+
+  const payload: ZapierLeadPayloadV2 = {
+    version: 'v2',
+    formType: input.formType,
+    submittedAt: cleanString(input.submittedAt) || new Date().toISOString(),
+    source,
+    contact,
+    smsConsent: {
+      projectSms: normalizeSmsConsent(input.smsConsent.smsProjectConsent),
+      marketingSms: normalizeSmsConsent(input.smsConsent.smsMarketingConsent),
+      disclosureVersion: 'sms-consent-v1',
+    },
+    details: compactRecord(input.details || {}),
+    antiSpam: compactRecord({
+      cfToken: input.antiSpam.cfToken,
+      hp_field: input.antiSpam.hp_field,
+    }) as ZapierLeadPayloadV2['antiSpam'],
+  };
+
+  const address = compactRecord({
+    address1: input.address?.address1,
+    address2: input.address?.address2,
+    city: input.address?.city,
+    state: input.address?.state,
+    zip: input.address?.zip,
+  });
+  if (Object.keys(address).length) {
+    payload.address = address as ZapierLeadPayloadV2['address'];
+  }
+
+  return payload;
+}
+
 export type ContactIdentityDraft = {
   firstName: string;
   lastName: string;
@@ -118,12 +307,18 @@ export type ContactLeadPayloadDraft = {
   page?: string;
 };
 
-export function validateContactIdentityDraft(draft: ContactIdentityDraft): Record<string, string> {
+export function validateContactIdentityDraft(
+  draft: ContactIdentityDraft,
+  options: { phoneRequired?: boolean } = {},
+): Record<string, string> {
+  const { phoneRequired = true } = options;
   const errors: Record<string, string> = {};
   if (!draft.firstName.trim()) errors.firstName = 'Enter your first name.';
   if (!draft.lastName.trim()) errors.lastName = 'Enter your last name.';
   if (!validateEmail(draft.email)) errors.email = 'Enter a valid email (example@gmail.com).';
-  if (!isUsPhoneComplete(draft.phone)) {
+  const phoneDigits = stripToPhoneDigits(draft.phone || '');
+  const hasPhoneInput = phoneDigits.length > 0;
+  if ((phoneRequired || hasPhoneInput) && !isUsPhoneComplete(phoneDigits)) {
     errors.phone = 'Enter a valid 10-digit phone number';
   }
   return errors;
@@ -301,7 +496,7 @@ function fireMetaPixelEvents(events?: MetaStandardEvent | MetaStandardEvent[]) {
   }
 }
 
-export async function submitLead<T extends LeadInput>(
+export async function submitLead<T extends Record<string, unknown>>(
   payload: T,
   options: SubmitLeadOptions = {},
 ): Promise<SubmitLeadResult> {
@@ -322,28 +517,32 @@ export async function submitLead<T extends LeadInput>(
       signal,
     });
 
-    let json: LeadApiResponse = {};
+    let json: LeadApiResponse | null = null;
     try {
       json = (await response.json()) as LeadApiResponse;
     } catch {
-      json = {};
+      json = null;
     }
 
-    if (response.ok && json.ok) {
+    const upstreamExplicitFailure = json?.ok === false;
+    if (response.ok && !upstreamExplicitFailure) {
       if (contactReadyCookie) {
         writeCookie(CONTACT_READY_COOKIE, '1', contactReadyCookieMaxAge);
       }
       if (gtmEvent) pushToDataLayer(gtmEvent);
       fireMetaPixelEvents(metaPixelEvents);
-      return { ok: true, status: response.status, data: json };
+      return { ok: true, status: response.status, data: json || {} };
     }
 
-    const errorMessage = json.error || `Unable to submit lead (${response.status})`;
+    const errorMessage =
+      json?.error ||
+      response.statusText ||
+      `Unable to submit lead (${response.status})`;
     return {
       ok: false,
       status: response.status,
       error: errorMessage,
-      fieldErrors: json.fieldErrors,
+      fieldErrors: json?.fieldErrors,
     };
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : null;

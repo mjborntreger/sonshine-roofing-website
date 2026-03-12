@@ -4,13 +4,15 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/lead-capture/Turnstile';
 import SmartLink from '@/components/utils/SmartLink';
+import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 import {
+  buildZapierLeadPayload,
+  type SmsConsentFieldValue,
+  validateSmsConsentDraft,
   sanitizePhoneInput,
   isUsPhoneComplete,
-  normalizePhoneForSubmit,
   formatPhoneExample,
   submitLead,
-  type FeedbackLeadInput,
 } from '@/lib/lead-capture/contact-lead';
 
 const RATING_VALUES = ['1', '2', '3'] as const;
@@ -35,6 +37,9 @@ export default function TellUsWhyForm() {
 
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
   const [err, setErr] = useState<string | null>(null);
+  const [consentErrors, setConsentErrors] = useState<Record<string, string>>({});
+  const [smsProjectConsent, setSmsProjectConsent] = useState<SmsConsentFieldValue>('');
+  const [smsMarketingConsent, setSmsMarketingConsent] = useState<SmsConsentFieldValue>('');
   const [countdown, setCountdown] = useState(3);
   const router = useRouter();
 
@@ -69,41 +74,55 @@ export default function TellUsWhyForm() {
     const cfToken = String(fd.get('cfToken') || ''); // provided by <Turnstile />
     const hp_field = String(fd.get('company') || ''); // honeypot
 
-    const phoneDigits = sanitizePhoneInput(phone);
-    if (!isUsPhoneComplete(phoneDigits)) {
+    const smsErrors = validateSmsConsentDraft({ smsProjectConsent, smsMarketingConsent });
+    if (Object.keys(smsErrors).length) {
       setStatus('err');
-      setErr('Enter a valid US phone number (10 digits).');
+      setErr('Please complete the SMS consent selections.');
+      setConsentErrors(smsErrors);
       return;
     }
-    const normalizedPhone = normalizePhoneForSubmit(phoneDigits);
-    if (!normalizedPhone) {
-      setStatus('err');
-      setErr('Enter a valid US phone number (10 digits).');
-      return;
-    }
+    setConsentErrors({});
 
-    const payload: FeedbackLeadInput & { submittedAt: string } = {
-      type: 'feedback',
-      firstName: first,
-      lastName: last,
-      email,
-      phone: normalizedPhone,
-      rating: ratingValue,
-      message,
-      cfToken,
-      hp_field: hp_field || undefined,
-      page: '/tell-us-why',
-      ua: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-      tz: typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : '',
-      submittedAt: new Date().toISOString(),
-    };
+    const phoneDigits = sanitizePhoneInput(phone);
+    if (phoneDigits && !isUsPhoneComplete(phoneDigits)) {
+      setStatus('err');
+      setErr('Enter a valid US phone number (10 digits).');
+      return;
+    }
 
     const utmSource = qs.get('utm_source');
     const utmMedium = qs.get('utm_medium');
     const utmCampaign = qs.get('utm_campaign');
-    if (utmSource) payload.utm_source = utmSource.trim();
-    if (utmMedium) payload.utm_medium = utmMedium.trim();
-    if (utmCampaign) payload.utm_campaign = utmCampaign.trim();
+    const payload = buildZapierLeadPayload({
+      formType: 'feedback',
+      submittedAt: new Date().toISOString(),
+      source: {
+        page: '/tell-us-why',
+        utm_source: utmSource?.trim() || undefined,
+        utm_medium: utmMedium?.trim() || undefined,
+        utm_campaign: utmCampaign?.trim() || undefined,
+        ua: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        tz: typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : '',
+      },
+      contact: {
+        firstName: first,
+        lastName: last,
+        email,
+        phone,
+      },
+      smsConsent: {
+        smsProjectConsent,
+        smsMarketingConsent,
+      },
+      details: {
+        rating: ratingValue,
+        message,
+      },
+      antiSpam: {
+        cfToken,
+        hp_field: hp_field || undefined,
+      },
+    });
 
     const result = await submitLead(payload, {
       gtmEvent: {
@@ -181,11 +200,10 @@ export default function TellUsWhyForm() {
         </label>
 
         <label className="block">
-          <span className="text-sm">Phone number*</span>
+          <span className="text-sm">Phone number</span>
           <input
             type="tel"
             name="phone"
-            required
             autoComplete="tel"
             inputMode="tel"
             aria-describedby="phone-hint"
@@ -208,6 +226,27 @@ export default function TellUsWhyForm() {
 
         {/* Hidden rating (from query param) */}
         <input type="hidden" name="rating" value={rating} readOnly />
+
+        <SmsConsentFields
+          smsProjectConsent={smsProjectConsent}
+          smsMarketingConsent={smsMarketingConsent}
+          onChange={(field, value) => {
+            if (field === 'smsProjectConsent') setSmsProjectConsent(value);
+            if (field === 'smsMarketingConsent') setSmsMarketingConsent(value);
+            if (consentErrors[field]) {
+              setConsentErrors((prev) => {
+                const next = { ...prev };
+                delete next[field];
+                return next;
+              });
+            }
+            if (err) setErr(null);
+          }}
+          errors={{
+            smsProjectConsent: consentErrors.smsProjectConsent,
+            smsMarketingConsent: consentErrors.smsMarketingConsent,
+          }}
+        />
 
         {/* Turnstile widget injects cfToken hidden input too */}
         <Turnstile className="pt-1" />

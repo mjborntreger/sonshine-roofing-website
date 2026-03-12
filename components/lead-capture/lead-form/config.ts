@@ -343,9 +343,9 @@ export const CONTACT_PREF_OPTIONS: ReadonlyArray<{ value: PreferredContactValue;
 ] as const;
 
 export const BEST_TIME_OPTIONS = [
-  { value: 'morning', label: 'Morning (8–11am)' },
-  { value: 'midday', label: 'Midday (11–2pm)' },
-  { value: 'afternoon', label: 'Afternoon (2–5pm)' },
+  { value: 'morning', label: 'Morning (7–10am)' },
+  { value: 'midday', label: 'Midday (10am–1pm)' },
+  { value: 'afternoon', label: 'Afternoon (1–4pm)' },
   { value: 'no-preference', label: 'No preference' },
 ] as const;
 

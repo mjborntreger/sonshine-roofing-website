@@ -5,6 +5,35 @@ Environments
 - NEXT_PUBLIC_ENV=production → Production
 - NEXT_PUBLIC_ENV=staging    → Staging (or anything not "production")
 
+Lead Webhook Routing (n8n)
+- Application ingress is `POST /api/lead`.
+- The API route forwards validated lead payloads to n8n.
+- Set these server environment variables in staging and production:
+  - `N8N_WEBHOOK_URL`
+  - `N8N_WEBHOOK_SECRET`
+  - `TURNSTILE_SECRET_KEY`
+- Optional:
+  - `ALLOWED_ORIGIN` for cross-origin posting (comma-separated origins)
+- Migration-only fallback support remains in code:
+  - `LEAD_ENDPOINT_URL` (fallback for `N8N_WEBHOOK_URL`)
+  - `LEAD_FORWARD_SECRET` (fallback for `N8N_WEBHOOK_SECRET`)
+
+Lead Payload Contract (v2)
+- Required shape:
+  - `version: "v2"`
+  - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback"`
+  - `submittedAt` (ISO timestamp)
+  - `source.page`
+  - `contact.firstName`, `contact.lastName`, `contact.email`
+  - `smsConsent.projectSms`, `smsConsent.marketingSms` (`yes` or `no`)
+  - `antiSpam.cfToken`
+- Optional sections:
+  - `source.{utm_source,utm_medium,utm_campaign,ua,tz}`
+  - `contact.phone`
+  - `address.{address1,address2,city,state,zip}`
+  - `details` (form-specific fields)
+  - `antiSpam.hp_field`
+
 Sitemaps & Robots
 - Production
   - robots.txt: Allow all, sitemap at `${NEXT_PUBLIC_BASE_URL}/sitemap_index`.

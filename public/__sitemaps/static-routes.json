@@ -1,61 +1,81 @@
 {
-  "generatedAt": "2026-01-07T00:29:03.777Z",
+  "generatedAt": "2026-03-12T21:26:11.478Z",
   "routes": [
     {
       "loc": "/",
-      "lastmod": "2025-12-25T20:38:34.568Z"
+      "lastmod": "2026-02-27T15:35:28.275Z"
     },
     {
       "loc": "/about-sonshine-roofing",
-      "lastmod": "2025-12-25T20:38:34.566Z"
+      "lastmod": "2026-02-27T15:35:28.270Z"
     },
     {
       "loc": "/blog",
-      "lastmod": "2025-12-02T21:11:30.148Z"
+      "lastmod": "2026-02-27T15:35:28.270Z"
     },
     {
       "loc": "/contact-us",
-      "lastmod": "2025-12-25T20:38:34.566Z"
+      "lastmod": "2026-02-27T15:35:28.271Z"
     },
     {
       "loc": "/faq",
-      "lastmod": "2025-12-02T21:11:30.149Z"
+      "lastmod": "2026-02-27T15:35:28.271Z"
     },
     {
       "loc": "/financing",
-      "lastmod": "2025-12-02T21:11:30.149Z"
+      "lastmod": "2026-02-27T15:35:28.272Z"
+    },
+    {
+      "loc": "/homeowner-referral-program",
+      "lastmod": "2026-02-27T15:35:28.273Z"
     },
     {
       "loc": "/privacy-policy",
-      "lastmod": "2025-10-22T01:14:41.956Z"
+      "lastmod": "2026-03-12T16:25:39.131Z"
     },
     {
       "loc": "/project",
-      "lastmod": "2025-12-02T21:11:30.152Z"
+      "lastmod": "2026-02-27T15:35:28.277Z"
     },
     {
       "loc": "/roof-inspection",
-      "lastmod": "2026-01-07T00:26:48.730Z"
+      "lastmod": "2026-03-04T20:03:47.850Z"
     },
     {
       "loc": "/roof-maintenance",
-      "lastmod": "2026-01-07T00:26:34.799Z"
+      "lastmod": "2026-02-27T15:35:28.278Z"
     },
     {
       "loc": "/roof-repair",
-      "lastmod": "2026-01-07T00:26:39.725Z"
+      "lastmod": "2026-02-27T15:35:28.279Z"
     },
     {
       "loc": "/roof-replacement-sarasota-fl",
-      "lastmod": "2026-01-07T00:26:44.495Z"
+      "lastmod": "2026-02-27T15:35:28.280Z"
     },
     {
       "loc": "/roofing-glossary",
-      "lastmod": "2025-12-02T21:11:30.154Z"
+      "lastmod": "2026-02-27T15:35:28.280Z"
+    },
+    {
+      "loc": "/sms-terms-and-conditions",
+      "lastmod": "2026-03-12T16:15:20.357Z"
     },
     {
       "loc": "/video-library",
-      "lastmod": "2025-12-02T21:11:30.156Z"
+      "lastmod": "2026-02-27T15:35:28.282Z"
+    },
+    {
+      "loc": "/truck-for-sale",
+      "lastmod": "2026-03-11T17:29:46.856Z"
+    },
+    {
+      "loc": "/homeowner-referral-program/terms-and-conditions",
+      "lastmod": "2026-03-03T19:48:55.367Z"
+    },
+    {
+      "loc": "/roof-maintenance/roof-care-club-terms-and-conditions",
+      "lastmod": "2026-02-27T15:35:28.279Z"
     }
   ]
 }

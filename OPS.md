@@ -26,12 +26,34 @@ Security headers
 - CSP is enforced on staging, report-only on production.
 - If staging breaks, check console for CSP violations; then update `next.config.mjs`.
 
-Financing calculator webhook (WordPress)
-- Create a dedicated REST route (e.g. `/wp-json/sonshine/v1/financing`) that skips the feedback-specific `rating` constraint.
-- It should accept the POST body we send (`name`, `firstName`, `lastName`, `email`, `phone`, address fields, `amount`, `page`).
-- Forward the payload to Fluent SMTP/Brevo using whatever automation you prefer.
-- Add the shared secret header guard: expect `x-ss-secret` to equal the value stored in `FINANCING_LEAD_FORWARD_SECRET`.
-- Set the environment variable `FINANCING_LEAD_ENDPOINT_URL` (staging and production) to the new route once it is live.
+Lead Pipeline (n8n)
+- Browser forms submit to `POST /api/lead`.
+- Server route validates payload and anti-spam, then forwards to n8n with header `x-ss-secret`.
+- Required server env vars:
+  - `N8N_WEBHOOK_URL` (target n8n webhook URL)
+  - `N8N_WEBHOOK_SECRET` (shared secret sent as `x-ss-secret`)
+  - `TURNSTILE_SECRET_KEY` (Cloudflare Turnstile verification)
+- Legacy fallback env names still work but should be treated as migration-only:
+  - `LEAD_ENDPOINT_URL` (fallback for `N8N_WEBHOOK_URL`)
+  - `LEAD_FORWARD_SECRET` (fallback for `N8N_WEBHOOK_SECRET`)
+- Optional CORS allowlist:
+  - `ALLOWED_ORIGIN` (comma-separated origins)
+
+Lead Payload Contract (v2)
+- Root fields:
+  - `version: "v2"`
+  - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback"`
+  - `submittedAt` (ISO timestamp)
+  - `source.page` (required)
+  - `contact.firstName`, `contact.lastName`, `contact.email` (required)
+  - `smsConsent.projectSms`, `smsConsent.marketingSms` (`yes`/`no`)
+  - `antiSpam.cfToken` (Turnstile token, required)
+- Optional fields:
+  - `source.utm_source`, `source.utm_medium`, `source.utm_campaign`, `source.ua`, `source.tz`
+  - `contact.phone`
+  - `address.{address1,address2,city,state,zip}`
+  - `details` (form-specific object)
+  - `antiSpam.hp_field` (honeypot)
 
 Status Checklist (handoff)
 - [ ] Robots staging: Disallow all

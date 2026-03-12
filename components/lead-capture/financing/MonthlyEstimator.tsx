@@ -2,25 +2,28 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
 import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight, HandCoins, Wallet } from 'lucide-react';
 import ProjectTestimonial from '@/components/dynamic-content/project/ProjectTestimonial';
 import Turnstile from '@/components/lead-capture/Turnstile';
+import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/components/marketing/financing/financing-programs';
 import { readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
 import {
+  buildZapierLeadPayload,
   CONTACT_READY_COOKIE,
   CONTACT_READY_MAX_AGE,
   sanitizePhoneInput,
   isUsPhoneComplete,
-  normalizePhoneForSubmit,
   formatPhoneExample,
   normalizeState,
   normalizeZip,
+  type SmsConsentFieldValue,
   isValidState,
   isValidZip,
   submitLead,
-  type FinancingLeadInput,
+  validateSmsConsentDraft,
 } from '@/lib/lead-capture/contact-lead';
 import { formatPhoneForDisplay } from '@/lib/lead-capture/phone';
 
@@ -320,6 +323,8 @@ type FormValues = {
   amount: string;
   email: string;
   phone: string; // digits only
+  smsProjectConsent: SmsConsentFieldValue;
+  smsMarketingConsent: SmsConsentFieldValue;
 };
 
 type SubmissionState = 'idle' | 'submitting' | 'error';
@@ -360,6 +365,7 @@ function parseCookie(raw: string | null): FinancingCookie | null {
 }
 
 export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmount?: number }) {
+  const searchParams = useSearchParams();
   const totalQuizQuestions = quizQuestions.length;
   const summaryStepIndex = totalQuizQuestions;
   const firstFormStepIndex = summaryStepIndex + 1;
@@ -395,6 +401,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     amount: String(defaultAmount || ''),
     email: '',
     phone: '',
+    smsProjectConsent: '',
+    smsMarketingConsent: '',
   });
 
   useEffect(() => {
@@ -579,9 +587,13 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
     if (currentStep === thirdFormStepIndex) {
       if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
-      if (!isUsPhoneComplete(formValues.phone)) {
+      if (formValues.phone && !isUsPhoneComplete(formValues.phone)) {
         nextErrors.phone = 'Enter a valid phone number (10 digits, optional country code).';
       }
+      Object.assign(nextErrors, validateSmsConsentDraft({
+        smsProjectConsent: formValues.smsProjectConsent,
+        smsMarketingConsent: formValues.smsMarketingConsent,
+      }));
     }
     return nextErrors;
   };
@@ -771,30 +783,42 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     const stateValue = normalizeState(formValues.state);
     const zipValue = normalizeZip(formValues.zip);
 
-    const payload: FinancingLeadInput & {
-      quizSummary: typeof quizSummary;
-      submittedAt: string;
-    } = {
-      type: 'financing-calculator',
-      firstName: formValues.firstName.trim(),
-      lastName: formValues.lastName.trim(),
-      email: formValues.email.trim(),
-      phone: normalizePhoneForSubmit(formValues.phone),
-      address1: formValues.address1.trim(),
-      address2: formValues.address2.trim() || undefined,
-      city: formValues.city.trim(),
-      state: stateValue,
-      zip: zipValue,
-      amount: amountNumber,
-      page: '/financing',
-      cfToken,
-      hp_field: honeypot || undefined,
-      quizSummary,
+    const payload = buildZapierLeadPayload({
+      formType: 'financing-calculator',
       submittedAt: new Date().toISOString(),
-    };
-    if (scoresResult) {
-      payload.scores = scoresResult;
-    }
+      source: {
+        page: '/financing',
+        utm_source: searchParams.get('utm_source')?.trim() || undefined,
+        utm_medium: searchParams.get('utm_medium')?.trim() || undefined,
+        utm_campaign: searchParams.get('utm_campaign')?.trim() || undefined,
+      },
+      contact: {
+        firstName: formValues.firstName,
+        lastName: formValues.lastName,
+        email: formValues.email,
+        phone: formValues.phone,
+      },
+      address: {
+        address1: formValues.address1,
+        address2: formValues.address2 || undefined,
+        city: formValues.city,
+        state: stateValue,
+        zip: zipValue,
+      },
+      smsConsent: {
+        smsProjectConsent: formValues.smsProjectConsent,
+        smsMarketingConsent: formValues.smsMarketingConsent,
+      },
+      details: {
+        amount: amountNumber,
+        quizSummary,
+        scores: scoresResult || undefined,
+      },
+      antiSpam: {
+        cfToken,
+        hp_field: honeypot || undefined,
+      },
+    });
 
     setSubmission('submitting');
     setGlobalError(null);
@@ -1094,7 +1118,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700" htmlFor="phone">Phone*</label>
+          <label className="block text-sm font-medium text-slate-700" htmlFor="phone">Phone</label>
           <input
             id="phone"
             name="phone"
@@ -1114,6 +1138,24 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             Digits only, US numbers. Example: {formatPhoneExample(formValues.phone)}
           </p>
         </div>
+        <SmsConsentFields
+          smsProjectConsent={formValues.smsProjectConsent}
+          smsMarketingConsent={formValues.smsMarketingConsent}
+          onChange={(field, value) => {
+            setFormValues((prev) => ({ ...prev, [field]: value }));
+            if (errors[field]) {
+              setErrors((prev) => {
+                const next = { ...prev };
+                delete next[field];
+                return next;
+              });
+            }
+          }}
+          errors={{
+            smsProjectConsent: errors.smsProjectConsent,
+            smsMarketingConsent: errors.smsMarketingConsent,
+          }}
+        />
         <p className="mt-3 text-xs italic text-slate-500">Quick verification keeps spam away. It never impacts your credit.</p>
         <div className="pt-2">
           <Turnstile className="pt-1" />

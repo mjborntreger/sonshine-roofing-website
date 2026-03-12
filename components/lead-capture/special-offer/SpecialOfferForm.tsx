@@ -3,19 +3,22 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/lead-capture/Turnstile';
+import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 import {
+  buildZapierLeadPayload,
+  type SmsConsentFieldValue,
+  validateSmsConsentDraft,
   sanitizePhoneInput,
   isUsPhoneComplete,
-  normalizePhoneForSubmit,
   formatPhoneExample,
   submitLead,
-  type SpecialOfferLeadInput,
 } from '@/lib/lead-capture/contact-lead';
 
 type Props = {
   offerCode: string;
   offerSlug: string;
   offerTitle?: string | null;
+  offerDiscount?: string | null;
   offerExpiration?: string | null;
   initialUnlock?: { offerCode: string } | null;
 };
@@ -25,6 +28,8 @@ type FormValues = {
   lastName: string;
   email: string;
   phone: string;
+  smsProjectConsent: SmsConsentFieldValue;
+  smsMarketingConsent: SmsConsentFieldValue;
 };
 
 type Submission = 'idle' | 'submitting' | 'success' | 'error';
@@ -78,13 +83,22 @@ function readOfferCookie(name: string): { code: string; exp?: string } | null {
   }
 }
 
-export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, offerExpiration, initialUnlock }: Props) {
+export default function SpecialOfferForm({
+  offerCode,
+  offerSlug,
+  offerTitle,
+  offerDiscount,
+  offerExpiration,
+  initialUnlock,
+}: Props) {
   const searchParams = useSearchParams();
   const [values, setValues] = useState<FormValues>({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
+    smsProjectConsent: '',
+    smsMarketingConsent: '',
   });
   const [submission, setSubmission] = useState<Submission>(initialUnlock ? 'success' : 'idle');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -105,9 +119,14 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
     } else if (!emailRegex.test(email)) {
       next.email = 'Enter a valid email (example@domain.com)';
     }
-    if (!isUsPhoneComplete(values.phone)) {
+    const hasPhone = values.phone.trim().length > 0;
+    if (hasPhone && !isUsPhoneComplete(values.phone)) {
       next.phone = 'Enter a valid US phone number (10 digits).';
     }
+    Object.assign(next, validateSmsConsentDraft({
+      smsProjectConsent: values.smsProjectConsent,
+      smsMarketingConsent: values.smsMarketingConsent,
+    }));
     return next;
   };
 
@@ -163,31 +182,40 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
       return;
     }
 
-    const payload: SpecialOfferLeadInput & { submittedAt: string } = {
-      type: 'special-offer',
-      firstName: values.firstName.trim(),
-      lastName: values.lastName.trim(),
-      email: values.email.trim(),
-      phone: normalizePhoneForSubmit(values.phone),
-      offerCode,
-      offerSlug,
-      offerTitle: offerTitle ?? undefined,
-      cfToken,
-      hp_field: honeypot || undefined,
-      page: `/special-offers/${offerSlug}`,
-      address1: '',
-      city: '',
-      state: '',
-      zip: '',
-      submittedAt: new Date().toISOString(),
-    };
-
     const utmSource = searchParams.get('utm_source');
     const utmMedium = searchParams.get('utm_medium');
     const utmCampaign = searchParams.get('utm_campaign');
-    if (utmSource) payload.utm_source = utmSource.trim();
-    if (utmMedium) payload.utm_medium = utmMedium.trim();
-    if (utmCampaign) payload.utm_campaign = utmCampaign.trim();
+
+    const payload = buildZapierLeadPayload({
+      formType: 'special-offer',
+      submittedAt: new Date().toISOString(),
+      source: {
+        page: `/special-offers/${offerSlug}`,
+        utm_source: utmSource?.trim() || undefined,
+        utm_medium: utmMedium?.trim() || undefined,
+        utm_campaign: utmCampaign?.trim() || undefined,
+      },
+      contact: {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+      },
+      smsConsent: {
+        smsProjectConsent: values.smsProjectConsent,
+        smsMarketingConsent: values.smsMarketingConsent,
+      },
+      details: {
+        offerCode,
+        offerSlug,
+        offerTitle: offerTitle ?? undefined,
+        discount: offerDiscount ?? undefined,
+      },
+      antiSpam: {
+        cfToken,
+        hp_field: honeypot || undefined,
+      },
+    });
 
     setSubmission('submitting');
 
@@ -324,7 +352,7 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
         </label>
 
         <label className="block text-sm font-medium text-slate-700" htmlFor="phone">
-          Phone*
+          Phone
           <input
             id="phone"
             name="phone"
@@ -346,6 +374,26 @@ export default function SpecialOfferForm({ offerCode, offerSlug, offerTitle, off
             Digits only, US numbers. Example: {formatPhoneExample(values.phone)}
           </p>
         </label>
+
+        <SmsConsentFields
+          smsProjectConsent={values.smsProjectConsent}
+          smsMarketingConsent={values.smsMarketingConsent}
+          onChange={(field, value) => {
+            setValues((prev) => ({ ...prev, [field]: value }));
+            if (fieldErrors[field]) {
+              setFieldErrors((prev) => {
+                const clone = { ...prev };
+                delete clone[field];
+                return clone;
+              });
+            }
+            if (globalError) setGlobalError(null);
+          }}
+          errors={{
+            smsProjectConsent: fieldErrors.smsProjectConsent,
+            smsMarketingConsent: fieldErrors.smsMarketingConsent,
+          }}
+        />
 
         <div className="pt-2">
           <Turnstile className="pt-1" />

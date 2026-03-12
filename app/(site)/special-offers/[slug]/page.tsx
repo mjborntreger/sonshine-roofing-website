@@ -204,6 +204,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
                   offerCode={offer.offerCode}
                   offerSlug={offer.slug}
                   offerTitle={offer.title}
+                  offerDiscount={offer.discount ?? null}
                   offerExpiration={offer.expirationDate ?? null}
                   initialUnlock={initialUnlock}
                 />

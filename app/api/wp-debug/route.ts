@@ -1,8 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const ENDPOINT =
   process.env.NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT ||
   "https://next.sonshineroofing.com/graphql";
+const DEFAULT_ALLOWED_BRANCH = "staging";
+const DEFAULT_ALLOWED_HOST = "staging.sonshineroofing.com";
+const ALLOWED_BRANCH =
+  (process.env.WP_DEBUG_ALLOWED_BRANCH || DEFAULT_ALLOWED_BRANCH).trim() ||
+  DEFAULT_ALLOWED_BRANCH;
+const ALLOWED_HOST =
+  (process.env.WP_DEBUG_ALLOWED_HOST || DEFAULT_ALLOWED_HOST).trim().toLowerCase() ||
+  DEFAULT_ALLOWED_HOST;
 
 type GraphQLVariables = Record<string, unknown>;
 
@@ -17,6 +25,26 @@ type GraphQLResult<T> = {
   status: number;
   body: GraphQLBody<T>;
 };
+
+function isAllowedBranch(): boolean {
+  const commitRef = (process.env.VERCEL_GIT_COMMIT_REF || "").trim();
+  if (!commitRef) return false;
+  return commitRef === ALLOWED_BRANCH;
+}
+
+function normalizeHost(rawHost: string): string {
+  return rawHost.trim().toLowerCase().split(":")[0] || "";
+}
+
+function isAllowedHost(req: NextRequest): boolean {
+  const headerHost =
+    req.headers.get("x-forwarded-host") ||
+    req.headers.get("host") ||
+    "";
+  const host = normalizeHost(headerHost);
+  if (!host) return false;
+  return host === normalizeHost(ALLOWED_HOST);
+}
 
 async function gq<T>(query: string, variables?: GraphQLVariables): Promise<GraphQLResult<T>> {
   const res = await fetch(ENDPOINT, {
@@ -70,7 +98,14 @@ const PROJECTS_QUERY = /* GraphQL */ `
   }
 `;
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  if (!isAllowedBranch() || !isAllowedHost(req)) {
+    return NextResponse.json(
+      { ok: false, error: "Not found" },
+      { status: 404, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   try {
     const [meta, videos, projects] = await Promise.all([
       gq<{ generalSettings?: { title?: string; url?: string; description?: string } }>(META_QUERY),
