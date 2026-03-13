@@ -3,6 +3,7 @@ import Section from "@/components/layout/Section";
 import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside";
 import { listProjectsPaged, listProjectFilterTerms } from "@/lib/content/wp";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import ProjectArchiveClient from "@/components/dynamic-content/project/ProjectArchiveClient";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
@@ -92,12 +93,20 @@ export default async function ProjectArchivePage() {
             <div>
               <JsonLd data={collectionLd} />
               <JsonLd data={breadcrumbsLd} />
-              <ProjectArchiveClient
-                initialResult={initialResult}
-                filterTerms={filterTerms}
-                pageSize={PAGE_SIZE}
-                initialFilters={initialFilters}
-              />
+              <Suspense
+                fallback={
+                  <div className="rounded-2xl border border-blue-100 bg-white/90 p-4 text-sm text-slate-600">
+                    Loading projects...
+                  </div>
+                }
+              >
+                <ProjectArchiveClient
+                  initialResult={initialResult}
+                  filterTerms={filterTerms}
+                  pageSize={PAGE_SIZE}
+                  initialFilters={initialFilters}
+                />
+              </Suspense>
             </div>
             <ResourcesAside activePath={PAGE_PATH} />
           </div>

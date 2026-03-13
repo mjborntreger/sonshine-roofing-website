@@ -1,4 +1,4 @@
-import { cache } from "react";
+import { Suspense, cache } from "react";
 
 import Section from "@/components/layout/Section";
 import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside";
@@ -233,16 +233,26 @@ export default async function VideoLibraryPage() {
             <div>
               <JsonLd data={collectionLd} />
               <JsonLd data={breadcrumbsLd} />
-              <VideoShareBar collectionUrl={collectionUrl} />
+              <Suspense fallback={null}>
+                <VideoShareBar collectionUrl={collectionUrl} />
+              </Suspense>
 
-              <VideoLibraryClient
-                initialResult={initialResult}
-                bucketOptions={BUCKET_OPTIONS}
-                materialOptions={materialOptions}
-                serviceOptions={serviceOptions}
-                pageSize={PAGE_SIZE}
-                initialFilters={initialFilters}
-              />
+              <Suspense
+                fallback={
+                  <div className="rounded-2xl border border-blue-100 bg-white/90 p-4 text-sm text-slate-600">
+                    Loading videos...
+                  </div>
+                }
+              >
+                <VideoLibraryClient
+                  initialResult={initialResult}
+                  bucketOptions={BUCKET_OPTIONS}
+                  materialOptions={materialOptions}
+                  serviceOptions={serviceOptions}
+                  pageSize={PAGE_SIZE}
+                  initialFilters={initialFilters}
+                />
+              </Suspense>
             </div>
 
             <ResourcesAside activePath={CANONICAL} />

@@ -3,6 +3,7 @@ import { ListChecks, ListOrdered, HelpCircle, Phone, Timer, Percent, CheckCircle
 import ProgramCard from '@/components/marketing/financing/ProgramCard';
 import MonthlyEstimator from '@/components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
+import { Suspense } from "react";
 import Image from "next/image";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import { listFaqsWithContent } from "@/lib/content/wp";
@@ -143,7 +144,15 @@ export default async function FinancingPage() {
             Free <span className="text-[--brand-blue]">Roof Financing</span> Monthly Payment Estimator
           </h2>
           <p className="text-center mx-auto max-w-3xl text-slate-600 mb-8 text-sm md:text-md">Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.</p>
-          <MonthlyEstimator />
+          <Suspense
+            fallback={
+              <div className="rounded-3xl border border-blue-100 bg-white/90 p-6 text-center text-sm text-slate-600 shadow-sm">
+                Loading estimator...
+              </div>
+            }
+          >
+            <MonthlyEstimator />
+          </Suspense>
 
           {/* Two programs (plan cards) */}
           <h2 className={h2} id="pick-a-plan">

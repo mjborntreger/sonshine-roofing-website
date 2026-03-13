@@ -3,6 +3,7 @@ import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside"
 import BlogArchiveClient from "@/components/dynamic-content/blog/BlogArchiveClient";
 import { listBlogCategories, listPostsPaged } from "@/lib/content/wp";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
@@ -91,12 +92,20 @@ export default async function BlogArchivePage() {
               <JsonLd data={collectionLd} />
               <JsonLd data={breadcrumbsLd} />
 
-              <BlogArchiveClient
-                initialResult={initialResult}
-                categories={filteredCategories}
-                pageSize={PAGE_SIZE}
-                initialFilters={initialFilters}
-              />
+              <Suspense
+                fallback={
+                  <div className="rounded-2xl border border-blue-100 bg-white/90 p-4 text-sm text-slate-600">
+                    Loading posts...
+                  </div>
+                }
+              >
+                <BlogArchiveClient
+                  initialResult={initialResult}
+                  categories={filteredCategories}
+                  pageSize={PAGE_SIZE}
+                  initialFilters={initialFilters}
+                />
+              </Suspense>
             </div>
 
             <ResourcesAside activePath={PAGE_PATH} />
