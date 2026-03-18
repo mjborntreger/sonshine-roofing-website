@@ -5,6 +5,8 @@ import { ArrowUpRight, ChartSpline, Map, Truck, Zap } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import { VideoWithSchema } from "@/components/utils/VideoWithSchema";
 
+const PRICE = "$63,500";
+
 const comparisonRows = [
   { truck: "GMC Sierra Denali (ProCharged 6.2L)*", drivetrain: "4WD", whp: "~800 whp", crank: "~1,025 - 1,070 hp (est.)" },
   { truck: "Ram TRX*", drivetrain: "4WD", whp: "~580 - 590 whp", crank: "702 hp" },
@@ -105,7 +107,10 @@ export default async function Page() {
           <div className="flex gap-6 flex-wrap max-w-3xl">
             <div>
               <p className="italic text-xl text-slate-300">
-                This truck is going to auction this Friday 03/13/26.
+                Current Price <span className="text-slate-400 not-italic text-sm">(Cash only, no trades)</span>
+              </p>
+              <p className="text-blue-400 mt-2 text-5xl">
+                {PRICE}
               </p>
               <p className="mt-3 text-sm text-slate-200">
                 This is not a truck for joy rides or casual test drives.
@@ -122,9 +127,10 @@ export default async function Page() {
         <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
           <div className="space-y-8 min-w-0">
             <div className="space-y-4">
-              <h2 className="text-3xl font-semibold text-slate-900">Why this truck stands out</h2>
+              <h2 className="text-3xl font-semibold text-slate-900">Why this truck commands the price</h2>
               <p className="text-base leading-relaxed text-slate-700">
-                Ram TRX, Raptor R, and Shelby Super Snake all make brochure horsepower. None of them
+                Some people see the number and think it is a lot for a pickup. They are right—until you compare it to
+                what is out there. Ram TRX, Raptor R, and Shelby Super Snake all make brochure horsepower. None of them
                 put down what this truck does in the real world: around 800 horsepower at the wheels, backed by 4WD traction
                 and a Denali interior you actually want to sit in every day.
               </p>
@@ -158,7 +164,7 @@ export default async function Page() {
                 </div>
               </div>
               <p className="text-base leading-relaxed text-slate-700">
-                Real 800-wheel horsepower, real drivability, and real build quality. You can choose a factory badge
+                Real 800-wheel horsepower, real drivability, and real build quality. You can spend more on a factory badge
                 with less power and be average, or choose the combination that does it all.
               </p>
             </div>
@@ -250,9 +256,9 @@ export default async function Page() {
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-slate-900 p-6 text-white shadow-sm">
-              <h3 className="text-2xl text-white font-semibold">Auction & terms</h3>
+              <h3 className="text-2xl text-white font-semibold">Price & terms</h3>
               <p className="text-slate-200">
-                This truck is going to auction this Friday. Vehicle is sold as-is with no warranty expressed or implied.
+                {`Asking ${PRICE} — cash only — no trades. Vehicle is sold as-is with no warranty expressed or implied.`}
               </p>
               <p className="mt-3 text-slate-200">
                 Serious interest only. This is not a truck for joy rides or casual test drives.
@@ -326,7 +332,7 @@ export default async function Page() {
       <Section className="bg-slate-900">
         <div className="flex flex-col items-center gap-4 text-center text-white">
           <p className="text-lg font-semibold">Ready to feel 800 wheel horsepower again?</p>
-          <p className="text-sm text-slate-200">Jump back to the auction and contact details at the top.</p>
+          <p className="text-sm text-slate-200">Jump back to the price and contact details at the top.</p>
           <SmartLink
             href="#truck-offer"
             className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300"
