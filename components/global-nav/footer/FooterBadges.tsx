@@ -49,7 +49,7 @@ const badges = [
   {
     href: "https://www.expertise.com/fl/sarasota/roofing",
     title: "Expertise.com",
-    src: "https://res.cloudinary.com/expertise-com/image/upload/remote_media/awards/fl_sarasota_roofing_2025_transparent.svg",
+    src: "https://res.cloudinary.com/expertise-com/image/upload/v1767650446/remote_media/assets/awards/fl_sarasota_roofing_2026.svg",
   },
 ];
 
