@@ -6,8 +6,8 @@ type UnknownRecord = Record<string, unknown>;
 type FieldErrors = Record<string, string[]>;
 
 const TURNSTILE_SECRET = requireEnv('TURNSTILE_SECRET_KEY', { prodOnly: true });
-const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL || process.env.LEAD_ENDPOINT_URL;
-const N8N_WEBHOOK_SECRET = process.env.N8N_WEBHOOK_SECRET || process.env.LEAD_FORWARD_SECRET;
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
+const N8N_WEBHOOK_SECRET = process.env.N8N_WEBHOOK_SECRET;
 
 const FORM_TYPES = new Set<LeadForwardPayloadV2['formType']>([
   'contact-lead',
@@ -19,7 +19,7 @@ const FORM_TYPES = new Set<LeadForwardPayloadV2['formType']>([
 const SMS_CHOICES = new Set<LeadForwardPayloadV2['smsConsent']['projectSms']>(['yes', 'no']);
 
 if ((!N8N_WEBHOOK_URL || !N8N_WEBHOOK_SECRET) && isProdEnv()) {
-  console.error('[env] Missing N8N_WEBHOOK_URL/N8N_WEBHOOK_SECRET (fallback: LEAD_ENDPOINT_URL/LEAD_FORWARD_SECRET).');
+  console.error('[env] Missing N8N_WEBHOOK_URL/N8N_WEBHOOK_SECRET.');
 }
 
 const isRecord = (value: unknown): value is UnknownRecord =>

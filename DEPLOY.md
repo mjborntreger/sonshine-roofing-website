@@ -14,9 +14,6 @@ Lead Webhook Routing (n8n)
   - `TURNSTILE_SECRET_KEY`
 - Optional:
   - `ALLOWED_ORIGIN` for cross-origin posting (comma-separated origins)
-- Migration-only fallback support remains in code:
-  - `LEAD_ENDPOINT_URL` (fallback for `N8N_WEBHOOK_URL`)
-  - `LEAD_FORWARD_SECRET` (fallback for `N8N_WEBHOOK_SECRET`)
 
 Lead Payload Contract (v2)
 - Required shape:

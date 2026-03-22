@@ -33,9 +33,6 @@ Lead Pipeline (n8n)
   - `N8N_WEBHOOK_URL` (target n8n webhook URL)
   - `N8N_WEBHOOK_SECRET` (shared secret sent as `x-ss-secret`)
   - `TURNSTILE_SECRET_KEY` (Cloudflare Turnstile verification)
-- Legacy fallback env names still work but should be treated as migration-only:
-  - `LEAD_ENDPOINT_URL` (fallback for `N8N_WEBHOOK_URL`)
-  - `LEAD_FORWARD_SECRET` (fallback for `N8N_WEBHOOK_SECRET`)
 - Optional CORS allowlist:
   - `ALLOWED_ORIGIN` (comma-separated origins)
 
