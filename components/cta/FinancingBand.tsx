@@ -10,7 +10,7 @@ export default function FinancingBand() {
                 </p>
                 <SmartLink 
                     href="/financing" 
-                    className="btn btn-brand-blue h-11 px-5" 
+                    className="btn btn-sm btn-brand-blue h-11 px-5" 
                     aria-label="Explore financing options"
                     data-icon-affordance="right"
                     proseGuard

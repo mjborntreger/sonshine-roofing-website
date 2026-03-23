@@ -177,7 +177,7 @@ const BADGES = [
     label: "Best Roofers in Sarasota Award (2025)",
     subtitle: "Forbes affiliate Expertise.com has recognized our best-in-class customer service and workmanship.",
     href: "https://www.expertise.com/fl/sarasota/roofing",
-    src: "https://res.cloudinary.com/expertise-com/image/upload/remote_media/awards/fl_sarasota_roofing_2025_transparent.svg",
+    src: "https://res.cloudinary.com/expertise-com/image/upload/v1767650446/remote_media/assets/awards/fl_sarasota_roofing_2026.svg",
     alt: "Expertise.com Best Roofers in Sarasota Award (2025)",
   },
 ] as const;
