@@ -23,9 +23,9 @@ export default function ProjectReviewSnippet({ review, author, className }: Prop
   const resolvedAuthor = typeof author === "string" && author.trim().length > 0 ? author.trim() : null;
 
   return (
-    <div className={cn("mt-5 space-y-2", className)}>
+    <div className={cn("mt-5 space-y-2 text-sm", className)}>
       <ReviewStarRow />
-      <div className="italic text-slate-500" style={clampStyle}>
+      <div className="italic leading-6 text-slate-500" style={clampStyle}>
         &ldquo;{content}&rdquo;
         {resolvedAuthor ? (
           <span className="not-italic text-slate-600"> — {resolvedAuthor}</span>

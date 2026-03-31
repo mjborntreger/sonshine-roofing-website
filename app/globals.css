@@ -34,6 +34,10 @@
     --skeleton-highlight: rgba(255, 255, 255, 0.35);
     --skeleton-radius: 0.5rem;
     --scroll-lock-offset: 0px;
+    --blog-preview-card-min-h-mobile: 24rem;
+    --blog-preview-card-min-h-desktop: 26rem;
+    --project-preview-card-min-h-mobile: 31rem;
+    --project-preview-card-min-h-desktop: 33rem;
   }
 
   html {
@@ -80,6 +84,15 @@
   .ring-brand { box-shadow: 0 0 0 2px color-mix(in oklab, var(--brand-blue) 70%, white); }
   .scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
   .scrollbar-none::-webkit-scrollbar { display: none; }
+  .blog-preview-card-min-h { min-height: var(--blog-preview-card-min-h-mobile); }
+  .project-preview-card-min-h { min-height: var(--project-preview-card-min-h-mobile); }
+}
+
+@media (min-width: 768px) {
+  @layer utilities {
+    .blog-preview-card-min-h { min-height: var(--blog-preview-card-min-h-desktop); }
+    .project-preview-card-min-h { min-height: var(--project-preview-card-min-h-desktop); }
+  }
 }
 
 /* ---------------------------------------

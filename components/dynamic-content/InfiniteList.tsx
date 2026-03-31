@@ -9,19 +9,18 @@ import { fetchPage, getCachedPages, setCachedPages } from "@/lib/content/resourc
 import { useIntersection } from "@/lib/ui/useIntersection";
 import GridLoadingState from "@/components/layout/GridLoadingState";
 import Grid from "@/components/layout/Grid";
+import BlogArchiveCard from "@/components/dynamic-content/blog/BlogArchiveCard";
+import ProjectArchiveCard from "@/components/dynamic-content/project/ProjectArchiveCard";
 
 import SmartLink from "@/components/utils/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { stripHtml } from "@/lib/content/wp";
 import { lineClampStyle, truncateText } from "@/components/dynamic-content/card-utils";
-import { buildBlogPostHref, buildProjectHref, buildProjectHrefFromUri, ROUTES } from "@/lib/routes";
-import ProjectReviewSnippet from "@/components/dynamic-content/project/ProjectReviewSnippet";
+import { buildProjectHref, ROUTES } from "@/lib/routes";
 
 const smallPillClass =
     "inline-flex min-w-0 max-w-full items-center rounded-xl font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-[0.75rem] sm:text-xs text-slate-800 sm:px-3 sm:py-1 sm:text-sm";
-const largePillClass =
-    "inline-flex min-w-0 max-w-full items-center rounded-xl font-semibold tracking-tight bg-[--brand-orange] px-2.5 py-1 text-sm text-white sm:px-3 sm:py-1 sm:text-sm";
 const pillLabelClass = "block max-w-full truncate";
 
 type Props<T> = {
@@ -68,80 +67,7 @@ const Frame: React.FC<{
     );
 };
 
-const renderBlogItem = (post: PostCard): ReactNode => {
-    const date = post.date ? new Date(post.date) : null;
-    const dateLabel = date && !Number.isNaN(date.getTime())
-        ? new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric" }).format(date)
-        : "";
-    const href = buildBlogPostHref(post.slug) ?? ROUTES.blog;
-    const rawHtml = String(post.excerpt ?? "");
-    const categories = post.categories ?? [];
-    const catList = categories.join(", ");
-    const summarySource = post.contentPlain ?? stripHtml(rawHtml);
-    const summary = truncateText(summarySource, 260);
-
-    return (
-        <article
-            data-title={post.title}
-            data-cats={catList}
-            data-body=""
-            data-body-ready="0"
-            className="blog-card"
-        >
-            <template className="blog-body-src" dangerouslySetInnerHTML={{ __html: rawHtml }} />
-            <SmartLink href={href} className="group block" data-icon-affordance="right">
-                <Card className="overflow-hidden hover:shadow-lg transition">
-                    <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-                        <CardTitle className="text-xl font-semibold">{post.title}</CardTitle>
-                    </CardHeader>
-                    {post.featuredImage?.url ? (
-                        <div
-                            className="relative w-full overflow-hidden bg-blue-200"
-                        >
-                            <Frame
-                                src={post.featuredImage.url}
-                                alt={post.featuredImage.altText ?? post.title}
-                                ratio="16 / 9"
-                                className="object-cover w-full transition-transform duration-300 hover:scale-[1.06]"
-                                sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
-                            />
-                        </div>
-                    ) : (
-                        <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
-                    )}
-                    <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
-                        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
-                            {dateLabel && <span>{dateLabel}</span>}
-                        </div>
-                        {summary && (
-                            <p className="mt-3 text-sm text-slate-600" style={lineClampStyle}>
-                                {summary}
-                            </p>
-                        )}
-                        {categories.length > 0 && (
-                            <div className="mt-3 flex flex-wrap gap-2">
-                                {categories.map((category) => (
-                                    <span
-                                        key={category}
-                                        className={smallPillClass}
-                                    >
-                                        <span className={pillLabelClass}>{category}</span>
-                                    </span>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                    <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
-                        <span className="items-center gap-2 text-md font-semibold tracking-wide">
-                            Read full post
-                            <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
-                        </span>
-                    </CardFooter>
-                </Card>
-            </SmartLink>
-        </article>
-    );
-};
+const renderBlogItem = (post: PostCard): ReactNode => <BlogArchiveCard post={post} />;
 
 const renderVideoItem = (
     video: VideoItem,
@@ -270,116 +196,7 @@ const renderVideoItem = (
     );
 };
 
-const renderProjectItem = (project: ProjectSummary, index: number): ReactNode => {
-    const key = project.slug ?? project.uri ?? index;
-    const materialTypes = project.materialTypes ?? [];
-    const serviceAreas = project.serviceAreas ?? [];
-    const roofColors = project.roofColors ?? [];
-    const taxonomyNames = [...materialTypes, ...serviceAreas, ...roofColors]
-        .map((term) => term?.name)
-        .filter(Boolean)
-        .join(", ");
-    const materialSlugs = materialTypes.map((term) => term?.slug ?? "").filter(Boolean).join(",");
-    const serviceSlugs = serviceAreas.map((term) => term?.slug ?? "").filter(Boolean).join(",");
-    const roofSlugs = roofColors.map((term) => term?.slug ?? "").filter(Boolean).join(",");
-    const searchBody = project.projectDescription ?? "";
-    const projectSummary = truncateText(stripHtml(searchBody), 260);
-    const href =
-        buildProjectHref(project.slug) ??
-        buildProjectHrefFromUri(project.uri) ??
-        project.uri ??
-        ROUTES.project;
-    const heroImage = project.heroImage;
-
-    return (
-        <div className="proj-item group block" data-key={key}>
-            <SmartLink href={href} className="group block rounded-2xl focus-visible:outline-none" data-icon-affordance="right">
-                <Card
-                    className="proj-card overflow-hidden hover:shadow-lg transition"
-                    data-title={project.title}
-                    data-taxes={taxonomyNames}
-                    data-mt={materialSlugs}
-                    data-rc={roofSlugs}
-                    data-sa={serviceSlugs}
-                >
-                    <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-                        <CardTitle className="font-bold text-2xl">{project.title}</CardTitle>
-                    </CardHeader>
-
-                    {heroImage?.url ? (
-                        <div
-                            className="relative w-full overflow-hidden bg-blue-200"
-                        >
-                            <Frame
-                                src={heroImage.url}
-                                alt={heroImage.altText ?? project.title}
-                                ratio="16 / 10"
-                                className="object-cover w-full transition-transform duration-300 hover:scale-[1.06]"
-                                sizes="(min-width: 1024px) 50vw, 100vw"
-                            />
-                        </div>
-                    ) : (
-                        <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
-                    )}
-
-                    <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
-                        {projectSummary && (
-                            <p className="text-slate-600" style={lineClampStyle}>
-                                {projectSummary}
-                            </p>
-                        )}
-
-                        {(materialTypes.length + serviceAreas.length + roofColors.length > 0) && (
-                            <div className="relative mt-4 -mx-5 sm:mx-0">
-                                <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-                                    {materialTypes.map((term) => (
-                                        <span
-                                            key={`mtb-${key}-${term.slug}`}
-                                            className={largePillClass}
-                                        >
-                                            <span className={pillLabelClass}>{term.name}</span>
-                                        </span>
-                                    ))}
-                                    {serviceAreas.map((term) => (
-                                        <span
-                                            key={`sab-${key}-${term.slug}`}
-                                            className={largePillClass}
-                                        >
-                                            <span className={pillLabelClass}>{term.name}</span>
-                                        </span>
-                                    ))}
-                                    {roofColors.map((term) => (
-                                        <span
-                                            key={`rcb-${key}-${term.slug}`}
-                                            className={largePillClass}
-                                        >
-                                            <span className={pillLabelClass}>{term.name}</span>
-                                        </span>
-                                    ))}
-                                </div>
-                                <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent sm:hidden" />
-                                <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent sm:hidden" />
-                            </div>
-                        )}
-
-                        <ProjectReviewSnippet review={project.reviewSnippet} author={project.reviewAuthorName} />
-                    </CardContent>
-
-                    <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
-                        <span className="items-center gap-2 text-lg font-semibold tracking-wide">
-                            View project
-                            <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
-                        </span>
-                    </CardFooter>
-                </Card>
-            </SmartLink>
-
-            <template className="proj-body-src" suppressHydrationWarning>
-                {String(searchBody)}
-            </template>
-        </div>
-    );
-};
+const renderProjectItem = (project: ProjectSummary): ReactNode => <ProjectArchiveCard project={project} />;
 
 export default function InfiniteList<T>({
     kind,
@@ -397,6 +214,10 @@ export default function InfiniteList<T>({
     const baseQuery: ResourceQuery = useMemo(() => ({ first: pageSize, filters }), [pageSize, filters]);
     const serializedFilters = useMemo(() => JSON.stringify(baseQuery.filters ?? {}), [baseQuery.filters]);
     const initialPages = useMemo(() => [initial], [initial]);
+    const effectiveGridLayoutClassName = useMemo(
+        () => ["auto-rows-fr", gridLayoutClassName].filter(Boolean).join(" "),
+        [gridLayoutClassName]
+    );
 
     const [pages, setPages] = useState<PageResult<T>[]>(() => {
         const cached = getCachedPages<T>(kind, baseQuery);
@@ -495,7 +316,7 @@ export default function InfiniteList<T>({
                         onVideoOpen as ((video: VideoItem) => void) | undefined
                     );
             case "project":
-                return (item, index) => renderProjectItem(item as unknown as ProjectSummary, index);
+                return (item) => renderProjectItem(item as unknown as ProjectSummary);
             default:
                 return () => null;
         }
@@ -532,7 +353,7 @@ export default function InfiniteList<T>({
         <>
             <Grid 
                 className={gridClass} 
-                layoutClassName={gridLayoutClassName}
+                layoutClassName={effectiveGridLayoutClassName}
                 data-loading={loading ? "true" : "false"}
             >
                 {items.map((item, index) => {
@@ -550,7 +371,7 @@ export default function InfiniteList<T>({
                     variant={loaderVariant}
                     count={skeletonCountEff}
                     className={gridClass}
-                    layoutClassName={gridLayoutClassName}
+                    layoutClassName={effectiveGridLayoutClassName}
                 />
             )}
 

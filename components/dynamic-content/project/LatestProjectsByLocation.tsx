@@ -63,11 +63,11 @@ export default function LatestProjectsByLocation({
         </SmartLink>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
+      <div className="grid auto-rows-fr grid-cols-1 gap-6 mt-4 sm:grid-cols-2">
         {projects.map((project, index) => (
           <div
             key={project.slug}
-            className="motion-safe:animate-lp-fade-in"
+            className="h-full motion-safe:animate-lp-fade-in"
             style={{ animationDelay: `${index * 60}ms` }}
           >
             <ProjectArchiveCard project={project} />

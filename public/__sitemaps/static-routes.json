@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-03-13T13:12:38.499Z",
+  "generatedAt": "2026-03-31T18:28:58.437Z",
   "routes": [
     {
       "loc": "/",
-      "lastmod": "2026-02-27T15:35:28.275Z"
+      "lastmod": "2026-03-31T18:27:54.414Z"
     },
     {
       "loc": "/about-sonshine-roofing",
@@ -11,35 +11,35 @@
     },
     {
       "loc": "/blog",
-      "lastmod": "2026-03-13T13:12:04.721Z"
+      "lastmod": "2026-03-22T10:44:59.658Z"
     },
     {
       "loc": "/contact-us",
       "lastmod": "2026-02-27T15:35:28.271Z"
     },
     {
-      "loc": "/faq",
-      "lastmod": "2026-02-27T15:35:28.271Z"
+      "loc": "/financing",
+      "lastmod": "2026-03-22T10:44:59.659Z"
     },
     {
-      "loc": "/financing",
-      "lastmod": "2026-03-13T13:11:58.007Z"
+      "loc": "/faq",
+      "lastmod": "2026-02-27T15:35:28.271Z"
     },
     {
       "loc": "/homeowner-referral-program",
       "lastmod": "2026-02-27T15:35:28.273Z"
     },
     {
-      "loc": "/privacy-policy",
-      "lastmod": "2026-03-12T16:25:39.131Z"
-    },
-    {
       "loc": "/project",
-      "lastmod": "2026-03-13T13:12:11.282Z"
+      "lastmod": "2026-03-22T10:44:59.659Z"
     },
     {
       "loc": "/roof-inspection",
-      "lastmod": "2026-03-04T20:03:47.850Z"
+      "lastmod": "2026-03-22T10:44:59.660Z"
+    },
+    {
+      "loc": "/privacy-policy",
+      "lastmod": "2026-03-22T10:44:59.659Z"
     },
     {
       "loc": "/roof-maintenance",
@@ -59,19 +59,19 @@
     },
     {
       "loc": "/sms-terms-and-conditions",
-      "lastmod": "2026-03-12T16:15:20.357Z"
+      "lastmod": "2026-03-22T10:44:59.660Z"
     },
     {
       "loc": "/video-library",
-      "lastmod": "2026-03-13T13:12:17.876Z"
+      "lastmod": "2026-03-22T10:44:59.661Z"
+    },
+    {
+      "loc": "/truck-for-sale",
+      "lastmod": "2026-03-22T10:44:59.661Z"
     },
     {
       "loc": "/homeowner-referral-program/terms-and-conditions",
       "lastmod": "2026-03-03T19:48:55.367Z"
-    },
-    {
-      "loc": "/truck-for-sale",
-      "lastmod": "2026-03-11T17:29:46.856Z"
     },
     {
       "loc": "/roof-maintenance/roof-care-club-terms-and-conditions",

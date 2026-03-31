@@ -94,11 +94,11 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     <>
       <Hero />
       <div className={reviewsLayout}>
-        <HeroTrustBar />
+        <LeadFormSection variant="heroOverlap" />
         <div className="bg-blue-200/50 border border-t-blue-300 border-b-blue-300">
           <ReviewsCarousel />
         </div>
-        <LeadFormSection />
+        <HeroTrustBar variant="inline" />
       </div>
       <div className={narrowLayout}>
         <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] max-w-[1280px] mx-auto items-start">

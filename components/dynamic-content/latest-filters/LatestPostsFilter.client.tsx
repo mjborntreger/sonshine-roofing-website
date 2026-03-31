@@ -125,7 +125,7 @@ export default function LatestPostsFilter({
         </div>
       )}
 
-      <div key={selected} className="grid gap-6 mt-8 sm:grid-cols-2 md:grid-cols-4">
+      <div key={selected} className="grid auto-rows-fr gap-6 mt-8 sm:grid-cols-2 md:grid-cols-4">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];
@@ -133,7 +133,7 @@ export default function LatestPostsFilter({
               return (
                 <div
                   key={slug}
-                  className="motion-safe:animate-lp-fade-in"
+                  className="h-full motion-safe:animate-lp-fade-in"
                   style={{ animationDelay: `${index * 60}ms` }}
                 >
                   {card}

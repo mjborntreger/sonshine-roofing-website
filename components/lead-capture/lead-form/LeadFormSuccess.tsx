@@ -7,11 +7,13 @@ import { Button } from '@/components/ui/button';
 import type { SuccessMeta } from '@/lib/lead-capture/contact-lead';
 import { getSuccessLinks } from '@/components/lead-capture/lead-form/config';
 import { cn } from '@/lib/utils';
+import type { LeadFormLayoutVariant } from './LeadForm';
 
 type LeadFormSuccessProps = {
   successMeta: SuccessMeta;
   onReset: () => void;
   maxWidthClassName?: string;
+  variant?: LeadFormLayoutVariant;
 };
 
 const INFO_BADGE_CLASS = 'inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1';
@@ -20,7 +22,12 @@ const SUCCESS_LINK_CARD_CLASS =
 const SUCCESS_LINK_ICON_WRAPPER_CLASS =
   'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[--brand-blue]/10 text-[--brand-blue]';
 
-export default function LeadFormSuccess({ successMeta, onReset, maxWidthClassName = 'max-w-3xl' }: LeadFormSuccessProps) {
+export default function LeadFormSuccess({
+  successMeta,
+  onReset,
+  maxWidthClassName = 'max-w-3xl',
+  variant = 'default',
+}: LeadFormSuccessProps) {
   const successLinks = useMemo(() => getSuccessLinks(successMeta.projectType), [successMeta.projectType]);
   const hasSharedDetails =
     Boolean(successMeta.timelineLabel) ||
@@ -29,7 +36,7 @@ export default function LeadFormSuccess({ successMeta, onReset, maxWidthClassNam
     Boolean(successMeta.notes);
 
   return (
-    <div className="mt-8 flex justify-center px-4">
+    <div className={cn('flex justify-center px-4', variant === 'default' && 'mt-8')}>
       <div
         className={cn(
           'w-full mx-auto rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-md',

@@ -1,5 +1,9 @@
 import * as React from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  BLOG_PREVIEW_CARD_MIN_HEIGHT_CLASS,
+  PROJECT_PREVIEW_CARD_MIN_HEIGHT_CLASS,
+} from "@/components/dynamic-content/card-utils";
 import { cn } from "@/lib/utils";
 import Skeleton from "@/components/ui/Skeleton";
 
@@ -37,13 +41,15 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(functio
   const cardClassName = cn(
     variant === "video"
       ? "vid-card overflow-hidden transition hover:shadow-lg"
-      : "overflow-hidden hover:shadow-lg transition",
+      : "flex h-full flex-col overflow-hidden transition hover:shadow-lg",
+    variant === "blog" && BLOG_PREVIEW_CARD_MIN_HEIGHT_CLASS,
+    variant === "project" && PROJECT_PREVIEW_CARD_MIN_HEIGHT_CLASS,
     className
   );
   const headerClassName = variant === "video" ? undefined : "px-5 pb-5 pt-5 sm:px-6 sm:pt-6";
-  const contentClassName = "px-5 pb-4 pt-5 sm:px-6 sm:pb-6";
+  const contentClassName = "flex flex-1 flex-col px-5 pb-4 pt-5 sm:px-6 sm:pb-6";
   const footerClassName =
-    "flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6";
+    "mt-auto flex items-center justify-between border-t border-slate-100/60 bg-slate-50/40 px-5 py-4 text-[#0045d7] sm:px-6";
 
   const renderBodyLines = (wrapperClassName?: string) => {
     if (lines === 0) return null;
@@ -72,7 +78,7 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(functio
     const height = size === "small" ? "h-6" : "h-7";
     const width = size === "small" ? "w-16" : "w-24";
     return (
-      <div className={cn("flex flex-wrap gap-2", containerClassName)}>
+      <div className={cn("flex gap-2", containerClassName)}>
         {Array.from({ length: count }).map((_, i) => (
           <Skeleton key={`chip-${size}-${i}`} className={cn(height, width, "rounded-full")} />
         ))}
@@ -80,22 +86,30 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(functio
     );
   };
 
-  const renderProjectPills = () => (
-    <div className="relative mt-4 -mx-5 sm:mx-0">
-      <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-        {Array.from({ length: DEFAULT_CHIP_COUNT }).map((_, i) => (
-          <Skeleton key={`project-pill-${i}`} className="h-7 w-28 min-w-[7rem] rounded-full" />
-        ))}
+  const renderPreviewPillStrip = (size: "small" | "large", slotClassName?: string) => (
+    <div className={cn("relative -mx-5 sm:-mx-6", slotClassName)}>
+      <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:px-6">
+        {renderChipRow(DEFAULT_CHIP_COUNT, size)}
       </div>
-      <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent sm:hidden" />
-      <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent sm:hidden" />
+      <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent" />
+      <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent" />
     </div>
+  );
+
+  const renderProjectPills = () => (
+    renderPreviewPillStrip("large", "mt-4 min-h-[2.875rem]")
   );
 
   return (
     <Card ref={ref} className={cardClassName} {...props}>
       <CardHeader className={headerClassName}>
-        <CardTitle className={variant === "video" ? "font-medium" : "font-semibold"}>
+        <CardTitle
+          className={cn(
+            variant === "video" ? "font-medium" : "font-semibold",
+            variant === "blog" && "min-h-[3rem]",
+            variant === "project" && "min-h-[3.75rem]",
+          )}
+        >
           <Skeleton className="h-6 w-3/4" />
         </CardTitle>
       </CardHeader>
@@ -117,19 +131,29 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(functio
         {variant === "blog" && (
           <>
             {showMeta && (
-              <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+              <div className="flex min-h-5 items-center text-sm text-slate-600">
                 <Skeleton className="h-4 w-24" />
               </div>
             )}
 
-            {renderBodyLines(showMeta ? "mt-3" : "mt-2")}
-            {renderChipRow(DEFAULT_CHIP_COUNT, "small", "mt-3")}
+            <div className="mt-3 min-h-[4.5rem]">
+              {renderBodyLines(showMeta ? undefined : "mt-2")}
+            </div>
+            {renderPreviewPillStrip("small", "mt-3 min-h-[2.75rem]")}
           </>
         )}
 
         {variant === "project" && (
           <>
-            {renderBodyLines()}
+            <div className="min-h-[5.25rem]">
+              {renderBodyLines()}
+            </div>
+            <div className="mt-5 min-h-[8rem] space-y-2">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
             {renderProjectPills()}
           </>
         )}

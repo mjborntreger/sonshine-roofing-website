@@ -20,11 +20,14 @@ const LeadFormWizard = dynamic(() => import('@/components/lead-capture/lead-form
   loading: () => <LeadFormSkeleton />,
 });
 
+export type LeadFormLayoutVariant = 'default' | 'heroOverlap';
+
 type LeadFormProps = {
   restoredSuccess?: LeadSuccessRestore | null;
+  variant?: LeadFormLayoutVariant;
 };
 
-export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
+export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadFormProps = {}) {
   const initialJourneyFromSuccess = useMemo(() => {
     const journey = restoredSuccess?.formPreset.projectType;
     return journey && isJourneyKey(journey) ? journey : null;
@@ -63,11 +66,12 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
     setShowWizard(false);
   }, []);
   const stepZeroHeading = renderHighlight('How can we help?', 'we help');
+  const formSpacingClassName = variant === 'heroOverlap' ? 'px-4' : 'px-4 py-16';
 
   return (
     <div id="get-started">
       {!showWizard && (
-        <div className="px-4 py-16" ref={containerRef}>
+        <div className={formSpacingClassName} ref={containerRef}>
           <LeadFormStepShell
             stepLabel="Step 1 of 4"
             title={stepZeroHeading}
@@ -115,6 +119,7 @@ export default function LeadForm({ restoredSuccess }: LeadFormProps = {}) {
           initialJourney={selectedJourney}
           onResetSuccess={handleWizardReset}
           utm={utm}
+          variant={variant}
         />
       )}
     </div>

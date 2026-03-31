@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowUpRight, BadgeCheck } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import { renderHighlight } from "@/components/utils/renderHighlight";
+import { cn } from "@/lib/utils";
 
 // LINKS
 const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
@@ -23,6 +24,7 @@ const NEXTDOOR_LOGO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/N
 type HeroTrustBarProps = {
   heading?: string;
   highlightText?: string;
+  variant?: "heroOverlap" | "inline";
 };
 
 // REVIEW LINK STYLES
@@ -185,13 +187,19 @@ const BADGES = [
 export default function HeroTrustBar({
   heading = DEFAULT_HEADING,
   highlightText = DEFAULT_HEADING_HIGHLIGHT,
+  variant = "heroOverlap",
 }: HeroTrustBarProps = {}) {
   const renderedHeading = renderHighlight(heading, highlightText);
 
   return (
     <section
       aria-label="Trust indicators and recognitions"
-      className="relative mt-[-12rem] isolate w-full bg-gradient-to-b from-transparent via-[--brand-cyan] to-[#cef3ff] pb-12 pt-16"
+      className={cn(
+        "relative isolate w-full",
+        variant === "heroOverlap"
+          ? "mt-[-12rem] bg-gradient-to-b from-transparent via-[--brand-cyan] to-[#cef3ff] pb-12 pt-16"
+          : "bg-[#cef3ff] py-12"
+      )}
     >
       <div className="relative mx-auto flex max-w-[1440px] flex-col gap-6 px-4 sm:px-4 lg:px-10">
         <div className="rounded-3xl border border-blue-100 bg-blue-50 p-4 md:p-6 lg:p-8 shadow-xl">

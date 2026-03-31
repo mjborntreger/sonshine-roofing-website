@@ -125,7 +125,7 @@ export default function LatestProjectsFilter({
         </div>
       )}
 
-      <div key={selected} className="grid gap-6 mt-8 grid-cols-1 sm:grid-cols-2">
+      <div key={selected} className="grid auto-rows-fr gap-6 mt-8 grid-cols-1 sm:grid-cols-2">
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];
@@ -133,7 +133,7 @@ export default function LatestProjectsFilter({
               return (
                 <div
                   key={slug}
-                  className="motion-safe:animate-lp-fade-in"
+                  className="h-full motion-safe:animate-lp-fade-in"
                   style={{ animationDelay: `${index * 60}ms` }}
                 >
                   {card}

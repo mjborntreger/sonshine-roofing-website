@@ -297,7 +297,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
       {structuredData ? <JsonLd data={structuredData} /> : null}
       <Hero title={`One of The Best Roofing Companies in ${location.locationName} for Over 38 Years`} />
       <div className={reviewsLayout}>
-        <HeroTrustBar heading={heroTrustHeading} />
+        <LeadFormSection variant="heroOverlap" />
         <div className="bg-blue-200/50 border border-t-blue-200 border-b-blue-200">
           {hasDisplayReviews ? (
             <ReviewsCarousel
@@ -308,10 +308,12 @@ export default async function LocationPage({ params }: { params: Promise<Params>
               fallbackToRemote={true}
             />
           ) : (
-            <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
+            <div className="mx-auto max-w-[1280px] px-4 py-10 text-center">
+              <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
+            </div>
           )}
         </div>
-        <LeadFormSection />
+        <HeroTrustBar heading={heroTrustHeading} variant="inline" />
       </div>
 
       <main className={narrowLayout}>

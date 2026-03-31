@@ -76,7 +76,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'repair',
     label: 'Roof Repair',
-    description: 'FREE ESTIMATE | Fast, Friendly, & Professional.',
+    description: 'GET A FREE ESTIMATE | Fast, Friendly, & Professional.',
     icon: Droplets,
     accent: 'border-rose-200 bg-rose-50 text-rose-600',
     action: 'advance',
@@ -86,7 +86,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'retail',
     label: 'Roof Replacement',
-    description: 'FREE QUOTE | Shingle, Metal, Tile, & Flat,',
+    description: 'GET A FREE QUOTE | Shingle, Metal, Tile, & Flat,',
     icon: Hammer,
     accent: 'border-amber-200 bg-amber-50 text-amber-600',
     action: 'advance',
@@ -96,17 +96,18 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'maintenance',
     label: 'Roof Inspection',
-    description: 'TIP TOP ROOF CHECK-UP | 18-point Inspection.',
+    description: 'Schedule a TIP TOP ROOF CHECK-UP | 18-point Inspection.',
     icon: Wrench,
     accent: 'border-emerald-200 bg-emerald-50 text-emerald-600',
-    action: 'advance',
+    action: 'link',
+    href: '/roof-inspection',
     imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
     imageAlt: 'Technician performing light roof repairs and an inspection',
   },
   {
     value: 'financing-link',
     label: 'Browse Financing',
-    description: 'Take a short quiz to discover your ideal financing plan.',
+    description: 'Take a short quiz to discover your ideal financing plan. No credit check.',
     icon: HandCoins,
     accent: 'border-sky-200 bg-sky-50 text-sky-600',
     action: 'link',
@@ -117,7 +118,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'project-gallery',
     label: 'See Our Past Work',
-    description: 'Roofing Project Gallery | Shingle, Metal, & Tile',
+    description: 'See our Roofing Project Gallery | Shingle, Metal, & Tile',
     icon: Star,
     accent: 'border-purple-200 bg-purple-50 text-purple-600',
     action: 'link',
@@ -128,7 +129,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'something-else',
     label: 'Something Else / Not Sure',
-    description: "Warranties, Skylights, or just have a few questions",
+    description: "Warranties, Skylights, Roof Care Club membership, or just have a few questions",
     icon: MessageCircle,
     accent: 'border-violet-200 bg-violet-50 text-violet-600',
     action: 'advance',

@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { deleteCookie } from '@/lib/telemetry/client-cookies';
+import type { LeadFormLayoutVariant } from './LeadForm';
 import {
   LEAD_SUCCESS_COOKIE,
   LeadSuccessCookiePayload,
@@ -111,6 +112,7 @@ type LeadFormWizardProps = {
   initialJourney?: JourneyKey | null;
   onResetSuccess?: () => void;
   utm?: LeadFormUtmParams;
+  variant?: LeadFormLayoutVariant;
 };
 
 const HISTORY_STATE_KEY = 'leadFormWizard' as const;
@@ -256,6 +258,7 @@ export default function LeadFormWizard({
   initialJourney: initialJourneyProp,
   onResetSuccess,
   utm: utmProp,
+  variant = 'default',
 }: LeadFormWizardProps = {}) {
   const router = useRouter();
   const restoredSuccess = useMemo(
@@ -810,11 +813,11 @@ export default function LeadFormWizard({
     };
 
   if (status === 'success' && successMeta) {
-    return <LeadFormSuccess successMeta={successMeta} onReset={handleResetSuccess} />;
+    return <LeadFormSuccess successMeta={successMeta} onReset={handleResetSuccess} variant={variant} />;
   }
 
   return (
-    <form ref={formRef} className="px-4 py-16" onSubmit={handleSubmit} noValidate>
+    <form ref={formRef} className={variant === 'heroOverlap' ? 'px-4' : 'px-4 py-16'} onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
       <input type="hidden" name="projectType" value={form.projectType} />
       <input type="hidden" name="helpTopics" value={helpSummary} />

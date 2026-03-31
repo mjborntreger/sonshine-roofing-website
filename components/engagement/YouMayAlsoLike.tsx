@@ -276,12 +276,12 @@ export default function YouMayAlsoLike(props: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+        <div className="grid auto-rows-fr grid-cols-1 gap-6 md:grid-cols-4">
           {projectItems.map((item, index) => (
             <ProjectArchiveCard
               key={item.slug}
               project={toProjectSummary(item)}
-              className="motion-safe:animate-lp-fade-in"
+              className="h-full motion-safe:animate-lp-fade-in"
               style={{ animationDelay: `${index * 60}ms` }}
             />
           ))}
@@ -321,12 +321,12 @@ export default function YouMayAlsoLike(props: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+      <div className="grid auto-rows-fr grid-cols-1 gap-6 md:grid-cols-4">
         {blogItems.map((item, index) => (
           <BlogArchiveCard
             key={item.slug}
             post={toPostCard(item)}
-            className="motion-safe:animate-lp-fade-in"
+            className="h-full motion-safe:animate-lp-fade-in"
             style={{ animationDelay: `${index * 60}ms` }}
           />
         ))}

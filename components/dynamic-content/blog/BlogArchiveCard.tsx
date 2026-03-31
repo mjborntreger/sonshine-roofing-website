@@ -5,8 +5,14 @@ import SmartLink from "@/components/utils/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PostCard } from "@/lib/content/wp";
 import { stripHtml } from "@/lib/content/wp";
-import { lineClampStyle, truncateText } from "@/components/dynamic-content/card-utils";
+import {
+  BLOG_PREVIEW_CARD_MIN_HEIGHT_CLASS,
+  lineClampStyle,
+  titleClampStyle,
+  truncateText,
+} from "@/components/dynamic-content/card-utils";
 import { buildBlogPostHref, ROUTES } from "@/lib/routes";
+import { cn } from "@/lib/utils";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -30,25 +36,33 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
   const dateLabel = date && !Number.isNaN(date.getTime()) ? dateFormatter.format(date) : "";
   const summarySource = post.contentPlain || stripHtml(post.excerpt || "");
   const summary = truncateText(summarySource, 260);
+  const categories = post.categories ?? [];
 
   return (
-    <SmartLink
-      href={href}
-      className={`group block ${className ?? ""}`}
-      style={style}
-      title={post.title}
-      data-icon-affordance="right"
-    >
-      <Card className="overflow-hidden hover:shadow-lg transition">
+    <div className={cn("h-full", className)} style={style}>
+      <SmartLink
+        href={href}
+        className="group block h-full rounded-3xl focus-visible:outline-none"
+        title={post.title}
+        data-icon-affordance="right"
+      >
+        <Card
+          className={cn(
+            "flex h-full flex-col overflow-hidden transition hover:shadow-lg",
+            BLOG_PREVIEW_CARD_MIN_HEIGHT_CLASS,
+          )}
+        >
           <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-            <CardTitle className="font-bold">{post.title}</CardTitle>
+            <CardTitle className="min-h-[3rem] font-bold leading-tight" style={titleClampStyle}>
+              {post.title}
+            </CardTitle>
           </CardHeader>
 
-          {post.featuredImage?.url ? (
-            <div
-              className="relative w-full overflow-hidden bg-slate-100"
-              style={{ aspectRatio: "16 / 9" }}
-            >
+          <div
+            className="relative w-full overflow-hidden bg-slate-100"
+            style={{ aspectRatio: "16 / 9" }}
+          >
+            {post.featuredImage?.url ? (
               <Image
                 fill
                 src={post.featuredImage.url}
@@ -56,25 +70,27 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
                 sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
                 className="object-cover transition-transform duration-300 hover:scale-[1.06]"
               />
-            </div>
-          ) : (
-            <div className="w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
-          )}
-
-          <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
-            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
-              {dateLabel && <span>{dateLabel}</span>}
-            </div>
-
-            {summary && (
-              <p className="mt-3 text-sm text-slate-600" style={lineClampStyle}>
-                {summary}
-              </p>
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
             )}
+          </div>
 
-            {(post.categories?.length ?? 0) > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {post.categories.map((cat) => (
+          <CardContent className="flex flex-1 flex-col px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
+            <div className="flex min-h-5 items-center text-sm text-slate-600">
+              {dateLabel ? <span>{dateLabel}</span> : null}
+            </div>
+
+            <div className="mt-3 min-h-[4.5rem]">
+              {summary ? (
+                <p className="text-sm leading-6 text-slate-600" style={lineClampStyle}>
+                  {summary}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="relative mt-3 min-h-[2.75rem] -mx-5 sm:-mx-6">
+              <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:px-6">
+                {categories.map((cat) => (
                   <span
                     key={cat}
                     className={pillClass}
@@ -83,16 +99,19 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
                   </span>
                 ))}
               </div>
-            )}
+              <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent" />
+              <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent" />
+            </div>
           </CardContent>
 
-          <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
-            <span className="items-center gap-2 text-md font-semibold tracking-wide">
+          <CardFooter className="mt-auto flex justify-end border-t border-blue-200 bg-blue-50 px-5 py-4 font-semibold text-slate-700 sm:px-6">
+            <span className="inline-flex items-center gap-2 text-md font-semibold tracking-wide">
               Read full article
               <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
             </span>
           </CardFooter>
-      </Card>
-    </SmartLink>
+        </Card>
+      </SmartLink>
+    </div>
   );
 }
