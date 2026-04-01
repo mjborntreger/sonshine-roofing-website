@@ -183,7 +183,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
   "/homeowner-referral-program": {
     title: "Homeowner Referral Program | SonShine Roofing",
     description:
-      "Earn $250 per qualified roof replacement referral and share the SonShine Roofing experience.",
+      "Learn who can refer SonShine Roofing, what projects qualify, and how to earn $250 per qualified full roof replacement referral.",
     keywords: [
       "homeowner referral program",
       "roofing referral program",

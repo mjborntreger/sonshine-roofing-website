@@ -49,11 +49,11 @@ type OpenOrClosedProps = {
  */
 const DEFAULT_HOURS: WeeklyHours = {
   0: [], // Sun
-  1: [{ open: '07:00', close: '17:30' }],
-  2: [{ open: '07:00', close: '17:30' }],
-  3: [{ open: '07:00', close: '17:30' }],
-  4: [{ open: '07:00', close: '17:30' }],
-  5: [{ open: '07:00', close: '17:30' }],
+  1: [{ open: '07:00', close: '16:00' }],
+  2: [{ open: '07:00', close: '16:00' }],
+  3: [{ open: '07:00', close: '16:00' }],
+  4: [{ open: '07:00', close: '16:00' }],
+  5: [{ open: '07:00', close: '16:00' }],
   6: [], // Sat
 };
 

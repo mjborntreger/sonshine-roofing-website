@@ -1,8 +1,9 @@
 import Section from "@/components/layout/Section";
-import RevealEmail from "@/components/utils/RevealEmail";
+import SmartLink from "@/components/utils/SmartLink";
 import RevealPhone from "@/components/utils/RevealPhone";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import type { Metadata } from "next";
+import { ArrowLeft } from "lucide-react";
 
 const PAGE_PATH = "/homeowner-referral-program/terms-and-conditions";
 const SEO_TITLE = "Homeowner Referral Program Terms and Conditions | SonShine Roofing";
@@ -23,12 +24,23 @@ export default function ReferralProgramTermsPage() {
     <Section>
       <div className="container-edge py-10">
         <div className="prose">
+          <div className="not-prose mb-6">
+            <SmartLink
+              href="/homeowner-referral-program"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 underline-offset-2 hover:underline"
+              aria-label="Back to the homeowner referral program page"
+            >
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Back to Referral Program
+            </SmartLink>
+          </div>
           <h1>SonShine Roofing Referral Program - Terms & Conditions (2026)</h1>
           <p><strong>Effective Date:</strong> January 1, 2026</p>
           <p>
             The SonShine Roofing Referral Program (&quot;Program&quot;) is offered by SonShine
-            Roofing Inc. (&quot;SonShine,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) to reward eligible past
-            customers for referring new roof replacement customers.
+            Roofing Inc. (&quot;SonShine,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) to reward eligible
+            participants for legitimate, good-faith referrals that lead to qualifying full
+            roof replacement projects within our service area.
           </p>
           <p>
             By participating in the Program, you agree to the following Terms and Conditions.
@@ -36,80 +48,97 @@ export default function ReferralProgramTermsPage() {
 
           <h2>1. Eligibility</h2>
           <p>
-            The Referral Program is open only to past SonShine Roofing customers who
-            have previously completed a roof repair or roof replacement project with
-            SonShine Roofing.
+            The Program is open to past paying SonShine Roofing customers, current
+            SonShine Roofing customers, and Roof Care Club members.
           </p>
-          <p>The referred individual must be:</p>
+          <p>To qualify under the Program, the referred person should be:</p>
           <ul>
-            <li>A new customer to SonShine Roofing (no prior contracts for roof replacement with SonShine).</li>
             <li>The legal owner of the property receiving the roof replacement.</li>
-            <li>Located within SonShine Roofing&rsquo;s service area.</li>
+            <li>
+              Seeking service for a property located within SonShine Roofing&rsquo;s service
+              area: Sarasota County, Florida; Manatee County, Florida; or Charlotte
+              County, Florida.
+            </li>
           </ul>
           <p>
-            Employees of SonShine Roofing, their immediate family members, and
-            subcontractors are not eligible to participate.
+            SonShine reserves the right to verify eligibility, service area, and referral
+            details at any time.
           </p>
-          <p>SonShine reserves the right to verify eligibility at its sole discretion.</p>
 
           <h2>2. Referral Qualification Requirements</h2>
           <p>To qualify for a referral reward:</p>
-          <p>The referred customer must:</p>
           <ul>
-            <li>Contact SonShine Roofing and explicitly mention the referrer&rsquo;s name at the time of initial contact.</li>
-            <li>Schedule and complete a roof replacement estimate.</li>
-            <li>Enter into a signed contract with SonShine Roofing for a full roof replacement.</li>
-            <li>Successfully complete the roof replacement project.</li>
-            <li>Pay the contract price in full.</li>
+            <li>The referral must relate to a full roof replacement project.</li>
+            <li>
+              Roof repairs, inspections, maintenance services, and partial roofing
+              projects do not qualify.
+            </li>
+            <li>Self-referrals do not qualify.</li>
+            <li>
+              The referred person may contact SonShine Roofing by calling{" "}
+              <a href="tel:+19418664320">(941) 866-4320</a> during business hours or by
+              submitting a contact request at{" "}
+              <a href="https://sonshineroofing.com/contact-us">
+                https://sonshineroofing.com/contact-us
+              </a>.
+            </li>
+            <li>
+              When reaching out, the referred person should provide the referrer&rsquo;s
+              name, phone number, and preferred email address.
+            </li>
+            <li>
+              A referral may still be credited after initial contact if SonShine receives
+              the referral information before the sale is made. Once the job is approved,
+              the referral-credit window closes.
+            </li>
+            <li>
+              A referral becomes a qualified referral only after the referred full roof
+              replacement job is approved, completed, and paid in full.
+            </li>
           </ul>
           <p>
-            The referral reward will only be issued after the roof replacement project
-            is fully completed and paid in full.
-          </p>
-          <p>
-            Estimates alone do not qualify. Repairs do not qualify. Partial projects do not qualify.
+            Estimates, consultations, and inquiries alone do not qualify for a reward.
           </p>
 
           <h2>3. Referral Reward</h2>
           <p>
-            Eligible referrers will receive $250 per qualified roof replacement referral,
-            as advertised in the official SonShine Roofing Referral Program materials
-            (New Roof Care Club Whitepaper _...).
+            Eligible referrers will receive $250 for each qualified referral.
           </p>
           <p>
-            Payment will be made via ACH transfer (or other method at SonShine&rsquo;s discretion)
-            within a reasonable processing period following project completion and full payment.
-          </p>
-          <p>The referrer is responsible for providing accurate payment information.</p>
-          <p>
-            Referrers are responsible for any applicable tax reporting obligations related
-            to referral payments.
+            Payment is made by check mailed by SonShine Roofing within 7 business days
+            after the referred job reaches paid in full status.
           </p>
 
           <h2>4. Limitations & Restrictions</h2>
-          <p>Referral rewards are paid only when a roof replacement is successfully purchased and completed.</p>
           <p>
-            The Program applies to roof replacement projects only. Roof repairs, inspections,
-            maintenance services, or other services do not qualify.
+            There is no fixed cap on the number of referral rewards an eligible referrer
+            may earn.
           </p>
           <p>
-            The Program is limited to legitimate, good-faith referrals. Self-referrals are not permitted.
+            The Program is limited to legitimate, good-faith referrals. SonShine reserves
+            the right to decline, deny, or refuse any referral reward if we determine that
+            referral activity is spammy, abusive, manipulated, suspicious, bad-faith, or
+            otherwise illegitimate.
           </p>
           <p>
-            If multiple individuals claim the same referral, SonShine Roofing will determine,
-            in its sole discretion, which referrer (if any) qualifies based on documentation and timing.
+            If multiple parties claim the same referral, SonShine will review the facts
+            and determine in its sole discretion whether any referral credit will be given
+            and to whom.
           </p>
           <p>
-            Referrals must be submitted before or at the time of the referred party&rsquo;s first
-            contact with SonShine Roofing. Retroactive referrals will not be honored.
+            Referral rewards are paid only for qualified full roof replacement jobs that
+            are completed and paid in full.
           </p>
 
           <h2>5. Program Changes & Termination</h2>
           <p>SonShine Roofing reserves the right to:</p>
           <ul>
             <li>Modify, suspend, or terminate the Referral Program at any time.</li>
-            <li>Change reward amounts.</li>
-            <li>Refuse payment if fraud, abuse, or manipulation of the Program is suspected.</li>
+            <li>Change reward amounts or eligibility rules for future referrals.</li>
+            <li>
+              Refuse payment if fraud, abuse, manipulation, or other misuse of the Program
+              is suspected.
+            </li>
           </ul>
           <p>
             Any changes will not affect referral rewards already earned prior to modification.
@@ -123,21 +152,28 @@ export default function ReferralProgramTermsPage() {
           <p>Referrers are not authorized to:</p>
           <ul>
             <li>Negotiate pricing,</li>
-            <li>Make binding representations,</li>
-            <li>Present themselves as employees or agents of SonShine Roofing.</li>
+            <li>Make binding promises, warranties, or representations,</li>
+            <li>Present themselves as employees, agents, partners, or representatives of SonShine Roofing.</li>
           </ul>
 
           <h2>7. Discretion & Final Authority</h2>
           <p>
-            All determinations regarding eligibility, qualification, and reward payment are
-            made at the sole discretion of SonShine Roofing. All decisions are final.
+            SonShine Roofing reserves the right to verify eligibility, referral ownership,
+            project qualification, and compliance with these Terms. All determinations
+            regarding eligibility, duplicate claims, qualification, and reward payment are
+            made in SonShine&rsquo;s sole discretion, and all decisions are final.
           </p>
 
           <h2>8. Contact Information</h2>
-          <p>For questions regarding the Referral Program:</p>
+          <p>
+            For questions about referral status, payout status, disputes, duplicate claims,
+            or program eligibility, contact SonShine Roofing directly at:
+          </p>
           <address className="not-italic">
-            <RevealPhone e164="+19413779933" display="(941) 377-9933" />
-            <RevealEmail encoded="bWFya2V0aW5nQHNvbnNoaW5lcm9vZmluZy5jb20=" />
+            <div>
+              <RevealPhone e164="+19418664320" display="(941) 866-4320" />
+            </div>
+            <div>Monday through Friday, 7:30 AM to 4:00 PM EST</div>
           </address>
         </div>
       </div>

@@ -1,7 +1,9 @@
 import Section from "@/components/layout/Section";
 import RevealEmail from "@/components/utils/RevealEmail";
 import RevealPhone from "@/components/utils/RevealPhone";
+import SmartLink from "@/components/utils/SmartLink";
 import { buildBasicMetadata } from "@/lib/seo/meta";
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
 const PAGE_PATH = "/roof-maintenance/roof-care-club-terms-and-conditions";
@@ -22,6 +24,16 @@ export default function RoofCareClubTermsPage() {
   return (
     <Section>
       <div className="container-edge py-10">
+        <div className="not-prose mb-6">
+            <SmartLink
+              href="/roof-maintenance#roof-care-club"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 underline-offset-2 hover:underline"
+              aria-label="Back to the Roof Care Club page"
+            >
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Back to Roof Care Club
+            </SmartLink>
+          </div>
         <div className="prose">
           <h1>Roof Care Club Terms and Conditions</h1>
           <p><strong>Effective Date:</strong> 02/10/2026</p>

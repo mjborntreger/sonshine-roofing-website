@@ -148,7 +148,7 @@ export default async function Page() {
                 </div>
               }
             >
-              <SimpleLeadForm />
+              <SimpleLeadForm selectableProjectTypes={['repair', 'retail', 'maintenance', 'something-else']} />
             </Suspense>
           </div>
           <div className="lg:sticky top-16 self-start">

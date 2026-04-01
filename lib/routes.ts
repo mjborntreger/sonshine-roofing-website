@@ -7,6 +7,7 @@ export const routes = [
   { href: "/roof-repair", label: "Roof Repair" },
   { href: "/roof-inspection", label: "Roof Inspection" },
   { href: "/roof-maintenance", label: "Roof Maintenance" },
+  { href: "/homeowner-referral-program", label: "Referral Program"},
 
   // Resources
   { href: "/project", label: "Project Gallery" },
@@ -38,6 +39,7 @@ export const ROUTES = {
   roofRepair: '/roof-repair' as Route,
   roofInspection: '/roof-inspection' as Route,
   roofMaintenance: '/roof-maintenance' as Route,
+  referralProgram: '/homeowner-referral-program' as Route,
   project: '/project' as Route,
   videoLibrary: '/video-library' as Route,
   blog: '/blog' as Route,
@@ -124,10 +126,13 @@ export const NAV_MAIN: ReadonlyArray<NavItem> = [
   { label: 'About', href: ROUTES.about },
   {
     label: 'Roofing Services',
-    children: SERVICE_ROUTE_DEFINITIONS.map(({ label, key }) => ({
-      label,
-      href: buildServiceHref(key) as Route, // widen when enabling location-scoped service variants
-    })),
+    children: [
+      ...SERVICE_ROUTE_DEFINITIONS.map(({ label, key }) => ({
+        label,
+        href: buildServiceHref(key) as Route, // widen when enabling location-scoped service variants
+      })),
+      { label: 'Referral Program', href: ROUTES.referralProgram },
+    ],
   },
   {
     label: 'Our Work',
@@ -155,6 +160,7 @@ export const NAV_SERVICES: ReadonlyArray<{ label: string; href: Route }> = [
     label,
     href: buildServiceHref(key) as Route, // widen when enabling location-scoped service variants
   })),
+  { label: 'Referral Program', href: ROUTES.referralProgram },
 ] as const;
 
 export const NAV_RESOURCES: ReadonlyArray<{ label: string; href: Route }> = [

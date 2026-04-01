@@ -176,15 +176,15 @@ export default function Footer() {
               </h3>
               <dl className="grid grid-cols-2 pr-8 mt-4 text-sm gap-x-1 gap-y-3">
                 <dt className={hoursStyles}>Mon.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
                 <dt className={hoursStyles}>Tues.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
                 <dt className={hoursStyles}>Wed.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
                 <dt className={hoursStyles}>Thurs.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
                 <dt className={hoursStyles}>Fri.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 5:30p</dd>
+                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
                 <dt className={hoursStyles}>Sat.</dt>
                 <dd className={`${hoursStyles} text-right whitespace-nowrap`}>Closed</dd>
                 <dt className={hoursStyles}>Sun.</dt>

@@ -28,6 +28,7 @@ import { cn } from '@/lib/utils';
 import {
   PROJECT_OPTIONS,
   STANDARD_TIMELINE_OPTIONS,
+  isJourneyKey,
   type JourneyKey,
   type ProjectOption,
   getTimelineLabelForDisplay,
@@ -92,9 +93,25 @@ const INITIAL_STATE: FormState = {
   smsMarketingConsent: '',
 };
 
-const SIMPLE_PROJECT_OPTIONS = PROJECT_OPTIONS.filter(
-  (option): option is ProjectOption & { action: 'advance'; value: JourneyKey } => option.action === 'advance'
-);
+const DEFAULT_SELECTABLE_PROJECT_TYPES = PROJECT_OPTIONS.reduce<JourneyKey[]>((acc, option) => {
+  if (option.action === 'advance' && isJourneyKey(option.value)) {
+    acc.push(option.value);
+  }
+  return acc;
+}, []);
+
+function getSelectableProjectOptions(selectableProjectTypes: readonly JourneyKey[]): Array<ProjectOption & { value: JourneyKey }> {
+  const allowedProjectTypes = new Set(selectableProjectTypes);
+
+  return PROJECT_OPTIONS.filter(
+    (option): option is ProjectOption & { value: JourneyKey } =>
+      isJourneyKey(option.value) && allowedProjectTypes.has(option.value)
+  );
+}
+
+type SimpleLeadFormProps = {
+  selectableProjectTypes?: readonly JourneyKey[];
+};
 
 type RoofTypeValue = 'shingle' | 'metal' | 'tile' | 'flat';
 
@@ -161,8 +178,14 @@ function buildSuccessMetaFromPayload(payload: LeadSuccessCookiePayload): Success
   };
 }
 
-export default function SimpleLeadForm() {
+export default function SimpleLeadForm({
+  selectableProjectTypes = DEFAULT_SELECTABLE_PROJECT_TYPES,
+}: SimpleLeadFormProps = {}) {
   const parsedCookie = useMemo(() => parseLeadSuccessCookie(), []);
+  const projectOptions = useMemo(
+    () => getSelectableProjectOptions(selectableProjectTypes),
+    [selectableProjectTypes]
+  );
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
@@ -498,7 +521,7 @@ export default function SimpleLeadForm() {
                 <h3 className={SECTION_TITLE_BASE_CLASS}>How can we help?</h3>
                 <p className={SECTION_EYELASH}>Helps us route you faster</p>
                 <div className="mt-3 grid grid-cols-2 gap-4 md:grid-cols-4">
-                  {SIMPLE_PROJECT_OPTIONS.map((option) => {
+                  {projectOptions.map((option) => {
                     const selected = form.projectType === option.value;
                     return (
                       <button

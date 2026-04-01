@@ -175,7 +175,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
   );
 
   return (
-    <div aria-labelledby="roof-care-club" className="mt-2 mb-12 not-prose">
+    <div aria-labelledby="roof-care-club" className="mt-2 mb-12 not-prose" id="roof-care-club">
       <JsonLd data={serviceLd} />
       {/* Cards */}
       <div className="not-prose max-w-4xl mx-auto">

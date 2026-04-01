@@ -15,6 +15,8 @@ import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
 import { ArrowRight, HandCoins, HardHat, HelpCircle, MapPin, Phone, ShieldCheck, Zap } from "lucide-react";
 import { STRIPE_PAYMENT_LINK } from "@/components/marketing/service-pages/TipTopRoofCheckup";
+import { Suspense } from "react";
+import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
 
 const SERVICE_PATH = "/roof-inspection";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -124,7 +126,16 @@ export default async function Page() {
 
             <div className="bg-slate-200 h-[1px] my-8" />
 
-            <div className="not-prose flex flex-row justify-between">
+            <Suspense fallback={null}>
+              <EvenSimplerLeadForm
+                projectType="maintenance"
+                page="/roof-inspection"
+                title="Book a Roof Inspection Today"
+                titleHighlight="Roof Inspection"
+              />
+            </Suspense>
+
+            <div className="mt-16 not-prose flex flex-row justify-between">
               <h3 className="mb-3 text-xl text-slate-700 md:text-2xl">
                 <HelpCircle className="text-[--brand-blue] h-5 w-5 inline mr-2" aria-hidden="true" />
                 Why Do I Need a Roof Inspection?

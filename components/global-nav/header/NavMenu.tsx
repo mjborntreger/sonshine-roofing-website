@@ -40,6 +40,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "Roof Repair": Wrench,
   "Roof Inspection": Search,
   "Roof Maintenance": ShieldCheck,
+  "Referral Program": HandCoins,
   "Our Work": Eye,
   "Project Gallery": ImageIcon,
   "Video Library": PlayCircle,
