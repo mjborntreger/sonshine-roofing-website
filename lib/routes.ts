@@ -173,9 +173,10 @@ export const NAV_RESOURCES: ReadonlyArray<{ label: string; href: Route }> = [
 
 export const NAV_LOCATIONS: ReadonlyArray<{ label: string; href: Route }> = [
   { label: 'Sarasota, FL', href: '/locations/sarasota' as Route },
-  { label: 'North Port, FL', href: '/locations/north-port' as Route },
+  { label: 'Bradenton, FL', href: '/locations/bradenton' as Route },
   { label: 'Lakewood Ranch, FL', href: '/locations/lakewood-ranch' as Route },
   { label: 'Venice, FL', href: '/locations/venice' as Route },
+  { label: 'North Port, FL', href: '/locations/north-port' as Route },
   // add in more as location posts are created
 ];
 

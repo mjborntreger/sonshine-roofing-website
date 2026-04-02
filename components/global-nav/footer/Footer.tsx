@@ -154,7 +154,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Locations */}
+            {/* Dynamic Location Pages */}
             <div>
               <h3 className={h3Styles}>Service Areas</h3>
               <ul className="mt-4 space-y-3 text-sm">
@@ -165,6 +165,12 @@ export default function Footer() {
                     </SmartLink>
                   </li>
                 ))}
+                {/* Hardcoded Locations (no href yet) */}
+                  <li className={linkStyles}>Palmetto, FL</li>
+                  <li className={linkStyles}>Parrish, FL</li>
+                  <li className={linkStyles}>Myakka City, FL</li>
+                  <li className={linkStyles}>Port Charlotte, FL</li>
+                  <li className={linkStyles}>Punta Gorda, FL</li>
               </ul>
             </div>
 
