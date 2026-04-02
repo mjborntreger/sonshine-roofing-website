@@ -170,9 +170,9 @@ export default function Header() {
           />
         </SmartLink>
         <SmartLink className="align-baseline phone-affordance text-right" href="tel:+19418664320">
-          <div className="bg-orange-500 hover:bg-orange-400 transition-colors text-white border shadow-sm md:hidden border-white text-xs font-medium rounded-lg px-3 py-1 phone">
-            <Phone className="phone-affordance-icon inline h-3 w-3 mr-1" />
-            (941) 866-4320
+          <div className="bg-orange-500 hover:bg-orange-400 transition-colors text-white border shadow-sm md:hidden border-white text-sm font-medium rounded-lg px-3 py-1 phone">
+            <Phone className="hidden phone-affordance-icon sm:inline h-3 w-3 mr-1" />
+            941-866-4320
           </div>
         </SmartLink>
         <NavMenu transparent={isTransparent} />

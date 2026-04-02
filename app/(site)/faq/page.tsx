@@ -100,8 +100,8 @@ export default async function FAQArchivePage(_: PageProps) {
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           {/* LEFT: main content */}
           <div>
-            <h1 className="text-3xl font-semibold">Frequently Asked Questions</h1>
-            <p className="mt-2 text-slate-600">
+            <h1 className="text-3xl md:text-5xl font-semibold">Frequently Asked Questions</h1>
+            <p className="mt-4 text-slate-600 md:text-lg">
               Answers to common roofing questions from our team in Sarasota. If you can’t find what you need,
               we’re one call away.
             </p>

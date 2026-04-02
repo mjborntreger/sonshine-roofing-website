@@ -72,9 +72,9 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
     <div className="mb-8 mt-24 px-2" data-toc-exclude>
       <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start justify-start gap-4">
-          <h2 className="flex items-center gap-2 text-center text-3xl font-semibold text-slate-800 sm:text-left md:text-4xl">
+          <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-800 md:text-4xl">
             <HelpCircle
-              className="mr-1 inline h-7 w-7 text-[--brand-blue] md:h-9 md:w-9"
+              className="mr-1 hidden sm:inline h-7 w-7 text-[--brand-blue] md:h-9 md:w-9"
               aria-hidden="true"
             />
             {heading}
@@ -149,7 +149,7 @@ const FaqItem = forwardRef<HTMLDetailsElement, FaqItemProps>(function FaqItem(
   return (
     <Accordion
       ref={ref}
-      summary={<h3 className="text-xl text-slate-800">{title}</h3>}
+      summary={<h3 className="text-base md:text-xl font-normal text-slate-800">{title}</h3>}
       size="md"
       tone="soft"
       radius="2xl"

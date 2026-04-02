@@ -693,7 +693,7 @@ function MobileMenu() {
         aria-haspopup="menu"
         data-open={open}
       >
-        <span className="font-display font-semibold text-sm leading-none">Menu</span>
+
         <MenuToggleIcon open={open} />
       </button>
       {mounted && menuOverlay ? createPortal(menuOverlay, document.body) : null}
