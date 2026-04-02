@@ -170,7 +170,7 @@ export default async function FAQArchivePage(_: PageProps) {
                       className="faq-topic"
                       icon={<HelpCircle className="h-5 w-5" aria-hidden="true" />}
                       summary={
-                        <h2 className="text-2xl" data-topic-name={title}>
+                        <h2 className="text-xl md:text-2xl" data-topic-name={title}>
                           {title}
                         </h2>
                       }
@@ -195,7 +195,7 @@ export default async function FAQArchivePage(_: PageProps) {
                           data-title={(f.title || '').toString()}
                           data-topic={title}
                           data-excerpt=""
-                          summary={<h3 className="text-xl text-slate-800">{f.title}</h3>}
+                          summary={<h3 className="text-base md:text-xl font-normal text-slate-700">{f.title}</h3>}
                           radius="2xl"
                           tone="soft"
                           size="sm"

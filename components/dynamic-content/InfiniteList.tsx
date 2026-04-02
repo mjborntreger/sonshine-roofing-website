@@ -214,9 +214,9 @@ export default function InfiniteList<T>({
     const baseQuery: ResourceQuery = useMemo(() => ({ first: pageSize, filters }), [pageSize, filters]);
     const serializedFilters = useMemo(() => JSON.stringify(baseQuery.filters ?? {}), [baseQuery.filters]);
     const initialPages = useMemo(() => [initial], [initial]);
-    const effectiveGridLayoutClassName = useMemo(
-        () => ["auto-rows-fr", gridLayoutClassName].filter(Boolean).join(" "),
-        [gridLayoutClassName]
+    const effectiveGridClassName = useMemo(
+        () => ["auto-rows-fr", gridClass].filter(Boolean).join(" "),
+        [gridClass]
     );
 
     const [pages, setPages] = useState<PageResult<T>[]>(() => {
@@ -352,8 +352,8 @@ export default function InfiniteList<T>({
     return (
         <>
             <Grid 
-                className={gridClass} 
-                layoutClassName={effectiveGridLayoutClassName}
+                className={effectiveGridClassName} 
+                layoutClassName={gridLayoutClassName}
                 data-loading={loading ? "true" : "false"}
             >
                 {items.map((item, index) => {
@@ -370,8 +370,8 @@ export default function InfiniteList<T>({
                 <GridLoadingState
                     variant={loaderVariant}
                     count={skeletonCountEff}
-                    className={gridClass}
-                    layoutClassName={effectiveGridLayoutClassName}
+                    className={effectiveGridClassName}
+                    layoutClassName={gridLayoutClassName}
                 />
             )}
 

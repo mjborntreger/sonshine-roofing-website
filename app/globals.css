@@ -61,13 +61,6 @@
     margin-right: calc(-1 * var(--scroll-lock-offset));
   }
 
-  html.nav-locked,
-  body.nav-locked {
-    overflow: hidden;
-    touch-action: none;
-    overscroll-behavior: contain;
-  }
-
 }
 
 /* ---------------------------------------

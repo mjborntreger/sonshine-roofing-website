@@ -39,16 +39,16 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
   const categories = post.categories ?? [];
 
   return (
-    <div className={cn("h-full", className)} style={style}>
+    <div className={cn("min-w-0 h-full", className)} style={style}>
       <SmartLink
         href={href}
-        className="group block h-full rounded-3xl focus-visible:outline-none"
+        className="group block h-full min-w-0 rounded-3xl focus-visible:outline-none"
         title={post.title}
         data-icon-affordance="right"
       >
         <Card
           className={cn(
-            "flex h-full flex-col overflow-hidden transition hover:shadow-lg",
+            "flex h-full min-w-0 flex-col overflow-hidden transition hover:shadow-lg",
             BLOG_PREVIEW_CARD_MIN_HEIGHT_CLASS,
           )}
         >

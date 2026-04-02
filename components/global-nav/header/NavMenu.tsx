@@ -1,6 +1,7 @@
 "use client";
 import SmartLink from "@/components/utils/SmartLink";
 import { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ChevronDown,
@@ -55,7 +56,6 @@ const NAV_ICONS: Record<string, LucideIcon> = {
 const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);
 const CONTACT_LABELS = new Set(["Contact", "Contact Us"]);
 const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
-const NAV_SCROLL_LOCK_CLASS = "nav-locked";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
   const prefersReducedMotion = useReducedMotion();
@@ -374,8 +374,15 @@ function MobileMenu() {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [entered, setEntered] = useState<Record<string, boolean>>({});
   const [enteredTop, setEnteredTop] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const scrollYRef = useRef(0);
+  const previouslyFocused = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Close on click outside or ESC
   useEffect(() => {
@@ -414,21 +421,81 @@ function MobileMenu() {
     setEnteredTop(false);
   }, [open]);
 
-  // lock scroll via class to avoid conflicting inline styles
   useEffect(() => {
-    if (typeof document === "undefined") return;
+    if (!open) return undefined;
+
     const root = document.documentElement;
     const body = document.body;
-    if (open) {
-      root.classList.add(NAV_SCROLL_LOCK_CLASS);
-      body.classList.add(NAV_SCROLL_LOCK_CLASS);
-    } else {
-      root.classList.remove(NAV_SCROLL_LOCK_CLASS);
-      body.classList.remove(NAV_SCROLL_LOCK_CLASS);
-    }
+
+    scrollYRef.current = window.scrollY || document.documentElement.scrollTop || 0;
+    previouslyFocused.current = document.activeElement as HTMLElement | null;
+
+    const prevBody = {
+      position: body.style.position,
+      top: body.style.top,
+      left: body.style.left,
+      right: body.style.right,
+      width: body.style.width,
+      overflow: body.style.overflow,
+      paddingRight: body.style.paddingRight,
+    };
+
+    const prevRoot = {
+      scrollBehavior: root.style.scrollBehavior,
+      scrollLock: root.dataset.scrollLock,
+      scrollLockOffset: root.style.getPropertyValue("--scroll-lock-offset"),
+    };
+    const restoreFocusTarget = buttonRef.current;
+
+    const scrollbar = window.innerWidth - root.clientWidth;
+
+    body.style.position = "fixed";
+    body.style.top = `-${scrollYRef.current}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+    body.style.overflow = "hidden";
+    if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+
+    root.dataset.scrollLock = "true";
+    root.style.setProperty("--scroll-lock-offset", `${scrollbar}px`);
+
     return () => {
-      root.classList.remove(NAV_SCROLL_LOCK_CLASS);
-      body.classList.remove(NAV_SCROLL_LOCK_CLASS);
+      body.style.position = prevBody.position;
+      body.style.top = prevBody.top;
+      body.style.left = prevBody.left;
+      body.style.right = prevBody.right;
+      body.style.width = prevBody.width;
+      body.style.overflow = prevBody.overflow;
+      body.style.paddingRight = prevBody.paddingRight;
+
+      if (prevRoot.scrollLock) {
+        root.dataset.scrollLock = prevRoot.scrollLock;
+      } else {
+        delete root.dataset.scrollLock;
+      }
+
+      if (prevRoot.scrollLockOffset) {
+        root.style.setProperty("--scroll-lock-offset", prevRoot.scrollLockOffset);
+      } else {
+        root.style.removeProperty("--scroll-lock-offset");
+      }
+
+      const y = scrollYRef.current || 0;
+      root.style.scrollBehavior = "auto";
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: y, left: 0 });
+        root.style.scrollBehavior = prevRoot.scrollBehavior;
+        const focusTarget = restoreFocusTarget ?? previouslyFocused.current;
+        if (focusTarget) {
+          try {
+            focusTarget.focus({ preventScroll: true });
+          } catch {
+            focusTarget.focus();
+          }
+        }
+        previouslyFocused.current = null;
+      });
     };
   }, [open]);
 
@@ -451,6 +518,169 @@ function MobileMenu() {
       return next;
     });
 
+  const menuOverlay = open ? (
+    <div className="fixed inset-0 z-[60]">
+      {/* backdrop */}
+      <button
+        type="button"
+        aria-label="Close menu"
+        className="absolute inset-0"
+        onClick={() => setOpen(false)}
+      />
+
+      {/* floating panel */}
+      <div
+        id="mobile-nav"
+        ref={panelRef}
+        role="menu"
+        aria-label="Main"
+        className="fixed left-2 right-2 z-[61]
+                   rounded-3xl border border-blue-200 bg-white shadow-xl p-2
+                   top-[calc(var(--header-h,56px)+8px)]
+                   max-h-[calc(100vh-var(--header-h,56px)-24px)] overflow-auto overscroll-contain"
+      >
+        <ul className="space-y-1">
+          <li
+            className={cn(
+              "transition-all duration-150 ease-out",
+              enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+            )}
+            // ANIM: Mobile Home item stagger — base
+            style={{ transitionDelay: `${MOBILE_TOP_STAGGER_BASE_MS}ms` }}
+          >
+            <SmartLink
+              href={ROUTES.home}
+              className="flex w-full px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
+              onClick={() => setOpen(false)}
+            >
+              <LabelWithIcon label="Home" />
+            </SmartLink>
+          </li>
+          <hr className="my-1 border-blue-100" />
+          {NAV.map((item, i) => {
+            const k = `lv1-${i}`;
+            const hasChildren = !!item.children?.length;
+            return (
+              <li
+                key={k}
+                className={cn(
+                  "transition-all duration-150 ease-out",
+                  enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                )}
+                // ANIM: Mobile top-level stagger — base + per-item step
+                style={{ transitionDelay: `${Math.min(300, MOBILE_TOP_STAGGER_BASE_MS + i * ITEM_STAGGER_STEP_MS)}ms` }}
+              >
+                {!hasChildren && item.href ? (
+                  <SmartLink
+                    href={item.href}
+                    className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
+                    onClick={() => setOpen(false)}
+                  >
+                    <LabelWithIcon label={item.label} />
+                  </SmartLink>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    {item.href ? (
+                      <SmartLink
+                        href={item.href}
+                        className="block flex-1 min-w-0 text-left px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
+                        onClick={() => setOpen(false)}
+                      >
+                        <LabelWithIcon label={item.label} />
+                      </SmartLink>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => toggle(k)}
+                        aria-expanded={!!expanded[k]}
+                        aria-controls={`section-${k}`}
+                        className="px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200 text-left flex-1"
+                      >
+                        <LabelWithIcon label={item.label} />
+                      </button>
+                    )}
+                    {hasChildren && (
+                      <button
+                        type="button"
+                        onClick={() => toggle(k)}
+                        aria-expanded={!!expanded[k]}
+                        aria-controls={`section-${k}`}
+                        className="p-2"
+                      >
+                        <ChevronDown
+                          className={cn(
+                            "h-4 w-4 transition-transform duration-200",
+                            expanded[k] ? "rotate-180" : "rotate-0"
+                          )}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {hasChildren && expanded[k] && (
+                  <ul id={`section-${k}`} className="ml-2 border-l pl-3 py-1 group" data-open={!!expanded[k]}>
+                    {item.children!.map((c, j) => {
+                      const ck = `lv2-${i}-${j}`;
+                      const childHasKids = !!c.children?.length;
+                      const showChevron = !childHasKids && TARGET_CHILD_PARENTS.has(item.label);
+                      return (
+                        <li
+                          key={ck}
+                          className={cn(
+                            "py-1 transition-all duration-150 ease-out",
+                            entered[k] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                          )}
+                          // ANIM: Mobile child stagger — base + per-item step
+                          style={{ transitionDelay: `${Math.min(300, ITEM_STAGGER_BASE_MS + j * ITEM_STAGGER_STEP_MS)}ms` }}
+                        >
+                          {c.href ? (
+                            <SmartLink
+                              href={c.href}
+                              className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-700 hover:bg-slate-200"
+                              data-icon-affordance={showChevron ? "right" : undefined}
+                              onClick={() => setOpen(false)}
+                            >
+                              <LabelWithIcon label={c.label} />
+                              {showChevron ? (
+                                <ChevronRight className={CHILD_CHEVRON_CLASS} aria-hidden="true" />
+                              ) : null}
+                            </SmartLink>
+                          ) : (
+                            <span className="block px-3 py-2 text-slate-700">
+                              <LabelWithIcon label={c.label} />
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </li>
+            );
+          })}
+          <li
+            className={cn(
+              "transition-all duration-150 ease-out",
+              enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+            )}
+            // ANIM: Mobile CTA1 stagger — base + NAV length step
+            style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
+          >
+            <InstantQuoteCTA
+              size="sm"
+              buttonClassName="w-full mt-4"
+              linkClassName="w-full justify-center gap-x-2"
+              iconClassName="w-4 h-4"
+              onClick={() => setOpen(false)}
+            />
+          </li>
+        </ul>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div className="lg:hidden ml-auto">
       <button
@@ -466,169 +696,7 @@ function MobileMenu() {
         <span className="font-display font-semibold text-sm leading-none">Menu</span>
         <MenuToggleIcon open={open} />
       </button>
-
-      {open && (
-        <div className="fixed inset-0 z-[60]">
-          {/* backdrop */}
-          <button
-            type="button"
-            aria-label="Close menu"
-            className="absolute inset-0"
-            onClick={() => setOpen(false)}
-          />
-
-          {/* floating panel */}
-          <div
-            id="mobile-nav"
-            ref={panelRef}
-            role="menu"
-            aria-label="Main"
-            className="fixed left-2 right-2 z-[61]
-                       rounded-3xl border border-blue-200 bg-white shadow-xl p-2
-                       top-[calc(var(--header-h,56px)+8px)]
-                       max-h-[calc(100vh-var(--header-h,56px)-24px)] overflow-auto"
-          >
-            <ul className="space-y-1">
-              <li
-                className={cn(
-                  "transition-all duration-150 ease-out",
-                  enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
-                )}
-                // ANIM: Mobile Home item stagger — base
-                style={{ transitionDelay: `${MOBILE_TOP_STAGGER_BASE_MS}ms` }}
-              >
-                <SmartLink
-                  href={ROUTES.home}
-                  className="flex w-full px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
-                  onClick={() => setOpen(false)}
-                >
-                  <LabelWithIcon label="Home" />
-                </SmartLink>
-              </li>
-              <hr className="my-1 border-blue-100" />
-              {NAV.map((item, i) => {
-                const k = `lv1-${i}`;
-                const hasChildren = !!item.children?.length;
-                return (
-                  <li
-                    key={k}
-                    className={cn(
-                      "transition-all duration-150 ease-out",
-                      enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
-                    )}
-                    // ANIM: Mobile top-level stagger — base + per-item step
-                    style={{ transitionDelay: `${Math.min(300, MOBILE_TOP_STAGGER_BASE_MS + i * ITEM_STAGGER_STEP_MS)}ms` }}
-                  >
-                    {!hasChildren && item.href ? (
-                      <SmartLink
-                        href={item.href}
-                        className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
-                        onClick={() => setOpen(false)}
-                      >
-                        <LabelWithIcon label={item.label} />
-                      </SmartLink>
-                    ) : (
-                      <div className="flex items-center justify-between">
-                        {item.href ? (
-                          <SmartLink
-                            href={item.href}
-                            className="block flex-1 min-w-0 text-left px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200"
-                            onClick={() => setOpen(false)}
-                          >
-                            <LabelWithIcon label={item.label} />
-                          </SmartLink>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => toggle(k)}
-                            aria-expanded={!!expanded[k]}
-                            aria-controls={`section-${k}`}
-                            className="px-3 py-2 rounded-2xl text-slate-800 hover:bg-slate-200 text-left flex-1"
-                          >
-                            <LabelWithIcon label={item.label} />
-                          </button>
-                        )}
-                        {hasChildren && (
-                          <button
-                            type="button"
-                            onClick={() => toggle(k)}
-                            aria-expanded={!!expanded[k]}
-                            aria-controls={`section-${k}`}
-                            className="p-2"
-                          >
-                            <ChevronDown
-                              className={cn(
-                                "h-4 w-4 transition-transform duration-200",
-                                expanded[k] ? "rotate-180" : "rotate-0"
-                              )}
-                              aria-hidden="true"
-                            />
-                          </button>
-                        )}
-                      </div>
-                    )}
-
-                    {hasChildren && expanded[k] && (
-                      <ul id={`section-${k}`} className="ml-2 border-l pl-3 py-1 group" data-open={!!expanded[k]}>
-                        {item.children!.map((c, j) => {
-                          const ck = `lv2-${i}-${j}`;
-                          const childHasKids = !!c.children?.length;
-                          const showChevron = !childHasKids && TARGET_CHILD_PARENTS.has(item.label);
-                          return (
-                            <li
-                              key={ck}
-                              className={cn(
-                                "py-1 transition-all duration-150 ease-out",
-                                entered[k] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
-                              )}
-                              // ANIM: Mobile child stagger — base + per-item step
-                              style={{ transitionDelay: `${Math.min(300, ITEM_STAGGER_BASE_MS + j * ITEM_STAGGER_STEP_MS)}ms` }}
-                            >
-                              {c.href ? (
-                                <SmartLink
-                                  href={c.href}
-                                  className="flex w-full items-center justify-between px-3 py-2 rounded-2xl text-slate-700 hover:bg-slate-200"
-                                  data-icon-affordance={showChevron ? "right" : undefined}
-                                  onClick={() => setOpen(false)}
-                                >
-                                  <LabelWithIcon label={c.label} />
-                                  {showChevron ? (
-                                    <ChevronRight className={CHILD_CHEVRON_CLASS} aria-hidden="true" />
-                                  ) : null}
-                                </SmartLink>
-                              ) : (
-                                <span className="block px-3 py-2 text-slate-700">
-                                  <LabelWithIcon label={c.label} />
-                                </span>
-                              )}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    )}
-                  </li>
-                );
-              })}
-              <li
-                className={cn(
-                  "transition-all duration-150 ease-out",
-                  enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
-                )}
-                // ANIM: Mobile CTA1 stagger — base + NAV length step
-                style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
-              >
-                <InstantQuoteCTA
-                  size="sm"
-                  buttonClassName="w-full mt-4"
-                  linkClassName="w-full justify-center gap-x-2"
-                  iconClassName="w-4 h-4"
-                  onClick={() => setOpen(false)}
-                />
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
+      {mounted && menuOverlay ? createPortal(menuOverlay, document.body) : null}
     </div>
   );
 }

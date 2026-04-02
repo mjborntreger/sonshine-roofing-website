@@ -78,11 +78,11 @@ export default function FilterTabs({
   const activeIndex = indexMap[activeKey];
 
   return (
-    <div>
+    <div className="min-w-0">
       <div
         role="tablist"
         aria-label={ariaLabel}
-        className="flex-wrap items-center w-fit justify-start gap-1 rounded-xl border border-blue-200 bg-amber-50/50 p-1"
+        className="inline-flex max-w-full flex-wrap items-center justify-center gap-1 rounded-xl border border-blue-200 bg-amber-50/50 p-1"
       >
         {orderedTabs.map((tab) => {
           const selected = tab.key === activeKey;

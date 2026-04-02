@@ -88,7 +88,7 @@ export default async function BlogArchivePage() {
       <Section>
         <div className="container-edge py-8">
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-            <div>
+            <div className="min-w-0">
               <JsonLd data={collectionLd} />
               <JsonLd data={breadcrumbsLd} />
 
