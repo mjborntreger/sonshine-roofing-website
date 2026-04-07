@@ -985,6 +985,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 id="amount"
                 name="amount"
                 inputMode="numeric"
+                autoComplete="off"
                 className="h-10 w-full rounded-lg border border-blue-100 bg-white/95 px-3 text-slate-900 shadow-sm outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
                 value={formValues.amount}
                 onChange={(e) => {
@@ -1455,6 +1456,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 id="activeAmount"
                 inputMode="numeric"
                 pattern="[0-9]*"
+                autoComplete="off"
                 className="h-10 w-full rounded-lg border border-blue-100 bg-white/95 px-3 text-slate-900 shadow-sm outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
                 value={calculatorAmount}
                 onChange={(e) => {

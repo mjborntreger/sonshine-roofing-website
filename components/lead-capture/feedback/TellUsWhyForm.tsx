@@ -220,6 +220,7 @@ export default function TellUsWhyForm() {
             name="message"
             rows={6}
             required
+            autoComplete="off"
             className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]"
           />
         </label>

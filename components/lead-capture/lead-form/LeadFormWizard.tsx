@@ -982,6 +982,7 @@ export default function LeadFormWizard({
                           id="notes"
                           name="notes"
                           rows={journey.requireNotes ? 8 : 3}
+                          autoComplete="off"
                           className="mt-2 w-full rounded-2xl border border-blue-200 px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
                           placeholder={journey.notesPlaceholder}
                           value={form.notes}
@@ -1150,7 +1151,7 @@ export default function LeadFormWizard({
                     <input
                       type="text"
                       name="address1"
-                      autoComplete="street-address"
+                      autoComplete="address-line1"
                       required
                       value={form.address1}
                       onChange={(event) => onSelect('address1', event.target.value)}

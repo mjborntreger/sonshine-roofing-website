@@ -16,7 +16,7 @@ export default function FinancingBand() {
                     proseGuard
                     >
                         <HandCoins className="h-4 w-4 inline mr-2" />
-                        Explore financing
+                        Financing
                         <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
                 </SmartLink>
             </div>
