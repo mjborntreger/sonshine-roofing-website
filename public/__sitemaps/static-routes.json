@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-31T18:28:58.437Z",
+  "generatedAt": "2026-04-09T19:50:52.385Z",
   "routes": [
     {
       "loc": "/",
@@ -11,23 +11,27 @@
     },
     {
       "loc": "/blog",
-      "lastmod": "2026-03-22T10:44:59.658Z"
+      "lastmod": "2026-04-02T12:40:50.653Z"
     },
     {
       "loc": "/contact-us",
-      "lastmod": "2026-02-27T15:35:28.271Z"
+      "lastmod": "2026-04-01T15:34:33.725Z"
+    },
+    {
+      "loc": "/faq",
+      "lastmod": "2026-04-02T13:38:06.347Z"
     },
     {
       "loc": "/financing",
       "lastmod": "2026-03-22T10:44:59.659Z"
     },
     {
-      "loc": "/faq",
-      "lastmod": "2026-02-27T15:35:28.271Z"
+      "loc": "/homeowner-referral-program",
+      "lastmod": "2026-04-02T15:54:50.092Z"
     },
     {
-      "loc": "/homeowner-referral-program",
-      "lastmod": "2026-02-27T15:35:28.273Z"
+      "loc": "/privacy-policy",
+      "lastmod": "2026-03-22T10:44:59.659Z"
     },
     {
       "loc": "/project",
@@ -35,11 +39,7 @@
     },
     {
       "loc": "/roof-inspection",
-      "lastmod": "2026-03-22T10:44:59.660Z"
-    },
-    {
-      "loc": "/privacy-policy",
-      "lastmod": "2026-03-22T10:44:59.659Z"
+      "lastmod": "2026-04-01T16:45:50.082Z"
     },
     {
       "loc": "/roof-maintenance",
@@ -67,15 +67,15 @@
     },
     {
       "loc": "/truck-for-sale",
-      "lastmod": "2026-03-22T10:44:59.661Z"
+      "lastmod": "2026-04-03T18:16:47.977Z"
     },
     {
       "loc": "/homeowner-referral-program/terms-and-conditions",
-      "lastmod": "2026-03-03T19:48:55.367Z"
+      "lastmod": "2026-04-05T06:20:31.690Z"
     },
     {
       "loc": "/roof-maintenance/roof-care-club-terms-and-conditions",
-      "lastmod": "2026-02-27T15:35:28.279Z"
+      "lastmod": "2026-04-01T16:52:10.189Z"
     }
   ]
 }
