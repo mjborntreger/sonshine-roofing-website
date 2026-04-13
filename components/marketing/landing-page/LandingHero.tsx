@@ -1,11 +1,12 @@
 "use client";
 
 import Head from "next/head";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Phone, ShieldCheck } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import Image from "next/image";
 import LeadForm from "@/components/lead-capture/lead-form/LeadForm";
+import { LeadFormFallback } from "@/components/lead-capture/lead-form/Fallback";
 import { restoreLeadSuccessState, type LeadSuccessRestore } from "@/components/lead-capture/lead-form/config";
 
 const VIDEO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/Landing-Page-Hero-Spin-Effect-2025.webm";
@@ -141,7 +142,9 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
             </div>
 
             <div className="mx-auto w-full max-w-[520px] lg:mx-0 lg:justify-self-end">
-              <LeadForm restoredSuccess={restoredSuccess} variant="heroEmbedded" />
+              <Suspense fallback={<LeadFormFallback />}>
+                <LeadForm restoredSuccess={restoredSuccess} variant="heroEmbedded" />
+              </Suspense>
             </div>
           </div>
         </div>
