@@ -102,19 +102,19 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
           <div className="grid gap-10 items-center lg:grid-cols-[minmax(0,1fr)_minmax(360px,520px)]">
             <div className="max-w-3xl text-center lg:pb-8 lg:text-left">
               <div>
-                <p className="font-display mt-8 sm:mt-16 text-3xl font-semibold text-[--brand-cyan] sm:text-4xl">
+                <p className="font-display sm:mt-16 text-2xl font-semibold text-[--brand-cyan] sm:text-4xl">
                   Since 1987, we&apos;ve got you covered.
                 </p>
                 <SmartLink
                   href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
                   showExternalIcon
-                  className="mt-4 font-semibold tracking-wider text-green-300">
+                  className="mt-4 font-semibold text-sm tracking-wider text-green-300">
                   <ShieldCheck className="mr-1 inline h-3 w-3 text-[--brand-cyan]" />
                   INSURED | LICENSE #CCC1331483
                 </SmartLink>
               </div>
 
-              <h1 className="my-8 text-5xl leading-[4rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">
+              <h1 className="my-8 text-3xl sm:4xl leading-[3rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">
                 {title}
               </h1>
 
