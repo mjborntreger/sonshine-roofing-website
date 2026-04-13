@@ -34,19 +34,43 @@ export default function LeadFormSuccess({
     successMeta.helpTopicLabels.length > 0 ||
     Boolean(successMeta.roofTypeLabel) ||
     Boolean(successMeta.notes);
+  const isHeroEmbedded = variant === 'heroEmbedded';
+
+  const outerWrapperClassName = cn(
+    'flex justify-center',
+    isHeroEmbedded ? 'px-0' : 'px-4',
+    variant === 'default' && 'mt-8'
+  );
+  const panelClassName = cn(
+    'w-full mx-auto rounded-3xl p-8',
+    isHeroEmbedded
+      ? 'border border-white/15 bg-slate-950/72 text-white shadow-[0_30px_90px_rgba(0,0,0,0.4)] backdrop-blur-xl'
+      : 'border border-emerald-200 bg-white/95 shadow-md',
+    maxWidthClassName
+  );
+  const headingClassName = isHeroEmbedded ? 'mt-4 text-3xl font-semibold text-white' : 'mt-4 text-3xl font-semibold text-slate-900';
+  const paragraphClassName = isHeroEmbedded ? 'mt-3 max-w-xl text-sm text-blue-50/85' : 'mt-3 max-w-xl text-sm text-slate-600';
+  const detailsCardClassName = isHeroEmbedded
+    ? 'mt-6 w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left'
+    : 'mt-6 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-left';
+  const detailsHeadingClassName = isHeroEmbedded
+    ? 'text-sm font-semibold uppercase tracking-wide text-blue-100/80'
+    : 'text-sm font-semibold uppercase tracking-wide text-slate-600';
+  const bodyTextClassName = isHeroEmbedded ? 'text-sm text-blue-50/85' : 'text-sm text-slate-600';
+  const labelTextClassName = isHeroEmbedded ? 'font-semibold text-white' : 'font-semibold text-slate-700';
+  const infoBadgeClassName = cn(
+    INFO_BADGE_CLASS,
+    isHeroEmbedded ? 'border-white/15 bg-white/5 text-blue-100' : 'text-slate-500'
+  );
+  const nextHeadingClassName = isHeroEmbedded ? 'text-lg font-semibold text-white' : 'text-lg font-semibold text-slate-900';
 
   return (
-    <div className={cn('flex justify-center px-4', variant === 'default' && 'mt-8')}>
-      <div
-        className={cn(
-          'w-full mx-auto rounded-3xl border border-emerald-200 bg-white/95 p-8 shadow-md',
-          maxWidthClassName
-        )}
-      >
+    <div className={outerWrapperClassName}>
+      <div className={panelClassName}>
         <div className="flex flex-col items-center text-center">
           <CheckCircle2 className="h-12 w-12 text-emerald-500" aria-hidden="true" />
-          <h3 className="mt-4 text-3xl font-semibold text-slate-900">We’ve got it — thank you!</h3>
-          <p className="mt-3 max-w-xl text-sm text-slate-600">
+          <h3 className={headingClassName}>We’ve got it — thank you!</h3>
+          <p className={paragraphClassName}>
             Your message is already on the way to our project support team. We’ll reach out shortly with next steps. If a
             storm is moving in or water is coming inside, call us right now at{' '}
             <a className="font-semibold text-[--brand-blue]" href="tel:+19418664320">
@@ -55,17 +79,17 @@ export default function LeadFormSuccess({
             .
           </p>
           {hasSharedDetails && (
-            <div className="mt-6 w-full rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 text-left">
-              <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-600">What you shared</h4>
+            <div className={detailsCardClassName}>
+              <h4 className={detailsHeadingClassName}>What you shared</h4>
               {successMeta.timelineLabel && (
-                <p className="mt-3 text-sm text-slate-600">
-                  <span className="font-semibold text-slate-700">Timeline:</span> {successMeta.timelineLabel}
+                <p className={cn('mt-3', bodyTextClassName)}>
+                  <span className={labelTextClassName}>Timeline:</span> {successMeta.timelineLabel}
                 </p>
               )}
               {successMeta.helpTopicLabels.length ? (
                 <div className="mt-3">
-                  <p className="text-sm font-semibold text-slate-700">Your priorities:</p>
-                  <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-600">
+                  <p className={cn('text-sm', labelTextClassName)}>Your priorities:</p>
+                  <ul className={cn('mt-2 list-disc space-y-1 pl-5 text-sm', isHeroEmbedded ? 'text-blue-50/85' : 'text-slate-600')}>
                     {successMeta.helpTopicLabels.map((label) => (
                       <li key={label}>{label}</li>
                     ))}
@@ -73,33 +97,35 @@ export default function LeadFormSuccess({
                 </div>
               ) : null}
               {successMeta.roofTypeLabel && (
-                <p className="mt-3 text-sm text-slate-600">
-                  <span className="font-semibold text-slate-700">Roof type:</span> {successMeta.roofTypeLabel}
+                <p className={cn('mt-3', bodyTextClassName)}>
+                  <span className={labelTextClassName}>Roof type:</span> {successMeta.roofTypeLabel}
                 </p>
               )}
               {successMeta.notes && (
                 <div className="mt-3">
-                  <p className="text-sm font-semibold text-slate-700">Notes:</p>
-                  <p className="mt-2 whitespace-pre-line text-sm text-slate-600">{successMeta.notes}</p>
+                  <p className={cn('text-sm', labelTextClassName)}>Notes:</p>
+                  <p className={cn('mt-2 whitespace-pre-line text-sm', isHeroEmbedded ? 'text-blue-50/85' : 'text-slate-600')}>
+                    {successMeta.notes}
+                  </p>
                 </div>
               )}
             </div>
           )}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500">
-            <span className={INFO_BADGE_CLASS}>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs">
+            <span className={infoBadgeClassName}>
               <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Licensed &amp; insured
             </span>
-            <span className={INFO_BADGE_CLASS}>
+            <span className={infoBadgeClassName}>
               <Clock4 className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Typical response under 30 minutes
             </span>
-            <span className={INFO_BADGE_CLASS}>
+            <span className={infoBadgeClassName}>
               <Star className="h-4 w-4 text-amber-500" aria-hidden="true" /> 4.8 rating on Google
             </span>
           </div>
         </div>
         {successLinks.length > 0 && (
           <div className="not-prose mt-10">
-            <h4 className="text-lg font-semibold text-slate-900">What to do next</h4>
+            <h4 className={nextHeadingClassName}>What to do next</h4>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               {successLinks.map(({ label, description, href, external, icon: Icon }) => (
                 <SmartLink

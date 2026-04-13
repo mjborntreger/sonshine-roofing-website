@@ -130,8 +130,14 @@ function validateLeadForwardPayload(input: unknown):
   const contactRaw = isRecord(input.contact) ? input.contact : {};
   const firstName = getRequiredTrimmed(contactRaw, 'firstName', 'contact.firstName', errors);
   const lastName = getRequiredTrimmed(contactRaw, 'lastName', 'contact.lastName', errors);
-  const email = getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors);
+  const email = formTypeRaw === 'contact-lead'
+    ? getOptionalTrimmed(contactRaw, 'email')
+    : getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors);
   const phone = getOptionalTrimmed(contactRaw, 'phone');
+  if (formTypeRaw === 'contact-lead' && !email && !phone) {
+    addFieldError(errors, 'contact.email', 'Email or phone is required.');
+    addFieldError(errors, 'contact.phone', 'Phone or email is required.');
+  }
 
   const smsRaw = isRecord(input.smsConsent) ? input.smsConsent : {};
   const projectSmsRaw = trimString(smsRaw.projectSms);
@@ -173,7 +179,7 @@ function validateLeadForwardPayload(input: unknown):
     contact: {
       firstName,
       lastName,
-      email,
+      ...(email ? { email } : {}),
       ...(phone ? { phone } : {}),
     },
     smsConsent: {

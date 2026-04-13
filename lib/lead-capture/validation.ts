@@ -241,6 +241,28 @@ const leadFeedbackPhoneSchema = z
   })
   .transform((value) => normalizePhoneForSubmit(value));
 
+const optionalContactEmailSchema = z.preprocess((value) => {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}, z.string().max(MAX_EMAIL).email("Invalid email").optional());
+
+const optionalContactPhoneSchema = z
+  .preprocess((value) => {
+    if (typeof value !== "string") return undefined;
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
+  }, z.string().max(MAX_PHONE).optional())
+  .transform((value) => {
+    if (typeof value !== "string") return value;
+    const digits = sanitizePhoneInput(value);
+    return digits || undefined;
+  })
+  .refine((value) => value === undefined || isUsPhoneComplete(value), {
+    message: "Invalid phone",
+  })
+  .transform((value) => (value ? normalizePhoneForSubmit(value) : value));
+
 const leadFeedbackSchema = leadBaseSchema
   .extend({
     type: z.literal('feedback'),
@@ -289,8 +311,8 @@ const leadContactSchema = leadBaseSchema
     type: z.literal('contact-lead'),
     firstName: z.preprocess(trim, z.string().min(1, 'First name is required').max(MAX_NAME)),
     lastName: z.preprocess(trim, z.string().min(1, 'Last name is required').max(MAX_NAME)),
-    email: leadFeedbackEmailSchema,
-    phone: financingPhoneSchema,
+    email: optionalContactEmailSchema,
+    phone: optionalContactPhoneSchema,
     projectType: optionalTrimmedString(80),
     helpTopics: optionalTrimmedString(MAX_CONTACT_HELP),
     timeline: optionalTrimmedString(MAX_CONTACT_TIMELINE),
@@ -323,6 +345,17 @@ export type ContactLeadInput = z.infer<typeof leadContactSchema>;
 export function parseLead(input: unknown): ParseResult<LeadInput> {
   const result = leadSchema.safeParse(input);
   if (result.success) {
+    if (result.data.type === 'contact-lead' && !result.data.email && !result.data.phone) {
+      return {
+        ok: false,
+        status: 400,
+        message: 'Validation failed',
+        fieldErrors: {
+          email: ['Email or phone is required'],
+          phone: ['Phone or email is required'],
+        },
+      };
+    }
     return { ok: true, data: result.data };
   }
   const fieldErrors: FieldErrors = {};

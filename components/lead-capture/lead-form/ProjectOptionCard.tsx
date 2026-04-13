@@ -1,7 +1,5 @@
-'use client';
-
 import Image from 'next/image';
-import type { ProjectOption } from '@/components/lead-capture/lead-form/config';
+import type { LeadNavigationCard, ProjectOption } from '@/components/lead-capture/lead-form/config';
 
 export const PROJECT_OPTION_CARD_BASE_CLASS =
   'group flex h-full flex-col justify-between rounded-2xl sm:rounded-3xl border bg-white p-3 sm:p-4 text-left shadow-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2';
@@ -10,11 +8,11 @@ export const PROJECT_OPTION_CARD_UNSELECTED_CLASS =
 export const PROJECT_OPTION_CARD_SELECTED_CLASS = 'border-[--brand-blue] bg-blue-10 shadow-[0_10px_25px_rgba(15,76,129,0.12)]';
 
 type ProjectOptionCardContentProps = {
-  option: ProjectOption;
+  option: Pick<ProjectOption | LeadNavigationCard, 'label' | 'description' | 'imageSrc' | 'imageAlt' | 'eyebrow'>;
 };
 
 export function ProjectOptionCardContent({ option }: ProjectOptionCardContentProps) {
-  const { label, description, imageSrc, imageAlt } = option;
+  const { label, description, imageSrc, imageAlt, eyebrow } = option;
   return (
     <div className="flex flex-col gap-3">
       <div className="relative aspect-[7/3] w-full overflow-hidden rounded-lg sm:rounded-xl bg-slate-100">
@@ -26,10 +24,13 @@ export function ProjectOptionCardContent({ option }: ProjectOptionCardContentPro
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
         />
       </div>
-      <h4 className="text-lg leading-none text-slate-900 md:text-xl">{label}</h4>
-      <div className="flex items-center justify-start gap-2 text-xs sm:text-sm text-slate-500">
-        <p>{description}</p>
-      </div>
+      {eyebrow ? (
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[--brand-blue]">
+          {eyebrow}
+        </p>
+      ) : null}
+      <h4 className="text-xl leading-none text-slate-800 md:text-2xl">{label}</h4>
+      <p className="text-xs sm:text-sm text-slate-500">{description}</p>
     </div>
   );
 }

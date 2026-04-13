@@ -133,7 +133,7 @@ export type ZapierLeadPayloadV2 = {
   contact: {
     firstName: string;
     lastName: string;
-    email: string;
+    email?: string;
     phone?: string;
   };
   address?: {
@@ -169,7 +169,7 @@ type BuildZapierLeadPayloadInput = {
   contact: {
     firstName: string;
     lastName: string;
-    email: string;
+    email?: string;
     phone?: string;
   };
   address?: {
@@ -240,8 +240,11 @@ export function buildZapierLeadPayload(input: BuildZapierLeadPayloadInput): Zapi
   const contact: ZapierLeadPayloadV2['contact'] = {
     firstName: cleanString(input.contact.firstName) || '',
     lastName: cleanString(input.contact.lastName) || '',
-    email: cleanString(input.contact.email) || '',
   };
+  const normalizedEmail = cleanString(input.contact.email);
+  if (normalizedEmail) {
+    contact.email = normalizedEmail;
+  }
   if (normalizedPhone) {
     contact.phone = normalizedPhone;
   }
@@ -309,17 +312,35 @@ export type ContactLeadPayloadDraft = {
 
 export function validateContactIdentityDraft(
   draft: ContactIdentityDraft,
-  options: { phoneRequired?: boolean } = {},
+  options: { phoneRequired?: boolean; emailRequired?: boolean; requireAtLeastOneContactMethod?: boolean } = {},
 ): Record<string, string> {
-  const { phoneRequired = true } = options;
+  const {
+    phoneRequired = true,
+    emailRequired = true,
+    requireAtLeastOneContactMethod = false,
+  } = options;
   const errors: Record<string, string> = {};
+  const emailValue = draft.email.trim();
   if (!draft.firstName.trim()) errors.firstName = 'Enter your first name.';
   if (!draft.lastName.trim()) errors.lastName = 'Enter your last name.';
-  if (!validateEmail(draft.email)) errors.email = 'Enter a valid email (example@gmail.com).';
   const phoneDigits = stripToPhoneDigits(draft.phone || '');
   const hasPhoneInput = phoneDigits.length > 0;
+  const hasEmailInput = emailValue.length > 0;
+
+  if (emailRequired) {
+    if (!validateEmail(emailValue)) {
+      errors.email = 'Enter a valid email (example@gmail.com).';
+    }
+  } else if (hasEmailInput && !validateEmail(emailValue)) {
+    errors.email = 'Enter a valid email (example@gmail.com).';
+  }
+
   if ((phoneRequired || hasPhoneInput) && !isUsPhoneComplete(phoneDigits)) {
     errors.phone = 'Enter a valid 10-digit phone number';
+  }
+  if (requireAtLeastOneContactMethod && !hasEmailInput && !hasPhoneInput) {
+    errors.email = 'Enter an email or phone number.';
+    errors.phone = 'Enter a phone number or email address.';
   }
   return errors;
 }
@@ -372,6 +393,7 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
   const cityValue = address.city.trim();
   const stateValue = normalizeState(address.state ?? '');
   const zipValue = normalizeZip(address.zip ?? '');
+  const phoneValue = normalizePhoneForSubmit(identity.phone);
 
   const payload: ContactLeadCorePayload = {
     type: 'contact-lead',
@@ -381,8 +403,6 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
     notes: trimmedNotes || undefined,
     firstName: identity.firstName.trim(),
     lastName: identity.lastName.trim(),
-    email: identity.email.trim(),
-    phone: normalizePhoneForSubmit(identity.phone),
     preferredContact: normalizePreferredContact(preferredContact),
     bestTime: bestTimeLabel?.trim() || undefined,
     consentSms: Boolean(consentSms),
@@ -392,6 +412,14 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
     state: stateValue,
     zip: zipValue,
   };
+
+  const emailValue = identity.email.trim();
+  if (emailValue) {
+    payload.email = emailValue;
+  }
+  if (phoneValue) {
+    payload.phone = phoneValue;
+  }
 
   if (address2Value) payload.address2 = address2Value;
 

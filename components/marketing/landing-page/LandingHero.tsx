@@ -1,11 +1,12 @@
 "use client";
 
 import Head from "next/head";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ShieldCheck } from "lucide-react";
-import ShinyText from "./ShinyText";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ArrowRight, Phone, ShieldCheck } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import Image from "next/image";
+import LeadForm from "@/components/lead-capture/lead-form/LeadForm";
+import { restoreLeadSuccessState, type LeadSuccessRestore } from "@/components/lead-capture/lead-form/config";
 
 const VIDEO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/Landing-Page-Hero-Spin-Effect-2025.webm";
 const POSTER_SRC = "https://next.sonshineroofing.com/wp-content/uploads/landing-hero-fallback.webp";
@@ -14,10 +15,11 @@ type HeroProps = {
   title?: string
 };
 
-export default function Hero({ title = "One of The Best Roofing Companies in Sarasota, Manatee, and Charlotte Counties for Over 38 Years" }: HeroProps) {
+export default function Hero({ title = "The BEST Roofing Company in Sarasota, Manatee, and Charlotte Counties for Over 39 Years" }: HeroProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [shouldShowVideo, setShouldShowVideo] = useState(false);
+  const restoredSuccess = useMemo<LeadSuccessRestore | null>(() => restoreLeadSuccessState(), []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -89,41 +91,59 @@ export default function Hero({ title = "One of The Best Roofing Companies in Sar
           poster={POSTER_SRC}
         />
 
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-[5] bg-black/45"
+        />
+
         {/* Content */}
-        <div className="px-4 pt-8 mx-auto text-center text-white max-w-8xl not-prose">
-          <div className="mt-4">
-            <ShinyText
-              text="SonShine Roofing"
-              className="mt-8 text-5xl font-script lg:text-6xl"
-              disabled={false}
-              speed={2.5}
-            >
-            </ShinyText>
-            <p className="font-display md:text-lg font-semibold text-blue-400">Since 1987, we&apos;ve got you covered</p>
+        <div className="relative z-10 mx-auto max-w-[1440px] px-4 pb-32 pt-32 not-prose">
+          <div className="grid gap-10 items-center lg:grid-cols-[minmax(0,1fr)_minmax(360px,520px)]">
+            <div className="max-w-3xl text-center lg:pb-8 lg:text-left">
+              <div>
+                <p className="font-display mt-8 sm:mt-16 text-3xl font-semibold text-[--brand-cyan] sm:text-4xl">
+                  Since 1987, we&apos;ve got you covered.
+                </p>
+                <SmartLink
+                  href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
+                  showExternalIcon
+                  className="mt-4 font-semibold tracking-wider text-green-300">
+                  <ShieldCheck className="mr-1 inline h-3 w-3 text-[--brand-cyan]" />
+                  INSURED | LICENSE #CCC1331483
+                </SmartLink>
+              </div>
+
+              <h1 className="my-8 text-5xl leading-[4rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">
+                {title}
+              </h1>
+
+              <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
+                <SmartLink
+                  className="inline-flex items-center gap-2 rounded-xl border border-blue-100/50 bg-[--brand-blue] px-8 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
+                  href="/contact-us"
+                  title="Contact SonShine Roofing"
+                  aria-label="Contact SonShine Roofing"
+                >
+                  <Phone className="h-4 w-4 sm:h-6 sm:w-6 inline mr-1 phone-affordance-icon" />
+                  Contact Us
+                </SmartLink>
+                <SmartLink
+                  className="backdrop-blur-sm inline-flex items-center gap-2 rounded-xl border border-white/40 px-8 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
+                  href="/about-sonshine-roofing"
+                  title="About SonShine Roofing"
+                  aria-label="About SonShine Roofing"
+                  data-icon-affordance="right"
+                >
+                  Learn More
+                  <ArrowRight className="h-4 w-4 sm:h-6 sm:w-6 inline ml-1 icon-affordance" />
+                </SmartLink>
+              </div>
+            </div>
+
+            <div className="mx-auto w-full max-w-[520px] lg:mx-0 lg:justify-self-end">
+              <LeadForm restoredSuccess={restoredSuccess} variant="heroEmbedded" />
+            </div>
           </div>
-
-          <h1 className="my-8 max-w-6xl mx-auto text-4xl md:text-5xl lg:text-7xl justify-center md:leading-[5rem] lg:leading-[6rem] text-blue-50">
-            {title}
-          </h1>
-
-          <SmartLink
-            className="block hover:scale-[1.02] phone-affordance hover:bg-neutral-800/50 transition-all duration-300 py-3 md:py-6 px-6 md:px-10 w-fit border border-opacity-60 border-white mx-auto rounded-2xl bg-neutral-800/30 backdrop-blur z-10 mb-[11rem]"
-            href="/contact-us"
-            title="Contact SonShine Roofing"
-            aria-label="Contact SonShine Roofing"
-            data-icon-affordance="right"
-          >
-
-            <p className="items-center font-display mb-2 font-semibold text-3xl md:text-5xl tracking-wider text-blue-100 hover:scale-[1.02] transition-transform">
-              
-              Contact Us
-              <ArrowRight className="icon-affordance items-center text-[--brand-cyan] h-6 w-6 md:h-8 md:w-8 inline ml-2" />
-            </p>
-            <p className="mb-1 font-extralight text-xs tracking-wider text-green-400">
-              <ShieldCheck className="text-[--brand-cyan] h-3 w-3 inline mr-1" />
-              INSURED | LICENSE #CCC1331483
-            </p>
-          </SmartLink>
         </div>
       </section>
     </>

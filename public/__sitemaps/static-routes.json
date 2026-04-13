@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-04-09T19:50:52.385Z",
+  "generatedAt": "2026-04-13T20:42:35.258Z",
   "routes": [
     {
       "loc": "/",
-      "lastmod": "2026-03-31T18:27:54.414Z"
+      "lastmod": "2026-04-13T20:41:39.691Z"
     },
     {
       "loc": "/about-sonshine-roofing",
@@ -50,11 +50,11 @@
       "lastmod": "2026-02-27T15:35:28.279Z"
     },
     {
-      "loc": "/roof-replacement-sarasota-fl",
+      "loc": "/roofing-glossary",
       "lastmod": "2026-02-27T15:35:28.280Z"
     },
     {
-      "loc": "/roofing-glossary",
+      "loc": "/roof-replacement-sarasota-fl",
       "lastmod": "2026-02-27T15:35:28.280Z"
     },
     {
@@ -75,7 +75,7 @@
     },
     {
       "loc": "/roof-maintenance/roof-care-club-terms-and-conditions",
-      "lastmod": "2026-04-01T16:52:10.189Z"
+      "lastmod": "2026-04-12T23:14:13.980Z"
     }
   ]
 }

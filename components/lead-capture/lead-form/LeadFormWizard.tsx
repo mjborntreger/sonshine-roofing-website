@@ -819,12 +819,6 @@ export default function LeadFormWizard({
   return (
     <form ref={formRef} className={variant === 'heroOverlap' ? 'px-4' : 'px-4 py-16'} onSubmit={handleSubmit} noValidate>
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
-      <input type="hidden" name="projectType" value={form.projectType} />
-      <input type="hidden" name="helpTopics" value={helpSummary} />
-      <input type="hidden" name="timeline" value={form.timeline} />
-      <input type="hidden" name="preferredContact" value={form.preferredContact} />
-      <input type="hidden" name="bestTime" value={form.bestTime} />
-      <input type="hidden" name="notes" value={form.notes} />
 
       <LeadFormStepShell
         stepLabel={`Step ${activeStepIndex + 1} of ${totalSteps}`}
@@ -896,7 +890,7 @@ export default function LeadFormWizard({
 
                     {journey?.showHelpMulti && (
                       <div>
-                        <div className="flex-col items-baseline justify-start">
+                        <div>
                           <h4 className="text-base font-semibold tracking-wide uppercase text-slate-600">What&rsquo;s the situation?</h4>
                           <p className="mt-2 mb-1 text-sm font-medium text-slate-500">Select all that apply</p>
                         </div>

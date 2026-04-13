@@ -24,6 +24,7 @@ export type JourneyKey = 'repair' | 'retail' | 'maintenance' | 'something-else';
 export type ProjectOption = {
   value: JourneyKey | 'financing-link' | 'project-gallery';
   label: string;
+  eyebrow?: string;
   description: string;
   icon: LucideIcon;
   accent: string;
@@ -70,6 +71,15 @@ export type LeadFormUtmParams = {
   source?: string;
   medium?: string;
   campaign?: string;
+};
+
+export type LeadNavigationCard = {
+  href: string;
+  label: string;
+  eyebrow?: string;
+  description: string;
+  imageSrc: string;
+  imageAlt: string;
 };
 
 export const PROJECT_OPTIONS: ProjectOption[] = [
@@ -135,6 +145,57 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     action: 'advance',
     imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Something-Else.webp',
     imageAlt: 'Homeowner talking with a roofing advisor',
+  },
+];
+
+export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
+  {
+    href: '/roof-repair',
+    label: 'Roof Repair',
+    eyebrow: 'Free estimate',
+    description: 'Fast, lasting roof repair for leaks, flashing, fascia, and storm damage.',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Emergency-Roof-Repair.webp',
+    imageAlt: 'Roof leak in an attic that needs repair',
+  },
+  {
+    href: '/roof-replacement-sarasota-fl',
+    label: 'Roof Replacement',
+    eyebrow: 'Free estimate',
+    description: 'Shingle, tile, metal, and flat roof replacements backed by strong warranties.',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp',
+    imageAlt: 'Florida home getting a roof replacement',
+  },
+  {
+    href: '/roof-inspection',
+    label: '18-Point Roof Inspection',
+    eyebrow: 'Tip Top Roof Check-up',
+    description: 'Licensed residential inspections to catch hidden leaks and storm damage early.',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
+    imageAlt: 'Roofing technician performing an inspection',
+  },
+  {
+    href: '/roof-maintenance',
+    label: 'Roof Maintenance Plans',
+    eyebrow: 'Roof Care Club',
+    description: 'Prevent leaks, catch issues early, and extend roof life with scheduled upkeep.',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/taking-care-of-your-roof-maintenance-saves-moneybak.webp',
+    imageAlt: 'Roof maintenance helping homeowners save money',
+  },
+  {
+    href: '/financing',
+    label: 'Explore Financing',
+    eyebrow: 'Flexible payments',
+    description: 'Explore credit-based and equity-based roof financing with clear monthly options.',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp',
+    imageAlt: 'Homeowners reviewing roof financing options together',
+  },
+  {
+    href: '/homeowner-referral-program',
+    label: 'Refer and Get Paid',
+    eyebrow: '$250 referral reward',
+    description: 'Refer a full roof replacement and learn how qualified homeowner referrals work.',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp',
+    imageAlt: 'Homeowner referral program for full roof replacement projects',
   },
 ];
 

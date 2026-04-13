@@ -9,7 +9,7 @@ import {
 } from "@/lib/content/wp";
 import type { LocationRecord } from "@/lib/content/wp";
 import Hero from "@/components/marketing/landing-page/LandingHero";
-import LeadFormSection from "@/components/lead-capture/lead-form/LeadFormSection";
+import LeadFormSection from "@/components/lead-capture/lead-form/InitialNavigation";
 import ReviewsCarousel from "@/components/reviews-widget/ReviewsCarousel";
 import type { Review } from "@/components/reviews-widget/types";
 import WhyHomeownersChooseUs from "@/components/marketing/landing-page/WhyHomeownersChooseUs";
@@ -28,6 +28,7 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { buildReviewSchema, sponsorFeaturesItemListSchema, graphSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
 import HeroTrustBar from "@/components/marketing/landing-page/HeroTrustBar";
+import SidebarCta from "@/components/cta/SidebarCta";
 
 type OgImageRecord = {
   url?: unknown;
@@ -296,60 +297,73 @@ export default async function LocationPage({ params }: { params: Promise<Params>
     <>
       {structuredData ? <JsonLd data={structuredData} /> : null}
       <Hero title={`One of The Best Roofing Companies in ${location.locationName} for Over 38 Years`} />
+      <div className="bg-blue-200/50 border border-b-blue-300/70">
+        {hasDisplayReviews ? (
+          <ReviewsCarousel
+            reviews={displayReviews}
+            showBusinessProfileLink={true}
+            showDisclaimer={true}
+            limit={carouselLimit}
+            fallbackToRemote={true}
+          />
+        ) : (
+          <div className="mx-auto max-w-[1280px] px-4 py-10 text-center">
+            <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
+          </div>
+        )}
+      </div>
+      <LeadFormSection />
       <div className={reviewsLayout}>
-        <LeadFormSection variant="heroOverlap" />
-        <div className="bg-blue-200/50 border border-t-blue-200 border-b-blue-200">
-          {hasDisplayReviews ? (
-            <ReviewsCarousel
-              reviews={displayReviews}
-              showBusinessProfileLink={true}
-              showDisclaimer={true}
-              limit={carouselLimit}
-              fallbackToRemote={true}
-            />
-          ) : (
-            <div className="mx-auto max-w-[1280px] px-4 py-10 text-center">
-              <p className="text-sm text-slate-600">No reviews highlighted yet.</p>
-            </div>
-          )}
-        </div>
-        <HeroTrustBar heading={heroTrustHeading} variant="inline" />
+        <HeroTrustBar heading={heroTrustHeading} />
       </div>
 
-      <main className={narrowLayout}>
-        <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] max-w-[1280px] mx-auto items-start">
-          <div className="min-w-0">
-            <div className="mx-2">
-              <WhyHomeownersChooseUs
-                title={`Family-owned ${location.locationName} Roofing Company`}
-                highlightText={location.locationName ? `${location.locationName} Roofing Company` : undefined}
-                description={`Since 1987, SonShine Roofing has been an integral part of the ${location.locationName} community. Over the past 38 years, we've always honored a tradition of honesty, respect, and integrity in everything we do.`}
-              />
-              <LocalPartnershipsSection
-                features={sponsorFeatures}
-                eyebrow={`As a pillar of the ${location.locationName} roofing community, we believe it is our duty to give back to organizations whose values align with ours. As you'll see, we proudly support law enforcement, youth sports, and more.`}
-                emptyMessage="No sponsored partners yet."
-              />
-              <BestOfTheBest title={botbTitle} highlightText={botbHighlight} />
-              <section className="mt-12 mx-2 p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-blue-200">
-                <h2 className="text-xl text-slate-700 md:text-3xl">{`A Special Message to ${location.locationName} Homeowners:`}</h2>
-                <p className="italic text-slate-400">{`Updated: ${modifiedDisplay}`}</p>
+      <main>
+        <div className={narrowLayout}>
+          <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] max-w-[1280px] mx-auto items-start">
+            <div className="min-w-0">
+              <div className="mx-2">
+                <WhyHomeownersChooseUs
+                  title={`Family-owned ${location.locationName} Roofing Company`}
+                  highlightText={location.locationName ? `${location.locationName} Roofing Company` : undefined}
+                  description={`Since 1987, SonShine Roofing has been an integral part of the ${location.locationName} community. Over the past 38 years, we've always honored a tradition of honesty, respect, and integrity in everything we do.`}
+                />
+                <LocalPartnershipsSection
+                  features={sponsorFeatures}
+                  eyebrow={`As a pillar of the ${location.locationName} roofing community, we believe it is our duty to give back to organizations whose values align with ours. As you'll see, we proudly support law enforcement, youth sports, and more.`}
+                  emptyMessage="No sponsored partners yet."
+                />
+                <BestOfTheBest title={botbTitle} highlightText={botbHighlight} />
+                <section className="mt-12 mx-2 p-6 prose bg-white border shadow-md max-w-none rounded-3xl border-blue-200">
+                  <h2 className="text-xl text-slate-700 md:text-3xl">{`A Special Message to ${location.locationName} Homeowners:`}</h2>
+                  <p className="italic text-slate-400">{`Updated: ${modifiedDisplay}`}</p>
 
-                {location.contentHtml ? (
-                  <div className="mt-4" dangerouslySetInnerHTML={{ __html: location.contentHtml }} />
-                ) : (
-                  <p className="mt-4">No WordPress editor content provided for this location.</p>
-                )}
-              </section>
+                  {location.contentHtml ? (
+                    <div className="mt-4" dangerouslySetInnerHTML={{ __html: location.contentHtml }} />
+                  ) : (
+                    <p className="mt-4">No WordPress editor content provided for this location.</p>
+                  )}
+                </section>
+                <ServiceAreaSection
+                  mapImage={location.mapImage}
+                  neighborhoods={location.neighborhoodsServed}
+                  landmarks={location.nearbyLandmarks}
+                  locationName={location.locationName}
+                  fallbackLocationLabel={location.title || slug}
+                  heading={`Affordable Roofing Services in ${location.locationName}`}
+                  eyebrow={`During our 38-year tenure in ${location.locationName}, we've always kept prices competitive without sacrificing on a quality roofing experience. We adapt to your neighborhood, not the other way around.`}
+                  className="py-12"
+                />
+              </div>
             </div>
+
+            <aside className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-16">
+              <ServicesQuickLinks activePath="/" locationSlug={slug} />
+              <div className="h-[1px] w-full bg-blue-100 my-4" />
+              <ResourcesQuickLinks activePath="/" />
+              <div className="h-[1px] w-full bg-blue-100 my-4" />
+              <SidebarCta />
+            </aside>
           </div>
-
-          {/* Sticky Section */}
-          <aside className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-16">
-            <ServicesQuickLinks activePath="/" locationSlug={slug} />
-            <ResourcesQuickLinks activePath="/" />
-          </aside>
-
         </div>
 
         <div className={leadFormLayout}>
@@ -362,16 +376,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
           </div>
         </div>
 
-        <ServiceAreaSection
-          mapImage={location.mapImage}
-          neighborhoods={location.neighborhoodsServed}
-          landmarks={location.nearbyLandmarks}
-          locationName={location.locationName}
-          fallbackLocationLabel={location.title || slug}
-          heading={`Affordable Roofing Services in ${location.locationName}`}
-          eyebrow={`During our 38-year tenure in ${location.locationName}, we've always kept prices competitive without sacrificing on a quality roofing experience. We adapt to your neighborhood, not the other way around.`}
-          className="py-12"
-        />
         <Section>
           <FaqInlineList
             heading="General FAQs"
@@ -381,7 +385,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
             seeMoreHref="/faq"
           />
         </Section>
-
       </main>
     </>
   );

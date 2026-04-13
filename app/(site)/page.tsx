@@ -10,7 +10,7 @@ import BestOfTheBest from "@/components/marketing/landing-page/BestOfTheBest";
 import Section from "@/components/layout/Section";
 import type { Metadata } from 'next';
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
-import LeadFormSection from "@/components/lead-capture/lead-form/LeadFormSection";
+import LeadFormSection from "@/components/lead-capture/lead-form/InitialNavigation";
 import LocalPartnershipsSection from "@/components/location/LocalPartnershipsSection";
 import SidebarCta from "@/components/cta/SidebarCta";
 
@@ -93,12 +93,12 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   return (
     <>
       <Hero />
-      <div className={reviewsLayout}>
-        <LeadFormSection variant="heroOverlap" />
-        <div className="bg-blue-200/50 border border-t-blue-300 border-b-blue-300">
+      <div className="bg-blue-200/50 border border-b-blue-300/70">
           <ReviewsCarousel />
         </div>
-        <HeroTrustBar variant="inline" />
+      <LeadFormSection />
+      <div className={reviewsLayout}>
+        <HeroTrustBar />
       </div>
       <div className={narrowLayout}>
         <div className="py-16 grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px] max-w-[1280px] mx-auto items-start">

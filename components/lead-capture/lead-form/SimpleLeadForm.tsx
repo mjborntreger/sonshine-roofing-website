@@ -217,7 +217,7 @@ export default function SimpleLeadForm({
       lastName: form.lastName,
       email: form.email,
       phone: form.phone,
-    }, { phoneRequired: false });
+    }, { phoneRequired: false, emailRequired: false, requireAtLeastOneContactMethod: true });
     const addressErrors = validateContactAddressDraft({
       address1: form.address1,
       address2: form.address2,
@@ -419,7 +419,7 @@ export default function SimpleLeadForm({
 
                 <section className="grid gap-4 md:grid-cols-2">
                   <label className="block font-medium text-slate-700">
-                    Email*
+                    Email (optional)
                     <input
                       type="email"
                       name="email"
@@ -432,7 +432,7 @@ export default function SimpleLeadForm({
                     {errors.email && <span className="mt-1 text-xs text-red-600">{errors.email}</span>}
                   </label>
                   <label className="block font-medium text-slate-700">
-                    Phone
+                    Phone (optional)
                     <input
                       type="tel"
                       name="phone"
