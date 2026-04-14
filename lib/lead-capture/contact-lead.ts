@@ -117,6 +117,8 @@ export function normalizeSmsConsent(value: SmsConsentFieldValue): SmsConsentChoi
 }
 
 export type ZapierLeadFormType = 'contact-lead' | 'financing-calculator' | 'special-offer' | 'feedback';
+export const CONTACT_LEAD_NOT_PROVIDED = 'Not provided';
+export const CONTACT_LEAD_NOT_PROVIDED_EMAIL = 'notprovided@example.com';
 
 export type ZapierLeadPayloadV2 = {
   version: 'v2';
@@ -186,6 +188,64 @@ type BuildZapierLeadPayloadInput = {
     hp_field?: string;
   };
 };
+
+export type ContactLeadRoutingPlaceholderOptions = {
+  intent: string;
+  preferredContact?: PreferredContactValue;
+  placeholder?: string;
+};
+
+export type ContactLeadRoutingPlaceholders = {
+  contact: {
+    email: string;
+  };
+  address: Required<NonNullable<BuildZapierLeadPayloadInput['address']>>;
+  details: {
+    intent: string;
+    projectType: string;
+    helpTopics: string[];
+    helpSummary: string;
+    timeline: string;
+    timelineLabel: string;
+    notes: string;
+    roofTypeLabel: string;
+    preferredContact: PreferredContactValue;
+    bestTime: string;
+    bestTimeLabel: string;
+  };
+};
+
+export function buildContactLeadRoutingPlaceholders(
+  options: ContactLeadRoutingPlaceholderOptions,
+): ContactLeadRoutingPlaceholders {
+  const placeholder = options.placeholder?.trim() || CONTACT_LEAD_NOT_PROVIDED;
+
+  return {
+    contact: {
+      email: CONTACT_LEAD_NOT_PROVIDED_EMAIL,
+    },
+    address: {
+      address1: placeholder,
+      address2: placeholder,
+      city: placeholder,
+      state: placeholder,
+      zip: placeholder,
+    },
+    details: {
+      intent: options.intent,
+      projectType: placeholder,
+      helpTopics: [placeholder],
+      helpSummary: placeholder,
+      timeline: placeholder,
+      timelineLabel: placeholder,
+      notes: placeholder,
+      roofTypeLabel: placeholder,
+      preferredContact: normalizePreferredContact(options.preferredContact),
+      bestTime: placeholder,
+      bestTimeLabel: placeholder,
+    },
+  };
+}
 
 function cleanString(value: unknown): string | undefined {
   if (typeof value !== 'string') return undefined;
@@ -514,6 +574,36 @@ export type SubmitLeadOptions = {
 };
 
 const DEFAULT_ENDPOINT = '/api/lead';
+const LEAD_API_FIELD_ERROR_KEY_MAP: Record<string, string> = {
+  'contact.firstName': 'firstName',
+  'contact.lastName': 'lastName',
+  'contact.email': 'email',
+  'contact.phone': 'phone',
+  'address.address1': 'address1',
+  'address.address2': 'address2',
+  'address.city': 'city',
+  'address.state': 'state',
+  'address.zip': 'zip',
+  'smsConsent.projectSms': 'smsProjectConsent',
+  'smsConsent.marketingSms': 'smsMarketingConsent',
+  'antiSpam.cfToken': 'cfToken',
+};
+
+export function mapLeadApiFieldErrors(fieldErrors?: Record<string, string[]>): Record<string, string> {
+  if (!fieldErrors) return {};
+
+  return Object.entries(fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
+    if (!Array.isArray(messages) || !messages.length) {
+      return acc;
+    }
+
+    const mappedKey = LEAD_API_FIELD_ERROR_KEY_MAP[key] || key;
+    if (!(mappedKey in acc)) {
+      acc[mappedKey] = String(messages[0]);
+    }
+    return acc;
+  }, {});
+}
 
 function fireMetaPixelEvents(events?: MetaStandardEvent | MetaStandardEvent[]) {
   if (!events) return;

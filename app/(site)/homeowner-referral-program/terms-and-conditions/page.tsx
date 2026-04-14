@@ -2,6 +2,7 @@ import Section from "@/components/layout/Section";
 import SmartLink from "@/components/utils/SmartLink";
 import RevealPhone from "@/components/utils/RevealPhone";
 import { buildBasicMetadata } from "@/lib/seo/meta";
+import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_LABEL, PHONE_HOURS_PREFIXED } from "@/lib/contact-hours";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 
@@ -76,7 +77,7 @@ export default function ReferralProgramTermsPage() {
             <li>Self-referrals do not qualify.</li>
             <li>
               The referred person may contact SonShine Roofing by calling{" "}
-              <a href="tel:+19418664320">(941) 866-4320</a> during business hours or by
+              <a href="tel:+19418664320">(941) 866-4320</a> by phone {PHONE_HOURS_LABEL} or by
               submitting a contact request at{" "}
               <a href="https://sonshineroofing.com/contact-us">
                 https://sonshineroofing.com/contact-us
@@ -173,7 +174,8 @@ export default function ReferralProgramTermsPage() {
             <div>
               <RevealPhone e164="+19418664320" display="(941) 866-4320" />
             </div>
-            <div>Monday through Friday, 7:30 AM to 4:00 PM EST</div>
+            <div>{OFFICE_HOURS_PREFIXED} EST</div>
+            <div>{PHONE_HOURS_PREFIXED}</div>
           </address>
         </div>
       </div>

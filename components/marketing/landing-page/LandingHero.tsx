@@ -96,7 +96,7 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
 
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-[5] bg-black/80"
+          className="absolute inset-0 -z-[5] bg-black/70"
         />
 
         {/* Content */}

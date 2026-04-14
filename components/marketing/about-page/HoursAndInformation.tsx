@@ -1,5 +1,6 @@
 import SmartLink from "@/components/utils/SmartLink";
 import { Accordion } from "@/components/ui/Accordion";
+import { OFFICE_HOURS_LONG, PHONE_HOURS_LABEL } from "@/lib/contact-hours";
 import { Clock, Tag, Users, Languages, CreditCard, Hammer, MapPin, BadgePercent, ArrowDown } from "lucide-react";
 
 const h2Styles = "mb-8 text-center text-4xl"
@@ -24,28 +25,22 @@ export async function HoursAndInformation() {
         {/* Hours */}
         <Accordion
           icon={<Clock className="h-5 w-5" aria-hidden="true" />}
-          summary={<h3 className="text-2xl">Business Hours</h3>}
+          summary={<h3 className="text-2xl">Hours of Operation</h3>}
           radius="2xl"
           proseBody={false}
           defaultOpen
           tone="soft"
         >
-          <dl className="mt-2 grid grid-cols-[max-content_auto] gap-x-1 gap-y-2 text-lg text-slate-700">
-            <dt className="text-slate-600">Monday</dt>
-            <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-            <dt className="text-slate-600">Tuesday</dt>
-            <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-            <dt className="text-slate-600">Wednesday</dt>
-            <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-            <dt className="text-slate-600">Thursday</dt>
-            <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-            <dt className="text-slate-600">Friday</dt>
-            <dd className="text-right text-slate-600 tabular-nums whitespace-nowrap">7:00 AM – 5:30 PM</dd>
-            <dt className="text-slate-600">Saturday</dt>
-            <dd className="text-right text-slate-600">Closed</dd>
-            <dt className="text-slate-600">Sunday</dt>
-            <dd className="text-right text-slate-600">Closed</dd>
-          </dl>
+          <div className="mt-2 space-y-4 text-lg text-slate-700">
+            <div className="space-y-1">
+              <p className="font-semibold text-slate-900">Office</p>
+              <p className="text-slate-600">{OFFICE_HOURS_LONG.weekday}</p>
+              <p className="text-slate-600">{OFFICE_HOURS_LONG.weekend}</p>
+            </div>
+            <p className="text-slate-600">
+              <span className="font-semibold text-slate-900">Phone</span>, {PHONE_HOURS_LABEL}
+            </p>
+          </div>
         </Accordion>
 
         {/* Service Areas */}

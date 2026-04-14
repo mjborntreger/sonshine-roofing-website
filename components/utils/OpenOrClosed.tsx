@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { CONTACT_TIME_ZONE, OFFICE_HOURS, type WeeklyHours } from "@/lib/contact-hours";
 
 // STYLES
   const baseStyles =
@@ -11,9 +12,6 @@ import { useEffect, useMemo, useState } from 'react';
     'border-red-200 bg-red-50 text-red-700';
   const helperTextStyles = 
     'block my-1 text-sm text-slate-500';
-
-type Interval = { open: string; close: string }; // 24h "HH:mm"
-type WeeklyHours = Record<number, Interval[]>; // 0 = Sunday ... 6 = Saturday
 
 type OpenOrClosedProps = {
   /**
@@ -42,22 +40,6 @@ type OpenOrClosedProps = {
    */
   hideHelperText?: boolean;
 };
-
-/**
- * Default business hours for SonShine Roofing:
- * Mon–Fri 07:00–17:30, closed Sat–Sun.
- */
-const DEFAULT_HOURS: WeeklyHours = {
-  0: [], // Sun
-  1: [{ open: '07:00', close: '16:00' }],
-  2: [{ open: '07:00', close: '16:00' }],
-  3: [{ open: '07:00', close: '16:00' }],
-  4: [{ open: '07:00', close: '16:00' }],
-  5: [{ open: '07:00', close: '16:00' }],
-  6: [], // Sat
-};
-
-const DEFAULT_TZ = 'America/New_York';
 
 function zonedNow(tz: string) {
   // Convert "now" into a Date object reflecting the target timezone.
@@ -166,8 +148,8 @@ function computeStatus(
 }
 
 export default function OpenOrClosed({
-  hours = DEFAULT_HOURS,
-  timeZone = DEFAULT_TZ,
+  hours = OFFICE_HOURS,
+  timeZone = CONTACT_TIME_ZONE,
   holidayClosures = [],
   recurringClosures = [],
   className = '',

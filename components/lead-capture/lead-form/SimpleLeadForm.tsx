@@ -11,8 +11,10 @@ import {
   LEAD_SUCCESS_COOKIE,
   LeadSuccessCookiePayload,
   SuccessMeta,
+  buildContactLeadRoutingPlaceholders,
   buildZapierLeadPayload,
   formatPhoneExample,
+  mapLeadApiFieldErrors,
   normalizeState,
   normalizeZip,
   parseLeadSuccessCookie,
@@ -257,6 +259,11 @@ export default function SimpleLeadForm({
     const combinedNotes = roofTypeLabel
       ? [notes, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
       : notes;
+    const preferredContact = form.phone ? DEFAULT_PREFERRED_CONTACT : 'email';
+    const routingPlaceholders = buildContactLeadRoutingPlaceholders({
+      intent: 'free-estimate',
+      preferredContact,
+    });
 
     const payload = buildZapierLeadPayload({
       formType: 'contact-lead',
@@ -270,12 +277,13 @@ export default function SimpleLeadForm({
       contact: {
         firstName: form.firstName,
         lastName: form.lastName,
-        email: form.email,
+        email: form.email || routingPlaceholders.contact.email,
         phone: form.phone,
       },
       address: {
+        ...routingPlaceholders.address,
         address1: form.address1,
-        address2: form.address2,
+        address2: form.address2 || routingPlaceholders.address.address2,
         city: form.city,
         state: form.state,
         zip: form.zip,
@@ -285,12 +293,13 @@ export default function SimpleLeadForm({
         smsMarketingConsent: form.smsMarketingConsent,
       },
       details: {
-        projectType: form.projectType || undefined,
-        timeline: form.timeline || undefined,
-        timelineLabel: timelineLabel || undefined,
-        notes: combinedNotes.trim() || undefined,
-        roofTypeLabel: roofTypeLabel || undefined,
-        preferredContact: form.phone ? DEFAULT_PREFERRED_CONTACT : 'email',
+        ...routingPlaceholders.details,
+        projectType: form.projectType || routingPlaceholders.details.projectType,
+        timeline: form.timeline || routingPlaceholders.details.timeline,
+        timelineLabel: timelineLabel || routingPlaceholders.details.timelineLabel,
+        notes: combinedNotes.trim() || routingPlaceholders.details.notes,
+        roofTypeLabel: roofTypeLabel || routingPlaceholders.details.roofTypeLabel,
+        preferredContact,
         bestTime: 'No preference',
       },
       antiSpam: {
@@ -315,12 +324,7 @@ export default function SimpleLeadForm({
       setStatus('error');
       setGlobalError(result.error || 'We could not send your message. Please call us at (941) 866-4320.');
       if (result.fieldErrors) {
-        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
-          if (Array.isArray(messages) && messages.length) {
-            acc[key] = String(messages[0]);
-          }
-          return acc;
-        }, {});
+        const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
         if (Object.keys(serverErrors).length) {
           setErrors(serverErrors);
         }

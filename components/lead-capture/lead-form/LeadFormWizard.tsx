@@ -16,11 +16,13 @@ import {
   LeadSuccessCookiePayload,
   SuccessMeta,
   DEFAULT_PREFERRED_CONTACT,
+  buildContactLeadRoutingPlaceholders,
   type PreferredContactValue,
   sanitizePhoneInput,
   formatPhoneExample,
   normalizeState,
   normalizeZip,
+  mapLeadApiFieldErrors,
   persistLeadSuccessCookie,
   submitLead,
   buildZapierLeadPayload,
@@ -616,6 +618,11 @@ export default function LeadFormWizard({
         external,
       })
     );
+    const preferredContact = form.phone ? form.preferredContact : 'email';
+    const routingPlaceholders = buildContactLeadRoutingPlaceholders({
+      intent: 'free-estimate',
+      preferredContact,
+    });
 
     const payload = buildZapierLeadPayload({
       formType: 'contact-lead',
@@ -629,12 +636,13 @@ export default function LeadFormWizard({
       contact: {
         firstName: form.firstName,
         lastName: form.lastName,
-        email: form.email,
+        email: form.email || routingPlaceholders.contact.email,
         phone: form.phone,
       },
       address: {
+        ...routingPlaceholders.address,
         address1: form.address1,
-        address2: form.address2,
+        address2: form.address2 || routingPlaceholders.address.address2,
         city: form.city,
         state: form.state,
         zip: form.zip,
@@ -644,16 +652,17 @@ export default function LeadFormWizard({
         smsMarketingConsent: form.smsMarketingConsent,
       },
       details: {
-        projectType: form.projectType || undefined,
-        helpTopics: form.helpTopics,
-        helpSummary: helpSummary || undefined,
-        timeline: form.timeline || undefined,
-        timelineLabel: timelineLabel || undefined,
-        notes: combinedNotes.trim() || undefined,
-        roofTypeLabel: roofTypeLabel || undefined,
-        preferredContact: form.phone ? form.preferredContact : 'email',
-        bestTime: form.bestTime || undefined,
-        bestTimeLabel: bestTimeLabel || undefined,
+        ...routingPlaceholders.details,
+        projectType: form.projectType || routingPlaceholders.details.projectType,
+        helpTopics: form.helpTopics.length ? form.helpTopics : routingPlaceholders.details.helpTopics,
+        helpSummary: helpSummary || routingPlaceholders.details.helpSummary,
+        timeline: form.timeline || routingPlaceholders.details.timeline,
+        timelineLabel: timelineLabel || routingPlaceholders.details.timelineLabel,
+        notes: combinedNotes.trim() || routingPlaceholders.details.notes,
+        roofTypeLabel: roofTypeLabel || routingPlaceholders.details.roofTypeLabel,
+        preferredContact,
+        bestTime: form.bestTime || routingPlaceholders.details.bestTime,
+        bestTimeLabel: bestTimeLabel || routingPlaceholders.details.bestTimeLabel,
         resourceLinks: resourceLinksForPayload,
       },
       antiSpam: {
@@ -678,12 +687,7 @@ export default function LeadFormWizard({
       setStatus('error');
       setGlobalError(result.error || 'We could not send your message. Please call us at (941) 866-4320.');
       if (result.fieldErrors) {
-        const serverErrors = Object.entries(result.fieldErrors).reduce<FieldErrors>((acc, [key, messages]) => {
-          if (Array.isArray(messages) && messages.length) {
-            acc[key] = String(messages[0]);
-          }
-          return acc;
-        }, {});
+        const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
         if (Object.keys(serverErrors).length) {
           setErrors(serverErrors);
           const firstErrorStepIndex = STEP_ORDER.findIndex((step) =>

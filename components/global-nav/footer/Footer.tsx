@@ -1,6 +1,7 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import SmartLink from "@/components/utils/SmartLink";
+import { OFFICE_HOURS_COMPACT, PHONE_HOURS_LABEL } from "@/lib/contact-hours";
 import {
   ArrowUpRight,
   ArrowUp,
@@ -36,7 +37,8 @@ const SOCIALS: SocialLink[] = [
 
 const linkStyles = "text-xs md:text-sm text-slate-600 hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]";
 const h3Styles = "text-sm md:text-md font-bold uppercase tracking-wider text-[--brand-blue]";
-const hoursStyles = "text-xs md:text-sm text-slate-600"
+const hoursStyles = "text-xs md:text-sm text-slate-600";
+const hoursLabelStyles = "text-xs md:text-sm font-semibold text-slate-800";
 
 const logoSrc = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp";
 
@@ -180,22 +182,17 @@ export default function Footer() {
               <h3 className={h3Styles}>
                 Hours of Operation
               </h3>
-              <dl className="grid grid-cols-2 pr-8 mt-4 text-sm gap-x-1 gap-y-3">
-                <dt className={hoursStyles}>Mon.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
-                <dt className={hoursStyles}>Tues.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
-                <dt className={hoursStyles}>Wed.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
-                <dt className={hoursStyles}>Thurs.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
-                <dt className={hoursStyles}>Fri.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>7:00a – 4:00p</dd>
-                <dt className={hoursStyles}>Sat.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>Closed</dd>
-                <dt className={hoursStyles}>Sun.</dt>
-                <dd className={`${hoursStyles} text-right whitespace-nowrap`}>Closed</dd>
-              </dl>
+              <div className="mt-4 pr-8 space-y-4">
+                <div className="space-y-1">
+                  <p className={hoursLabelStyles}>Office</p>
+                  <p className={hoursStyles}>{OFFICE_HOURS_COMPACT.weekday}</p>
+                  <p className={hoursStyles}>{OFFICE_HOURS_COMPACT.weekend}</p>
+                </div>
+                <div className="space-y-1">
+                  <p className={hoursLabelStyles}>Phone</p>
+                  <p className={hoursStyles}>{PHONE_HOURS_LABEL}</p>
+                </div>
+              </div>
             </div>
 
           </nav>

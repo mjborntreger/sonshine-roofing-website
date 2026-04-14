@@ -42,7 +42,9 @@ Lead Payload Contract (v2)
   - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback"`
   - `submittedAt` (ISO timestamp)
   - `source.page` (required)
-  - `contact.firstName`, `contact.lastName`, `contact.email` (required)
+  - `contact.firstName`, `contact.lastName` (required)
+  - `contact.email` (required for non-`contact-lead` forms)
+  - `contact.email` or `contact.phone` (required for `contact-lead`)
   - `smsConsent.projectSms`, `smsConsent.marketingSms` (`yes`/`no`)
   - `antiSpam.cfToken` (Turnstile token, required)
 - Optional fields:

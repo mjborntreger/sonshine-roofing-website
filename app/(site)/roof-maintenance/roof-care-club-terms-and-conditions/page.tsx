@@ -245,6 +245,12 @@ export default function RoofCareClubTermsPage() {
             could affect safety or scheduling.
           </p>
           <p>
+            The Member must also inform SonShine Roofing if their primary contact 
+            information (phone number, email) has changed. Failure to do so before the end of 
+            his/her scheduling window may result in a loss of benefits at the discretion of 
+            SonShine Roofing. 
+          </p>
+          <p>
             SonShine Roofing may reschedule, delay, decline, or discontinue service if weather
             conditions, unsafe roof conditions, restricted access, site hazards, force majeure
             events, governmental restrictions, or other circumstances outside our reasonable

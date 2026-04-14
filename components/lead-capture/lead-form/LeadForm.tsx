@@ -7,9 +7,12 @@ import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import {
+  DEFAULT_PREFERRED_CONTACT,
   LEAD_SUCCESS_COOKIE,
   buildZapierLeadPayload,
+  buildContactLeadRoutingPlaceholders,
   formatPhoneExample,
+  mapLeadApiFieldErrors,
   persistLeadSuccessCookie,
   sanitizePhoneInput,
   submitLead,
@@ -345,6 +348,10 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
 
     setStatus('submitting');
     setGlobalError(null);
+    const routingPlaceholders = buildContactLeadRoutingPlaceholders({
+      intent: 'free-estimate',
+      preferredContact: DEFAULT_PREFERRED_CONTACT,
+    });
 
     const payload = buildZapierLeadPayload({
       formType: 'contact-lead',
@@ -358,15 +365,15 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
       contact: {
         firstName: form.firstName,
         lastName: form.lastName,
+        email: routingPlaceholders.contact.email,
         phone: form.phone,
       },
+      address: routingPlaceholders.address,
       smsConsent: {
         smsProjectConsent: form.smsProjectConsent,
         smsMarketingConsent: form.smsMarketingConsent,
       },
-      details: {
-        intent: 'free-estimate',
-      },
+      details: routingPlaceholders.details,
       antiSpam: {
         cfToken,
         hp_field: honeypot || undefined,
@@ -390,12 +397,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
       setStatus('error');
       setGlobalError(result.error || 'We could not send your request. Please call us at (941) 866-4320.');
       if (result.fieldErrors) {
-        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
-          if (Array.isArray(messages) && messages.length) {
-            acc[key] = String(messages[0]);
-          }
-          return acc;
-        }, {});
+        const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
         if (Object.keys(serverErrors).length) {
           setErrors(serverErrors);
         }

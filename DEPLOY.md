@@ -21,7 +21,9 @@ Lead Payload Contract (v2)
   - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback"`
   - `submittedAt` (ISO timestamp)
   - `source.page`
-  - `contact.firstName`, `contact.lastName`, `contact.email`
+  - `contact.firstName`, `contact.lastName`
+  - `contact.email` for non-`contact-lead` forms
+  - `contact.email` or `contact.phone` for `contact-lead`
   - `smsConsent.projectSms`, `smsConsent.marketingSms` (`yes` or `no`)
   - `antiSpam.cfToken`
 - Optional sections:

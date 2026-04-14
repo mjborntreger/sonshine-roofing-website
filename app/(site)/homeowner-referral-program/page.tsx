@@ -7,6 +7,7 @@ import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
+import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_LABEL, PHONE_HOURS_PREFIXED } from "@/lib/contact-hours";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import type { Metadata } from "next";
 import {
@@ -45,7 +46,7 @@ const PROCESS_STEPS: StepCard[] = [
   {
     step: "Step 1",
     title: "Homeowner reaches out",
-    text: "They can call SonShine Roofing during business hours or send a request through our contact page.",
+    text: `They can call SonShine Roofing ${PHONE_HOURS_LABEL} or send a request through our contact page.`,
   },
   {
     step: "Step 2",
@@ -308,8 +309,7 @@ export default async function HomeownerReferralProgramPage() {
                   </p>
                   <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
                     For questions about eligibility, referral status, payout timing, duplicate
-                    claims, or disputes, call SonShine Roofing directly Monday through Friday,
-                    7:30 AM to 4:00 PM EST.
+                    claims, or disputes, call SonShine Roofing directly. {OFFICE_HOURS_PREFIXED} EST. {PHONE_HOURS_PREFIXED}.
                   </p>
                   <div className="mt-6 flex flex-wrap gap-3">
                     <SmartLink

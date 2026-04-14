@@ -6,6 +6,7 @@ import Turnstile from '@/components/lead-capture/Turnstile';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 import {
   buildZapierLeadPayload,
+  mapLeadApiFieldErrors,
   type SmsConsentFieldValue,
   validateSmsConsentDraft,
   sanitizePhoneInput,
@@ -233,12 +234,7 @@ export default function SpecialOfferForm({
       setSubmission('error');
       setGlobalError(result.error || 'We could not send your request. Please try again.');
       if (result.fieldErrors) {
-        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
-          if (Array.isArray(messages) && messages.length) {
-            acc[key] = String(messages[0]);
-          }
-          return acc;
-        }, {});
+        const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
         if (Object.keys(serverErrors).length) {
           setFieldErrors(serverErrors);
         }

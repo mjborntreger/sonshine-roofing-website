@@ -14,6 +14,7 @@ import {
   buildZapierLeadPayload,
   CONTACT_READY_COOKIE,
   CONTACT_READY_MAX_AGE,
+  mapLeadApiFieldErrors,
   sanitizePhoneInput,
   isUsPhoneComplete,
   formatPhoneExample,
@@ -833,12 +834,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       setSubmission('error');
       setGlobalError(friendlyError(result.error));
       if (result.fieldErrors) {
-        const serverErrors = Object.entries(result.fieldErrors).reduce<Record<string, string>>((acc, [key, messages]) => {
-          if (Array.isArray(messages) && messages.length) {
-            acc[key] = String(messages[0]);
-          }
-          return acc;
-        }, {});
+        const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
         if (Object.keys(serverErrors).length) {
           setErrors(serverErrors);
           setStep(thirdFormStepIndex);

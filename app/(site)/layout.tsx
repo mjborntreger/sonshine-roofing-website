@@ -3,6 +3,7 @@ import Header from "@/components/global-nav/header/Header";
 import Footer from "@/components/global-nav/footer/Footer";
 import AnalyticsScripts from "@/lib/telemetry/analytics";
 import { SITE_ORIGIN } from "@/lib/seo/site";
+import { OFFICE_OPENING_HOURS_SPEC, PHONE_OPENING_HOURS_SPEC } from "@/lib/contact-hours";
 import PhoneClickListener from "@/components/telemetry/PhoneClickListener";
 
 export const metadata: Metadata = {
@@ -73,12 +74,7 @@ function getGlobalSchema() {
           { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
           { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' }
         ],
-        hoursAvailable: {
-          '@type': 'OpeningHoursSpecification',
-          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          opens: '07:00',
-          closes: '17:30',
-        },
+        hoursAvailable: PHONE_OPENING_HOURS_SPEC,
       },
       {
         '@type': 'ContactPoint',
@@ -90,12 +86,7 @@ function getGlobalSchema() {
           { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
           { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' }
         ],
-        hoursAvailable: {
-          '@type': 'OpeningHoursSpecification',
-          dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-          opens: '07:00',
-          closes: '17:30',
-        },
+        hoursAvailable: PHONE_OPENING_HOURS_SPEC,
       }
     ],
     address: {
@@ -107,9 +98,7 @@ function getGlobalSchema() {
       addressCountry: 'US',
     },
     geo: { '@type': 'GeoCoordinates', latitude: 27.310763334560175, longitude: -82.44696100279685 },
-    openingHoursSpecification: [
-      { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '07:00', closes: '17:30' }
-    ],
+    openingHoursSpecification: [OFFICE_OPENING_HOURS_SPEC],
     areaServed: [
       { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
       { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
