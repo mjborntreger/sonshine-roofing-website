@@ -108,7 +108,7 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
                 <SmartLink
                   href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
                   showExternalIcon
-                  className="mt-4 font-semibold text-xs md:text-sm tracking-wider text-green-300">
+                  className="mt-4 font-semibold text-xs md:text-sm tracking-wider text-orange-300">
                   <ShieldCheck className="mr-1 inline h-3 w-3 text-[--brand-cyan]" />
                   INSURED | LICENSE #CCC1331483
                 </SmartLink>

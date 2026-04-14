@@ -422,7 +422,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
 
         <div className={HERO_PANEL_CLASS}>
           <div>
-            <h2 className="mt-3 font-display text-center text-3xl font-semibold leading-tight text-blue-50 sm:text-left sm:text-3xl">
+            <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-blue-50 sm:text-3xl">
               {formHeading}
             </h2>
             <p className="mt-1 max-w-lg leading-6 text-slate-300 text-lg">
