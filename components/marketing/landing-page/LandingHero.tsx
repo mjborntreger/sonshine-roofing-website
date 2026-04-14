@@ -9,8 +9,8 @@ import LeadForm from "@/components/lead-capture/lead-form/LeadForm";
 import { LeadFormFallback } from "@/components/lead-capture/lead-form/Fallback";
 import { restoreLeadSuccessState, type LeadSuccessRestore } from "@/components/lead-capture/lead-form/config";
 
-const VIDEO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/Landing-Page-Hero-Spin-Effect-2025.webm";
-const POSTER_SRC = "https://next.sonshineroofing.com/wp-content/uploads/landing-hero-fallback.webp";
+const VIDEO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/updated-website-hero-apr-2026.mp4";
+const POSTER_SRC = "https://next.sonshineroofing.com/wp-content/uploads/updated-website-hero-fallback-apr-2026.webp";
 
 type HeroProps = {
   title?: string
@@ -94,7 +94,7 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
 
         <div
           aria-hidden="true"
-          className="absolute inset-0 -z-[5] bg-black/45"
+          className="absolute inset-0 -z-[5] bg-black/80"
         />
 
         {/* Content */}

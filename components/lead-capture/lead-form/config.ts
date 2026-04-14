@@ -170,7 +170,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: '18-Point Roof Inspection',
     eyebrow: 'Tip Top Roof Check-up',
     description: 'Licensed residential inspections to catch hidden leaks and storm damage early.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/roof-inspection-navigation-preview-image.webp',
     imageAlt: 'Roofing technician performing an inspection',
   },
   {
@@ -178,7 +178,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: 'Roof Maintenance Plans',
     eyebrow: 'Roof Care Club',
     description: 'Prevent leaks, catch issues early, and extend roof life with scheduled upkeep.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/taking-care-of-your-roof-maintenance-saves-moneybak.webp',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
     imageAlt: 'Roof maintenance helping homeowners save money',
   },
   {
