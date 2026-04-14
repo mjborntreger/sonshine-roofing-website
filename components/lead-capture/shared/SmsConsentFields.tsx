@@ -59,7 +59,7 @@ const DEFAULT_CLASS_NAMES: SmsConsentFieldsClassNames = {
   sectionIntro: 'mt-1 text-sm text-slate-600',
   label: 'text-base font-semibold text-slate-700',
   options: 'mt-2 flex items-center gap-8',
-  optionLabel: 'inline-flex items-center gap-2 text-slate-700',
+  optionLabel: 'pointer-events-auto inline-flex items-center gap-2 text-slate-700',
   optionLabelSelected: '',
   radio: 'h-4 w-4 border-slate-300 text-[--brand-blue] focus:ring-[--brand-blue]',
   optionText: 'text-sm leading-none',

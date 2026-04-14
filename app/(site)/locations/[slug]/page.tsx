@@ -296,7 +296,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   return (
     <>
       {structuredData ? <JsonLd data={structuredData} /> : null}
-      <Hero title={`One of The Best Roofing Companies in ${location.locationName} for Over 38 Years`} />
+      <Hero title={`The Best Roofing Company in ${location.locationName} for Over 39 Years`} />
       <div className="bg-blue-200/50 border border-b-blue-300/70">
         {hasDisplayReviews ? (
           <ReviewsCarousel
