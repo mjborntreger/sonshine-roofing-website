@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { FormEvent, useMemo, useState } from 'react';
-import { ArrowRight, SquareMenu, Check } from 'lucide-react';
+import { ArrowRight, Check, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import {
@@ -374,7 +374,7 @@ export default function SimpleLeadForm({
         <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white shadow-md">
           <div className="border-b rounded-t-3xl border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
             <h2 className="flex items-center text-3xl font-bold gap-2">
-              <SquareMenu className="h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
+              <Mail className="h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
               <span>{renderHighlight('Contact Our Office', 'Our Office')}</span>
             </h2>
             <p className="text-slate-500 mt-1 text-sm md:text-base pb-2">We respond within 30 minutes during business hours. After hours, we&apos;ll contact you in the next business day.</p>

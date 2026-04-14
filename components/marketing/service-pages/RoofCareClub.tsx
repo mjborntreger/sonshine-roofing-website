@@ -6,7 +6,7 @@ import SmartLink from '@/components/utils/SmartLink';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
-import { ArrowLeftRight, ArrowUpRight, CircleCheck, Phone } from 'lucide-react';
+import { ArrowLeftRight, ArrowUpRight, CircleCheck, Smartphone } from 'lucide-react';
 
 // -----------------------------
 // Types & Data
@@ -247,7 +247,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                 </div>
                 <SmartLink className="phone-affordance mt-4 w-full not-prose" href="tel:+19418664320">
                   <div className="btn btn-md btn-brand-blue w-full">
-                    <Phone className="phone-affordance-icon inline h-4 w-4 mr-2" />
+                    <Smartphone className="phone-affordance-icon inline h-4 w-4 mr-2" />
                     Call (941) 866-4320
                   </div>
                 </SmartLink>

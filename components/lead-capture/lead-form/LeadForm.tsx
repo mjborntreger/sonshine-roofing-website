@@ -20,7 +20,8 @@ import {
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { type LeadSuccessRestore } from '@/components/lead-capture/lead-form/config';
 import LeadFormStepShell from '@/components/lead-capture/lead-form/LeadFormStepShell';
-import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
+import SmsConsentFields, { SmsConsentFooter } from '@/components/lead-capture/shared/SmsConsentFields';
+import { renderHighlight } from '@/components/utils/renderHighlight';
 import { cn } from '@/lib/utils';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
@@ -192,6 +193,7 @@ function LeadFormSmsConsentSection({ tone, form, errors, onFieldChange }: LeadFo
               classNames: HERO_SMS_CLASS_NAMES,
             }
           : {})}
+        showFooter={false}
         smsProjectConsent={form.smsProjectConsent}
         smsMarketingConsent={form.smsMarketingConsent}
         onChange={(field, value) => onFieldChange(field, value)}
@@ -201,6 +203,21 @@ function LeadFormSmsConsentSection({ tone, form, errors, onFieldChange }: LeadFo
         }}
       />
     </div>
+  );
+}
+
+type LeadFormGeneralDisclosureSectionProps = {
+  tone: LeadFormTone;
+};
+
+function LeadFormGeneralDisclosureSection({ tone }: LeadFormGeneralDisclosureSectionProps) {
+  const isHero = tone === 'hero';
+
+  return (
+    <SmsConsentFooter
+      className={isHero ? 'mt-5' : 'mt-4'}
+      classNames={isHero ? HERO_SMS_CLASS_NAMES : undefined}
+    />
   );
 }
 
@@ -269,6 +286,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
   const isHeroEmbedded = variant === 'heroEmbedded';
   const formSpacingClassName = variant === 'heroOverlap' ? 'px-4' : 'px-4 py-16';
   const formHeading = 'Get a FREE Estimate';
+  const renderedFormHeading = renderHighlight(formHeading, 'FREE', 'text-[--brand-cyan]');
 
   const setField: SetFormField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -423,7 +441,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
         <div className={HERO_PANEL_CLASS}>
           <div>
             <h2 className="mt-3 font-display text-3xl font-semibold leading-tight text-blue-50 sm:text-3xl">
-              {formHeading}
+              {renderedFormHeading}
             </h2>
             <p className="mt-1 max-w-lg leading-6 text-slate-300 text-lg">
               Tell us how to contact you and we&apos;ll reach out shortly.
@@ -449,6 +467,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
           <LeadFormSmsConsentSection tone="hero" form={form} errors={errors} onFieldChange={setField} />
           <LeadFormTurnstileSection tone="hero" errors={errors} />
           <LeadFormSubmitSection tone="hero" status={status} />
+          <LeadFormGeneralDisclosureSection tone="hero" />
         </div>
       </form>
     );
@@ -461,7 +480,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
 
         <LeadFormStepShell
           stepLabel="Free Estimate"
-          title={formHeading}
+          title={renderedFormHeading}
           description="FREE ESTIMATE"
           headerFooter={(
             <div className="mt-6 flex items-start gap-3 rounded-2xl border border-blue-100 bg-white/70 px-4 py-4">
@@ -483,6 +502,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
           <LeadFormSmsConsentSection tone="default" form={form} errors={errors} onFieldChange={setField} />
           <LeadFormTurnstileSection tone="default" errors={errors} />
           <LeadFormSubmitSection tone="default" status={status} />
+          <LeadFormGeneralDisclosureSection tone="default" />
         </LeadFormStepShell>
       </form>
     </div>

@@ -6,7 +6,7 @@ import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import { Accordion } from "@/components/ui/Accordion";
-import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, Lightbulb, CircleCheckBig, HandCoins, CheckCircle, Ban } from "lucide-react";
+import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, Lightbulb, CircleCheckBig, HandCoins, CheckCircle, Ban, Smartphone, Zap, ArrowUpRight } from "lucide-react";
 import RepairVsReplace from "@/components/marketing/service-pages/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/cta/FinancingBand";
@@ -111,7 +111,30 @@ export default async function Page() {
         ]}
         justifyStart
         imageSrc="https://next.sonshineroofing.com/wp-content/uploads/2-Treedale-Glen-Lakewood-Ranch-FL-Roof-Replacement.webp"
-      />
+      >
+        <div className="flex flex-wrap gap-3">
+          <SmartLink
+            href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
+            className="btn-brand-blue btn-lg px-3 py-2 rounded-lg"
+            aria-label="Get Ballpark Estimate Online"
+            data-icon-affordance="up-right"
+            proseGuard
+          >
+            <Zap className="h-4 w-4 mr-2 inline" aria-hidden="true" />
+            Get Ballpark Estimate Online
+            <ArrowUpRight className="ml-2 inline h-4 w-4 icon-affordance" />
+          </SmartLink>
+          <SmartLink
+            href="tel:+19418664320"
+            className="btn-outline text-white btn-lg px-3 py-2 hover:bg-transparent rounded-lg phone-affordance"
+            aria-label="Call SonShine Roofing if you have questions"
+            proseGuard
+          >
+            <Smartphone className="h-4 w-4 mr-2 phone-affordance-icon inline" aria-hidden="true" />
+            (941) 866-4320
+          </SmartLink>
+        </div>
+      </Hero>
       <Section>
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start px-2">
           <div id="article-root" className="prose min-w-0">

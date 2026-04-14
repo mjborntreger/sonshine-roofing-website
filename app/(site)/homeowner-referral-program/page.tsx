@@ -16,7 +16,7 @@ import {
   HandCoins,
   Home,
   Mail,
-  Phone,
+  Smartphone,
   XCircle,
 } from "lucide-react";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
@@ -134,10 +134,11 @@ export default async function HomeownerReferralProgramPage() {
         badges={[
           { icon: HandCoins, label: "$250 per qualified referral" },
           { icon: Home, label: "Full roof replacement jobs only" },
-          { icon: Phone, label: "Call or use our contact form" },
+          { icon: Smartphone, label: "Call or use our contact form" },
           { icon: ArrowLeftRight, label: "Paid via check in the mail" },
         ]}
         justifyStart
+        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/referral-program-hero-image.webp"
       >
         <div className="flex flex-wrap gap-3">
           <SmartLink
@@ -146,7 +147,7 @@ export default async function HomeownerReferralProgramPage() {
             aria-label="Call SonShine Roofing about the homeowner referral program"
             proseGuard
           >
-            <Phone className="h-4 w-4 mr-2 phone-affordance-icon" aria-hidden="true" />
+            <Smartphone className="h-4 w-4 mr-2 phone-affordance-icon" aria-hidden="true" />
             {REFERRAL_PHONE_DISPLAY}
           </SmartLink>
           <SmartLink
@@ -317,7 +318,7 @@ export default async function HomeownerReferralProgramPage() {
                       aria-label="Call SonShine Roofing for referral program help"
                       proseGuard
                     >
-                      <Phone className="h-4 w-4 mr-2 phone-affordance-icon" aria-hidden="true" />
+                      <Smartphone className="h-4 w-4 mr-2 phone-affordance-icon" aria-hidden="true" />
                       {REFERRAL_PHONE_DISPLAY}
                     </SmartLink>
                     <SmartLink

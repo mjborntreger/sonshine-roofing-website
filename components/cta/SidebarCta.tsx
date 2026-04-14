@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, Phone } from "lucide-react";
+import { ArrowRight, CalendarDays, Smartphone } from "lucide-react";
 import SmartLink from "../utils/SmartLink";
 import OpenOrClosed from "../utils/OpenOrClosed";
 import CopyButton from "../utils/CopyButton";
@@ -34,7 +34,7 @@ export default function SidebarCta() {
                     aria-label="Call SonShine Roofing"
                     proseGuard
                 >
-                    <Phone className={`${semanticIconStyles} phone-affordance-icon`} />
+                    <Smartphone className={`${semanticIconStyles} phone-affordance-icon`} />
                     (941) 866-4320
                 </SmartLink>
                 <CopyButton className="mt-2" copyContent="+19418664320" ariaLabel="Copy phone number" />

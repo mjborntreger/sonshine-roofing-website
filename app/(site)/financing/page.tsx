@@ -1,5 +1,5 @@
 import SmartLink from "@/components/utils/SmartLink";
-import { ListChecks, ListOrdered, HelpCircle, Phone, Timer, Percent, CheckCircle, ArrowLeftRight, ChevronRight, DollarSign, ArrowRight } from "lucide-react";
+import { ListChecks, ListOrdered, HelpCircle, Smartphone, Timer, Percent, CheckCircle, ArrowLeftRight, ChevronRight, DollarSign, ArrowRight } from "lucide-react";
 import ProgramCard from '@/components/marketing/financing/ProgramCard';
 import MonthlyEstimator from '@/components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
@@ -280,7 +280,7 @@ export default async function FinancingPage() {
                   proseGuard
                   data-icon-affordance="right"
                 >
-                  <Phone className="phone-affordance-icon inline mr-2 h-4 w-4" />
+                  <Smartphone className="phone-affordance-icon inline mr-2 h-4 w-4" />
                   Contact Us
                   <ArrowRight className="icon-affordance h-4 w-4 inline ml-2" />
                 </SmartLink>

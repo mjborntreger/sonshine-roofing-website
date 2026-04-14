@@ -30,7 +30,7 @@ const ACCORDION_SHELL_BASE = `group ${CARD_SHELL_BASE}`;
 const CARD_SUMMARY_BASE = "flex cursor-pointer select-none items-center justify-between gap-3 rounded-t-3xl px-6 py-5 text-left text-lg font-semibold text-slate-900 transition-colors";
 const CARD_HEADER_BASE = "flex items-center gap-3 rounded-t-4xl px-6 pt-6 pb-4 text-lg font-semibold text-slate-900";
 const CARD_BODY_BASE = "flex-1 rounded-b-4xl md:text-lg px-6 pb-6 pt-4 leading-relaxed";
-const ICON_BASE = "grid h-10 w-10 place-items-center rounded-full transition-transform duration-200";
+const ICON_BASE = "grid h-10 w-10 place-items-center rounded-md transition-transform duration-200";
 const CHEVRON_BASE =
   "h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open/accordion:rotate-180";
 const TITLE_BASE = "text-xl md:text-2xl relative inline-block text-slate-900 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:transition-all after:duration-300";

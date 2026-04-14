@@ -77,7 +77,7 @@ export default function Hero({
                 {badges.map(({ label, icon: Icon }, index) => (
                   <span
                     key={`${label}-${index}`}
-                    className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur"
+                    className="inline-flex items-center gap-2 rounded-md border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur"
                   >
                     {Icon ? <Icon className="h-4 w-4 text-[--brand-cyan]" aria-hidden="true" /> : null}
                     <span className="leading-tight">{label}</span>

@@ -6,7 +6,7 @@ import {
   Hammer,
   HandCoins,
   MessageCircle,
-  Phone,
+  Smartphone,
   Send,
   ShieldCheck,
   Sparkles,
@@ -194,7 +194,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: 'Refer and Get Paid',
     eyebrow: '$250 referral reward',
     description: 'Refer a full roof replacement and learn how qualified homeowner referrals work.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp',
+    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/referral-program-navigational-image.webp',
     imageAlt: 'Homeowner referral program for full roof replacement projects',
   },
 ];
@@ -400,7 +400,7 @@ const UNIVERSAL_RESOURCES: ResourceLink[] = [
 ];
 
 export const CONTACT_PREF_OPTIONS: ReadonlyArray<{ value: PreferredContactValue; label: string; icon: LucideIcon }> = [
-  { value: 'phone-call', label: 'Phone call', icon: Phone },
+  { value: 'phone-call', label: 'Phone call', icon: Smartphone },
   { value: 'email', label: 'Email', icon: Send },
 ] as const;
 

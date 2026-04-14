@@ -6,7 +6,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import {
   ChevronDown,
   ChevronRight,
-  Phone,
+  Smartphone,
   UserSearch,
   HandCoins,
   Hammer,
@@ -49,8 +49,8 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   "Roofing Glossary": BookOpen,
   FAQ: HelpCircle,
   Home: HomeIcon,
-  Contact: Phone,
-  "Contact Us": Phone,
+  Contact: Smartphone,
+  "Contact Us": Smartphone,
 };
 
 const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);

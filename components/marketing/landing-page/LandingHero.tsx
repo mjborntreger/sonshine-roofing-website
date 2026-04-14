@@ -2,8 +2,9 @@
 
 import Head from "next/head";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, Phone, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck, Smartphone } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
+import { renderHighlight } from "@/components/utils/renderHighlight";
 import Image from "next/image";
 import LeadForm from "@/components/lead-capture/lead-form/LeadForm";
 import { LeadFormFallback } from "@/components/lead-capture/lead-form/Fallback";
@@ -21,6 +22,7 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [shouldShowVideo, setShouldShowVideo] = useState(false);
   const restoredSuccess = useMemo<LeadSuccessRestore | null>(() => restoreLeadSuccessState(), []);
+  const renderedTitle = renderHighlight(title, ["BEST", "Over 39 Years"], "text-[--brand-cyan]");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -109,27 +111,27 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
                   href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
                   showExternalIcon
                   className="mt-4 font-semibold text-xs md:text-sm tracking-wider text-orange-300">
-                  <ShieldCheck className="mr-1 inline h-3 w-3 text-[--brand-cyan]" />
+                  <ShieldCheck className="mr-1 inline h-3 w-3 text-orange-300" />
                   INSURED | LICENSE #CCC1331483
                 </SmartLink>
               </div>
 
               <h1 className="my-8 text-3xl sm:4xl leading-[3rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">
-                {title}
+                {renderedTitle}
               </h1>
 
               <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
                 <SmartLink
-                  className="inline-flex items-center gap-2 rounded-xl border border-blue-100/50 bg-[--brand-blue] px-8 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
+                  className="inline-flex items-center gap-2 rounded-xl border border-blue-100/50 bg-[--brand-blue] px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
                   href="/contact-us"
                   title="Contact SonShine Roofing"
                   aria-label="Contact SonShine Roofing"
                 >
-                  <Phone className="h-4 w-4 sm:h-6 sm:w-6 inline mr-1 phone-affordance-icon" />
+                  <Smartphone className="h-4 w-4 sm:h-6 sm:w-6 inline mr-1 phone-affordance-icon" />
                   Contact Us
                 </SmartLink>
                 <SmartLink
-                  className="backdrop-blur-sm inline-flex items-center gap-2 rounded-xl border border-white/40 px-8 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
+                  className="backdrop-blur-sm inline-flex items-center gap-2 rounded-xl border border-white/40 px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
                   href="/about-sonshine-roofing"
                   title="About SonShine Roofing"
                   aria-label="About SonShine Roofing"

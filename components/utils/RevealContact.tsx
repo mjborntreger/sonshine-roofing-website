@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from "react";
-import { Mail, Phone, Copy, Check } from "lucide-react";
+import { Mail, Smartphone, Copy, Check } from "lucide-react";
 
 type BaseCommonProps = {
   label?: string;
@@ -131,7 +131,7 @@ export default function RevealContact(props: Props) {
   }
 
   if (revealed && value) {
-    const Icon = props.variant === 'email' ? Mail : Phone;
+    const Icon = props.variant === 'email' ? Mail : Smartphone;
     const [primary, ext] = String(value).split('|');
     const href =
       props.variant === 'email'
@@ -184,7 +184,7 @@ export default function RevealContact(props: Props) {
       >
         {props.variant === 'email'
           ? <Mail className={baseIconClass} aria-hidden="true" />
-          : <Phone className={iconClassName} aria-hidden="true" />}
+          : <Smartphone className={iconClassName} aria-hidden="true" />}
         <span>{label}</span>
       </button>
     </div>

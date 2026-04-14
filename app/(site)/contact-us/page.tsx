@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Section from "@/components/layout/Section";
 import SimpleLeadForm from "@/components/lead-capture/lead-form/SimpleLeadForm";
 import SmartLink from "@/components/utils/SmartLink";
-import { Phone, ShieldCheck, BadgeCheck, Star, HandCoins } from "lucide-react";
+import { Smartphone, ShieldCheck, BadgeCheck, Star, HandCoins } from "lucide-react";
 import Image from 'next/image';
 import type { Metadata } from 'next';
 import LiteMap from "@/components/utils/LiteMap";
@@ -125,7 +125,7 @@ export default async function Page() {
                         title="Call SonShine Roofing"
                         proseGuard
                       >
-                        <Phone className={contactInfoIconStyles} aria-hidden="true" />
+                        <Smartphone className={contactInfoIconStyles} aria-hidden="true" />
                         <p className="font-semibold">{PHONE_DISPLAY}</p>
                       </SmartLink>
                       <CopyButton copyContent={PHONE_DISPLAY} ariaLabel="Copy phone number" />
@@ -185,7 +185,7 @@ export default async function Page() {
                         title="Call SonShine Roofing"
                         proseGuard
                       >
-                        <Phone className={contactInfoIconStyles} aria-hidden="true" />
+                        <Smartphone className={contactInfoIconStyles} aria-hidden="true" />
                         <p className="font-semibold">{PHONE_DISPLAY}</p>
                       </SmartLink>
                       <CopyButton copyContent={PHONE_DISPLAY} ariaLabel="Copy phone number" />

@@ -13,7 +13,7 @@ import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
-import { ArrowRight, HandCoins, HardHat, HelpCircle, MapPin, Phone, ShieldCheck, Zap } from "lucide-react";
+import { ArrowRight, HandCoins, HardHat, HelpCircle, MapPin, Smartphone, ShieldCheck, Zap } from "lucide-react";
 import { STRIPE_PAYMENT_LINK } from "@/components/marketing/service-pages/TipTopRoofCheckup";
 import { Suspense } from "react";
 import EvenSimplerLeadForm from "@/components/lead-capture/lead-form/EvenSimplerLeadForm";
@@ -96,7 +96,7 @@ export default async function Page() {
           </div>
           <div className="flex flex-row flex-wrap mx-auto mt-8 justify-center gap-4">
             <SmartLink className="text-white phone-affordance hover:bg-slate-600 flex-row flex-nowrap gap-x-1 not-prose py-4 btn btn-lg sm:btn-xl btn-outline h-[60px]" href={STRIPE_PAYMENT_LINK} target="_blank" rel="noopener noreferrer">
-              <Phone className="phone-affordance-icon h-4 w-4 sm:h-5 sm:w-5 inline mr-2" />
+              <Smartphone className="phone-affordance-icon h-4 w-4 sm:h-5 sm:w-5 inline mr-2" />
               Call (941) 866-4320
             </SmartLink>
             <div>
@@ -217,7 +217,7 @@ export default async function Page() {
                 </span>
                 <SmartLink className="phone-affordance mt-4 w-full not-prose" href="tel:+19418664320">
                   <div className="btn btn-md btn-outline w-full">
-                    <Phone className="phone-affordance-icon inline h-4 w-4 mr-2" />
+                    <Smartphone className="phone-affordance-icon inline h-4 w-4 mr-2" />
                     Call (941) 866-4320
                   </div>
                 </SmartLink>

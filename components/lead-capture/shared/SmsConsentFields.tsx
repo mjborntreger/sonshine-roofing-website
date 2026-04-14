@@ -44,6 +44,7 @@ type Props = {
   sectionTitle?: string;
   sectionIntro?: string;
   disclosureMode?: 'perCard' | 'shared';
+  showFooter?: boolean;
 };
 
 const DISCLOSURE_TEXT =
@@ -167,6 +168,37 @@ function ConsentCard({
   );
 }
 
+type SmsConsentFooterProps = {
+  className?: string;
+  classNames?: Partial<SmsConsentFieldsClassNames>;
+  companyName?: string;
+};
+
+export function SmsConsentFooter({
+  className,
+  classNames,
+  companyName = 'SonShine Roofing',
+}: SmsConsentFooterProps) {
+  return (
+    <div className={cn(DEFAULT_CLASS_NAMES.footer, className, classNames?.footer)}>
+      <p className={cn(DEFAULT_CLASS_NAMES.footerText, classNames?.footerText)}>
+        By submitting this form, you authorize {companyName} to reach out to you about your
+        project. We will never share your personal information with third parties for marketing
+        purposes. You can opt out at any time. Consent is not a condition of purchase.
+      </p>
+      <p className={cn(DEFAULT_CLASS_NAMES.footerLinks, classNames?.footerLinks)}>
+        <SmartLink href="/sms-terms-and-conditions" className={classNames?.footerLink}>
+          Terms &amp; Conditions
+        </SmartLink>
+        {' | '}
+        <SmartLink href="/privacy-policy" className={classNames?.footerLink}>
+          Privacy Policy
+        </SmartLink>
+      </p>
+    </div>
+  );
+}
+
 export default function SmsConsentFields({
   smsProjectConsent,
   smsMarketingConsent,
@@ -179,6 +211,7 @@ export default function SmsConsentFields({
   sectionTitle,
   sectionIntro,
   disclosureMode = 'perCard',
+  showFooter = true,
 }: Props) {
   return (
     <section className={cn(DEFAULT_CLASS_NAMES.root, className, classNames?.root)}>
@@ -223,22 +256,7 @@ export default function SmsConsentFields({
         <p className={cn(DEFAULT_CLASS_NAMES.sharedDisclosure, classNames?.sharedDisclosure)}>{DISCLOSURE_TEXT}</p>
       ) : null}
 
-      <div className={cn(DEFAULT_CLASS_NAMES.footer, classNames?.footer)}>
-        <p className={cn(DEFAULT_CLASS_NAMES.footerText, classNames?.footerText)}>
-          By submitting this form, you authorize {companyName} to reach out to you about your
-          project. We will never share your personal information with third parties for marketing
-          purposes. You can opt out at any time. Consent is not a condition of purchase.
-        </p>
-        <p className={cn(DEFAULT_CLASS_NAMES.footerLinks, classNames?.footerLinks)}>
-          <SmartLink href="/sms-terms-and-conditions" className={classNames?.footerLink}>
-            Terms &amp; Conditions
-          </SmartLink>
-          {' | '}
-          <SmartLink href="/privacy-policy" className={classNames?.footerLink}>
-            Privacy Policy
-          </SmartLink>
-        </p>
-      </div>
+      {showFooter ? <SmsConsentFooter classNames={classNames} companyName={companyName} /> : null}
     </section>
   );
 }
