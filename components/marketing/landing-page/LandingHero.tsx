@@ -102,7 +102,7 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
           <div className="grid gap-10 items-center lg:grid-cols-[minmax(0,1fr)_minmax(360px,520px)]">
             <div className="max-w-3xl text-center lg:pb-8 lg:text-left">
               <div>
-                <p className="font-display sm:mt-16 text-2xl font-semibold text-[--brand-cyan] sm:text-4xl">
+                <p className="font-script sm:mt-16 text-2xl font-semibold text-[--brand-cyan] sm:text-4xl">
                   Since 1987, we&apos;ve got you covered.
                 </p>
                 <SmartLink
