@@ -249,7 +249,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
   if (!hasImages) return null;
 
   return (
-    <section aria-label="Project Photos" className="mt-8 p-4 sm:p-6 bg-white rounded-3xl shadow-md border border-blue-200">
+    <section aria-label="Project Photos" className="p-4 sm:p-6 bg-white rounded-3xl shadow-md border border-blue-200">
       <h2 className="text-xl text-center md:text-left md:text-3xl">Photo Gallery</h2>
       <p className="text-xs flex items-center gap-2 justify-center md:justify-start md:text-sm text-slate-500" aria-live="off">
         <span>Tap to expand an image</span>
