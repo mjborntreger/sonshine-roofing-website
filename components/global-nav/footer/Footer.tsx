@@ -184,12 +184,12 @@ export default function Footer() {
               </h3>
               <div className="mt-4 pr-8 space-y-4">
                 <div className="space-y-1">
-                  <p className={hoursLabelStyles}>Office</p>
+                  <p className={hoursLabelStyles}>Office:</p>
                   <p className={hoursStyles}>{OFFICE_HOURS_COMPACT.weekday}</p>
                   <p className={hoursStyles}>{OFFICE_HOURS_COMPACT.weekend}</p>
                 </div>
                 <div className="space-y-1">
-                  <p className={hoursLabelStyles}>Phone</p>
+                  <p className={hoursLabelStyles}>Phone:</p>
                   <p className={hoursStyles}>{PHONE_HOURS_LABEL}</p>
                 </div>
               </div>
