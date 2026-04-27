@@ -243,7 +243,7 @@ export default function Footer() {
           </div>
           <div className="py-4">
             <div className="text-xs font-semibold text-right text-slate-500">
-              <SmartLink href="https://michaelborntreger.life">Website created by: Borntreger Digital</SmartLink>
+              <SmartLink href="https://michaelborntreger.life">Website created by: Michael Borntreger</SmartLink>
             </div>
           </div>
         </div>
