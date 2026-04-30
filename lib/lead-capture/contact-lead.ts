@@ -199,7 +199,8 @@ export type ContactLeadRoutingPlaceholders = {
   contact: {
     email: string;
   };
-  address: Required<NonNullable<BuildZapierLeadPayloadInput['address']>>;
+  address: Required<Omit<NonNullable<BuildZapierLeadPayloadInput['address']>, 'address2'>> &
+    Pick<NonNullable<BuildZapierLeadPayloadInput['address']>, 'address2'>;
   details: {
     intent: string;
     projectType: string;
@@ -226,7 +227,6 @@ export function buildContactLeadRoutingPlaceholders(
     },
     address: {
       address1: placeholder,
-      address2: placeholder,
       city: placeholder,
       state: placeholder,
       zip: placeholder,
