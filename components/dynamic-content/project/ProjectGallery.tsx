@@ -16,7 +16,7 @@ type ProjectGalleryProps = {
 };
 
 const imageClassBase =
-  "select-none object-cover hover:scale-[1.06] transition-all duration-500 ease-out";
+  "select-none object-cover object-center hover:scale-[1.06] transition-all duration-500 ease-out";
 
 const containerBase = "relative overflow-hidden rounded-xl shadow-xl border border-blue-200 bg-slate-100";
 
@@ -280,9 +280,6 @@ function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
   const [loaded, setLoaded] = React.useState(false);
   const imageRef = React.useRef<HTMLImageElement | null>(null);
   const handleLoad = React.useCallback(() => setLoaded(true), []);
-  const width = image.width ?? PROJECT_GALLERY_DEFAULT_WIDTH;
-  const height = image.height ?? PROJECT_GALLERY_DEFAULT_HEIGHT;
-  const aspectStyle: React.CSSProperties = { aspectRatio: `${width} / ${height}` };
   const alt = image.altText || projectTitle;
 
   React.useEffect(() => {
@@ -297,8 +294,7 @@ function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
     <button
       type="button"
       onClick={onOpen}
-      className={`${containerBase} shadow-md group block w-full cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]`}
-      style={aspectStyle}
+      className={`${containerBase} aspect-[4/3] shadow-md group block w-full cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]`}
       aria-label={`Open photo: ${alt}`}
     >
       {!loaded ? <Skeleton className="pointer-events-none absolute inset-0 h-full w-full" /> : null}
