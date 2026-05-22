@@ -1,9 +1,58 @@
 Deployment Runbook
 ===================
 
+Coolify Production Deployment
+- Deployment target:
+  - One production Coolify application.
+  - GitHub App source, branch `main`.
+  - Build pack: Dockerfile.
+  - Exposed port: `3000`.
+  - Health check path: `/robots.txt`.
+  - Domains:
+    - `https://sonshineroofing.com`
+    - `https://www.sonshineroofing.com`
+- Runtime:
+  - The Docker image uses Next standalone output and runs `node server.js`.
+  - Container defaults:
+    - `NODE_ENV=production`
+    - `HOSTNAME=0.0.0.0`
+    - `PORT=3000`
+- Cloudflare DNS:
+  - Keep records DNS-only, not proxied.
+  - Point apex `A` record to the Coolify server IPv4.
+  - Point `www` to the apex with a `CNAME`, or use a matching `A` record.
+  - Lower TTL before production cutover.
+  - Ensure ports `80` and `443` reach Coolify/Traefik for Let's Encrypt.
+- Cutover:
+  - Keep Vercel live until Coolify production passes smoke checks.
+  - Rollback is DNS-only: point records back to Vercel.
+
 Environments
 - NEXT_PUBLIC_ENV=production → Production
 - NEXT_PUBLIC_ENV=staging    → Staging (or anything not "production")
+
+Coolify Environment Variables
+- Mark these as build-time and runtime variables because Next bakes `NEXT_PUBLIC_*` values into the client bundle during `next build`:
+  - `NEXT_PUBLIC_ENV=production`
+  - `NEXT_PUBLIC_BASE_URL=https://sonshineroofing.com`
+  - `NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT`
+  - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+  - `NEXT_PUBLIC_GTM_ID`
+  - `NEXT_PUBLIC_META_PIXEL_ID`
+  - `NEXT_PUBLIC_GBP_URL`
+  - `NEXT_PUBLIC_REVIEWS_URL`
+  - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
+  - `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP` when the FAQ sitemap should be exposed
+- Set these as runtime secrets:
+  - `N8N_WEBHOOK_URL`
+  - `N8N_WEBHOOK_SECRET`
+  - `TURNSTILE_SECRET_KEY`
+  - `REVALIDATE_SECRET`
+  - `ALLOWED_ORIGIN=https://sonshineroofing.com,https://www.sonshineroofing.com`
+- Optional build-time variables:
+  - `YOUTUBE_API_KEY` for YouTube metadata during static generation.
+  - `WP_PROJECT_BASE` only if the WordPress project CPT base changes.
+- Do not set `WP_BASIC_AUTH_USER` or `WP_BASIC_AUTH_PASS` unless WPGraphQL becomes protected.
 
 Lead Webhook Routing (n8n)
 - Application ingress is `POST /api/lead`.
@@ -58,10 +107,8 @@ Static sitemap (pages not in CMS)
 
 Security headers & CSP
 - next.config.mjs adds security headers for all requests.
-- CSP behavior:
-  - Production: Report-Only (Content-Security-Policy-Report-Only)
-  - Staging: Enforced (Content-Security-Policy)
-  - If something breaks on staging, adjust CSP, test, then roll to prod.
+- CSP is currently enforced with `Content-Security-Policy` in all environments.
+- If something breaks after the Coolify cutover, check browser console CSP violations first.
 
 Cache/Invalidation
 - GraphQL data: leverages `unstable_cache` with tags; use `/api/revalidate` where applicable.
@@ -70,3 +117,18 @@ Cache/Invalidation
 GTMetrix/Analytics
 - GTM loads only when `NEXT_PUBLIC_GTM_ID` is set and env permits.
 - GA4 Enhanced Measurement should be enabled to track SPA route changes.
+
+Coolify Smoke Checks
+- Before DNS cutover:
+  - App boots and `/robots.txt` returns 200.
+  - `/`, `/contact-us`, `/sitemap_index`, `/sitemap_index/static`, and one WP-backed dynamic page render.
+  - `www.sonshineroofing.com` redirects to `sonshineroofing.com` once both domains point at Coolify.
+  - Legacy redirects and configured 410 routes still behave correctly.
+  - `/api/revalidate` rejects missing secrets and accepts a valid `REVALIDATE_SECRET`.
+  - A lead form submission verifies Turnstile and reaches n8n.
+- After DNS cutover:
+  - TLS is valid on apex and `www`.
+  - Production `robots.txt` allows crawling.
+  - Static assets have long-lived cache headers.
+  - `/api/*` responses are not cached.
+  - GTM, Meta Pixel, maps, reviews, and external scripts load without CSP errors.

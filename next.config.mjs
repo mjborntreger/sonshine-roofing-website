@@ -17,6 +17,7 @@ const csp = `
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typedRoutes: true,
+  output: "standalone",
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "sonshineroofing.com" },
@@ -31,7 +32,45 @@ const nextConfig = {
   },
   async headers() {
     const cspHeaderKey = 'Content-Security-Policy';
+    const immutableAssetCache = "public, max-age=31536000, immutable";
+    const sitemapCache = "public, s-maxage=3600, stale-while-revalidate=300";
+
     return [
+      {
+        source: "/__sitemaps/sitemap.xsl",
+        headers: [
+          { key: "Cache-Control", value: immutableAssetCache },
+          { key: "Content-Type", value: "text/xsl; charset=utf-8" },
+        ],
+      },
+      {
+        source: "/_next/static/:path*",
+        headers: [{ key: "Cache-Control", value: immutableAssetCache }],
+      },
+      {
+        source: "/fonts/:path*",
+        headers: [{ key: "Cache-Control", value: immutableAssetCache }],
+      },
+      {
+        source: "/:path*\\.(ico|png|jpg|jpeg|gif|svg|webp|avif|txt|webmanifest)",
+        headers: [{ key: "Cache-Control", value: immutableAssetCache }],
+      },
+      {
+        source: "/__sitemaps/static-routes.json",
+        headers: [{ key: "Cache-Control", value: sitemapCache }],
+      },
+      {
+        source: "/sitemap_index/:path*",
+        headers: [{ key: "Cache-Control", value: sitemapCache }],
+      },
+      {
+        source: "/sitemap_index",
+        headers: [{ key: "Cache-Control", value: sitemapCache }],
+      },
+      {
+        source: "/api/:path*",
+        headers: [{ key: "Cache-Control", value: "no-store" }],
+      },
       {
         source: "/(.*)",
         headers: [
