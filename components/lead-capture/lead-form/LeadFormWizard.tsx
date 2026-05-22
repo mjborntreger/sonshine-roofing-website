@@ -25,7 +25,7 @@ import {
   mapLeadApiFieldErrors,
   persistLeadSuccessCookie,
   submitLead,
-  buildZapierLeadPayload,
+  buildN8nLeadPayload,
   type SmsConsentFieldValue,
   validateContactIdentityDraft,
   validateContactAddressDraft,
@@ -624,7 +624,7 @@ export default function LeadFormWizard({
       preferredContact,
     });
 
-    const payload = buildZapierLeadPayload({
+    const payload = buildN8nLeadPayload({
       formType: 'contact-lead',
       submittedAt: new Date().toISOString(),
       source: {

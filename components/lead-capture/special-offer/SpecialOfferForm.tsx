@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/lead-capture/Turnstile';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 import {
-  buildZapierLeadPayload,
+  buildN8nLeadPayload,
   mapLeadApiFieldErrors,
   type SmsConsentFieldValue,
   validateSmsConsentDraft,
@@ -187,7 +187,7 @@ export default function SpecialOfferForm({
     const utmMedium = searchParams.get('utm_medium');
     const utmCampaign = searchParams.get('utm_campaign');
 
-    const payload = buildZapierLeadPayload({
+    const payload = buildN8nLeadPayload({
       formType: 'special-offer',
       submittedAt: new Date().toISOString(),
       source: {

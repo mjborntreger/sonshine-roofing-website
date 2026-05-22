@@ -116,13 +116,13 @@ export function normalizeSmsConsent(value: SmsConsentFieldValue): SmsConsentChoi
   return value === 'yes' ? 'yes' : 'no';
 }
 
-export type ZapierLeadFormType = 'contact-lead' | 'financing-calculator' | 'special-offer' | 'feedback' | 'referral';
+export type N8nLeadFormType = 'contact-lead' | 'financing-calculator' | 'special-offer' | 'feedback' | 'referral';
 export const CONTACT_LEAD_NOT_PROVIDED = 'Not provided';
 export const CONTACT_LEAD_NOT_PROVIDED_EMAIL = 'notprovided@example.com';
 
-export type ZapierLeadPayloadV2 = {
+export type N8nLeadPayloadV2 = {
   version: 'v2';
-  formType: ZapierLeadFormType;
+  formType: N8nLeadFormType;
   submittedAt: string;
   source: {
     page: string;
@@ -157,8 +157,8 @@ export type ZapierLeadPayloadV2 = {
   };
 };
 
-type BuildZapierLeadPayloadInput = {
-  formType: ZapierLeadFormType;
+type BuildN8nLeadPayloadInput = {
+  formType: N8nLeadFormType;
   submittedAt?: string;
   source: {
     page: string;
@@ -199,8 +199,8 @@ export type ContactLeadRoutingPlaceholders = {
   contact: {
     email: string;
   };
-  address: Required<Omit<NonNullable<BuildZapierLeadPayloadInput['address']>, 'address2'>> &
-    Pick<NonNullable<BuildZapierLeadPayloadInput['address']>, 'address2'>;
+  address: Required<Omit<NonNullable<BuildN8nLeadPayloadInput['address']>, 'address2'>> &
+    Pick<NonNullable<BuildN8nLeadPayloadInput['address']>, 'address2'>;
   details: {
     intent: string;
     projectType: string;
@@ -285,7 +285,7 @@ function compactRecord(record: Record<string, unknown>): Record<string, unknown>
   return next;
 }
 
-export function buildZapierLeadPayload(input: BuildZapierLeadPayloadInput): ZapierLeadPayloadV2 {
+export function buildN8nLeadPayload(input: BuildN8nLeadPayloadInput): N8nLeadPayloadV2 {
   const normalizedPhone = normalizePhoneForSubmit(input.contact.phone || '');
 
   const source = compactRecord({
@@ -295,9 +295,9 @@ export function buildZapierLeadPayload(input: BuildZapierLeadPayloadInput): Zapi
     utm_campaign: input.source.utm_campaign,
     ua: input.source.ua,
     tz: input.source.tz,
-  }) as ZapierLeadPayloadV2['source'];
+  }) as N8nLeadPayloadV2['source'];
 
-  const contact: ZapierLeadPayloadV2['contact'] = {
+  const contact: N8nLeadPayloadV2['contact'] = {
     firstName: cleanString(input.contact.firstName) || '',
     lastName: cleanString(input.contact.lastName) || '',
   };
@@ -309,7 +309,7 @@ export function buildZapierLeadPayload(input: BuildZapierLeadPayloadInput): Zapi
     contact.phone = normalizedPhone;
   }
 
-  const payload: ZapierLeadPayloadV2 = {
+  const payload: N8nLeadPayloadV2 = {
     version: 'v2',
     formType: input.formType,
     submittedAt: cleanString(input.submittedAt) || new Date().toISOString(),
@@ -324,7 +324,7 @@ export function buildZapierLeadPayload(input: BuildZapierLeadPayloadInput): Zapi
     antiSpam: compactRecord({
       cfToken: input.antiSpam.cfToken,
       hp_field: input.antiSpam.hp_field,
-    }) as ZapierLeadPayloadV2['antiSpam'],
+    }) as N8nLeadPayloadV2['antiSpam'],
   };
 
   const address = compactRecord({
@@ -335,7 +335,7 @@ export function buildZapierLeadPayload(input: BuildZapierLeadPayloadInput): Zapi
     zip: input.address?.zip,
   });
   if (Object.keys(address).length) {
-    payload.address = address as ZapierLeadPayloadV2['address'];
+    payload.address = address as N8nLeadPayloadV2['address'];
   }
 
   return payload;

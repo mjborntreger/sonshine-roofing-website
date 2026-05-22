@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   CONTACT_LEAD_NOT_PROVIDED,
-  buildZapierLeadPayload,
+  buildN8nLeadPayload,
   formatPhoneExample,
   isUsPhoneComplete,
   isValidState,
@@ -180,7 +180,7 @@ export default function ReferralForm() {
     const referredHomeowner = buildReferredHomeownerDetails(form);
     const notes = trim(form.notes);
 
-    const payload = buildZapierLeadPayload({
+    const payload = buildN8nLeadPayload({
       formType: 'referral',
       submittedAt: new Date().toISOString(),
       source: {

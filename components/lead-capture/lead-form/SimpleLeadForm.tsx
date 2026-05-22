@@ -12,7 +12,7 @@ import {
   LeadSuccessCookiePayload,
   SuccessMeta,
   buildContactLeadRoutingPlaceholders,
-  buildZapierLeadPayload,
+  buildN8nLeadPayload,
   formatPhoneExample,
   mapLeadApiFieldErrors,
   normalizeState,
@@ -265,7 +265,7 @@ export default function SimpleLeadForm({
       preferredContact,
     });
 
-    const payload = buildZapierLeadPayload({
+    const payload = buildN8nLeadPayload({
       formType: 'contact-lead',
       submittedAt: new Date().toISOString(),
       source: {

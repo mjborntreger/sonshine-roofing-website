@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import type { ZapierLeadPayloadV2 as LeadForwardPayloadV2 } from '@/lib/lead-capture/contact-lead';
+import type { N8nLeadPayloadV2 as LeadForwardPayloadV2 } from '@/lib/lead-capture/contact-lead';
 import { isProdEnv, requireEnv, SITE_ORIGIN } from '@/lib/seo/site';
 
 type UnknownRecord = Record<string, unknown>;

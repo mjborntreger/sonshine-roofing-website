@@ -9,7 +9,7 @@ import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import {
   DEFAULT_PREFERRED_CONTACT,
   LEAD_SUCCESS_COOKIE,
-  buildZapierLeadPayload,
+  buildN8nLeadPayload,
   buildContactLeadRoutingPlaceholders,
   formatPhoneExample,
   mapLeadApiFieldErrors,
@@ -353,7 +353,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
       preferredContact: DEFAULT_PREFERRED_CONTACT,
     });
 
-    const payload = buildZapierLeadPayload({
+    const payload = buildN8nLeadPayload({
       formType: 'contact-lead',
       submittedAt: new Date().toISOString(),
       source: {

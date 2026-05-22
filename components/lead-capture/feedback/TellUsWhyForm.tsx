@@ -6,7 +6,7 @@ import Turnstile from '@/components/lead-capture/Turnstile';
 import SmartLink from '@/components/utils/SmartLink';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 import {
-  buildZapierLeadPayload,
+  buildN8nLeadPayload,
   type SmsConsentFieldValue,
   validateSmsConsentDraft,
   sanitizePhoneInput,
@@ -93,7 +93,7 @@ export default function TellUsWhyForm() {
     const utmSource = qs.get('utm_source');
     const utmMedium = qs.get('utm_medium');
     const utmCampaign = qs.get('utm_campaign');
-    const payload = buildZapierLeadPayload({
+    const payload = buildN8nLeadPayload({
       formType: 'feedback',
       submittedAt: new Date().toISOString(),
       source: {

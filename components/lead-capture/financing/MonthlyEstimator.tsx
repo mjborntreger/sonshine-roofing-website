@@ -11,7 +11,7 @@ import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields'
 import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/components/marketing/financing/financing-programs';
 import { readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
 import {
-  buildZapierLeadPayload,
+  buildN8nLeadPayload,
   CONTACT_READY_COOKIE,
   CONTACT_READY_MAX_AGE,
   mapLeadApiFieldErrors,
@@ -784,7 +784,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     const stateValue = normalizeState(formValues.state);
     const zipValue = normalizeZip(formValues.zip);
 
-    const payload = buildZapierLeadPayload({
+    const payload = buildN8nLeadPayload({
       formType: 'financing-calculator',
       submittedAt: new Date().toISOString(),
       source: {
