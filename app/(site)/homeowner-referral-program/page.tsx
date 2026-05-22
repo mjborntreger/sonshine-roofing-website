@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Section from "@/components/layout/Section";
 import ServicesAside from "@/components/global-nav/static-pages/ServicesAside";
 import SmartLink from "@/components/utils/SmartLink";
@@ -206,7 +207,20 @@ export default async function HomeownerReferralProgramPage() {
             </div>
 
             <section id="referral-form" className="not-prose my-8 scroll-mt-24">
-              <ReferralForm />
+              <Suspense
+                fallback={
+                  <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+                    <div className="h-6 w-32 animate-pulse rounded-full bg-slate-200" />
+                    <div className="mt-4 space-y-3">
+                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
+                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
+                      <div className="h-4 animate-pulse rounded-full bg-slate-200" />
+                    </div>
+                  </div>
+                }
+              >
+                <ReferralForm />
+              </Suspense>
             </section>
 
             <h2>What Counts as an Eligible Referral?</h2>
