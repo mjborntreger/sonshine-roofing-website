@@ -2,7 +2,7 @@ import Section from "@/components/layout/Section";
 import SmartLink from "@/components/utils/SmartLink";
 import RevealPhone from "@/components/utils/RevealPhone";
 import { buildBasicMetadata } from "@/lib/seo/meta";
-import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_LABEL, PHONE_HOURS_PREFIXED } from "@/lib/contact-hours";
+import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_PREFIXED } from "@/lib/contact-hours";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 
@@ -76,21 +76,15 @@ export default function ReferralProgramTermsPage() {
             </li>
             <li>Self-referrals do not qualify.</li>
             <li>
-              The referred person may contact SonShine Roofing by calling{" "}
-              <a href="tel:+19418664320">(941) 866-4320</a> by phone {PHONE_HOURS_LABEL} or by
-              submitting a contact request at{" "}
-              <a href="https://sonshineroofing.com/contact-us">
-                https://sonshineroofing.com/contact-us
-              </a>.
+              The referrer should submit the referral form at{" "}
+              <a href="https://sonshineroofing.com/homeowner-referral-program">
+                https://sonshineroofing.com/homeowner-referral-program
+              </a>{" "}
+              with the referred homeowner&rsquo;s details.
             </li>
             <li>
-              When reaching out, the referred person should provide the referrer&rsquo;s
-              name, phone number, and preferred email address.
-            </li>
-            <li>
-              A referral may still be credited after initial contact if SonShine receives
-              the referral information before the sale is made. Once the job is approved,
-              the referral-credit window closes.
+              If the homeowner calls first and mentions the referrer&rsquo;s name before
+              SonShine receives the referral submission, the referral may still be credited.
             </li>
             <li>
               A referral becomes a qualified referral only after the referred full roof

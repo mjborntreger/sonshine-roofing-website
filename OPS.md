@@ -39,7 +39,7 @@ Lead Pipeline (n8n)
 Lead Payload Contract (v2)
 - Root fields:
   - `version: "v2"`
-  - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback"`
+  - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback" | "referral"`
   - `submittedAt` (ISO timestamp)
   - `source.page` (required)
   - `contact.firstName`, `contact.lastName` (required)
@@ -53,6 +53,10 @@ Lead Payload Contract (v2)
   - `address.{address1,address2,city,state,zip}`
   - `details` (form-specific object)
   - `antiSpam.hp_field` (honeypot)
+- Referral submissions:
+  - Root `contact` is the referrer.
+  - `details.referredHomeowner` is the referred homeowner.
+  - Referral forms do not show SMS consent UI and submit `smsConsent.projectSms: "no"` and `smsConsent.marketingSms: "no"`.
 
 Status Checklist (handoff)
 - [ ] Robots staging: Disallow all

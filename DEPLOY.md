@@ -18,7 +18,7 @@ Lead Webhook Routing (n8n)
 Lead Payload Contract (v2)
 - Required shape:
   - `version: "v2"`
-  - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback"`
+  - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback" | "referral"`
   - `submittedAt` (ISO timestamp)
   - `source.page`
   - `contact.firstName`, `contact.lastName`
@@ -32,6 +32,10 @@ Lead Payload Contract (v2)
   - `address.{address1,address2,city,state,zip}`
   - `details` (form-specific fields)
   - `antiSpam.hp_field`
+- Referral submissions:
+  - Root `contact` is the referrer.
+  - `details.referredHomeowner` is the referred homeowner.
+  - Referral forms do not show SMS consent UI and submit `smsConsent.projectSms: "no"` and `smsConsent.marketingSms: "no"`.
 
 Sitemaps & Robots
 - Production

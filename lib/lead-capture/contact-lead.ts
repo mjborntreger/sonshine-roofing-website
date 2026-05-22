@@ -116,7 +116,7 @@ export function normalizeSmsConsent(value: SmsConsentFieldValue): SmsConsentChoi
   return value === 'yes' ? 'yes' : 'no';
 }
 
-export type ZapierLeadFormType = 'contact-lead' | 'financing-calculator' | 'special-offer' | 'feedback';
+export type ZapierLeadFormType = 'contact-lead' | 'financing-calculator' | 'special-offer' | 'feedback' | 'referral';
 export const CONTACT_LEAD_NOT_PROVIDED = 'Not provided';
 export const CONTACT_LEAD_NOT_PROVIDED_EMAIL = 'notprovided@example.com';
 

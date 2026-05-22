@@ -2,21 +2,19 @@ import Section from "@/components/layout/Section";
 import ServicesAside from "@/components/global-nav/static-pages/ServicesAside";
 import SmartLink from "@/components/utils/SmartLink";
 import Hero from "@/components/ui/Hero";
+import ReferralForm from "@/components/lead-capture/referral/ReferralForm";
 import { listFaqsWithContent } from "@/lib/content/wp";
 import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
-import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_LABEL, PHONE_HOURS_PREFIXED } from "@/lib/contact-hours";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import type { Metadata } from "next";
 import {
   ArrowLeftRight,
-  CalendarDays,
   CheckCircle2,
-  HandCoins,
+  Contact,
   Home,
-  Mail,
   Smartphone,
   XCircle,
 } from "lucide-react";
@@ -25,9 +23,8 @@ import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 const SERVICE_PATH = "/homeowner-referral-program";
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
-const REFERRAL_PHONE_HREF = "tel:19418664320";
+const REFERRAL_PHONE_HREF = "tel:+19418664320";
 const REFERRAL_PHONE_DISPLAY = "(941) 866-4320";
-const CONTACT_PATH = "/contact-us";
 const TERMS_PATH = "/homeowner-referral-program/terms-and-conditions";
 
 const CARD_BASE = "rounded-3xl border bg-white p-6 shadow-sm";
@@ -45,18 +42,18 @@ type StepCard = {
 const PROCESS_STEPS: StepCard[] = [
   {
     step: "Step 1",
-    title: "Homeowner reaches out",
-    text: `They can call SonShine Roofing ${PHONE_HOURS_LABEL} or send a request through our contact page.`,
+    title: "Fill out the referral form",
+    text: "Send us the referred homeowner's contact details so SonShine can match the referral to you.",
   },
   {
     step: "Step 2",
-    title: "They share your contact details",
-    text: "The homeowner should provide your name, phone number, and preferred email address so SonShine can match the referral correctly.",
+    title: "We make the sale",
+    text: "Our team follows up with the homeowner and confirms whether the project qualifies as a full roof replacement.",
   },
   {
     step: "Step 3",
     title: "We mail you a check",
-    text: "Once the roof replacement sale is made, SonShine mails your $250 reward check within 7 business days.",
+    text: "Once the qualifying roof replacement sale is made, SonShine mails your $250 reward check.",
   },
 ];
 
@@ -131,11 +128,11 @@ export default async function HomeownerReferralProgramPage() {
       <Hero
         title="Homeowner Referral Program"
         eyelash="SonShine Roofing Referral Program"
-        subtitle="Are you a current or former SonShine customer who knows a homeowner who needs a full roof replacement? Refer them to SonShine Roofing and earn $250 for each qualified referral."
+        subtitle="Are you a current or former SonShine customer or Roof Care Club member who knows a homeowner who needs a full roof replacement? Submit their details to SonShine Roofing and earn $250 for each qualified referral."
         badges={[
-          { icon: HandCoins, label: "$250 per qualified referral" },
+          { icon: Contact, label: "$250 per qualified referral" },
+          { icon: CheckCircle2, label: "Referrer submits the referral" },
           { icon: Home, label: "Full roof replacement jobs only" },
-          { icon: Smartphone, label: "Call or use our contact form" },
           { icon: ArrowLeftRight, label: "Paid via check in the mail" },
         ]}
         justifyStart
@@ -143,22 +140,21 @@ export default async function HomeownerReferralProgramPage() {
       >
         <div className="flex flex-wrap gap-3">
           <SmartLink
+            href="#referral-form"
+            className={`${HERO_ACTION} btn-brand-blue`}
+            aria-label="Submit a referral"
+            proseGuard
+          >
+            Submit a Referral
+          </SmartLink>
+          <SmartLink
             href={REFERRAL_PHONE_HREF}
-            className={`${HERO_ACTION} btn-brand-blue phone-affordance`}
+            className={`${HERO_ACTION} btn-secondary phone-affordance`}
             aria-label="Call SonShine Roofing about the homeowner referral program"
             proseGuard
           >
             <Smartphone className="h-4 w-4 mr-2 phone-affordance-icon" aria-hidden="true" />
             {REFERRAL_PHONE_DISPLAY}
-          </SmartLink>
-          <SmartLink
-            href={CONTACT_PATH}
-            className={`${HERO_ACTION} btn-secondary`}
-            aria-label="Contact SonShine Roofing to submit a referral"
-            proseGuard
-          >
-            <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
-            Questions?
           </SmartLink>
           <SmartLink
             href={TERMS_PATH}
@@ -180,13 +176,13 @@ export default async function HomeownerReferralProgramPage() {
             <h2 className="mt-4 text-3xl">Refer a Homeowner <span className="text-[--brand-blue]">with Confidence</span></h2>
             <p>
               If you know a friend, family member, neighbor, or fellow homeowner who needs a
-              full roof replacement in our Southwest Florida service area, <strong>you may be eligible for a <span className="text-[--brand-blue]">$250</span> cash prize.</strong>
+              full roof replacement in our Southwest Florida service area, <strong>you may be eligible for a <span className="text-[--brand-blue]">$250</span> referral reward.</strong>
             </p>
             <h2>How to Submit a Referral</h2>
             <p>
-              The process is intentionally straightforward. The most important thing is making
-              sure SonShine receives enough information to match the homeowner to the correct
-              referrer before the sale is made.
+              Fill out the referral form with the homeowner&apos;s details. SonShine will use your
+              contact information as the referrer and the homeowner information to follow up
+              about the roof replacement project.
             </p>
 
             <div className="not-prose my-6 grid gap-4 md:grid-cols-3">
@@ -209,33 +205,11 @@ export default async function HomeownerReferralProgramPage() {
               ))}
             </div>
 
-            <div className="not-prose my-8 overflow-hidden rounded-3xl border border-blue-200 bg-blue-100/70 shadow-sm">
-              <div className="flex flex-col gap-4 p-6 lg:flex-row lg:items-start lg:justify-between">
-                <div className="max-w-2xl">
-                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-blue-600">
-                    Important timing note
-                  </p>
-                  <p className="mt-3 text-xl font-semibold text-slate-700">
-                    The homeowner does not have to mention you only on the first call.
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-slate-500">
-                    If referral details are not shared at initial contact, SonShine can still
-                    credit the referral later, provided we receive the referrer&apos;s name, phone
-                    number, and preferred email address before the sale is made. Once the job is
-                    approved, the referral-credit window closes.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-blue-100 bg-white p-5 text-slate-700 lg:max-w-sm">
-                  <p className="text-sm font-semibold text-slate-900">Best practice</p>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Ask the homeowner to share your name, phone number, and preferred email when
-                    they call or submit their contact request.
-                  </p>
-                </div>
-              </div>
-            </div>
+            <section id="referral-form" className="not-prose my-8 scroll-mt-24">
+              <ReferralForm />
+            </section>
 
-            <h2>What Counts as a Eligible Referral?</h2>
+            <h2>What Counts as an Eligible Referral?</h2>
             <p>
               SonShine limits rewards to <strong>full roof replacement jobs</strong> that meet the program requirements below:
             </p>
@@ -296,71 +270,6 @@ export default async function HomeownerReferralProgramPage() {
                       </span>
                     ))}
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <h2>Ready to Send a Referral?</h2>
-            <div className={`${PANEL_BASE} not-prose mt-6 overflow-hidden border-blue-200`}>
-              <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_320px]">
-                <div className="px-6 py-6 sm:px-8">
-                  <p className="mt-3 text-2xl font-semibold text-slate-900">
-                    Use this page as your quick program guide, <span className="text-[--brand-blue]">then send the homeowner our way.</span>
-                  </p>
-                  <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
-                    For questions about eligibility, referral status, payout timing, duplicate
-                    claims, or disputes, call SonShine Roofing directly. {OFFICE_HOURS_PREFIXED} EST. {PHONE_HOURS_PREFIXED}.
-                  </p>
-                  <div className="mt-6 flex flex-wrap gap-3">
-                    <SmartLink
-                      href={REFERRAL_PHONE_HREF}
-                      className="btn btn-lg btn-brand-blue phone-affordance"
-                      aria-label="Call SonShine Roofing for referral program help"
-                      proseGuard
-                    >
-                      <Smartphone className="h-4 w-4 mr-2 phone-affordance-icon" aria-hidden="true" />
-                      {REFERRAL_PHONE_DISPLAY}
-                    </SmartLink>
-                    <SmartLink
-                      href={CONTACT_PATH}
-                      className="btn btn-lg btn-outline"
-                      aria-label="Open the SonShine Roofing contact page"
-                      proseGuard
-                    >
-                      <Mail className="h-4 w-4 mr-2" aria-hidden="true" />
-                      Questions?
-                    </SmartLink>
-                  </div>
-                </div>
-                <div className="border-t border-slate-200 bg-slate-50 px-6 py-6 lg:border-l lg:border-t-0">
-                  <div className="flex items-center gap-3">
-                    <CalendarDays className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
-                    <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-900">
-                      Quick reminders
-                    </p>
-                  </div>
-                  <ul className="mt-4 space-y-4 text-sm leading-6 text-slate-600">
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[--brand-blue]" aria-hidden="true" />
-                      <span>The homeowner may call or submit a request through our contact page.</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[--brand-blue]" aria-hidden="true" />
-                      <span>They should share your name, phone number, and preferred email.</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[--brand-blue]" aria-hidden="true" />
-                      <span>Once the job is approved, the referral-credit window closes.</span>
-                    </li>
-                  </ul>
-                  <SmartLink
-                    href={TERMS_PATH}
-                    className="mt-6 inline-flex items-center text-sm font-semibold text-slate-700 underline-offset-4 hover:text-slate-900 hover:underline"
-                    aria-label="View the referral program terms and conditions"
-                    proseGuard
-                  >
-                    View full program terms and conditions
-                  </SmartLink>
                 </div>
               </div>
             </div>

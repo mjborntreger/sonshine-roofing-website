@@ -14,6 +14,7 @@ const FORM_TYPES = new Set<LeadForwardPayloadV2['formType']>([
   'financing-calculator',
   'special-offer',
   'feedback',
+  'referral',
 ]);
 
 const SMS_CHOICES = new Set<LeadForwardPayloadV2['smsConsent']['projectSms']>(['yes', 'no']);
