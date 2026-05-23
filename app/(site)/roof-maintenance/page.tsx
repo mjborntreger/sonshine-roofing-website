@@ -108,7 +108,7 @@ export default async function Page() {
             <figure className="not-prose">
               <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
                 <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/taking-care-of-your-roof-maintenance-saves-moneybak.webp"
+                  src="https://wp.sonshineroofing.com/wp-content/uploads/taking-care-of-your-roof-maintenance-saves-moneybak.webp"
                   alt="taking care of your roof maintenance saves you money"
                   fill
                   className="object-cover mb-2"

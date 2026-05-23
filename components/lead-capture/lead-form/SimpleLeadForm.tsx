@@ -128,25 +128,25 @@ const ROOF_TYPE_OPTIONS: RoofTypeOption[] = [
   {
     value: 'shingle',
     label: 'Shingle',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Shingle-Roof.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Shingle-Roof.webp',
     imageAlt: 'Close-up of a shingle roof',
   },
   {
     value: 'metal',
     label: 'Metal',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Metal-Roof.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Metal-Roof.webp',
     imageAlt: 'Modern home with metal roofing panels',
   },
   {
     value: 'tile',
     label: 'Tile',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Tile-Roof.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Tile-Roof.webp',
     imageAlt: 'Clay tile roof on a Florida home',
   },
   {
     value: 'flat',
     label: 'Flat',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Flat-Roof.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Flat-Roof.webp',
     imageAlt: 'Flat commercial roof with HVAC equipment',
   },
 ];

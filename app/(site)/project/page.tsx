@@ -17,7 +17,7 @@ export const dynamic = "force-static";
 const PAGE_PATH = "/project";
 const PAGE_TITLE = "Roofing Project Gallery | SonShine Roofing";
 const PAGE_DESCRIPTION = "Browse photos and videos of our recent roof replacement projects in Sarasota and surrounding areas. Filter by material, color, and service area to find real projects like yours.";
-const PAGE_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Project-Gallery-OpenGraph-Compressed.png";
+const PAGE_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/Project-Gallery-OpenGraph-Compressed.png";
 const PAGE_SIZE = 6;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -84,7 +84,7 @@ export default async function ProjectArchivePage() {
         title="Roofing Project Gallery"
         eyelash="See Our Past Work"
         subtitle="Explore our latest major roof replacements in Sarasota, Bradenton, Venice, North Port, and more. Filter by material (shingle, metal, tile), roof color, and service area — or search by phrase to find a specific project."
-        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/See-Our-Past-Work.webp"
+        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/See-Our-Past-Work.webp"
         
       />
       <Section>

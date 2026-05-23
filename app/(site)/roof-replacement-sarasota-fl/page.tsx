@@ -110,7 +110,7 @@ export default async function Page() {
           { icon: HandCoins, label: "Flexible Financing" }
         ]}
         justifyStart
-        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/2-Treedale-Glen-Lakewood-Ranch-FL-Roof-Replacement.webp"
+        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/2-Treedale-Glen-Lakewood-Ranch-FL-Roof-Replacement.webp"
       >
         <div className="flex flex-wrap gap-3">
           <SmartLink
@@ -184,7 +184,7 @@ export default async function Page() {
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
                     alt="Nathan Borntreger, owner of SonShine Roofing"
                     fill
                     className="object-cover mb-2"
@@ -230,7 +230,7 @@ export default async function Page() {
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/difference-between-tile-vs-metal-vs-shingle-roofs.jpg"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/difference-between-tile-vs-metal-vs-shingle-roofs.jpg"
                     alt="Roof replacement choices"
                     fill
                     className="object-cover mb-2"
@@ -327,7 +327,7 @@ export default async function Page() {
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
                     alt="The importance of roof maintenance"
                     fill
                     className="object-cover mb-2"

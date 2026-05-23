@@ -49,7 +49,7 @@ export default async function bestOfTheBest({
       <ul className="grid justify-center grid-cols-5 gap-4 my-16 place-items-center">
         <li className="relative group">
           <Image
-            src="https://next.sonshineroofing.com/wp-content/uploads/2021-Best-of-the-Best-award-icon.bak-175x175.webp"
+            src="https://wp.sonshineroofing.com/wp-content/uploads/2021-Best-of-the-Best-award-icon.bak-175x175.webp"
             aria-label="Best of the Best 2021 Award"
             title="Best of the Best 2021 Award"
             height={imageHeight}
@@ -64,7 +64,7 @@ export default async function bestOfTheBest({
 
         <li className="relative group">
           <Image
-            src="https://next.sonshineroofing.com/wp-content/uploads/2022-Best-of-the-Best-award-icon.bak-175x175.webp"
+            src="https://wp.sonshineroofing.com/wp-content/uploads/2022-Best-of-the-Best-award-icon.bak-175x175.webp"
             aria-label="Best of the Best 2022 Award"
             title="Best of the Best 2022 Award"
             height={imageHeight}
@@ -80,7 +80,7 @@ export default async function bestOfTheBest({
 
         <li className="relative group">
           <Image
-            src="https://next.sonshineroofing.com/wp-content/uploads/2023-best-of-the-best-award.bak-175x175.webp"
+            src="https://wp.sonshineroofing.com/wp-content/uploads/2023-best-of-the-best-award.bak-175x175.webp"
             aria-label="Best of the Best 2023 Award"
             title="Best of the Best 2023 Award"
             height={imageHeight}
@@ -96,7 +96,7 @@ export default async function bestOfTheBest({
 
         <li className="relative group">
           <Image
-            src="https://next.sonshineroofing.com/wp-content/uploads/backup/2024-Best-of-the-Best-badge-icon-1-175x175.webp"
+            src="https://wp.sonshineroofing.com/wp-content/uploads/backup/2024-Best-of-the-Best-badge-icon-1-175x175.webp"
             aria-label="Best of the Best 2024 Award"
             title="Best of the Best 2024 Award"
             height={imageHeight}
@@ -112,7 +112,7 @@ export default async function bestOfTheBest({
 
         <li className="relative group">
           <Image
-            src="https://next.sonshineroofing.com/wp-content/uploads/BOTB25_Award_1080px-175x175.webp"
+            src="https://wp.sonshineroofing.com/wp-content/uploads/BOTB25_Award_1080px-175x175.webp"
             aria-label="Best of the Best 2025 Award"
             title="Best of the Best 2025 Award"
             height={imageHeight}

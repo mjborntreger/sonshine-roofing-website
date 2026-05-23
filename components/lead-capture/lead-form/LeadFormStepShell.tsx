@@ -34,7 +34,7 @@ export default function LeadFormStepShell({
           </div>
           <div className="relative mb-4 aspect-[21/9] h-[27px] w-[79px] sm:h-[54px] sm:w-[158px] shrink-0">
             <Image
-              src="https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
+              src="https://wp.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
               alt="sonshine logo, no swoosh"
               width={158}
               height={54}

@@ -35,11 +35,11 @@ export const LANDING_PAGE_SLUGS = [
 
 export type LandingPageSlug = (typeof LANDING_PAGE_SLUGS)[number];
 
-const TEAM_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Nathan-Jeremy-JB-ezgif.com-optiwebp.webp";
-const LOGO_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-3.webp";
-const VENICE_PROJECT_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/3-Innisbrook-Court-Venice-FL-Roof-Replacement.webp";
-const NORTH_PORT_PROJECT_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/3-Brewster-Rd-North-Port-FL-Roof-Replacement.webp";
-const SARASOTA_PROJECT_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/3-Old-Stone-Rd-Sarasota-FL-Roof-Replacement.webp";
+const TEAM_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/Nathan-Jeremy-JB-ezgif.com-optiwebp.webp";
+const LOGO_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/sonshine-logo-3.webp";
+const VENICE_PROJECT_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/3-Innisbrook-Court-Venice-FL-Roof-Replacement.webp";
+const NORTH_PORT_PROJECT_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/3-Brewster-Rd-North-Port-FL-Roof-Replacement.webp";
+const SARASOTA_PROJECT_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/3-Old-Stone-Rd-Sarasota-FL-Roof-Replacement.webp";
 
 export const LANDING_PAGES_CONFIG: Record<LandingPageSlug, LandingPageConfig> = {
   sarasota: {

@@ -63,7 +63,7 @@ export default async function Page() {
     description: config?.description,
     url: SERVICE_PATH,
     origin,
-    primaryImage: config?.image?.url ?? "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png",
+    primaryImage: config?.image?.url ?? "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png",
     isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
   });
 
@@ -88,7 +88,7 @@ export default async function Page() {
       { icon: HardHat, label: "Expert Opinion" },
       { icon: Ban, label: "No BS" },
     ]}
-    imageSrc="https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp"
+    imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp"
     />
       <Section>
         <div className="grid gap-4 px-2 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
@@ -155,7 +155,7 @@ export default async function Page() {
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/curling-Shingles-on-roof.jpg"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/curling-Shingles-on-roof.jpg"
                     alt="Curling Shingles Roof Repair"
                     fill
                     className="object-cover mb-2"
@@ -191,7 +191,7 @@ export default async function Page() {
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
                     alt="Water Damage Roof Repair"
                     fill
                     className="object-cover mb-2"
@@ -230,7 +230,7 @@ export default async function Page() {
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/roof-insect-damage-repair.jpg"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/roof-insect-damage-repair.jpg"
                     alt="Insect Damage Roof Repair"
                     fill
                     className="object-cover mb-2"
@@ -267,7 +267,7 @@ export default async function Page() {
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/damaged-vent-flashing-scaled.jpg"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/damaged-vent-flashing-scaled.jpg"
                     alt="Worn out or damaged flashing roof repair"
                     fill
                     className="object-cover mb-2"
@@ -306,7 +306,7 @@ export default async function Page() {
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/rotten-fascia-scaled.jpg"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/rotten-fascia-scaled.jpg"
                     alt="Rotting fascia roof repair"
                     fill
                     className="object-cover mb-2"

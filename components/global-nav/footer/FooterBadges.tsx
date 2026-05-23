@@ -9,42 +9,42 @@ const badges = [
   {
     href: "https://mysafeflhome.com",
     title: "My Safe Florida Home Certified Contractor",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
   },
   {
     href: "https://business.sarasotachamber.com/active-member-directory/Details/sonshine-roofing-3821919",
     title: "Sarasota Chamber of Commerce",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/Chamber-Accreditation-Logo-4C-5STAR-400x106.png",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/Chamber-Accreditation-Logo-4C-5STAR-400x106.png",
   },
   {
     href: "https://business.manateechamber.com/list/member/sonshine-roofing-37287",
     title: "Manatee Chamber of Commerce",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/2020-Chamber-Proud-Member-Logo_WEB-VERSION_small.bak.webp",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/2020-Chamber-Proud-Member-Logo_WEB-VERSION_small.bak.webp",
   },
   {
     href: "https://www.northportareachamber.com/list/member/sonshine-roofing-inc-4041",
     title: "North Port Chamber of Commerce",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/NPChamberLogo.webp",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/NPChamberLogo.webp",
   },
   {
     href: "https://www.floridaroof.com/SONSHINE-ROOFING-INC-10-1104.html",
     title: "FRSA",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/FRSA-400x401.webp",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/FRSA-400x401.webp",
   },
   {
     href: "https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick",
     title: "A+ Rated Roofing Contractor with the BBB",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp",
   },
   {
     href: "https://www.nrca.net/Members/Members/Detail/26f0eca5-8397-4524-8ea3-807a1735e028#",
     title: "National Roofing Contractors Association",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/National-Roofing-Contractors-Association.webp",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/National-Roofing-Contractors-Association.webp",
   },
   {
     href: "https://www.gaf.com/en-us/roofing-contractors/residential/sonshine-roofing-inc-1104247",
     title: "GAF Master Elite Certified",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp",
   },
   {
     href: "https://www.expertise.com/fl/sarasota/roofing",

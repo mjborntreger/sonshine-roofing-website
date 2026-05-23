@@ -78,24 +78,24 @@ const buildSheet = [
 ];
 
 const truckGalleryImages: WpImage[] = [
-  'https://next.sonshineroofing.com/wp-content/uploads/DenaliSideView-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalirear-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalirightside-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalifrontview-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denaliinteriorfront-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denaliinteriorrear-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalimpgproof-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denaliliftgate-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalisupercharger-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denaliunderthehood2-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denaliunderthehood3-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denaliinfotainment2-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalidriveshaft-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalibelow2-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalibelow-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalidocs2-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/denalidocs-ezgif.com-optiwebp.webp',
-  'https://next.sonshineroofing.com/wp-content/uploads/Denali-Dynoresults-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/DenaliSideView-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalirear-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalirightside-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalifrontview-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denaliinteriorfront-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denaliinteriorrear-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalimpgproof-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denaliliftgate-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalisupercharger-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denaliunderthehood2-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denaliunderthehood3-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denaliinfotainment2-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalidriveshaft-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalibelow2-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalibelow-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalidocs2-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/denalidocs-ezgif.com-optiwebp.webp',
+  'https://wp.sonshineroofing.com/wp-content/uploads/Denali-Dynoresults-ezgif.com-optiwebp.webp',
 ].map((url) => ({ url, altText: TRUCK_TITLE }));
 
 export default async function Page() {
@@ -106,7 +106,7 @@ export default async function Page() {
           title="Performance Truck for Sale"
           subtitle="Real-world 800-wheel-horsepower GMC Sierra Denali that can be driven every day—comfort, 4WD traction, and a professionally built ProCharged 6.2L."
           eyelash="The 'Frankenstein Truck'"
-          imageSrc="https://next.sonshineroofing.com/wp-content/uploads/denalileftfront-ezgif.com-optiwebp-1.webp"
+          imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/denalileftfront-ezgif.com-optiwebp-1.webp"
           justifyStart
           badges={[
             { icon: Map, label: '53,334 chassis miles' },
@@ -191,7 +191,7 @@ export default async function Page() {
                 <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 my-8">
                   <div className="relative aspect-[16/9] w-full">
                     <Image
-                      src="https://next.sonshineroofing.com/wp-content/uploads/denaliunderhood-ezgif.com-optiwebp.webp"
+                      src="https://wp.sonshineroofing.com/wp-content/uploads/denaliunderhood-ezgif.com-optiwebp.webp"
                       alt={TRUCK_TITLE}
                       fill
                       className="object-cover"

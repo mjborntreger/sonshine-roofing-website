@@ -122,7 +122,7 @@ export default async function FinancingPage() {
           { icon: Percent, label: "Equity-based Options" },
           { icon: DollarSign, label: "Credit-based Options" },
         ]}
-        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp"
+        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp"
       >
         <div className="flex justify-center gap-6 flex-wrap mx-auto max-w-3xl">
           <div>
@@ -165,7 +165,7 @@ export default async function FinancingPage() {
               theme="orange"
               title="YGrene PACE Financing (Equity‑based)"
               subtitle="House‑secured. Payments typically included in your property‑tax bill."
-              logoUrl="https://next.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
+              logoUrl="https://wp.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
               chips={["No credit check", "Tax‑bill payments", "Equity‑based", "Fast approval"]}
               keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
               sampleMonthly={`${sampleMonthly849} on ${currency(defaultAmount)} (15yr @ 8.49%)`}
@@ -190,7 +190,7 @@ export default async function FinancingPage() {
               theme="cyan"
               title="Service Finance (Credit‑based)"
               subtitle="Signature loan with flexible terms. No lien on your property."
-              logoUrl="https://next.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
+              logoUrl="https://wp.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
               chips={["Signature loan", "Fixed term", "Fast approval"]}
               keyFigures={["0% for 12 months", "From 7.9% fixed", per10kService]}
               sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
@@ -303,7 +303,7 @@ export default async function FinancingPage() {
                   className="text-xl font-semibold text-slate-900">YGrene PACE Financing (Equity‑based)
                 </h3>
                 <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
+                  src="https://wp.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
                   title="Ygrene Financing Logo"
                   alt="Ygrene Financing Logo"
                   className="h-6 w-auto opacity-70"
@@ -346,7 +346,7 @@ export default async function FinancingPage() {
                   Service Finance (Credit‑based)
                 </h3>
                 <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
+                  src="https://wp.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
                   title="Service Finance Logo"
                   alt="Service Finance Logo"
                   className="h-8 w-auto opacity-70"

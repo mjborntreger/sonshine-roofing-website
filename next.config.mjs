@@ -1,6 +1,6 @@
 // Security headers (CSP enforced in all environments)
 const csp = `
-  default-src 'self' https://connect.facebook.net https://storage.googleapis.com https://next.sonshineroofing.com;
+  default-src 'self' https://connect.facebook.net https://storage.googleapis.com https://wp.sonshineroofing.com;
   base-uri 'self';
   form-action 'self' https://*.acculynx.com;
   frame-ancestors https://www.google.com;
@@ -10,7 +10,7 @@ const csp = `
   style-src 'self' 'unsafe-inline' quickquote.iife.js.map https://cdn.socket.io https://fonts.bunny.net https://cdn.jsdelivr.net https://fonts.googleapis.com https://www.googletagmanager.com https://assets.calendly.com;
   script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' data: https://connect.facebook.net quickquote.iife.js.map https://maps.googleapis.com https://www.google.com https://storage.googleapis.com https://www.googletagmanager.com https://qq.leadsbyquickquote.com https://vercel.live https://challenges.cloudflare.com https://www.clarity.ms https://scripts.clarity.ms https://cdn.callrail.com https://js.callrail.com https://googleads.g.doubleclick.net https://www.googleadservices.com blob: https://*.amazon-adsystem.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://*.tvsquared.com https://ct.pinterest.com https://assets.calendly.com https://hatch-javascript.s3.amazonaws.com https://unpkg.com https://app.usehatchapp.com;
   script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' data: https://cdn.socket.io quickquote.iife.js.map https://connect.facebook.net https://www.gstatic.com https://maps.googleapis.com https://www.google.com https://storage.googleapis.com https://qq.leadsbyquickquote.com https://www.googletagmanager.com https://vercel.live https://challenges.cloudflare.com https://www.clarity.ms https://scripts.clarity.ms https://cdn.callrail.com https://js.callrail.com https://googleads.g.doubleclick.net https://www.googleadservices.com blob: https://*.amazon-adsystem.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://*.tvsquared.com https://ct.pinterest.com https://assets.calendly.com https://hatch-javascript.s3.amazonaws.com https://unpkg.com https://app.usehatchapp.com;
-  connect-src 'self' ws: wss: quickquote.iife.js.map https://cdn.socket.io https://y.clarity.ms/collect https://b.clarity.ms/collect https://j.clarity.ms/collect https://connect.facebook.net https://places.googleapis.com https://maps.googleapis.com https://cdn.jsdelivr.net https://storage.googleapis.com https://quickquote-api-223492134056.us-central1.run.app https://sonshineroofing.com https://next.sonshineroofing.com https://vitals.vercel-insights.com https://*.acculynx.com https://challenges.cloudflare.com https://www.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://q.clarity.ms https://a.clarity.ms/collect https://stats.g.doubleclick.net/g/collect https://*.amazon-adsystem.com https://www.facebook.com https://connect.facebook.net https://ct.pinterest.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://insight.adsrvr.org https://*.tvsquared.com https://*.paa-reporting-advertising.amazon https://*.amazon https://calendly.com https://assets.calendly.com https://app.usehatchapp.com;
+  connect-src 'self' ws: wss: quickquote.iife.js.map https://cdn.socket.io https://y.clarity.ms/collect https://b.clarity.ms/collect https://j.clarity.ms/collect https://connect.facebook.net https://places.googleapis.com https://maps.googleapis.com https://cdn.jsdelivr.net https://storage.googleapis.com https://quickquote-api-223492134056.us-central1.run.app https://sonshineroofing.com https://wp.sonshineroofing.com https://vitals.vercel-insights.com https://*.acculynx.com https://challenges.cloudflare.com https://www.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://q.clarity.ms https://a.clarity.ms/collect https://stats.g.doubleclick.net/g/collect https://*.amazon-adsystem.com https://www.facebook.com https://connect.facebook.net https://ct.pinterest.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://insight.adsrvr.org https://*.tvsquared.com https://*.paa-reporting-advertising.amazon https://*.amazon https://calendly.com https://assets.calendly.com https://app.usehatchapp.com;
   object-src 'none';
 `.replace(/\s{2,}/g, ' ').trim();
 
@@ -21,7 +21,7 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "sonshineroofing.com" },
-      { protocol: "https", hostname: "next.sonshineroofing.com" },
+      { protocol: "https", hostname: "wp.sonshineroofing.com" },
       { protocol: "https", hostname: "**.wp.com" },
       { protocol: "https", hostname: "coc.codes" },
       { protocol: "https", hostname: "res.cloudinary.com" },
@@ -166,19 +166,19 @@ const nextConfig = {
       { source: "/project/treedale-glen-lakewood-ranch", destination: "/project/treesdale-glen-lakewood-ranch", permanent: true },
 
       // === Broken Backlinks ===
-      { source: "/wp-content/uploads/roof-lifespan-1-1080x619.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/extend-roof-lifespan.webp", permanent: true },
-      { source: "/wp-content/uploads/sarasota-roofing-companies-sonshine-roofing.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png", permanent: true },
-      { source: "/wp-content/uploads/sonshine-roofing-logo.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png", permanent: true },
-      { source: "/wp-content/uploads/how-long-does-a-roof-last-composite.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
-      { source: "/wp-content/uploads/pitch-roofed-roof-vs.-flat-roof.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/pitched-roof-vs-flat-roof.webp", permanent: true },
-      { source: "/wp-content/uploads/how-long-does-a-roof-last-slate.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
-      { source: "/wp-content/uploads/need-roof-repair-attic2-1080x675.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/need-roof-repair-attic-800x450-1.webp", permanent: true },
-      { source: "/wp-content/uploads/roofing-contractor-1-1080x675.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/ask-sarasota-roofing-contractor-1.webp", permanent: true },
-      { source: "/wp-content/uploads/GAF-Footer-LOGO.png", destination: "https://next.sonshineroofing.com/wp-content/uploads/master-elite-logo-hi-res-png.png", permanent: true },
-      { source: "/wp-content/uploads/roof-leak-warning-9-roof-stain.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/roof-leak-warning-9-roof-stain.webp", permanent: true },
-      { source: "/wp-content/uploads/roof-leak-warning-1-algae.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/roof-leak-warning-1-algae.webp", permanent: true },
-      { source: "/wp-content/uploads/how-long-does-a-tile-roof-last-in-florida-1080x675.jpg", destination: "https://next.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
-      { source: "/wp-content/:path*", destination: "https://next.sonshineroofing.com/wp-content/:path*", permanent: true },
+      { source: "/wp-content/uploads/roof-lifespan-1-1080x619.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/extend-roof-lifespan.webp", permanent: true },
+      { source: "/wp-content/uploads/sarasota-roofing-companies-sonshine-roofing.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png", permanent: true },
+      { source: "/wp-content/uploads/sonshine-roofing-logo.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png", permanent: true },
+      { source: "/wp-content/uploads/how-long-does-a-roof-last-composite.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
+      { source: "/wp-content/uploads/pitch-roofed-roof-vs.-flat-roof.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/pitched-roof-vs-flat-roof.webp", permanent: true },
+      { source: "/wp-content/uploads/how-long-does-a-roof-last-slate.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
+      { source: "/wp-content/uploads/need-roof-repair-attic2-1080x675.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/need-roof-repair-attic-800x450-1.webp", permanent: true },
+      { source: "/wp-content/uploads/roofing-contractor-1-1080x675.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/ask-sarasota-roofing-contractor-1.webp", permanent: true },
+      { source: "/wp-content/uploads/GAF-Footer-LOGO.png", destination: "https://wp.sonshineroofing.com/wp-content/uploads/master-elite-logo-hi-res-png.png", permanent: true },
+      { source: "/wp-content/uploads/roof-leak-warning-9-roof-stain.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/roof-leak-warning-9-roof-stain.webp", permanent: true },
+      { source: "/wp-content/uploads/roof-leak-warning-1-algae.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/roof-leak-warning-1-algae.webp", permanent: true },
+      { source: "/wp-content/uploads/how-long-does-a-tile-roof-last-in-florida-1080x675.jpg", destination: "https://wp.sonshineroofing.com/wp-content/uploads/how-long-does-a-roof-last-tile.webp", permanent: true },
+      { source: "/wp-content/:path*", destination: "https://wp.sonshineroofing.com/wp-content/:path*", permanent: true },
       { source: "/free-roofing-estimate", destination: "/contact-us", permanent: true },
       { source: "/double-roof-service-life", destination: "/roof-maintenance", permanent: true },
       { source: "/wp-content/uploads/Lifted-Cox.jpg", destination: "/", permanent: true },

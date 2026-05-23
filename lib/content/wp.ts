@@ -122,7 +122,7 @@ const readRecordString = (record: UnknownRecord | null, key: string): string | n
 // ----- Endpoint & Auth -----
 const WP_ENDPOINT =
   process.env.NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT ||
-  "https://next.sonshineroofing.com/graphql";
+  "https://wp.sonshineroofing.com/graphql";
 
 // Server-only env vars (keep these secret)
 const WP_USER = process.env.WP_BASIC_AUTH_USER;

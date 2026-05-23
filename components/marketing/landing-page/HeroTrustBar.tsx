@@ -14,11 +14,11 @@ const FACEBOOK_PROFILE_URL = "https://www.facebook.com/sonshineroofing";
 const NEXTDOOR_PROFILE_URL = "https://nextdoor.com/page/sonshine-roofing-sarasota-fl?utm_campaign=1763612646168&share_action_id=ec8cdd35-bc00-464d-a93a-da23de117ddc";
 
 // LOGO SRC
-const GOOGLE_LOGO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/google.webp";
-const YELP_LOGO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/Yelp-Logo-Icon-for-Reviews.webp";
-const ANGI_LOGO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/Angi-Logo-Icon.webp";
-const FACEBOOK_LOGO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/facebook-logo-for-reviews.webp";
-const NEXTDOOR_LOGO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/Nextdoor-Logo-Icon.webp";
+const GOOGLE_LOGO_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/google.webp";
+const YELP_LOGO_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/Yelp-Logo-Icon-for-Reviews.webp";
+const ANGI_LOGO_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/Angi-Logo-Icon.webp";
+const FACEBOOK_LOGO_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/facebook-logo-for-reviews.webp";
+const NEXTDOOR_LOGO_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/Nextdoor-Logo-Icon.webp";
 
 type HeroTrustBarProps = {
   heading?: string;
@@ -153,7 +153,7 @@ const BADGES = [
     label: "GAF Master Elite Cerified",
     subtitle: "Industry-leading warranties and premium roofing materials you can rely on.",
     href: "https://www.gaf.com/en-us/roofing-contractors/residential/sonshine-roofing-inc-1104247",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp",
     alt: "GAF Master Elite Contractor Seal",
   },
   {
@@ -161,7 +161,7 @@ const BADGES = [
     label: "My Safe FL Home Certified",
     subtitle: "Prepare for hurricane season and save thousands in insurance costs and wind mitigation services.",
     href: "https://mysafeflhome.com",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
     alt: "My Safe FL Home Certified Roofing Contractor in Florida",
   },
   {
@@ -169,7 +169,7 @@ const BADGES = [
     label: "A+ Rating with the BBB",
     subtitle: "Stability and a longstanding reputation in the community.",
     href: "https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick",
-    src: "https://next.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp",
+    src: "https://wp.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp",
     alt: "A+ Rated Roofing Contractor with the Better Business Bureau",
   },
   {

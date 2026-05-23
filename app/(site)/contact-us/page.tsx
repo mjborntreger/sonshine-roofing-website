@@ -72,7 +72,7 @@ export default async function Page() {
       <Hero
         title="Contact Us"
         eyelash="Whatever you need, we've got you covered"
-        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp"
+        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp"
         subtitle="Whether you want to schedule an appointment with one our expert Roofing Specialists or if you just have a few questions, we’re here to help! Give us a call or complete the form below to contact our office."
         badges={[
           { icon: ShieldCheck, label: "Licensed & Insured" },
@@ -103,7 +103,7 @@ export default async function Page() {
 
                   </div>
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
                     alt="Tara – Project Support Specialist"
                     width={75}
                     height={107.25}
@@ -163,7 +163,7 @@ export default async function Page() {
                     />
                   </div>
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
                     alt="Tara – Project Support Specialist"
                     width={75}
                     height={107.25}

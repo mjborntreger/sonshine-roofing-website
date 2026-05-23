@@ -47,7 +47,7 @@ export default function ReviewsCatcher() {
           >
             <Image
               alt="Google logo"
-              src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
+              src="https://wp.sonshineroofing.com/wp-content/uploads/google.webp"
               width={20}
               height={20}
               className="object-contain w-5 h-5"

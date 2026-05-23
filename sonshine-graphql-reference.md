@@ -6,7 +6,7 @@
 
 ## Runtime configuration 
 
-- `NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT` → defaults to `https://next.sonshineroofing.com/graphql`.
+- `NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT` → defaults to `https://wp.sonshineroofing.com/graphql`.
 - `WP_BASIC_AUTH_USER` / `WP_BASIC_AUTH_PASS` → optional Basic Auth applied on every request.
 - `WP_PROJECT_BASE` → base segment for project permalinks (default `project`); used when building URIs for GraphQL lookups.
 - `NODE_ENV` toggles `WP_VERBOSE_ERRORS`, causing raw GraphQL errors to be surfaced during development.

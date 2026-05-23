@@ -84,7 +84,7 @@ export default async function Page() {
           { icon: HardHat, label: "Expert Opinion" },
           { icon: Zap, label: "Hurricane Preparation" },
         ]}
-        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/Roof-Inspection-Hero-Image.webp"
+        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Roof-Inspection-Hero-Image.webp"
       >
         <div className="bg-slate-600 h-[1px] my-8" />
         <div className="flex-col gap-y-6 max-w-5xl text-center mx-auto">
@@ -159,7 +159,7 @@ export default async function Page() {
               <figure className="not-prose mt-4">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
                   <Image
-                    src="https://next.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
+                    src="https://wp.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
                     alt="Nathan Borntreger, owner of SonShine Roofing, Roof Inspection Expert"
                     fill
                     className="object-cover mb-2"

@@ -90,7 +90,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     icon: Droplets,
     accent: 'border-rose-200 bg-rose-50 text-rose-600',
     action: 'advance',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Emergency-Roof-Repair.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Emergency-Roof-Repair.webp',
     imageAlt: 'Roof Leak in Attic',
   },
   {
@@ -100,7 +100,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     icon: Hammer,
     accent: 'border-amber-200 bg-amber-50 text-amber-600',
     action: 'advance',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp',
     imageAlt: 'Example image of a tile roof replacement in Sarasota',
   },
   {
@@ -111,7 +111,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     accent: 'border-emerald-200 bg-emerald-50 text-emerald-600',
     action: 'link',
     href: '/roof-inspection',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
     imageAlt: 'Technician performing light roof repairs and an inspection',
   },
   {
@@ -122,7 +122,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     accent: 'border-sky-200 bg-sky-50 text-sky-600',
     action: 'link',
     href: '/financing#get-started',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp',
     imageAlt: 'Homeowner couple reviewing roof financing options',
   },
   {
@@ -133,7 +133,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     accent: 'border-purple-200 bg-purple-50 text-purple-600',
     action: 'link',
     href: '/project',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/See-Our-Past-Work.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/See-Our-Past-Work.webp',
     imageAlt: 'Finished shingle, tile, and metal roofing projects showcasing past work',
   },
   {
@@ -143,7 +143,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     icon: MessageCircle,
     accent: 'border-violet-200 bg-violet-50 text-violet-600',
     action: 'advance',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Something-Else.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Something-Else.webp',
     imageAlt: 'Homeowner talking with a roofing advisor',
   },
 ];
@@ -154,7 +154,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: 'Roof Repair',
     eyebrow: 'Free estimate',
     description: 'Fast, lasting roof repair for leaks, flashing, fascia, and storm damage.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Emergency-Roof-Repair.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Emergency-Roof-Repair.webp',
     imageAlt: 'Roof leak in an attic that needs repair',
   },
   {
@@ -162,7 +162,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: 'Roof Replacement',
     eyebrow: 'Free estimate',
     description: 'Shingle, tile, metal, and flat roof replacements backed by strong warranties.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp',
     imageAlt: 'Florida home getting a roof replacement',
   },
   {
@@ -170,7 +170,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: '18-Point Roof Inspection',
     eyebrow: 'Tip Top Roof Check-up',
     description: 'Licensed residential inspections to catch hidden leaks and storm damage early.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/roof-inspection-navigation-preview-image.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/roof-inspection-navigation-preview-image.webp',
     imageAlt: 'Roofing technician performing an inspection',
   },
   {
@@ -178,7 +178,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: 'Roof Maintenance Plans',
     eyebrow: 'Roof Care Club',
     description: 'Prevent leaks, catch issues early, and extend roof life with scheduled upkeep.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
     imageAlt: 'Roof maintenance helping homeowners save money',
   },
   {
@@ -186,7 +186,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: 'Explore Financing',
     eyebrow: 'Flexible payments',
     description: 'Explore credit-based and equity-based roof financing with clear monthly options.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp',
     imageAlt: 'Homeowners reviewing roof financing options together',
   },
   {
@@ -194,7 +194,7 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
     label: 'Refer and Get Paid',
     eyebrow: '$250 referral reward',
     description: 'Refer a full roof replacement and learn how qualified homeowner referrals work.',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/referral-program-navigational-image.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/referral-program-navigational-image.webp',
     imageAlt: 'Homeowner referral program for full roof replacement projects',
   },
 ];
@@ -214,7 +214,7 @@ const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
     label: 'Water damage',
     description: 'There is water inside or the interior is compromised',
     icon: Droplets,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/i-have-an-active-leak.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/i-have-an-active-leak.webp',
     imageAlt: 'Active roof leak with buckets catching water inside a home',
   },
   {
@@ -222,7 +222,7 @@ const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
     label: 'Aging roof',
     description: 'It’s close to the end of its lifespan and we want a plan',
     icon: SunDim,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/roof-is-aging-out.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/roof-is-aging-out.webp',
     imageAlt: 'Homeowner inspecting an older roof showing wear',
   },
   {
@@ -230,7 +230,7 @@ const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
     label: 'Researching options',
     description: 'Gathering ideas, timelines, and investment ranges',
     icon: TrendingUp,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/researching-options.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/researching-options.webp',
     imageAlt: 'Couple reviewing roofing options on a laptop',
   },
   {
@@ -238,7 +238,7 @@ const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
     label: 'Exterior roof damage',
     description: 'Missing shingles, lifted tiles, or debris on the roof',
     icon: AlertTriangle,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/I-can-see-roof-damage.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/I-can-see-roof-damage.webp',
     imageAlt: 'Close-up of shingles showing visible roof damage',
   },
   {
@@ -246,7 +246,7 @@ const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
     label: 'Need an inspection report',
     description: 'For insurance, warranty, or peace of mind before hurricane season',
     icon: ShieldCheck,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/need-an-inspection-report.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/need-an-inspection-report.webp',
     imageAlt: 'Roof inspector documenting findings on a clipboard',
   },
   {
@@ -254,7 +254,7 @@ const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
     label: 'Interested in financing',
     description: 'No credit check, personalized quiz, detailed monthly payment calculator',
     icon: HandCoins,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Interested-in-Financing-Options.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Interested-in-Financing-Options.webp',
     imageAlt: 'Homeowner discussing roofing financing options with advisor',
   },
 ];
@@ -265,7 +265,7 @@ const MAINTENANCE_HELP: HelpOption[] = [
     label: 'Need an inspection report',
     description: 'For insurance, warranty, or peace of mind before hurricane season',
     icon: ClipboardList,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/need-an-inspection-report.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/need-an-inspection-report.webp',
     imageAlt: 'Roof inspector documenting findings on a clipboard',
   },
   {
@@ -273,7 +273,7 @@ const MAINTENANCE_HELP: HelpOption[] = [
     label: 'Exterior roof damage',
     description: 'Missing shingles, lifted tiles, or debris on the roof',
     icon: AlertTriangle,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/I-can-see-roof-damage.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/I-can-see-roof-damage.webp',
     imageAlt: 'Close-up of shingles showing visible roof damage',
   },
   {
@@ -281,7 +281,7 @@ const MAINTENANCE_HELP: HelpOption[] = [
     label: 'Water damage',
     description: 'There is water inside or the interior is compromised',
     icon: Droplets,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/i-have-an-active-leak.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/i-have-an-active-leak.webp',
     imageAlt: 'Active roof leak with buckets catching water inside a home',
   },
   {
@@ -289,7 +289,7 @@ const MAINTENANCE_HELP: HelpOption[] = [
     label: 'I want to join the Roof Care Club',
     description: 'Yearly maintenance plan, documentation for insurance',
     icon: Sparkles,
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp',
     imageAlt: 'Technician performing routine roof maintenance',
   },
 ];

@@ -94,7 +94,7 @@ export default async function Page() {
         eyelash="Who we are"
         subtitle="Family-owned roofing company based in Sarasota, Florida, serving Sarasota, Manatee, and Charlotte County residents with 38+ years of experience."
         justifyStart
-        imageSrc="https://next.sonshineroofing.com/wp-content/uploads/SonShine-Roofing-Team-Wide-Angle.webp"
+        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Roofing-Team-Wide-Angle.webp"
         badges={[
           { icon: ShieldCheck, label: "Licensed & Insured" },
           { icon: MapPin, label: "Local & Family-owned" },
@@ -171,7 +171,7 @@ export default async function Page() {
               </p>
               <div className="flex items-center justify-self-center">
                 <Image
-                  src="https://next.sonshineroofing.com/wp-content/uploads/SonShine-Roofing-Team-Wide-Angle.webp"
+                  src="https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Roofing-Team-Wide-Angle.webp"
                   alt="Wide Angle Shot of The SonShine Roofing Team"
                   title="SonShine Roofing Team"
                   width={800}

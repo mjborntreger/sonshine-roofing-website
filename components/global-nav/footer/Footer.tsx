@@ -40,7 +40,7 @@ const h3Styles = "text-sm md:text-md font-bold uppercase tracking-wider text-[--
 const hoursStyles = "text-xs md:text-sm text-slate-600";
 const hoursLabelStyles = "text-xs md:text-sm font-semibold text-slate-800";
 
-const logoSrc = "https://next.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp";
+const logoSrc = "https://wp.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp";
 
 const FooterBadges = dynamic(() => import("@/components/global-nav/footer/FooterBadges"), {
   loading: () => (

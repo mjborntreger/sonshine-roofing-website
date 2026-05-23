@@ -1,7 +1,7 @@
 export const REVIEW_PLATFORM_META = {
   google: {
     label: "Google",
-    logoSrc: "https://next.sonshineroofing.com/wp-content/uploads/google.webp",
+    logoSrc: "https://wp.sonshineroofing.com/wp-content/uploads/google.webp",
     logoAlt: "Google logo",
     accentColor: "var(--brand-blue)",
     publisherName: "Google",
@@ -9,7 +9,7 @@ export const REVIEW_PLATFORM_META = {
   },
   facebook: {
     label: "Facebook",
-    logoSrc: "https://next.sonshineroofing.com/wp-content/uploads/facebook-logo-for-reviews.webp",
+    logoSrc: "https://wp.sonshineroofing.com/wp-content/uploads/facebook-logo-for-reviews.webp",
     logoAlt: "Facebook logo",
     accentColor: "#1877F2",
     publisherName: "Facebook",
@@ -17,7 +17,7 @@ export const REVIEW_PLATFORM_META = {
   },
   yelp: {
     label: "Yelp",
-    logoSrc: "https://next.sonshineroofing.com/wp-content/uploads/Yelp-Logo-Icon-for-Reviews.webp",
+    logoSrc: "https://wp.sonshineroofing.com/wp-content/uploads/Yelp-Logo-Icon-for-Reviews.webp",
     logoAlt: "Yelp logo",
     accentColor: "#FF1A1A",
     publisherName: "Yelp",
@@ -25,7 +25,7 @@ export const REVIEW_PLATFORM_META = {
   },
   bbb: {
     label: "Better Business Bureau",
-    logoSrc: "https://next.sonshineroofing.com/wp-content/uploads/BBB-Logo-Icon-for-Reviews.webp",
+    logoSrc: "https://wp.sonshineroofing.com/wp-content/uploads/BBB-Logo-Icon-for-Reviews.webp",
     logoAlt: "Better Business Bureau logo",
     accentColor: "#005F86",
     publisherName: "Better Business Bureau",

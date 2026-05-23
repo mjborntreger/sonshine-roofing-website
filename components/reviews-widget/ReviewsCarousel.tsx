@@ -8,7 +8,7 @@ import ReviewStarRow from "@/components/reviews-widget/ReviewStarRow";
 
 const RAW_REVIEWS_URL = (process.env.NEXT_PUBLIC_REVIEWS_URL ?? "").replace(/\u200B/g, "").trim();
 const REVIEWS_URL =
-  RAW_REVIEWS_URL || "https://next.sonshineroofing.com/wp-content/uploads/sonshine-reviews/reviews-archive.json";
+  RAW_REVIEWS_URL || "https://wp.sonshineroofing.com/wp-content/uploads/sonshine-reviews/reviews-archive.json";
 
 const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
 const GBP_URL =

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 const ENDPOINT =
   process.env.NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT ||
-  "https://next.sonshineroofing.com/graphql";
+  "https://wp.sonshineroofing.com/graphql";
 const DEFAULT_ALLOWED_BRANCH = "staging";
 const DEFAULT_ALLOWED_HOST = "staging.sonshineroofing.com";
 const ALLOWED_BRANCH =

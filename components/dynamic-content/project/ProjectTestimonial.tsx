@@ -17,7 +17,7 @@ type Props = {
 };
 
 const OWNER_RESPONSE_IMAGE =
-  "https://next.sonshineroofing.com/wp-content/uploads/Nathan-Edited-Bio-Photo-175x175-1.webp";
+  "https://wp.sonshineroofing.com/wp-content/uploads/Nathan-Edited-Bio-Photo-175x175-1.webp";
 
 const formatReviewDate = (value?: string) => {
   if (!value) return null;

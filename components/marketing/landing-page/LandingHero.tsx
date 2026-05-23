@@ -10,8 +10,8 @@ import LeadForm from "@/components/lead-capture/lead-form/LeadForm";
 import { LeadFormFallback } from "@/components/lead-capture/lead-form/Fallback";
 import { restoreLeadSuccessState, type LeadSuccessRestore } from "@/components/lead-capture/lead-form/config";
 
-const VIDEO_SRC = "https://next.sonshineroofing.com/wp-content/uploads/updated-website-hero-apr-2026.mp4";
-const POSTER_SRC = "https://next.sonshineroofing.com/wp-content/uploads/updated-website-hero-fallback-apr-2026.webp";
+const VIDEO_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/updated-website-hero-apr-2026.mp4";
+const POSTER_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/updated-website-hero-fallback-apr-2026.webp";
 
 type HeroProps = {
   title?: string

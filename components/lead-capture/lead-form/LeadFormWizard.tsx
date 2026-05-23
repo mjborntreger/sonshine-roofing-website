@@ -80,25 +80,25 @@ const ROOF_TYPE_OPTIONS: RoofTypeOption[] = [
   {
     value: 'shingle',
     label: 'Shingle',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Shingle-Roof.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Shingle-Roof.webp',
     imageAlt: 'Shingle Roof',
   },
   {
     value: 'metal',
     label: 'Metal',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Metal-Roof.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Metal-Roof.webp',
     imageAlt: 'Metal Roof',
   },
   {
     value: 'tile',
     label: 'Tile',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Tile-Roof.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Tile-Roof.webp',
     imageAlt: 'Concrete tile roof',
   },
   {
     value: 'flat',
     label: 'Flat',
-    imageSrc: 'https://next.sonshineroofing.com/wp-content/uploads/Flat-Roof.webp',
+    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Flat-Roof.webp',
     imageAlt: 'Flat roof',
   },
 ];

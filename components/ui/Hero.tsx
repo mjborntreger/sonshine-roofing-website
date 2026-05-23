@@ -14,7 +14,7 @@ type HeroProps = {
   children?: ReactNode;
 };
 
-const FALLBACK_IMAGE = "https://next.sonshineroofing.com/wp-content/uploads/Fallback-Hero.webp";
+const FALLBACK_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/Fallback-Hero.webp";
 
 /**
  * Base hero for service/resource/blog/project pages.

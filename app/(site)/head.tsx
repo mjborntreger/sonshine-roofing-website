@@ -1,7 +1,7 @@
 export default function Head() {
   return (
     <>
-      <link rel="preconnect" href="https://next.sonshineroofing.com" crossOrigin="" />
+      <link rel="preconnect" href="https://wp.sonshineroofing.com" crossOrigin="" />
       <link rel="preconnect" href="https://sonshineroofing.com" crossOrigin="" />
       <meta property="fb:app_id" content="1087269253041713" />
       <meta name="facebook-domain-verification" content="wrgyk374pn09qej89okes7upeqbqkf" />

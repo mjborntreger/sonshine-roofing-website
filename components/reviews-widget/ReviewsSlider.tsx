@@ -252,7 +252,7 @@ export default function ReviewsSlider({
                       <div className="flex-1 min-w-0">
                         <h3 className="flex items-start gap-2 m-0 text-xl font-bold text-slate-700">
                           <Image
-                            src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
+                            src="https://wp.sonshineroofing.com/wp-content/uploads/google.webp"
                             alt="Google logo"
                             width={40}
                             height={40}
@@ -344,7 +344,7 @@ export default function ReviewsSlider({
                         <div className="flex justify-start items-center gap-2">
                           <h4 id="review-title" className="flex items-center gap-2 m-0 text-2xl font-bold text-slate-700">
                             <Image
-                              src="https://next.sonshineroofing.com/wp-content/uploads/google.webp"
+                              src="https://wp.sonshineroofing.com/wp-content/uploads/google.webp"
                               alt="Google logo"
                               width={40}
                               height={40}

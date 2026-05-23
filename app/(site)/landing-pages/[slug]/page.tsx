@@ -21,19 +21,19 @@ const MATERIALS = [
   {
     label: "Shingle",
     blurb: "Budget-friendly, wind-rated shingles installed by in-house crews.",
-    imageSrc: "https://next.sonshineroofing.com/wp-content/uploads/Shingle-Roof.webp",
+    imageSrc: "https://wp.sonshineroofing.com/wp-content/uploads/Shingle-Roof.webp",
     imageAlt: "Architectural shingle roof",
   },
   {
     label: "Metal",
     blurb: "Sleek standing seam systems built to beat Florida sun and storms.",
-    imageSrc: "https://next.sonshineroofing.com/wp-content/uploads/Metal-Roof.webp",
+    imageSrc: "https://wp.sonshineroofing.com/wp-content/uploads/Metal-Roof.webp",
     imageAlt: "Metal roof on a modern home",
   },
   {
     label: "Tile",
     blurb: "Classic tile roofs with proper underlayment and code-driven installs.",
-    imageSrc: "https://next.sonshineroofing.com/wp-content/uploads/Tile-Roof.webp",
+    imageSrc: "https://wp.sonshineroofing.com/wp-content/uploads/Tile-Roof.webp",
     imageAlt: "Tile roof on a Florida home",
   },
 ];

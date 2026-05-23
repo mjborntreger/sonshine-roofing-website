@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     siteName: "SonShine Roofing",
     title: "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte",
     description: "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!",
-    images: [{ url: "https://next.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630, alt: "SonShine Roofing, Sarasota, FL" }],
+    images: [{ url: "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630, alt: "SonShine Roofing, Sarasota, FL" }],
   },
   twitter: {
     card: "summary_large_image",
