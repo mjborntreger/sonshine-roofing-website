@@ -98,7 +98,18 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               <strong>Cloudflare Turnstile:</strong> We use Cloudflare Turnstile on forms to help detect bots,
-              reduce spam, and protect our website and lead systems.
+              reduce spam, and protect our website and lead systems. Turnstile may run invisibly when you use
+              our forms and may process client-side signals such as IP address, user-agent header, TLS fingerprint,
+              sitekey, and website origin to distinguish humans from bots. Cloudflare processes these signals to
+              provide Turnstile to us and may also use them to improve Turnstile&apos;s bot detection. For more
+              information, see Cloudflare&apos;s{" "}
+              <a
+                href="https://www.cloudflare.com/en-gb/turnstile-privacy-policy/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Turnstile Privacy Addendum
+              </a>.
             </li>
             <li>
               <strong>n8n:</strong> We use n8n to route validated form leads and related attribution data to our
