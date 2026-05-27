@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
       <div className="container-edge py-10">
         <div className="prose">
           <h1>Privacy Policy</h1>
-          <p><strong>Effective Date:</strong> 03/12/2026</p>
+          <p><strong>Effective Date:</strong> 05/27/2026</p>
           <p>
             SonShine Roofing Inc. is committed to protecting your privacy. This Privacy Policy explains how we
             collect, use, and safeguard your information when you visit
@@ -52,27 +52,71 @@ export default function PrivacyPolicyPage() {
             <li>Email address</li>
             <li>Phone number</li>
             <li>Physical address</li>
-            <li>User behavior data (via analytics scripts)</li>
+            <li>Project, referral, feedback, financing, and other lead details you submit</li>
+            <li>SMS consent choices and communication preferences</li>
+            <li>User behavior data collected through analytics scripts, cookies, and tracking pixels</li>
+            <li>Lead attribution information, such as the page submitted from, form type, submission time,
+              UTM source, UTM medium, UTM campaign, user agent, and time zone where captured</li>
+            <li>Call details, call recordings, and call review notes where calls are recorded or reviewed</li>
           </ul>
 
           <h2>2. How We Collect It</h2>
           <p>We collect information when you:</p>
           <ul>
             <li>Fill out contact forms</li>
-            <li>Sign up for our newsletter</li>
+            <li>Submit referral, financing, feedback, special offer, or other lead forms</li>
+            <li>Call us or interact with a tracked phone number</li>
+            <li>Opt in to receive SMS, email, or other communications</li>
             <li>Interact with our website (via cookies and tracking pixels)</li>
+            <li>Arrive from ads, search results, social media, referral links, or tagged campaigns</li>
           </ul>
 
           <h2>3. Tools and Third Parties</h2>
-          <p>We use trusted third-party services to collect and process data:</p>
+          <p>We use trusted third-party services to collect, route, store, measure, and process data:</p>
           <ul>
-            <li><strong>Google Analytics</strong> – to understand site usage and behavior.</li>
-            <li><strong>Facebook Pixel</strong> – to track ad performance and user interactions.</li>
-            <li><strong>Brevo</strong> – to send marketing and transactional emails.</li>
-            <li><strong>AccuLynx</strong> – to manage leads and customer communications via form integration.</li>
-            <li><strong>NETO</strong> – to automatically respond to inquiries and scheduling questions via SMS through an AI agent.</li>
+            <li>
+              <strong>Analytics and advertising:</strong> Google Analytics, Google Tag Manager, Google Ads
+              conversion tracking, and Meta/Facebook Pixel help us understand website usage, measure ad
+              performance, and improve marketing.
+            </li>
+            <li>
+              <strong>Google Ads conversion measurement:</strong> Google Ads may use cookies, conversion tags,
+              and related identifiers to measure actions such as form submissions, phone calls, and other lead
+              events generated from ads.
+            </li>
+            <li>
+              <strong>Enhanced Conversions for Leads:</strong> We may send hashed first-party lead data, such as
+              email address, phone number, name, or address, to Google to improve ad attribution and offline
+              conversion measurement. Hashing is applied before this data is shared, but the hashed data is still
+              derived from information you submitted to us.
+            </li>
+            <li>
+              <strong>Call tracking and call review:</strong> We may use Google forwarding numbers, call reporting,
+              or phone service providers to route calls, measure advertising performance, and understand which
+              campaigns generated calls. SonShine Roofing or its phone providers may record and review inbound
+              calls for quality, training, lead handling, customer support, and marketing attribution.
+            </li>
+            <li>
+              <strong>Cloudflare Turnstile:</strong> We use Cloudflare Turnstile on forms to help detect bots,
+              reduce spam, and protect our website and lead systems.
+            </li>
+            <li>
+              <strong>n8n:</strong> We use n8n to route validated form leads and related attribution data to our
+              internal lead workflows.
+            </li>
+            <li>
+              <strong>NocoDB:</strong> We use NocoDB to store or queue lead records for operational routing,
+              review, and follow-up.
+            </li>
+            <li>
+              <strong>AccuLynx:</strong> We use AccuLynx to manage customer records, lead records, project
+              communication, and attribution fields so we can understand which campaigns generated leads.
+            </li>
           </ul>
-          <p>These services may use cookies and other tracking technologies as per their own privacy policies.</p>
+          <p>
+            These services may use cookies, pixels, scripts, call tracking technology, and other processing tools
+            as described in their own privacy policies and service terms.
+          </p>
 
           <h2>4. How We Use Your Information</h2>
           <p>Your information is used to:</p>
@@ -81,14 +125,28 @@ export default function PrivacyPolicyPage() {
             <li>Improve our website and services</li>
             <li>Send occasional promotional and informational content</li>
             <li>Track and analyze user behavior to optimize marketing</li>
+            <li>Route, review, store, and follow up on leads and customer requests</li>
+            <li>Measure website, form, phone call, and advertising performance</li>
+            <li>Match submitted leads with advertising campaigns using attribution fields and hashed lead data</li>
+            <li>Protect our forms and systems from spam, fraud, and automated abuse</li>
           </ul>
+          <p>
+            Financing-related pages and forms may help us discuss available financing options with you. Same-day
+            approvals may be available. Financing subject to approval.
+          </p>
 
           <h2>5. Data Sharing</h2>
           <p>
-            We will never share your contact information for marketing purposes.
+            We will never share your personal information with third parties for their own marketing purposes.
           </p>
           <p>
             We do not sell, rent, or trade your personal data.
+          </p>
+          <p>
+            We may share personal information with service providers that help us operate our website, route leads,
+            manage customer records, communicate with you, protect our forms from abuse, process phone calls, and
+            measure advertising performance. These providers are allowed to use the information only to provide
+            services to us or as otherwise permitted by their service terms and applicable law.
           </p>
           <p>
             We may disclose personal information only in the following limited situations:
