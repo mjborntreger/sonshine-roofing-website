@@ -6,6 +6,8 @@
     "dev": "next dev",
     "prebuild": "node scripts/make-static-sitemap.mjs",
     "build": "next build",
+    "prebuild:codex": "node scripts/make-static-sitemap.mjs",
+    "build:codex": "NODE_OPTIONS=\"--require ./scripts/codex-fetch-proxy.cjs $NODE_OPTIONS\" next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "test": "npm run lint"

@@ -5,7 +5,7 @@ import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import { Accordion } from "@/components/ui/Accordion";
-import { Layers, Droplets, Bug, Hammer, PanelRight, CircleCheckBig, Rabbit, HandCoins, Ban, HardHat } from "lucide-react";
+import { Layers, Droplets, Bug, Hammer, PanelRight, CircleCheckBig, Rabbit, HandCoins, Ban, HardHat, Zap, ArrowDown, Smartphone } from "lucide-react";
 import RepairVsReplace from "@/components/marketing/service-pages/RepairVsReplace";
 import type { Metadata } from "next";
 import FinancingBand from "@/components/cta/FinancingBand";
@@ -77,19 +77,42 @@ export default async function Page() {
 
   return (
     <>
-    <Hero
-    title="Roof Repair"
-    eyelash="Residential Roof Repair Services in Sarasota, FL and Surrounding Areas"
-    subtitle="We are committed to extending the lifespan of your current roof above all else. We perform fast, lasting roof repair for leaks, flashing, fascia and storm/wind damage."
-    justifyStart
-    badges={[
-      { icon: Rabbit, label: "Fast Response" },
-      { icon: HandCoins, label: "Affordable Pricing" },
-      { icon: HardHat, label: "Expert Opinion" },
-      { icon: Ban, label: "No BS" },
-    ]}
-    imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp"
-    />
+      <Hero
+        title="Roof Repair"
+        eyelash="Residential Roof Repair Services in Sarasota, FL and Surrounding Areas"
+        subtitle="We are committed to extending the lifespan of your current roof above all else. We perform fast, lasting roof repair for leaks, flashing, fascia and storm/wind damage."
+        justifyStart
+        badges={[
+          { icon: Rabbit, label: "Fast Response" },
+          { icon: HandCoins, label: "Affordable Pricing" },
+          { icon: HardHat, label: "Expert Opinion" },
+          { icon: Ban, label: "No BS" },
+        ]}
+        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp"
+      >
+        <div className="flex flex-wrap gap-3">
+          <SmartLink
+            href="#book-an-appointment"
+            className="btn-brand-blue btn-lg px-3 py-2 rounded-lg"
+            aria-label="Get Ballpark Estimate Online"
+            data-icon-affordance="down"
+            proseGuard
+          >
+            <Zap className="h-4 w-4 mr-2 inline" aria-hidden="true" />
+            Free Estimate
+            <ArrowDown className="ml-2 inline h-4 w-4 icon-affordance" />
+          </SmartLink>
+          <SmartLink
+            href="tel:+19418664320"
+            className="btn-outline text-white btn-lg px-3 py-2 hover:bg-transparent rounded-lg phone-affordance"
+            aria-label="Call SonShine Roofing if you have questions"
+            proseGuard
+          >
+            <Smartphone className="h-4 w-4 mr-2 phone-affordance-icon inline" aria-hidden="true" />
+            (941) 866-4320
+          </SmartLink>
+        </div>
+      </Hero>
       <Section>
         <div className="grid gap-4 px-2 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           <div id="article-root" className="prose min-w-0">
@@ -124,8 +147,6 @@ export default async function Page() {
               For guidance on assessing roofing needs, see the <a href="https://www.hud.gov/program_offices/healthy_homes">
                 HUD inspection checklist </a>for homeowners and contractors.
             </p>
-
-            <FinancingBand />
 
             <Suspense fallback={null}>
               <EvenSimplerLeadForm
@@ -326,6 +347,8 @@ export default async function Page() {
             </Accordion>
 
             <RepairVsReplace />
+
+            <FinancingBand />
 
           </div>
 

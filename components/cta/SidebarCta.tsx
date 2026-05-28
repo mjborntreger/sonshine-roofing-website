@@ -24,7 +24,7 @@ export default function SidebarCta() {
                 proseGuard
             >
                 <CalendarDays className={semanticIconStyles} />
-                Contact Form
+                Contact Us
                 <ArrowRight className={arrowIconStyles} />
             </SmartLink>
             <div className="flex flex-row justify-between gap-2">

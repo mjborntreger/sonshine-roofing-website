@@ -1,81 +1,81 @@
 {
-  "generatedAt": "2026-05-22T00:54:50.801Z",
+  "generatedAt": "2026-05-27T03:14:37.000Z",
   "routes": [
     {
       "loc": "/",
-      "lastmod": "2026-04-13T21:01:19.573Z"
+      "lastmod": "2026-05-23T06:25:04.000Z"
     },
     {
       "loc": "/about-sonshine-roofing",
-      "lastmod": "2026-02-27T15:35:28.270Z"
+      "lastmod": "2026-05-23T06:25:04.000Z"
     },
     {
       "loc": "/blog",
-      "lastmod": "2026-04-02T12:40:50.653Z"
+      "lastmod": "2026-04-02T13:24:36.000Z"
     },
     {
       "loc": "/contact-us",
-      "lastmod": "2026-04-14T01:51:36.143Z"
+      "lastmod": "2026-05-23T06:25:04.000Z"
     },
     {
       "loc": "/faq",
-      "lastmod": "2026-04-02T13:38:06.347Z"
+      "lastmod": "2026-04-02T13:52:31.000Z"
     },
     {
       "loc": "/financing",
-      "lastmod": "2026-04-14T01:51:36.143Z"
+      "lastmod": "2026-05-23T06:25:04.000Z"
     },
     {
       "loc": "/homeowner-referral-program",
-      "lastmod": "2026-05-22T00:54:32.076Z"
-    },
-    {
-      "loc": "/privacy-policy",
-      "lastmod": "2026-03-22T10:44:59.659Z"
-    },
-    {
-      "loc": "/project",
-      "lastmod": "2026-03-22T10:44:59.659Z"
-    },
-    {
-      "loc": "/roof-inspection",
-      "lastmod": "2026-04-14T01:51:36.141Z"
-    },
-    {
-      "loc": "/roof-maintenance",
-      "lastmod": "2026-02-27T15:35:28.278Z"
-    },
-    {
-      "loc": "/roof-repair",
-      "lastmod": "2026-02-27T15:35:28.279Z"
-    },
-    {
-      "loc": "/roof-replacement-sarasota-fl",
-      "lastmod": "2026-04-14T01:51:58.870Z"
-    },
-    {
-      "loc": "/roofing-glossary",
-      "lastmod": "2026-02-27T15:35:28.280Z"
-    },
-    {
-      "loc": "/sms-terms-and-conditions",
-      "lastmod": "2026-03-22T10:44:59.660Z"
-    },
-    {
-      "loc": "/video-library",
-      "lastmod": "2026-03-22T10:44:59.661Z"
-    },
-    {
-      "loc": "/truck-for-sale",
-      "lastmod": "2026-04-19T16:08:47.689Z"
+      "lastmod": "2026-05-23T06:25:04.000Z"
     },
     {
       "loc": "/homeowner-referral-program/terms-and-conditions",
-      "lastmod": "2026-05-19T22:38:19.128Z"
+      "lastmod": "2026-05-22T00:39:36.000Z"
+    },
+    {
+      "loc": "/privacy-policy",
+      "lastmod": "2026-05-27T03:14:37.000Z"
+    },
+    {
+      "loc": "/project",
+      "lastmod": "2026-05-23T06:25:04.000Z"
+    },
+    {
+      "loc": "/roof-inspection",
+      "lastmod": "2026-05-23T06:25:04.000Z"
+    },
+    {
+      "loc": "/roof-maintenance",
+      "lastmod": "2026-05-23T06:25:04.000Z"
     },
     {
       "loc": "/roof-maintenance/roof-care-club-terms-and-conditions",
-      "lastmod": "2026-04-14T17:59:33.140Z"
+      "lastmod": "2026-04-14T19:43:32.000Z"
+    },
+    {
+      "loc": "/roof-repair",
+      "lastmod": "2026-05-23T06:25:04.000Z"
+    },
+    {
+      "loc": "/roof-replacement-sarasota-fl",
+      "lastmod": "2026-05-23T06:25:04.000Z"
+    },
+    {
+      "loc": "/roofing-glossary",
+      "lastmod": "2026-01-08T22:52:37.000Z"
+    },
+    {
+      "loc": "/sms-terms-and-conditions",
+      "lastmod": "2026-03-12T22:22:37.000Z"
+    },
+    {
+      "loc": "/truck-for-sale",
+      "lastmod": "2026-05-23T06:25:04.000Z"
+    },
+    {
+      "loc": "/video-library",
+      "lastmod": "2026-03-13T13:14:45.000Z"
     }
   ]
 }

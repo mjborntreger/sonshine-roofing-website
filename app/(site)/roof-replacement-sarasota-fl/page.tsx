@@ -6,7 +6,7 @@ import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import { Accordion } from "@/components/ui/Accordion";
-import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, Lightbulb, CircleCheckBig, HandCoins, CheckCircle, Ban, Smartphone, Zap, ArrowUpRight } from "lucide-react";
+import { ShieldCheck, Layers, BadgeCheck, Wrench, ListChecks, Lightbulb, CircleCheckBig, HandCoins, CheckCircle, Ban, Smartphone, Zap, ArrowDown } from "lucide-react";
 import RepairVsReplace from "@/components/marketing/service-pages/RepairVsReplace";
 import type { Metadata } from 'next';
 import FinancingBand from "@/components/cta/FinancingBand";
@@ -114,15 +114,15 @@ export default async function Page() {
       >
         <div className="flex flex-wrap gap-3">
           <SmartLink
-            href="https://www.myquickroofquote.com/contractors/sonshine-roofing"
+            href="#book-an-appointment"
             className="btn-brand-blue btn-lg px-3 py-2 rounded-lg"
             aria-label="Get Ballpark Estimate Online"
-            data-icon-affordance="up-right"
+            data-icon-affordance="down"
             proseGuard
           >
             <Zap className="h-4 w-4 mr-2 inline" aria-hidden="true" />
-            Get Ballpark Estimate Online
-            <ArrowUpRight className="ml-2 inline h-4 w-4 icon-affordance" />
+            Free Estimate
+            <ArrowDown className="ml-2 inline h-4 w-4 icon-affordance" />
           </SmartLink>
           <SmartLink
             href="tel:+19418664320"
@@ -153,8 +153,6 @@ export default async function Page() {
               SonShine offers coverage ranging from 6 to 25 years, depending on
               the materials you choose when building your new roof.
             </p>
-
-            <FinancingBand />
 
             <Suspense fallback={null}>
               <EvenSimplerLeadForm
@@ -396,6 +394,8 @@ export default async function Page() {
             </Accordion>
 
             <RepairVsReplace />
+
+            <FinancingBand />
 
           </div>
 

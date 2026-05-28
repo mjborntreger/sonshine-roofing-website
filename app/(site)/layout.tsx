@@ -4,7 +4,6 @@ import Footer from "@/components/global-nav/footer/Footer";
 import AnalyticsScripts from "@/lib/telemetry/analytics";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import { OFFICE_OPENING_HOURS_SPEC, PHONE_OPENING_HOURS_SPEC } from "@/lib/contact-hours";
-import PhoneClickListener from "@/components/telemetry/PhoneClickListener";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
@@ -193,7 +192,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         selection:bg-[#0045d7] selection:text-white
       "
     >
-      <PhoneClickListener />
       <AnalyticsScripts />
       <Header />
       <main className="flex-1">{children}</main>
