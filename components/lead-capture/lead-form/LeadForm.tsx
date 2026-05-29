@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { FormEvent, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { Check } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import {
@@ -260,9 +260,10 @@ function LeadFormSubmitSection({ tone, status }: LeadFormSubmitSectionProps) {
           variant="brandOrange"
           disabled={isSubmitting}
           className="w-full justify-center"
+          data-icon-affordance="right"
         >
           {isSubmitting ? 'Sending…' : 'Submit'}
-          {!isSubmitting ? <Check className="ml-2 h-4 w-4" aria-hidden="true" /> : null}
+          {!isSubmitting ? <ArrowRight className="ml-2 h-4 w-4 icon-affordance" aria-hidden="true" /> : null}
         </Button>
       </div>
     );
@@ -270,9 +271,9 @@ function LeadFormSubmitSection({ tone, status }: LeadFormSubmitSectionProps) {
 
   return (
     <div className="mt-6 flex justify-end">
-      <Button type="submit" size="xl" variant="brandOrange" disabled={isSubmitting}>
+      <Button data-icon-affordance="right" type="submit" size="xl" variant="brandOrange" disabled={isSubmitting}>
         {isSubmitting ? 'Sending…' : 'Submit my free estimate request'}
-        {!isSubmitting ? <Check className="ml-2 h-4 w-4" aria-hidden="true" /> : null}
+        {!isSubmitting ? <ArrowRight className="ml-2 h-4 w-4 icon-affordance" aria-hidden="true" /> : null}
       </Button>
     </div>
   );

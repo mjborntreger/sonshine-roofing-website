@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle2, Phone, ShieldCheck } from 'lucide-react';
+import { CheckCircle2, ShieldCheck } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import {
   fireAdsLeadSubmitOnce,
@@ -67,12 +67,8 @@ export default function ThankYouClient() {
         <p className="mt-4 text-base leading-7 text-slate-600">{getMessage(context)}</p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <SmartLink href="/contact-us" className="btn btn-brand-blue btn-md justify-center">
-            Contact our office
-          </SmartLink>
-          <SmartLink href="tel:+19418664320" className="btn btn-brand-orange btn-md justify-center">
-            <Phone className="mr-2 h-4 w-4" aria-hidden="true" />
-            Call (941) 866-4320
+          <SmartLink href="/" className="btn btn-brand-blue btn-md justify-center">
+            Return Home
           </SmartLink>
         </div>
 

@@ -139,7 +139,7 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     value: 'something-else',
     label: 'Something Else / Not Sure',
-    description: "Warranties, Skylights, Roof Care Club membership, or just have a few questions",
+    description: "Warranties, Skylights, Roof Care Club membership",
     icon: MessageCircle,
     accent: 'border-violet-200 bg-violet-50 text-violet-600',
     action: 'advance',

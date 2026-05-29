@@ -639,10 +639,10 @@ export default function SimpleLeadForm({
                 {errors.cfToken && <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>}
               </section>
 
-              <div className="flex justify-end">
-                <Button type="submit" size="xl" variant="brandOrange" disabled={status === 'submitting'}>
+              <div className="flex w-full">
+                <Button className="w-full" data-icon-affordance="right" type="submit" size="xl" variant="brandOrange" disabled={status === 'submitting'}>
                   {status === 'submitting' ? 'Sending…' : 'Submit Request'}
-                  <ArrowRight className="ml-2 h-4 w-4 inline" />
+                  <ArrowRight className="ml-2 h-4 w-4 inline icon-affordance" />
                 </Button>
               </div>
             </div>
