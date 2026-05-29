@@ -14,6 +14,7 @@ import {
   formatPhoneExample,
   submitLead,
 } from '@/lib/lead-capture/contact-lead';
+import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 
 const RATING_VALUES = ['1', '2', '3'] as const;
 type RatingString = (typeof RATING_VALUES)[number];
@@ -140,7 +141,7 @@ export default function TellUsWhyForm() {
       return;
     }
 
-    setStatus('ok');
+    redirectToThankYou(payload);
   }
 
   if (status === 'ok') {

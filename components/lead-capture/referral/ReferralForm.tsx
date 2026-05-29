@@ -21,6 +21,7 @@ import {
   submitLead,
   validateEmail,
 } from '@/lib/lead-capture/contact-lead';
+import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -243,7 +244,7 @@ export default function ReferralForm() {
 
     setErrors({});
     setGlobalError(null);
-    setStatus('success');
+    redirectToThankYou(payload);
   };
 
   if (status === 'success') {

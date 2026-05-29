@@ -118,13 +118,21 @@ function validateLeadForwardPayload(input: unknown):
     addFieldError(errors, 'formType', 'Unsupported formType.');
   }
 
+  const sri_lead_id = getRequiredTrimmed(input, 'sri_lead_id', 'sri_lead_id', errors);
   const submittedAt = getRequiredTrimmed(input, 'submittedAt', 'submittedAt', errors);
 
   const sourceRaw = isRecord(input.source) ? input.source : {};
   const page = getRequiredTrimmed(sourceRaw, 'page', 'source.page', errors);
+  const gclid = getOptionalTrimmed(sourceRaw, 'gclid');
+  const gbraid = getOptionalTrimmed(sourceRaw, 'gbraid');
+  const wbraid = getOptionalTrimmed(sourceRaw, 'wbraid');
   const utm_source = getOptionalTrimmed(sourceRaw, 'utm_source');
   const utm_medium = getOptionalTrimmed(sourceRaw, 'utm_medium');
   const utm_campaign = getOptionalTrimmed(sourceRaw, 'utm_campaign');
+  const utm_term = getOptionalTrimmed(sourceRaw, 'utm_term');
+  const utm_content = getOptionalTrimmed(sourceRaw, 'utm_content');
+  const landing_page = getOptionalTrimmed(sourceRaw, 'landing_page');
+  const referrer = getOptionalTrimmed(sourceRaw, 'referrer');
   const ua = getOptionalTrimmed(sourceRaw, 'ua');
   const tz = getOptionalTrimmed(sourceRaw, 'tz');
 
@@ -167,13 +175,22 @@ function validateLeadForwardPayload(input: unknown):
 
   const payload: LeadForwardPayloadV2 = {
     version: 'v2',
+    sri_lead_id,
+    lead_source: gclid || gbraid || wbraid ? 'google_ads' : 'seo',
     formType: formTypeRaw as LeadForwardPayloadV2['formType'],
     submittedAt,
     source: {
       page,
+      ...(gclid ? { gclid } : {}),
+      ...(gbraid ? { gbraid } : {}),
+      ...(wbraid ? { wbraid } : {}),
       ...(utm_source ? { utm_source } : {}),
       ...(utm_medium ? { utm_medium } : {}),
       ...(utm_campaign ? { utm_campaign } : {}),
+      ...(utm_term ? { utm_term } : {}),
+      ...(utm_content ? { utm_content } : {}),
+      ...(landing_page ? { landing_page } : {}),
+      ...(referrer ? { referrer } : {}),
       ...(ua ? { ua } : {}),
       ...(tz ? { tz } : {}),
     },

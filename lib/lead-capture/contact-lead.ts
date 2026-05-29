@@ -3,6 +3,8 @@ import { pushToDataLayer } from '@/lib/telemetry/gtm';
 import { trackMetaPixel, type MetaStandardEvent } from '@/lib/telemetry/meta';
 import { normalizePhoneForSubmit, isUsPhoneComplete, stripToPhoneDigits } from '@/lib/lead-capture/phone';
 import type { ContactLeadInput } from '@/lib/lead-capture/validation';
+import { getLeadAttributionForSubmit } from '@/lib/lead-capture/attribution';
+import { generateSriLeadId } from '@/lib/lead-capture/lead-id';
 
 export {
   stripToPhoneDigits as sanitizePhoneInput,
@@ -29,8 +31,8 @@ export type LeadSuccessCookiePayload = {
   projectType: string;
   helpTopics?: string[];
   helpTopicLabels?: string[];
-  timeline?: string;
-  timelineLabel?: string;
+  roofAge?: string;
+  roofAgeLabel?: string;
   notes?: string;
   roofTypeLabel?: string;
   timestamp?: string;
@@ -39,7 +41,7 @@ export type LeadSuccessCookiePayload = {
 export interface SuccessMeta {
   projectType: string;
   helpTopicLabels: string[];
-  timelineLabel: string | null;
+  roofAgeLabel: string | null;
   notes: string | null;
   roofTypeLabel: string | null;
 }
@@ -117,18 +119,28 @@ export function normalizeSmsConsent(value: SmsConsentFieldValue): SmsConsentChoi
 }
 
 export type N8nLeadFormType = 'contact-lead' | 'financing-calculator' | 'special-offer' | 'feedback' | 'referral';
+export type N8nLeadSource = 'google_ads' | 'seo';
 export const CONTACT_LEAD_NOT_PROVIDED = 'Not provided';
 export const CONTACT_LEAD_NOT_PROVIDED_EMAIL = 'notprovided@example.com';
 
 export type N8nLeadPayloadV2 = {
   version: 'v2';
+  sri_lead_id: string;
+  lead_source: N8nLeadSource;
   formType: N8nLeadFormType;
   submittedAt: string;
   source: {
     page: string;
+    gclid?: string;
+    gbraid?: string;
+    wbraid?: string;
     utm_source?: string;
     utm_medium?: string;
     utm_campaign?: string;
+    utm_term?: string;
+    utm_content?: string;
+    landing_page?: string;
+    referrer?: string;
     ua?: string;
     tz?: string;
   };
@@ -158,13 +170,21 @@ export type N8nLeadPayloadV2 = {
 };
 
 type BuildN8nLeadPayloadInput = {
+  sri_lead_id?: string;
   formType: N8nLeadFormType;
   submittedAt?: string;
   source: {
     page: string;
+    gclid?: string;
+    gbraid?: string;
+    wbraid?: string;
     utm_source?: string;
     utm_medium?: string;
     utm_campaign?: string;
+    utm_term?: string;
+    utm_content?: string;
+    landing_page?: string;
+    referrer?: string;
     ua?: string;
     tz?: string;
   };
@@ -206,8 +226,9 @@ export type ContactLeadRoutingPlaceholders = {
     projectType: string;
     helpTopics: string[];
     helpSummary: string;
-    timeline: string;
-    timelineLabel: string;
+    roofAge: string;
+    roofAgeLabel: string;
+    roofType: string;
     notes: string;
     roofTypeLabel: string;
     preferredContact: PreferredContactValue;
@@ -236,8 +257,9 @@ export function buildContactLeadRoutingPlaceholders(
       projectType: placeholder,
       helpTopics: [placeholder],
       helpSummary: placeholder,
-      timeline: placeholder,
-      timelineLabel: placeholder,
+      roofAge: placeholder,
+      roofAgeLabel: placeholder,
+      roofType: placeholder,
       notes: placeholder,
       roofTypeLabel: placeholder,
       preferredContact: normalizePreferredContact(options.preferredContact),
@@ -287,12 +309,20 @@ function compactRecord(record: Record<string, unknown>): Record<string, unknown>
 
 export function buildN8nLeadPayload(input: BuildN8nLeadPayloadInput): N8nLeadPayloadV2 {
   const normalizedPhone = normalizePhoneForSubmit(input.contact.phone || '');
+  const attribution = getLeadAttributionForSubmit();
 
   const source = compactRecord({
     page: input.source.page,
-    utm_source: input.source.utm_source,
-    utm_medium: input.source.utm_medium,
-    utm_campaign: input.source.utm_campaign,
+    gclid: attribution?.gclid || input.source.gclid,
+    gbraid: attribution?.gbraid || input.source.gbraid,
+    wbraid: attribution?.wbraid || input.source.wbraid,
+    utm_source: attribution?.utm_source || input.source.utm_source,
+    utm_medium: attribution?.utm_medium || input.source.utm_medium,
+    utm_campaign: attribution?.utm_campaign || input.source.utm_campaign,
+    utm_term: attribution?.utm_term || input.source.utm_term,
+    utm_content: attribution?.utm_content || input.source.utm_content,
+    landing_page: attribution?.landing_page || input.source.landing_page,
+    referrer: attribution?.referrer || input.source.referrer,
     ua: input.source.ua,
     tz: input.source.tz,
   }) as N8nLeadPayloadV2['source'];
@@ -311,6 +341,8 @@ export function buildN8nLeadPayload(input: BuildN8nLeadPayloadInput): N8nLeadPay
 
   const payload: N8nLeadPayloadV2 = {
     version: 'v2',
+    sri_lead_id: cleanString(input.sri_lead_id) || generateSriLeadId(),
+    lead_source: source.gclid || source.gbraid || source.wbraid ? 'google_ads' : 'seo',
     formType: input.formType,
     submittedAt: cleanString(input.submittedAt) || new Date().toISOString(),
     source,
@@ -359,7 +391,8 @@ export type ContactAddressDraft = {
 export type ContactLeadPayloadDraft = {
   projectType?: string;
   helpSummary?: string;
-  timelineLabel?: string;
+  roofAge?: string;
+  roofAgeLabel?: string;
   notes?: string;
   preferredContact?: PreferredContactValue;
   bestTimeLabel?: string;
@@ -435,7 +468,8 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
   const {
     projectType,
     helpSummary,
-    timelineLabel,
+    roofAge,
+    roofAgeLabel,
     notes,
     preferredContact,
     bestTimeLabel,
@@ -448,6 +482,8 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
 
   const trimmedNotes = notes?.trim();
   const projectTypeValue = projectType?.trim();
+  const roofAgeValue = roofAge?.trim();
+  const roofAgeLabelValue = roofAgeLabel?.trim();
   const address1Value = address.address1.trim();
   const address2Value = address.address2?.trim();
   const cityValue = address.city.trim();
@@ -459,7 +495,8 @@ export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): Contact
     type: 'contact-lead',
     projectType: projectTypeValue || undefined,
     helpTopics: helpSummary?.trim() || undefined,
-    timeline: timelineLabel?.trim() || undefined,
+    roofAge: roofAgeValue || roofAgeLabelValue || undefined,
+    roofAgeLabel: roofAgeLabelValue || roofAgeValue || undefined,
     notes: trimmedNotes || undefined,
     firstName: identity.firstName.trim(),
     lastName: identity.lastName.trim(),
@@ -525,12 +562,12 @@ export function parseLeadSuccessCookie(rawCookie?: string | null): LeadSuccessCo
       payload.helpTopicLabels = parsed.helpTopicLabels.filter((value): value is string => typeof value === 'string');
     }
 
-    if (typeof parsed.timeline === 'string') {
-      payload.timeline = parsed.timeline;
+    if (typeof parsed.roofAge === 'string') {
+      payload.roofAge = parsed.roofAge;
     }
 
-    if (typeof parsed.timelineLabel === 'string') {
-      payload.timelineLabel = parsed.timelineLabel;
+    if (typeof parsed.roofAgeLabel === 'string') {
+      payload.roofAgeLabel = parsed.roofAgeLabel;
     }
 
     if (typeof parsed.notes === 'string') {

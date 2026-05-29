@@ -14,6 +14,7 @@ import {
   formatPhoneExample,
   submitLead,
 } from '@/lib/lead-capture/contact-lead';
+import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 
 type Props = {
   offerCode: string;
@@ -101,7 +102,7 @@ export default function SpecialOfferForm({
     smsProjectConsent: '',
     smsMarketingConsent: '',
   });
-  const [submission, setSubmission] = useState<Submission>(initialUnlock ? 'success' : 'idle');
+  const [submission, setSubmission] = useState<Submission>('idle');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
 
@@ -157,7 +158,6 @@ export default function SpecialOfferForm({
     if (submission === 'success') return;
     const stored = readOfferCookie(cookieName);
     if (stored && stored.code === offerCode) {
-      setSubmission('success');
       setGlobalError(null);
       writeOfferCookie(cookieName, stored.code, offerExpiration);
     }
@@ -242,9 +242,9 @@ export default function SpecialOfferForm({
       return;
     }
 
-    setSubmission('success');
     setGlobalError(null);
     writeOfferCookie(cookieName, offerCode, offerExpiration);
+    redirectToThankYou(payload);
   };
 
   if (submission === 'success') {

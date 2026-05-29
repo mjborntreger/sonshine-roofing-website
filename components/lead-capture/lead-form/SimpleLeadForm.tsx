@@ -29,11 +29,11 @@ import {
 import { cn } from '@/lib/utils';
 import {
   PROJECT_OPTIONS,
-  STANDARD_TIMELINE_OPTIONS,
+  STANDARD_ROOF_AGE_OPTIONS,
   isJourneyKey,
   type JourneyKey,
   type ProjectOption,
-  getTimelineLabelForDisplay,
+  getRoofAgeLabelForDisplay,
 } from '@/components/lead-capture/lead-form/config';
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { renderHighlight } from '@/components/utils/renderHighlight';
@@ -43,6 +43,7 @@ import {
   PROJECT_OPTION_CARD_UNSELECTED_CLASS,
   ProjectOptionCardContent,
 } from '@/components/lead-capture/lead-form/ProjectOptionCard';
+import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 
 // STYLES
@@ -61,7 +62,7 @@ type Status = 'idle' | 'submitting' | 'success' | 'error';
 
 type FormState = {
   projectType: JourneyKey | '';
-  timeline: string;
+  roofAge: string;
   notes: string;
   roofType: RoofTypeValue | '';
   firstName: string;
@@ -79,7 +80,7 @@ type FormState = {
 
 const INITIAL_STATE: FormState = {
   projectType: '',
-  timeline: '',
+  roofAge: '',
   notes: '',
   roofType: '',
   firstName: '',
@@ -161,10 +162,10 @@ function buildSuccessMetaFromPayload(payload: LeadSuccessCookiePayload): Success
   const helpTopicLabels = Array.isArray(payload.helpTopicLabels)
     ? payload.helpTopicLabels.filter((item): item is string => typeof item === 'string')
     : [];
-  const timelineLabel =
-    typeof payload.timelineLabel === 'string' && payload.timelineLabel
-      ? payload.timelineLabel
-      : getTimelineLabelForDisplay(payload.projectType, payload.timeline || '') || null;
+  const roofAgeLabel =
+    typeof payload.roofAgeLabel === 'string' && payload.roofAgeLabel
+      ? payload.roofAgeLabel
+      : getRoofAgeLabelForDisplay(payload.projectType, payload.roofAge || '') || null;
   const notes = typeof payload.notes === 'string' ? payload.notes : null;
   const roofTypeLabel =
     typeof payload.roofTypeLabel === 'string' && payload.roofTypeLabel
@@ -174,7 +175,7 @@ function buildSuccessMetaFromPayload(payload: LeadSuccessCookiePayload): Success
   return {
     projectType: payload.projectType,
     helpTopicLabels,
-    timelineLabel,
+    roofAgeLabel,
     notes,
     roofTypeLabel,
   };
@@ -191,7 +192,7 @@ export default function SimpleLeadForm({
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [status, setStatus] = useState<Status>(parsedCookie ? 'success' : 'idle');
+  const [status, setStatus] = useState<Status>('idle');
   const [successMeta, setSuccessMeta] = useState<SuccessMeta | null>(
     parsedCookie ? buildSuccessMetaFromPayload(parsedCookie) : null
   );
@@ -253,7 +254,7 @@ export default function SimpleLeadForm({
     setStatus('submitting');
     setGlobalError(null);
 
-    const timelineLabel = getTimelineLabelForDisplay(form.projectType, form.timeline) || form.timeline;
+    const roofAgeLabel = getRoofAgeLabelForDisplay(form.projectType, form.roofAge) || form.roofAge;
     const notes = form.notes.trim();
     const roofTypeLabel = getRoofTypeLabel(form.roofType);
     const combinedNotes = roofTypeLabel
@@ -295,8 +296,9 @@ export default function SimpleLeadForm({
       details: {
         ...routingPlaceholders.details,
         projectType: form.projectType || routingPlaceholders.details.projectType,
-        timeline: form.timeline || routingPlaceholders.details.timeline,
-        timelineLabel: timelineLabel || routingPlaceholders.details.timelineLabel,
+        roofAge: form.roofAge || routingPlaceholders.details.roofAge,
+        roofAgeLabel: roofAgeLabel || routingPlaceholders.details.roofAgeLabel,
+        roofType: form.roofType || routingPlaceholders.details.roofType,
         notes: combinedNotes.trim() || routingPlaceholders.details.notes,
         roofTypeLabel: roofTypeLabel || routingPlaceholders.details.roofTypeLabel,
         preferredContact,
@@ -336,19 +338,14 @@ export default function SimpleLeadForm({
       projectType: form.projectType || 'contact',
       helpTopics: [],
       helpTopicLabels: [],
-      timeline: form.timeline,
-      timelineLabel: timelineLabel || undefined,
+      roofAge: form.roofAge,
+      roofAgeLabel: roofAgeLabel || undefined,
       notes: notes || undefined,
       roofTypeLabel: roofTypeLabel || undefined,
       timestamp: new Date().toISOString(),
     };
     persistLeadSuccessCookie(successPayload);
-    setSuccessMeta(buildSuccessMetaFromPayload(successPayload));
-
-    setForm(INITIAL_STATE);
-    setErrors({});
-    setGlobalError(null);
-    setStatus('success');
+    redirectToThankYou(payload);
   };
 
   const handleResetSuccess = () => {
@@ -547,16 +544,16 @@ export default function SimpleLeadForm({
               </section>
 
               <section>
-                <h3 className={SECTION_TITLE_BASE_CLASS}>How soon would you like to start?</h3>
-                <p className={SECTION_EYELASH}>Share a timeline if you have one</p>
+                <h3 className={SECTION_TITLE_BASE_CLASS}>How old is your roof?</h3>
+                <p className={SECTION_EYELASH}>Share your roof&apos;s age or click &quot;Not sure.&quot;</p>
                 <div className="mt-3 grid gap-3 grid-cols-3 sm:grid-cols-6">
-                  {STANDARD_TIMELINE_OPTIONS.map(({ value, label }) => {
-                    const selected = form.timeline === value;
+                  {STANDARD_ROOF_AGE_OPTIONS.map(({ value, label }) => {
+                    const selected = form.roofAge === value;
                     return (
                       <button
                         key={value}
                         type="button"
-                        onClick={() => setField('timeline', value)}
+                        onClick={() => setField('roofAge', value)}
                         className={cn(
                           'font-medium text-slate-600 rounded-xl border px-4 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                           selected
@@ -570,7 +567,7 @@ export default function SimpleLeadForm({
                     );
                   })}
                 </div>
-                {errors.timeline && <p className="mt-2 text-sm font-medium text-red-600">{errors.timeline}</p>}
+                {errors.roofAge && <p className="mt-2 text-sm font-medium text-red-600">{errors.roofAge}</p>}
               </section>
 
               <section>

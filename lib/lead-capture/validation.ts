@@ -24,7 +24,7 @@ const MAX_TRACKING = 200;
 const MAX_SPECIAL_MESSAGE = 1000;
 const MAX_CONTACT_NOTES = 2000;
 const MAX_CONTACT_HELP = 400;
-const MAX_CONTACT_TIMELINE = 120;
+const MAX_CONTACT_ROOF_AGE = 120;
 const MAX_CONTACT_PREF = 60;
 const MAX_CONTACT_RESOURCE_LABEL = 160;
 const MAX_CONTACT_RESOURCE_DESC = 240;
@@ -315,7 +315,8 @@ const leadContactSchema = leadBaseSchema
     phone: optionalContactPhoneSchema,
     projectType: optionalTrimmedString(80),
     helpTopics: optionalTrimmedString(MAX_CONTACT_HELP),
-    timeline: optionalTrimmedString(MAX_CONTACT_TIMELINE),
+    roofAge: optionalTrimmedString(MAX_CONTACT_ROOF_AGE),
+    roofAgeLabel: optionalTrimmedString(MAX_CONTACT_ROOF_AGE),
     notes: optionalTrimmedString(MAX_CONTACT_NOTES),
     preferredContact: optionalTrimmedString(MAX_CONTACT_PREF),
     bestTime: optionalTrimmedString(MAX_CONTACT_PREF),

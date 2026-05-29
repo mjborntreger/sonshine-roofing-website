@@ -39,6 +39,8 @@ Lead Pipeline (n8n)
 Lead Payload Contract (v2)
 - Root fields:
   - `version: "v2"`
+  - `sri_lead_id` (site-generated dedupe/conversion ID)
+  - `lead_source: "google_ads" | "seo"` (`google_ads` when `source.gclid`, `source.gbraid`, or `source.wbraid` exists; otherwise `seo`)
   - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback" | "referral"`
   - `submittedAt` (ISO timestamp)
   - `source.page` (required)
@@ -48,7 +50,9 @@ Lead Payload Contract (v2)
   - `smsConsent.projectSms`, `smsConsent.marketingSms` (`yes`/`no`)
   - `antiSpam.cfToken` (Turnstile token, required)
 - Optional fields:
-  - `source.utm_source`, `source.utm_medium`, `source.utm_campaign`, `source.ua`, `source.tz`
+  - `source.gclid`, `source.gbraid`, `source.wbraid`
+  - `source.utm_source`, `source.utm_medium`, `source.utm_campaign`, `source.utm_term`, `source.utm_content`
+  - `source.landing_page`, `source.referrer`, `source.ua`, `source.tz`
   - `contact.phone`
   - `address.{address1,address2,city,state,zip}`
   - `details` (form-specific object)

@@ -30,7 +30,7 @@ export default function LeadFormSuccess({
 }: LeadFormSuccessProps) {
   const successLinks = useMemo(() => getSuccessLinks(successMeta.projectType), [successMeta.projectType]);
   const hasSharedDetails =
-    Boolean(successMeta.timelineLabel) ||
+    Boolean(successMeta.roofAgeLabel) ||
     successMeta.helpTopicLabels.length > 0 ||
     Boolean(successMeta.roofTypeLabel) ||
     Boolean(successMeta.notes);
@@ -81,9 +81,9 @@ export default function LeadFormSuccess({
           {hasSharedDetails && (
             <div className={detailsCardClassName}>
               <h4 className={detailsHeadingClassName}>What you shared</h4>
-              {successMeta.timelineLabel && (
+              {successMeta.roofAgeLabel && (
                 <p className={cn('mt-3', bodyTextClassName)}>
-                  <span className={labelTextClassName}>Timeline:</span> {successMeta.timelineLabel}
+                  <span className={labelTextClassName}>Roof age:</span> {successMeta.roofAgeLabel}
                 </p>
               )}
               {successMeta.helpTopicLabels.length ? (

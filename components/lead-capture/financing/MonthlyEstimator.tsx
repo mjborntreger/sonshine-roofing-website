@@ -26,6 +26,7 @@ import {
   submitLead,
   validateSmsConsentDraft,
 } from '@/lib/lead-capture/contact-lead';
+import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import { formatPhoneForDisplay } from '@/lib/lead-capture/phone';
 
 const COOKIE_NAME = 'ss_financing_calc';
@@ -856,6 +857,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
     setPersistedScores(scoresResult);
     writeCookie(COOKIE_NAME, JSON.stringify(cookiePayload), COOKIE_MAX_AGE);
+    redirectToThankYou(payload);
   };
 
   const totalFlowSteps = effectiveLastStepIndex + 1;

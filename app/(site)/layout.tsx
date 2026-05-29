@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import Header from "@/components/global-nav/header/Header";
 import Footer from "@/components/global-nav/footer/Footer";
 import AnalyticsScripts from "@/lib/telemetry/analytics";
+import LeadAttributionCapture from "@/components/lead-capture/LeadAttributionCapture";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import { OFFICE_OPENING_HOURS_SPEC, PHONE_OPENING_HOURS_SPEC } from "@/lib/contact-hours";
 
@@ -193,6 +195,9 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       "
     >
       <AnalyticsScripts />
+      <Suspense fallback={null}>
+        <LeadAttributionCapture />
+      </Suspense>
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />

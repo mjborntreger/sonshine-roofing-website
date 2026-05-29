@@ -43,16 +43,16 @@ export type HelpOption = {
   imageAlt?: string;
 };
 
-export type TimelineOption = {
+export type RoofAgeOption = {
   value: string;
   label: string;
 };
 
 export type JourneyConfig = {
   helpOptions: HelpOption[];
-  timelineOptions: TimelineOption[];
+  roofAgeOptions: RoofAgeOption[];
   showHelpMulti: boolean;
-  showTimeline: boolean;
+  showRoofAge: boolean;
   showNotes: boolean;
   requireNotes: boolean;
   notesLabel: string;
@@ -199,13 +199,13 @@ export const LEAD_NAVIGATION_CARDS: LeadNavigationCard[] = [
   },
 ];
 
-export const STANDARD_TIMELINE_OPTIONS: TimelineOption[] = [
-  { value: 'within-72-hours', label: 'ASAP' },
-  { value: 'this-week', label: 'This week' },
-  { value: 'this-month', label: 'This month' },
-  { value: 'next-2-3-months', label: '2–3 months' },
-  { value: 'this-year', label: 'This Year' },
-  { value: 'not-sure-yet', label: 'Not sure yet' },
+export const STANDARD_ROOF_AGE_OPTIONS: RoofAgeOption[] = [
+  { value: '0-5-years', label: '0-5 years' },
+  { value: '5-10-years', label: '5-10 years' },
+  { value: '10-15-years', label: '10-15 years' },
+  { value: '15-20-years', label: '15-20 years' },
+  { value: '20-plus-years', label: '20+ years' },
+  { value: 'not-sure', label: 'Not sure' },
 ];
 
 const EMERGENCY_REPLACEMENT_HELP: HelpOption[] = [
@@ -297,9 +297,9 @@ const MAINTENANCE_HELP: HelpOption[] = [
 export const JOURNEY_CONFIG: Record<JourneyKey, JourneyConfig> = {
   repair: {
     helpOptions: EMERGENCY_REPLACEMENT_HELP,
-    timelineOptions: STANDARD_TIMELINE_OPTIONS,
+    roofAgeOptions: STANDARD_ROOF_AGE_OPTIONS,
     showHelpMulti: true,
-    showTimeline: true,
+    showRoofAge: true,
     showNotes: true,
     requireNotes: false,
     notesLabel: 'Anything else you’d like us to know?',
@@ -307,9 +307,9 @@ export const JOURNEY_CONFIG: Record<JourneyKey, JourneyConfig> = {
   },
   retail: {
     helpOptions: EMERGENCY_REPLACEMENT_HELP,
-    timelineOptions: STANDARD_TIMELINE_OPTIONS,
+    roofAgeOptions: STANDARD_ROOF_AGE_OPTIONS,
     showHelpMulti: true,
-    showTimeline: true,
+    showRoofAge: true,
     showNotes: true,
     requireNotes: false,
     notesLabel: 'Anything else you’d like us to know?',
@@ -317,9 +317,9 @@ export const JOURNEY_CONFIG: Record<JourneyKey, JourneyConfig> = {
   },
   maintenance: {
     helpOptions: MAINTENANCE_HELP,
-    timelineOptions: STANDARD_TIMELINE_OPTIONS,
+    roofAgeOptions: STANDARD_ROOF_AGE_OPTIONS,
     showHelpMulti: true,
-    showTimeline: true,
+    showRoofAge: true,
     showNotes: true,
     requireNotes: false,
     notesLabel: 'Anything else you’d like us to know?',
@@ -327,9 +327,9 @@ export const JOURNEY_CONFIG: Record<JourneyKey, JourneyConfig> = {
   },
   'something-else': {
     helpOptions: [],
-    timelineOptions: [],
+    roofAgeOptions: [],
     showHelpMulti: false,
-    showTimeline: false,
+    showRoofAge: false,
     showNotes: true,
     requireNotes: true,
     notesLabel: 'Explain your situation',
@@ -444,19 +444,21 @@ export function getHelpTopicLabelsForDisplay(projectType: string, helpTopics: st
   return helpTopics.map((topic) => lookup.get(topic) ?? formatFallbackLabel(topic));
 }
 
-export function getTimelineLabelForDisplay(projectType: string, timeline: string): string | null {
-  if (!timeline) return null;
+export function getRoofAgeLabelForDisplay(projectType: string, roofAge: string): string | null {
+  if (!roofAge) return null;
   const journey = getJourneyConfig(projectType);
-  const option = journey?.timelineOptions.find((item) => item.value === timeline);
+  const option =
+    STANDARD_ROOF_AGE_OPTIONS.find((item) => item.value === roofAge) ??
+    journey?.roofAgeOptions.find((item) => item.value === roofAge);
   if (option) return option.label;
-  return formatFallbackLabel(timeline) || null;
+  return formatFallbackLabel(roofAge) || null;
 }
 
 export type LeadSuccessRestore = {
   formPreset: {
     projectType: string;
     helpTopics: string[];
-    timeline: string;
+    roofAge: string;
   };
   meta: SuccessMeta;
 };
@@ -471,17 +473,17 @@ export function restoreLeadSuccessState(rawCookie?: string | null): LeadSuccessR
   const helpTopics = Array.isArray(parsed.helpTopics)
     ? parsed.helpTopics.filter((topic): topic is string => typeof topic === 'string')
     : [];
-  const timeline = typeof parsed.timeline === 'string' ? parsed.timeline : '';
+  const roofAge = typeof parsed.roofAge === 'string' ? parsed.roofAge : '';
 
   const helpTopicLabels =
     Array.isArray(parsed.helpTopicLabels) && parsed.helpTopicLabels.every((label) => typeof label === 'string')
       ? (parsed.helpTopicLabels as string[])
       : getHelpTopicLabelsForDisplay(projectType, helpTopics);
 
-  const timelineLabel =
-    typeof parsed.timelineLabel === 'string' && parsed.timelineLabel
-      ? parsed.timelineLabel
-      : getTimelineLabelForDisplay(projectType, timeline);
+  const roofAgeLabel =
+    typeof parsed.roofAgeLabel === 'string' && parsed.roofAgeLabel
+      ? parsed.roofAgeLabel
+      : getRoofAgeLabelForDisplay(projectType, roofAge);
   const notes = typeof parsed.notes === 'string' ? parsed.notes : null;
   const roofTypeLabel =
     typeof parsed.roofTypeLabel === 'string' && parsed.roofTypeLabel
@@ -492,12 +494,12 @@ export function restoreLeadSuccessState(rawCookie?: string | null): LeadSuccessR
     formPreset: {
       projectType,
       helpTopics,
-      timeline,
+      roofAge,
     },
     meta: {
       projectType,
       helpTopicLabels,
-      timelineLabel: timelineLabel || null,
+      roofAgeLabel: roofAgeLabel || null,
       notes,
       roofTypeLabel,
     },

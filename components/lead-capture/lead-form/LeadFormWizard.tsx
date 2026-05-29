@@ -38,7 +38,7 @@ import {
   getJourneyConfig,
   getHelpTopicLabelsForDisplay,
   getSuccessLinks,
-  getTimelineLabelForDisplay,
+  getRoofAgeLabelForDisplay,
   isJourneyKey,
   restoreLeadSuccessState,
 } from '@/components/lead-capture/lead-form/config';
@@ -52,6 +52,7 @@ import {
   PROJECT_OPTION_CARD_UNSELECTED_CLASS,
   ProjectOptionCardContent,
 } from '@/components/lead-capture/lead-form/ProjectOptionCard';
+import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
@@ -144,7 +145,7 @@ type RoofTypeOption = {
 interface FormState {
   projectType: string;
   helpTopics: string[];
-  timeline: string;
+  roofAge: string;
   notes: string;
   roofType: RoofTypeValue | '';
   firstName: string;
@@ -165,7 +166,7 @@ interface FormState {
 const INITIAL_STATE: FormState = {
   projectType: '',
   helpTopics: [],
-  timeline: '',
+  roofAge: '',
   notes: '',
   roofType: '',
   firstName: '',
@@ -221,7 +222,7 @@ const clampStepIndex = (stepIndex: number) => Math.min(Math.max(stepIndex, 0), S
 
 const STEP_FIELD_KEYS: Record<StepId, ReadonlyArray<keyof FormState>> = {
   need: ['projectType'],
-  context: ['helpTopics', 'timeline', 'notes'],
+  context: ['helpTopics', 'roofAge', 'notes'],
   contact: ['roofType', 'firstName', 'lastName', 'email', 'phone'],
   schedule: ['address1', 'city', 'state', 'zip', 'bestTime', 'smsProjectConsent', 'smsMarketingConsent'],
 };
@@ -287,7 +288,7 @@ export default function LeadFormWizard({
     return 0;
   });
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [status, setStatus] = useState<Status>(restoredSuccess ? 'success' : 'idle');
+  const [status, setStatus] = useState<Status>('idle');
   const [globalError, setGlobalError] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const reduceMotion = useReducedMotion();
@@ -477,7 +478,7 @@ export default function LeadFormWizard({
         values: {
           projectType: option.value,
           helpTopics: [],
-          timeline: '',
+          roofAge: '',
           notes: '',
           roofType: '',
         },
@@ -497,8 +498,8 @@ export default function LeadFormWizard({
     onSelect('helpTopics', next);
   };
 
-  const handleTimelineSelect = (value: string) => {
-    onSelect('timeline', value);
+  const handleRoofAgeSelect = (value: string) => {
+    onSelect('roofAge', value);
   };
 
   const handleResetSuccess = () => {
@@ -599,8 +600,8 @@ export default function LeadFormWizard({
     setStatus('submitting');
     setGlobalError(null);
 
-    const timelineLabel = form.timeline
-      ? journey?.timelineOptions.find((option) => option.value === form.timeline)?.label || form.timeline
+    const roofAgeLabel = form.roofAge
+      ? journey?.roofAgeOptions.find((option) => option.value === form.roofAge)?.label || form.roofAge
       : '';
     const bestTimeLabel = form.bestTime
       ? BEST_TIME_OPTIONS.find((option) => option.value === form.bestTime)?.label || form.bestTime
@@ -656,8 +657,9 @@ export default function LeadFormWizard({
         projectType: form.projectType || routingPlaceholders.details.projectType,
         helpTopics: form.helpTopics.length ? form.helpTopics : routingPlaceholders.details.helpTopics,
         helpSummary: helpSummary || routingPlaceholders.details.helpSummary,
-        timeline: form.timeline || routingPlaceholders.details.timeline,
-        timelineLabel: timelineLabel || routingPlaceholders.details.timelineLabel,
+        roofAge: form.roofAge || routingPlaceholders.details.roofAge,
+        roofAgeLabel: roofAgeLabel || routingPlaceholders.details.roofAgeLabel,
+        roofType: form.roofType || routingPlaceholders.details.roofType,
         notes: combinedNotes.trim() || routingPlaceholders.details.notes,
         roofTypeLabel: roofTypeLabel || routingPlaceholders.details.roofTypeLabel,
         preferredContact,
@@ -701,30 +703,23 @@ export default function LeadFormWizard({
       return;
     }
 
-    setStatus('success');
       setErrors({});
       setGlobalError(null);
       const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
-      const timelineLabelDisplay = timelineLabel || getTimelineLabelForDisplay(form.projectType, form.timeline) || null;
+      const roofAgeLabelDisplay = roofAgeLabel || getRoofAgeLabelForDisplay(form.projectType, form.roofAge) || null;
       const projectTypeForSuccess = form.projectType || 'contact';
       const successPayload: LeadSuccessCookiePayload = {
         projectType: projectTypeForSuccess,
         helpTopics: form.helpTopics,
         helpTopicLabels,
-        timeline: form.timeline,
-        timelineLabel: timelineLabelDisplay || undefined,
+        roofAge: form.roofAge,
+        roofAgeLabel: roofAgeLabelDisplay || undefined,
         notes: notesText || undefined,
         roofTypeLabel: roofTypeLabel || undefined,
         timestamp: new Date().toISOString(),
       };
       persistLeadSuccessCookie(successPayload);
-      setSuccessMeta({
-        projectType: projectTypeForSuccess,
-        helpTopicLabels,
-        timelineLabel: timelineLabelDisplay,
-        notes: notesText || null,
-        roofTypeLabel: roofTypeLabel || null,
-      });
+      redirectToThankYou(payload);
   };
 
   const getStepMeta = (stepId: StepId) => {
@@ -944,17 +939,18 @@ export default function LeadFormWizard({
                       </div>
                     )}
 
-                    {journey?.showTimeline && (
+                    {journey?.showRoofAge && (
                       <div className="mt-4">
-                        <h4 className="text-sm font-semibold tracking-wide uppercase text-slate-500">Timeline</h4>
+                        <h4 className="text-sm font-semibold tracking-wide uppercase text-slate-500">How old is your roof?</h4>
+                        <p className="mt-1 text-sm text-slate-500">Share your roof&apos;s age or click &quot;Not sure.&quot;</p>
                         <div className="flex flex-wrap gap-2 mt-3">
-                          {journey.timelineOptions.map(({ value, label }) => {
-                            const selected = form.timeline === value;
+                          {journey.roofAgeOptions.map(({ value, label }) => {
+                            const selected = form.roofAge === value;
                             return (
                               <button
                                 key={value}
                                 type="button"
-                                onClick={() => handleTimelineSelect(value)}
+                                onClick={() => handleRoofAgeSelect(value)}
                                 className={cn(
                                   SELECTION_PILL_BASE_CLASS,
                                   selected ? SELECTION_PILL_SELECTED_CLASS : SELECTION_PILL_UNSELECTED_CLASS,
@@ -967,7 +963,7 @@ export default function LeadFormWizard({
                             );
                           })}
                         </div>
-                        {errors.timeline && <p className="mt-2 text-sm font-medium text-red-600">{errors.timeline}</p>}
+                        {errors.roofAge && <p className="mt-2 text-sm font-medium text-red-600">{errors.roofAge}</p>}
                       </div>
                     )}
 

@@ -22,6 +22,7 @@ import {
 } from '@/lib/lead-capture/contact-lead';
 import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { type LeadSuccessRestore } from '@/components/lead-capture/lead-form/config';
+import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import LeadFormStepShell from '@/components/lead-capture/lead-form/LeadFormStepShell';
 import SmsConsentFields, { SmsConsentFooter } from '@/components/lead-capture/shared/SmsConsentFields';
 import { renderHighlight } from '@/components/utils/renderHighlight';
@@ -283,7 +284,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const [status, setStatus] = useState<Status>(restoredSuccess ? 'success' : 'idle');
+  const [status, setStatus] = useState<Status>('idle');
   const [successMeta, setSuccessMeta] = useState(() => restoredSuccess?.meta ?? null);
 
   const isHeroEmbedded = variant === 'heroEmbedded';
@@ -405,23 +406,11 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
       return;
     }
 
-    const nextSuccessMeta = {
-      projectType: 'contact',
-      helpTopicLabels: [],
-      timelineLabel: null,
-      notes: null,
-      roofTypeLabel: null,
-    };
-
     persistLeadSuccessCookie({
       projectType: 'contact',
       timestamp: new Date().toISOString(),
     });
-    setSuccessMeta(nextSuccessMeta);
-    setForm(INITIAL_STATE);
-    setErrors({});
-    setGlobalError(null);
-    setStatus('success');
+    redirectToThankYou(payload);
   };
 
   if (status === 'success' && successMeta) {

@@ -72,7 +72,7 @@ const items = files.map((f) => {
 }).sort((a, b) => a.loc.localeCompare(b.loc));
 
 // Exclude specific routes from the static sitemap
-const EXCLUDE = new Set(["/reviews", "/tell-us-why"]);
+const EXCLUDE = new Set(["/reviews", "/tell-us-why", "/thank-you"]);
 const filtered = items.filter(({ loc }) => !EXCLUDE.has(loc));
 
 // Optionally fallback to commit time
