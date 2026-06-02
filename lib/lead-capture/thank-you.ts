@@ -1,13 +1,19 @@
 import type { N8nLeadPayloadV2, N8nLeadFormType } from '@/lib/lead-capture/contact-lead';
 import { readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
 import { pushToDataLayer } from '@/lib/telemetry/gtm';
-import { CLICK_ID_FIELDS, hasClickId } from '@/lib/lead-capture/attribution';
+import { CLICK_ID_FIELDS } from '@/lib/lead-capture/attribution';
 
 export const THANK_YOU_CONTEXT_KEY = 'ss_lead_thank_you_context_v1';
 export const THANK_YOU_CONVERTED_KEY = 'ss_lead_converted_ids_v1';
 export const THANK_YOU_CONTEXT_MAX_AGE = 60 * 60 * 24 * 90; // 90 days
 
 const NOT_PROVIDED_VALUES = new Set(['not provided', 'notprovided@example.com']);
+const ADS_LEAD_ELIGIBLE_FORM_TYPES = new Set<N8nLeadFormType>([
+  'contact-lead',
+  'financing-calculator',
+  'referral',
+]);
+const ROOF_INSPECTION_PATH = '/roof-inspection';
 
 export type LeadType = 'roof_replacement' | 'roof_repair' | 'other';
 
@@ -278,14 +284,53 @@ export function getLeadTypeBaseValue(leadType: LeadType): number {
   }
 }
 
-export function buildAdsLeadDataLayerEvent(context: ThankYouLeadContext): AdsLeadDataLayerEvent | null {
-  if (!hasClickId(context.source)) return null;
+function getSourcePath(page?: string): string {
+  const value = cleanValue(page);
+  if (!value) return '/';
+
+  try {
+    return new URL(value, 'https://sonshineroofing.local').pathname || '/';
+  } catch {
+    return value.split(/[?#]/)[0] || '/';
+  }
+}
+
+function isAdsLeadEligible(context: ThankYouLeadContext): boolean {
+  return ADS_LEAD_ELIGIBLE_FORM_TYPES.has(context.formType);
+}
+
+function resolveAdsLeadValue(context: ThankYouLeadContext): {
+  leadType: LeadType;
+  includeRoofAdjustments: boolean;
+} {
+  if (context.formType === 'financing-calculator') {
+    return { leadType: 'roof_replacement', includeRoofAdjustments: false };
+  }
+
+  if (context.formType === 'referral') {
+    return { leadType: 'roof_replacement', includeRoofAdjustments: false };
+  }
+
+  if (getSourcePath(context.source.page) === ROOF_INSPECTION_PATH) {
+    return { leadType: 'roof_repair', includeRoofAdjustments: true };
+  }
 
   const leadType = getLeadType(context.details?.projectType);
+  return {
+    leadType,
+    includeRoofAdjustments: leadType === 'roof_replacement' || leadType === 'roof_repair',
+  };
+}
+
+export function buildAdsLeadDataLayerEvent(context: ThankYouLeadContext): AdsLeadDataLayerEvent | null {
+  if (!isAdsLeadEligible(context)) return null;
+
+  const { leadType, includeRoofAdjustments } = resolveAdsLeadValue(context);
   const roofAge = cleanValue(context.details?.roofAge);
   const roofType = cleanValue(context.details?.roofType);
   const conversionValue =
-    getLeadTypeBaseValue(leadType) + getRoofAgeAdjustment(roofAge) + getRoofTypeAdjustment(roofType);
+    getLeadTypeBaseValue(leadType) +
+    (includeRoofAdjustments ? getRoofAgeAdjustment(roofAge) + getRoofTypeAdjustment(roofType) : 0);
 
   return {
     event: 'ads_lead_submit',
