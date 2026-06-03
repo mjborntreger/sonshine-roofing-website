@@ -120,7 +120,7 @@ export default async function FAQSlugPage({ params }: { params: Promise<{ slug: 
         {/* Still Stuck CTA */}
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
           <SmartLink
-            href="tel:19418664320"
+            href="tel:+19418664320"
             className="rounded-xl border border-blue-200 bg-white p-5 shadow-sm hover:shadow-md transition"
           >
             <div className="text-sm font-semibold text-slate-900">Still stuck?</div>

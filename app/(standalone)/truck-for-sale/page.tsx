@@ -124,7 +124,7 @@ export default async function Page() {
               <p className="text-blue-400 mt-2 text-5xl">{PRICE}</p>
               <p className="mt-6 text-2xl font-semibold">
                 Interested? Call or Text Nathan Borntreger:{' '}
-                <SmartLink href="+19417354947" className="text-blue-400 font-bold">
+                <SmartLink href="tel:+19417354947" className="text-blue-400 font-bold">
                   (941) 735-4947
                 </SmartLink>
               </p>

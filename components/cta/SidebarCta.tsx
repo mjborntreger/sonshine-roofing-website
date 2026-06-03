@@ -29,7 +29,7 @@ export default function SidebarCta() {
             </SmartLink>
             <div className="flex flex-row justify-between gap-2">
                 <SmartLink
-                    href="tel:19418664320"
+                    href="tel:+19418664320"
                     className={`${buttonStyles} btn-outline phone-affordance`}
                     aria-label="Call SonShine Roofing"
                     proseGuard
