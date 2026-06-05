@@ -243,7 +243,7 @@ export default function QuickQuoteWebForm() {
     <>
       <div
         id={QUICKQUOTE_TARGET_ID}
-        className="min-h-[720px] w-full overflow-hidden rounded-md bg-white"
+        className="min-h-[720px] w-full overflow-hidden"
         aria-live="polite"
       />
       <noscript>

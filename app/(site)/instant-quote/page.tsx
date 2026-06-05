@@ -17,7 +17,7 @@ export const revalidate = 900;
 const PAGE_PATH = "/instant-quote";
 const PAGE_TITLE = "Instant Roof Quote | SonShine Roofing";
 const PAGE_DESCRIPTION =
-  "Get a fast instant roof replacement estimate from SonShine Roofing using QuickQuote satellite measurements.";
+  "Get a fast & free roof replacement estimate from SonShine Roofing using QuickQuote satellite measurements.";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildBasicMetadata({
@@ -26,10 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
     path: PAGE_PATH,
     keywords: [
       "instant roof quote",
+      "roof replacement quote",
+      "roofing quote",
       "roof replacement estimate",
-      "roofing quote Sarasota",
-      "QuickQuote roofing",
-      "SonShine Roofing estimate",
+      "free roofing estimate",
+      "new roof estimate",
+      "new roof quote",
     ],
     image: { url: "/og-default.png", width: 1200, height: 630 },
   });
@@ -63,12 +65,13 @@ export default async function InstantQuotePage() {
       <Hero
         title="Instant Roof Quote"
         eyelash="Roof Replacement Estimates"
-        subtitle="Use our instant quote tool to request a fast roof replacement estimate with satellite measurements and local SonShine Roofing follow-up."
+        subtitle="Use our instant quote tool to request an instant roof replacement estimate with satellite measurements and quick follow-up."
+        justifyStart={true}
         badges={[
-          { icon: Zap, label: "Fast Estimate" },
+          { icon: Zap, label: "Fast & Free" },
           { icon: Calculator, label: "Satellite Measurements" },
           { icon: Home, label: "Residential Roofing" },
-          { icon: ShieldCheck, label: "Local Follow-up" },
+          { icon: ShieldCheck, label: "Quick Follow-up" },
         ]}
       />
 
@@ -78,9 +81,7 @@ export default async function InstantQuotePage() {
 
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           <div className="min-w-0">
-            <div className="rounded-md border border-blue-100 bg-white p-3 shadow-sm sm:p-5">
-              <QuickQuoteWebForm />
-            </div>
+            <QuickQuoteWebForm />
           </div>
 
           <ResourcesAside activePath={PAGE_PATH} />
