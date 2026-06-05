@@ -47,6 +47,12 @@ Security headers & CSP
   - Production: Report-Only (Content-Security-Policy-Report-Only)
   - Staging: Enforced (Content-Security-Policy)
   - If something breaks on staging, adjust CSP, test, then roll to prod.
+- QuickQuote instant quote embed:
+  - Internal page: `/instant-quote`
+  - Loader: `https://qq.leadsbyquickquote.com/roofs/integration?target=quickquote-web-form&contractorId=d9d4c0ba-e0cc-4f1c-a12e-5c30d9b2ce8d`
+  - Runtime bundle: `https://storage.googleapis.com/qq-framework/quickquote.iife.js`
+  - CSP must allow the QuickQuote API hosts in `connect-src`, Google reCAPTCHA, Google Fonts, and jsDelivr Toastify CSS.
+  - The site hydrates stored `utm_*` and `gclid` into the URL before loading QuickQuote; unsupported webhook fields such as `gbraid`, `wbraid`, landing page, and referrer require QuickQuote vendor support.
 
 Cache/Invalidation
 - GraphQL data: leverages `unstable_cache` with tags; use `/api/revalidate` where applicable.

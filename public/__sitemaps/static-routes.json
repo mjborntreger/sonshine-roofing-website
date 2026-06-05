@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-05-27T03:14:37.000Z",
+  "generatedAt": "2026-06-05T19:48:43.950Z",
   "routes": [
     {
       "loc": "/",
@@ -34,6 +34,10 @@
       "lastmod": "2026-05-22T00:39:36.000Z"
     },
     {
+      "loc": "/instant-quote",
+      "lastmod": "2026-06-05T19:48:43.950Z"
+    },
+    {
       "loc": "/privacy-policy",
       "lastmod": "2026-05-27T03:14:37.000Z"
     },
@@ -55,11 +59,11 @@
     },
     {
       "loc": "/roof-repair",
-      "lastmod": "2026-05-23T06:25:04.000Z"
+      "lastmod": "2026-05-28T16:25:30.000Z"
     },
     {
       "loc": "/roof-replacement-sarasota-fl",
-      "lastmod": "2026-05-23T06:25:04.000Z"
+      "lastmod": "2026-05-28T16:25:30.000Z"
     },
     {
       "loc": "/roofing-glossary",
@@ -71,7 +75,7 @@
     },
     {
       "loc": "/truck-for-sale",
-      "lastmod": "2026-05-23T06:25:04.000Z"
+      "lastmod": "2026-06-03T17:44:17.000Z"
     },
     {
       "loc": "/video-library",

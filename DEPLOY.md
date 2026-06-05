@@ -109,6 +109,12 @@ Security headers & CSP
 - next.config.mjs adds security headers for all requests.
 - CSP is currently enforced with `Content-Security-Policy` in all environments.
 - If something breaks after the Coolify cutover, check browser console CSP violations first.
+- `/instant-quote` embeds QuickQuote with contractor id `d9d4c0ba-e0cc-4f1c-a12e-5c30d9b2ce8d`.
+- QuickQuote CSP dependencies:
+  - Loader/runtime scripts: `qq.leadsbyquickquote.com`, `storage.googleapis.com`
+  - API hosts: `quickquote-api-628343900656.us-central1.run.app`, `quickquote-api-223492134056.us-central1.run.app`, `quickquote-api-78479757910.us-central1.run.app`
+  - Runtime dependencies: Google reCAPTCHA, Google Fonts, jsDelivr CSS, and possible HTTPS media assets.
+- QuickQuote submissions are bridged into `lead_form_submitted` and `ads_lead_submit` dataLayer events as roof replacement conversions.
 
 Cache/Invalidation
 - GraphQL data: leverages `unstable_cache` with tags; use `/api/revalidate` where applicable.

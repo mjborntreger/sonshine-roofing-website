@@ -356,9 +356,8 @@ const JOURNEY_RESOURCES: Partial<Record<JourneyKey, ResourceLink[]>> = {
     {
       label: 'Get a 60-second estimate',
       description: 'Satellite measurements, select materials',
-      href: 'https://www.myquickroofquote.com/contractors/sonshine-roofing',
+      href: '/instant-quote',
       icon: ClipboardList,
-      external: true,
     },
   ],
   maintenance: [

@@ -25,6 +25,13 @@ Enable preview sitemaps on staging
 Security headers
 - CSP is enforced on staging, report-only on production.
 - If staging breaks, check console for CSP violations; then update `next.config.mjs`.
+- QuickQuote on `/instant-quote` needs CSP access to:
+  - `qq.leadsbyquickquote.com`
+  - `storage.googleapis.com`
+  - `quickquote-api-628343900656.us-central1.run.app`
+  - `quickquote-api-223492134056.us-central1.run.app`
+  - `quickquote-api-78479757910.us-central1.run.app`
+  - Google reCAPTCHA, Google Fonts, jsDelivr CSS, and HTTPS media assets.
 
 Lead Pipeline (n8n)
 - Browser forms submit to `POST /api/lead`.
@@ -35,6 +42,7 @@ Lead Pipeline (n8n)
   - `TURNSTILE_SECRET_KEY` (Cloudflare Turnstile verification)
 - Optional CORS allowlist:
   - `ALLOWED_ORIGIN` (comma-separated origins)
+- QuickQuote submissions do not use `/api/lead`; the vendor script submits to QuickQuote APIs. The site listens for the vendor success event and pushes `lead_form_submitted` plus a one-time `ads_lead_submit` roof replacement conversion. Stored `utm_*` and `gclid` are hydrated into the URL before the script loads; other webhook fields require vendor support.
 
 Lead Payload Contract (v2)
 - Root fields:

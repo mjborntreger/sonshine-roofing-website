@@ -20,6 +20,7 @@ export const routes = [
   // Contact & legal
   { href: "/contact-us", label: "Contact" },
   { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/instant-quote", label: "Instant Quote" },
 
   // Miscellaneous (developer/internal)
   // (design-system removed)
@@ -48,6 +49,7 @@ export const ROUTES = {
   financing: '/financing' as Route,
   contact: '/contact-us' as Route,
   privacyPolicy: '/privacy-policy' as Route,
+  instantQuote: '/instant-quote' as Route,
   sitemapIndex: '/sitemap_index' as Route,
   // additional pages that exist but are not typically in primary nav
   reviews: '/reviews' as Route,

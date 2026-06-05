@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Zap } from "lucide-react";
 
 export const INSTANT_QUOTE_CTA = {
-  href: "https://www.myquickroofquote.com/contractors/sonshine-roofing",
+  href: "/instant-quote",
   label: "Instant Quote",
   buttonClassName: "bg-neutral-900/60 text-white font-display py-6 md:py-3 items-center text-2xl md:text-xl backdrop-blur hover:bg-neutral-900/90",
   linkClassName: "flex items-center gap-2",
