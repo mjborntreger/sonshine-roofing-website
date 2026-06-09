@@ -349,7 +349,7 @@ function QuickQuoteLoadError() {
   return (
     <div
       role="alert"
-      className="mx-auto w-full max-w-[480px] rounded-[16px] border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-950 shadow-[0_16px_36px_rgba(15,23,42,0.12)]"
+      className="mx-auto w-full max-w-[480px] rounded-[16px] border border-amber-200 bg-amber-50 px-5 pb-8 text-sm text-amber-950 shadow-[0_16px_36px_rgba(15,23,42,0.12)]"
     >
       The instant quote form is taking longer than expected to load. Please refresh the page or call{" "}
       <a className="font-semibold underline" href="tel:+19418664320">
