@@ -1267,8 +1267,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                     <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>Back</span>
                   </button>
 
-                  <div className="px-1 flex-1 font-semibold text-center text-xs text-slate-600">
-                    Don&rsquo;t worry<span className="font-normal">&mdash;we won&rsquo;t run your credit until you ask.</span>
+                  <div className="px-1 flex-1 text-center italic text-sm text-slate-500">
+                    Since 1987, we&apos;ve got you covered.
                   </div>
 
                   {step < thirdFormStepIndex ? (

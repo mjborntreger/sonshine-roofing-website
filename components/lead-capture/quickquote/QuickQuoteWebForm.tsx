@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import QuickQuoteWebFormSkeleton from "./QuickQuoteWebFormSkeleton";
 import { getLeadAttributionForSubmit, type AttributionQueryField } from "@/lib/lead-capture/attribution";
 import { pushToDataLayer } from "@/lib/telemetry/gtm";
 
@@ -24,9 +25,11 @@ const CONVERTED_IDS_KEY = "ss_quickquote_converted_ids_v1";
 const FALLBACK_LEAD_ID_KEY = "ss_quickquote_fallback_lead_id";
 
 type DataLayerEvent = Record<string, unknown>;
+type QuickQuoteLoadStatus = "loading" | "ready" | "error";
+type QuickQuoteRenderResult = unknown | PromiseLike<unknown>;
 
 type QuickQuoteGlobal = {
-  render?: (config: Record<string, unknown>) => unknown;
+  render?: (config: Record<string, unknown>) => QuickQuoteRenderResult;
   queue?: Record<string, unknown>[];
 };
 
@@ -121,6 +124,85 @@ function buildQuickQuoteRenderConfig() {
   };
 }
 
+function targetHasQuickQuoteContent(target: HTMLElement | null): boolean {
+  if (!target) return false;
+  if (target.querySelector("[data-qq-fallback]")) return true;
+
+  const shadowRoot = target.shadowRoot;
+  if (!shadowRoot) return false;
+
+  if (shadowRoot.querySelector("#dynamicContractorForm, #qq-config-error, .qq-inline-wrapper")) {
+    return true;
+  }
+
+  const reactRoot = shadowRoot.querySelector<HTMLElement>("[data-qq-role='react-root']");
+  return Boolean(reactRoot?.childElementCount);
+}
+
+function watchQuickQuoteTarget(onReady: () => void): () => void {
+  if (typeof document === "undefined" || typeof window === "undefined") return () => {};
+
+  const target = document.getElementById(QUICKQUOTE_TARGET_ID);
+  if (!target) return () => {};
+
+  let disposed = false;
+  let completed = false;
+  let frame = 0;
+  let intervalId: number | undefined;
+  let observedShadowRoot: ShadowRoot | null = null;
+
+  const finish = () => {
+    if (completed) return;
+    completed = true;
+    cleanup();
+    onReady();
+  };
+
+  const check = () => {
+    if (disposed || completed) return;
+
+    if (target.shadowRoot && target.shadowRoot !== observedShadowRoot && observer) {
+      observer.observe(target.shadowRoot, { attributes: true, childList: true, subtree: true });
+      observedShadowRoot = target.shadowRoot;
+    }
+
+    if (targetHasQuickQuoteContent(target)) {
+      finish();
+    }
+  };
+
+  const scheduleCheck = () => {
+    if (disposed || completed || frame) return;
+
+    frame = window.requestAnimationFrame(() => {
+      frame = 0;
+      check();
+    });
+  };
+
+  const observer =
+    typeof MutationObserver !== "undefined" ? new MutationObserver(scheduleCheck) : null;
+
+  observer?.observe(target, { attributes: true, childList: true, subtree: true });
+  intervalId = window.setInterval(scheduleCheck, 125);
+  scheduleCheck();
+
+  function cleanup() {
+    disposed = true;
+    if (frame) {
+      window.cancelAnimationFrame(frame);
+      frame = 0;
+    }
+    if (intervalId) {
+      window.clearInterval(intervalId);
+      intervalId = undefined;
+    }
+    observer?.disconnect();
+  }
+
+  return cleanup;
+}
+
 function hydrateQuickQuoteAttributionUrl() {
   const attribution = getLeadAttributionForSubmit();
   if (!attribution || typeof window === "undefined") return;
@@ -205,47 +287,152 @@ function installQuickQuoteDataLayerBridge() {
   dataLayer.forEach(handleDataLayerItem);
 }
 
-function renderExistingQuickQuote(): boolean {
+function renderExistingQuickQuote(onReady: () => void, onError: () => void): boolean {
   if (typeof window === "undefined") return false;
   const win = window as QuickQuoteWindow;
 
   if (typeof win.QuickQuote?.render !== "function") return false;
   if (!document.getElementById(QUICKQUOTE_TARGET_ID)) return false;
 
-  win.QuickQuote.render(buildQuickQuoteRenderConfig());
+  try {
+    const result = win.QuickQuote.render(buildQuickQuoteRenderConfig());
+    Promise.resolve(result).then(
+      () => {
+        window.requestAnimationFrame(onReady);
+      },
+      () => {
+        onError();
+      },
+    );
+  } catch {
+    onError();
+  }
+
   return true;
 }
 
-function loadQuickQuoteScript() {
-  if (typeof document === "undefined") return;
+function loadQuickQuoteScript(onError: () => void): () => void {
+  if (typeof document === "undefined") return () => {};
 
   const existing = document.querySelector<HTMLScriptElement>("script[data-ss-quickquote-loader='true']");
-  if (existing) return;
+  if (existing) {
+    if (existing.dataset.ssQuickquoteLoadError === "true") {
+      onError();
+      return () => {};
+    }
+
+    existing.addEventListener("error", onError, { once: true });
+    return () => {
+      existing.removeEventListener("error", onError);
+    };
+  }
 
   const script = document.createElement("script");
   script.src = QUICKQUOTE_LOADER_SRC;
   script.async = true;
   script.dataset.ssQuickquoteLoader = "true";
+
+  const handleError = () => {
+    script.dataset.ssQuickquoteLoadError = "true";
+    onError();
+  };
+
+  script.addEventListener("error", handleError, { once: true });
   document.head.appendChild(script);
+
+  return () => {
+    script.removeEventListener("error", handleError);
+  };
+}
+
+function QuickQuoteLoadError() {
+  return (
+    <div
+      role="alert"
+      className="mx-auto w-full max-w-[480px] rounded-[16px] border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-950 shadow-[0_16px_36px_rgba(15,23,42,0.12)]"
+    >
+      The instant quote form is taking longer than expected to load. Please refresh the page or call{" "}
+      <a className="font-semibold underline" href="tel:+19418664320">
+        (941) 866-4320
+      </a>
+      .
+    </div>
+  );
 }
 
 export default function QuickQuoteWebForm() {
+  const [loadStatus, setLoadStatus] = useState<QuickQuoteLoadStatus>("loading");
+  const isLoading = loadStatus === "loading";
+
   useEffect(() => {
+    let active = true;
+    let readyFrame = 0;
+
+    const markReady = () => {
+      if (!active) return;
+
+      if (readyFrame) {
+        window.cancelAnimationFrame(readyFrame);
+      }
+
+      readyFrame = window.requestAnimationFrame(() => {
+        readyFrame = 0;
+        if (active) setLoadStatus("ready");
+      });
+    };
+
+    const markError = () => {
+      if (active) {
+        setLoadStatus((current) => (current === "ready" ? current : "error"));
+      }
+    };
+
+    const cleanupWatcher = watchQuickQuoteTarget(markReady);
+    let cleanupScript = () => {};
+
     hydrateQuickQuoteAttributionUrl();
     installQuickQuoteDataLayerBridge();
 
-    if (!renderExistingQuickQuote()) {
-      loadQuickQuoteScript();
+    if (!renderExistingQuickQuote(markReady, markError)) {
+      cleanupScript = loadQuickQuoteScript(markError);
     }
+
+    return () => {
+      active = false;
+      cleanupWatcher();
+      cleanupScript();
+      if (readyFrame) {
+        window.cancelAnimationFrame(readyFrame);
+      }
+    };
   }, []);
 
   return (
     <>
-      <div
-        id={QUICKQUOTE_TARGET_ID}
-        className="min-h-[720px] w-full overflow-hidden"
-        aria-live="polite"
-      />
+      <div className="relative min-h-[720px] w-full overflow-hidden" aria-busy={isLoading}>
+        {isLoading ? (
+          <div className="pointer-events-none absolute inset-0 z-10 py-16">
+            <QuickQuoteWebFormSkeleton />
+          </div>
+        ) : null}
+
+        {loadStatus === "error" ? (
+          <div className="absolute inset-0 z-10 py-16">
+            <QuickQuoteLoadError />
+          </div>
+        ) : null}
+
+        <div
+          id={QUICKQUOTE_TARGET_ID}
+          className={[
+            "min-h-[720px] w-full overflow-hidden py-16",
+            isLoading || loadStatus === "error" ? "pointer-events-none opacity-0" : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          aria-live="polite"
+        />
+      </div>
       <noscript>
         <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           JavaScript is required to load the instant quote form. Please call (941) 866-4320 for help.
