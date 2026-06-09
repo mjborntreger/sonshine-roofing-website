@@ -15,9 +15,9 @@ import { listFaqsWithContent, listRecentPostsPool } from "@/lib/content/wp";
 export const revalidate = 900;
 
 const PAGE_PATH = "/instant-quote";
-const PAGE_TITLE = "Instant Roof Quote | SonShine Roofing";
+const PAGE_TITLE = "60-sec Roof Quote | SonShine Roofing";
 const PAGE_DESCRIPTION =
-  "Get a fast & free roof replacement estimate from SonShine Roofing using QuickQuote satellite measurements.";
+  "Get a 60-sec roof replacement quote from SonShine Roofing using QuickQuote satellite measurements.";
 
 export async function generateMetadata(): Promise<Metadata> {
   return buildBasicMetadata({
@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,
     keywords: [
-      "instant roof quote",
+      "60-sec roof quote",
       "roof replacement quote",
       "roofing quote",
       "roof replacement estimate",
@@ -55,7 +55,7 @@ export default async function InstantQuotePage() {
   const breadcrumbsLd = breadcrumbSchema(
     [
       { name: "Home", item: "/" },
-      { name: "Instant Quote", item: PAGE_PATH },
+      { name: "60-sec Roof Quote", item: PAGE_PATH },
     ],
     { origin },
   );
@@ -63,9 +63,9 @@ export default async function InstantQuotePage() {
   return (
     <>
       <Hero
-        title="Instant Roof Quote"
+        title="60-sec Roof Quote"
         eyelash="Roof Replacement Estimates"
-        subtitle="Use our instant quote tool to request an instant roof replacement estimate with satellite measurements and quick follow-up."
+        subtitle="Use our 60-sec quote tool to request a roof replacement estimate with satellite measurements and quick follow-up."
         justifyStart={true}
         badges={[
           { icon: Zap, label: "Fast & Free" },

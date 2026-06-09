@@ -351,7 +351,7 @@ function QuickQuoteLoadError() {
       role="alert"
       className="mx-auto w-full max-w-[480px] rounded-[16px] border border-amber-200 bg-amber-50 px-5 pb-8 text-sm text-amber-950 shadow-[0_16px_36px_rgba(15,23,42,0.12)]"
     >
-      The instant quote form is taking longer than expected to load. Please refresh the page or call{" "}
+      The 60-sec quote form is taking longer than expected to load. Please refresh the page or call{" "}
       <a className="font-semibold underline" href="tel:+19418664320">
         (941) 866-4320
       </a>
@@ -435,7 +435,7 @@ export default function QuickQuoteWebForm() {
       </div>
       <noscript>
         <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          JavaScript is required to load the instant quote form. Please call (941) 866-4320 for help.
+          JavaScript is required to load the 60-sec quote form. Please call (941) 866-4320 for help.
         </p>
       </noscript>
     </>

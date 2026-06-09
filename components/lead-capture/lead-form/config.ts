@@ -354,7 +354,7 @@ const JOURNEY_RESOURCES: Partial<Record<JourneyKey, ResourceLink[]>> = {
       icon: Hammer,
     },
     {
-      label: 'Get a 60-second estimate',
+      label: '60-sec Quote',
       description: 'Satellite measurements, select materials',
       href: '/instant-quote',
       icon: ClipboardList,

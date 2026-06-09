@@ -20,7 +20,7 @@ export const routes = [
   // Contact & legal
   { href: "/contact-us", label: "Contact" },
   { href: "/privacy-policy", label: "Privacy Policy" },
-  { href: "/instant-quote", label: "Instant Quote" },
+  { href: "/instant-quote", label: "60-sec Quote" },
 
   // Miscellaneous (developer/internal)
   // (design-system removed)

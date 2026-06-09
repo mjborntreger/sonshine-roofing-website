@@ -122,7 +122,7 @@ const ITEM_STAGGER_STEP_MS = 50; // per-item additional delay
 const LEVEL_BONUS_MS = 20;       // extra delay per nested level (deeper = later)
 // Mobile-only: top-level staggering and CTA offsets
 const MOBILE_TOP_STAGGER_BASE_MS = 70;
-const MOBILE_CTA1_DELAY_MS = 70;  // "Free 60-second Quote"
+const MOBILE_CTA1_DELAY_MS = 70;  // "60-sec Quote"
 
 /* ===== Desktop (fixed) ===== */
 function DesktopMenu({ transparent }: { transparent: boolean }) {
