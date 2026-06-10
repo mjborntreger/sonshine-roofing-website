@@ -2,8 +2,10 @@
 
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { ArrowRight } from 'lucide-react';
 import Turnstile from '@/components/lead-capture/Turnstile';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
+import { Button } from '@/components/ui/button';
 import {
   buildN8nLeadPayload,
   mapLeadApiFieldErrors,
@@ -15,6 +17,8 @@ import {
   submitLead,
 } from '@/lib/lead-capture/contact-lead';
 import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
+import { endOfDay, parseSpecialOfferDate } from '@/lib/lead-capture/specialOfferDates';
+import { cn } from '@/lib/utils';
 
 type Props = {
   offerCode: string;
@@ -37,20 +41,17 @@ type FormValues = {
 type Submission = 'idle' | 'submitting' | 'success' | 'error';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const INPUT_BASE_CLASS =
+  'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
+const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
+const FIELD_ERROR_CLASS = 'mt-1 block text-xs text-red-600';
 
 function parseExpirationDate(raw?: string | null): Date {
-  if (raw) {
-    const parts = raw.split('/').map((part) => Number.parseInt(part, 10));
-    if (parts.length === 3) {
-      const [month, day, year] = parts;
-      if (month && day && year) {
-        const candidate = new Date(year, month - 1, day, 23, 59, 59, 999);
-        if (!Number.isNaN(candidate.getTime())) {
-          return candidate;
-        }
-      }
-    }
+  const parsed = parseSpecialOfferDate(raw);
+  if (parsed) {
+    return endOfDay(parsed);
   }
+
   const fallback = new Date();
   fallback.setFullYear(fallback.getFullYear() + 1);
   return fallback;
@@ -249,7 +250,7 @@ export default function SpecialOfferForm({
 
   if (submission === 'success') {
     return (
-      <div className="rounded-3xl border border-emerald-200 bg-white/95 p-6 shadow-lg print:border-neutral-700 print:bg-white">
+      <div className="not-prose rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm print:border-neutral-700 print:bg-white">
         <h2 className="text-2xl font-semibold text-emerald-700">You&rsquo;re all set!</h2>
         <p className="mt-2 text-sm text-slate-600 print:text-black">
           Thanks! Your offer code is below. We’ve also emailed it to you so you can keep it handy.
@@ -274,17 +275,13 @@ export default function SpecialOfferForm({
   }
 
   return (
-    <div className="rounded-3xl mb-12 border border-blue-100 bg-white/95 p-6 shadow-lg print:hidden">
-      <h2 
-        className="text-2xl font-semibold text-slate-800"
-        >
-          Claim this offer
-      </h2>
+    <div className="not-prose rounded-3xl border border-blue-100 bg-white p-6 shadow-sm print:hidden sm:p-8">
+      <h2 className="text-2xl font-semibold text-slate-800">Claim This Offer</h2>
       <p className="mt-4 text-sm text-slate-600">
         Fill out the quick form below and we’ll email your offer code instantly.
       </p>
 
-      <form className="mt-6 space-y-5" onSubmit={handleSubmit} noValidate>
+      <form className="mt-6 space-y-6" onSubmit={handleSubmit} noValidate>
         <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -293,7 +290,7 @@ export default function SpecialOfferForm({
             <input
               id="firstName"
               name="firstName"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/40"
+              className={cn(INPUT_BASE_CLASS, fieldErrors.firstName && INPUT_ERROR_CLASS)}
               value={values.firstName}
               onChange={handleChange('firstName')}
               autoComplete="given-name"
@@ -301,7 +298,7 @@ export default function SpecialOfferForm({
               aria-describedby={fieldErrors.firstName ? 'firstName-error' : undefined}
             />
             {fieldErrors.firstName && (
-              <span id="firstName-error" className="mt-1 block text-xs text-red-600">
+              <span id="firstName-error" className={FIELD_ERROR_CLASS}>
                 {fieldErrors.firstName}
               </span>
             )}
@@ -312,7 +309,7 @@ export default function SpecialOfferForm({
             <input
               id="lastName"
               name="lastName"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/40"
+              className={cn(INPUT_BASE_CLASS, fieldErrors.lastName && INPUT_ERROR_CLASS)}
               value={values.lastName}
               onChange={handleChange('lastName')}
               autoComplete="family-name"
@@ -320,7 +317,7 @@ export default function SpecialOfferForm({
               aria-describedby={fieldErrors.lastName ? 'lastName-error' : undefined}
             />
             {fieldErrors.lastName && (
-              <span id="lastName-error" className="mt-1 block text-xs text-red-600">
+              <span id="lastName-error" className={FIELD_ERROR_CLASS}>
                 {fieldErrors.lastName}
               </span>
             )}
@@ -333,7 +330,7 @@ export default function SpecialOfferForm({
             id="email"
             name="email"
             type="email"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/40"
+            className={cn(INPUT_BASE_CLASS, fieldErrors.email && INPUT_ERROR_CLASS)}
             value={values.email}
             onChange={handleChange('email')}
             autoComplete="email"
@@ -341,7 +338,7 @@ export default function SpecialOfferForm({
             aria-describedby={fieldErrors.email ? 'email-error' : undefined}
           />
           {fieldErrors.email && (
-            <span id="email-error" className="mt-1 block text-xs text-red-600">
+            <span id="email-error" className={FIELD_ERROR_CLASS}>
               {fieldErrors.email}
             </span>
           )}
@@ -354,7 +351,7 @@ export default function SpecialOfferForm({
             name="phone"
             type="tel"
             inputMode="tel"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/40"
+            className={cn(INPUT_BASE_CLASS, fieldErrors.phone && INPUT_ERROR_CLASS)}
             value={values.phone}
             onChange={handleChange('phone')}
             autoComplete="tel"
@@ -362,7 +359,7 @@ export default function SpecialOfferForm({
             aria-describedby={fieldErrors.phone ? 'phone-error' : undefined}
           />
           {fieldErrors.phone && (
-            <span id="phone-error" className="mt-1 block text-xs text-red-600">
+            <span id="phone-error" className={FIELD_ERROR_CLASS}>
               {fieldErrors.phone}
             </span>
           )}
@@ -396,18 +393,22 @@ export default function SpecialOfferForm({
         </div>
 
         {globalError && (
-          <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-2 text-sm text-red-700">
+          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
             {globalError}
           </div>
         )}
 
-        <button
+        <Button
           type="submit"
-          className="btn btn-brand-orange btn-md w-full"
+          variant="brandOrange"
+          size="xl"
+          className="w-full justify-center"
+          data-icon-affordance="right"
           disabled={submission === 'submitting'}
         >
-          {submission === 'submitting' ? 'Sending…' : 'Submit'}
-        </button>
+          {submission === 'submitting' ? 'Sending…' : 'Claim This Offer'}
+          {submission !== 'submitting' ? <ArrowRight className="icon-affordance ml-2 h-4 w-4" aria-hidden="true" /> : null}
+        </Button>
       </form>
     </div>
   );

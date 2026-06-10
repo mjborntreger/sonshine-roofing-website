@@ -1,6 +1,6 @@
 # SonShine Roofing – WPGraphQL Reference
 
-`lib/content/wp.ts` centralises every GraphQL interaction with the headless WordPress instance. This document inventories those calls, with an emphasis on how dynamic slugs and custom post types flow into Next.js routes.
+`lib/content/wp.ts` centralises every GraphQL interaction with the headless WordPress instance. This document inventories those calls, with an emphasis on how dynamic slugs and custom post types flow into Next.js routes. Special offers now live in Directus and are documented separately below.
 
 ---
 
@@ -10,6 +10,7 @@
 - `WP_BASIC_AUTH_USER` / `WP_BASIC_AUTH_PASS` → optional Basic Auth applied on every request.
 - `WP_PROJECT_BASE` → base segment for project permalinks (default `project`); used when building URIs for GraphQL lookups.
 - `NODE_ENV` toggles `WP_VERBOSE_ERRORS`, causing raw GraphQL errors to be surfaced during development.
+- Directus special offers use server-side `DIRECTUS_URL`, `DIRECTUS_CLIENT_SLUG`, and `DIRECTUS_TOKEN`.
 
 ---
 
@@ -36,7 +37,6 @@ const data = await wpFetch<MyQuery>(query, vars, { revalidateSeconds: 3600, cach
 | Locations | `location` / `locations` | `listLocationSlugs` (600 s) | `getLocationBySlug` | `app/locations/[slug]/page.tsx` |
 | FAQs | `faq` / `faqs` | `listFaqSlugs` (86 400 s) | `getFaq` | `app/faq/[slug]/page.tsx` |
 | Glossary terms | `glossaryTerm` / `glossaryTerms` | `listGlossaryIndex` (batched, 600 s) | `getGlossaryTerm` | `app/roofing-glossary/[slug]/page.tsx` |
-| Special offers | `specialOffer` / `specialOffers` | `listSpecialOfferSlugs` (900 s) | `getSpecialOfferBySlug` (900 s) | `app/special-offers/[slug]/page.tsx` |
 | Team members | `person` / `persons` | `listPersonNav` (86 400 s) | `listPersonsBySlug` (caller sets revalidate) | `app/person/[slug]/page.tsx` |
 | Video entries | `videoEntry` / `videoEntries` | n/a (pool only) | `getVideoEntryBySlug` (900 s) | Consumed by `components/dynamic-content/video/*` |
 
@@ -490,76 +490,24 @@ fragment GlossaryFields on GlossaryTerm {
 
 ---
 
-## Special offers (`specialOffer`)
+## Special offers (`special_offers` in Directus)
 
-- **Slug loader** – `listSpecialOfferSlugs(limit = 100)` refreshes every 15 min; query restricts to published entries.
-- **Single fetch** – `getSpecialOfferBySlug(slug)` returns content, featured image, Rank Math SEO, and ACF fields from `specialOffersAttributes` (`discount`, `offerCode`, `expirationDate`, `legalDisclaimers`).
-- **Next usage** – `app/special-offers/[slug]/page.tsx` seeds static params via the slug list, renders with the single fetcher, and handles per-offer caching/expiry UI client side.
+- **Fetcher module** – `lib/content/directus-special-offers.ts` uses the Directus Items REST API with `Authorization: Bearer ${DIRECTUS_TOKEN}` and a 900 s Next fetch revalidation window.
+- **Collection filter** – all reads filter `special_offers` by related `client.slug = DIRECTUS_CLIENT_SLUG` and `is_published = true`; there is no WordPress fallback.
+- **Fields** – the site reads `client.slug`, `title`, `slug`, `featured_image.id`, `featured_image.description`, `featured_image.width`, `featured_image.height`, `offer_code`, `discount`, `description`, `expiration_date`, `legal_disclaimer`, and `featured`.
+- **Next usage** – `app/special-offers/[slug]/page.tsx` seeds static params via `listSpecialOfferSlugs`, renders offer pages with `getSpecialOfferBySlug`, and preserves the existing special-offer lead form payload.
+- **Featured popup** – `app/(site)/layout.tsx` fetches `getFeaturedSpecialOffer`; if multiple published, unexpired offers are featured, the soonest-expiring offer wins. The popup excludes `offer_code`, links to the offer page, and suppresses itself in browser storage for 7 days after dismissal or CTA click.
+- **Directus docs** – see Directus Items API, Query Parameters, Authentication, and Assets API:
+  - `https://directus.com/docs/api/items`
+  - `https://directus.com/docs/guides/connect/query-parameters`
+  - `https://directus.com/docs/api/authentication`
+  - `https://directus.com/docs/api/assets`
 
-```graphql
-query SpecialOfferSmokeTest($slug: ID!, $first: Int = 10) {
-  specialOffers(
-    first: $first
-    where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }
-  ) {
-    nodes {
-      ...SpecialOfferFields
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-  }
+REST smoke-test shape:
 
-  specialOffer(id: $slug, idType: SLUG) {
-    ...SpecialOfferFields
-    content(format: RENDERED)
-  }
-}
-
-fragment SpecialOfferFields on SpecialOffer {
-  databaseId
-  id
-  slug
-  status
-  title
-  date(format: "c")
-  modified(format: "c")
-  featuredImage {
-    node {
-      id
-      sourceUrl
-      altText
-      mediaDetails {
-        width
-        height
-      }
-    }
-  }
-  specialOffersAttributes {
-    discount
-    offerCode
-    expirationDate
-    legalDisclaimers
-  }
-  seo {
-    title
-    description
-    canonicalUrl
-    openGraph {
-      title
-      description
-      type
-      image {
-        url
-        secureUrl
-        width
-        height
-        type
-      }
-    }
-  }
-}
+```http
+GET /items/special_offers?fields=client.slug,title,slug,featured_image.id,featured_image.description,offer_code,discount,description,expiration_date,legal_disclaimer,featured&filter={"client":{"slug":{"_eq":"<DIRECTUS_CLIENT_SLUG>"}},"is_published":{"_eq":true},"slug":{"_eq":"<slug>"}}&limit=1
+Authorization: Bearer <DIRECTUS_TOKEN>
 ```
 
 ---

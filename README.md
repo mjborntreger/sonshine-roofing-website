@@ -55,7 +55,7 @@ Security headers & CSP
   - The site hydrates stored `utm_*` and `gclid` into the URL before loading QuickQuote; unsupported webhook fields such as `gbraid`, `wbraid`, landing page, and referrer require QuickQuote vendor support.
 
 Cache/Invalidation
-- GraphQL data: leverages `unstable_cache` with tags; use `/api/revalidate` where applicable.
+- WordPress GraphQL data uses Next fetch revalidation where configured; Directus special offers revalidate every 15 minutes.
 - Static sitemap: regenerated on build; read dynamically per request.
 
 GTMetrix/Analytics
@@ -98,6 +98,7 @@ Content Workflow
 
 Where content lives
 - WordPress (via WPGraphQL): blog posts, projects, glossary, faqs, persons, videos.
+- Directus: special offers in `special_offers`, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`.
 - Next.js app pages: service pages, about, contact, policy pages.
 
 Publishing in WP

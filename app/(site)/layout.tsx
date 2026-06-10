@@ -4,6 +4,9 @@ import Header from "@/components/global-nav/header/Header";
 import Footer from "@/components/global-nav/footer/Footer";
 import AnalyticsScripts from "@/lib/telemetry/analytics";
 import LeadAttributionCapture from "@/components/lead-capture/LeadAttributionCapture";
+import SpecialOfferPopup, { type SpecialOfferPopupOffer } from "@/components/lead-capture/special-offer/SpecialOfferPopup";
+import { getFeaturedSpecialOffer } from "@/lib/content/directus-special-offers";
+import { formatSpecialOfferExpiration } from "@/lib/lead-capture/specialOfferDates";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import { OFFICE_OPENING_HOURS_SPEC, PHONE_OPENING_HOURS_SPEC } from "@/lib/contact-hours";
 
@@ -184,7 +187,37 @@ function getGlobalSchema() {
   } as const;
 }
 
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+async function getFeaturedOfferPopup(): Promise<SpecialOfferPopupOffer | null> {
+  try {
+    const offer = await getFeaturedSpecialOffer();
+    if (!offer) return null;
+
+    return {
+      slug: offer.slug,
+      title: offer.title,
+      href: `/special-offers/${offer.slug}`,
+      description: offer.description,
+      discount: offer.discount,
+      expirationLabel: formatSpecialOfferExpiration(offer.expirationDate),
+      legalDisclaimer: offer.legalDisclaimer,
+      featuredImage: offer.featuredImage
+        ? {
+            url: offer.featuredImage.url,
+            altText: offer.featuredImage.altText,
+            width: offer.featuredImage.width,
+            height: offer.featuredImage.height,
+          }
+        : null,
+    };
+  } catch (error) {
+    console.error("[directus] Unable to load featured special offer.", error);
+    return null;
+  }
+}
+
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const featuredOfferPopup = await getFeaturedOfferPopup();
+
   return (
     <div
       id="page-top"
@@ -198,6 +231,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <Suspense fallback={null}>
         <LeadAttributionCapture />
       </Suspense>
+      {featuredOfferPopup ? <SpecialOfferPopup offer={featuredOfferPopup} /> : null}
       <Header />
       <main className="flex-1">{children}</main>
       <Footer />

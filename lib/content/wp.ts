@@ -741,36 +741,6 @@ export type FaqFull = Faq & {
   };
 };
 
-export type SpecialOffer = {
-  slug: string;
-  title: string;
-  contentHtml: string;
-  featuredImage?: WpImage | null;
-  date?: string | null;
-  modified?: string | null;
-  discount?: string | null;
-  offerCode?: string | null;
-  expirationDate?: string | null;
-  legalDisclaimers?: string | null;
-  seo?: {
-    title?: string | null;
-    description?: string | null;
-    canonicalUrl?: string | null;
-    openGraph?: {
-      title?: string | null;
-      description?: string | null;
-      type?: string | null;
-      image?: {
-        url?: string | null;
-        secureUrl?: string | null;
-        width?: number | null;
-        height?: number | null;
-        type?: string | null;
-      } | null;
-    } | null;
-  };
-};
-
 // FAQ Topic type (taxonomy term)
 export type FaqTopic = {
   slug: string;
@@ -1144,88 +1114,6 @@ export async function getFaq(slug: string): Promise<FaqFull | null> {
     seo,
   };
 }
-
-// ----- Special Offers -----
-
-export async function listSpecialOfferSlugs(limit = 100): Promise<string[]> {
-  const query = /* GraphQL */ `
-    query SpecialOfferSlugs($first: Int!) {
-      specialOffers(first: $first, where: { status: PUBLISH }) {
-        nodes {
-          slug
-        }
-      }
-    }
-  `;
-
-  const data = await wpFetch<{ specialOffers?: { nodes?: Array<{ slug?: string | null }> } }>(
-    query,
-    { first: limit },
-    900
-  );
-
-  return (data?.specialOffers?.nodes ?? [])
-    .map((node) => String(node?.slug || ""))
-    .filter((s) => s.length > 0);
-}
-
-export async function getSpecialOfferBySlug(slug: string): Promise<SpecialOffer | null> {
-  const query = /* GraphQL */ `
-    query SpecialOfferBySlug($slug: ID!) {
-      specialOffer(id: $slug, idType: SLUG) {
-        slug
-        title
-        date
-        modified
-        content(format: RENDERED)
-        featuredImage {
-          node {
-            sourceUrl
-            altText
-          }
-        }
-        specialOffersAttributes {
-          offerCode
-          expirationDate
-          discount
-          legalDisclaimers
-        }
-        seo {
-          title
-          description
-          canonicalUrl
-          openGraph {
-            title
-            description
-            type
-            image { url secureUrl width height type }
-          }
-        }
-      }
-    }
-  `;
-
-  const data = await wpFetch<{ specialOffer?: UnknownRecord | null }>(query, { slug }, 900);
-  const node = asRecord(data?.specialOffer);
-  if (!node) return null;
-
-  const fields = asRecord(node.specialOffersAttributes);
-
-  return {
-    slug: toStringSafe(node.slug) || slug,
-    title: toStringSafe(node.title),
-    contentHtml: String(node.content || ''),
-    featuredImage: pickImageFrom(node.featuredImage),
-    date: typeof node.date === 'string' ? node.date : null,
-    modified: typeof node.modified === 'string' ? node.modified : null,
-    discount: typeof fields?.discount === 'string' ? fields.discount : null,
-    offerCode: typeof fields?.offerCode === 'string' ? fields.offerCode : null,
-    expirationDate: typeof fields?.expirationDate === 'string' ? fields.expirationDate : null,
-    legalDisclaimers: typeof fields?.legalDisclaimers === 'string' ? fields.legalDisclaimers : null,
-    seo: isRecord(node.seo) ? (node.seo as SpecialOffer['seo']) : undefined,
-  };
-}
-
 
 /**
  * Fetch a list of FAQs with full rendered content, optionally filtered by topic, for archive JSON-LD.

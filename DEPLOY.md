@@ -43,6 +43,10 @@ Coolify Environment Variables
   - `NEXT_PUBLIC_REVIEWS_URL`
   - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
   - `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP` when the FAQ sitemap should be exposed
+- Mark these server variables as build-time and runtime variables because special offers are fetched during static generation and runtime ISR:
+  - `DIRECTUS_URL`
+  - `DIRECTUS_CLIENT_SLUG`
+  - `DIRECTUS_TOKEN`
 - Set these as runtime secrets:
   - `N8N_WEBHOOK_URL`
   - `N8N_WEBHOOK_SECRET`
@@ -117,7 +121,7 @@ Security headers & CSP
 - QuickQuote submissions are bridged into `lead_form_submitted` and `ads_lead_submit` dataLayer events as roof replacement conversions.
 
 Cache/Invalidation
-- GraphQL data: leverages `unstable_cache` with tags; use `/api/revalidate` where applicable.
+- WordPress GraphQL data uses Next fetch revalidation where configured; Directus special offers revalidate every 15 minutes.
 - Static sitemap: regenerated on build; read dynamically per request.
 
 GTMetrix/Analytics
