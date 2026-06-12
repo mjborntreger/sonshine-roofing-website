@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { N8nLeadPayloadV2 as LeadForwardPayloadV2 } from '@/lib/lead-capture/contact-lead';
+import { isUsPhoneComplete, normalizePhoneForSubmit } from '@/lib/lead-capture/phone';
 import { isProdEnv, requireEnv, SITE_ORIGIN } from '@/lib/seo/site';
 
 type UnknownRecord = Record<string, unknown>;
@@ -142,7 +143,16 @@ function validateLeadForwardPayload(input: unknown):
   const email = formTypeRaw === 'contact-lead'
     ? getOptionalTrimmed(contactRaw, 'email')
     : getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors);
-  const phone = getOptionalTrimmed(contactRaw, 'phone');
+  let phone = getOptionalTrimmed(contactRaw, 'phone');
+  if (formTypeRaw === 'special-offer') {
+    if (!phone) {
+      addFieldError(errors, 'contact.phone', 'Phone is required.');
+    } else if (!isUsPhoneComplete(phone)) {
+      addFieldError(errors, 'contact.phone', 'Phone must include 10 digits (US only).');
+    } else {
+      phone = normalizePhoneForSubmit(phone);
+    }
+  }
   if (formTypeRaw === 'contact-lead' && !email && !phone) {
     addFieldError(errors, 'contact.email', 'Email or phone is required.');
     addFieldError(errors, 'contact.phone', 'Phone or email is required.');

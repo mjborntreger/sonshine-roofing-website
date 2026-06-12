@@ -123,7 +123,9 @@ export default function SpecialOfferForm({
       next.email = 'Enter a valid email (example@domain.com)';
     }
     const hasPhone = values.phone.trim().length > 0;
-    if (hasPhone && !isUsPhoneComplete(values.phone)) {
+    if (!hasPhone) {
+      next.phone = 'Enter your phone number';
+    } else if (!isUsPhoneComplete(values.phone)) {
       next.phone = 'Enter a valid US phone number (10 digits).';
     }
     Object.assign(next, validateSmsConsentDraft({
@@ -345,7 +347,7 @@ export default function SpecialOfferForm({
         </label>
 
         <label className="block text-sm font-medium text-slate-700" htmlFor="phone">
-          Phone
+          Phone*
           <input
             id="phone"
             name="phone"
