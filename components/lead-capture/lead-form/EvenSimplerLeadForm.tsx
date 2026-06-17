@@ -9,10 +9,9 @@ import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import {
   DEFAULT_PREFERRED_CONTACT,
   LEAD_SUCCESS_COOKIE,
-  LeadSuccessCookiePayload,
   SuccessMeta,
-  buildContactLeadRoutingPlaceholders,
-  buildN8nLeadPayload,
+  buildContactLeadForwardPayload,
+  buildContactLeadSuccessPayload,
   formatPhoneExample,
   mapLeadApiFieldErrors,
   normalizeState,
@@ -218,13 +217,7 @@ export default function EvenSimplerLeadForm({
       ? [notes, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
       : notes;
     const preferredContact = form.phone ? DEFAULT_PREFERRED_CONTACT : 'email';
-    const routingPlaceholders = buildContactLeadRoutingPlaceholders({
-      intent: 'free-estimate',
-      preferredContact,
-    });
-
-    const payload = buildN8nLeadPayload({
-      formType: 'contact-lead',
+    const payload = buildContactLeadForwardPayload({
       submittedAt: new Date().toISOString(),
       source: {
         page: page || '/contact-us',
@@ -235,13 +228,12 @@ export default function EvenSimplerLeadForm({
       contact: {
         firstName: form.firstName,
         lastName: form.lastName,
-        email: form.email || routingPlaceholders.contact.email,
+        email: form.email,
         phone: form.phone,
       },
       address: {
-        ...routingPlaceholders.address,
         address1: form.address1,
-        address2: form.address2 || routingPlaceholders.address.address2,
+        address2: form.address2,
         city: form.city,
         state: form.state,
         zip: form.zip,
@@ -251,16 +243,16 @@ export default function EvenSimplerLeadForm({
         smsMarketingConsent: form.smsMarketingConsent,
       },
       details: {
-        ...routingPlaceholders.details,
-        projectType: form.projectType || routingPlaceholders.details.projectType,
-        roofAge: form.roofAge || routingPlaceholders.details.roofAge,
-        roofAgeLabel: roofAgeLabel || routingPlaceholders.details.roofAgeLabel,
-        roofType: form.roofType || routingPlaceholders.details.roofType,
-        notes: combinedNotes.trim() || routingPlaceholders.details.notes,
-        roofTypeLabel: roofTypeLabel || routingPlaceholders.details.roofTypeLabel,
+        projectType: form.projectType,
+        roofAge: form.roofAge,
+        roofAgeLabel,
+        roofType: form.roofType,
+        notes: combinedNotes.trim(),
+        roofTypeLabel,
         preferredContact,
         bestTime: 'No preference',
       },
+      preferredContact,
       antiSpam: {
         cfToken,
         hp_field: honeypot || undefined,
@@ -291,16 +283,15 @@ export default function EvenSimplerLeadForm({
       return;
     }
 
-    const successPayload: LeadSuccessCookiePayload = {
+    const successPayload = buildContactLeadSuccessPayload({
       projectType: form.projectType,
       helpTopics: [],
       helpTopicLabels: [],
       roofAge: form.roofAge,
-      roofAgeLabel: roofAgeLabel || undefined,
-      notes: notes || undefined,
-      roofTypeLabel: roofTypeLabel || undefined,
-      timestamp: new Date().toISOString(),
-    };
+      roofAgeLabel,
+      notes,
+      roofTypeLabel,
+    });
     persistLeadSuccessCookie(successPayload);
     redirectToThankYou(payload);
   };

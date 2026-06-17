@@ -9,8 +9,8 @@ import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import {
   DEFAULT_PREFERRED_CONTACT,
   LEAD_SUCCESS_COOKIE,
-  buildN8nLeadPayload,
-  buildContactLeadRoutingPlaceholders,
+  buildContactLeadForwardPayload,
+  buildContactLeadSuccessPayload,
   formatPhoneExample,
   mapLeadApiFieldErrors,
   persistLeadSuccessCookie,
@@ -77,6 +77,7 @@ type SetFormField = <K extends keyof FormState>(field: K, value: FormState[K]) =
 type FormState = {
   firstName: string;
   lastName: string;
+  email: string;
   phone: string;
   smsProjectConsent: SmsConsentFieldValue;
   smsMarketingConsent: SmsConsentFieldValue;
@@ -85,6 +86,7 @@ type FormState = {
 const INITIAL_STATE: FormState = {
   firstName: '',
   lastName: '',
+  email: '',
   phone: '',
   smsProjectConsent: '',
   smsMarketingConsent: '',
@@ -156,6 +158,22 @@ function LeadFormContactFields({ tone, form, errors, onFieldChange }: LeadFormCo
           {errors.lastName ? <span className={errorClassName}>{errors.lastName}</span> : null}
         </label>
       </div>
+
+      {isHero ? (
+        <label className={phoneLabelClassName}>
+          Email*
+          <input
+            type="email"
+            name="email"
+            autoComplete="email"
+            value={form.email}
+            onChange={(event) => onFieldChange('email', event.target.value)}
+            className={cn(inputClassName, errors.email && INPUT_ERROR_CLASS)}
+            placeholder="example@domain.com"
+          />
+          {errors.email ? <span className={errorClassName}>{errors.email}</span> : null}
+        </label>
+      ) : null}
 
       <label className={phoneLabelClassName}>
         Phone Number*
@@ -317,14 +335,15 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
     event.preventDefault();
     if (status === 'submitting') return;
 
+    const requiresEmail = variant === 'heroEmbedded';
     const identityErrors = validateContactIdentityDraft(
       {
         firstName: form.firstName,
         lastName: form.lastName,
-        email: '',
+        email: requiresEmail ? form.email : '',
         phone: form.phone,
       },
-      { emailRequired: false, phoneRequired: true }
+      { emailRequired: requiresEmail, phoneRequired: true }
     );
     const smsErrors = validateSmsConsentDraft({
       smsProjectConsent: form.smsProjectConsent,
@@ -350,13 +369,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
 
     setStatus('submitting');
     setGlobalError(null);
-    const routingPlaceholders = buildContactLeadRoutingPlaceholders({
-      intent: 'free-estimate',
-      preferredContact: DEFAULT_PREFERRED_CONTACT,
-    });
-
-    const payload = buildN8nLeadPayload({
-      formType: 'contact-lead',
+    const payload = buildContactLeadForwardPayload({
       submittedAt: new Date().toISOString(),
       source: {
         page: pathname,
@@ -367,15 +380,15 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
       contact: {
         firstName: form.firstName,
         lastName: form.lastName,
-        email: routingPlaceholders.contact.email,
+        email: requiresEmail ? form.email : undefined,
         phone: form.phone,
       },
-      address: routingPlaceholders.address,
       smsConsent: {
         smsProjectConsent: form.smsProjectConsent,
         smsMarketingConsent: form.smsMarketingConsent,
       },
-      details: routingPlaceholders.details,
+      preferredContact: DEFAULT_PREFERRED_CONTACT,
+      formVariant: requiresEmail ? 'heroEmbedded' : undefined,
       antiSpam: {
         cfToken,
         hp_field: honeypot || undefined,
@@ -407,10 +420,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
       return;
     }
 
-    persistLeadSuccessCookie({
-      projectType: 'contact',
-      timestamp: new Date().toISOString(),
-    });
+    persistLeadSuccessCookie(buildContactLeadSuccessPayload({ projectType: 'contact' }));
     redirectToThankYou(payload);
   };
 

@@ -2,7 +2,6 @@ import { deleteCookie, readCookie, writeCookie } from '@/lib/telemetry/client-co
 import { pushToDataLayer } from '@/lib/telemetry/gtm';
 import { trackMetaPixel, type MetaStandardEvent } from '@/lib/telemetry/meta';
 import { normalizePhoneForSubmit, isUsPhoneComplete, stripToPhoneDigits } from '@/lib/lead-capture/phone';
-import type { ContactLeadInput } from '@/lib/lead-capture/validation';
 import { getLeadAttributionForSubmit } from '@/lib/lead-capture/attribution';
 import { generateSriLeadId } from '@/lib/lead-capture/lead-id';
 
@@ -12,14 +11,6 @@ export {
   formatPhoneExample,
   isUsPhoneComplete,
 } from '@/lib/lead-capture/phone';
-
-export type {
-  ContactLeadInput,
-  FeedbackLeadInput,
-  FinancingLeadInput,
-  LeadInput,
-  SpecialOfferLeadInput,
-} from '@/lib/lead-capture/validation';
 
 export const CONTACT_READY_COOKIE = 'ss_lead_contact_ready';
 export const CONTACT_READY_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
@@ -46,15 +37,11 @@ export interface SuccessMeta {
   roofTypeLabel: string | null;
 }
 
-export type ContactLeadResourceLink = NonNullable<ContactLeadInput['resourceLinks']>[number];
-
-type StripIndexSignature<T> = {
-  [K in keyof T as K extends string
-    ? (string extends K ? never : number extends K ? never : K)
-    : K extends number
-      ? never
-      : K
-  ]: T[K];
+export type ContactLeadResourceLink = {
+  label: string;
+  description?: string;
+  href: string;
+  external?: boolean;
 };
 
 const STATE_REGEX = /^[A-Za-z]{2}$/;
@@ -207,6 +194,33 @@ type BuildN8nLeadPayloadInput = {
     cfToken: string;
     hp_field?: string;
   };
+};
+
+export type ContactLeadFormVariant = 'heroEmbedded';
+
+type BuildContactLeadForwardPayloadInput = {
+  submittedAt?: string;
+  source: BuildN8nLeadPayloadInput['source'];
+  contact: BuildN8nLeadPayloadInput['contact'];
+  address?: BuildN8nLeadPayloadInput['address'];
+  smsConsent: SmsConsentDraft;
+  details?: Record<string, unknown>;
+  antiSpam: BuildN8nLeadPayloadInput['antiSpam'];
+  intent?: string;
+  preferredContact?: PreferredContactValue;
+  placeholder?: string;
+  formVariant?: ContactLeadFormVariant;
+};
+
+type BuildContactLeadSuccessPayloadInput = {
+  projectType?: string;
+  helpTopics?: string[];
+  helpTopicLabels?: string[];
+  roofAge?: string;
+  roofAgeLabel?: string | null;
+  notes?: string;
+  roofTypeLabel?: string | null;
+  timestamp?: string;
 };
 
 export type ContactLeadRoutingPlaceholderOptions = {
@@ -373,6 +387,43 @@ export function buildN8nLeadPayload(input: BuildN8nLeadPayloadInput): N8nLeadPay
   return payload;
 }
 
+export function buildContactLeadForwardPayload(input: BuildContactLeadForwardPayloadInput): N8nLeadPayloadV2 {
+  const routingPlaceholders = buildContactLeadRoutingPlaceholders({
+    intent: input.intent || 'free-estimate',
+    preferredContact: input.preferredContact,
+    placeholder: input.placeholder,
+  });
+  const details = compactRecord(input.details || {});
+
+  return buildN8nLeadPayload({
+    formType: 'contact-lead',
+    submittedAt: input.submittedAt,
+    source: input.source,
+    contact: {
+      firstName: input.contact.firstName,
+      lastName: input.contact.lastName,
+      email: input.formVariant === 'heroEmbedded'
+        ? input.contact.email
+        : cleanString(input.contact.email) || routingPlaceholders.contact.email,
+      phone: input.contact.phone,
+    },
+    address: {
+      address1: cleanString(input.address?.address1) || routingPlaceholders.address.address1,
+      address2: cleanString(input.address?.address2) || routingPlaceholders.address.address2,
+      city: cleanString(input.address?.city) || routingPlaceholders.address.city,
+      state: cleanString(input.address?.state) || routingPlaceholders.address.state,
+      zip: cleanString(input.address?.zip) || routingPlaceholders.address.zip,
+    },
+    smsConsent: input.smsConsent,
+    details: {
+      ...routingPlaceholders.details,
+      ...details,
+      ...(input.formVariant ? { formVariant: input.formVariant } : {}),
+    },
+    antiSpam: input.antiSpam,
+  });
+}
+
 export type ContactIdentityDraft = {
   firstName: string;
   lastName: string;
@@ -386,21 +437,6 @@ export type ContactAddressDraft = {
   city: string;
   state: string;
   zip: string;
-};
-
-export type ContactLeadPayloadDraft = {
-  projectType?: string;
-  helpSummary?: string;
-  roofAge?: string;
-  roofAgeLabel?: string;
-  notes?: string;
-  preferredContact?: PreferredContactValue;
-  bestTimeLabel?: string;
-  consentSms?: boolean;
-  identity: ContactIdentityDraft;
-  address: ContactAddressDraft;
-  resourceLinks?: ContactLeadResourceLink[];
-  page?: string;
 };
 
 export function validateContactIdentityDraft(
@@ -460,74 +496,27 @@ export function validateContactAddressDraft(draft: ContactAddressDraft): Record<
   return errors;
 }
 
-type ContactLeadCorePayload = Omit<StripIndexSignature<ContactLeadInput>, 'cfToken' | 'hp_field'>;
-
-export type { ContactLeadCorePayload };
-
-export function buildContactLeadPayload(draft: ContactLeadPayloadDraft): ContactLeadCorePayload {
-  const {
-    projectType,
-    helpSummary,
-    roofAge,
-    roofAgeLabel,
-    notes,
-    preferredContact,
-    bestTimeLabel,
-    consentSms,
-    identity,
-    address,
-    resourceLinks,
-    page = '/contact-us',
-  } = draft;
-
-  const trimmedNotes = notes?.trim();
-  const projectTypeValue = projectType?.trim();
-  const roofAgeValue = roofAge?.trim();
-  const roofAgeLabelValue = roofAgeLabel?.trim();
-  const address1Value = address.address1.trim();
-  const address2Value = address.address2?.trim();
-  const cityValue = address.city.trim();
-  const stateValue = normalizeState(address.state ?? '');
-  const zipValue = normalizeZip(address.zip ?? '');
-  const phoneValue = normalizePhoneForSubmit(identity.phone);
-
-  const payload: ContactLeadCorePayload = {
-    type: 'contact-lead',
-    projectType: projectTypeValue || undefined,
-    helpTopics: helpSummary?.trim() || undefined,
-    roofAge: roofAgeValue || roofAgeLabelValue || undefined,
-    roofAgeLabel: roofAgeLabelValue || roofAgeValue || undefined,
-    notes: trimmedNotes || undefined,
-    firstName: identity.firstName.trim(),
-    lastName: identity.lastName.trim(),
-    preferredContact: normalizePreferredContact(preferredContact),
-    bestTime: bestTimeLabel?.trim() || undefined,
-    consentSms: Boolean(consentSms),
-    page,
-    address1: address1Value,
-    city: cityValue,
-    state: stateValue,
-    zip: zipValue,
+export function buildContactLeadSuccessPayload(input: BuildContactLeadSuccessPayloadInput): LeadSuccessCookiePayload {
+  const payload: LeadSuccessCookiePayload = {
+    projectType: cleanString(input.projectType) || 'contact',
+    timestamp: cleanString(input.timestamp) || new Date().toISOString(),
   };
 
-  const emailValue = identity.email.trim();
-  if (emailValue) {
-    payload.email = emailValue;
+  if (input.helpTopics) {
+    payload.helpTopics = input.helpTopics.filter((value): value is string => typeof value === 'string');
   }
-  if (phoneValue) {
-    payload.phone = phoneValue;
+  if (input.helpTopicLabels) {
+    payload.helpTopicLabels = input.helpTopicLabels.filter((value): value is string => typeof value === 'string');
   }
 
-  if (address2Value) payload.address2 = address2Value;
-
-  if (resourceLinks && resourceLinks.length) {
-    payload.resourceLinks = resourceLinks.map((link) => ({
-      label: link.label.trim(),
-      description: link.description?.trim() || undefined,
-      href: link.href,
-      external: link.external,
-    })) as ContactLeadResourceLink[];
-  }
+  const roofAge = cleanString(input.roofAge);
+  if (roofAge) payload.roofAge = roofAge;
+  const roofAgeLabel = cleanString(input.roofAgeLabel);
+  if (roofAgeLabel) payload.roofAgeLabel = roofAgeLabel;
+  const notes = cleanString(input.notes);
+  if (notes) payload.notes = notes;
+  const roofTypeLabel = cleanString(input.roofTypeLabel);
+  if (roofTypeLabel) payload.roofTypeLabel = roofTypeLabel;
 
   return payload;
 }
@@ -624,6 +613,7 @@ const LEAD_API_FIELD_ERROR_KEY_MAP: Record<string, string> = {
   'smsConsent.projectSms': 'smsProjectConsent',
   'smsConsent.marketingSms': 'smsMarketingConsent',
   'antiSpam.cfToken': 'cfToken',
+  'details.message': 'message',
 };
 
 export function mapLeadApiFieldErrors(fieldErrors?: Record<string, string[]>): Record<string, string> {

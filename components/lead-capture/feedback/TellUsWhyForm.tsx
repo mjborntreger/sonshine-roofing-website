@@ -7,14 +7,17 @@ import SmartLink from '@/components/utils/SmartLink';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 import {
   buildN8nLeadPayload,
+  mapLeadApiFieldErrors,
   type SmsConsentFieldValue,
   validateSmsConsentDraft,
+  validateEmail,
   sanitizePhoneInput,
   isUsPhoneComplete,
   formatPhoneExample,
   submitLead,
 } from '@/lib/lead-capture/contact-lead';
 import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
+import { cn } from '@/lib/utils';
 
 const RATING_VALUES = ['1', '2', '3'] as const;
 type RatingString = (typeof RATING_VALUES)[number];
@@ -23,6 +26,9 @@ const ratingValueLookup: Record<RatingString, 1 | 2 | 3> = {
   '2': 2,
   '3': 3,
 };
+const INPUT_CLASS = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]';
+const INPUT_ERROR_CLASS = 'border-red-300 focus:ring-red-200';
+const FIELD_ERROR_CLASS = 'mt-1 block text-xs text-red-600';
 
 function toRatingString(input: string | null): RatingString {
   if (input && RATING_VALUES.includes(input as RatingString)) {
@@ -38,11 +44,21 @@ export default function TellUsWhyForm() {
 
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
   const [err, setErr] = useState<string | null>(null);
-  const [consentErrors, setConsentErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [smsProjectConsent, setSmsProjectConsent] = useState<SmsConsentFieldValue>('');
   const [smsMarketingConsent, setSmsMarketingConsent] = useState<SmsConsentFieldValue>('');
   const [countdown, setCountdown] = useState(3);
   const router = useRouter();
+
+  const clearFieldError = (field: string) => {
+    if (err) setErr(null);
+    if (!fieldErrors[field]) return;
+    setFieldErrors((prev) => {
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (status !== 'ok') return;
@@ -61,8 +77,10 @@ export default function TellUsWhyForm() {
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus('sending');
+    if (status === 'sending') return;
+
     setErr(null);
+    setFieldErrors({});
 
     const fd = new FormData(e.currentTarget);
 
@@ -75,21 +93,32 @@ export default function TellUsWhyForm() {
     const cfToken = String(fd.get('cfToken') || ''); // provided by <Turnstile />
     const hp_field = String(fd.get('company') || ''); // honeypot
 
-    const smsErrors = validateSmsConsentDraft({ smsProjectConsent, smsMarketingConsent });
-    if (Object.keys(smsErrors).length) {
-      setStatus('err');
-      setErr('Please complete the SMS consent selections.');
-      setConsentErrors(smsErrors);
-      return;
-    }
-    setConsentErrors({});
+    const nextErrors: Record<string, string> = {};
+    if (!first) nextErrors.firstName = 'Enter your first name.';
+    if (!last) nextErrors.lastName = 'Enter your last name.';
+    if (!validateEmail(email)) nextErrors.email = 'Enter a valid email address.';
+    if (!message) nextErrors.message = 'Enter your feedback message.';
 
     const phoneDigits = sanitizePhoneInput(phone);
     if (phoneDigits && !isUsPhoneComplete(phoneDigits)) {
+      nextErrors.phone = 'Enter a valid US phone number (10 digits).';
+    }
+
+    const smsErrors = validateSmsConsentDraft({ smsProjectConsent, smsMarketingConsent });
+    Object.assign(nextErrors, smsErrors);
+
+    if (!cfToken) {
+      nextErrors.cfToken = 'Verification required.';
+    }
+
+    if (Object.keys(nextErrors).length) {
       setStatus('err');
-      setErr('Enter a valid US phone number (10 digits).');
+      setErr('Please complete the highlighted fields.');
+      setFieldErrors(nextErrors);
       return;
     }
+
+    setStatus('sending');
 
     const utmSource = qs.get('utm_source');
     const utmMedium = qs.get('utm_medium');
@@ -138,6 +167,10 @@ export default function TellUsWhyForm() {
     if (!result.ok) {
       setStatus('err');
       setErr(result.error || 'Something went wrong. Please try again.');
+      const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
+      if (Object.keys(serverErrors).length) {
+        setFieldErrors(serverErrors);
+      }
       return;
     }
 
@@ -175,8 +208,12 @@ export default function TellUsWhyForm() {
               name="firstName"
               required
               autoComplete="given-name"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]"
+              className={cn(INPUT_CLASS, fieldErrors.firstName && INPUT_ERROR_CLASS)}
+              onChange={() => clearFieldError('firstName')}
+              aria-invalid={Boolean(fieldErrors.firstName)}
+              aria-describedby={fieldErrors.firstName ? 'firstName-error' : undefined}
             />
+            {fieldErrors.firstName ? <span id="firstName-error" className={FIELD_ERROR_CLASS}>{fieldErrors.firstName}</span> : null}
           </label>
           <label className="block">
             <span className="text-sm">Last name*</span>
@@ -184,8 +221,12 @@ export default function TellUsWhyForm() {
               name="lastName"
               required
               autoComplete="family-name"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]"
+              className={cn(INPUT_CLASS, fieldErrors.lastName && INPUT_ERROR_CLASS)}
+              onChange={() => clearFieldError('lastName')}
+              aria-invalid={Boolean(fieldErrors.lastName)}
+              aria-describedby={fieldErrors.lastName ? 'lastName-error' : undefined}
             />
+            {fieldErrors.lastName ? <span id="lastName-error" className={FIELD_ERROR_CLASS}>{fieldErrors.lastName}</span> : null}
           </label>
         </div>
 
@@ -196,8 +237,12 @@ export default function TellUsWhyForm() {
             name="email"
             required
             autoComplete="email"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]"
+            className={cn(INPUT_CLASS, fieldErrors.email && INPUT_ERROR_CLASS)}
+            onChange={() => clearFieldError('email')}
+            aria-invalid={Boolean(fieldErrors.email)}
+            aria-describedby={fieldErrors.email ? 'email-error' : undefined}
           />
+          {fieldErrors.email ? <span id="email-error" className={FIELD_ERROR_CLASS}>{fieldErrors.email}</span> : null}
         </label>
 
         <label className="block">
@@ -208,8 +253,11 @@ export default function TellUsWhyForm() {
             autoComplete="tel"
             inputMode="tel"
             aria-describedby="phone-hint"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]"
+            className={cn(INPUT_CLASS, fieldErrors.phone && INPUT_ERROR_CLASS)}
+            onChange={() => clearFieldError('phone')}
+            aria-invalid={Boolean(fieldErrors.phone)}
           />
+          {fieldErrors.phone ? <span className={FIELD_ERROR_CLASS}>{fieldErrors.phone}</span> : null}
           <p id="phone-hint" className="mt-1 text-xs text-slate-500">
             Digits only, US numbers. Example: {formatPhoneExample()}
           </p>
@@ -222,8 +270,12 @@ export default function TellUsWhyForm() {
             rows={6}
             required
             autoComplete="off"
-            className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]"
+            className={cn(INPUT_CLASS, fieldErrors.message && INPUT_ERROR_CLASS)}
+            onChange={() => clearFieldError('message')}
+            aria-invalid={Boolean(fieldErrors.message)}
+            aria-describedby={fieldErrors.message ? 'message-error' : undefined}
           />
+          {fieldErrors.message ? <span id="message-error" className={FIELD_ERROR_CLASS}>{fieldErrors.message}</span> : null}
         </label>
 
         {/* Hidden rating (from query param) */}
@@ -235,23 +287,18 @@ export default function TellUsWhyForm() {
           onChange={(field, value) => {
             if (field === 'smsProjectConsent') setSmsProjectConsent(value);
             if (field === 'smsMarketingConsent') setSmsMarketingConsent(value);
-            if (consentErrors[field]) {
-              setConsentErrors((prev) => {
-                const next = { ...prev };
-                delete next[field];
-                return next;
-              });
-            }
+            clearFieldError(field);
             if (err) setErr(null);
           }}
           errors={{
-            smsProjectConsent: consentErrors.smsProjectConsent,
-            smsMarketingConsent: consentErrors.smsMarketingConsent,
+            smsProjectConsent: fieldErrors.smsProjectConsent,
+            smsMarketingConsent: fieldErrors.smsMarketingConsent,
           }}
         />
 
         {/* Turnstile widget injects cfToken hidden input too */}
         <Turnstile className="pt-1" />
+        {fieldErrors.cfToken ? <p className="text-sm font-medium text-red-600">{fieldErrors.cfToken}</p> : null}
 
         <div className="flex items-center gap-3 pt-2">
           <button type="submit" disabled={status === 'sending'} className="btn btn-brand-orange btn-md">

@@ -136,12 +136,25 @@ function validateLeadForwardPayload(input: unknown):
   const referrer = getOptionalTrimmed(sourceRaw, 'referrer');
   const ua = getOptionalTrimmed(sourceRaw, 'ua');
   const tz = getOptionalTrimmed(sourceRaw, 'tz');
+  let details = normalizeDetails(input.details);
+  const formVariant = trimString(details.formVariant);
+  const requiresContactLeadEmail = formTypeRaw === 'contact-lead' && formVariant === 'heroEmbedded';
+  const feedbackMessage = trimString(details.message);
+  if (formTypeRaw === 'feedback') {
+    if (!feedbackMessage) {
+      addFieldError(errors, 'details.message', 'Message is required.');
+    } else {
+      details = { ...details, message: feedbackMessage };
+    }
+  }
 
   const contactRaw = isRecord(input.contact) ? input.contact : {};
   const firstName = getRequiredTrimmed(contactRaw, 'firstName', 'contact.firstName', errors);
   const lastName = getRequiredTrimmed(contactRaw, 'lastName', 'contact.lastName', errors);
   const email = formTypeRaw === 'contact-lead'
-    ? getOptionalTrimmed(contactRaw, 'email')
+    ? requiresContactLeadEmail
+      ? getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors)
+      : getOptionalTrimmed(contactRaw, 'email')
     : getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors);
   let phone = getOptionalTrimmed(contactRaw, 'phone');
   if (formTypeRaw === 'special-offer') {
@@ -215,7 +228,7 @@ function validateLeadForwardPayload(input: unknown):
       marketingSms: marketingSmsRaw as LeadForwardPayloadV2['smsConsent']['marketingSms'],
       disclosureVersion: 'sms-consent-v1',
     },
-    details: normalizeDetails(input.details),
+    details,
     antiSpam: {
       cfToken,
       ...(hp_field ? { hp_field } : {}),

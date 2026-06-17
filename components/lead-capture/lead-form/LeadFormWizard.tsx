@@ -13,10 +13,10 @@ import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import type { LeadFormLayoutVariant } from './LeadForm';
 import {
   LEAD_SUCCESS_COOKIE,
-  LeadSuccessCookiePayload,
   SuccessMeta,
   DEFAULT_PREFERRED_CONTACT,
-  buildContactLeadRoutingPlaceholders,
+  buildContactLeadForwardPayload,
+  buildContactLeadSuccessPayload,
   type PreferredContactValue,
   sanitizePhoneInput,
   formatPhoneExample,
@@ -25,7 +25,6 @@ import {
   mapLeadApiFieldErrors,
   persistLeadSuccessCookie,
   submitLead,
-  buildN8nLeadPayload,
   type SmsConsentFieldValue,
   validateContactIdentityDraft,
   validateContactAddressDraft,
@@ -620,13 +619,7 @@ export default function LeadFormWizard({
       })
     );
     const preferredContact = form.phone ? form.preferredContact : 'email';
-    const routingPlaceholders = buildContactLeadRoutingPlaceholders({
-      intent: 'free-estimate',
-      preferredContact,
-    });
-
-    const payload = buildN8nLeadPayload({
-      formType: 'contact-lead',
+    const payload = buildContactLeadForwardPayload({
       submittedAt: new Date().toISOString(),
       source: {
         page: '/contact-us',
@@ -637,13 +630,12 @@ export default function LeadFormWizard({
       contact: {
         firstName: form.firstName,
         lastName: form.lastName,
-        email: form.email || routingPlaceholders.contact.email,
+        email: form.email,
         phone: form.phone,
       },
       address: {
-        ...routingPlaceholders.address,
         address1: form.address1,
-        address2: form.address2 || routingPlaceholders.address.address2,
+        address2: form.address2,
         city: form.city,
         state: form.state,
         zip: form.zip,
@@ -653,20 +645,20 @@ export default function LeadFormWizard({
         smsMarketingConsent: form.smsMarketingConsent,
       },
       details: {
-        ...routingPlaceholders.details,
-        projectType: form.projectType || routingPlaceholders.details.projectType,
-        helpTopics: form.helpTopics.length ? form.helpTopics : routingPlaceholders.details.helpTopics,
-        helpSummary: helpSummary || routingPlaceholders.details.helpSummary,
-        roofAge: form.roofAge || routingPlaceholders.details.roofAge,
-        roofAgeLabel: roofAgeLabel || routingPlaceholders.details.roofAgeLabel,
-        roofType: form.roofType || routingPlaceholders.details.roofType,
-        notes: combinedNotes.trim() || routingPlaceholders.details.notes,
-        roofTypeLabel: roofTypeLabel || routingPlaceholders.details.roofTypeLabel,
+        projectType: form.projectType,
+        helpTopics: form.helpTopics.length ? form.helpTopics : undefined,
+        helpSummary,
+        roofAge: form.roofAge,
+        roofAgeLabel,
+        roofType: form.roofType,
+        notes: combinedNotes.trim(),
+        roofTypeLabel,
         preferredContact,
-        bestTime: form.bestTime || routingPlaceholders.details.bestTime,
-        bestTimeLabel: bestTimeLabel || routingPlaceholders.details.bestTimeLabel,
+        bestTime: form.bestTime,
+        bestTimeLabel,
         resourceLinks: resourceLinksForPayload,
       },
+      preferredContact,
       antiSpam: {
         cfToken,
         hp_field: honeypot || undefined,
@@ -708,16 +700,15 @@ export default function LeadFormWizard({
       const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
       const roofAgeLabelDisplay = roofAgeLabel || getRoofAgeLabelForDisplay(form.projectType, form.roofAge) || null;
       const projectTypeForSuccess = form.projectType || 'contact';
-      const successPayload: LeadSuccessCookiePayload = {
+      const successPayload = buildContactLeadSuccessPayload({
         projectType: projectTypeForSuccess,
         helpTopics: form.helpTopics,
         helpTopicLabels,
         roofAge: form.roofAge,
-        roofAgeLabel: roofAgeLabelDisplay || undefined,
-        notes: notesText || undefined,
-        roofTypeLabel: roofTypeLabel || undefined,
-        timestamp: new Date().toISOString(),
-      };
+        roofAgeLabel: roofAgeLabelDisplay,
+        notes: notesText,
+        roofTypeLabel,
+      });
       persistLeadSuccessCookie(successPayload);
       redirectToThankYou(payload);
   };

@@ -23,22 +23,12 @@ import Section from "@/components/layout/Section";
 import LocalPartnershipsSection from "@/components/location/LocalPartnershipsSection";
 import ServiceAreaSection from "@/components/location/ServiceAreaSection";
 import type { Metadata } from "next";
-import { buildArticleMetadata } from "@/lib/seo/meta";
+import { buildBasicMetadata } from "@/lib/seo/meta";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { buildReviewSchema, sponsorFeaturesItemListSchema, graphSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
 import HeroTrustBar from "@/components/marketing/landing-page/HeroTrustBar";
 import SidebarCta from "@/components/cta/SidebarCta";
-
-type OgImageRecord = {
-  url?: unknown;
-  secureUrl?: unknown;
-  width?: unknown;
-  height?: unknown;
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null && !Array.isArray(value);
 
 type Params = { slug: string };
 export const revalidate = 600;
@@ -63,11 +53,49 @@ const SARASOTA_SLUG = "sarasota";
 const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
 const GBP_PROFILE_URL =
   RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
+const SEO_OG_IMAGE_DEFAULT = "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png";
+const LOCATION_SEO_GENERIC_KEYWORDS = [
+  "best roofing company",
+  "roof replacement",
+  "roof repair",
+  "roof inspection",
+  "roof maintenance",
+  "tile roof",
+  "shingle roof",
+  "metal roof",
+  "flat roof",
+  "financing",
+  "licensed and insured",
+  "roofing contractor",
+  "roofing company",
+];
 // =========================== //
 
 
 
-const stripHtml = (html: string) => html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+const titleCaseSlug = (slug: string): string =>
+  slug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+
+const getLocationSeoLabel = (location: LocationRecord, slug: string): string =>
+  location.locationName?.trim() || location.title?.trim() || titleCaseSlug(slug);
+
+const buildLocationSeoKeywords = (locationLabel: string): string[] =>
+  Array.from(
+    new Set([
+      ...LOCATION_SEO_GENERIC_KEYWORDS,
+      `${locationLabel} roofing`,
+      `${locationLabel} roof replacement`,
+      `${locationLabel} roof repair`,
+      `${locationLabel} roof inspection`,
+      `${locationLabel} roof maintenance`,
+      `${locationLabel} roofing contractor`,
+      `${locationLabel} roofing company`,
+    ])
+  );
 
 const parseReviewDateToEpochSeconds = (input: string | null | undefined): number | null => {
   if (!input) return null;
@@ -144,33 +172,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const location = await getLocationBySlug(slug).catch(() => null);
   if (!location) notFound();
 
-  const seo = location.seo ?? {};
-  const og = seo.openGraph ?? {};
+  const locationLabel = getLocationSeoLabel(location, slug);
+  const title = `SonShine Roofing | Best Roofing Company in ${locationLabel}`;
+  const description =
+    `Fast, Friendly, & Reliable | (941) 866-4320 | Licensed & Insured | Your trusted local roofing contractor serving ${locationLabel}.`;
 
-  const rawDescription =
-    seo.description || og.description || stripHtml(location.contentHtml || "") || "";
-
-  const title = (seo.title || og.title || location.title || "Location · SonShine Roofing").trim();
-  const description = rawDescription.trim().slice(0, 160);
-
-  const ogImageRecord = isRecord(og.image) ? (og.image as OgImageRecord) : null;
-  const ogUrl: string =
-    (ogImageRecord && typeof ogImageRecord.secureUrl === "string" && ogImageRecord.secureUrl) ||
-    (ogImageRecord && typeof ogImageRecord.url === "string" && ogImageRecord.url) ||
-    location.mapImage?.url ||
-    "/og-default.png";
-  const ogWidth: number =
-    (ogImageRecord && typeof ogImageRecord.width === "number" && ogImageRecord.width) || 1200;
-  const ogHeight: number =
-    (ogImageRecord && typeof ogImageRecord.height === "number" && ogImageRecord.height) || 630;
-
-  return buildArticleMetadata({
+  return buildBasicMetadata({
     title,
     description,
     path: `/locations/${slug}`,
-    image: { url: ogUrl, width: ogWidth, height: ogHeight },
-    publishedTime: location.date ?? undefined,
-    modifiedTime: location.modified ?? undefined,
+    keywords: buildLocationSeoKeywords(locationLabel),
+    image: { url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 },
   });
 }
 
