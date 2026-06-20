@@ -100,7 +100,9 @@ export default function TellUsWhyForm() {
     if (!message) nextErrors.message = 'Enter your feedback message.';
 
     const phoneDigits = sanitizePhoneInput(phone);
-    if (phoneDigits && !isUsPhoneComplete(phoneDigits)) {
+    if (!phoneDigits) {
+      nextErrors.phone = 'Enter your phone number.';
+    } else if (!isUsPhoneComplete(phoneDigits)) {
       nextErrors.phone = 'Enter a valid US phone number (10 digits).';
     }
 
@@ -246,7 +248,7 @@ export default function TellUsWhyForm() {
         </label>
 
         <label className="block">
-          <span className="text-sm">Phone number</span>
+          <span className="text-sm">Phone number*</span>
           <input
             type="tel"
             name="phone"

@@ -220,7 +220,7 @@ export default function SimpleLeadForm({
       lastName: form.lastName,
       email: form.email,
       phone: form.phone,
-    }, { phoneRequired: false, emailRequired: false, requireAtLeastOneContactMethod: true });
+    }, { phoneRequired: true, emailRequired: true });
     const addressErrors = validateContactAddressDraft({
       address1: form.address1,
       address2: form.address2,
@@ -260,7 +260,7 @@ export default function SimpleLeadForm({
     const combinedNotes = roofTypeLabel
       ? [notes, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
       : notes;
-    const preferredContact = form.phone ? DEFAULT_PREFERRED_CONTACT : 'email';
+    const preferredContact = DEFAULT_PREFERRED_CONTACT;
     const payload = buildContactLeadForwardPayload({
       submittedAt: new Date().toISOString(),
       source: {
@@ -412,7 +412,7 @@ export default function SimpleLeadForm({
 
                 <section className="grid gap-4 md:grid-cols-2">
                   <label className="block font-medium text-slate-700">
-                    Email (optional)
+                    Email*
                     <input
                       type="email"
                       name="email"
@@ -425,7 +425,7 @@ export default function SimpleLeadForm({
                     {errors.email && <span className="mt-1 text-xs text-red-600">{errors.email}</span>}
                   </label>
                   <label className="block font-medium text-slate-700">
-                    Phone (optional)
+                    Phone*
                     <input
                       type="tel"
                       name="phone"

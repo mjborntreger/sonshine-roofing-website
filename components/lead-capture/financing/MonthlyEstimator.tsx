@@ -589,7 +589,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
     if (currentStep === thirdFormStepIndex) {
       if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
-      if (formValues.phone && !isUsPhoneComplete(formValues.phone)) {
+      if (!formValues.phone) {
+        nextErrors.phone = 'Enter your phone number.';
+      } else if (!isUsPhoneComplete(formValues.phone)) {
         nextErrors.phone = 'Enter a valid phone number (10 digits, optional country code).';
       }
       Object.assign(nextErrors, validateSmsConsentDraft({
@@ -1117,7 +1119,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700" htmlFor="phone">Phone</label>
+          <label className="block text-sm font-medium text-slate-700" htmlFor="phone">Phone*</label>
           <input
             id="phone"
             name="phone"

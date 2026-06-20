@@ -134,8 +134,8 @@ export type N8nLeadPayloadV2 = {
   contact: {
     firstName: string;
     lastName: string;
-    email?: string;
-    phone?: string;
+    email: string;
+    phone: string;
   };
   address?: {
     address1?: string;
@@ -178,8 +178,8 @@ type BuildN8nLeadPayloadInput = {
   contact: {
     firstName: string;
     lastName: string;
-    email?: string;
-    phone?: string;
+    email: string;
+    phone: string;
   };
   address?: {
     address1?: string;
@@ -344,14 +344,9 @@ export function buildN8nLeadPayload(input: BuildN8nLeadPayloadInput): N8nLeadPay
   const contact: N8nLeadPayloadV2['contact'] = {
     firstName: cleanString(input.contact.firstName) || '',
     lastName: cleanString(input.contact.lastName) || '',
+    email: cleanString(input.contact.email) || '',
+    phone: normalizedPhone,
   };
-  const normalizedEmail = cleanString(input.contact.email);
-  if (normalizedEmail) {
-    contact.email = normalizedEmail;
-  }
-  if (normalizedPhone) {
-    contact.phone = normalizedPhone;
-  }
 
   const payload: N8nLeadPayloadV2 = {
     version: 'v2',
@@ -402,9 +397,7 @@ export function buildContactLeadForwardPayload(input: BuildContactLeadForwardPay
     contact: {
       firstName: input.contact.firstName,
       lastName: input.contact.lastName,
-      email: input.formVariant === 'heroEmbedded'
-        ? input.contact.email
-        : cleanString(input.contact.email) || routingPlaceholders.contact.email,
+      email: input.contact.email,
       phone: input.contact.phone,
     },
     address: {
@@ -605,6 +598,7 @@ const LEAD_API_FIELD_ERROR_KEY_MAP: Record<string, string> = {
   'contact.lastName': 'lastName',
   'contact.email': 'email',
   'contact.phone': 'phone',
+  'details.referredHomeowner.phone': 'homeownerPhone',
   'address.address1': 'address1',
   'address.address2': 'address2',
   'address.city': 'city',

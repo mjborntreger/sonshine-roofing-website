@@ -159,21 +159,19 @@ function LeadFormContactFields({ tone, form, errors, onFieldChange }: LeadFormCo
         </label>
       </div>
 
-      {isHero ? (
-        <label className={phoneLabelClassName}>
-          Email*
-          <input
-            type="email"
-            name="email"
-            autoComplete="email"
-            value={form.email}
-            onChange={(event) => onFieldChange('email', event.target.value)}
-            className={cn(inputClassName, errors.email && INPUT_ERROR_CLASS)}
-            placeholder="example@domain.com"
-          />
-          {errors.email ? <span className={errorClassName}>{errors.email}</span> : null}
-        </label>
-      ) : null}
+      <label className={phoneLabelClassName}>
+        Email*
+        <input
+          type="email"
+          name="email"
+          autoComplete="email"
+          value={form.email}
+          onChange={(event) => onFieldChange('email', event.target.value)}
+          className={cn(inputClassName, errors.email && INPUT_ERROR_CLASS)}
+          placeholder="example@domain.com"
+        />
+        {errors.email ? <span className={errorClassName}>{errors.email}</span> : null}
+      </label>
 
       <label className={phoneLabelClassName}>
         Phone Number*
@@ -335,15 +333,14 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
     event.preventDefault();
     if (status === 'submitting') return;
 
-    const requiresEmail = variant === 'heroEmbedded';
     const identityErrors = validateContactIdentityDraft(
       {
         firstName: form.firstName,
         lastName: form.lastName,
-        email: requiresEmail ? form.email : '',
+        email: form.email,
         phone: form.phone,
       },
-      { emailRequired: requiresEmail, phoneRequired: true }
+      { emailRequired: true, phoneRequired: true }
     );
     const smsErrors = validateSmsConsentDraft({
       smsProjectConsent: form.smsProjectConsent,
@@ -380,7 +377,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
       contact: {
         firstName: form.firstName,
         lastName: form.lastName,
-        email: requiresEmail ? form.email : undefined,
+        email: form.email,
         phone: form.phone,
       },
       smsConsent: {
@@ -388,7 +385,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
         smsMarketingConsent: form.smsMarketingConsent,
       },
       preferredContact: DEFAULT_PREFERRED_CONTACT,
-      formVariant: requiresEmail ? 'heroEmbedded' : undefined,
+      formVariant: isHeroEmbedded ? 'heroEmbedded' : undefined,
       antiSpam: {
         cfToken,
         hp_field: honeypot || undefined,

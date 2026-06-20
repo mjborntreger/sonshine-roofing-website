@@ -234,7 +234,7 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
       lastName: data.lastName,
       email: data.email,
       phone: data.phone,
-    }, { phoneRequired: false });
+    }, { phoneRequired: true, emailRequired: true });
     Object.assign(errors, identityErrors);
   }
   if (step === 'schedule') {
@@ -1082,7 +1082,7 @@ export default function LeadFormWizard({
                   </label>
 
                   <label className="flex flex-col text-sm font-medium text-slate-700">
-                    Phone
+                    Phone*
                     <input
                       type="tel"
                       name="phone"

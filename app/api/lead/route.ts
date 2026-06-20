@@ -83,6 +83,10 @@ function getRequiredTrimmed(record: UnknownRecord, key: string, path: string, er
   return value;
 }
 
+function isEmailComplete(value: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim().toLowerCase());
+}
+
 function isHoneypotTrippedV2(raw: UnknownRecord): boolean {
   const directHp = trimString(raw.hp_field);
   const company = trimString(raw.company);
@@ -137,8 +141,6 @@ function validateLeadForwardPayload(input: unknown):
   const ua = getOptionalTrimmed(sourceRaw, 'ua');
   const tz = getOptionalTrimmed(sourceRaw, 'tz');
   let details = normalizeDetails(input.details);
-  const formVariant = trimString(details.formVariant);
-  const requiresContactLeadEmail = formTypeRaw === 'contact-lead' && formVariant === 'heroEmbedded';
   const feedbackMessage = trimString(details.message);
   if (formTypeRaw === 'feedback') {
     if (!feedbackMessage) {
@@ -147,28 +149,38 @@ function validateLeadForwardPayload(input: unknown):
       details = { ...details, message: feedbackMessage };
     }
   }
+  if (formTypeRaw === 'referral') {
+    const referredHomeownerRaw = isRecord(details.referredHomeowner) ? details.referredHomeowner : {};
+    const referredHomeownerPhone = getOptionalTrimmed(referredHomeownerRaw, 'phone');
+    if (!referredHomeownerPhone) {
+      addFieldError(errors, 'details.referredHomeowner.phone', 'Homeowner phone is required.');
+    } else if (!isUsPhoneComplete(referredHomeownerPhone)) {
+      addFieldError(errors, 'details.referredHomeowner.phone', 'Homeowner phone must include 10 digits (US only).');
+    } else {
+      details = {
+        ...details,
+        referredHomeowner: {
+          ...referredHomeownerRaw,
+          phone: normalizePhoneForSubmit(referredHomeownerPhone),
+        },
+      };
+    }
+  }
 
   const contactRaw = isRecord(input.contact) ? input.contact : {};
   const firstName = getRequiredTrimmed(contactRaw, 'firstName', 'contact.firstName', errors);
   const lastName = getRequiredTrimmed(contactRaw, 'lastName', 'contact.lastName', errors);
-  const email = formTypeRaw === 'contact-lead'
-    ? requiresContactLeadEmail
-      ? getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors)
-      : getOptionalTrimmed(contactRaw, 'email')
-    : getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors);
-  let phone = getOptionalTrimmed(contactRaw, 'phone');
-  if (formTypeRaw === 'special-offer') {
-    if (!phone) {
-      addFieldError(errors, 'contact.phone', 'Phone is required.');
-    } else if (!isUsPhoneComplete(phone)) {
-      addFieldError(errors, 'contact.phone', 'Phone must include 10 digits (US only).');
-    } else {
-      phone = normalizePhoneForSubmit(phone);
-    }
+  const email = getRequiredTrimmed(contactRaw, 'email', 'contact.email', errors);
+  if (email && !isEmailComplete(email)) {
+    addFieldError(errors, 'contact.email', 'Email must be valid.');
   }
-  if (formTypeRaw === 'contact-lead' && !email && !phone) {
-    addFieldError(errors, 'contact.email', 'Email or phone is required.');
-    addFieldError(errors, 'contact.phone', 'Phone or email is required.');
+  let phone = getOptionalTrimmed(contactRaw, 'phone');
+  if (!phone) {
+    addFieldError(errors, 'contact.phone', 'Phone is required.');
+  } else if (!isUsPhoneComplete(phone)) {
+    addFieldError(errors, 'contact.phone', 'Phone must include 10 digits (US only).');
+  } else {
+    phone = normalizePhoneForSubmit(phone);
   }
 
   const smsRaw = isRecord(input.smsConsent) ? input.smsConsent : {};
@@ -220,8 +232,8 @@ function validateLeadForwardPayload(input: unknown):
     contact: {
       firstName,
       lastName,
-      ...(email ? { email } : {}),
-      ...(phone ? { phone } : {}),
+      email,
+      phone: phone || '',
     },
     smsConsent: {
       projectSms: projectSmsRaw as LeadForwardPayloadV2['smsConsent']['projectSms'],
