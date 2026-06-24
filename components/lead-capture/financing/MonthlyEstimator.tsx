@@ -888,7 +888,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
       return (
         <div className={stepCardClass} aria-live="polite">
-          <p className="text-base font-semibold text-slate-900">{question.prompt}</p>
+          <p className="text-base font-semibold text-slate-900">{question.prompt}*</p>
           <div className="mt-4 flex flex-col gap-2">
             {question.options.map((option) => {
               const selected = answer === option.value;

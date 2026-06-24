@@ -228,6 +228,12 @@ const STEP_FIELD_KEYS: Record<StepId, ReadonlyArray<keyof FormState>> = {
 
 function validateStep(step: StepId, data: FormState): FieldErrors {
   const errors: FieldErrors = {};
+  if (step === 'context') {
+    const journey = getJourneyConfig(data.projectType);
+    if (journey?.requireNotes && !data.notes.trim()) {
+      errors.notes = 'Tell us a little more about your situation.';
+    }
+  }
   if (step === 'contact') {
     const identityErrors = validateContactIdentityDraft({
       firstName: data.firstName,
@@ -961,12 +967,13 @@ export default function LeadFormWizard({
                     {journey?.showNotes && (
                       <div className="mt-4">
                         <label htmlFor="notes" className="text-sm font-semibold text-slate-700">
-                          {journey.notesLabel}
+                          {journey.notesLabel}{journey.requireNotes ? '*' : ''}
                         </label>
                         <textarea
                           id="notes"
                           name="notes"
                           rows={journey.requireNotes ? 8 : 3}
+                          required={journey.requireNotes}
                           autoComplete="off"
                           className="mt-2 w-full rounded-2xl border border-blue-200 px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
                           placeholder={journey.notesPlaceholder}

@@ -234,7 +234,7 @@ export default function SmsConsentFields({
       <div className={cn(DEFAULT_CLASS_NAMES.cards, classNames?.cards)}>
         <ConsentCard
           name="smsProjectConsent"
-          label="I'd like to receive SMS messages about my project."
+          label="I'd like to receive SMS messages about my project.*"
           value={smsProjectConsent}
           onChange={onChange}
           error={errors?.smsProjectConsent}
@@ -243,7 +243,7 @@ export default function SmsConsentFields({
         />
         <ConsentCard
           name="smsMarketingConsent"
-          label={`I'd like to receive SMS marketing messages from ${companyName}.`}
+          label={`I'd like to receive SMS marketing messages from ${companyName}.*`}
           value={smsMarketingConsent}
           onChange={onChange}
           error={errors?.smsMarketingConsent}
