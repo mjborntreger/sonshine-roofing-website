@@ -26,7 +26,7 @@ type DirectusSpecialOfferItem = {
   description?: unknown;
   expiration_date?: unknown;
   legal_disclaimer?: unknown;
-  is_published?: unknown;
+  status?: unknown;
   featured?: unknown;
 };
 
@@ -74,7 +74,7 @@ const SPECIAL_OFFER_FIELDS = [
   "description",
   "expiration_date",
   "legal_disclaimer",
-  "is_published",
+  "status",
   "featured",
 ] as const;
 
@@ -196,7 +196,9 @@ async function fetchSpecialOfferItems({
     "filter",
     JSON.stringify({
       client: { slug: { _eq: config.clientSlug } },
-      is_published: { _eq: true },
+      status: {
+        _eq: "published",
+      },
       ...filter,
     }),
   );
