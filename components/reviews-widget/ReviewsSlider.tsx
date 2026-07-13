@@ -7,8 +7,7 @@ import { createPortal } from 'react-dom';
 import SmartLink from '../utils/SmartLink';
 import { ArrowUpRight, Quote } from 'lucide-react';
 import Image from 'next/image';
-import type { Review } from './types';
-import { OWNER_RESPONSE_IMAGE } from './constants';
+import type { Review, ReviewOwnerImage } from './types';
 
 const ordinalize = (day: number): string => {
   const j = day % 10;
@@ -35,9 +34,11 @@ const formatReviewDate = (time?: number | null, fallback?: string | null | undef
 export default function ReviewsSlider({
   reviews,
   gbpUrl,
+  ownerHeadshot,
 }: {
   reviews: Review[];
   gbpUrl: string;
+  ownerHeadshot: ReviewOwnerImage | null;
 }) {
   // Continuous auto-scroll (linear), infinite loop, pause on hover
   const autoScrollOptions = useMemo(
@@ -278,14 +279,16 @@ export default function ReviewsSlider({
                   {r.ownerReply ? (
                     <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
                       <div className="flex items-start gap-3">
-                        <Image
-                          src={OWNER_RESPONSE_IMAGE}
-                          alt="Owner response avatar"
-                          width={48}
-                          height={48}
-                          className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
-                          loading="lazy"
-                        />
+                        {ownerHeadshot ? (
+                          <Image
+                            src={ownerHeadshot.url}
+                            alt={ownerHeadshot.altText}
+                            width={48}
+                            height={48}
+                            className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
+                            loading="lazy"
+                          />
+                        ) : null}
                         <div>
                           <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
                           <span className="pb-2 text-xs text-slate-500">Owner</span>
@@ -377,14 +380,16 @@ export default function ReviewsSlider({
                   {r.ownerReply ? (
                     <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
                       <SmartLink href="/person/nathan-borntreger" title="Nathan Borntreger's Profile" className="flex items-start gap-3">
-                        <Image
-                          src={OWNER_RESPONSE_IMAGE}
-                          alt="Owner response avatar"
-                          width={48}
-                          height={48}
-                          className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
-                          loading="lazy"
-                        />
+                        {ownerHeadshot ? (
+                          <Image
+                            src={ownerHeadshot.url}
+                            alt={ownerHeadshot.altText}
+                            width={48}
+                            height={48}
+                            className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
+                            loading="lazy"
+                          />
+                        ) : null}
                         <div>
                           <p className="transition-colors pt-2 text-md font-semibold text-slate-700 hover:text-[--brand-blue]">Nathan Borntreger</p>
                           <span className="pb-2 text-xs text-slate-500">Owner</span>

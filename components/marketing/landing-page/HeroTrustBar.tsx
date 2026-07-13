@@ -3,11 +3,12 @@ import Image from "next/image";
 import { ArrowUpRight, BadgeCheck } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import { renderHighlight } from "@/components/utils/renderHighlight";
+import {
+  DEFAULT_GOOGLE_BUSINESS_PROFILE_URL,
+  getReviewsCarouselSettings,
+} from "@/lib/content/directus-reviews";
 
 // LINKS
-const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
-const DEFAULT_GBP_URL = "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
-const GOOGLE_BUSINESS_PROFILE_URL = RAW_GBP_URL || DEFAULT_GBP_URL;
 const YELP_PROFILE_URL = "https://www.yelp.com/biz/sonshine-roofing-sarasota";
 const ANGI_PROFILE_URL = "https://www.angi.com/companylist/us/fl/sarasota/sonshine-roofing-reviews-7970755.htm";
 const FACEBOOK_PROFILE_URL = "https://www.facebook.com/sonshineroofing";
@@ -23,6 +24,7 @@ const NEXTDOOR_LOGO_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/Nex
 type HeroTrustBarProps = {
   heading?: string;
   highlightText?: string;
+  gbpUrl?: string | null;
 };
 
 // REVIEW LINK STYLES
@@ -71,7 +73,7 @@ const hexToRgba = (hex: string, alpha: number) => {
 const REVIEW_LINKS = [
   {
     id: "google",
-    href: GOOGLE_BUSINESS_PROFILE_URL,
+    href: DEFAULT_GOOGLE_BUSINESS_PROFILE_URL,
     ariaLabel: "View our 4.9-star Google Business Profile reviews (opens in a new tab)",
     statValue: "244+",
     statDescriptor: "Reviews",
@@ -182,10 +184,21 @@ const BADGES = [
   },
 ] as const;
 
-export default function HeroTrustBar({
+export default async function HeroTrustBar({
   heading = DEFAULT_HEADING,
   highlightText = DEFAULT_HEADING_HIGHLIGHT,
+  gbpUrl,
 }: HeroTrustBarProps = {}) {
+  const settings = gbpUrl
+    ? null
+    : await getReviewsCarouselSettings().catch((error) => {
+        console.error("[HeroTrustBar] Failed to load the Directus GBP link:", error);
+        return null;
+      });
+  const resolvedGbpUrl = gbpUrl ?? settings?.gbpProfileLink ?? DEFAULT_GOOGLE_BUSINESS_PROFILE_URL;
+  const reviewLinks = REVIEW_LINKS.map((review) =>
+    review.id === "google" ? { ...review, href: resolvedGbpUrl } : review,
+  );
   const renderedHeading = renderHighlight(heading, highlightText);
 
   return (
@@ -208,7 +221,7 @@ export default function HeroTrustBar({
                 <BadgeCheck className="h-5 w-5 text-emerald-700 inline ml-2" />
               </p>
             </div>
-            {REVIEW_LINKS.map((review) => (
+            {reviewLinks.map((review) => (
               <SmartLink
                 key={review.id}
                 href={review.href}

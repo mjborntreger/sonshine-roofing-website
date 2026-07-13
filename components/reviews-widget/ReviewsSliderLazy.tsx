@@ -1,17 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useState, type ComponentType } from 'react';
-import type { Review } from './types';
+import type { Review, ReviewOwnerImage } from './types';
 
 type Props = {
   reviews: Review[];
   gbpUrl: string;
+  ownerHeadshot: ReviewOwnerImage | null;
   fallbackId?: string;
 };
 
-type SliderComponent = ComponentType<Pick<Props, 'reviews' | 'gbpUrl'>>;
+type SliderComponent = ComponentType<Pick<Props, 'reviews' | 'gbpUrl' | 'ownerHeadshot'>>;
 
-export default function ReviewsSliderLazy({ reviews, gbpUrl, fallbackId }: Props) {
+export default function ReviewsSliderLazy({ reviews, gbpUrl, ownerHeadshot, fallbackId }: Props) {
   const [Slider, setSlider] = useState<SliderComponent | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
 
@@ -79,5 +80,5 @@ export default function ReviewsSliderLazy({ reviews, gbpUrl, fallbackId }: Props
     return () => cancelAnimationFrame(frame);
   }, [Slider, hideFallback]);
 
-  return Slider ? <Slider reviews={reviews} gbpUrl={gbpUrl} /> : null;
+  return Slider ? <Slider reviews={reviews} gbpUrl={gbpUrl} ownerHeadshot={ownerHeadshot} /> : null;
 }

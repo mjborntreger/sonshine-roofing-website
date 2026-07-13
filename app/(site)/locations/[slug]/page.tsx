@@ -29,6 +29,10 @@ import { buildReviewSchema, sponsorFeaturesItemListSchema, graphSchema } from "@
 import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
 import HeroTrustBar from "@/components/marketing/landing-page/HeroTrustBar";
 import SidebarCta from "@/components/cta/SidebarCta";
+import {
+  DEFAULT_GOOGLE_BUSINESS_PROFILE_URL,
+  getReviewsCarouselSettings,
+} from "@/lib/content/directus-reviews";
 
 type Params = { slug: string };
 export const revalidate = 600;
@@ -50,9 +54,6 @@ const narrowLayout = "bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transp
 const FALLBACK_REVIEW_INTERVAL_SECONDS = 60;
 const MAX_LOCATION_REVIEWS = 10;
 const SARASOTA_SLUG = "sarasota";
-const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
-const GBP_PROFILE_URL =
-  RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
 const SEO_OG_IMAGE_DEFAULT = "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png";
 const LOCATION_SEO_GENERIC_KEYWORDS = [
   "best roofing company",
@@ -194,13 +195,15 @@ export default async function LocationPage({ params }: { params: Promise<Params>
     fallbackLimit: 6,
     minimum: 4,
   }).catch(() => []);
+  const reviewsCarouselSettingsPromise = getReviewsCarouselSettings().catch(() => null);
 
-  const [location, posts, locationProjects, generalFaqs, sponsorFeatures] = await Promise.all([
+  const [location, posts, locationProjects, generalFaqs, sponsorFeatures, reviewsCarouselSettings] = await Promise.all([
     locationPromise,
     listRecentPostsPoolForFilters(4, 4).catch(() => []),
     listRecentProjectsByServiceArea(slug, 4).catch(() => []),
     listFaqsWithContent(8, "general").catch(() => []),
     sponsorFeaturesPromise,
+    reviewsCarouselSettingsPromise,
   ]);
 
   if (!location) notFound();
@@ -258,6 +261,8 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   );
   const averageRating =
     ratingAggregate.count > 0 ? ratingAggregate.sum / ratingAggregate.count : null;
+  const gbpProfileUrl =
+    reviewsCarouselSettings?.gbpProfileLink ?? DEFAULT_GOOGLE_BUSINESS_PROFILE_URL;
 
   const reviewSchema = displayReviews.length
     ? buildReviewSchema({
@@ -268,7 +273,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
       options: {
         businessName: schemaBusinessName ?? "SonShine Roofing",
         businessUrl: locationSchemaUrl,
-        providerUrl: GBP_PROFILE_URL,
+        providerUrl: gbpProfileUrl,
         origin: SITE_ORIGIN,
         id: `${locationSchemaUrl}#roofing-contractor`,
         address: {
@@ -313,10 +318,10 @@ export default async function LocationPage({ params }: { params: Promise<Params>
         {hasDisplayReviews ? (
           <ReviewsCarousel
             reviews={displayReviews}
+            gbpUrl={gbpProfileUrl}
             showBusinessProfileLink={true}
             showDisclaimer={true}
             limit={carouselLimit}
-            fallbackToRemote={true}
           />
         ) : (
           <div className="mx-auto max-w-[1280px] px-4 py-10 text-center">
@@ -326,7 +331,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
       </div>
       <LeadFormSection />
       <div className={reviewsLayout}>
-        <HeroTrustBar heading={heroTrustHeading} />
+        <HeroTrustBar heading={heroTrustHeading} gbpUrl={gbpProfileUrl} />
       </div>
 
       <main>

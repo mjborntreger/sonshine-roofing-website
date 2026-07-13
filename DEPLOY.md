@@ -39,11 +39,9 @@ Coolify Environment Variables
   - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
   - `NEXT_PUBLIC_GTM_ID`
   - `NEXT_PUBLIC_META_PIXEL_ID`
-  - `NEXT_PUBLIC_GBP_URL`
-  - `NEXT_PUBLIC_REVIEWS_URL`
   - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
   - `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP` when the FAQ sitemap should be exposed
-- Mark these server variables as build-time and runtime variables because special offers are fetched during static generation and runtime ISR:
+- Mark these server variables as build-time and runtime variables because Directus reviews, review-carousel settings, and special offers are fetched during static generation and runtime ISR:
   - `DIRECTUS_URL`
   - `DIRECTUS_CLIENT_SLUG`
   - `DIRECTUS_TOKEN`
@@ -57,6 +55,12 @@ Coolify Environment Variables
   - `YOUTUBE_API_KEY` for YouTube metadata during static generation.
   - `WP_PROJECT_BASE` only if the WordPress project CPT base changes.
 - Do not set `WP_BASIC_AUTH_USER` or `WP_BASIC_AUTH_PASS` unless WPGraphQL becomes protected.
+
+Directus Reviews Cache
+- `ReviewsCarousel` reads published five-star Google records from Directus for `DIRECTUS_CLIENT_SLUG`.
+- The default carousel limit and Google Business Profile link come from the matching `reviews_carousels` record.
+- Review and carousel reads use a 15-minute ISR safety cache tagged `directus:reviews:<client-slug>`.
+- The reviews synchronization workflow should revalidate that tag only after its Directus write/readback cycle succeeds.
 
 Lead Webhook Routing (n8n)
 - Application ingress is `POST /api/lead`.

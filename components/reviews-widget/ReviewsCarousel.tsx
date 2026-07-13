@@ -2,17 +2,13 @@ import ReviewsSliderLazy from "@/components/reviews-widget/ReviewsSliderLazy";
 import SmartLink from "@/components/utils/SmartLink";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
-import type { Review, ReviewsPayload } from "./types";
-import { OWNER_RESPONSE_IMAGE } from "./constants";
+import type { Review } from "./types";
 import ReviewStarRow from "@/components/reviews-widget/ReviewStarRow";
-
-const RAW_REVIEWS_URL = (process.env.NEXT_PUBLIC_REVIEWS_URL ?? "").replace(/\u200B/g, "").trim();
-const REVIEWS_URL =
-  RAW_REVIEWS_URL || "https://wp.sonshineroofing.com/wp-content/uploads/sonshine-reviews/reviews-archive.json";
-
-const RAW_GBP_URL = (process.env.NEXT_PUBLIC_GBP_URL ?? "").replace(/\u200B/g, "").trim();
-const GBP_URL =
-  RAW_GBP_URL || "https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958";
+import {
+  DEFAULT_GOOGLE_BUSINESS_PROFILE_URL,
+  getGoogleReviews,
+  getReviewsCarouselSettings,
+} from "@/lib/content/directus-reviews";
 
 const DEFAULT_CONTAINER_CLASS = "max-w-[1600px] mx-auto overflow-hidden";
 
@@ -23,7 +19,6 @@ type ReviewsCarouselProps = {
   showBusinessProfileLink?: boolean;
   showDisclaimer?: boolean;
   limit?: number;
-  fallbackToRemote?: boolean;
 };
 
 const ensureValidUrl = (value?: string | null): string | null => {
@@ -36,7 +31,7 @@ const ensureValidUrl = (value?: string | null): string | null => {
 };
 
 const sanitizeLimit = (value?: number): number =>
-  Number.isFinite(value) && value !== undefined && value > 0 ? Math.floor(value) : 8;
+  Number.isFinite(value) && value !== undefined && value > 0 ? Math.floor(value) : 20;
 
 const ordinalize = (day: number): string => {
   const j = day % 10;
@@ -79,38 +74,27 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
     showBusinessProfileLink = true,
     showDisclaimer = true,
     limit,
-    fallbackToRemote = true,
   } = props ?? {};
 
-  const safeLimit = sanitizeLimit(limit);
-  const resolvedGbpUrl = ensureValidUrl(injectedGbpUrl ?? GBP_URL);
+  const settings = await getReviewsCarouselSettings().catch((error) => {
+    console.error("[ReviewsCarousel] Failed to load Directus carousel settings:", error);
+    return null;
+  });
+  const safeLimit = sanitizeLimit(limit ?? settings?.limit);
+  const resolvedGbpUrl = ensureValidUrl(
+    injectedGbpUrl ?? settings?.gbpProfileLink ?? DEFAULT_GOOGLE_BUSINESS_PROFILE_URL,
+  );
   if (!resolvedGbpUrl) {
-    console.error('[ReviewsCarousel] Invalid GBP URL:', { injectedGbpUrl, GBP_URL });
+    console.error("[ReviewsCarousel] Invalid GBP URL");
     return null;
   }
 
   let sourceReviews: Review[] = Array.isArray(injectedReviews) ? injectedReviews : [];
-
-  const shouldAttemptRemote = fallbackToRemote && !sourceReviews.length;
-
-  if (shouldAttemptRemote) {
-    const resolvedReviewsUrl = ensureValidUrl(REVIEWS_URL);
-    if (!resolvedReviewsUrl) {
-      console.error('[ReviewsCarousel] Invalid reviews feed URL:', { REVIEWS_URL });
-      return null;
-    }
-
-    const res = await fetch(resolvedReviewsUrl, { next: { revalidate: 21600 } }); // 6h
-    if (!res.ok) return null;
-
-    const data: ReviewsPayload = await res.json().catch(err => {
-      console.error('[ReviewsCarousel] JSON parse error:', err);
-      return {};
+  if (!sourceReviews.length) {
+    sourceReviews = await getGoogleReviews().catch((error) => {
+      console.error("[ReviewsCarousel] Failed to load Directus reviews:", error);
+      return [];
     });
-
-    if (!sourceReviews.length) {
-      sourceReviews = Array.isArray(data.reviews) ? data.reviews : [];
-    }
   }
 
   const filtered = sourceReviews
@@ -153,14 +137,16 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
             {review.ownerReply ? (
               <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <div className="flex items-start gap-3">
-                  <Image
-                    src={OWNER_RESPONSE_IMAGE}
-                    alt="Owner response avatar"
-                    width={48}
-                    height={48}
-                    className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
-                    loading="lazy"
-                  />
+                  {settings?.ownerHeadshot ? (
+                    <Image
+                      src={settings.ownerHeadshot.url}
+                      alt={settings.ownerHeadshot.altText}
+                      width={48}
+                      height={48}
+                      className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
+                      loading="lazy"
+                    />
+                  ) : null}
                   <div>
                     <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
                     <span className="pb-2 text-xs text-slate-500">Owner</span>
@@ -179,7 +165,12 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
     <div className={className}>
       <div className="text-center not-prose">
         {fallbackReviews}
-        <ReviewsSliderLazy reviews={filtered} gbpUrl={resolvedGbpUrl} fallbackId={fallbackId} />
+        <ReviewsSliderLazy
+          reviews={filtered}
+          gbpUrl={resolvedGbpUrl}
+          ownerHeadshot={settings?.ownerHeadshot ?? null}
+          fallbackId={fallbackId}
+        />
         <div className="mb-4 flex flex-wrap gap-y-4 justify-center mx-auto max-w-6xl">
           {showDisclaimer ? (
             <p className="mx-2 text-sm text-slate-500">
