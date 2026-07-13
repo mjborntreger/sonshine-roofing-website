@@ -18,6 +18,7 @@ type ReviewsCarouselProps = {
   className?: string;
   showBusinessProfileLink?: boolean;
   showDisclaimer?: boolean;
+  showOwnerReplies?: boolean;
   limit?: number;
 };
 
@@ -73,6 +74,7 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
     className = DEFAULT_CONTAINER_CLASS,
     showBusinessProfileLink = true,
     showDisclaimer = true,
+    showOwnerReplies = true,
     limit,
   } = props ?? {};
 
@@ -134,7 +136,7 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
             <p className="mt-4 text-sm leading-7 whitespace-pre-line text-slate-700 flex-1">
               {review.text}
             </p>
-            {review.ownerReply ? (
+            {showOwnerReplies && review.ownerReply ? (
               <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
                 <div className="flex items-start gap-3">
                   {settings?.ownerHeadshot ? (
@@ -169,6 +171,7 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
           reviews={filtered}
           gbpUrl={resolvedGbpUrl}
           ownerHeadshot={settings?.ownerHeadshot ?? null}
+          showOwnerReplies={showOwnerReplies}
           fallbackId={fallbackId}
         />
         <div className="mb-4 flex flex-wrap gap-y-4 justify-center mx-auto max-w-6xl">

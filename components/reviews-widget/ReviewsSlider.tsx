@@ -35,10 +35,12 @@ export default function ReviewsSlider({
   reviews,
   gbpUrl,
   ownerHeadshot,
+  showOwnerReplies,
 }: {
   reviews: Review[];
   gbpUrl: string;
   ownerHeadshot: ReviewOwnerImage | null;
+  showOwnerReplies: boolean;
 }) {
   // Continuous auto-scroll (linear), infinite loop, pause on hover
   const autoScrollOptions = useMemo(
@@ -276,7 +278,7 @@ export default function ReviewsSlider({
                     </div>
                   </header>
                   <p className="text-md md:text-lg text-slate-700">{text}</p>
-                  {r.ownerReply ? (
+                  {showOwnerReplies && r.ownerReply ? (
                     <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
                       <div className="flex items-start gap-3">
                         {ownerHeadshot ? (
@@ -377,7 +379,7 @@ export default function ReviewsSlider({
                 </header>
                 <div className="max-h-[80vh] overflow-auto px-5 py-4 bg-amber-50/50 space-y-4">
                   <p className="m-0 whitespace-pre-wrap text-md md:text-lg text-slate-700">{r.text || ''}</p>
-                  {r.ownerReply ? (
+                  {showOwnerReplies && r.ownerReply ? (
                     <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
                       <SmartLink href="/person/nathan-borntreger" title="Nathan Borntreger's Profile" className="flex items-start gap-3">
                         {ownerHeadshot ? (

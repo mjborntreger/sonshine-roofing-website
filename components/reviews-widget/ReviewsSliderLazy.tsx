@@ -7,12 +7,21 @@ type Props = {
   reviews: Review[];
   gbpUrl: string;
   ownerHeadshot: ReviewOwnerImage | null;
+  showOwnerReplies: boolean;
   fallbackId?: string;
 };
 
-type SliderComponent = ComponentType<Pick<Props, 'reviews' | 'gbpUrl' | 'ownerHeadshot'>>;
+type SliderComponent = ComponentType<
+  Pick<Props, 'reviews' | 'gbpUrl' | 'ownerHeadshot' | 'showOwnerReplies'>
+>;
 
-export default function ReviewsSliderLazy({ reviews, gbpUrl, ownerHeadshot, fallbackId }: Props) {
+export default function ReviewsSliderLazy({
+  reviews,
+  gbpUrl,
+  ownerHeadshot,
+  showOwnerReplies,
+  fallbackId,
+}: Props) {
   const [Slider, setSlider] = useState<SliderComponent | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
 
@@ -80,5 +89,12 @@ export default function ReviewsSliderLazy({ reviews, gbpUrl, ownerHeadshot, fall
     return () => cancelAnimationFrame(frame);
   }, [Slider, hideFallback]);
 
-  return Slider ? <Slider reviews={reviews} gbpUrl={gbpUrl} ownerHeadshot={ownerHeadshot} /> : null;
+  return Slider ? (
+    <Slider
+      reviews={reviews}
+      gbpUrl={gbpUrl}
+      ownerHeadshot={ownerHeadshot}
+      showOwnerReplies={showOwnerReplies}
+    />
+  ) : null;
 }

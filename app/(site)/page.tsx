@@ -94,7 +94,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     <>
       <Hero />
       <div className="bg-blue-200/50 border border-b-blue-300/70">
-          <ReviewsCarousel />
+          <ReviewsCarousel showOwnerReplies={false} />
         </div>
       <LeadFormSection />
       <div className={reviewsLayout}>
