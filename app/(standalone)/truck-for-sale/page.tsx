@@ -7,7 +7,7 @@ import { VideoWithSchema } from '@/components/utils/VideoWithSchema';
 import ProjectGallery from '@/components/dynamic-content/project/ProjectGallery';
 import type { WpImage } from '@/lib/content/wp';
 
-const PRICE = '$59,500';
+const PRICE = '$52,500';
 const TRUCK_TITLE = '2020 GMC Sierra 1500 Denali';
 
 const comparisonRows = [
