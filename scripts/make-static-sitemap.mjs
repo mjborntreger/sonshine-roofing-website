@@ -13,14 +13,14 @@ const files = await fg(['app/**/page.@(tsx|jsx|mdx)'], {
     'app/**/api/**',
     'app/**/sitemap_index/**',
     'app/**/robots.ts',
-    'app/**/route.ts',          // non-page routes
+    'app/**/route.ts', // non-page routes
     'app/**/error.tsx',
     'app/**/not-found.tsx',
     'app/**/global-error.tsx',
-    'app/**/[[]*[]]/**',        // dynamic segments like [slug]
-    'app/**/[[*]]/**',          // optional catch-alls
-    'app/**/@*/*',              // parallel routes
-  ]
+    'app/**/[[]*[]]/**', // dynamic segments like [slug]
+    'app/**/[[*]]/**', // optional catch-alls
+    'app/**/@*/*', // parallel routes
+  ],
 });
 
 function segmentToUrlPart(seg) {
@@ -31,12 +31,12 @@ function segmentToUrlPart(seg) {
 
 function fileToRoute(p) {
   // convert e.g. app/(marketing)/contact-us/page.tsx -> /contact-us
-  const rel = p.split('app'+sep)[1].replace(/\\/g, '/');
+  const rel = p.split('app' + sep)[1].replace(/\\/g, '/');
   const parts = rel.split('/');
   parts.pop(); // remove page.tsx
   const filtered = parts.map(segmentToUrlPart).filter(Boolean);
-  const route = '/'+filtered.join('/');
-  return route === '/' ? '/' : route.replace(/\/index$/,'/').replace(/\/+/g, '/');
+  const route = '/' + filtered.join('/');
+  return route === '/' ? '/' : route.replace(/\/index$/, '/').replace(/\/+/g, '/');
 }
 
 function toIsoTimestamp(value) {
@@ -66,13 +66,15 @@ function fileLastmod(file) {
   return statSync(join(ROOT, file)).mtime.toISOString();
 }
 
-const items = files.map((f) => {
-  const route = fileToRoute(f);
-  return { loc: route, lastmod: fileLastmod(f) };
-}).sort((a, b) => a.loc.localeCompare(b.loc));
+const items = files
+  .map((f) => {
+    const route = fileToRoute(f);
+    return { loc: route, lastmod: fileLastmod(f) };
+  })
+  .sort((a, b) => a.loc.localeCompare(b.loc));
 
 // Exclude specific routes from the static sitemap
-const EXCLUDE = new Set(["/reviews", "/tell-us-why", "/thank-you"]);
+const EXCLUDE = new Set(['/reviews', '/tell-us-why', '/thank-you', '/truck-for-sale']);
 const filtered = items.filter(({ loc }) => !EXCLUDE.has(loc));
 
 // Optionally fallback to commit time
@@ -80,9 +82,12 @@ const commitTs = process.env.VERCEL_GIT_COMMIT_TIMESTAMP
   ? toIsoTimestamp(process.env.VERCEL_GIT_COMMIT_TIMESTAMP)
   : null;
 const routes = filtered.map(({ loc, lastmod }) => ({ loc, lastmod: commitTs || lastmod }));
-const generatedAt = commitTs || routes.reduce((latest, { lastmod }) => {
-  return !latest || lastmod > latest ? lastmod : latest;
-}, null) || '1970-01-01T00:00:00.000Z';
+const generatedAt =
+  commitTs ||
+  routes.reduce((latest, { lastmod }) => {
+    return !latest || lastmod > latest ? lastmod : latest;
+  }, null) ||
+  '1970-01-01T00:00:00.000Z';
 
 const outDir = join(ROOT, 'public', '__sitemaps');
 const outPath = join(outDir, 'static-routes.json');

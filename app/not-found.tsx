@@ -1,3 +1,16 @@
+import type { Metadata } from 'next';
+import { getWebsitePageMetadata } from '@/lib/content/directus-site';
+
+export async function generateMetadata(): Promise<Metadata> {
+  return getWebsitePageMetadata({
+    title: 'Page Not Found | SonShine Roofing',
+    description: 'The requested page could not be found on the SonShine Roofing website.',
+    path: '/404',
+    includeCanonical: false,
+    robots: { index: false, follow: false },
+  });
+}
+
 export default function NotFound() {
   return (
     <div className="flex min-h-svh items-center justify-center bg-slate-900 px-4 text-center text-white">

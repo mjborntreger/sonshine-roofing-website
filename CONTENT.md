@@ -3,8 +3,30 @@ Content Workflow
 
 Where content lives
 - WordPress (via WPGraphQL): blog posts, projects, glossary, faqs, persons, videos.
-- Directus: special offers in `special_offers` and WYSIWYG privacy/SMS terms content in `legal_copy`, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`.
-- Next.js app pages: service pages, about, contact, and legal page shells.
+- Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
+  - `site_settings`: shared brand, contact, address, social, image, footer, and schema values.
+  - `website_pages`: metadata, canonical, Open Graph, noindex, and sitemap-policy records for static routes.
+  - `services`: primary service records used by navigation and service quick links.
+  - `navigation_items`: header navigation and matching footer link groups.
+  - `redirects`: published legacy redirect rules loaded at build time.
+  - `special_offers`: special-offer pages and popup content.
+  - `legal_copy`: WYSIWYG privacy/SMS terms content.
+- Next.js app pages: route layouts, components, and page body copy not yet moved to Directus.
+
+Publishing shared site content in Directus
+- Keep exactly one `site_settings` record for the SonShine client.
+- Use unique normalized paths in `website_pages`; the 404 record is `/404` even though it has no public canonical.
+- Keep the four primary `services` records published and linked from their matching `website_pages` records.
+- Publish navigation only after its target `website_pages` records exist.
+- Every Directus image must have a `directus_files.description`.
+- Analytics remains on its existing configuration; do not use `site_settings.enable_site_analytics` yet.
+
+Publishing redirects in Directus
+- Redirect changes become active only after a new site build.
+- Keep `source_path` unique, set `preserve_query=true`, and use a supported status code (`301`, `302`, `303`, `307`, or `308`).
+- Use `/prefix/*` for prefix wildcards. Invalid, duplicate, or self-redirect records fail the build.
+- Canonical-host, global de-pagination, global `.html`, and WordPress sitemap-pattern rules remain in `next.config.mjs`.
+- Deleted deprecated landing-page routes intentionally return 404; do not add redirects for them.
 
 Publishing in WP
 - Ensure posts/projects are Published, not Draft.
@@ -31,5 +53,5 @@ Images
 - Default OG image: `/og-default.png` (1200×630).
 
 Noindex Policy
-- Utility pages (`/reviews`, `/tell-us-why`) are marked noindex.
+- Utility pages (`/reviews`, `/tell-us-why`, `/thank-you`, `/truck-for-sale`, and the 404 page) are marked noindex and excluded from the static sitemap where applicable.
 - Person and glossary terms are noindex by business choice.

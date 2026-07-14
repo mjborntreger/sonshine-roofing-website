@@ -55,8 +55,9 @@ Security headers & CSP
   - The site hydrates stored `utm_*` and `gclid` into the URL before loading QuickQuote; unsupported webhook fields such as `gbraid`, `wbraid`, landing page, and referrer require QuickQuote vendor support.
 
 Cache/Invalidation
-- WordPress GraphQL data uses Next fetch revalidation where configured; Directus special offers revalidate every 15 minutes.
+- WordPress GraphQL data uses Next fetch revalidation where configured. Directus special offers revalidate every 15 minutes; shared site content revalidates hourly.
 - Static sitemap: regenerated on build; read dynamically per request.
+- Redirects are loaded from Directus during each build, so redirect changes require a new build to take effect.
 
 GTMetrix/Analytics
 - GTM loads only when `NEXT_PUBLIC_GTM_ID` is set and env permits.
@@ -98,8 +99,24 @@ Content Workflow
 
 Where content lives
 - WordPress (via WPGraphQL): blog posts, projects, glossary, faqs, persons, videos.
-- Directus: special offers in `special_offers` and WYSIWYG privacy/SMS terms content in `legal_copy`, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`.
-- Next.js app pages: service pages, about, contact, and legal page shells.
+- Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
+  - `site_settings`: shared brand, contact, address, social, image, footer, and schema values.
+  - `website_pages`: metadata, canonical, Open Graph, noindex, and sitemap-policy records for static routes.
+  - `services`: the four primary service records used by navigation and service quick links.
+  - `navigation_items`: header navigation and matching footer link groups.
+  - `redirects`: published legacy redirects loaded and validated at build time.
+  - `special_offers`: offer pages and the featured offer popup.
+  - `legal_copy`: WYSIWYG privacy/SMS terms content.
+- Next.js app pages: route layouts, components, and page body copy that has not yet moved to Directus.
+
+Directus-backed static page metadata falls back to the route's local metadata when Directus is unavailable outside production. Every referenced Directus image must have a `directus_files.description`; missing descriptions fail the content read instead of producing empty alt text.
+
+Redirect ownership
+- Content-specific legacy redirects live in Directus and are fetched by `next.config.mjs` during a build.
+- Canonical-host, global de-pagination, global `.html`, and WordPress sitemap-pattern rules remain in code because they depend on host or regex matching.
+- Published redirect records must have unique source paths, a supported status (`301`, `302`, `303`, `307`, or `308`), and `preserve_query=true`; invalid records fail the build.
+- Static generation is limited to two workers with one page per worker at a time to avoid bursting WordPress or Directus.
+- Analytics remains controlled by the existing environment/config path. `site_settings.enable_site_analytics` is intentionally not wired yet.
 
 Legal copy in `legal_copy.privacy_policy` and `legal_copy.terms_of_use` is sanitized server-side before rendering. Use semantic HTML without classes, IDs, inline styles, scripts, or event-handler attributes. Body headings begin at `h2`; Next.js owns each page's primary `h1`, metadata, canonical URL, and layout.
 
@@ -117,7 +134,7 @@ Images
 - Default OG image: `/og-default.png` (1200×630).
 
 Noindex Policy
-- Utility pages (`/reviews`, `/tell-us-why`) are marked noindex.
+- Utility pages (`/reviews`, `/tell-us-why`, `/thank-you`, `/truck-for-sale`, and the 404 page) are marked noindex and excluded from the static sitemap where applicable.
 - Person and glossary terms are noindex by business choice.
 
 

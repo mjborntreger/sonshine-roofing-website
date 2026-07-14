@@ -1,5 +1,6 @@
 import Section from '@/components/layout/Section';
 import { getLegalCopy } from '@/lib/content/directus-legal-copy';
+import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 import type { Metadata } from 'next';
 
 const SEO_TITLE = 'Privacy Policy | SonShine Roofing';
@@ -8,24 +9,12 @@ const SEO_DESC =
 const CANONICAL = '/privacy-policy';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
+  return getWebsitePageMetadata({
     title: SEO_TITLE,
     description: SEO_DESC,
-    alternates: { canonical: CANONICAL },
-    openGraph: {
-      type: 'website',
-      title: SEO_TITLE,
-      description: SEO_DESC,
-      url: CANONICAL,
-      images: [{ url: '/og-default.png', width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: SEO_TITLE,
-      description: SEO_DESC,
-      images: ['/og-default.png'],
-    },
-  };
+    path: CANONICAL,
+    image: { url: '/og-default.png', width: 1200, height: 630 },
+  });
 }
 
 export const revalidate = 86400;

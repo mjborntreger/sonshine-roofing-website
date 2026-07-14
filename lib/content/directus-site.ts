@@ -1,13 +1,9 @@
-import "server-only";
+import 'server-only';
 
-import type { Metadata } from "next";
-import { cache } from "react";
-import type { NavItem } from "@/lib/routes";
-import {
-  buildBasicMetadata,
-  type BasicMetadataInput,
-  type OgImageInput,
-} from "@/lib/seo/meta";
+import type { Metadata } from 'next';
+import { cache } from 'react';
+import type { NavItem } from '@/lib/routes';
+import { buildBasicMetadata, type BasicMetadataInput, type OgImageInput } from '@/lib/seo/meta';
 
 const DIRECTUS_REVALIDATE_SECONDS = 3600;
 
@@ -177,7 +173,7 @@ export type SiteBundle = {
 let warnedForMissingConfig = false;
 
 function readString(value: unknown): string | null {
-  if (typeof value !== "string") return null;
+  if (typeof value !== 'string') return null;
   const trimmed = value.trim();
   return trimmed.length ? trimmed : null;
 }
@@ -191,19 +187,19 @@ function requiredString(value: unknown, collection: string, field: string): stri
 }
 
 function readBoolean(value: unknown, fallback = false): boolean {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value === 1;
-  if (typeof value === "string") {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') {
     const normalized = value.trim().toLowerCase();
-    if (["true", "1", "yes"].includes(normalized)) return true;
-    if (["false", "0", "no"].includes(normalized)) return false;
+    if (['true', '1', 'yes'].includes(normalized)) return true;
+    if (['false', '0', 'no'].includes(normalized)) return false;
   }
   return fallback;
 }
 
 function readNumber(value: unknown): number | null {
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim()) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
+  if (typeof value === 'string' && value.trim()) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
   }
@@ -211,17 +207,13 @@ function readNumber(value: unknown): number | null {
 }
 
 function trimTrailingSlash(value: string): string {
-  return value.replace(/\/+$/, "");
+  return value.replace(/\/+$/, '');
 }
 
 export function normalizeWebsitePath(value: string): string {
-  const withoutQuery = value.split(/[?#]/, 1)[0] || "/";
-  const withLeadingSlash = withoutQuery.startsWith("/")
-    ? withoutQuery
-    : `/${withoutQuery}`;
-  return withLeadingSlash.length > 1
-    ? withLeadingSlash.replace(/\/+$/, "")
-    : "/";
+  const withoutQuery = value.split(/[?#]/, 1)[0] || '/';
+  const withLeadingSlash = withoutQuery.startsWith('/') ? withoutQuery : `/${withoutQuery}`;
+  return withLeadingSlash.length > 1 ? withLeadingSlash.replace(/\/+$/, '') : '/';
 }
 
 function getDirectusConfig(): DirectusConfig | null {
@@ -230,9 +222,9 @@ function getDirectusConfig(): DirectusConfig | null {
   const token = readString(process.env.DIRECTUS_TOKEN);
 
   if (!url || !clientSlug || !token) {
-    if (!warnedForMissingConfig && process.env.NODE_ENV === "production") {
+    if (!warnedForMissingConfig && process.env.NODE_ENV === 'production') {
       console.error(
-        "[directus-site] Missing DIRECTUS_URL, DIRECTUS_CLIENT_SLUG, or DIRECTUS_TOKEN.",
+        '[directus-site] Missing DIRECTUS_URL, DIRECTUS_CLIENT_SLUG, or DIRECTUS_TOKEN.',
       );
       warnedForMissingConfig = true;
     }
@@ -250,14 +242,14 @@ async function fetchCollection<T>(
   options: { sort?: readonly string[]; limit?: number } = {},
 ): Promise<T[]> {
   const url = new URL(`items/${collection}`, `${config.url}/`);
-  url.searchParams.set("fields", fields.join(","));
-  url.searchParams.set("filter", JSON.stringify(filter));
-  url.searchParams.set("limit", String(options.limit ?? 100));
-  if (options.sort?.length) url.searchParams.set("sort", options.sort.join(","));
+  url.searchParams.set('fields', fields.join(','));
+  url.searchParams.set('filter', JSON.stringify(filter));
+  url.searchParams.set('limit', String(options.limit ?? 100));
+  if (options.sort?.length) url.searchParams.set('sort', options.sort.join(','));
 
   const response = await fetch(url, {
     headers: {
-      Accept: "application/json",
+      Accept: 'application/json',
       Authorization: `Bearer ${config.token}`,
     },
     next: {
@@ -275,8 +267,10 @@ async function fetchCollection<T>(
   const json = (await response.json()) as DirectusListResponse<T>;
   if (json.errors?.length) {
     throw new Error(
-      json.errors.map((error) => error.message).filter(Boolean).join("; ") ||
-        `[directus-site] Directus ${collection} request failed.`,
+      json.errors
+        .map((error) => error.message)
+        .filter(Boolean)
+        .join('; ') || `[directus-site] Directus ${collection} request failed.`,
     );
   }
 
@@ -299,18 +293,14 @@ function mapAsset(
     return null;
   }
 
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     throw new Error(
       `[directus-site] ${collection}.${field} must include directus_files.description.`,
     );
   }
 
   const id = requiredString(value.id, collection, `${field}.id`);
-  const description = requiredString(
-    value.description,
-    collection,
-    `${field}.description`,
-  );
+  const description = requiredString(value.description, collection, `${field}.description`);
 
   return {
     id,
@@ -323,17 +313,17 @@ function mapAsset(
 }
 
 function phoneHref(value: string): string {
-  const digits = value.replace(/\D/g, "");
+  const digits = value.replace(/\D/g, '');
   if (digits.length === 10) return `tel:+1${digits}`;
-  if (digits.length === 11 && digits.startsWith("1")) return `tel:+${digits}`;
-  return `tel:${value.replace(/\s+/g, "")}`;
+  if (digits.length === 11 && digits.startsWith('1')) return `tel:+${digits}`;
+  return `tel:${value.replace(/\s+/g, '')}`;
 }
 
 function mapOpeningHours(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return value
     .map((entry) =>
-      entry && typeof entry === "object"
+      entry && typeof entry === 'object'
         ? readString((entry as UnknownRecord).opening_hours)
         : null,
     )
@@ -346,50 +336,50 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
 
   const items = await fetchCollection<DirectusSiteSettingsItem>(
     config,
-    "site_settings",
+    'site_settings',
     [
-      "brand_name",
-      "brand_legal_name",
-      "brand_slogan",
-      "brand_description",
-      "phone",
-      "email",
-      "site_url",
-      "logo.id",
-      "logo.description",
-      "logo.width",
-      "logo.height",
-      "logo.type",
-      "logo_inverted.id",
-      "logo_inverted.description",
-      "logo_inverted.width",
-      "logo_inverted.height",
-      "logo_inverted.type",
-      "favicon.id",
-      "favicon.description",
-      "favicon.width",
-      "favicon.height",
-      "favicon.type",
-      "default_og_image.id",
-      "default_og_image.description",
-      "default_og_image.width",
-      "default_og_image.height",
-      "default_og_image.type",
-      "address_street",
-      "address_city",
-      "address_region",
-      "address_postal_code",
-      "address_country",
-      "facebook",
-      "instagram",
-      "youtube",
-      "schema_type",
-      "price_range",
-      "opening_hours",
-      "footer_include_legal",
-      "footer_include_socials",
-      "footer_include_services",
-      "enable_site_analytics",
+      'brand_name',
+      'brand_legal_name',
+      'brand_slogan',
+      'brand_description',
+      'phone',
+      'email',
+      'site_url',
+      'logo.id',
+      'logo.description',
+      'logo.width',
+      'logo.height',
+      'logo.type',
+      'logo_inverted.id',
+      'logo_inverted.description',
+      'logo_inverted.width',
+      'logo_inverted.height',
+      'logo_inverted.type',
+      'favicon.id',
+      'favicon.description',
+      'favicon.width',
+      'favicon.height',
+      'favicon.type',
+      'default_og_image.id',
+      'default_og_image.description',
+      'default_og_image.width',
+      'default_og_image.height',
+      'default_og_image.type',
+      'address_street',
+      'address_city',
+      'address_region',
+      'address_postal_code',
+      'address_country',
+      'facebook',
+      'instagram',
+      'youtube',
+      'schema_type',
+      'price_range',
+      'opening_hours',
+      'footer_include_legal',
+      'footer_include_socials',
+      'footer_include_services',
+      'enable_site_analytics',
     ],
     { client: { slug: { _eq: config.clientSlug } } },
     { limit: 2 },
@@ -402,67 +392,47 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
   }
 
   const item = items[0];
-  const phone = requiredString(item.phone, "site_settings", "phone");
+  const phone = requiredString(item.phone, 'site_settings', 'phone');
 
   return {
-    brandName: requiredString(item.brand_name, "site_settings", "brand_name"),
-    brandLegalName: requiredString(
-      item.brand_legal_name,
-      "site_settings",
-      "brand_legal_name",
-    ),
-    brandSlogan: requiredString(item.brand_slogan, "site_settings", "brand_slogan"),
-    brandDescription: requiredString(
-      item.brand_description,
-      "site_settings",
-      "brand_description",
-    ),
+    brandName: requiredString(item.brand_name, 'site_settings', 'brand_name'),
+    brandLegalName: requiredString(item.brand_legal_name, 'site_settings', 'brand_legal_name'),
+    brandSlogan: requiredString(item.brand_slogan, 'site_settings', 'brand_slogan'),
+    brandDescription: requiredString(item.brand_description, 'site_settings', 'brand_description'),
     phone,
     phoneHref: phoneHref(phone),
-    email: requiredString(item.email, "site_settings", "email"),
-    siteUrl: trimTrailingSlash(
-      requiredString(item.site_url, "site_settings", "site_url"),
-    ),
-    logo: mapAsset(item.logo ?? null, config, "site_settings", "logo", true)!,
+    email: requiredString(item.email, 'site_settings', 'email'),
+    siteUrl: trimTrailingSlash(requiredString(item.site_url, 'site_settings', 'site_url')),
+    logo: mapAsset(item.logo ?? null, config, 'site_settings', 'logo', true)!,
     logoInverted: mapAsset(
       item.logo_inverted ?? null,
       config,
-      "site_settings",
-      "logo_inverted",
+      'site_settings',
+      'logo_inverted',
       true,
     )!,
-    favicon: mapAsset(
-      item.favicon ?? null,
-      config,
-      "site_settings",
-      "favicon",
-      true,
-    )!,
+    favicon: mapAsset(item.favicon ?? null, config, 'site_settings', 'favicon', true)!,
     defaultOgImage: mapAsset(
       item.default_og_image ?? null,
       config,
-      "site_settings",
-      "default_og_image",
+      'site_settings',
+      'default_og_image',
       true,
     )!,
     address: {
-      street: requiredString(item.address_street, "site_settings", "address_street"),
-      city: requiredString(item.address_city, "site_settings", "address_city"),
-      region: requiredString(item.address_region, "site_settings", "address_region"),
-      postalCode: requiredString(
-        item.address_postal_code,
-        "site_settings",
-        "address_postal_code",
-      ),
-      country: requiredString(item.address_country, "site_settings", "address_country"),
+      street: requiredString(item.address_street, 'site_settings', 'address_street'),
+      city: requiredString(item.address_city, 'site_settings', 'address_city'),
+      region: requiredString(item.address_region, 'site_settings', 'address_region'),
+      postalCode: requiredString(item.address_postal_code, 'site_settings', 'address_postal_code'),
+      country: requiredString(item.address_country, 'site_settings', 'address_country'),
     },
     socials: {
       facebook: readString(item.facebook),
       instagram: readString(item.instagram),
       youtube: readString(item.youtube),
     },
-    schemaType: requiredString(item.schema_type, "site_settings", "schema_type"),
-    priceRange: requiredString(item.price_range, "site_settings", "price_range"),
+    schemaType: requiredString(item.schema_type, 'site_settings', 'schema_type'),
+    priceRange: requiredString(item.price_range, 'site_settings', 'price_range'),
     openingHours: mapOpeningHours(item.opening_hours),
     footerIncludeLegal: readBoolean(item.footer_include_legal, true),
     footerIncludeSocials: readBoolean(item.footer_include_socials, true),
@@ -477,38 +447,36 @@ export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
 
   const items = await fetchCollection<DirectusWebsitePageItem>(
     config,
-    "website_pages",
+    'website_pages',
     [
-      "path",
-      "title",
-      "description",
-      "image.id",
-      "image.description",
-      "image.width",
-      "image.height",
-      "image.type",
-      "noindex",
-      "og_title",
-      "og_description",
-      "canonical_path",
-      "nav_label",
-      "include_in_sitemap",
-      "sitemap_priority",
-      "sitemap_changefreq",
-      "page_type",
+      'path',
+      'title',
+      'description',
+      'image.id',
+      'image.description',
+      'image.width',
+      'image.height',
+      'image.type',
+      'noindex',
+      'og_title',
+      'og_description',
+      'canonical_path',
+      'nav_label',
+      'include_in_sitemap',
+      'sitemap_priority',
+      'sitemap_changefreq',
+      'page_type',
     ],
     {
       client: { slug: { _eq: config.clientSlug } },
-      status: { _eq: "published" },
+      status: { _eq: 'published' },
     },
-    { sort: ["path"], limit: 500 },
+    { sort: ['path'], limit: 500 },
   );
 
   const seen = new Set<string>();
   return items.map((item) => {
-    const path = normalizeWebsitePath(
-      requiredString(item.path, "website_pages", "path"),
-    );
+    const path = normalizeWebsitePath(requiredString(item.path, 'website_pages', 'path'));
     if (seen.has(path)) {
       throw new Error(`[directus-site] Duplicate website_pages path "${path}".`);
     }
@@ -516,13 +484,9 @@ export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
 
     return {
       path,
-      title: requiredString(item.title, "website_pages", "title"),
-      description: requiredString(
-        item.description,
-        "website_pages",
-        "description",
-      ),
-      image: mapAsset(item.image ?? null, config, "website_pages", "image"),
+      title: requiredString(item.title, 'website_pages', 'title'),
+      description: requiredString(item.description, 'website_pages', 'description'),
+      image: mapAsset(item.image ?? null, config, 'website_pages', 'image'),
       noindex: readBoolean(item.noindex, false),
       ogTitle: readString(item.og_title),
       ogDescription: readString(item.og_description),
@@ -531,7 +495,7 @@ export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
       includeInSitemap: readBoolean(item.include_in_sitemap, true),
       sitemapPriority: readNumber(item.sitemap_priority),
       sitemapChangefreq: readString(item.sitemap_changefreq),
-      pageType: requiredString(item.page_type, "website_pages", "page_type"),
+      pageType: requiredString(item.page_type, 'website_pages', 'page_type'),
     };
   });
 });
@@ -548,23 +512,23 @@ export const getServices = cache(async (): Promise<ServiceSummary[]> => {
 
   const items = await fetchCollection<DirectusServiceItem>(
     config,
-    "services",
-    ["slug", "nav_label", "intro", "lucide_icon", "sort_order"],
+    'services',
+    ['slug', 'nav_label', 'intro', 'lucide_icon', 'sort_order'],
     {
       client: { slug: { _eq: config.clientSlug } },
-      status: { _eq: "published" },
+      status: { _eq: 'published' },
     },
-    { sort: ["sort_order", "slug"], limit: 100 },
+    { sort: ['sort_order', 'slug'], limit: 100 },
   );
 
   return items.map((item) => {
-    const slug = requiredString(item.slug, "services", "slug");
+    const slug = requiredString(item.slug, 'services', 'slug');
     return {
       slug,
       href: `/${slug}`,
-      navLabel: requiredString(item.nav_label, "services", "nav_label"),
-      intro: requiredString(item.intro, "services", "intro"),
-      lucideIcon: requiredString(item.lucide_icon, "services", "lucide_icon"),
+      navLabel: requiredString(item.nav_label, 'services', 'nav_label'),
+      intro: requiredString(item.intro, 'services', 'intro'),
+      lucideIcon: requiredString(item.lucide_icon, 'services', 'lucide_icon'),
       sortOrder: readNumber(item.sort_order) ?? 0,
     };
   });
@@ -572,12 +536,12 @@ export const getServices = cache(async (): Promise<ServiceSummary[]> => {
 
 function navigationHref(item: DirectusNavigationItem): string | undefined {
   const linkType = readString(item.link_type);
-  if (linkType === "page" && item.page && typeof item.page === "object") {
+  if (linkType === 'page' && item.page && typeof item.page === 'object') {
     const path = readString(item.page.path);
     return path ? normalizeWebsitePath(path) : undefined;
   }
-  if (linkType === "external_url") return readString(item.url) ?? undefined;
-  if (linkType === "anchor") return readString(item.anchor) ?? undefined;
+  if (linkType === 'external_url') return readString(item.url) ?? undefined;
+  if (linkType === 'anchor') return readString(item.anchor) ?? undefined;
   return undefined;
 }
 
@@ -587,35 +551,26 @@ export const getHeaderNavigation = cache(async (): Promise<NavItem[]> => {
 
   const items = await fetchCollection<DirectusNavigationItem>(
     config,
-    "navigation_items",
-    [
-      "id",
-      "parent.id",
-      "label",
-      "link_type",
-      "page.path",
-      "url",
-      "anchor",
-      "sort",
-    ],
+    'navigation_items',
+    ['id', 'parent.id', 'label', 'link_type', 'page.path', 'url', 'anchor', 'sort'],
     {
       menu: {
         client: { slug: { _eq: config.clientSlug } },
-        key: { _eq: "header" },
-        status: { _eq: "published" },
+        key: { _eq: 'header' },
+        status: { _eq: 'published' },
       },
-      status: { _eq: "published" },
+      status: { _eq: 'published' },
     },
-    { sort: ["sort", "label"], limit: 100 },
+    { sort: ['sort', 'label'], limit: 100 },
   );
 
   const nodes = items.map((item) => ({
-    id: requiredString(item.id, "navigation_items", "id"),
+    id: requiredString(item.id, 'navigation_items', 'id'),
     parentId:
-      item.parent && typeof item.parent === "object"
+      item.parent && typeof item.parent === 'object'
         ? readString(item.parent.id)
         : readString(item.parent),
-    label: requiredString(item.label, "navigation_items", "label"),
+    label: requiredString(item.label, 'navigation_items', 'label'),
     href: navigationHref(item),
     sort: readNumber(item.sort) ?? 0,
   }));
@@ -631,7 +586,7 @@ export const getHeaderNavigation = cache(async (): Promise<NavItem[]> => {
 
       return {
         label: node.label,
-        ...(node.href && node.href !== "#" ? { href: node.href } : {}),
+        ...(node.href && node.href !== '#' ? { href: node.href } : {}),
         ...(children.length ? { children } : {}),
       };
     });
@@ -665,7 +620,11 @@ export async function getWebsitePageMetadata({
   ...fallback
 }: WebsitePageMetadataInput): Promise<Metadata> {
   const page = await getWebsitePage(fallback.path);
-  if (!page) return buildBasicMetadata(fallback);
+  if (!page) {
+    const metadata = buildBasicMetadata(fallback);
+    if (!includeCanonical) delete metadata.alternates;
+    return metadata;
+  }
 
   const settings = await getSiteSettings();
   const image = page.image
@@ -674,7 +633,10 @@ export async function getWebsitePageMetadata({
       ? assetToOgImage(settings.defaultOgImage)
       : fallback.image;
   const robots = page.noindex
-    ? { ...(fallback.robots ?? {}), index: false }
+    ? {
+        ...(fallback.robots && typeof fallback.robots === 'object' ? fallback.robots : {}),
+        index: false,
+      }
     : fallback.robots;
   const metadata = buildBasicMetadata({
     ...fallback,
@@ -689,11 +651,11 @@ export async function getWebsitePageMetadata({
 
   const socialTitle = page.ogTitle ?? page.title;
   const socialDescription = page.ogDescription ?? page.description;
-  if (metadata.openGraph && typeof metadata.openGraph === "object") {
+  if (metadata.openGraph && typeof metadata.openGraph === 'object') {
     metadata.openGraph.title = socialTitle;
     metadata.openGraph.description = socialDescription;
   }
-  if (metadata.twitter && typeof metadata.twitter === "object") {
+  if (metadata.twitter && typeof metadata.twitter === 'object') {
     metadata.twitter.title = socialTitle;
     metadata.twitter.description = socialDescription;
   }

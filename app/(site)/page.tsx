@@ -1,23 +1,30 @@
-import Hero from "@/components/marketing/landing-page/LandingHero";
-import HeroTrustBar from "@/components/marketing/landing-page/HeroTrustBar";
-import ReviewsCarousel from "@/components/reviews-widget/ReviewsCarousel";
-import WhyHomeownersChooseUs from "@/components/marketing/landing-page/WhyHomeownersChooseUs";
-import LatestProjectsFilter from "@/components/dynamic-content/latest-filters/LatestProjectsFilter";
-import { listRecentProjectsPoolForFilters, listRecentPostsPoolForFilters, listFaqsWithContent, listSponsorFeaturesByServiceArea } from '@/lib/content/wp';
-import LatestPostsFilters from "@/components/dynamic-content/latest-filters/LatestPostsFilter";
-import ServicesQuickLinks from "@/components/global-nav/static-pages/ServicesQuickLinks";
-import BestOfTheBest from "@/components/marketing/landing-page/BestOfTheBest";
-import Section from "@/components/layout/Section";
+import Hero from '@/components/marketing/landing-page/LandingHero';
+import HeroTrustBar from '@/components/marketing/landing-page/HeroTrustBar';
+import ReviewsCarousel from '@/components/reviews-widget/ReviewsCarousel';
+import WhyHomeownersChooseUs from '@/components/marketing/landing-page/WhyHomeownersChooseUs';
+import LatestProjectsFilter from '@/components/dynamic-content/latest-filters/LatestProjectsFilter';
+import {
+  listRecentProjectsPoolForFilters,
+  listRecentPostsPoolForFilters,
+  listFaqsWithContent,
+  listSponsorFeaturesByServiceArea,
+} from '@/lib/content/wp';
+import LatestPostsFilters from '@/components/dynamic-content/latest-filters/LatestPostsFilter';
+import ServicesQuickLinks from '@/components/global-nav/static-pages/ServicesQuickLinks';
+import BestOfTheBest from '@/components/marketing/landing-page/BestOfTheBest';
+import Section from '@/components/layout/Section';
 import type { Metadata } from 'next';
-import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
-import LeadFormSection from "@/components/lead-capture/lead-form/InitialNavigation";
-import LocalPartnershipsSection from "@/components/location/LocalPartnershipsSection";
-import SidebarCta from "@/components/cta/SidebarCta";
+import FaqInlineList from '@/components/dynamic-content/faq/FaqInlineList';
+import LeadFormSection from '@/components/lead-capture/lead-form/InitialNavigation';
+import LocalPartnershipsSection from '@/components/location/LocalPartnershipsSection';
+import SidebarCta from '@/components/cta/SidebarCta';
+import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 
 // ===== STYLE CONSTANTS ===== //
-const leadFormLayout = "mx-auto w-full";
-const reviewsLayout = "mx-auto w-full bg-[#cef3ff]";
-const narrowLayout = "bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent mx-auto w-full";
+const leadFormLayout = 'mx-auto w-full';
+const reviewsLayout = 'mx-auto w-full bg-[#cef3ff]';
+const narrowLayout =
+  'bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent mx-auto w-full';
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Best Roofing Company in Sarasota';
@@ -50,28 +57,17 @@ const SEO_KEYWORDS_HOME = [
   'roofing company',
 ];
 const SEO_CANONICAL_HOME = '/';
-const SEO_OG_IMAGE_DEFAULT = 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png';
+const SEO_OG_IMAGE_DEFAULT =
+  'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png';
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
+  return getWebsitePageMetadata({
     title: SEO_TITLE_HOME,
     description: SEO_DESCRIPTION_HOME,
     keywords: SEO_KEYWORDS_HOME,
-    alternates: { canonical: SEO_CANONICAL_HOME },
-    openGraph: {
-      type: 'website',
-      title: SEO_TITLE_HOME,
-      description: SEO_DESCRIPTION_HOME,
-      url: SEO_CANONICAL_HOME,
-      images: [{ url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 }],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: SEO_TITLE_HOME,
-      description: SEO_DESCRIPTION_HOME,
-      images: [SEO_OG_IMAGE_DEFAULT],
-    },
-  };
+    path: SEO_CANONICAL_HOME,
+    image: { url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 },
+  });
 }
 
 type Params = { slug: string };
@@ -87,15 +83,15 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   const [projects, posts, generalFaqs, sponsorFeatures] = await Promise.all([
     listRecentProjectsPoolForFilters(4, 8),
     listRecentPostsPoolForFilters(4, 4).catch(() => []),
-    listFaqsWithContent(8, "general").catch(() => []),
+    listFaqsWithContent(8, 'general').catch(() => []),
     sponsorFeaturesPromise,
   ]);
   return (
     <>
       <Hero />
       <div className="bg-blue-200/50 border border-b-blue-300/70">
-          <ReviewsCarousel showOwnerReplies={false} />
-        </div>
+        <ReviewsCarousel showOwnerReplies={false} />
+      </div>
       <LeadFormSection />
       <div className={reviewsLayout}>
         <HeroTrustBar />
@@ -127,7 +123,6 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           <LatestPostsFilters posts={posts} initial={4} />
         </div>
       </div>
-
 
       {/* General FAQs at bottom of the landing page */}
       <Section>

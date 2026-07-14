@@ -1,4 +1,4 @@
-import { getDirectusRedirects } from "./lib/content/directus-redirects.mjs";
+import { getDirectusRedirects } from './lib/content/directus-redirects.mjs';
 
 // Security headers (CSP enforced in all environments)
 const csp = `
@@ -15,26 +15,28 @@ const csp = `
   script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' data: https://cdn.socket.io https://connect.facebook.net https://www.gstatic.com https://maps.googleapis.com https://www.google.com https://storage.googleapis.com https://qq.leadsbyquickquote.com https://www.googletagmanager.com https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://challenges.cloudflare.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.googleadservices.com blob: https://*.amazon-adsystem.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://*.tvsquared.com https://ct.pinterest.com https://assets.calendly.com https://hatch-javascript.s3.amazonaws.com https://unpkg.com https://app.usehatchapp.com;
   connect-src 'self' ws: wss: https://cdn.socket.io https://connect.facebook.net https://places.googleapis.com https://maps.googleapis.com https://cdn.jsdelivr.net https://storage.googleapis.com https://quickquote-api-628343900656.us-central1.run.app https://quickquote-api-223492134056.us-central1.run.app https://quickquote-api-78479757910.us-central1.run.app https://sonshineroofing.com https://wp.sonshineroofing.com https://*.acculynx.com https://challenges.cloudflare.com https://www.googletagmanager.com https://*.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.google.com https://google.com https://*.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.g.doubleclick.net https://ad.doubleclick.net https://pagead2.googlesyndication.com https://stats.g.doubleclick.net/g/collect https://*.amazon-adsystem.com https://www.facebook.com https://connect.facebook.net https://ct.pinterest.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://insight.adsrvr.org https://*.tvsquared.com https://*.paa-reporting-advertising.amazon https://*.amazon https://calendly.com https://assets.calendly.com https://app.usehatchapp.com;
   object-src 'none';
-`.replace(/\s{2,}/g, ' ').trim();
+`
+  .replace(/\s{2,}/g, ' ')
+  .trim();
 
 const imageRemotePatterns = [
-  { protocol: "https", hostname: "sonshineroofing.com" },
-  { protocol: "https", hostname: "wp.sonshineroofing.com" },
-  { protocol: "https", hostname: "**.wp.com" },
-  { protocol: "https", hostname: "coc.codes" },
-  { protocol: "https", hostname: "res.cloudinary.com" },
-  { protocol: "https", hostname: "seal-westflorida.bbb.org" },
-  { protocol: "https", hostname: "i.ytimg.com" },
-  { protocol: "https", hostname: "www.google.com" },
+  { protocol: 'https', hostname: 'sonshineroofing.com' },
+  { protocol: 'https', hostname: 'wp.sonshineroofing.com' },
+  { protocol: 'https', hostname: '**.wp.com' },
+  { protocol: 'https', hostname: 'coc.codes' },
+  { protocol: 'https', hostname: 'res.cloudinary.com' },
+  { protocol: 'https', hostname: 'seal-westflorida.bbb.org' },
+  { protocol: 'https', hostname: 'i.ytimg.com' },
+  { protocol: 'https', hostname: 'www.google.com' },
 ];
 
 const directusUrl = process.env.DIRECTUS_URL?.trim();
 if (directusUrl) {
   try {
     const url = new URL(directusUrl);
-    if (url.protocol === "https:" || url.protocol === "http:") {
+    if (url.protocol === 'https:' || url.protocol === 'http:') {
       imageRemotePatterns.push({
-        protocol: url.protocol.replace(":", ""),
+        protocol: url.protocol.replace(':', ''),
         hostname: url.hostname,
         ...(url.port ? { port: url.port } : {}),
       });
@@ -47,63 +49,71 @@ if (directusUrl) {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   typedRoutes: true,
-  output: "standalone",
+  output: 'standalone',
+  // Keep WordPress and Directus traffic bounded while static pages are generated.
+  experimental: {
+    cpus: 2,
+    staticGenerationMaxConcurrency: 1,
+  },
   images: {
-    remotePatterns: imageRemotePatterns
+    remotePatterns: imageRemotePatterns,
   },
   async headers() {
     const cspHeaderKey = 'Content-Security-Policy';
-    const immutableAssetCache = "public, max-age=31536000, immutable";
-    const sitemapCache = "public, s-maxage=3600, stale-while-revalidate=300";
+    const immutableAssetCache = 'public, max-age=31536000, immutable';
+    const sitemapCache = 'public, s-maxage=3600, stale-while-revalidate=300';
 
     return [
       {
-        source: "/__sitemaps/sitemap.xsl",
+        source: '/__sitemaps/sitemap.xsl',
         headers: [
-          { key: "Cache-Control", value: immutableAssetCache },
-          { key: "Content-Type", value: "text/xsl; charset=utf-8" },
+          { key: 'Cache-Control', value: immutableAssetCache },
+          { key: 'Content-Type', value: 'text/xsl; charset=utf-8' },
         ],
       },
       {
-        source: "/_next/static/:path*",
-        headers: [{ key: "Cache-Control", value: immutableAssetCache }],
+        source: '/_next/static/:path*',
+        headers: [{ key: 'Cache-Control', value: immutableAssetCache }],
       },
       {
-        source: "/fonts/:path*",
-        headers: [{ key: "Cache-Control", value: immutableAssetCache }],
+        source: '/fonts/:path*',
+        headers: [{ key: 'Cache-Control', value: immutableAssetCache }],
       },
       {
-        source: "/:path*\\.(ico|png|jpg|jpeg|gif|svg|webp|avif|txt|webmanifest)",
-        headers: [{ key: "Cache-Control", value: immutableAssetCache }],
+        source: '/:path*\\.(ico|png|jpg|jpeg|gif|svg|webp|avif|txt|webmanifest)',
+        headers: [{ key: 'Cache-Control', value: immutableAssetCache }],
       },
       {
-        source: "/__sitemaps/static-routes.json",
-        headers: [{ key: "Cache-Control", value: sitemapCache }],
+        source: '/__sitemaps/static-routes.json',
+        headers: [{ key: 'Cache-Control', value: sitemapCache }],
       },
       {
-        source: "/sitemap_index/:path*",
-        headers: [{ key: "Cache-Control", value: sitemapCache }],
+        source: '/sitemap_index/:path*',
+        headers: [{ key: 'Cache-Control', value: sitemapCache }],
       },
       {
-        source: "/sitemap_index",
-        headers: [{ key: "Cache-Control", value: sitemapCache }],
+        source: '/sitemap_index',
+        headers: [{ key: 'Cache-Control', value: sitemapCache }],
       },
       {
-        source: "/api/:path*",
-        headers: [{ key: "Cache-Control", value: "no-store" }],
+        source: '/api/:path*',
+        headers: [{ key: 'Cache-Control', value: 'no-store' }],
       },
       {
-        source: "/(.*)",
+        source: '/(.*)',
         headers: [
           { key: cspHeaderKey, value: csp },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "Permissions-Policy", value: "geolocation=(), camera=(), microphone=()" },
-          { key: "Strict-Transport-Security", value: "max-age=15552000; includeSubDomains; preload" },
-          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
-          { key: "Cross-Origin-Resource-Policy", value: "same-origin" }
-        ]
-      }
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Permissions-Policy', value: 'geolocation=(), camera=(), microphone=()' },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=15552000; includeSubDomains; preload',
+          },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'same-origin' },
+        ],
+      },
     ];
   },
 
@@ -116,19 +126,24 @@ const nextConfig = {
 
     return [
       // === Canonical host — www → apex (run first to avoid extra hops) ===
-      { source: "/:path*", has: [{ type: 'host', value: 'www.sonshineroofing.com' }], destination: "https://sonshineroofing.com/:path*", permanent: true },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.sonshineroofing.com' }],
+        destination: 'https://sonshineroofing.com/:path*',
+        permanent: true,
+      },
 
       // Content-specific redirects are managed in Directus and loaded at build time.
       ...directusRedirects,
 
       // De-paginate everywhere: /something/page/2 -> /something/
-      { source: "/:prefix*/page/:n(\\d+)", destination: "/:prefix*", permanent: true },
+      { source: '/:prefix*/page/:n(\\d+)', destination: '/:prefix*', permanent: true },
 
       // Strip .html endings globally
-      { source: "/:path*.html", destination: "/:path*", permanent: true },
+      { source: '/:path*.html', destination: '/:path*', permanent: true },
 
       // WordPress sitemap aliases need regex matching that the shared redirects schema does not expose.
-      { source: "/:prefix*/:seg(wp\\-sitemap.*)", destination: "/sitemap_index", permanent: true },
+      { source: '/:prefix*/:seg(wp\\-sitemap.*)', destination: '/sitemap_index', permanent: true },
     ];
   },
 };

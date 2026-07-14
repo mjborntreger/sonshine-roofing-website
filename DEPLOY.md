@@ -41,7 +41,7 @@ Coolify Environment Variables
   - `NEXT_PUBLIC_META_PIXEL_ID`
   - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
   - `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP` when the FAQ sitemap should be exposed
-- Mark these server variables as build-time and runtime variables because Directus reviews, review-carousel settings, and special offers are fetched during static generation and runtime ISR:
+- Mark these server variables as build-time and runtime variables because Directus redirects, shared site content, reviews, review-carousel settings, and special offers are fetched during the build or runtime ISR:
   - `DIRECTUS_URL`
   - `DIRECTUS_CLIENT_SLUG`
   - `DIRECTUS_TOKEN`
@@ -125,8 +125,11 @@ Security headers & CSP
 - QuickQuote submissions are bridged into `lead_form_submitted` and `ads_lead_submit` dataLayer events as roof replacement conversions.
 
 Cache/Invalidation
-- WordPress GraphQL data uses Next fetch revalidation where configured; Directus special offers revalidate every 15 minutes.
+- WordPress GraphQL data uses Next fetch revalidation where configured. Directus special offers revalidate every 15 minutes; shared site content revalidates hourly.
 - Static sitemap: regenerated on build; read dynamically per request.
+- Published Directus redirects are fetched and validated by `next.config.mjs` at build time. Redirect changes require a new build.
+- Static generation is limited to two workers with one page per worker at a time to avoid bursting WordPress or Directus.
+- Analytics remains controlled by the existing environment/config path; `site_settings.enable_site_analytics` is intentionally not wired.
 
 GTMetrix/Analytics
 - GTM loads only when `NEXT_PUBLIC_GTM_ID` is set and env permits.
@@ -138,6 +141,7 @@ Coolify Smoke Checks
   - `/`, `/contact-us`, `/sitemap_index`, `/sitemap_index/static`, and one WP-backed dynamic page render.
   - `www.sonshineroofing.com` redirects to `sonshineroofing.com` once both domains point at Coolify.
   - Legacy redirects and configured 410 routes still behave correctly.
+  - A deprecated static landing-page URL returns 404 without redirecting.
   - `/api/revalidate` rejects missing secrets and accepts a valid `REVALIDATE_SECRET`.
   - A lead form submission verifies Turnstile and reaches n8n.
 - After DNS cutover:

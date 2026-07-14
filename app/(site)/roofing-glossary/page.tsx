@@ -7,6 +7,7 @@ import SmartLink from '@/components/utils/SmartLink';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, definedTermSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
+import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 
 export const revalidate = 86400; // daily ISR
 const PAGE_PATH = '/roofing-glossary';
@@ -14,26 +15,15 @@ const PAGE_PATH = '/roofing-glossary';
 export async function generateMetadata(): Promise<Metadata> {
   // EDIT: Roofing Glossary archive SEO (title/description)
   const title = 'Roofing Glossary | SonShine Roofing';
-  const description = 'Plain-English definitions of roofing terms for Sarasota, Manatee, and Charlotte Counties. No jargon, just clarity.';
+  const description =
+    'Plain-English definitions of roofing terms for Sarasota, Manatee, and Charlotte Counties. No jargon, just clarity.';
 
-  return {
+  return getWebsitePageMetadata({
     title,
     description,
-    alternates: { canonical: PAGE_PATH },
-    openGraph: {
-      type: 'website',
-      title,
-      description,
-      url: PAGE_PATH,
-      images: [{ url: '/og-default.png', width: 1200, height: 630 }], // EDIT: swap if you add a dedicated OG image
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: ['/og-default.png'],
-    },
-  };
+    path: PAGE_PATH,
+    image: { url: '/og-default.png', width: 1200, height: 630 },
+  });
 }
 
 export default async function GlossaryArchivePage() {
@@ -41,7 +31,7 @@ export default async function GlossaryArchivePage() {
   try {
     terms = await listGlossaryIndex(500);
   } catch (error) {
-    console.error("[roofing-glossary] Failed to load glossary index:", error);
+    console.error('[roofing-glossary] Failed to load glossary index:', error);
     terms = [];
   }
 
@@ -74,7 +64,8 @@ export default async function GlossaryArchivePage() {
     '@context': 'https://schema.org',
     '@type': 'DefinedTermSet',
     name: 'Roofing Glossary',
-    description: 'Plain-English definitions of roofing terms used by homeowners and pros in Southwest Florida.',
+    description:
+      'Plain-English definitions of roofing terms used by homeowners and pros in Southwest Florida.',
     url: pageUrl,
     hasDefinedTerm: definedTerms,
   } as const;
@@ -91,7 +82,6 @@ export default async function GlossaryArchivePage() {
     <Section>
       <div className="container-edge py-8">
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-
           {/* LEFT: main content */}
           <div>
             <h1 className="text-3xl font-semibold">Roofing Glossary</h1>
@@ -145,7 +135,6 @@ export default async function GlossaryArchivePage() {
 
           {/* RIGHT: floating aside on desktop */}
           <ResourcesAside activePath={PAGE_PATH} />
-
         </div>
       </div>
     </Section>

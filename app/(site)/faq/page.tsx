@@ -10,6 +10,7 @@ import FaqBulkToggleClient from '@/components/dynamic-content/faq/FaqBulkToggleC
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
+import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 
 export const revalidate = 86400; // daily ISR
 const PAGE_PATH = '/faq';
@@ -17,32 +18,21 @@ const PAGE_PATH = '/faq';
 export async function generateMetadata(): Promise<Metadata> {
   // EDIT: FAQ archive SEO title/description/copy here (applies to prod + staging)
   const title = 'Roofing FAQs | SonShine Roofing';
-  const description = 'Clear, no-nonsense answers to the most common roofing questions in Sarasota, Manatee, and Charlotte Counties. Get the facts before you buy.';
+  const description =
+    'Clear, no-nonsense answers to the most common roofing questions in Sarasota, Manatee, and Charlotte Counties. Get the facts before you buy.';
 
-  return {
+  return getWebsitePageMetadata({
     title,
     description,
-    alternates: { canonical: PAGE_PATH },
-    openGraph: {
-      type: 'website',
-      title,
-      description,
-      url: PAGE_PATH,
-      images: [{ url: '/og-default.png', width: 1200, height: 630 }], // EDIT: swap if you add a dedicated FAQ OG image
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-      images: ['/og-default.png'],
-    },
-  };
+    path: PAGE_PATH,
+    image: { url: '/og-default.png', width: 1200, height: 630 },
+  });
 }
 
 type PageProps = { searchParams?: Promise<{ q?: string; topic?: string }> };
 
 export default async function FAQArchivePage(_: PageProps) {
-  const q = "";
+  const q = '';
 
   const [topics, faqs] = await Promise.all([
     listFaqTopics(200).catch(() => [] as FaqTopic[]),
@@ -102,8 +92,8 @@ export default async function FAQArchivePage(_: PageProps) {
           <div>
             <h1 className="text-3xl md:text-5xl font-semibold">Frequently Asked Questions</h1>
             <p className="mt-4 text-slate-600 md:text-lg">
-              Answers to common roofing questions from our team in Sarasota. If you can’t find what you need,
-              we’re one call away.
+              Answers to common roofing questions from our team in Sarasota. If you can’t find what
+              you need, we’re one call away.
             </p>
 
             {/* JSON-LD: FAQPage + Breadcrumbs */}
@@ -130,7 +120,13 @@ export default async function FAQArchivePage(_: PageProps) {
 
             {/* Results meta + controls */}
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <span className="text-sm text-slate-700">Showing <span id="faq-result-count" aria-live="polite">{faqs.length}</span> FAQs</span>
+              <span className="text-sm text-slate-700">
+                Showing{' '}
+                <span id="faq-result-count" aria-live="polite">
+                  {faqs.length}
+                </span>{' '}
+                FAQs
+              </span>
               <div className="ml-auto flex items-center">
                 <button
                   id="faq-toggle-all"
@@ -147,7 +143,10 @@ export default async function FAQArchivePage(_: PageProps) {
             </div>
 
             {/* Client-driven No results panel */}
-            <div id="faq-no-results" className="mt-6 hidden rounded-md border border-blue-200 bg-white p-4">
+            <div
+              id="faq-no-results"
+              className="mt-6 hidden rounded-md border border-blue-200 bg-white p-4"
+            >
               <p className="text-sm text-slate-700">
                 No results for <span id="faq-query" className="font-semibold"></span>.
               </p>
@@ -195,13 +194,20 @@ export default async function FAQArchivePage(_: PageProps) {
                           data-title={(f.title || '').toString()}
                           data-topic={title}
                           data-excerpt=""
-                          summary={<h3 className="text-base md:text-xl font-normal text-slate-700">{f.title}</h3>}
+                          summary={
+                            <h3 className="text-base md:text-xl font-normal text-slate-700">
+                              {f.title}
+                            </h3>
+                          }
                           radius="2xl"
                           tone="soft"
                           size="sm"
                           proseBody={false}
                         >
-                          <div className="text-[1rem] leading-loose text-slate-700" dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }} />
+                          <div
+                            className="text-[1rem] leading-loose text-slate-700"
+                            dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }}
+                          />
                         </Accordion>
                       ))}
                     </Accordion>
@@ -219,14 +225,14 @@ export default async function FAQArchivePage(_: PageProps) {
       <ResourceSearchController
         kind="faq"
         ids={{
-          query: "#faq-search",
-          grid: "#faq-topics",
-          chips: "",             // not used on FAQ
-          skeleton: "",          // not used by default
-          noResults: "#faq-no-results",
-          resultCount: "#faq-result-count",
+          query: '#faq-search',
+          grid: '#faq-topics',
+          chips: '', // not used on FAQ
+          skeleton: '', // not used by default
+          noResults: '#faq-no-results',
+          resultCount: '#faq-result-count',
         }}
-        urlKeys={{ q: "q" }}
+        urlKeys={{ q: 'q' }}
         minQueryLen={2}
       />
     </Section>

@@ -1,6 +1,6 @@
-import Image from "next/image";
-import dynamic from "next/dynamic";
-import SmartLink from "@/components/utils/SmartLink";
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
+import SmartLink from '@/components/utils/SmartLink';
 import {
   ArrowUpRight,
   ArrowUp,
@@ -14,10 +14,10 @@ import {
   Pin,
   BadgeCheck,
   type LucideIcon,
-} from "lucide-react";
-import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from "@/lib/routes";
-import type { NavItem } from "@/lib/routes";
-import type { ServiceSummary, SiteSettings } from "@/lib/content/directus-site";
+} from 'lucide-react';
+import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from '@/lib/routes';
+import type { NavItem } from '@/lib/routes';
+import type { ServiceSummary, SiteSettings } from '@/lib/content/directus-site';
 
 type SocialLink = {
   href: string;
@@ -26,24 +26,33 @@ type SocialLink = {
 };
 
 const SOCIALS: SocialLink[] = [
-  { href: "https://www.facebook.com/sonshineroofing", label: "Facebook", icon: Facebook },
-  { href: "https://www.instagram.com/sonshineroofing", label: "Instagram", icon: Instagram },
-  { href: "https://www.youtube.com/c/sonshineroofing", label: "YouTube", icon: Youtube },
-  { href: "https://nextdoor.com/pages/sonshine-roofing-sarasota-fl", label: "Nextdoor", icon: Home },
-  { href: "https://www.google.com/maps/place/SonShine+Roofing/@27.3105774,-82.4518265,16z/data=!3m1!4b1!4m6!3m5!1s0x88c34710987d2023:0x5318594fb175e958!8m2!3d27.3105727!4d-82.446961!16s%2Fg%2F1wh4gn84?entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D", label: "Google Business Profile", icon: MapPin },
-  { href: "https://www.yelp.com/biz/sonshine-roofing-sarasota", label: "Yelp", icon: BadgeCheck },
-  { href: "https://www.pinterest.com/sonshineroofing", label: "Pinterest", icon: Pin },
-  { href: "https://x.com/ssroofinginc", label: "X (Twitter)", icon: Twitter },
+  { href: 'https://www.facebook.com/sonshineroofing', label: 'Facebook', icon: Facebook },
+  { href: 'https://www.instagram.com/sonshineroofing', label: 'Instagram', icon: Instagram },
+  { href: 'https://www.youtube.com/c/sonshineroofing', label: 'YouTube', icon: Youtube },
+  {
+    href: 'https://nextdoor.com/pages/sonshine-roofing-sarasota-fl',
+    label: 'Nextdoor',
+    icon: Home,
+  },
+  {
+    href: 'https://www.google.com/maps/place/SonShine+Roofing/@27.3105774,-82.4518265,16z/data=!3m1!4b1!4m6!3m5!1s0x88c34710987d2023:0x5318594fb175e958!8m2!3d27.3105727!4d-82.446961!16s%2Fg%2F1wh4gn84?entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D',
+    label: 'Google Business Profile',
+    icon: MapPin,
+  },
+  { href: 'https://www.yelp.com/biz/sonshine-roofing-sarasota', label: 'Yelp', icon: BadgeCheck },
+  { href: 'https://www.pinterest.com/sonshineroofing', label: 'Pinterest', icon: Pin },
+  { href: 'https://x.com/ssroofinginc', label: 'X (Twitter)', icon: Twitter },
 ];
 
-const linkStyles = "text-xs md:text-sm text-slate-600 hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]";
-const h3Styles = "text-sm md:text-md font-bold uppercase tracking-wider text-[--brand-blue]";
-const hoursStyles = "text-xs md:text-sm text-slate-600";
-const hoursLabelStyles = "text-xs md:text-sm font-semibold text-slate-800";
+const linkStyles =
+  'text-xs md:text-sm text-slate-600 hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]';
+const h3Styles = 'text-sm md:text-md font-bold uppercase tracking-wider text-[--brand-blue]';
+const hoursStyles = 'text-xs md:text-sm text-slate-600';
+const hoursLabelStyles = 'text-xs md:text-sm font-semibold text-slate-800';
 
-const logoSrc = "https://wp.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp";
+const logoSrc = 'https://wp.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp';
 
-const FooterBadges = dynamic(() => import("@/components/global-nav/footer/FooterBadges"), {
+const FooterBadges = dynamic(() => import('@/components/global-nav/footer/FooterBadges'), {
   loading: () => (
     <div
       aria-hidden="true"
@@ -58,50 +67,54 @@ type FooterProps = {
   navigation?: NavItem[];
 };
 
+type FooterLink = { label: string; href: string };
+
 function findNavigationItem(navigation: NavItem[], label: string): NavItem | undefined {
   return navigation.find((item) => item.label === label);
 }
 
-export default function Footer({
-  settings,
-  services = [],
-  navigation = [],
-}: FooterProps) {
-  const brandName = settings?.brandName ?? "SonShine Roofing";
-  const brandSlogan = settings?.brandSlogan ?? "Since 1987, we’ve got you covered.";
+export default function Footer({ settings, services = [], navigation = [] }: FooterProps) {
+  const brandName = settings?.brandName ?? 'SonShine Roofing';
+  const brandSlogan = settings?.brandSlogan ?? 'Since 1987, we’ve got you covered.';
   const resolvedLogoSrc = settings?.logoInverted.url ?? logoSrc;
   const resolvedLogoAlt = settings?.logoInverted.description ?? `${brandName} logo`;
   const companyLinks = NAV_COMPANY.map((fallback) => {
     const directusItem = findNavigationItem(navigation, fallback.label);
     return { ...fallback, href: directusItem?.href ?? fallback.href };
   });
-  const roofingNavigation = findNavigationItem(navigation, "Roofing Services");
+  const roofingNavigation = findNavigationItem(navigation, 'Roofing Services');
   const referralLink = roofingNavigation?.children?.find(
-    (item) => item.label === "Referral Program",
+    (item) => item.label === 'Referral Program',
   );
-  const serviceLinks = services.length
+  const serviceLinks: FooterLink[] = services.length
     ? [
         ...services.map((service) => ({
           label: service.navLabel,
           href: service.href,
         })),
-        ...(referralLink?.href ? [referralLink] : []),
+        ...(referralLink?.href ? [{ label: referralLink.label, href: referralLink.href }] : []),
       ]
-    : NAV_SERVICES;
-  const directusResources = findNavigationItem(navigation, "Our Work")?.children;
-  const resourceLinks = directusResources?.length ? directusResources : NAV_RESOURCES;
+    : [...NAV_SERVICES];
+  const directusResources = findNavigationItem(navigation, 'Our Work')?.children;
+  const configuredResourceLinks: FooterLink[] =
+    directusResources?.flatMap((item) =>
+      item.href ? [{ label: item.label, href: item.href }] : [],
+    ) ?? [];
+  const resourceLinks: FooterLink[] = configuredResourceLinks.length
+    ? configuredResourceLinks
+    : [...NAV_RESOURCES];
   const openingHours = settings?.openingHours.length
     ? settings.openingHours
-    : ["Office: M-F 7:00 AM to 4:00 PM", "Phone: 24/7"];
+    : ['Office: M-F 7:00 AM to 4:00 PM', 'Phone: 24/7'];
   const configuredSocials: SocialLink[] = [
     ...(settings?.socials.facebook
-      ? [{ href: settings.socials.facebook, label: "Facebook", icon: Facebook }]
+      ? [{ href: settings.socials.facebook, label: 'Facebook', icon: Facebook }]
       : []),
     ...(settings?.socials.instagram
-      ? [{ href: settings.socials.instagram, label: "Instagram", icon: Instagram }]
+      ? [{ href: settings.socials.instagram, label: 'Instagram', icon: Instagram }]
       : []),
     ...(settings?.socials.youtube
-      ? [{ href: settings.socials.youtube, label: "YouTube", icon: Youtube }]
+      ? [{ href: settings.socials.youtube, label: 'YouTube', icon: Youtube }]
       : []),
   ];
   const configuredLabels = new Set(configuredSocials.map((social) => social.label));
@@ -129,10 +142,7 @@ export default function Footer({
           <h2 className="sr-only">Footer</h2>
 
           {/* Columns */}
-          <nav
-            aria-label="Footer"
-            className="grid grid-cols-2 gap-12 lg:grid-cols-5"
-          >
+          <nav aria-label="Footer" className="grid grid-cols-2 gap-12 lg:grid-cols-5">
             {/* Company */}
             <div>
               <SmartLink
@@ -153,8 +163,6 @@ export default function Footer({
                 />
               </SmartLink>
               <ul className="mt-3 space-y-3 text-sm">
-                <li>
-                </li>
                 <li>
                   <SmartLink
                     className="font-display tracking-wider text-sm md:text-md uppercase font-bold text-[--brand-blue] hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
@@ -199,9 +207,7 @@ export default function Footer({
 
             {/* Resources */}
             <div>
-              <h3 className={h3Styles}>
-                Our Work
-              </h3>
+              <h3 className={h3Styles}>Our Work</h3>
               <ul className="mt-4 space-y-3 text-sm">
                 {resourceLinks.map((r) => (
                   <li key={r.href}>
@@ -225,24 +231,21 @@ export default function Footer({
                   </li>
                 ))}
                 {/* Hardcoded Locations (no href yet) */}
-                  <li className={linkStyles}>Palmetto, FL</li>
-                  <li className={linkStyles}>Parrish, FL</li>
-                  <li className={linkStyles}>Myakka City, FL</li>
-                  <li className={linkStyles}>Port Charlotte, FL</li>
-                  <li className={linkStyles}>Punta Gorda, FL</li>
+                <li className={linkStyles}>Palmetto, FL</li>
+                <li className={linkStyles}>Parrish, FL</li>
+                <li className={linkStyles}>Myakka City, FL</li>
+                <li className={linkStyles}>Port Charlotte, FL</li>
+                <li className={linkStyles}>Punta Gorda, FL</li>
               </ul>
             </div>
 
-
             {/* Hours */}
             <div>
-              <h3 className={h3Styles}>
-                Hours of Operation
-              </h3>
+              <h3 className={h3Styles}>Hours of Operation</h3>
               <div className="mt-4 pr-8 space-y-4">
                 {openingHours.map((line) => {
-                  const [label, ...valueParts] = line.split(":");
-                  const value = valueParts.join(":").trim();
+                  const [label, ...valueParts] = line.split(':');
+                  const value = valueParts.join(':').trim();
                   return (
                     <div key={line} className="space-y-1">
                       <p className={hoursLabelStyles}>{label.trim()}:</p>
@@ -252,7 +255,6 @@ export default function Footer({
                 })}
               </div>
             </div>
-
           </nav>
 
           <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
@@ -269,25 +271,24 @@ export default function Footer({
             {/* Socials Badges Row */}
             {settings?.footerIncludeSocials !== false ? (
               <div className="flex items-center gap-2">
-              {socialLinks.map((s) => {
-                const Icon = s.icon;
-                return (
-                  <a
-                    key={s.href}
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={s.label}
-                    title={s.label}
-                    className="flex h-6 w-6 items-center justify-center text-[--brand-blue] transition-colors hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
-                  >
-                    <Icon className="h-5 w-5" aria-hidden="true" />
-                  </a>
-                );
-              })}
+                {socialLinks.map((s) => {
+                  const Icon = s.icon;
+                  return (
+                    <a
+                      key={s.href}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.label}
+                      title={s.label}
+                      className="flex h-6 w-6 items-center justify-center text-[--brand-blue] transition-colors hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                    >
+                      <Icon className="h-5 w-5" aria-hidden="true" />
+                    </a>
+                  );
+                })}
               </div>
             ) : null}
-
           </div>
 
           {/* Bottom bar */}
@@ -305,7 +306,9 @@ export default function Footer({
           </div>
           <div className="py-4">
             <div className="text-xs font-semibold text-right text-slate-500">
-              <SmartLink href="https://michaelborntreger.life">Website created by: Michael Borntreger</SmartLink>
+              <SmartLink href="https://michaelborntreger.life">
+                Website created by: Michael Borntreger
+              </SmartLink>
             </div>
           </div>
         </div>
