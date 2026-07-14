@@ -1,7 +1,7 @@
 import Section from "@/components/layout/Section";
 import SmartLink from "@/components/utils/SmartLink";
 import RevealPhone from "@/components/utils/RevealPhone";
-import { buildBasicMetadata } from "@/lib/seo/meta";
+import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_PREFIXED } from "@/lib/contact-hours";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
@@ -11,7 +11,7 @@ const SEO_TITLE = "Homeowner Referral Program Terms and Conditions | SonShine Ro
 const SEO_DESC = "Terms and conditions for the SonShine Roofing Homeowner Referral Program.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildBasicMetadata({
+  return getWebsitePageMetadata({
     title: SEO_TITLE,
     description: SEO_DESC,
     path: PAGE_PATH,

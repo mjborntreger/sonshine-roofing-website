@@ -5,7 +5,7 @@ import { listProjectsPaged, listProjectFilterTerms } from "@/lib/content/wp";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import ProjectArchiveClient from "@/components/dynamic-content/project/ProjectArchiveClient";
-import { buildBasicMetadata } from "@/lib/seo/meta";
+import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
@@ -21,7 +21,7 @@ const PAGE_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/Project-Ga
 const PAGE_SIZE = 6;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildBasicMetadata({
+  return getWebsitePageMetadata({
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,

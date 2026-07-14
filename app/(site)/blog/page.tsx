@@ -4,7 +4,7 @@ import BlogArchiveClient from "@/components/dynamic-content/blog/BlogArchiveClie
 import { listBlogCategories, listPostsPaged } from "@/lib/content/wp";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { buildBasicMetadata } from "@/lib/seo/meta";
+import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
@@ -19,7 +19,7 @@ const PAGE_IMAGE = "/og-default.png";
 const PAGE_SIZE = 6;
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildBasicMetadata({
+  return getWebsitePageMetadata({
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,

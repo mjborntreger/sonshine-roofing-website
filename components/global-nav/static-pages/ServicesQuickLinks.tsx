@@ -9,6 +9,7 @@ import {
   getServiceRouteDefinition,
   type ServiceRouteKey,
 } from "@/lib/routes";
+import type { ServiceSummary } from "@/lib/content/directus-site";
 
 const PALETTE: QuickLinksPalette = {
   activeBorderClass: "border-[--brand-orange]",
@@ -24,6 +25,7 @@ export type ServicesQuickLinksProps = {
   activePath?: string;
   locationSlug?: string | null;
   preferLocationScopedLinks?: boolean;
+  services?: ServiceSummary[];
 };
 
 type ServiceQuickLinkDefinition = {
@@ -64,16 +66,20 @@ export default function ServicesQuickLinks({
   activePath = "/",
   locationSlug,
   preferLocationScopedLinks = false,
+  services = [],
 }: ServicesQuickLinksProps) {
   // Flip preferLocationScopedLinks to true once /locations/[slug]/service routes are live.
   const links: QuickLinkItem[] = LINK_DEFINITIONS.map(({ serviceKey, description, aria, Icon }) => {
     const route = getServiceRouteDefinition(serviceKey);
+    const directusService = services.find(
+      (service) => service.href === route?.baseHref,
+    );
     return {
       href: buildServiceHref(serviceKey, {
         locationSlug,
         preferLocation: preferLocationScopedLinks,
       }),
-      label: route?.label ?? aria,
+      label: directusService?.navLabel ?? route?.label ?? aria,
       description,
       aria,
       Icon,

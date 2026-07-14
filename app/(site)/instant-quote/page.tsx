@@ -7,7 +7,7 @@ import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import QuickQuoteWebForm from "@/components/lead-capture/quickquote/QuickQuoteWebForm";
 import Hero from "@/components/ui/Hero";
 import { JsonLd } from "@/lib/seo/json-ld";
-import { buildBasicMetadata } from "@/lib/seo/meta";
+import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import { listFaqsWithContent, listRecentPostsPool } from "@/lib/content/wp";
@@ -20,7 +20,7 @@ const PAGE_DESCRIPTION =
   "Get a 60-sec roof replacement quote from SonShine Roofing using QuickQuote satellite measurements.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildBasicMetadata({
+  return getWebsitePageMetadata({
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,

@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 import LiteMap from "@/components/utils/LiteMap";
 import OpenOrClosed from "@/components/utils/OpenOrClosed";
 import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks";
-import { buildBasicMetadata } from "@/lib/seo/meta";
+import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
@@ -25,14 +25,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const config = SERVICE_CONFIG;
 
   if (!config) {
-    return buildBasicMetadata({
+    return getWebsitePageMetadata({
       title: "Contact SonShine Roofing",
       description: "Get in touch with SonShine Roofing.",
       path: SERVICE_PATH,
     });
   }
 
-  return buildBasicMetadata({
+  return getWebsitePageMetadata({
     title: config.title,
     description: config.description,
     path: SERVICE_PATH,

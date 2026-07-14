@@ -9,39 +9,82 @@ import { getFeaturedSpecialOffer } from "@/lib/content/directus-special-offers";
 import { formatSpecialOfferExpiration } from "@/lib/lead-capture/specialOfferDates";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import { OFFICE_OPENING_HOURS_SPEC, PHONE_OPENING_HOURS_SPEC } from "@/lib/contact-hours";
+import {
+  getSiteBundle,
+  getSiteSettings,
+  getWebsitePage,
+  type SiteSettings,
+} from "@/lib/content/directus-site";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_ORIGIN),
-  openGraph: {
-    type: "website",
-    siteName: "SonShine Roofing",
-    title: "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte",
-    description: "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!",
-    images: [{ url: "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png", width: 1200, height: 630, alt: "SonShine Roofing, Sarasota, FL" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    creator: "@ssroofinginc",
-  },
-  alternates: { canonical: "./" },
-  title: "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte",
-  description:
-    "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!",
-  manifest: "/site.webmanifest",
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180" },
-    ],
-    shortcut: "/favicon.ico",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  const homePage = await getWebsitePage("/");
+  const title =
+    homePage?.title ??
+    "SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte";
+  const description =
+    homePage?.description ??
+    settings?.brandDescription ??
+    "SonShine Roofing is Sarasota's trusted expert roofing contractor with 38+ years of experience in roof repair, replacement, and maintenance. Call us today!";
+  const ogImage = homePage?.image ?? settings?.defaultOgImage;
+  const favicon = settings?.favicon;
+
+  return {
+    metadataBase: new URL(settings?.siteUrl ?? SITE_ORIGIN),
+    openGraph: {
+      type: "website",
+      siteName: settings?.brandName ?? "SonShine Roofing",
+      title: homePage?.ogTitle ?? title,
+      description: homePage?.ogDescription ?? description,
+      images: [
+        ogImage
+          ? {
+              url: ogImage.url,
+              width: ogImage.width ?? undefined,
+              height: ogImage.height ?? undefined,
+              alt: ogImage.description,
+            }
+          : {
+              url: "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png",
+              width: 1200,
+              height: 630,
+              alt: "SonShine Roofing, Sarasota, FL",
+            },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      creator: "@ssroofinginc",
+    },
+    alternates: { canonical: "./" },
+    title,
+    description,
+    manifest: "/site.webmanifest",
+    icons: {
+      icon: [
+        ...(favicon
+          ? [
+              {
+                url: favicon.url,
+                sizes:
+                  favicon.width && favicon.height
+                    ? `${favicon.width}x${favicon.height}`
+                    : undefined,
+                type: favicon.type ?? undefined,
+              },
+            ]
+          : []),
+        { url: "/favicon.ico" },
+        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+        { url: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },
+        { url: "/android-chrome-512x512.png", sizes: "512x512", type: "image/png" },
+      ],
+      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+      shortcut: favicon?.url ?? "/favicon.ico",
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [{ media: "(prefers-color-scheme: light)", color: "#0045d7" }],
@@ -53,25 +96,39 @@ const LOGO_URL_512 = 'https://sonshineroofing.com/wp-content/uploads/cropped-GBP
 const AGG_RATING_VALUE = 4.8;
 const AGG_RATING_COUNT = 211;
 
-function getGlobalSchema() {
-  const providerId = `${BASE_URL}/#roofingcontractor`;
+function getGlobalSchema(settings: SiteSettings | null) {
+  const baseUrl = settings?.siteUrl ?? BASE_URL;
+  const providerId = `${baseUrl}/#roofingcontractor`;
+  const configuredSocials = [
+    settings?.socials.facebook,
+    settings?.socials.instagram,
+    settings?.socials.youtube,
+  ].filter((url): url is string => Boolean(url));
 
   const roofingContractor = {
-    '@type': 'RoofingContractor',
+    '@type': settings?.schemaType ?? 'RoofingContractor',
     '@id': providerId,
-    name: 'SonShine Roofing',
-    url: `${BASE_URL}/`,
-    logo: { '@type': 'ImageObject', url: LOGO_URL_512, width: 512, height: 512 },
+    name: settings?.brandName ?? 'SonShine Roofing',
+    legalName: settings?.brandLegalName,
+    description: settings?.brandDescription,
+    email: settings?.email,
+    url: `${baseUrl}/`,
+    logo: {
+      '@type': 'ImageObject',
+      url: settings?.logo.url ?? LOGO_URL_512,
+      width: settings?.logo.width ?? 512,
+      height: settings?.logo.height ?? 512,
+    },
     foundingDate: '1987',
-    priceRange: '$$',
+    priceRange: settings?.priceRange ?? '$$',
     currenciesAccepted: 'USD',
     paymentAccepted: ['Cash', 'Check', 'Credit Card', 'Debit Card', 'Financing', 'Insurance'],
-    telephone: PHONE_E164,
+    telephone: settings?.phoneHref.replace(/^tel:/, '') ?? PHONE_E164,
     contactPoint: [
       {
         '@type': 'ContactPoint',
         contactType: 'customer service',
-        telephone: PHONE_E164,
+        telephone: settings?.phoneHref.replace(/^tel:/, '') ?? PHONE_E164,
         availableLanguage: ['en'],
         areaServed: [
           { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
@@ -83,7 +140,7 @@ function getGlobalSchema() {
       {
         '@type': 'ContactPoint',
         contactType: 'sales',
-        telephone: PHONE_E164,
+        telephone: settings?.phoneHref.replace(/^tel:/, '') ?? PHONE_E164,
         availableLanguage: ['en'],
         areaServed: [
           { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
@@ -95,11 +152,11 @@ function getGlobalSchema() {
     ],
     address: {
       '@type': 'PostalAddress',
-      streetAddress: '2555 Porter Lake Dr STE 109',
-      addressLocality: 'Sarasota',
-      addressRegion: 'FL',
-      postalCode: '34240',
-      addressCountry: 'US',
+      streetAddress: settings?.address.street ?? '2555 Porter Lake Dr STE 109',
+      addressLocality: settings?.address.city ?? 'Sarasota',
+      addressRegion: settings?.address.region ?? 'FL',
+      postalCode: settings?.address.postalCode ?? '34240',
+      addressCountry: settings?.address.country ?? 'US',
     },
     geo: { '@type': 'GeoCoordinates', latitude: 27.310763334560175, longitude: -82.44696100279685 },
     openingHoursSpecification: [OFFICE_OPENING_HOURS_SPEC],
@@ -137,7 +194,8 @@ function getGlobalSchema() {
       { '@type': 'Offer', itemOffered: { '@id': `${BASE_URL}/roof-inspection` } },
       { '@type': 'Offer', itemOffered: { '@id': `${BASE_URL}/roof-maintenance#roof-care-club` } },
     ],
-    sameAs: [
+    sameAs: Array.from(new Set([
+      ...configuredSocials,
       'https://www.facebook.com/sonshineroofing',
       'https://x.com/SSRoofingInc',
       'https://www.youtube.com/@sonshineroofing',
@@ -163,15 +221,15 @@ function getGlobalSchema() {
       'https://www.trustpilot.com/review/sonshineroofing.com',
       'https://www.google.com/maps/place/?q=place_id:ChIJIyB9mBBHw4gRWOl1sU9ZGFM',
       'https://www.linkedin.com/company/sonshineroofing/'
-    ],
+    ])),
   } as const;
 
   const services = [
-    { id: 'roof-replacement', name: 'Roof Replacement', type: 'Residential Roof Replacement', url: `${BASE_URL}/roof-replacement-sarasota-fl/` },
-    { id: 'roof-repair', name: 'Roof Repair', type: 'Residential Roof Repair', url: `${BASE_URL}/roof-repair/` },
-    { id: 'roof-maintenance', name: 'Roof Maintenance', type: 'Ongoing Roof Maintenance', url: `${BASE_URL}/roof-maintenance/` },
-    { id: 'roof-inspection', name: 'Tip Top Roof Checkup', type: 'Detailed Roof Inspection', url: `${BASE_URL}/roof-inspection/` },
-    { id: 'roof-care-club', name: 'Roof Care Club', type: 'Membership Maintenance Plan', url: `${BASE_URL}/roof-maintenance/` },
+    { id: 'roof-replacement', name: 'Roof Replacement', type: 'Residential Roof Replacement', url: `${baseUrl}/roof-replacement-sarasota-fl/` },
+    { id: 'roof-repair', name: 'Roof Repair', type: 'Residential Roof Repair', url: `${baseUrl}/roof-repair/` },
+    { id: 'roof-maintenance', name: 'Roof Maintenance', type: 'Ongoing Roof Maintenance', url: `${baseUrl}/roof-maintenance/` },
+    { id: 'roof-inspection', name: 'Tip Top Roof Checkup', type: 'Detailed Roof Inspection', url: `${baseUrl}/roof-inspection/` },
+    { id: 'roof-care-club', name: 'Roof Care Club', type: 'Membership Maintenance Plan', url: `${baseUrl}/roof-maintenance/` },
   ].map((s) => ({
     '@type': 'Service',
     '@id': `${BASE_URL}/#${s.id}`,
@@ -216,7 +274,9 @@ async function getFeaturedOfferPopup(): Promise<SpecialOfferPopupOffer | null> {
 }
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const siteBundle = await getSiteBundle();
   const featuredOfferPopup = await getFeaturedOfferPopup();
+  const { settings, services, navigation } = siteBundle;
 
   return (
     <div
@@ -232,13 +292,22 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <LeadAttributionCapture />
       </Suspense>
       {featuredOfferPopup ? <SpecialOfferPopup offer={featuredOfferPopup} /> : null}
-      <Header />
+      <Header
+        navigation={navigation}
+        brandName={settings?.brandName}
+        phoneDisplay={settings?.phone}
+        phoneHref={settings?.phoneHref}
+        expandedLogoSrc={settings?.logo.url}
+        collapsedLogoSrc={settings?.logoInverted.url}
+        expandedLogoAlt={settings?.logo.description}
+        collapsedLogoAlt={settings?.logoInverted.description}
+      />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <Footer settings={settings} services={services} navigation={navigation} />
       <script
         type="application/ld+json"
         suppressHydrationWarning
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(getGlobalSchema()) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(getGlobalSchema(settings)) }}
       />
     </div>
   );

@@ -122,7 +122,7 @@ export const buildServiceHref = (
 export const getServiceRouteDefinition = (service: ServiceRouteKey) =>
   SERVICE_ROUTE_LOOKUP[service];
 
-export type NavItem = { label: string; href?: Route; children?: NavItem[] };
+export type NavItem = { label: string; href?: string; children?: NavItem[] };
 
 export const NAV_MAIN: ReadonlyArray<NavItem> = [
   { label: 'About', href: ROUTES.about },

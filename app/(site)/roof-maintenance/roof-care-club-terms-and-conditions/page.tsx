@@ -1,6 +1,6 @@
 import Section from "@/components/layout/Section";
 import SmartLink from "@/components/utils/SmartLink";
-import { buildBasicMetadata } from "@/lib/seo/meta";
+import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 
@@ -9,7 +9,7 @@ const SEO_TITLE = "Roof Care Club Terms and Conditions | SonShine Roofing";
 const SEO_DESC = "Terms and conditions for the SonShine Roofing Roof Care Club maintenance membership.";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return buildBasicMetadata({
+  return getWebsitePageMetadata({
     title: SEO_TITLE,
     description: SEO_DESC,
     path: PAGE_PATH,

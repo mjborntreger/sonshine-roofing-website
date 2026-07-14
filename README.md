@@ -98,8 +98,10 @@ Content Workflow
 
 Where content lives
 - WordPress (via WPGraphQL): blog posts, projects, glossary, faqs, persons, videos.
-- Directus: special offers in `special_offers`, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`.
-- Next.js app pages: service pages, about, contact, policy pages.
+- Directus: special offers in `special_offers` and WYSIWYG privacy/SMS terms content in `legal_copy`, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`.
+- Next.js app pages: service pages, about, contact, and legal page shells.
+
+Legal copy in `legal_copy.privacy_policy` and `legal_copy.terms_of_use` is sanitized server-side before rendering. Use semantic HTML without classes, IDs, inline styles, scripts, or event-handler attributes. Body headings begin at `h2`; Next.js owns each page's primary `h1`, metadata, canonical URL, and layout.
 
 Publishing in WP
 - Ensure posts/projects are Published, not Draft.

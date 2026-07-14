@@ -7,13 +7,34 @@ import { useSelectedLayoutSegments } from "next/navigation";
 import { NavMenu } from "./NavMenu";
 import { cn } from "@/lib/utils";
 import { Smartphone } from "lucide-react";
+import type { NavItem } from "@/lib/routes";
 
 const HEADER_COLLAPSE_THRESHOLD = 140; // tweak this to adjust when the header compresses
 const HEADER_EXPAND_THRESHOLD = 60; // below this scroll position the header expands again
 const UTILITY_BREAKPOINT_CLASS = "flex"; // tweak this Tailwind breakpoint for the utility strip visibility
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-export default function Header() {
+type HeaderProps = {
+  navigation?: NavItem[];
+  brandName?: string;
+  phoneDisplay?: string;
+  phoneHref?: string;
+  expandedLogoSrc?: string;
+  collapsedLogoSrc?: string;
+  expandedLogoAlt?: string;
+  collapsedLogoAlt?: string;
+};
+
+export default function Header({
+  navigation,
+  brandName = "SonShine Roofing",
+  phoneDisplay = "(941) 866-4320",
+  phoneHref = "tel:+19418664320",
+  expandedLogoSrc,
+  collapsedLogoSrc,
+  expandedLogoAlt,
+  collapsedLogoAlt,
+}: HeaderProps) {
   const ref = useRef<HTMLElement>(null);
   const segments = useSelectedLayoutSegments();
   const locationSlug =
@@ -109,11 +130,18 @@ export default function Header() {
   const headerBackground = `rgba(236, 254, 255, ${backgroundOpacity})`;
   const headerBorder = `rgba(191, 219, 254, ${backgroundOpacity})`;
   const backdropBlur = backgroundOpacity > 0 ? `blur(${6 + backgroundOpacity * 6}px)` : "blur(0px)";
-  const expandedLogo = "https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Blue.webp";
-  const collapsedLogo = "https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Orange.webp";
+  const expandedLogo =
+    expandedLogoSrc ??
+    "https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Blue.webp";
+  const collapsedLogo =
+    collapsedLogoSrc ??
+    "https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Orange.webp";
   const logoSrc = !collapsed && isLanding
     ? collapsedLogo
     : expandedLogo;
+  const logoAlt = !collapsed && isLanding
+    ? collapsedLogoAlt ?? `${brandName} logo`
+    : expandedLogoAlt ?? `${brandName} logo`;
 
   return (
     <header
@@ -158,8 +186,8 @@ export default function Header() {
         >
           <Image
             src={logoSrc}
-            alt="SonShine Roofing Logo"
-            aria-label="SonShine Roofing Logo"
+            alt={logoAlt}
+            aria-label={`${brandName} logo`}
             width={106}
             height={40}
             sizes="(max-width: 120px) 20vw, 768px"
@@ -169,13 +197,13 @@ export default function Header() {
             className="h-[40px]"
           />
         </SmartLink>
-        <SmartLink className="align-baseline phone-affordance text-right" href="tel:+19418664320">
+        <SmartLink className="align-baseline phone-affordance text-right" href={phoneHref}>
           <div className="bg-orange-500 hover:bg-orange-400 transition-colors text-white border shadow-sm md:hidden border-white text-sm font-medium rounded-lg px-3 py-1 phone">
             <Smartphone className="hidden phone-affordance-icon sm:inline h-3 w-3 mr-1" />
-            (941) 866-4320
+            {phoneDisplay}
           </div>
         </SmartLink>
-        <NavMenu transparent={isTransparent} />
+        <NavMenu transparent={isTransparent} navigation={navigation} />
       </div>
     </header>
   );

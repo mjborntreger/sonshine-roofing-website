@@ -1,7 +1,6 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import SmartLink from "@/components/utils/SmartLink";
-import { OFFICE_HOURS_COMPACT, PHONE_HOURS_LABEL } from "@/lib/contact-hours";
 import {
   ArrowUpRight,
   ArrowUp,
@@ -17,6 +16,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from "@/lib/routes";
+import type { NavItem } from "@/lib/routes";
+import type { ServiceSummary, SiteSettings } from "@/lib/content/directus-site";
 
 type SocialLink = {
   href: string;
@@ -51,7 +52,64 @@ const FooterBadges = dynamic(() => import("@/components/global-nav/footer/Footer
   ),
 });
 
-export default function Footer() {
+type FooterProps = {
+  settings?: SiteSettings | null;
+  services?: ServiceSummary[];
+  navigation?: NavItem[];
+};
+
+function findNavigationItem(navigation: NavItem[], label: string): NavItem | undefined {
+  return navigation.find((item) => item.label === label);
+}
+
+export default function Footer({
+  settings,
+  services = [],
+  navigation = [],
+}: FooterProps) {
+  const brandName = settings?.brandName ?? "SonShine Roofing";
+  const brandSlogan = settings?.brandSlogan ?? "Since 1987, we’ve got you covered.";
+  const resolvedLogoSrc = settings?.logoInverted.url ?? logoSrc;
+  const resolvedLogoAlt = settings?.logoInverted.description ?? `${brandName} logo`;
+  const companyLinks = NAV_COMPANY.map((fallback) => {
+    const directusItem = findNavigationItem(navigation, fallback.label);
+    return { ...fallback, href: directusItem?.href ?? fallback.href };
+  });
+  const roofingNavigation = findNavigationItem(navigation, "Roofing Services");
+  const referralLink = roofingNavigation?.children?.find(
+    (item) => item.label === "Referral Program",
+  );
+  const serviceLinks = services.length
+    ? [
+        ...services.map((service) => ({
+          label: service.navLabel,
+          href: service.href,
+        })),
+        ...(referralLink?.href ? [referralLink] : []),
+      ]
+    : NAV_SERVICES;
+  const directusResources = findNavigationItem(navigation, "Our Work")?.children;
+  const resourceLinks = directusResources?.length ? directusResources : NAV_RESOURCES;
+  const openingHours = settings?.openingHours.length
+    ? settings.openingHours
+    : ["Office: M-F 7:00 AM to 4:00 PM", "Phone: 24/7"];
+  const configuredSocials: SocialLink[] = [
+    ...(settings?.socials.facebook
+      ? [{ href: settings.socials.facebook, label: "Facebook", icon: Facebook }]
+      : []),
+    ...(settings?.socials.instagram
+      ? [{ href: settings.socials.instagram, label: "Instagram", icon: Instagram }]
+      : []),
+    ...(settings?.socials.youtube
+      ? [{ href: settings.socials.youtube, label: "YouTube", icon: Youtube }]
+      : []),
+  ];
+  const configuredLabels = new Set(configuredSocials.map((social) => social.label));
+  const socialLinks = [
+    ...configuredSocials,
+    ...SOCIALS.filter((social) => !configuredLabels.has(social.label)),
+  ];
+
   return (
     <>
       <SmartLink
@@ -79,13 +137,13 @@ export default function Footer() {
             <div>
               <SmartLink
                 href={ROUTES.home}
-                aria-label="SonShine Roofing Logo"
-                title="SonShine Roofing Logo"
+                aria-label={`${brandName} logo`}
+                title={`${brandName} logo`}
               >
                 <Image
-                  src={logoSrc}
-                  alt="SonShine Roofing Logo"
-                  aria-label="SonShine Roofing Logo"
+                  src={resolvedLogoSrc}
+                  alt={resolvedLogoAlt}
+                  aria-label={`${brandName} logo`}
                   width={180}
                   height={75}
                   sizes="(max-width: 120px) 20vw, 768px"
@@ -113,7 +171,7 @@ export default function Footer() {
                     />
                   </SmartLink>
                 </li>
-                {NAV_COMPANY.map((r) => (
+                {companyLinks.map((r) => (
                   <li key={r.href}>
                     <SmartLink href={r.href} className={linkStyles}>
                       {r.label}
@@ -124,21 +182,20 @@ export default function Footer() {
             </div>
 
             {/* Roofing Services */}
-            <div>
-              <h3 className={h3Styles}>
-                Roofing Services
-              </h3>
-              <ul className="mt-4 space-y-3 text-sm">
-                {/* NAV_SERVICES pulls from buildServiceHref; supply location slug once scoped pages exist. */}
-                {NAV_SERVICES.map((r) => (
-                  <li key={r.href}>
-                    <SmartLink href={r.href} className={linkStyles}>
-                      {r.label}
-                    </SmartLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {settings?.footerIncludeServices !== false ? (
+              <div>
+                <h3 className={h3Styles}>Roofing Services</h3>
+                <ul className="mt-4 space-y-3 text-sm">
+                  {serviceLinks.map((r) => (
+                    <li key={r.href}>
+                      <SmartLink href={r.href} className={linkStyles}>
+                        {r.label}
+                      </SmartLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
 
             {/* Resources */}
             <div>
@@ -146,7 +203,7 @@ export default function Footer() {
                 Our Work
               </h3>
               <ul className="mt-4 space-y-3 text-sm">
-                {NAV_RESOURCES.map((r) => (
+                {resourceLinks.map((r) => (
                   <li key={r.href}>
                     <SmartLink href={r.href} className={linkStyles}>
                       {r.label}
@@ -183,15 +240,16 @@ export default function Footer() {
                 Hours of Operation
               </h3>
               <div className="mt-4 pr-8 space-y-4">
-                <div className="space-y-1">
-                  <p className={hoursLabelStyles}>Office:</p>
-                  <p className={hoursStyles}>{OFFICE_HOURS_COMPACT.weekday}</p>
-                  <p className={hoursStyles}>{OFFICE_HOURS_COMPACT.weekend}</p>
-                </div>
-                <div className="space-y-1">
-                  <p className={hoursLabelStyles}>Phone:</p>
-                  <p className={hoursStyles}>{PHONE_HOURS_LABEL}</p>
-                </div>
+                {openingHours.map((line) => {
+                  const [label, ...valueParts] = line.split(":");
+                  const value = valueParts.join(":").trim();
+                  return (
+                    <div key={line} className="space-y-1">
+                      <p className={hoursLabelStyles}>{label.trim()}:</p>
+                      <p className={hoursStyles}>{value || line}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -209,8 +267,9 @@ export default function Footer() {
             </SmartLink>
 
             {/* Socials Badges Row */}
-            <div className="flex items-center gap-2">
-              {SOCIALS.map((s) => {
+            {settings?.footerIncludeSocials !== false ? (
+              <div className="flex items-center gap-2">
+              {socialLinks.map((s) => {
                 const Icon = s.icon;
                 return (
                   <a
@@ -226,18 +285,21 @@ export default function Footer() {
                   </a>
                 );
               })}
-            </div>
+              </div>
+            ) : null}
 
           </div>
 
           {/* Bottom bar */}
           <div className="flex flex-wrap items-center justify-between gap-4 pt-6 mt-3 border-t border-slate-300">
             <div className="text-xs text-slate-500">
-              © {new Date().getFullYear()} SonShine Roofing — Since 1987 we’ve got you covered. | All Rights Reserved
+              © {new Date().getFullYear()} {brandName} — {brandSlogan} | All Rights Reserved
             </div>
 
             <nav className="flex items-center justify-end gap-4 text-xs font-semibold text-slate-500">
-              <SmartLink href={ROUTES.privacyPolicy}>Privacy Policy</SmartLink>
+              {settings?.footerIncludeLegal !== false ? (
+                <SmartLink href={ROUTES.privacyPolicy}>Privacy Policy</SmartLink>
+              ) : null}
               <SmartLink href={ROUTES.sitemapIndex}>XML Sitemap</SmartLink>
             </nav>
           </div>

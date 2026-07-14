@@ -31,7 +31,6 @@ import { NAV_MAIN, ROUTES } from "@/lib/routes";
 import { InstantQuoteCTA } from "./InstantQuoteCTA";
 
 type Item = NavItem;
-const NAV: Item[] = NAV_MAIN as Item[]; // service links resolve through buildServiceHref for future location variants
 
 const NAV_ICONS: Record<string, LucideIcon> = {
   About: UserSearch,
@@ -125,7 +124,13 @@ const MOBILE_TOP_STAGGER_BASE_MS = 70;
 const MOBILE_CTA1_DELAY_MS = 70;  // "60-sec Quote"
 
 /* ===== Desktop (fixed) ===== */
-function DesktopMenu({ transparent }: { transparent: boolean }) {
+function DesktopMenu({
+  transparent,
+  navigation,
+}: {
+  transparent: boolean;
+  navigation: Item[];
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [enteredPanel, setEnteredPanel] = useState(false);
@@ -148,7 +153,7 @@ function DesktopMenu({ transparent }: { transparent: boolean }) {
   return (
     <>
       <ul className="hidden lg:flex items-center gap-4">
-        {NAV.map((item, i) => (
+        {navigation.map((item, i) => (
           <li
             key={item.label}
             className="relative"
@@ -369,7 +374,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
 }
 
 /* ===== Mobile ===== */
-function MobileMenu() {
+function MobileMenu({ navigation }: { navigation: Item[] }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [entered, setEntered] = useState<Record<string, boolean>>({});
@@ -557,7 +562,7 @@ function MobileMenu() {
             </SmartLink>
           </li>
           <hr className="my-1 border-blue-100" />
-          {NAV.map((item, i) => {
+          {navigation.map((item, i) => {
             const k = `lv1-${i}`;
             const hasChildren = !!item.children?.length;
             return (
@@ -666,7 +671,7 @@ function MobileMenu() {
               enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
             )}
             // ANIM: Mobile CTA1 stagger — base + NAV length step
-            style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + NAV.length * ITEM_STAGGER_STEP_MS)}ms` }}
+            style={{ transitionDelay: `${Math.min(380, MOBILE_CTA1_DELAY_MS + navigation.length * ITEM_STAGGER_STEP_MS)}ms` }}
           >
             <InstantQuoteCTA
               size="sm"
@@ -703,13 +708,17 @@ function MobileMenu() {
 
 type NavMenuProps = {
   transparent: boolean;
+  navigation?: NavItem[];
 };
 
-export function NavMenu({ transparent }: NavMenuProps) {
+export function NavMenu({ transparent, navigation }: NavMenuProps) {
+  const resolvedNavigation =
+    navigation?.length ? (navigation as Item[]) : (NAV_MAIN as Item[]);
+
   return (
     <nav className="ml-auto flex items-center gap-3">
-      <DesktopMenu transparent={transparent} />
-      <MobileMenu />
+      <DesktopMenu transparent={transparent} navigation={resolvedNavigation} />
+      <MobileMenu navigation={resolvedNavigation} />
     </nav>
   );
 }

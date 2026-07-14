@@ -5,7 +5,7 @@ import SmartLink from "@/components/utils/SmartLink";
 import Hero from "@/components/ui/Hero";
 import ReferralForm from "@/components/lead-capture/referral/ReferralForm";
 import { listFaqsWithContent } from "@/lib/content/wp";
-import { buildBasicMetadata } from "@/lib/seo/meta";
+import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { getServicePageConfig } from "@/lib/seo/service-pages";
@@ -76,7 +76,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const config = SERVICE_CONFIG;
 
   if (!config) {
-    return buildBasicMetadata({
+    return getWebsitePageMetadata({
       title: "Homeowner Referral Program | SonShine Roofing",
       description:
         "Learn who can refer SonShine Roofing, what projects qualify, and how to earn $250 per qualified full roof replacement referral.",
@@ -84,7 +84,7 @@ export async function generateMetadata(): Promise<Metadata> {
     });
   }
 
-  return buildBasicMetadata({
+  return getWebsitePageMetadata({
     title: config.title,
     description: config.description,
     path: SERVICE_PATH,
