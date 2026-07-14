@@ -45,10 +45,13 @@ const SOCIALS: SocialLink[] = [
 ];
 
 const linkStyles =
-  'text-xs md:text-sm text-slate-600 hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]';
-const h3Styles = 'text-sm md:text-md font-bold uppercase tracking-wider text-[--brand-blue]';
-const hoursStyles = 'text-xs md:text-sm text-slate-600';
-const hoursLabelStyles = 'text-xs md:text-sm font-semibold text-slate-800';
+  'text-xs md:text-sm text-[#cad8e6] transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
+const h3Styles =
+  'text-sm md:text-md font-bold uppercase tracking-wider text-white after:mt-2 after:block after:h-0.5 after:w-8 after:rounded-full after:bg-[#fb9216]';
+const hoursStyles = 'text-xs md:text-sm text-[#cad8e6]';
+const hoursLabelStyles = 'text-xs md:text-sm font-semibold text-white';
+const legalLinkStyles =
+  'transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
 
 const logoSrc = 'https://wp.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp';
 
@@ -127,7 +130,7 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
     <>
       <SmartLink
         href="#page-top"
-        className="text-center hover:text-slate-600"
+        className="mx-auto flex w-fit rounded-lg items-center border border-[#24445f] bg-[#071b2b] px-5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:border-[#fb9216] hover:bg-[#0d2942] hover:text-[#ffb45f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2"
         data-icon-affordance="up"
         aria-label="Return to top of page"
       >
@@ -135,9 +138,11 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
         <ArrowUp className="inline w-4 h-4 ml-2 icon-affordance" />
       </SmartLink>
 
-      <FooterBadges />
+      <div className="my-16 sm:my-24 md:my-32">
+        <FooterBadges />
+      </div>
 
-      <footer className="bg-[#cef3ff] pt-20">
+      <footer className="border-t-4 border-[#fb9216] bg-[#071b2b] pt-20 text-slate-100">
         <div className="max-w-6xl px-10 mx-auto">
           <h2 className="sr-only">Footer</h2>
 
@@ -159,13 +164,13 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
                   sizes="(max-width: 120px) 20vw, 768px"
                   loading="lazy"
                   fetchPriority="low"
-                  className="mb-4"
+                  className="my-48"
                 />
               </SmartLink>
-              <ul className="mt-3 space-y-3 text-sm">
-                <li>
+              <ul className="mt-8 space-y-3 text-sm">
+                <li className="mb-8">
                   <SmartLink
-                    className="font-display tracking-wider text-sm md:text-md uppercase font-bold text-[--brand-blue] hover:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                    className="font-display text-sm font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-md"
                     href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
                     aria-label="Florida Roofing Contractor's License Number CCC1331483"
                     target="_blank"
@@ -174,7 +179,7 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
                   >
                     License: #CCC1331483
                     <ArrowUpRight
-                      className="icon-affordance inline ml-1 h-3 w-3 md:h-4 md:w-4 align-[-0.125em] text-[--brand-blue]"
+                      className="icon-affordance ml-1 inline h-3 w-3 align-[-0.125em] text-[#ffb45f] md:h-4 md:w-4"
                       aria-hidden="true"
                     />
                   </SmartLink>
@@ -260,17 +265,17 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
           <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
             <SmartLink
               href="/reviews"
-              className="px-3 py-2 text-sm text-white md:text-md btn btn-brand-orange"
+              className="btn bg-[#fb9216] px-3 py-2 text-sm font-bold !text-[#071b2b] shadow-lg shadow-black/25 transition-colors hover:bg-[#ffb45f] focus-visible:!ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-md"
               data-icon-affordance="up-right"
             >
-              <Star className="w-3 h-3 mr-2 text-white md:h-4 md:w-4" />
+              <Star className="mr-2 h-3 w-3 text-[#071b2b] md:h-4 md:w-4" />
               Leave a Review
-              <ArrowUpRight className="inline w-3 h-3 ml-1 text-white md:h-4 md:w-4 icon-affordance" />
+              <ArrowUpRight className="icon-affordance ml-1 inline h-3 w-3 text-[#071b2b] md:h-4 md:w-4" />
             </SmartLink>
 
             {/* Socials Badges Row */}
             {settings?.footerIncludeSocials !== false ? (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {socialLinks.map((s) => {
                   const Icon = s.icon;
                   return (
@@ -281,7 +286,7 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
                       rel="noopener noreferrer"
                       aria-label={s.label}
                       title={s.label}
-                      className="flex h-6 w-6 items-center justify-center text-[--brand-blue] transition-colors hover:text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#00e3fe]"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#24445f] bg-[#0d2942] text-[#ffb45f] transition-colors hover:border-[#fb9216] hover:bg-[#fb9216] hover:text-[#071b2b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
                     >
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </a>
@@ -292,22 +297,27 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
           </div>
 
           {/* Bottom bar */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-6 mt-3 border-t border-slate-300">
-            <div className="text-xs text-slate-500">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border-t border-[#24445f] pt-6">
+            <div className="text-xs text-[#9db2c6]">
               © {new Date().getFullYear()} {brandName} — {brandSlogan} | All Rights Reserved
             </div>
 
-            <nav className="flex items-center justify-end gap-4 text-xs font-semibold text-slate-500">
+            <nav className="flex items-center justify-end gap-4 text-xs font-semibold text-[#b9cad9]">
               {settings?.footerIncludeLegal !== false ? (
-                <SmartLink href={ROUTES.privacyPolicy}>Privacy Policy</SmartLink>
+                <SmartLink href={ROUTES.privacyPolicy} className={legalLinkStyles}>
+                  Privacy Policy
+                </SmartLink>
               ) : null}
-              <SmartLink href={ROUTES.sitemapIndex}>XML Sitemap</SmartLink>
+              <SmartLink href={ROUTES.sitemapIndex} className={legalLinkStyles}>
+                XML Sitemap
+              </SmartLink>
             </nav>
           </div>
           <div className="py-4">
-            <div className="text-xs font-semibold text-right text-slate-500">
-              <SmartLink href="https://michaelborntreger.life">
-                Website created by: Michael Borntreger
+            <div className="text-right text-xs font-semibold text-[#9db2c6]">
+              <SmartLink href="https://borntregerdigital.com" className={legalLinkStyles}>
+                Website created by Borntreger Digital LLC
+                <ArrowUpRight className="inline h-4 w-4 ml-1" />
               </SmartLink>
             </div>
           </div>

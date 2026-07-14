@@ -55,7 +55,7 @@ const badges = [
 
 export default function FooterBadges() {
   return (
-    <div className="mx-auto max-w-6xl px-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 place-items-center justify-center gap-3 my-20">
+    <div className="mx-auto max-w-6xl px-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 place-items-center justify-center gap-3">
       {badges.map((badge) => (
         <SmartLink
           key={badge.href}
