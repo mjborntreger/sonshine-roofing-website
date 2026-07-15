@@ -84,12 +84,6 @@ const TERM_PLANS: TermPlan[] = [
 
 const TERMS_URL = '/roof-maintenance/roof-care-club-terms-and-conditions';
 
-
-const INCLUSION_RULES = [
-  'Roof replacement customers receive 2 years of Roof Care Club membership at no cost.',
-  'Roof repair customers receive 1 year of Roof Care Club membership at no cost.',
-] as const;
-
 // -----------------------------
 // Helpers
 // -----------------------------
@@ -288,7 +282,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
               </div>
 
               {/* Discounts */}
-              <div className="mt-6 border-t border-slate-200 px-6 pt-5">
+              <div className="my-6 border-t border-slate-200 px-6 pt-5">
                 <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
                   Term-based discounts
                 </h4>
@@ -312,18 +306,6 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Inclusion rules */}
-              <div className="mt-6 border-t border-slate-200 px-6 pt-5 pb-6">
-                <h4 className="text-lg font-semibold uppercase tracking-wide text-slate-700">
-                  FREE TRIAL membership for existing customers
-                </h4>
-                <ul className="mt-3 list-disc pl-5 text-lg text-slate-600">
-                  {INCLUSION_RULES.map((rule) => (
-                    <li key={rule}>{rule}</li>
-                  ))}
-                </ul>
               </div>
             </div>
           );
