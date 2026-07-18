@@ -1,5 +1,6 @@
 // app/[slug]/page.tsx
-import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
+import { listRecentPostsPool } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import Image from "next/image";
 import Section from "@/components/layout/Section";
@@ -193,7 +194,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (slug.startsWith("_")) notFound();
   const postPromise = getPostBySlug(slug);
   const poolPromise = listRecentPostsPool(36);
-  const generalFaqsPromise = listFaqsWithContent(8, "general").catch(() => []);
+  const generalFaqsPromise = listFaqs({ limit: 8 }).catch(() => []);
   const navPromise = listRecentPostNav(200).catch(
     () => [] as Awaited<ReturnType<typeof listRecentPostNav>>,
   );
@@ -369,7 +370,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
         <FaqInlineList
           heading="General FAQs"
-          topicSlug="general"
           limit={8}
           initialItems={generalFaqs}
           seeMoreHref="/faq"

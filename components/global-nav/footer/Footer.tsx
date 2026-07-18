@@ -164,7 +164,6 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
                   sizes="(max-width: 120px) 20vw, 768px"
                   loading="lazy"
                   fetchPriority="low"
-                  className="my-48"
                 />
               </SmartLink>
               <ul className="mt-8 space-y-3 text-sm">

@@ -1,6 +1,7 @@
 import Section from "@/components/layout/Section";
 import Image from "next/image";
-import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
+import { listRecentPostsPool } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import RoofCareClub from "@/components/marketing/service-pages/RoofCareClub";
@@ -39,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const [pool, faqs] = await Promise.all([
     listRecentPostsPool(36),
-    listFaqsWithContent(8, "roof-maintenance").catch(() => []),
+    listFaqs({ pagePath: "/roof-maintenance", limit: 8 }).catch(() => []),
   ]);
 
   const origin = SITE_ORIGIN;
@@ -146,7 +147,7 @@ export default async function Page() {
         {/* FAQs (dynamic) */}
         <FaqInlineList
           heading="Roof Maintenance FAQs"
-          topicSlug="roof-maintenance"
+          pagePath="/roof-maintenance"
           limit={8}
           initialItems={faqs}
           seeMoreHref="/faq"

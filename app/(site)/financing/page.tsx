@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 import { Suspense } from "react";
 import Image from "next/image";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
-import { listFaqsWithContent } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, serviceSchema, webPageSchema } from "@/lib/seo/schema";
@@ -49,8 +49,7 @@ const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
 const ctaSecondary = 'btn w-full btn-brand-blue btn-lg phone-affordance';
 
 export default async function FinancingPage() {
-  // Dynamic FAQs for topic "financing-payment" (max 8)
-  const faqs = await listFaqsWithContent(8, "financing-payment").catch(() => []);
+  const faqs = await listFaqs({ pagePath: "/financing", limit: 8 }).catch(() => []);
   const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
 
@@ -388,7 +387,7 @@ export default async function FinancingPage() {
 
           <FaqInlineList
             heading="Financing FAQs"
-            topicSlug="financing-payment"
+            pagePath="/financing"
             limit={8}
             initialItems={faqs}
             seeMoreHref="/faq"

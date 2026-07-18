@@ -10,7 +10,8 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
-import { listFaqsWithContent, listRecentPostsPool } from "@/lib/content/wp";
+import { listRecentPostsPool } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 
 export const revalidate = 900;
 
@@ -40,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function InstantQuotePage() {
   const [pool, faqs] = await Promise.all([
     listRecentPostsPool(36).catch(() => []),
-    listFaqsWithContent(8).catch(() => []),
+    listFaqs({ pagePath: PAGE_PATH, limit: 8 }).catch(() => []),
   ]);
 
   const origin = SITE_ORIGIN;
@@ -96,6 +97,7 @@ export default async function InstantQuotePage() {
 
         <FaqInlineList
           heading="Roofing FAQs"
+          pagePath={PAGE_PATH}
           limit={8}
           initialItems={faqs}
           seeMoreHref="/faq"

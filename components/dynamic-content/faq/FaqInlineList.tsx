@@ -1,21 +1,20 @@
-import { listFaqsWithContent } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { faqSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import FaqInlineListClient, { type FaqInlineListClientItem } from "@/components/dynamic-content/faq/FaqInlineListClient";
 
 type FaqInlineItem = {
-  slug: string;
+  id: string;
   title: string;
   contentHtml: string;
-  date?: string | null;
 };
 
 type Props = {
   heading?: string;
   seeMoreHref?: string;
-  /** Optional FAQ topic slug to load from WordPress (e.g., "roof-repair"). */
-  topicSlug?: string;
+  /** Current page path. Directus returns global FAQs plus FAQs linked to this page. */
+  pagePath?: string;
   /** Maximum number of FAQs to display. Defaults to 8. */
   limit?: number;
   /** Preloaded FAQs (e.g., reused server data fetched for JSON-LD). */
@@ -24,16 +23,10 @@ type Props = {
   origin?: string;
 };
 
-const parseDate = (value?: string | null): number => {
-  if (!value) return 0;
-  const time = Date.parse(value);
-  return Number.isNaN(time) ? 0 : time;
-};
-
 export default async function FaqInlineList({
   heading = "FAQs",
   seeMoreHref = "/faq",
-  topicSlug,
+  pagePath,
   limit = 8,
   initialItems,
   origin: originOverride,
@@ -41,19 +34,16 @@ export default async function FaqInlineList({
   let records = initialItems;
 
   if (!records || records.length === 0) {
-    records = await listFaqsWithContent(limit, topicSlug).catch(() => []);
+    records = await listFaqs({ pagePath, limit }).catch(() => []);
   }
 
   if (!records || records.length === 0) return null;
 
-  const items: FaqInlineListClientItem[] = [...records]
-    .sort((a, b) => parseDate(b.date) - parseDate(a.date))
-    .slice(0, limit)
-    .map((faq) => ({
-      slug: faq.slug,
-      title: faq.title,
-      contentHtml: faq.contentHtml,
-    }));
+  const items: FaqInlineListClientItem[] = records.slice(0, limit).map((faq) => ({
+    id: faq.id,
+    title: faq.title,
+    contentHtml: faq.contentHtml,
+  }));
 
   const origin = originOverride ?? SITE_ORIGIN;
   const normalizedSeeMoreHref =
@@ -63,7 +53,7 @@ export default async function FaqInlineList({
     items.map((faq) => ({
       question: faq.title,
       answerHtml: faq.contentHtml,
-      url: `${normalizedSeeMoreHref}/${faq.slug}`,
+      url: `${normalizedSeeMoreHref}#faq-${faq.id}`,
     })),
     {
       origin,

@@ -1,6 +1,5 @@
 import Section from '@/components/layout/Section';
-import { listFaqTopics, listFaqsWithContent, faqListToJsonLd } from '@/lib/content/wp';
-import type { FaqFull, FaqTopic } from '@/lib/content/wp';
+import { groupFaqsForArchive, listAllFaqs } from '@/lib/content/directus-faqs';
 import type { Metadata } from 'next';
 import ResourceSearchController from '@/components/dynamic-content/ResourceSearchController';
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
@@ -8,7 +7,7 @@ import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
 import { Accordion } from '@/components/ui/Accordion';
 import FaqBulkToggleClient from '@/components/dynamic-content/faq/FaqBulkToggleClient';
 import { JsonLd } from '@/lib/seo/json-ld';
-import { breadcrumbSchema } from '@/lib/seo/schema';
+import { breadcrumbSchema, faqSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 
@@ -29,19 +28,21 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-type PageProps = { searchParams?: Promise<{ q?: string; topic?: string }> };
-
-export default async function FAQArchivePage(_: PageProps) {
+export default async function FAQArchivePage() {
   const q = '';
-
-  const [topics, faqs] = await Promise.all([
-    listFaqTopics(200).catch(() => [] as FaqTopic[]),
-    listFaqsWithContent(500).catch(() => [] as FaqFull[]),
-  ]);
+  const faqs = await listAllFaqs(500);
+  const groups = groupFaqsForArchive(faqs);
 
   // JSON-LD: build FAQPage + Breadcrumbs (first 50 items)
   const origin = SITE_ORIGIN;
-  const faqLd = faqListToJsonLd(faqs.slice(0, 50), origin, PAGE_PATH);
+  const faqLd = faqSchema(
+    faqs.slice(0, 50).map((faq) => ({
+      question: faq.title,
+      answerHtml: faq.contentHtml,
+      url: `${PAGE_PATH}#faq-${faq.id}`,
+    })),
+    { origin, url: PAGE_PATH },
+  );
   const breadcrumbsLd = breadcrumbSchema(
     [
       { name: 'Home', item: '/' },
@@ -49,40 +50,6 @@ export default async function FAQArchivePage(_: PageProps) {
     ],
     { origin },
   );
-
-  // Sort topics: featured topics first (if available), then alphabetically
-  const topicsSorted = [...topics].sort((a, b) => {
-    const af = a.featured ? 1 : 0;
-    const bf = b.featured ? 1 : 0;
-    if (af !== bf) return bf - af; // featured first
-    return a.name.localeCompare(b.name);
-  });
-
-  // Group all items by topic for display
-  const groups = new Map<string, FaqFull[]>();
-  for (const f of faqs) {
-    const slugs = f.topicSlugs ?? [];
-    if (slugs.length > 0) {
-      for (const t of slugs) {
-        if (!groups.has(t)) groups.set(t, []);
-        groups.get(t)!.push(f);
-      }
-    } else {
-      if (!groups.has('uncategorized')) groups.set('uncategorized', []);
-      groups.get('uncategorized')!.push(f);
-    }
-  }
-
-  // Resolve group ordering by topics list (so featured first)
-  const topicOrder = new Map<string, number>(topicsSorted.map((t, i) => [t.slug, i] as const));
-  const orderedGroupKeys = Array.from(groups.keys()).sort((a, b) => {
-    const ia = topicOrder.has(a) ? topicOrder.get(a)! : 9_999;
-    const ib = topicOrder.has(b) ? topicOrder.get(b)! : 9_999;
-    if (ia !== ib) return ia - ib;
-    const na = topicsSorted.find((t) => t.slug === a)?.name || a;
-    const nb = topicsSorted.find((t) => t.slug === b)?.name || b;
-    return na.localeCompare(nb);
-  });
 
   return (
     <Section>
@@ -158,13 +125,11 @@ export default async function FAQArchivePage(_: PageProps) {
 
             {/* Groups as accordions */}
             <div className="mt-8 space-y-6" id="faq-topics">
-              {orderedGroupKeys.map((slug) => {
-                const term = topicsSorted.find((t) => t.slug === slug);
-                const title = term?.name || slug;
-                const list = groups.get(slug) || [];
+              {groups.map((group) => {
+                const { key, title, items: list } = group;
                 if (list.length === 0) return null;
                 return (
-                  <section key={slug} id={`topic-${slug}`}>
+                  <section key={key} id={`topic-${key}`}>
                     <Accordion
                       className="faq-topic"
                       icon={<HelpCircle className="h-5 w-5" aria-hidden="true" />}
@@ -188,8 +153,8 @@ export default async function FAQArchivePage(_: PageProps) {
                     >
                       {list.map((f) => (
                         <Accordion
-                          key={f.slug}
-                          id={`faq-${f.slug}`}
+                          key={f.id}
+                          id={`faq-${f.id}`}
                           className="faq-item mb-4"
                           data-title={(f.title || '').toString()}
                           data-topic={title}

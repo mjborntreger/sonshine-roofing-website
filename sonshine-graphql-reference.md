@@ -35,7 +35,6 @@ const data = await wpFetch<MyQuery>(query, vars, { revalidateSeconds: 3600, cach
 | Blog posts | `post` / `posts` | `listPostSlugs` (600 s) | `getPostBySlug` | `app/[slug]/page.tsx` |
 | Projects | `project` / `projects` | `listProjectSlugs` (600 s) | `getProjectBySlug` (URI-based) | `app/project/[slug]/page.tsx` |
 | Locations | `location` / `locations` | `listLocationSlugs` (600 s) | `getLocationBySlug` | `app/locations/[slug]/page.tsx` |
-| FAQs | `faq` / `faqs` | `listFaqSlugs` (86 400 s) | `getFaq` | `app/faq/[slug]/page.tsx` |
 | Glossary terms | `glossaryTerm` / `glossaryTerms` | `listGlossaryIndex` (batched, 600 s) | `getGlossaryTerm` | `app/roofing-glossary/[slug]/page.tsx` |
 | Team members | `person` / `persons` | `listPersonNav` (86 400 s) | `listPersonsBySlug` (caller sets revalidate) | `app/person/[slug]/page.tsx` |
 | Video entries | `videoEntry` / `videoEntries` | n/a (pool only) | `getVideoEntryBySlug` (900 s) | Consumed by `components/dynamic-content/video/*` |
@@ -60,7 +59,7 @@ Static params are always transformed into `{ slug }` objects before being return
   - `listPostsPaged` → offset pagination plus `facetCounts` for categories (search, include/exclude cat slugs supported).
   - `listRecentPostsPool` / `listRecentPostsPoolForFilters` → prefetch pools for client-side filtering.
   - `listRecentPostNav` → lightweight nav list cached for 30 min.
-- **Next usage** – `app/[slug]/page.tsx` relies on `listPostSlugs` for static generation and `getPostBySlug` for runtime data. The same module builds FAQ/related content blocks with `listRecentPostsPool` and `listFaqsWithContent`.
+- **Next usage** – `app/[slug]/page.tsx` relies on `listPostSlugs` for static generation and `getPostBySlug` for runtime data. Related posts still use `listRecentPostsPool`; FAQs are loaded separately from Directus.
 
 ```graphql
 query PostSmokeTest($slug: ID!, $first: Int = 10) {
@@ -374,80 +373,13 @@ fragment ProjectFields on Project {
 
 ---
 
-## FAQs (`faq`)
+## FAQs (migrated to Directus)
 
-- **Slug loader** – `listFaqSlugs(limit = 500)` caches for 24 h to support static generation:
-  ```graphql
-  query ListFaqSlugs($limit: Int!) {
-    faqs(first: $limit, where: { status: PUBLISH, orderby: { field: TITLE, order: ASC } }) {
-      nodes { slug }
-    }
-  }
-  ```
-- **Single fetch** – `getFaq(slug)` returns rendered HTML, topic slugs, ISO publish/modified timestamps, and SEO payloads.
-- **Indexes**:
-  - `listFaqIndex` → alphabetical slug/title/excerpt index (paged loop using `pageInfo.endCursor`).
-  - `listFaqsWithContent` → full-content list for JSON-LD or archives (optionally filtered to a topic).
-  - `listFaqs` → light summaries with optional topic filter.
-  - `listFaqTopics` → taxonomy term list (cached 24 h).
-- **JSON-LD helpers** – `faqItemsToJsonLd` and `faqListToJsonLd` convert fetched content into FAQ schema.
-- **Next usage** – `app/faq/[slug]/page.tsx` builds static params from `listFaqSlugs`, loads individual entries via `getFaq`, and builds prev/next navigation from `listFaqIndex`.
-
-```graphql
-query FaqSmokeTest($slug: ID!, $first: Int = 10) {
-  faqs(
-    first: $first
-    where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }
-  ) {
-    nodes {
-      ...FaqFields
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-  }
-
-  faq(id: $slug, idType: SLUG) {
-    ...FaqFields
-    content(format: RENDERED)
-  }
-}
-
-fragment FaqFields on Faq {
-  databaseId
-  id
-  slug
-  status
-  title
-  date(format: "c")
-  modified(format: "c")
-  excerpt(format: RENDERED)
-  faqTopics {
-    nodes {
-      slug
-      name
-    }
-  }
-  seo {
-    title
-    description
-    canonicalUrl
-    openGraph {
-      title
-      description
-      type
-      image {
-        url
-        secureUrl
-        width
-        height
-        type
-      }
-    }
-  }
-}
-```
+FAQ content no longer uses WPGraphQL. `lib/content/directus-faqs.ts` loads published `faqs`
+records for `DIRECTUS_CLIENT_SLUG`. A null `website_page` relation marks a global FAQ;
+otherwise, page sections match `website_page.path`. The `/faq` archive uses
+`website_page.nav_label` for group headings, with General first and the remaining groups
+alphabetical. Individual `/faq/[slug]` routes and the FAQ child sitemap were removed.
 
 ---
 
@@ -652,7 +584,6 @@ fragment VideoEntryFields on VideoEntry {
 ## Taxonomies, filters, and counts
 
 - Blog categories → `listBlogCategories` (hide empty, cached 24 h).
-- FAQ topics → `listFaqTopics`.
 - Project taxonomies → `listProjectMaterialTypes`, `listProjectRoofColors`, `listProjectServiceAreas`, bundled via `listProjectFilterTerms`.
 - `listPostsPaged` and `listProjectsPaged` both request `facetCounts`, and helper utilities (`mapFacetBucketsFromWp`, `mapFacetGroupsFromWp`) normalise taxonomy buckets `{ slug, name, count }`.
 - `listRecentProjectsPoolForFilters` and `listRecentPostsPoolForFilters` guarantee coverage for key categories/materials by merging curated batches.
@@ -665,7 +596,6 @@ fragment VideoEntryFields on VideoEntry {
 - Media helpers: `pickImage`, `pickImageFrom`.
 - Text helpers: `stripHtml`, `calcReadingTimeMinutes`, `toTrimmedExcerpt`, HTML entity decoders.
 - Video helpers: `extractYouTubeId`, `youtubeThumb`, `videoJsonLd`.
-- Schema helpers: `faqItemsToJsonLd`, `faqListToJsonLd`.
 - Health checks: `getSiteMeta` (60 s cache) and `pingWP` for the `/api/wp-debug` route.
 
 These helpers ensure inconsistent WPGraphQL payloads (e.g. nullable connections, union objects) are coerced into predictable shapes before entering the React layer.

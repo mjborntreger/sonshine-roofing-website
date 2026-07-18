@@ -1,6 +1,6 @@
 import Image from "next/image";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
-import { listFaqsWithContent } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 import SmartLink from "@/components/utils/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
@@ -101,7 +101,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const { slug } = await params;
   const projectPromise = getProjectBySlug(slug);
   const projectPoolPromise = listRecentProjectsPool(36);
-  const faqsPromise = listFaqsWithContent(8, "roof-replacement").catch(() => []);
+  const faqsPromise = listFaqs({
+    pagePath: "/roof-replacement-sarasota-fl",
+    limit: 8,
+  }).catch(() => []);
 
   const project = await projectPromise;
 
@@ -368,7 +371,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
         <FaqInlineList
           heading="Roof Replacement FAQs"
-          topicSlug="roof-replacement"
+          pagePath="/roof-replacement-sarasota-fl"
           limit={8}
           initialItems={faqs}
           seeMoreHref="/faq"

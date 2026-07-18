@@ -8,7 +8,7 @@ import SmartLink from "../../utils/SmartLink";
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
 
 type Item = {
-  slug: string;
+  id: string;
   title: string;
   contentHtml: string;
 };
@@ -115,7 +115,7 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
         <div className="flex flex-col gap-4">
           {safeItems.filter((_, idx) => idx % 2 === 0).map((faq, idx) => (
             <FaqItem
-              key={faq.slug}
+              key={faq.id}
               ref={assignRef(idx * 2)}
               title={faq.title}
               contentHtml={faq.contentHtml}
@@ -125,7 +125,7 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
         <div className="flex flex-col gap-4">
           {safeItems.filter((_, idx) => idx % 2 === 1).map((faq, idx) => (
             <FaqItem
-              key={faq.slug}
+              key={faq.id}
               ref={assignRef(idx * 2 + 1)}
               title={faq.title}
               contentHtml={faq.contentHtml}

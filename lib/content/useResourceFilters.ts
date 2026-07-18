@@ -1361,9 +1361,9 @@ function strategyFaq(opts: MountOptions): Cleaner {
             const title = el.getAttribute("data-title") || "";
             const tNorm = ensureTitleNorm(el);
             if (tokens.some((tok) => tNorm.includes(tok))) {
-                const slug = (el.id || "").replace(/^faq-/, "");
-                const href = slug ? `/faq/${slug}` : "#";
-                const key = slug || title;
+                const id = (el.id || "").replace(/^faq-/, "");
+                const href = id ? `/faq#faq-${id}` : "#";
+                const key = id || title;
                 if (seen.has(key)) continue;
                 seen.add(key);
                 out.push({ title, href });

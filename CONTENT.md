@@ -2,11 +2,12 @@ Content Workflow
 ================
 
 Where content lives
-- WordPress (via WPGraphQL): blog posts, projects, glossary, faqs, persons, videos.
+- WordPress (via WPGraphQL): blog posts, projects, glossary, persons, videos.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
   - `site_settings`: shared brand, contact, address, social, image, footer, and schema values.
   - `website_pages`: metadata, canonical, Open Graph, noindex, and sitemap-policy records for static routes.
   - `services`: primary service records used by navigation and service quick links.
+  - `faqs`: published FAQ answers. A null `website_page` is global; otherwise the relation defines the FAQ's single primary page scope and supplies the archive group title from `website_pages.nav_label`.
   - `navigation_items`: header navigation and matching footer link groups.
   - `redirects`: published legacy redirect rules loaded at build time.
   - `special_offers`: special-offer pages and popup content.
@@ -20,6 +21,12 @@ Publishing shared site content in Directus
 - Publish navigation only after its target `website_pages` records exist.
 - Every Directus image must have a `directus_files.description`.
 - Analytics remains on its existing configuration; do not use `site_settings.enable_site_analytics` yet.
+
+Publishing FAQs in Directus
+- Keep each FAQ assigned to one client and no more than one `website_page`.
+- Leave `website_page` empty only for genuinely global FAQs.
+- Page sections render global FAQs plus FAQs whose related page path matches the current route.
+- The `/faq` archive renders General first, then page groups alphabetically by `website_pages.nav_label`.
 
 Publishing redirects in Directus
 - Redirect changes become active only after a new site build.

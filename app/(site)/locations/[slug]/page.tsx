@@ -1,12 +1,12 @@
 import { notFound } from "next/navigation";
 import {
   getLocationBySlug,
-  listFaqsWithContent,
   listRecentPostsPoolForFilters,
   listRecentProjectsByServiceArea,
   listLocationSlugs,
   listSponsorFeaturesByServiceArea,
 } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 import type { LocationRecord } from "@/lib/content/wp";
 import Hero from "@/components/marketing/landing-page/LandingHero";
 import LeadFormSection from "@/components/lead-capture/lead-form/InitialNavigation";
@@ -201,7 +201,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
     locationPromise,
     listRecentPostsPoolForFilters(4, 4).catch(() => []),
     listRecentProjectsByServiceArea(slug, 4).catch(() => []),
-    listFaqsWithContent(8, "general").catch(() => []),
+    listFaqs({ limit: 8 }).catch(() => []),
     sponsorFeaturesPromise,
     reviewsCarouselSettingsPromise,
   ]);
@@ -396,7 +396,6 @@ export default async function LocationPage({ params }: { params: Promise<Params>
         <Section>
           <FaqInlineList
             heading="General FAQs"
-            topicSlug="general"
             limit={8}
             initialItems={generalFaqs}
             seeMoreHref="/faq"

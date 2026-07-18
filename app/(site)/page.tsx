@@ -6,9 +6,9 @@ import LatestProjectsFilter from '@/components/dynamic-content/latest-filters/La
 import {
   listRecentProjectsPoolForFilters,
   listRecentPostsPoolForFilters,
-  listFaqsWithContent,
   listSponsorFeaturesByServiceArea,
 } from '@/lib/content/wp';
+import { listFaqs } from '@/lib/content/directus-faqs';
 import LatestPostsFilters from '@/components/dynamic-content/latest-filters/LatestPostsFilter';
 import ServicesQuickLinks from '@/components/global-nav/static-pages/ServicesQuickLinks';
 import BestOfTheBest from '@/components/marketing/landing-page/BestOfTheBest';
@@ -83,7 +83,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   const [projects, posts, generalFaqs, sponsorFeatures] = await Promise.all([
     listRecentProjectsPoolForFilters(4, 8),
     listRecentPostsPoolForFilters(4, 4).catch(() => []),
-    listFaqsWithContent(8, 'general').catch(() => []),
+    listFaqs({ pagePath: '/', limit: 8 }).catch(() => []),
     sponsorFeaturesPromise,
   ]);
   return (
@@ -128,7 +128,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
       <Section>
         <FaqInlineList
           heading="General FAQs"
-          topicSlug="general"
+          pagePath="/"
           limit={8}
           initialItems={generalFaqs}
           seeMoreHref="/faq"

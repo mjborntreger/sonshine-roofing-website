@@ -2,7 +2,8 @@ import Section from "@/components/layout/Section";
 import ServicesAside from "@/components/global-nav/static-pages/ServicesAside";
 import Image from "next/image";
 import SmartLink from "@/components/utils/SmartLink";
-import { listRecentPostsPool, listFaqsWithContent } from "@/lib/content/wp";
+import { listRecentPostsPool } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import { Accordion } from "@/components/ui/Accordion";
@@ -50,8 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const [pool, faqs] = await Promise.all([
     listRecentPostsPool(36),
-    // Dynamic FAQs for this service topic (gracefully handle WP hiccups)
-    listFaqsWithContent(8, "roof-replacement").catch(() => []),
+    listFaqs({ pagePath: "/roof-replacement-sarasota-fl", limit: 8 }).catch(() => []),
   ]);
   const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
@@ -415,7 +415,7 @@ export default async function Page() {
         {/* FAQs (dynamic) */}
         <FaqInlineList
           heading="Roof Replacement FAQs"
-          topicSlug="roof-replacement"
+          pagePath="/roof-replacement-sarasota-fl"
           limit={8}
           initialItems={faqs}
           seeMoreHref="/faq"

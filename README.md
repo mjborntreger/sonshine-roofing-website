@@ -8,7 +8,7 @@ Runbook (Staging vs Prod)
 - Sitemaps
   - Preview on staging: set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`
   - Static manifest generated prebuild to `public/__sitemaps/static-routes.json`
-  - FAQ sitemap is off by default; set `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP=true` to expose `/sitemap_index/faq`.
+  - The `/faq` archive is included in the static sitemap; individual FAQ anchors do not have a child sitemap.
 - Security
   - CSP enforced on staging, report-only on production
 - GTM
@@ -55,7 +55,7 @@ Security headers & CSP
   - The site hydrates stored `utm_*` and `gclid` into the URL before loading QuickQuote; unsupported webhook fields such as `gbraid`, `wbraid`, landing page, and referrer require QuickQuote vendor support.
 
 Cache/Invalidation
-- WordPress GraphQL data uses Next fetch revalidation where configured. Directus special offers revalidate every 15 minutes; shared site content revalidates hourly.
+- WordPress GraphQL data uses Next fetch revalidation where configured. Directus FAQs and shared site content revalidate hourly; special offers revalidate every 15 minutes.
 - Static sitemap: regenerated on build; read dynamically per request.
 - Redirects are loaded from Directus during each build, so redirect changes require a new build to take effect.
 
@@ -76,7 +76,6 @@ Quick Checks
   - `/sitemap_index` lists child sitemaps.
   - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
   - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
-  - `/sitemap_index/faq` only appears when `NEXT_PUBLIC_ENABLE_FAQ_SITEMAP=true`.
 - GTM
   - `NEXT_PUBLIC_GTM_ID` set; GA4 Enhanced Measurement is enabled for page views.
 

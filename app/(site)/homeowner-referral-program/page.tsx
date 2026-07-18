@@ -4,7 +4,7 @@ import ServicesAside from "@/components/global-nav/static-pages/ServicesAside";
 import SmartLink from "@/components/utils/SmartLink";
 import Hero from "@/components/ui/Hero";
 import ReferralForm from "@/components/lead-capture/referral/ReferralForm";
-import { listFaqsWithContent } from "@/lib/content/wp";
+import { listFaqs } from "@/lib/content/directus-faqs";
 import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { JsonLd } from "@/lib/seo/json-ld";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
@@ -95,7 +95,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function HomeownerReferralProgramPage() {
   const [faqs] = await Promise.all([
-    listFaqsWithContent(8, "roof-replacement").catch(() => []),
+    listFaqs({ pagePath: "/homeowner-referral-program", limit: 8 }).catch(() => []),
   ]);
 
   const origin = SITE_ORIGIN;
@@ -292,7 +292,7 @@ export default async function HomeownerReferralProgramPage() {
         </div>
         <FaqInlineList
           heading="Referral Program FAQs"
-          topicSlug="referral-program"
+          pagePath="/homeowner-referral-program"
           limit={8}
           initialItems={faqs}
           seeMoreHref="/faq"
