@@ -170,7 +170,7 @@ export default async function FAQArchivePage() {
                           proseBody={false}
                         >
                           <div
-                            className="text-[1rem] leading-loose text-slate-700"
+                            className="faq-answer text-[1rem] leading-loose text-slate-700"
                             dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }}
                           />
                         </Accordion>

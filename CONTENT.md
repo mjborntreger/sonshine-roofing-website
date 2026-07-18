@@ -41,7 +41,7 @@ Publishing in WP
 - Provide featured images for richer OG cards.
 
 Publishing special offers in Directus
-- Set `is_published=true` to make an offer routable.
+- Set `status=published` to make an offer routable.
 - Set `featured=true` to make an unexpired offer eligible for the sitewide popup.
 - Use `featured_image.description` for image alt text and `legal_disclaimer` for disclaimer copy.
 

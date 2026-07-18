@@ -1,5 +1,6 @@
 import { ensureAbsoluteUrl, SITE_ORIGIN } from "./site";
 import { DEFAULT_REVIEW_PLATFORM, getReviewPlatformMeta, type ReviewPlatform } from "@/lib/reviews/platforms";
+import { faqHtmlToPlainText } from "@/lib/content/directus-faq-html";
 
 type MaybeString = string | null | undefined;
 
@@ -131,7 +132,7 @@ export function faqSchema(
   { origin = SITE_ORIGIN, url, withContext = true }: FaqSchemaOptions = {},
 ) {
   const mainEntity = items.map((item) => {
-    const answerText = stripToPlainText(item.answerHtml) ?? "";
+    const answerText = faqHtmlToPlainText(item.answerHtml);
     const entity: SchemaInit = {
       "@type": "Question",
       name: item.question,

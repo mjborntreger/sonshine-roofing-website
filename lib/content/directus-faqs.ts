@@ -1,4 +1,4 @@
-import { sanitizeDirectusHtml } from '@/lib/content/directus-html';
+import { sanitizeFaqHtml } from '@/lib/content/directus-faq-html';
 
 const DIRECTUS_COLLECTION = 'faqs';
 const DIRECTUS_REVALIDATE_SECONDS = 3_600;
@@ -144,7 +144,7 @@ function mapWebsitePage(
 
 function mapFaq(item: DirectusFaqItem, config: DirectusConfig): DirectusFaq {
   const rawAnswer = requiredString(item.answer, 'answer');
-  const contentHtml = sanitizeDirectusHtml(rawAnswer, { assetBaseUrl: config.url });
+  const contentHtml = sanitizeFaqHtml(rawAnswer);
   if (!contentHtml.trim()) {
     throw new Error('[directus-faqs] FAQ answer is empty after HTML sanitization.');
   }

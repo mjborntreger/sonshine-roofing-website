@@ -157,7 +157,7 @@ const FaqItem = forwardRef<HTMLDetailsElement, FaqItemProps>(function FaqItem(
     >
       <div
         dangerouslySetInnerHTML={{ __html: contentHtml || "" }}
-        className="text-[1rem] leading-loose text-slate-700"
+        className="faq-answer text-[1rem] leading-loose text-slate-700"
       />
     </Accordion>
   );
