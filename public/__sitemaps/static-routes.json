@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-07-14T00:32:35.000Z",
+  "generatedAt": "2026-07-18T21:54:49.000Z",
   "routes": [
     {
       "loc": "/",
-      "lastmod": "2026-07-13T20:38:44.000Z"
+      "lastmod": "2026-07-18T20:04:47.000Z"
     },
     {
       "loc": "/about-sonshine-roofing",
@@ -19,15 +19,15 @@
     },
     {
       "loc": "/faq",
-      "lastmod": "2026-04-02T13:52:31.000Z"
+      "lastmod": "2026-07-18T21:54:49.000Z"
     },
     {
       "loc": "/financing",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-18T20:04:47.000Z"
     },
     {
       "loc": "/homeowner-referral-program",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-18T20:04:47.000Z"
     },
     {
       "loc": "/homeowner-referral-program/terms-and-conditions",
@@ -35,11 +35,11 @@
     },
     {
       "loc": "/instant-quote",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-18T20:04:47.000Z"
     },
     {
       "loc": "/privacy-policy",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-14T00:54:02.000Z"
     },
     {
       "loc": "/project",
@@ -47,11 +47,11 @@
     },
     {
       "loc": "/roof-inspection",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-18T20:04:47.000Z"
     },
     {
       "loc": "/roof-maintenance",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-18T20:04:47.000Z"
     },
     {
       "loc": "/roof-maintenance/roof-care-club-terms-and-conditions",
@@ -59,23 +59,23 @@
     },
     {
       "loc": "/roof-repair",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-18T20:04:47.000Z"
     },
     {
       "loc": "/roof-replacement-sarasota-fl",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-18T20:04:47.000Z"
     },
     {
       "loc": "/roofing-glossary",
-      "lastmod": "2026-01-08T22:52:37.000Z"
+      "lastmod": "2026-07-14T00:54:02.000Z"
     },
     {
       "loc": "/sms-terms-and-conditions",
-      "lastmod": "2026-07-14T00:32:35.000Z"
+      "lastmod": "2026-07-14T00:54:02.000Z"
     },
     {
       "loc": "/video-library",
-      "lastmod": "2026-03-13T13:14:45.000Z"
+      "lastmod": "2026-07-14T00:54:02.000Z"
     }
   ]
 }

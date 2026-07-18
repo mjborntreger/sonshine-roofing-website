@@ -25,15 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,
-    keywords: [
-      "60-sec roof quote",
-      "roof replacement quote",
-      "roofing quote",
-      "roof replacement estimate",
-      "free roofing estimate",
-      "new roof estimate",
-      "new roof quote",
-    ],
     image: { url: "/og-default.png", width: 1200, height: 630 },
   });
 }

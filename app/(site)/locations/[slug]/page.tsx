@@ -55,6 +55,8 @@ const FALLBACK_REVIEW_INTERVAL_SECONDS = 60;
 const MAX_LOCATION_REVIEWS = 10;
 const SARASOTA_SLUG = "sarasota";
 const SEO_OG_IMAGE_DEFAULT = "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png";
+// TODO(location_landing_pages): Keep this WordPress-backed dynamic-route
+// exception until each location owns its SEO fields in Directus.
 const LOCATION_SEO_GENERIC_KEYWORDS = [
   "best roofing company",
   "roof replacement",

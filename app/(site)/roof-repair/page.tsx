@@ -40,7 +40,6 @@ export async function generateMetadata(): Promise<Metadata> {
     title: config.title,
     description: config.description,
     path: SERVICE_PATH,
-    keywords: config.keywords,
     image: config.image,
   });
 }

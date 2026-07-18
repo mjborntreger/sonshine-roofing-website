@@ -5,7 +5,7 @@ Where content lives
 - WordPress (via WPGraphQL): blog posts, projects, glossary, persons, videos.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
   - `site_settings`: shared brand, contact, address, social, image, footer, and schema values.
-  - `website_pages`: metadata, canonical, Open Graph, noindex, and sitemap-policy records for static routes.
+  - `website_pages`: metadata, canonical, Open Graph, focus-keyword, noindex, and sitemap-policy records for static routes.
   - `services`: primary service records used by navigation and service quick links.
   - `faqs`: published FAQ answers. A null `website_page` is global; otherwise the relation defines the FAQ's single primary page scope and supplies the archive group title from `website_pages.nav_label`.
   - `navigation_items`: header navigation and matching footer link groups.
@@ -19,6 +19,7 @@ Publishing shared site content in Directus
 - Use unique normalized paths in `website_pages`; the 404 record is `/404` even though it has no public canonical.
 - Keep the four primary `services` records published and linked from their matching `website_pages` records.
 - Publish navigation only after its target `website_pages` records exist.
+- Store the complete keyword set in `focus_keywords` and select one of those exact values in `primary_focus_keyword`. A mismatch fails the build with `DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH`.
 - Every Directus image must have a `directus_files.description`.
 - Analytics remains on its existing configuration; do not use `site_settings.enable_site_analytics` yet.
 
@@ -39,6 +40,7 @@ Publishing in WP
 - Ensure posts/projects are Published, not Draft.
 - Fill excerpts where available (used as SEO fallbacks).
 - Provide featured images for richer OG cards.
+- Location landing pages remain a deliberate WordPress/code exception until they move to a dedicated Directus `location_landing_pages` collection.
 
 Publishing special offers in Directus
 - Set `status=published` to make an offer routable.

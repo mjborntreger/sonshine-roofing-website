@@ -74,6 +74,8 @@ type DirectusWebsitePageItem = {
   sitemap_priority?: unknown;
   sitemap_changefreq?: unknown;
   page_type?: unknown;
+  primary_focus_keyword?: unknown;
+  focus_keywords?: unknown;
 };
 
 type DirectusServiceItem = {
@@ -152,6 +154,8 @@ export type WebsitePage = {
   sitemapPriority: number | null;
   sitemapChangefreq: string | null;
   pageType: string;
+  primaryFocusKeyword: string | null;
+  focusKeywords: string[];
 };
 
 export type ServiceSummary = {
@@ -195,6 +199,62 @@ function readBoolean(value: unknown, fallback = false): boolean {
     if (['false', '0', 'no'].includes(normalized)) return false;
   }
   return fallback;
+}
+
+function readFocusKeywords(
+  primaryValue: unknown,
+  keywordValue: unknown,
+  path: string,
+): { primaryFocusKeyword: string | null; focusKeywords: string[] } {
+  if (keywordValue !== null && keywordValue !== undefined && !Array.isArray(keywordValue)) {
+    throw new Error(
+      `[DIRECTUS_FOCUS_KEYWORDS_INVALID] website_pages.focus_keywords for route "${path}" must be a JSON array of non-empty strings.`,
+    );
+  }
+
+  const focusKeywords: string[] = [];
+  const normalizedKeywords = new Set<string>();
+
+  for (const item of Array.isArray(keywordValue) ? keywordValue : []) {
+    const keyword = readString(item);
+    if (!keyword) {
+      throw new Error(
+        `[DIRECTUS_FOCUS_KEYWORDS_INVALID] website_pages.focus_keywords for route "${path}" must contain only non-empty strings.`,
+      );
+    }
+
+    const normalizedKeyword = keyword.toLocaleLowerCase('en-US');
+    if (!normalizedKeywords.has(normalizedKeyword)) {
+      normalizedKeywords.add(normalizedKeyword);
+      focusKeywords.push(keyword);
+    }
+  }
+
+  const primaryFocusKeyword = readString(primaryValue);
+  if (!primaryFocusKeyword) {
+    return { primaryFocusKeyword: null, focusKeywords };
+  }
+
+  const normalizedPrimary = primaryFocusKeyword.toLocaleLowerCase('en-US');
+  const matchedPrimary = focusKeywords.find(
+    (keyword) => keyword.toLocaleLowerCase('en-US') === normalizedPrimary,
+  );
+
+  if (!matchedPrimary) {
+    throw new Error(
+      `[DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH] website_pages record for route "${path}" has primary focus keyword "${primaryFocusKeyword}", but that phrase is missing from focus_keywords. Add the exact phrase as a Focus Keywords tag or clear the primary field.`,
+    );
+  }
+
+  return {
+    primaryFocusKeyword: matchedPrimary,
+    focusKeywords: [
+      matchedPrimary,
+      ...focusKeywords.filter(
+        (keyword) => keyword.toLocaleLowerCase('en-US') !== normalizedPrimary,
+      ),
+    ],
+  };
 }
 
 function readNumber(value: unknown): number | null {
@@ -466,6 +526,8 @@ export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
       'sitemap_priority',
       'sitemap_changefreq',
       'page_type',
+      'primary_focus_keyword',
+      'focus_keywords',
     ],
     {
       client: { slug: { _eq: config.clientSlug } },
@@ -481,6 +543,11 @@ export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
       throw new Error(`[directus-site] Duplicate website_pages path "${path}".`);
     }
     seen.add(path);
+    const focusKeywordMetadata = readFocusKeywords(
+      item.primary_focus_keyword,
+      item.focus_keywords,
+      path,
+    );
 
     return {
       path,
@@ -496,6 +563,7 @@ export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
       sitemapPriority: readNumber(item.sitemap_priority),
       sitemapChangefreq: readString(item.sitemap_changefreq),
       pageType: requiredString(item.page_type, 'website_pages', 'page_type'),
+      ...focusKeywordMetadata,
     };
   });
 });
@@ -645,6 +713,7 @@ export async function getWebsitePageMetadata({
     path: page.canonicalPath ?? page.path,
     image,
     robots,
+    keywords: page.focusKeywords,
   });
 
   if (!includeCanonical) delete metadata.alternates;

@@ -100,7 +100,7 @@ Where content lives
 - WordPress (via WPGraphQL): blog posts, projects, glossary, faqs, persons, videos.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
   - `site_settings`: shared brand, contact, address, social, image, footer, and schema values.
-  - `website_pages`: metadata, canonical, Open Graph, noindex, and sitemap-policy records for static routes.
+  - `website_pages`: metadata, canonical, Open Graph, focus-keyword, noindex, and sitemap-policy records for static routes.
   - `services`: the four primary service records used by navigation and service quick links.
   - `navigation_items`: header navigation and matching footer link groups.
   - `redirects`: published legacy redirects loaded and validated at build time.
@@ -109,6 +109,8 @@ Where content lives
 - Next.js app pages: route layouts, components, and page body copy that has not yet moved to Directus.
 
 Directus-backed static page metadata falls back to the route's local metadata when Directus is unavailable outside production. Every referenced Directus image must have a `directus_files.description`; missing descriptions fail the content read instead of producing empty alt text.
+
+For static pages, `focus_keywords` contains the complete keyword set and `primary_focus_keyword` must match one of those values exactly (case-insensitive). Invalid JSON fails with `DIRECTUS_FOCUS_KEYWORDS_INVALID`; a primary/tag mismatch fails with `DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH`. WordPress-backed location landing pages remain a deliberate code-owned exception until they move to a dedicated Directus `location_landing_pages` collection.
 
 Redirect ownership
 - Content-specific legacy redirects live in Directus and are fetched by `next.config.mjs` during a build.

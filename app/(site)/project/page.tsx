@@ -25,23 +25,6 @@ export async function generateMetadata(): Promise<Metadata> {
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,
-    keywords: [
-      "roofing photo gallery",
-      "roofing video gallery",
-      "roofing photos",
-      "roofing videos",
-      "new metal roof",
-      "new shingle roof",
-      "new tile roof",
-      "roof replacement projects sarasota",
-      "project gallery",
-      "roof replacement photos",
-      "roof replacement video",
-      "shingle roof replacement photos",
-      "tile roof replacement photos",
-      "metal roof replacement photos",
-      "Sarasota roofing project gallery",
-    ],
     image: { url: PAGE_IMAGE, width: 1200, height: 630 },
   });
 }

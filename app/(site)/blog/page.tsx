@@ -23,22 +23,6 @@ export async function generateMetadata(): Promise<Metadata> {
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,
-    keywords: [
-      "roofing blog",
-      "roofing tips",
-      "roof repair advice",
-      "roof replacement guide",
-      "Sarasota roofing blog",
-      "Manatee County roofing blog",
-      "Charlotte County roofing blog",
-      "North Port roofing blog",
-      "roofing insights",
-      "roofing news",
-      "Venice roofing blog",
-      "roof replacement advice",
-      "roof replacement tips",
-      "roof repair guide",
-    ],
     image: { url: PAGE_IMAGE, width: 1200, height: 630 },
   });
 }
