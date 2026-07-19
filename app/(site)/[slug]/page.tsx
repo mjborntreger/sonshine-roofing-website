@@ -1,11 +1,15 @@
 // app/[slug]/page.tsx
-import { listRecentPostsPool } from "@/lib/content/wp";
+import {
+  getPostBySlug,
+  listPostSlugs,
+  listRecentPostNav,
+  listRecentPostsPool,
+} from "@/lib/content/blog";
 import { listFaqs } from "@/lib/content/directus-faqs";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import Image from "next/image";
 import Section from "@/components/layout/Section";
 import SmartLink from "@/components/utils/SmartLink";
-import { getPostBySlug, listPostSlugs, listRecentPostNav } from "@/lib/content/wp";
 import type { Metadata } from "next";
 import TocFromHeadings from "@/components/global-nav/static-pages/TocFromHeadings";
 import { notFound } from "next/navigation";
@@ -173,7 +177,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     (ogImage && typeof ogImage.secureUrl === "string" && ogImage.secureUrl) ||
     (ogImage && typeof ogImage.url === "string" && ogImage.url) ||
     post.featuredImage?.url ||
-    "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png";
+    `${SITE_ORIGIN}/og-default.png`;
   const ogWidth = ogImage && typeof ogImage.width === "number" ? ogImage.width : 1200;
   const ogHeight = ogImage && typeof ogImage.height === "number" ? ogImage.height : 630;
 
@@ -228,7 +232,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     (ogImageJsonLd && typeof ogImageJsonLd.secureUrl === "string" && ogImageJsonLd.secureUrl) ||
     (ogImageJsonLd && typeof ogImageJsonLd.url === "string" && ogImageJsonLd.url) ||
     post.featuredImage?.url ||
-    "https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png";
+    `${origin}/og-default.png`;
   const ogImgAbs = ogImgCandidate.startsWith("http") ? ogImgCandidate : `${origin}${ogImgCandidate}`;
 
   const postSchema = blogPostingSchema({

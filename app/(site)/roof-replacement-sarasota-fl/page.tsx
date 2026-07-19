@@ -2,7 +2,7 @@ import Section from "@/components/layout/Section";
 import ServicesAside from "@/components/global-nav/static-pages/ServicesAside";
 import Image from "next/image";
 import SmartLink from "@/components/utils/SmartLink";
-import { listRecentPostsPool } from "@/lib/content/wp";
+import { listRecentPostsPool } from "@/lib/content/blog";
 import { listFaqs } from "@/lib/content/directus-faqs";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";

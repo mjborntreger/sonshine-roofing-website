@@ -38,7 +38,7 @@ export function groupPostsByCategory(posts: PostCard[]): TabRecord<CategoryKey, 
       .map((term) => term?.slug?.toLowerCase() ?? "")
       .filter(Boolean);
 
-    if (slugs.includes("education")) groups.education.push(post);
+    if (slugs.includes("roof-repair")) groups["roof-repair"].push(post);
     if (slugs.includes("hurricane-preparation")) groups["hurricane-preparation"].push(post);
     if (slugs.includes("energy-efficient-roofing")) groups["energy-efficient-roofing"].push(post);
   }

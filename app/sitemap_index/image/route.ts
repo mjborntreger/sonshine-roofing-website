@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch, mapImages, type WpImageNode } from '@/lib/content/wp';
+import { getBlogContentSource, listBlogImageSitemapEntries } from '@/lib/content/blog';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { serializeImageEntry, type ImageSitemapEntry } from './serialization';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
@@ -11,16 +12,11 @@ export const revalidate = 3600;
 const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
+const BLOG_SOURCE = getBlogContentSource();
 
 type Maybe<T> = T | null | undefined;
 
 type ImageNodeWrapper = { node?: Maybe<WpImageNode> };
-
-type BlogImageNode = {
-  uri?: string | null;
-  modifiedGmt?: string | null;
-  featuredImage?: Maybe<ImageNodeWrapper>;
-};
 
 type ProjectImageNode = {
   uri?: string | null;
@@ -51,13 +47,6 @@ type PersonImageNode = {
   uri?: string | null;
   modifiedGmt?: string | null;
   featuredImage?: Maybe<ImageNodeWrapper>;
-};
-
-type BlogImageResult = {
-  posts?: {
-    pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
-    nodes?: Maybe<BlogImageNode>[] | null;
-  } | null;
 };
 
 type ProjectImageResult = {
@@ -92,48 +81,8 @@ const toImageNodeArray = (
   Array.isArray(nodes) ? nodes : undefined;
 
 const getBlogImageNodes = unstable_cache(
-  async () => {
-    const query = /* GraphQL */ `
-      query ImageSitemapPosts($first: Int!, $after: String) {
-        posts(
-          first: $first
-          after: $after
-          where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-        ) {
-          pageInfo { hasNextPage endCursor }
-          nodes {
-            uri
-            modifiedGmt
-            featuredImage {
-              node {
-                sourceUrl
-                altText
-              }
-            }
-          }
-        }
-      }
-    `;
-
-    const nodes: BlogImageNode[] = [];
-    let after: string | null = null;
-
-    do {
-      const variables: { first: number; after?: string | null } = after
-        ? { first: 200, after }
-        : { first: 200 };
-      const data = await wpFetch<BlogImageResult>(query, variables);
-      const page = data?.posts;
-      const pageNodes = page?.nodes ?? [];
-      for (const node of pageNodes) {
-        if (node) nodes.push(node);
-      }
-      after = page?.pageInfo?.hasNextPage ? page?.pageInfo?.endCursor ?? null : null;
-    } while (after);
-
-    return nodes;
-  },
-  ['sitemap-image-blog'],
+  async () => listBlogImageSitemapEntries(),
+  [`sitemap-image-blog:${BLOG_SOURCE}`],
   { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:blog'] }
 );
 
@@ -305,13 +254,13 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
   const entries: ImageSitemapEntry[] = [];
 
   for (const node of blogNodes) {
-    const path = normalizeEntryPath(node.uri ?? '');
+    const path = normalizeEntryPath(node.uri);
     if (path === '/') continue;
-    const images = mapWrapperImages(node.featuredImage);
+    const images = node.featuredImage ? [node.featuredImage] : [];
     if (!images.length) continue;
     entries.push({
       loc: path,
-      lastmod: formatLastmod(node.modifiedGmt),
+      lastmod: formatLastmod(node.modified),
       images,
     });
   }

@@ -6,7 +6,7 @@ import SmartLink from "@/components/utils/SmartLink";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
 
-// Minimal blog post shape expected from wp.ts
+// Minimal normalized blog post shape returned by the active blog adapter.
 type BlogPoolItem = {
   slug: string;
   title: string;
@@ -45,7 +45,7 @@ type BaseProps = {
 
 type BlogVariantProps = BaseProps & {
   variant?: "blog";
-  /** Pool of recent blog posts fetched on the server (should include categories). */
+  /** Pool of recent blog posts fetched on the server (topics use the legacy categories shape). */
   posts: BlogPoolItem[];
   /** Target category slug to prioritize (e.g., 'roof-repair'). */
   category?: string;

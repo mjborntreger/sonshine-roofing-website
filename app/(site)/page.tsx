@@ -5,9 +5,9 @@ import WhyHomeownersChooseUs from '@/components/marketing/landing-page/WhyHomeow
 import LatestProjectsFilter from '@/components/dynamic-content/latest-filters/LatestProjectsFilter';
 import {
   listRecentProjectsPoolForFilters,
-  listRecentPostsPoolForFilters,
   listSponsorFeaturesByServiceArea,
 } from '@/lib/content/wp';
+import { listRecentPostsPoolForFilters } from '@/lib/content/blog';
 import { listFaqs } from '@/lib/content/directus-faqs';
 import LatestPostsFilters from '@/components/dynamic-content/latest-filters/LatestPostsFilter';
 import ServicesQuickLinks from '@/components/global-nav/static-pages/ServicesQuickLinks';

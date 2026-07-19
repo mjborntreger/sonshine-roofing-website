@@ -24,7 +24,7 @@ export default function BlogArchiveClient({ initialResult, categories, pageSize,
   const groups: FilterGroupConfig[] = [
     {
       key: "category",
-      label: "Categories",
+      label: "Topics",
       facet: "category",
       paramKey: "cat",
       icon: BookOpen,

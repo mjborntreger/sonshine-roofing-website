@@ -1,8 +1,8 @@
 import type { LucideIcon } from "lucide-react";
-import { Grid3x3, Hammer, Wrench, GraduationCap, Sun, Wind } from "lucide-react";
+import { Grid3x3, Hammer, Wrench, Sun, Wind } from "lucide-react";
 
 export type MaterialKey = "tile" | "shingle" | "metal";
-export type CategoryKey = "education" | "hurricane-preparation" | "energy-efficient-roofing";
+export type CategoryKey = "roof-repair" | "hurricane-preparation" | "energy-efficient-roofing";
 
 export type TabConfig<Key extends string> = {
   key: Key;
@@ -17,7 +17,7 @@ export const PROJECT_TAB_CONFIG: Array<TabConfig<MaterialKey>> = [
 ];
 
 export const POST_TAB_CONFIG: Array<TabConfig<CategoryKey>> = [
-  { key: "education", label: "Education", icon: GraduationCap },
+  { key: "roof-repair", label: "Roof Repair", icon: Wrench },
   { key: "hurricane-preparation", label: "Hurricane Prep", icon: Wind },
   { key: "energy-efficient-roofing", label: "Energy-Efficiency", icon: Sun },
 ];

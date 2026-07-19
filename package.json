@@ -11,6 +11,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "npm run lint",
+    "verify:directus-html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-directus-html.mjs",
     "verify:faq-html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-faq-html.mjs"
   },
   "dependencies": {

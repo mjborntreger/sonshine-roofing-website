@@ -1,7 +1,7 @@
 import Section from "@/components/layout/Section";
 import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside";
 import BlogArchiveClient from "@/components/dynamic-content/blog/BlogArchiveClient";
-import { listBlogCategories, listPostsPaged } from "@/lib/content/wp";
+import { listBlogCategories, listPostsPaged } from "@/lib/content/blog";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getWebsitePageMetadata } from "@/lib/content/directus-site";

@@ -10,7 +10,7 @@ import { JsonLd } from "@/lib/seo/json-ld";
 import { getWebsitePageMetadata } from "@/lib/content/directus-site";
 import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
-import { listRecentPostsPool } from "@/lib/content/wp";
+import { listRecentPostsPool } from "@/lib/content/blog";
 import { listFaqs } from "@/lib/content/directus-faqs";
 
 export const revalidate = 900;
