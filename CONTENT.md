@@ -7,7 +7,7 @@ Where content lives
   - `site_settings`: shared brand, contact, address, social, image, footer, and schema values.
   - `website_pages`: metadata, canonical, Open Graph, focus-keyword, noindex, and sitemap-policy records for static routes.
   - `services`: primary service records used by navigation and service quick links.
-  - `faqs`: published FAQ answers. A null `website_page` is global; otherwise the relation defines the FAQ's single primary page scope and supplies the archive group title from `website_pages.nav_label`.
+  - `faqs`: published WYSIWYG-authored semantic HTML answers. A null `website_page` is global; otherwise the relation defines the FAQ's single primary page scope and supplies the archive group title from `website_pages.nav_label`.
   - `navigation_items`: header navigation and matching footer link groups.
   - `redirects`: published legacy redirect rules loaded at build time.
   - `special_offers`: special-offer pages and popup content.
@@ -26,6 +26,12 @@ Publishing shared site content in Directus
 Publishing FAQs in Directus
 - Keep each FAQ assigned to one client and no more than one `website_page`.
 - Leave `website_page` empty only for genuinely global FAQs.
+- Use only paragraphs, links, bold/italic emphasis, ordered or unordered lists, list items, and line breaks in `answer` (`p`, `a`, `strong`, `em`, `ul`, `ol`, `li`, and `br`).
+- Link attributes are limited to `href`, `rel`, `target`, and `title`. Destinations must begin with exactly one `/`, begin with `#`, or use `http`, `https`, `mailto`, or `tel`. Do not use protocol-relative or unsafe-protocol URLs.
+- Do not add images, headings, tables, classes, IDs, inline styles, scripts, event handlers, or arbitrary editor/source markup.
+- The editor toolbar guides authors, but the restricted frontend sanitizer is the authoritative security boundary. `_blank` links receive `rel="noopener noreferrer"`.
+- FAQ JSON-LD uses parser-derived, entity-decoded plain text from `faqHtmlToPlainText()`; never remove tags with a regex.
+- Publication uses only `status`; page scope uses only `website_page`.
 - Page sections render global FAQs plus FAQs whose related page path matches the current route.
 - The `/faq` archive renders General first, then page groups alphabetically by `website_pages.nav_label`.
 

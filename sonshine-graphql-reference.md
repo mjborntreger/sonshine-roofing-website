@@ -381,6 +381,19 @@ otherwise, page sections match `website_page.path`. The `/faq` archive uses
 `website_page.nav_label` for group headings, with General first and the remaining groups
 alphabetical. Individual `/faq/[slug]` routes and the FAQ child sitemap were removed.
 
+`faqs.answer` is WYSIWYG-authored semantic HTML. `lib/content/directus-faq-html.ts`
+allows only `p`, `a`, `strong`, `em`, `ul`, `ol`, `li`, and `br`; anchors may use only
+`href`, `rel`, `target`, and `title`. Destinations must begin with exactly one `/`, begin
+with `#`, or use `http`, `https`, `mailto`, or `tel`. Protocol-relative and unsafe URLs,
+images, headings, tables, classes, IDs, inline styles, scripts, event handlers, and other
+editor/source markup are removed. The frontend sanitizer remains authoritative even
+though the Directus toolbar constrains authors. `_blank` links receive
+`rel="noopener noreferrer"`.
+
+Rendered FAQ content stays HTML, while FAQ JSON-LD uses parser-derived,
+entity-decoded plain text from `faqHtmlToPlainText()` rather than regex tag removal.
+Publication uses only `status`, and page scope uses only `website_page`.
+
 ---
 
 ## Glossary terms (`glossaryTerm`)

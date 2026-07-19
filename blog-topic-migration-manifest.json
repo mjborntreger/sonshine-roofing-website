@@ -1,0 +1,2931 @@
+{
+  "schema_version": "1.1.0",
+  "generated_at": "2026-07-19T17:56:40.877Z",
+  "updated_at": "2026-07-19T18:15:39Z",
+  "client": "SonShine Roofing",
+  "source_sitemap": "https://sonshineroofing.com/sitemap_index/blog",
+  "audit_scope": {
+    "authoritative_url_source": "The public XML blog sitemap was treated as the complete migration candidate list for this pass.",
+    "method": "Fetched all rendered post bodies and WordPress category assignments through the public WordPress REST API, matched each record to the sitemap by slug, and reviewed article body text, headings, opening, and closing content before assigning topics.",
+    "content_reviewed": "All 108 sitemap posts, one record per URL.",
+    "exclusions": "No remote writes, test executions, schema changes, or WordPress/Directus/n8n mutations were performed."
+  },
+  "migration_decisions": {
+    "status": "approved",
+    "content_mode": "migrate-as-is",
+    "default_disposition_for_unlisted_posts": "migrate",
+    "candidate_post_count": 106,
+    "excluded_post_slugs": [
+      "grouper-tacos",
+      "lead-safe-certified"
+    ],
+    "topic_assignment_field": "proposed_topic_slugs",
+    "default_max_topics_per_post": 3,
+    "content_freshness_and_consolidation": "deferred-to-future-review",
+    "approved_topic_reductions": [
+      {
+        "slug": "hurricane-resistant-roofing-in-sarasota-what-gafs-real-world-test-means-for-your-roof",
+        "approved_topic_slugs": [
+          "hurricane-preparation",
+          "asphalt-shingles",
+          "roofing-warranties"
+        ],
+        "dropped_topic_slug": "roofing-safety-and-standards"
+      },
+      {
+        "slug": "how-to-prepare-your-florida-roof-for-maximum-insurance-payout-after-storm-damage",
+        "approved_topic_slugs": [
+          "hurricane-preparation",
+          "insurance-and-claims",
+          "roof-inspection"
+        ],
+        "dropped_topic_slug": "storm-damage"
+      },
+      {
+        "slug": "roof-is-damaged-after-a-storm",
+        "approved_topic_slugs": [
+          "storm-damage",
+          "insurance-and-claims",
+          "roof-inspection"
+        ],
+        "dropped_topic_slug": "roof-repair"
+      },
+      {
+        "slug": "things-you-need-to-know-about-your-roof",
+        "approved_topic_slugs": [
+          "roof-lifespan",
+          "roof-inspection",
+          "roofing-warranties"
+        ],
+        "dropped_topic_slug": "roofing-safety-and-standards"
+      }
+    ]
+  },
+  "taxonomy_rules": [
+    "One flat client-scoped blog_topics vocabulary; no hierarchy and no parallel tag system.",
+    "A post may have multiple topics, but each assigned topic must represent a substantial body subject rather than a passing mention or CTA.",
+    "Broad containers such as Resources, Our Services, Education, and How-To Articles are retired.",
+    "Featured becomes presentation state on blog_posts, not a topic.",
+    "Uncategorized is never migrated as a topic.",
+    "Prefer reusable reader-navigation concepts; do not create one-off topics for isolated content.",
+    "A post with no honest reusable fit remains unassigned and is reported in no_fit_posts.",
+    "Topic slugs should be unique per client, with a database or workflow check preventing a post from selecting another client's topics."
+  ],
+  "proposed_topics": [
+    {
+      "name": "Roof Leaks",
+      "slug": "roof-leaks",
+      "definition": "Symptoms, causes, diagnosis, and immediate homeowner response to water intrusion.",
+      "inclusion_guidance": "Use when leak detection or water entry is a primary subject; pair with Roof Repair or Roof Inspection only when those actions are substantial.",
+      "aliases": [
+        "leaking roof",
+        "water intrusion"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Roof Repair",
+      "slug": "roof-repair",
+      "definition": "Repair decisions, methods, expectations, and targeted remediation of roof defects.",
+      "inclusion_guidance": "Use for articles materially about fixing an existing problem, not every article that mentions repair.",
+      "aliases": [],
+      "retired_source_terms": [
+        "Roof Repair / roof-repair-services"
+      ]
+    },
+    {
+      "name": "Roof Replacement",
+      "slug": "roof-replacement",
+      "definition": "Replacement timing, process, planning, scope, and decision-making.",
+      "inclusion_guidance": "Use when full replacement is a primary decision or process, not merely a CTA.",
+      "aliases": [
+        "reroofing"
+      ],
+      "retired_source_terms": [
+        "Roof Replacement / roof-replacement-services"
+      ]
+    },
+    {
+      "name": "Roof Maintenance",
+      "slug": "roof-maintenance",
+      "definition": "Preventive upkeep, cleaning, small interventions, and ongoing roof care.",
+      "inclusion_guidance": "Use for repeatable care that preserves roof condition; do not use merely because maintenance is mentioned.",
+      "aliases": [
+        "roof care"
+      ],
+      "retired_source_terms": [
+        "Roof Maintenance / roof-maintenance-services"
+      ]
+    },
+    {
+      "name": "Roof Inspections",
+      "slug": "roof-inspection",
+      "definition": "Professional or homeowner inspection cadence, checklists, documentation, and condition assessment.",
+      "inclusion_guidance": "Use when inspection is a central method, service, or decision step.",
+      "aliases": [
+        "roof checkup",
+        "Tip Top Roof Check-up"
+      ],
+      "retired_source_terms": [
+        "Roof Inspection / roof-inspection"
+      ]
+    },
+    {
+      "name": "Roof Lifespan",
+      "slug": "roof-lifespan",
+      "definition": "Expected service life, premature failure, longevity factors, and life-extension strategy.",
+      "inclusion_guidance": "Use for content whose primary promise is how long a roof lasts or why roofs reach or miss expected life.",
+      "aliases": [
+        "roof longevity",
+        "service life"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Hurricane Preparation",
+      "slug": "hurricane-preparation",
+      "definition": "Actions taken before hurricanes or tropical storms to improve roof and household readiness.",
+      "inclusion_guidance": "Use for pre-storm preparation; use Storm Damage for post-event damage and response.",
+      "aliases": [
+        "hurricane prep",
+        "storm readiness"
+      ],
+      "retired_source_terms": [
+        "Hurricane Preparation / hurricane-preparation"
+      ]
+    },
+    {
+      "name": "Storm Damage",
+      "slug": "storm-damage",
+      "definition": "Roof damage caused by hurricanes, wind, rain, hail, or debris and the post-event response.",
+      "inclusion_guidance": "Use when damage or post-storm action is primary, not for generic seasonal preparation.",
+      "aliases": [
+        "hurricane damage"
+      ],
+      "retired_source_terms": [
+        "Storms / storms"
+      ]
+    },
+    {
+      "name": "Insurance & Claims",
+      "slug": "insurance-and-claims",
+      "definition": "Roof documentation, coverage readiness, claim steps, adjuster roles, and insurer interactions.",
+      "inclusion_guidance": "Use only when insurance or claims receive substantive treatment; legal and policy content must be freshness-reviewed.",
+      "aliases": [
+        "roof insurance",
+        "storm claims"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Roofing Costs",
+      "slug": "roofing-costs",
+      "definition": "Pricing, budgeting, financing, bids, total ownership cost, and return on investment.",
+      "inclusion_guidance": "Use where cost or financial value is a primary reader intent.",
+      "aliases": [
+        "roof pricing",
+        "roof budget"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Choosing a Roofer",
+      "slug": "choosing-a-roofer",
+      "definition": "Contractor vetting, credentials, contracts, crews, estimates, ethics, and red flags.",
+      "inclusion_guidance": "Use for homeowner selection guidance, not ordinary company promotion.",
+      "aliases": [
+        "hiring a roofer",
+        "contractor selection"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Roofing Materials",
+      "slug": "roofing-materials",
+      "definition": "Cross-material selection, comparisons, properties, and general material education.",
+      "inclusion_guidance": "Use for articles comparing several material families; use a material-specific topic for focused articles.",
+      "aliases": [
+        "roof types"
+      ],
+      "retired_source_terms": [
+        "Roofing Materials / roofing-materials"
+      ]
+    },
+    {
+      "name": "Asphalt Shingles",
+      "slug": "asphalt-shingles",
+      "definition": "Asphalt shingle systems, grades, appearance, lifespan, performance, and comparisons.",
+      "inclusion_guidance": "Use only when asphalt shingles are a substantial subject, not when shingles are mentioned generically.",
+      "aliases": [
+        "shingle roofing"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Metal Roofing",
+      "slug": "metal-roofing",
+      "definition": "Standing seam, exposed-fastener, metal shingle, and other metal roof systems.",
+      "inclusion_guidance": "Use for metal-focused history, selection, comparison, cost, performance, or maintenance.",
+      "aliases": [],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Tile Roofing",
+      "slug": "tile-roofing",
+      "definition": "Concrete and clay tile performance, lifespan, value, maintenance, and selection.",
+      "inclusion_guidance": "Use for tile-focused content; general multi-material articles remain under Roofing Materials.",
+      "aliases": [
+        "concrete tile",
+        "clay tile"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Roof Components & Ventilation",
+      "slug": "roof-components-and-ventilation",
+      "definition": "Roof anatomy, geometry, vents, attic airflow, and component function.",
+      "inclusion_guidance": "Use for system components and ventilation; use Gutters & Drainage when runoff management is the dominant intent.",
+      "aliases": [
+        "roof anatomy",
+        "attic ventilation"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Gutters & Drainage",
+      "slug": "gutters-and-drainage",
+      "definition": "Gutters, downspouts, runoff paths, drainage failures, and related property damage.",
+      "inclusion_guidance": "Use for water management at and beyond the roof edge.",
+      "aliases": [
+        "roof runoff"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Energy-Efficient Roofing",
+      "slug": "energy-efficient-roofing",
+      "definition": "Heat control, reflective systems, insulation interactions, solar considerations, and environmentally responsible roofing.",
+      "inclusion_guidance": "Use where energy performance or sustainability is a primary subject.",
+      "aliases": [
+        "green roofing",
+        "sustainable roofing"
+      ],
+      "retired_source_terms": [
+        "Energy-Efficient Roofing / energy-efficient-roofing"
+      ]
+    },
+    {
+      "name": "Roof Style & Curb Appeal",
+      "slug": "roof-style-and-curb-appeal",
+      "definition": "Color, architectural fit, exterior coordination, appearance, and resale presentation.",
+      "inclusion_guidance": "Use when visual selection or curb appeal is a core reader intent.",
+      "aliases": [
+        "roof colors"
+      ],
+      "retired_source_terms": []
+    },
+    {
+      "name": "Roofing Safety & Standards",
+      "slug": "roofing-safety-and-standards",
+      "definition": "Building codes, installation standards, fasteners, certifications, safe practices, and quality controls.",
+      "inclusion_guidance": "Use for substantive technical, regulatory, or safety guidance; do not recreate the former catch-all Your Safety category.",
+      "aliases": [
+        "roofing codes",
+        "installation standards"
+      ],
+      "retired_source_terms": [
+        "Your Safety / safety-resources-2"
+      ]
+    },
+    {
+      "name": "Roofing Warranties",
+      "slug": "roofing-warranties",
+      "definition": "Manufacturer and workmanship warranty scope, exclusions, durability, and provider viability.",
+      "inclusion_guidance": "Use only when warranty mechanics or risk are a major subject.",
+      "aliases": [
+        "roof warranty"
+      ],
+      "retired_source_terms": [
+        "Warranty / warranty"
+      ]
+    }
+  ],
+  "retired_terms": [
+    {
+      "name": "Education",
+      "slug": "education",
+      "action": "retire",
+      "reason": "Generic container that describes editorial intent rather than subject matter; remap each post by body."
+    },
+    {
+      "name": "How-To Articles",
+      "slug": "how-to",
+      "action": "retire",
+      "reason": "Format label, not a subject taxonomy; how-to posts receive subject topics."
+    },
+    {
+      "name": "Our Services",
+      "slug": "our-services",
+      "action": "retire",
+      "reason": "Broad service container; use specific subject topics."
+    },
+    {
+      "name": "Resources",
+      "slug": "resources",
+      "action": "retire",
+      "reason": "Broad content container with no useful filter intent."
+    },
+    {
+      "name": "Featured",
+      "slug": "featured",
+      "action": "convert_to_field",
+      "reason": "Presentation state belongs in a blog_posts.featured boolean, not the topic taxonomy."
+    },
+    {
+      "name": "Uncategorized",
+      "slug": "uncategorized",
+      "action": "drop",
+      "reason": "A missing editorial decision should not become a public topic."
+    },
+    {
+      "name": "Recipes",
+      "slug": "recipes",
+      "action": "retire",
+      "reason": "One off-topic recipe does not justify a client blog topic; exclude or relocate that post."
+    },
+    {
+      "name": "Storms",
+      "slug": "storms",
+      "action": "replace",
+      "replacement_topic_slugs": [
+        "hurricane-preparation",
+        "storm-damage"
+      ],
+      "reason": "Split pre-event preparation from post-event damage according to article body."
+    },
+    {
+      "name": "Your Safety",
+      "slug": "safety-resources-2",
+      "action": "retire_and_remap",
+      "reason": "Historical catch-all; remap to hurricane, standards, leaks, repair, or contractor selection as appropriate."
+    },
+    {
+      "name": "Roof Maintenance",
+      "slug": "roof-maintenance-services",
+      "action": "rename_slug",
+      "replacement_topic_slugs": [
+        "roof-maintenance"
+      ],
+      "reason": "Keep the useful name while removing service-oriented slug baggage."
+    },
+    {
+      "name": "Roof Repair",
+      "slug": "roof-repair-services",
+      "action": "rename_slug",
+      "replacement_topic_slugs": [
+        "roof-repair"
+      ],
+      "reason": "Keep the useful name with a clean subject slug."
+    },
+    {
+      "name": "Roof Replacement",
+      "slug": "roof-replacement-services",
+      "action": "rename_slug",
+      "replacement_topic_slugs": [
+        "roof-replacement"
+      ],
+      "reason": "Keep the useful name with a clean subject slug."
+    },
+    {
+      "name": "Warranty",
+      "slug": "warranty",
+      "action": "rename",
+      "replacement_topic_slugs": [
+        "roofing-warranties"
+      ],
+      "reason": "Clarify the subject when displayed across many client-scoped vocabularies."
+    }
+  ],
+  "posts": [
+    {
+      "url": "https://sonshineroofing.com/my-ceiling-has-a-wet-spot",
+      "slug": "my-ceiling-has-a-wet-spot",
+      "title": "My Ceiling Has a Wet Spot: What Do I Do First?",
+      "current_wordpress_categories": [
+        "Roof Repair",
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-repair",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body traces ceiling stains to several water-entry paths, gives a first-response checklist, and recommends professional leak diagnosis.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-runoff-damage-sarasota",
+      "slug": "roof-runoff-damage-sarasota",
+      "title": "Roof Runoff Damage in Sarasota, FL: How It Erodes Soil, Hurts Foundations, and Kills Landscaping",
+      "current_wordpress_categories": [
+        "Education"
+      ],
+      "proposed_topic_slugs": [
+        "gutters-and-drainage"
+      ],
+      "confidence": "medium",
+      "rationale": "The joint article explains how failed roof runoff paths erode soil, damage foundations, and overwhelm Sarasota landscaping.",
+      "ambiguous": true,
+      "ambiguity_note": "The subject fits roof drainage, but much of the article belongs to the landscaping partner's expertise and audience.",
+      "ambiguity_options": [
+        "Migrate intact under gutters-and-drainage",
+        "Extract a roofing-focused version and move the landscaping guidance elsewhere",
+        "Move the whole joint article to Southern Standards and redirect"
+      ],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Joint publication with Southern Standards Landscaping; decide the canonical owner before migration."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/hurricane-resistant-roofing-in-sarasota-what-gafs-real-world-test-means-for-your-roof",
+      "slug": "hurricane-resistant-roofing-in-sarasota-what-gafs-real-world-test-means-for-your-roof",
+      "title": "Hurricane-Resistant Roofing in Sarasota: What GAF’s Real-World Test Means for Your Roof",
+      "current_wordpress_categories": [
+        "Hurricane Preparation",
+        "Education",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "asphalt-shingles",
+        "roofing-warranties"
+      ],
+      "confidence": "high",
+      "rationale": "The body interprets GAF wind testing, sealant and fastening requirements, system installation, and the WindProven warranty for Sarasota roofs.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Verify product and warranty claims against current GAF documentation before republishing."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/standing-seam-vs-exposed-fastener-which-metal-roof-is-right-for-your-home",
+      "slug": "standing-seam-vs-exposed-fastener-which-metal-roof-is-right-for-your-home",
+      "title": "Standing Seam vs Exposed Fastener: Which Metal Roof Is Right for Your Home",
+      "current_wordpress_categories": [
+        "Education",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "metal-roofing"
+      ],
+      "confidence": "high",
+      "rationale": "The article compares concealed and exposed fasteners, maintenance, cost, wind demands, and decision criteria for residential metal roofs.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/the-surprisingly-deep-history-of-metal-roofing",
+      "slug": "the-surprisingly-deep-history-of-metal-roofing",
+      "title": "The Surprisingly Deep History of Metal Roofing",
+      "current_wordpress_categories": [
+        "Education",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "metal-roofing"
+      ],
+      "confidence": "high",
+      "rationale": "The body follows metal roofing from ancient use through industrialization, aluminum, coatings, and modern residential systems.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/why-concrete-tiles-are-the-superior-choice",
+      "slug": "why-concrete-tiles-are-the-superior-choice",
+      "title": "The Case for Concrete: Why Concrete Tile Roofing is The Superior Choice for Sarasota Homeowners in 2025",
+      "current_wordpress_categories": [
+        "Education",
+        "Roof Replacement",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "tile-roofing",
+        "roofing-materials",
+        "roof-replacement"
+      ],
+      "confidence": "high",
+      "rationale": "The article compares concrete and clay tile manufacturing, durability, storm performance, aesthetics, cost, and resale value for replacement decisions.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/5-reasons-why-roof-ventilation-matters",
+      "slug": "5-reasons-why-roof-ventilation-matters",
+      "title": "5 Reasons Why Roof Ventilation Matters for Florida Homes",
+      "current_wordpress_categories": [
+        "Education",
+        "Featured"
+      ],
+      "proposed_topic_slugs": [
+        "roof-components-and-ventilation",
+        "energy-efficient-roofing"
+      ],
+      "confidence": "high",
+      "rationale": "The body connects ventilation to attic temperature, moisture control, roof life, comfort, code compliance, and common vent types.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-ventilation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/coordinate-roof-colors-with-exterior-paint",
+      "slug": "coordinate-roof-colors-with-exterior-paint",
+      "title": "Exterior and on Top: How to Coordinate Roof Colors with Your Exterior Paint (Updated 2026)",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Featured",
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "roof-style-and-curb-appeal",
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The article uses undertones, color theory, climate, material appearance, and landscaping to coordinate a roof with exterior paint.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-color-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/lead-safe-certified",
+      "slug": "lead-safe-certified",
+      "title": "If You’re Not Lead-Safe Certified, Lead Paint Could Cost You Big Time.",
+      "current_wordpress_categories": [
+        "Resources",
+        "Your Safety"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-safety-and-standards",
+        "choosing-a-roofer"
+      ],
+      "confidence": "medium",
+      "rationale": "The body centers on EPA lead-safe renovation rules, certification verification, containment practices, and contractor selection for older homes.",
+      "ambiguous": true,
+      "ambiguity_note": "Lead-safe renovation is relevant to roofing work but peripheral to the main roofing taxonomy and may function better as a company credential page.",
+      "ambiguity_options": [
+        "Keep as a blog post under roofing-safety-and-standards",
+        "Convert to a company credential/standards page",
+        "Retire if certification or regulatory details cannot be verified"
+      ],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Verify SonShine's current certification status and current EPA requirements before migration."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/new-roof-cost-in-north-port-2025",
+      "slug": "new-roof-cost-in-north-port-2025",
+      "title": "How Much Does a New Roof Cost in North Port, FL in 2025?",
+      "current_wordpress_categories": [
+        "Education",
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-replacement",
+        "roofing-costs"
+      ],
+      "confidence": "high",
+      "rationale": "The body itemizes size, decking, complexity, labor, permits, materials, financing, and local price ranges for a North Port replacement.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Time-sensitive 2025 price ranges and financing references require a freshness review before publication."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/6-ways-to-make-a-roof-hurricane-resistant",
+      "slug": "6-ways-to-make-a-roof-hurricane-resistant",
+      "title": "6 Ways to Make a Roof “Hurricane-Resistant”?",
+      "current_wordpress_categories": [
+        "Education",
+        "Hurricane Preparation",
+        "Storms",
+        "Your Safety"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "roofing-materials",
+        "roofing-safety-and-standards"
+      ],
+      "confidence": "high",
+      "rationale": "The article covers wind-rated materials, roof geometry, fasteners, underlayment, installation standards, and routine inspection for storm resistance.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/what-are-the-signs-my-roof-needs-repair-or-replacement",
+      "slug": "what-are-the-signs-my-roof-needs-repair-or-replacement",
+      "title": "What Are the Signs My Roof Needs Repair or Replacement?",
+      "current_wordpress_categories": [
+        "Roof Replacement",
+        "Roof Inspection",
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-repair",
+        "roof-replacement",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body evaluates damaged shingles, leaks, sagging, granule loss, growth, and roof age to distinguish repair from replacement.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: repair-versus-replacement. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roofs-lifespan",
+      "slug": "roofs-lifespan",
+      "title": "6 Ways to Extend Your Roof’s Lifespan in Sarasota, FL",
+      "current_wordpress_categories": [
+        "Roof Maintenance",
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "roof-lifespan",
+        "roof-maintenance"
+      ],
+      "confidence": "high",
+      "rationale": "The article recommends gutter care, tree trimming, insulation, ventilation, post-storm checks, and professional inspections to extend service life.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/average-roof-lifespan",
+      "slug": "average-roof-lifespan",
+      "title": "What’s the Average Roof Lifespan in Sarasota, Florida?",
+      "current_wordpress_categories": [
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-lifespan",
+        "roof-replacement"
+      ],
+      "confidence": "high",
+      "rationale": "The body discusses material, climate, installation, maintenance, roof history, and warning signs when estimating Sarasota roof life.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-lifespan-guides. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-shingle-colors",
+      "slug": "roof-shingle-colors",
+      "title": "Shingle Mingle: How to Choose Roof Shingle Colors for Your Home",
+      "current_wordpress_categories": [
+        "Roof Replacement",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "asphalt-shingles",
+        "roof-style-and-curb-appeal"
+      ],
+      "confidence": "high",
+      "rationale": "The article applies climate, exterior coordination, color theory, neighborhood context, and multi-tone options to shingle color selection.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-color-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/energy-efficient-roofing-options-florida",
+      "slug": "energy-efficient-roofing-options-florida",
+      "title": "Energy-Efficient Roofing Options for Florida Homes: Save Money and Beat the Heat",
+      "current_wordpress_categories": [
+        "Featured",
+        "Energy-Efficient Roofing"
+      ],
+      "proposed_topic_slugs": [
+        "energy-efficient-roofing",
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The body compares cool coatings, reflective shingles, metal, tile, ventilation, and insulation for cooling cost and environmental benefits.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Replace stale next.sonshineroofing.com references and recheck performance claims before migration."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/2025-guide-how-to-prepare-your-roof-and-fence-for-hurricane-season-in-florida",
+      "slug": "2025-guide-how-to-prepare-your-roof-and-fence-for-hurricane-season-in-florida",
+      "title": "2025 Guide: How to Prepare Your Roof and Fence for Hurricane Season in Florida",
+      "current_wordpress_categories": [
+        "Hurricane Preparation",
+        "How-To Articles",
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "insurance-and-claims"
+      ],
+      "confidence": "medium",
+      "rationale": "The joint body gives pre-storm inspection, repair, documentation, insurance, roof, and fence preparation checklists.",
+      "ambiguous": true,
+      "ambiguity_note": "Roughly half of the article is fence guidance for a partner business, so the correct canonical owner and migration scope are unclear.",
+      "ambiguity_options": [
+        "Migrate intact as a joint hurricane guide",
+        "Split into roofing and fencing articles",
+        "Keep only the roof section and redirect or cross-link the fence content"
+      ],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Title is year-stamped 2025; update season-specific statements and partner details before republishing.",
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/tips-for-hiring-roofing-contractor-sarasota-fl",
+      "slug": "tips-for-hiring-roofing-contractor-sarasota-fl",
+      "title": "8 Tips for Hiring a Roofing Company in Sarasota, FL (UPDATED OCT. 2025)",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Featured",
+        "Resources",
+        "Roof Repair",
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The article provides eight contractor-screening checks: process knowledge, referrals, locality, reviews, ratings, licensing, written scope, and subcontracting.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Legal-news framing and October 2025 update references require freshness review.",
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-repair-vs-roof-replacement-in-sarasota",
+      "slug": "roof-repair-vs-roof-replacement-in-sarasota",
+      "title": "Roof Repair vs. Roof Replacement in Sarasota: 5 Reasons To Call a Professional",
+      "current_wordpress_categories": [
+        "Roof Replacement",
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-repair",
+        "roof-replacement",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body weighs age, visible damage, storm impacts, energy performance, and long-term cost to choose repair or replacement.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: repair-versus-replacement. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/5-proven-tips-for-hurricane-roof-prep-in-sarasota",
+      "slug": "5-proven-tips-for-hurricane-roof-prep-in-sarasota",
+      "title": "5 Proven Tips for Hurricane Roof Prep in Sarasota",
+      "current_wordpress_categories": [
+        "Hurricane Preparation"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The article recommends inspection, reinforcing vulnerable areas, clearing drainage, trimming trees, and reviewing coverage and storm plans.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-long-does-an-asphalt-roof-last",
+      "slug": "how-long-does-an-asphalt-roof-last",
+      "title": "How Long Does an Asphalt Roof Last (2025)?",
+      "current_wordpress_categories": [
+        "Roofing Materials",
+        "Education"
+      ],
+      "proposed_topic_slugs": [
+        "asphalt-shingles",
+        "roof-lifespan"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains asphalt composition, shingle grades, lifespan ranges, replacement signs, maintenance, warranty, and replacement cost.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "The opening market projection is dated and should be removed or updated.",
+        "Potential duplicate/overlap cluster: roof-lifespan-guides. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-to-prepare-your-florida-roof-for-maximum-insurance-payout-after-storm-damage",
+      "slug": "how-to-prepare-your-florida-roof-for-maximum-insurance-payout-after-storm-damage",
+      "title": "How to Prepare Your Florida Roof for Maximum Insurance Payout After Storm Damage",
+      "current_wordpress_categories": [
+        "Hurricane Preparation",
+        "How-To Articles",
+        "Resources",
+        "Storms"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "insurance-and-claims",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body focuses on pre-loss photos, maintenance records, licensed claim help, post-storm documentation, mitigation, and inspection.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Verify Florida claim-handling guidance and named public-adjuster referrals before migration.",
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-is-damaged-after-a-storm",
+      "slug": "roof-is-damaged-after-a-storm",
+      "title": "What Should I Do if My Roof is Damaged After a Storm?",
+      "current_wordpress_categories": [
+        "Education",
+        "Resources",
+        "Roof Repair",
+        "Roof Replacement",
+        "Storms"
+      ],
+      "proposed_topic_slugs": [
+        "storm-damage",
+        "insurance-and-claims",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The article gives a post-storm sequence covering safety, documentation, insurer notice, professional inspection, mitigation, estimates, and repairs.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: storm-response. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/working-with-cheap-roofing-companies",
+      "slug": "working-with-cheap-roofing-companies",
+      "title": "Why Working with Cheap Roofing Companies Will Cost You More Money",
+      "current_wordpress_categories": [
+        "Education"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer",
+        "roofing-costs"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains how low bids can hide poor materials, weak workmanship, surprise costs, and inadequate credentials.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/pitched-roof-vs-flat-roof",
+      "slug": "pitched-roof-vs-flat-roof",
+      "title": "Pitched Roof Vs. Flat Roof: What’s The Difference?",
+      "current_wordpress_categories": [
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roof-components-and-ventilation"
+      ],
+      "confidence": "high",
+      "rationale": "The article compares pitched and flat roof geometry, drainage, usable space, maintenance, material compatibility, and Florida climate performance.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/how-long-does-it-take-to-replace-a-roof",
+      "slug": "how-long-does-it-take-to-replace-a-roof",
+      "title": "How Long Does It Take to Replace a Roof?",
+      "current_wordpress_categories": [
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-replacement"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains how material, tear-off method, size, complexity, structural repairs, and weather affect replacement duration.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/different-roof-types",
+      "slug": "different-roof-types",
+      "title": "A Guide to the Lifespans of the Different Roof Types and Materials",
+      "current_wordpress_categories": [
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-materials",
+        "roof-lifespan"
+      ],
+      "confidence": "high",
+      "rationale": "The article compares service-life expectations for asphalt, wood, metal, tile, and slate systems to support material selection.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-lifespan-guides. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/budget-friendly-roofing-secrets",
+      "slug": "budget-friendly-roofing-secrets",
+      "title": "6 Budget-Friendly Roofing Secrets Every Homeowner Should Know",
+      "current_wordpress_categories": [
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-costs",
+        "roof-replacement"
+      ],
+      "confidence": "high",
+      "rationale": "The body frames replacement budgeting around contractor quality, durable materials, insurance and warranty, seasonality, and lifetime value.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/5-must-do-roofing-tips",
+      "slug": "5-must-do-roofing-tips",
+      "title": "5 Must-Do Roofing Tips to Survive Hurricane Season in Sarasota",
+      "current_wordpress_categories": [
+        "Education",
+        "Hurricane Preparation"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The article recommends pre-season inspection, timely material work, bracing and clips, waterproof underlayment, and insurance review.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/signs-you-need-a-new-roof",
+      "slug": "signs-you-need-a-new-roof",
+      "title": "Is It Time to Replace? Here Are 7 Signs You Need a New Roof",
+      "current_wordpress_categories": [
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-replacement",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body lists age, shingle failure, soft spots, sagging, leaks, and energy bills as triggers for professional replacement evaluation.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-replacement-warning-signs. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-often-should-you-get-your-roof-inspected",
+      "slug": "how-often-should-you-get-your-roof-inspected",
+      "title": "How Often Should You Get Your Roof Inspected in Florida?",
+      "current_wordpress_categories": [
+        "Roof Inspection"
+      ],
+      "proposed_topic_slugs": [
+        "roof-inspection",
+        "roof-maintenance"
+      ],
+      "confidence": "high",
+      "rationale": "The article recommends an inspection cadence, contrasts homeowner checks with professional work, and explains preventive cost and safety benefits.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-inspection-guides. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/exploring-roofing-options-for-homes-in-sarasota",
+      "slug": "exploring-roofing-options-for-homes-in-sarasota",
+      "title": "Exploring Roofing Options for Homes in Sarasota",
+      "current_wordpress_categories": [
+        "Education",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The body compares asphalt, tile, metal, slate, wood, and flat-roof options against Sarasota durability, cost, style, and climate.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roofing-material-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/discover-the-true-cost-of-replacing-a-roof-in-sarasota",
+      "slug": "discover-the-true-cost-of-replacing-a-roof-in-sarasota",
+      "title": "Discover the True Cost of Replacing a Roof in Sarasota",
+      "current_wordpress_categories": [
+        "Education",
+        "Roof Maintenance",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roof-replacement",
+        "roofing-costs",
+        "roof-lifespan"
+      ],
+      "confidence": "medium",
+      "rationale": "The article evaluates total ownership cost through material durability, installation quality, maintenance, repair frequency, and replacement cycles.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "The title promises local replacement cost but the body provides comparative lifetime-value guidance rather than current Sarasota prices."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roofing-contractor-tell-me",
+      "slug": "roofing-contractor-tell-me",
+      "title": "Why Didn’t My Roofing Contractor Tell Me?",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Roof Replacement",
+        "Your Safety"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer",
+        "roofing-warranties",
+        "roof-replacement"
+      ],
+      "confidence": "high",
+      "rationale": "The body argues contractors should explain installation quality, premature failure, long-term warranty limits, and questions beyond the initial quote.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roi-of-a-tile-roof",
+      "slug": "roi-of-a-tile-roof",
+      "title": "The Return on Investment of a Tile Roof in Southwest Florida",
+      "current_wordpress_categories": [
+        "Resources",
+        "Education",
+        "Featured"
+      ],
+      "proposed_topic_slugs": [
+        "tile-roofing",
+        "roofing-costs",
+        "roof-style-and-curb-appeal"
+      ],
+      "confidence": "high",
+      "rationale": "The article evaluates concrete tile through lifetime cost, storm performance, energy comfort, maintenance, insurance, resale, and appearance.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-leaks-warning-signs",
+      "slug": "roof-leaks-warning-signs",
+      "title": "9 Warning Signs of Roof Leaks",
+      "current_wordpress_categories": [
+        "Roof Repair",
+        "Roof Inspection"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body identifies algae, shingle deformation, flashing damage, granule loss, ventilation, rot, and interior spots as leak warnings.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/7-essential-steps-to-hurricane-proof-your-roof-before-the-storm-hits",
+      "slug": "7-essential-steps-to-hurricane-proof-your-roof-before-the-storm-hits",
+      "title": "7 Essential Steps to Hurricane-Proof Your Roof Before the Storm Hits",
+      "current_wordpress_categories": [
+        "Education",
+        "Storms"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The article covers inspection, material reinforcement, clips, vents, gutters, tree trimming, and insurance review before a storm.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-cleaning-in-florida",
+      "slug": "roof-cleaning-in-florida",
+      "title": "Roof Cleaning in Florida: Expert Answers from Hoover Pressure Cleaning",
+      "current_wordpress_categories": [
+        "Education"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance"
+      ],
+      "confidence": "high",
+      "rationale": "The Q&A covers soft washing, cleaning frequency, algae, material-specific methods, landscaping protection, cost, and professional safety.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Joint expert content with Hoover Pressure Cleaning; verify partner details and quotations.",
+        "Potential duplicate/overlap cluster: roof-cleaning. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/algae-staining-on-shingled-roof-surfaces",
+      "slug": "algae-staining-on-shingled-roof-surfaces",
+      "title": "Algae Staining On Shingled Roof Surfaces",
+      "current_wordpress_categories": [
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance",
+        "asphalt-shingles"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains Gloeocapsa staining, spore spread, moisture conditions, safe treatment, and why pressure washing should be avoided.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-cleaning. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/rising-cost-of-doing-business-may-void-your-roof-warranty",
+      "slug": "rising-cost-of-doing-business-may-void-your-roof-warranty",
+      "title": "Rising Cost Of Doing Business May Void Your Roof Warranty",
+      "current_wordpress_categories": [
+        "Resources",
+        "Education",
+        "Warranty"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-warranties",
+        "choosing-a-roofer",
+        "roofing-costs"
+      ],
+      "confidence": "high",
+      "rationale": "The article connects contractor financial viability and low bidding to whether workmanship warranties remain supportable.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Economic examples and tax figures appear historically dated; rewrite around durable principles or retire."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roofing-truth",
+      "slug": "roofing-truth",
+      "title": "Roofing Truths from Sonshine Roofing",
+      "current_wordpress_categories": [
+        "Education",
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "roof-repair",
+        "roof-replacement",
+        "roofing-warranties"
+      ],
+      "confidence": "high",
+      "rationale": "The body challenges premature replacement recommendations, explains repairable defects, and cautions against relying on nominal long warranties.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: repair-versus-replacement. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/homeowner-alert-roofing-nails",
+      "slug": "homeowner-alert-roofing-nails",
+      "title": "Homeowner Alert: The New Counterfeit Roofing Nail Scam to Avoid",
+      "current_wordpress_categories": [
+        "Your Safety",
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-safety-and-standards",
+        "roofing-warranties",
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The article discusses approved fasteners, counterfeit or low-quality nails, corrosion, installation effects, and warranty fine print.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Verify current county notices, product claims, and recommended fastener standards before migration."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/green-roofing",
+      "slug": "green-roofing",
+      "title": "Why You Should Consider Green Roofing",
+      "current_wordpress_categories": [
+        "Energy-Efficient Roofing"
+      ],
+      "proposed_topic_slugs": [
+        "energy-efficient-roofing",
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The body defines green roofing through color, living roofs, efficient materials, waste reduction, and long service life.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: sustainable-roofing. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/warning-roofing-nightmares",
+      "slug": "warning-roofing-nightmares",
+      "title": "Warning: Roofing Nightmares!",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The article uses five project-failure scenarios to highlight storm chasers, delays, debris, poor communication, and weak guarantees.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roofing-rip-off",
+      "slug": "roofing-rip-off",
+      "title": "Seven Ways To Make Sure Your Roofing Contractor Will Rip You Off!",
+      "current_wordpress_categories": [
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer",
+        "roofing-warranties"
+      ],
+      "confidence": "high",
+      "rationale": "The body lists contractor practices that shorten roof life, obscure warranty value, or substitute minimum compliance for durable workmanship.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-leaking",
+      "slug": "roof-leaking",
+      "title": "Don’t Think Your Roof is Leaking? (The Yur Roof Letters)",
+      "current_wordpress_categories": [
+        "Resources",
+        "Your Safety"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-maintenance"
+      ],
+      "confidence": "high",
+      "rationale": "The first-person roof letter explains leak consequences, installation and maintenance causes, and the value of regular inspections.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Stylized 'Yur Roof' format may not match the desired future editorial voice.",
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/maintaining-a-healthy-roof-in-florida",
+      "slug": "maintaining-a-healthy-roof-in-florida",
+      "title": "5 Tips for Maintaining a Healthy Roof in Florida",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance",
+        "roof-lifespan"
+      ],
+      "confidence": "high",
+      "rationale": "The body recommends tree trimming, gutter cleaning, prompt shingle work, regular inspection, and a maintenance membership.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/5-things-ask-sarasota-roofing-contractor",
+      "slug": "5-things-ask-sarasota-roofing-contractor",
+      "title": "5 Things to Ask Your Sarasota Roofing Contractor",
+      "current_wordpress_categories": [
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer",
+        "roofing-warranties"
+      ],
+      "confidence": "high",
+      "rationale": "The article asks about references, warranty, longevity, repair versus replacement judgment, and worker compensation coverage.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/sarasota-roofing-contractor-should-tell",
+      "slug": "sarasota-roofing-contractor-should-tell",
+      "title": "5 Things Every Roofing Contractor Should Tell You",
+      "current_wordpress_categories": [
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer",
+        "roofing-warranties",
+        "roofing-safety-and-standards"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains why licensing, permits, manufacturer warranties, estimates, and ongoing inspections do not by themselves assure quality.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/best-roofing-contractor-sarasota",
+      "slug": "best-roofing-contractor-sarasota",
+      "title": "How to Find the Best Roofing Contractor in Sarasota",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The article evaluates diagnosis, product quality, business integrity, insurance, pricing, and long-term value when selecting a roofer.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/quality-of-roofing-contractor-workers",
+      "slug": "quality-of-roofing-contractor-workers",
+      "title": "An Eye-Opening Perspective on the Quality of Roofing Contractor Workers",
+      "current_wordpress_categories": [
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer",
+        "roofing-safety-and-standards"
+      ],
+      "confidence": "high",
+      "rationale": "The body focuses on workforce skill, lowest-bid labor risks, homeowner questions, supervision, training, and worker coverage.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/sarasota-roofing-contractors-wont-tell-you",
+      "slug": "sarasota-roofing-contractors-wont-tell-you",
+      "title": "3 Things Most Sarasota Roofing Contractors Won’t Tell You",
+      "current_wordpress_categories": [
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer",
+        "roofing-costs",
+        "roofing-safety-and-standards"
+      ],
+      "confidence": "high",
+      "rationale": "The article warns about contractor-favoring contracts, minimum licensing, low bids, hidden costs, and installation shortcuts.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-to-tell-if-roof-leak",
+      "slug": "how-to-tell-if-roof-leak",
+      "title": "How to Tell If Your Roof Has a Leak",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body walks through interior, exterior, and attic warning signs and recommends documentation and professional inspection.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-to-make-your-roof-last",
+      "slug": "how-to-make-your-roof-last",
+      "title": "How to Make Your Roof Last",
+      "current_wordpress_categories": [
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "roof-lifespan",
+        "roof-maintenance",
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The article attributes premature failure to poor craftsmanship and neglected inspections, then recommends contractor vetting and ongoing care.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roofing-education-is-key",
+      "slug": "roofing-education-is-key",
+      "title": "(Roofing) Education is Key",
+      "current_wordpress_categories": [
+        "Resources"
+      ],
+      "proposed_topic_slugs": [
+        "roof-lifespan",
+        "choosing-a-roofer",
+        "roofing-safety-and-standards"
+      ],
+      "confidence": "medium",
+      "rationale": "The body contrasts long-lived roofs with early failures and emphasizes installation details, contractor education, and maintenance.",
+      "ambiguous": true,
+      "ambiguity_note": "The post is a broad brand essay spanning installation quality, contractor choice, maintenance, and warranties without one strong navigation intent.",
+      "ambiguity_options": [
+        "Keep the three proposed topics",
+        "Consolidate its useful points into a stronger roof-longevity guide",
+        "Convert it to an about/process standards page"
+      ],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "The statement claiming over 50 years of company service conflicts with the 1987 brand history and must be corrected.",
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/things-you-need-to-know-about-your-roof",
+      "slug": "things-you-need-to-know-about-your-roof",
+      "title": "5 Things You Need to Know About Your Roof",
+      "current_wordpress_categories": [
+        "Resources",
+        "Your Safety"
+      ],
+      "proposed_topic_slugs": [
+        "roof-lifespan",
+        "roof-inspection",
+        "roofing-warranties"
+      ],
+      "confidence": "medium",
+      "rationale": "The five body sections span service-life extension, minimum compliance, warranty limits, small defects, and annual inspections.",
+      "ambiguous": true,
+      "ambiguity_note": "This short roundup spans four durable subjects but lacks a single dominant taxonomy intent.",
+      "ambiguity_options": [
+        "Keep all four proposed topics",
+        "Consolidate into a comprehensive roof-care guide",
+        "Split the strongest points into topic-specific evergreen posts"
+      ],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "At 289 words, this is thin relative to newer guides and is a strong consolidation candidate."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-maintenance-saves-money",
+      "slug": "roof-maintenance-saves-money",
+      "title": "Taking Care of Roof Maintenance Saves Money!",
+      "current_wordpress_categories": [
+        "Roof Maintenance"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The article describes professional checks of the roof, attic, weather damage, installation defects, and seasonal maintenance value.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/storm-damage-roof-repair",
+      "slug": "storm-damage-roof-repair",
+      "title": "Don’t Wait for Storm Damage: Get the Wheels of Roof Repair in Motion Now",
+      "current_wordpress_categories": [
+        "Your Safety"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "insurance-and-claims",
+        "roof-inspection"
+      ],
+      "confidence": "medium",
+      "rationale": "Despite its title, the body mainly urges pre-season scheduling, policy review, documentation, and inspection before storms arrive.",
+      "ambiguous": true,
+      "ambiguity_note": "The title promises post-damage roof repair, while the body is predominantly pre-storm preparation and insurance readiness.",
+      "ambiguity_options": [
+        "Retitle and keep under hurricane-preparation",
+        "Rewrite to fulfill the storm-damage repair intent",
+        "Consolidate into a stronger pre-storm inspection guide"
+      ],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/my-roof-is-leaking",
+      "slug": "my-roof-is-leaking",
+      "title": "My Roof Is Leaking! Now What?",
+      "current_wordpress_categories": [
+        "Roof Replacement",
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-repair"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains immediate leak response, contractor qualifications, interior and exterior signs, and the risks of delay.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/expect-during-roof-repair-replacement",
+      "slug": "expect-during-roof-repair-replacement",
+      "title": "What to Expect During Roof Repair and Replacement",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Roof Repair",
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-repair",
+        "roof-replacement"
+      ],
+      "confidence": "high",
+      "rationale": "The article prepares homeowners for noise, loose items, outdoor protection, attic and garage concerns, debris, delivery, and site safety.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/why-roofs-last",
+      "slug": "why-roofs-last",
+      "title": "Why Some Roofs Fail When Others Last: One Roofer’s 30-Year Reflection",
+      "current_wordpress_categories": [
+        "Featured"
+      ],
+      "proposed_topic_slugs": [
+        "roof-lifespan",
+        "roofing-safety-and-standards",
+        "choosing-a-roofer"
+      ],
+      "confidence": "medium",
+      "rationale": "The first-person history links long roof life to exceeding minimum code, resisting shortcuts, accumulated experience, and installation quality.",
+      "ambiguous": true,
+      "ambiguity_note": "It works both as a roof-longevity article and as a founder/company-values story.",
+      "ambiguity_options": [
+        "Keep as a blog post with the proposed topics",
+        "Convert to an about/quality-standards story",
+        "Extract technical guidance into an evergreen longevity post"
+      ],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Preserve the first-person provenance and verify historical claims if migrated."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-to-find-a-roof-leak",
+      "slug": "how-to-find-a-roof-leak",
+      "title": "Think Like the Water: How to Find a Roof Leak",
+      "current_wordpress_categories": [
+        "Education",
+        "Our Services",
+        "Roof Maintenance",
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-repair",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The article explains how water travels from entry point to stain, outlines a diagnostic process, and recommends professional annual checks.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/5-tips-to-extend-the-life-of-your-roof",
+      "slug": "5-tips-to-extend-the-life-of-your-roof",
+      "title": "5 Tips to Extend the Life of Your Roof",
+      "current_wordpress_categories": [
+        "Roof Maintenance",
+        "Education",
+        "Our Services"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance",
+        "roof-lifespan"
+      ],
+      "confidence": "high",
+      "rationale": "The five body sections cover gutters, trees, ventilation, insulation, and annual inspection to prevent premature replacement.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/what-you-need-to-know-about-roofing-after-a-hurricane",
+      "slug": "what-you-need-to-know-about-roofing-after-a-hurricane",
+      "title": "What You Need to Know About Roofing After a Hurricane",
+      "current_wordpress_categories": [
+        "Storms"
+      ],
+      "proposed_topic_slugs": [
+        "storm-damage",
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The body discusses post-hurricane emergency licensing exceptions, homeowner risk, local contractor selection, and storm-chaser avoidance.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "The post centers on a 2017 Florida emergency rule and Hurricane Irma context; verify legal status and likely retire or comprehensively rewrite.",
+        "Potential duplicate/overlap cluster: storm-response. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-maintenance-tips",
+      "slug": "roof-maintenance-tips",
+      "title": "Your Guide to Roof Maintenance for a Strong Roof",
+      "current_wordpress_categories": [
+        "Roof Maintenance",
+        "Our Services"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance"
+      ],
+      "confidence": "high",
+      "rationale": "The body covers ground checks, professional inspection, gutters, trees, moss and algae, and interior leak warning signs.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/hiring-the-best-roofing-company",
+      "slug": "hiring-the-best-roofing-company",
+      "title": "5 Essential Tips For Hiring The Best Roofing Company In Your Area",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The article recommends comparing options and estimates, learning the process, checking credentials, and understanding warranties.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/7-signs-you-need-roof-repair",
+      "slug": "7-signs-you-need-roof-repair",
+      "title": "7 Signs You Need Roof Repair",
+      "current_wordpress_categories": [
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-repair",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body details shingle damage, granules, failed penetrations, attic evidence, sagging, stains, paint, mold, and energy changes.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-repair-warning-signs. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/selecting-roof-shingles-colors",
+      "slug": "selecting-roof-shingles-colors",
+      "title": "The Ultimate Guide to Selecting Roof Shingles Colors",
+      "current_wordpress_categories": [
+        "Roof Replacement",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "asphalt-shingles",
+        "roof-style-and-curb-appeal"
+      ],
+      "confidence": "high",
+      "rationale": "The article relates roof color to Florida heat, architectural style, materials, slope, detached structures, and craftsmanship.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-color-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-to-prepare-your-home-for-a-hurricane",
+      "slug": "how-to-prepare-your-home-for-a-hurricane",
+      "title": "Is Your Roof Hurricane Ready? How to Prepare Your Home For a Hurricane",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Education"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation"
+      ],
+      "confidence": "high",
+      "rationale": "The body gives a whole-home checklist for roof, doors, windows, penetrations, external structures, drainage, landscaping, and coverage.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/why-you-need-roof-inspection",
+      "slug": "why-you-need-roof-inspection",
+      "title": "Why You Need a Roof Inspection",
+      "current_wordpress_categories": [
+        "Roof Maintenance"
+      ],
+      "proposed_topic_slugs": [
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The article explains lender and insurer needs, asset protection, weather risk, hidden defects, and the components of a professional inspection.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-inspection-guides. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/best-roofing-materials",
+      "slug": "best-roofing-materials",
+      "title": "How to Choose the Best Roofing Materials for Your Home",
+      "current_wordpress_categories": [
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The body compares climate fit, durability, cost, energy performance, and inspection needs when selecting materials.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roofing-material-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-long-does-a-roof-last",
+      "slug": "how-long-does-a-roof-last",
+      "title": "How Long Does a Roof Last? A Guide for Florida Homeowners",
+      "current_wordpress_categories": [
+        "Roofing Materials",
+        "Education"
+      ],
+      "proposed_topic_slugs": [
+        "roof-lifespan",
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The article gives material-specific lifespan ranges and explains how installation, Florida climate, maintenance, and inspection change outcomes.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-lifespan-guides. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-vents",
+      "slug": "roof-vents",
+      "title": "Roof Vents: What They Are and Why You Need Them",
+      "current_wordpress_categories": [
+        "Education",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roof-components-and-ventilation",
+        "energy-efficient-roofing"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains vent purpose, intake and exhaust types, sizing, moisture control, temperature regulation, and attic balance.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-ventilation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/bad-roof-common-signs-roof-replacement",
+      "slug": "bad-roof-common-signs-roof-replacement",
+      "title": "Do You Have a Bad Roof? Here Are Common Signs You Need a Roof Replacement",
+      "current_wordpress_categories": [
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-replacement",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The short body lists missing or damaged shingles, moss, sagging, and age as replacement warnings, then recommends inspection.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "At 191 words, this is thin and substantially overlaps stronger replacement-warning guides; consolidate rather than migrate as-is.",
+        "Potential duplicate/overlap cluster: roof-replacement-warning-signs. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/reasons-for-roof-leaks",
+      "slug": "reasons-for-roof-leaks",
+      "title": "What Causes a Roof Leak? 5 Common Reasons for Roof Leaks",
+      "current_wordpress_categories": [
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-repair"
+      ],
+      "confidence": "high",
+      "rationale": "The body identifies age, flashing, shingles, gutters, and skylights as common leak causes and urges timely professional repair.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/your-guide-to-roof-repair-a-diy-job-or-time-to-call-in-the-pros",
+      "slug": "your-guide-to-roof-repair-a-diy-job-or-time-to-call-in-the-pros",
+      "title": "Your Guide to DIY Roof Repair: A DIY Job or Time to Call in the Pros?",
+      "current_wordpress_categories": [
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-repair",
+        "roof-leaks",
+        "roofing-safety-and-standards"
+      ],
+      "confidence": "high",
+      "rationale": "The article covers leak-source diagnosis and damage assessment, then compares DIY cost with safety, quality, warranty, and professional repair.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/building-a-roof-eco-friendly-options",
+      "slug": "building-a-roof-eco-friendly-options",
+      "title": "Building a Roof? Here’s 7 Eco-Friendly Roofing Options",
+      "current_wordpress_categories": [
+        "Energy-Efficient Roofing",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "energy-efficient-roofing",
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The body compares white, metal, recycled, reclaimed, wood, solar, and living-roof options through sustainability and energy use.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: sustainable-roofing. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/metal-roofing-vs-shingle-roofing",
+      "slug": "metal-roofing-vs-shingle-roofing",
+      "title": "Metal Roofing vs Shingle Roofing: Which Should You Choose?",
+      "current_wordpress_categories": [
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "metal-roofing",
+        "asphalt-shingles",
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The article compares metal and asphalt on price, lifespan, maintenance, installation, environmental impact, and Florida suitability.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: metal-versus-shingle. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/need-a-new-roof",
+      "slug": "need-a-new-roof",
+      "title": "4 Reasons You Can’t Sacrifice Quality for Cost When You Need a New Roof",
+      "current_wordpress_categories": [
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-replacement",
+        "choosing-a-roofer",
+        "roofing-costs"
+      ],
+      "confidence": "high",
+      "rationale": "The body argues that professional expertise, investment protection, curb appeal, and safety outweigh bargain replacement bids.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/assess-your-own-roof-damage",
+      "slug": "assess-your-own-roof-damage",
+      "title": "How to Assess Your Own Roof Damage Before Calling the Pros",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "storm-damage",
+        "roof-inspection",
+        "roof-repair"
+      ],
+      "confidence": "high",
+      "rationale": "The post gives a post-storm ground-level damage checklist covering pipe collars, shingles, paint, mold, algae, and moisture.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: storm-response. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/5-questions-to-ask-your-roofing-contractors",
+      "slug": "5-questions-to-ask-your-roofing-contractors",
+      "title": "5 Essential Questions To Ask Your Roofing Contractors Before You Sign On The Dotted Line",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer",
+        "roofing-warranties"
+      ],
+      "confidence": "high",
+      "rationale": "The article recommends asking about experience, schedule, warranty, written estimate, licensing, and insurance before signing.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/best-roofing-material",
+      "slug": "best-roofing-material",
+      "title": "Choose the Best Roofing Material: The Top 7 Material Options",
+      "current_wordpress_categories": [
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The body compares asphalt, tile, metal, slate, wood, synthetic, and solar products by cost, durability, style, and efficiency.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roofing-material-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/hurricane-proof-house",
+      "slug": "hurricane-proof-house",
+      "title": "The Hurricane-Proof House: Does It Exist? What You Need to Know about Roofing Materials That Can Stand up to Mother Nature",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Your Safety"
+      ],
+      "proposed_topic_slugs": [
+        "hurricane-preparation",
+        "roofing-safety-and-standards"
+      ],
+      "confidence": "medium",
+      "rationale": "The body ranges across roof shape, windows, doors, structural materials, anchoring, and storm-rated roofing systems.",
+      "ambiguous": true,
+      "ambiguity_note": "The article is a whole-home resilience guide, with substantial non-roofing content outside SonShine's core service scope.",
+      "ambiguity_options": [
+        "Keep intact under hurricane-preparation",
+        "Rewrite as a roof-specific resilience guide",
+        "Retire and redirect to a stronger hurricane-roof article"
+      ],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/leaking-roof-find-out-why",
+      "slug": "leaking-roof-find-out-why",
+      "title": "Leaking Roof? Find Out Why",
+      "current_wordpress_categories": [
+        "Roof Inspection",
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-repair",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains flashing, shingles, gutters, age, interior signs, and exterior signs used to diagnose a leaking roof.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roofing-tips-ensure-yours-lasts-longer",
+      "slug": "roofing-tips-ensure-yours-lasts-longer",
+      "title": "Roofing Tips to Ensure Yours Lasts Longer",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Roof Maintenance"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance",
+        "roof-lifespan"
+      ],
+      "confidence": "high",
+      "rationale": "The five tips cover ventilation, trees, gutters, safe repair choices, and recurring professional inspections.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/mistakes-hiring-local-roofing-companies",
+      "slug": "mistakes-hiring-local-roofing-companies",
+      "title": "Mistakes to Avoid When Hiring Local Roofing Companies",
+      "current_wordpress_categories": [
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The article warns against unlicensed providers, price-only selection, inadequate estimates, ignored reviews, and unclear warranties.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/when-to-replace-roofing",
+      "slug": "when-to-replace-roofing",
+      "title": "When to Replace Roofing: Top Warning Signs You Need a New Roof",
+      "current_wordpress_categories": [
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-replacement",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body uses missing or damaged shingles, attic water, roof age, and energy bills to identify replacement timing.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-replacement-warning-signs. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-inspection-checklist",
+      "slug": "roof-inspection-checklist",
+      "title": "Roof Inspection Checklist: What to Expect",
+      "current_wordpress_categories": [
+        "Education",
+        "Roof Inspection"
+      ],
+      "proposed_topic_slugs": [
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The checklist covers roof profile, surface materials, flashing, gutters, attic insulation, ventilation, mold, rot, and installation quality.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-inspection-guides. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/parts-of-a-roof",
+      "slug": "parts-of-a-roof",
+      "title": "Roofing 101: What Are the Parts of a Roof?",
+      "current_wordpress_categories": [
+        "Education",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roof-components-and-ventilation"
+      ],
+      "confidence": "high",
+      "rationale": "The article defines shingles, decking, gutters, ridge, valley, flashing, underlayment, dormer, gable, and drip edge.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/clogged-roof-gutters",
+      "slug": "clogged-roof-gutters",
+      "title": "7 Ways Clogged Roof Gutters Cause Damage",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Roof Maintenance"
+      ],
+      "proposed_topic_slugs": [
+        "gutters-and-drainage",
+        "roof-maintenance",
+        "roof-leaks"
+      ],
+      "confidence": "high",
+      "rationale": "The body connects clogged gutters to leaks, rot, mold, pests, foundations, flooding, and preventive guards.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/roofing-101-how-to-choose-the-best-roofing-materials-for-your-home",
+      "slug": "roofing-101-how-to-choose-the-best-roofing-materials-for-your-home",
+      "title": "Roofing 101: How to Choose the Best Roofing Materials for Your Home",
+      "current_wordpress_categories": [
+        "Education",
+        "How-To Articles",
+        "Roof Replacement",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-materials",
+        "roof-replacement"
+      ],
+      "confidence": "high",
+      "rationale": "The article evaluates material durability, type, structural weight, installation cost, climate, energy efficiency, style, and code.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roofing-material-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/metal-roof-vs-shingles-4-important-questions-to-ask-before-deciding",
+      "slug": "metal-roof-vs-shingles-4-important-questions-to-ask-before-deciding",
+      "title": "Metal Roof vs Shingles: 4 Important Questions to Ask Before Deciding",
+      "current_wordpress_categories": [
+        "Roof Replacement",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "metal-roofing",
+        "asphalt-shingles",
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The body compares metal and shingles through appearance, environmental impact, budget, and lifespan.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: metal-versus-shingle. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/hurricane-roofing-damage",
+      "slug": "hurricane-roofing-damage",
+      "title": "What to Expect from Hurricane Roofing Damage",
+      "current_wordpress_categories": [
+        "Education",
+        "How-To Articles",
+        "Roof Inspection",
+        "Storms"
+      ],
+      "proposed_topic_slugs": [
+        "storm-damage",
+        "hurricane-preparation",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The article describes common hurricane damage, safe post-storm inspection, and pre-storm prevention measures.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: storm-response. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/hire-local-roofing-company",
+      "slug": "hire-local-roofing-company",
+      "title": "5 Important Reasons Why You Should Hire a Local Roofing Company",
+      "current_wordpress_categories": [
+        "Education",
+        "Roof Repair",
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The body argues for local code knowledge, emergency response, supplier access, community accountability, and climate experience.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/types-of-roof-shingles",
+      "slug": "types-of-roof-shingles",
+      "title": "Your Ultimate Guide to the Different Types of Roof Shingles",
+      "current_wordpress_categories": [
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-materials"
+      ],
+      "confidence": "high",
+      "rationale": "The article compares asphalt, metal, wood, slate, clay, composite, rubber, and green shingle-style products.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roofing-material-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-maintenance-a-homeowners-guide-to-replacing-shingles",
+      "slug": "roof-maintenance-a-homeowners-guide-to-replacing-shingles",
+      "title": "Roof Maintenance: A Homeowner’s Guide to Replacing Shingles",
+      "current_wordpress_categories": [
+        "Roof Maintenance"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance",
+        "roof-repair",
+        "asphalt-shingles"
+      ],
+      "confidence": "high",
+      "rationale": "The body walks through removing seals and nails, replacing a damaged shingle, resealing, and deciding when to call a professional.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-repair-cost",
+      "slug": "roof-repair-cost",
+      "title": "The Average Roof Repair Cost: A Guide on What You Can Expect to Pay",
+      "current_wordpress_categories": [
+        "Roof Repair"
+      ],
+      "proposed_topic_slugs": [
+        "roof-repair",
+        "roofing-costs"
+      ],
+      "confidence": "high",
+      "rationale": "The article gives material-based repair ranges, repair-versus-replacement considerations, and the cost value of early inspection.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "All dollar figures require a current local pricing review."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-to-find-the-right-roofer-for-you-in-sarasota",
+      "slug": "how-to-find-the-right-roofer-for-you-in-sarasota",
+      "title": "How to Find the Right Roofer for You in Sarasota",
+      "current_wordpress_categories": [
+        "How-To Articles",
+        "Roof Repair",
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The body supplies eight screening questions covering business history, licensing, portfolio, estimate, written scope, crew, guarantees, and tear-off.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/how-long-does-a-tile-roof-last-in-florida",
+      "slug": "how-long-does-a-tile-roof-last-in-florida",
+      "title": "How Long Does a Tile Roof Last in Florida?",
+      "current_wordpress_categories": [
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "tile-roofing",
+        "roof-lifespan"
+      ],
+      "confidence": "high",
+      "rationale": "The article explains tile life expectancy, climate and installation factors, end-of-life signs, and Florida suitability.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-lifespan-guides. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/building-codes",
+      "slug": "building-codes",
+      "title": "Building Codes 101: The Importance of Going Above and Beyond Minimum Standards",
+      "current_wordpress_categories": [
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-safety-and-standards",
+        "roof-replacement"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains regulators and Florida code requirements for decking, coverings, flashing, drainage, and above-minimum installation.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/best-type-of-roof",
+      "slug": "best-type-of-roof",
+      "title": "What Is the Best Type of Roof for Florida Residents?",
+      "current_wordpress_categories": [
+        "Education",
+        "Hurricane Preparation",
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "roofing-materials",
+        "hurricane-preparation"
+      ],
+      "confidence": "high",
+      "rationale": "The article compares asphalt, clay, concrete, metal, and slate against Florida heat, humidity, rain, and storm exposure.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roofing-material-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/are-solar-panels-bad-for-your-roof",
+      "slug": "are-solar-panels-bad-for-your-roof",
+      "title": "Are Solar Panels Bad for Your Roof?",
+      "current_wordpress_categories": [
+        "Roofing Materials"
+      ],
+      "proposed_topic_slugs": [
+        "energy-efficient-roofing",
+        "roof-maintenance"
+      ],
+      "confidence": "high",
+      "rationale": "The body covers roof condition, strength, age, penetrations, mounting, installer credentials, financing, and ongoing care around solar panels.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": []
+    },
+    {
+      "url": "https://sonshineroofing.com/how-to-clean-your-roof",
+      "slug": "how-to-clean-your-roof",
+      "title": "How to Clean Your Roof: An Expert Roof Care Guide",
+      "current_wordpress_categories": [
+        "Education",
+        "How-To Articles",
+        "Roof Maintenance"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance"
+      ],
+      "confidence": "high",
+      "rationale": "The article explains material-specific inspection, common threats, pressure and chemical cleaning, algae removal, and safe professional care.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-cleaning. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roof-maintenance-tips-homeowners-should-know",
+      "slug": "roof-maintenance-tips-homeowners-should-know",
+      "title": "10 DIY Roof Maintenance Tips Every Homeowner Should Know",
+      "current_wordpress_categories": [
+        "Education",
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "roof-maintenance",
+        "roof-inspection"
+      ],
+      "confidence": "high",
+      "rationale": "The body provides safe ground checks, debris and gutter care, tree trimming, moss monitoring, attic checks, flashing review, and professional follow-up.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: roof-maintenance-and-longevity. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/understanding-roof-leaks-causes-and-solutions",
+      "slug": "understanding-roof-leaks-causes-and-solutions",
+      "title": "Understanding Roof Leaks: 10 Causes and Solutions",
+      "current_wordpress_categories": [
+        "Roof Repair",
+        "Roof Inspection",
+        "Roof Maintenance",
+        "Roof Replacement"
+      ],
+      "proposed_topic_slugs": [
+        "roof-leaks",
+        "roof-repair"
+      ],
+      "confidence": "high",
+      "rationale": "The body enumerates ten leak causes and pairs each with preventive maintenance or professional repair solutions.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Replace the obsolete next.next.sonshineroofing.com email address.",
+        "Potential duplicate/overlap cluster: roof-leak-diagnosis. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/find-the-best-roofing-contractor-in-sarasota-florida",
+      "slug": "find-the-best-roofing-contractor-in-sarasota-florida",
+      "title": "How to Find the Best Roofing Contractor in Sarasota, Florida: A Homeowner’s Checklist",
+      "current_wordpress_categories": [
+        "Education",
+        "How-To Articles"
+      ],
+      "proposed_topic_slugs": [
+        "choosing-a-roofer"
+      ],
+      "confidence": "high",
+      "rationale": "The checklist covers credentials, local experience, reviews, referrals, communication, multiple quotes, warranties, and follow-up.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Potential duplicate/overlap cluster: contractor-selection. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/pre-storm-roof-inspection",
+      "slug": "pre-storm-roof-inspection",
+      "title": "Pre-Storm Roof Inspection: How to Protect Yourself Before the Next Hurricane",
+      "current_wordpress_categories": [
+        "Education",
+        "Roof Inspection",
+        "Storms"
+      ],
+      "proposed_topic_slugs": [
+        "roof-inspection",
+        "hurricane-preparation",
+        "insurance-and-claims"
+      ],
+      "confidence": "high",
+      "rationale": "The body explains pre-existing-damage disputes and how dated photos, maintenance records, and a professional inspection support storm claims.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": false,
+      "content_migration_notes": [
+        "Replace the obsolete next.next.sonshineroofing.com email address and verify insurance/legal claims.",
+        "Potential duplicate/overlap cluster: hurricane-preparation. Compare search intent and select a canonical article before bulk import."
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/grouper-tacos",
+      "slug": "grouper-tacos",
+      "title": "Irresistible Blackened Grouper Tacos with Creamy Lime Crema",
+      "current_wordpress_categories": [
+        "Recipes"
+      ],
+      "proposed_topic_slugs": [],
+      "confidence": "low",
+      "rationale": "The body is a blackened grouper taco recipe with ingredients, cooking steps, and lime crema; it has no roofing subject.",
+      "ambiguous": false,
+      "ambiguity_note": null,
+      "ambiguity_options": [],
+      "no_reusable_topic_fit": true,
+      "content_migration_notes": [
+        "Off-topic recipe. Do not create a one-off Recipes topic; exclude from the Directus blog migration or move to a separate personal/community content property."
+      ]
+    }
+  ],
+  "ambiguous_posts": [
+    {
+      "url": "https://sonshineroofing.com/roof-runoff-damage-sarasota",
+      "slug": "roof-runoff-damage-sarasota",
+      "title": "Roof Runoff Damage in Sarasota, FL: How It Erodes Soil, Hurts Foundations, and Kills Landscaping",
+      "reason": "The subject fits roof drainage, but much of the article belongs to the landscaping partner's expertise and audience.",
+      "options": [
+        "Migrate intact under gutters-and-drainage",
+        "Extract a roofing-focused version and move the landscaping guidance elsewhere",
+        "Move the whole joint article to Southern Standards and redirect"
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/lead-safe-certified",
+      "slug": "lead-safe-certified",
+      "title": "If You’re Not Lead-Safe Certified, Lead Paint Could Cost You Big Time.",
+      "reason": "Lead-safe renovation is relevant to roofing work but peripheral to the main roofing taxonomy and may function better as a company credential page.",
+      "options": [
+        "Keep as a blog post under roofing-safety-and-standards",
+        "Convert to a company credential/standards page",
+        "Retire if certification or regulatory details cannot be verified"
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/2025-guide-how-to-prepare-your-roof-and-fence-for-hurricane-season-in-florida",
+      "slug": "2025-guide-how-to-prepare-your-roof-and-fence-for-hurricane-season-in-florida",
+      "title": "2025 Guide: How to Prepare Your Roof and Fence for Hurricane Season in Florida",
+      "reason": "Roughly half of the article is fence guidance for a partner business, so the correct canonical owner and migration scope are unclear.",
+      "options": [
+        "Migrate intact as a joint hurricane guide",
+        "Split into roofing and fencing articles",
+        "Keep only the roof section and redirect or cross-link the fence content"
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/roofing-education-is-key",
+      "slug": "roofing-education-is-key",
+      "title": "(Roofing) Education is Key",
+      "reason": "The post is a broad brand essay spanning installation quality, contractor choice, maintenance, and warranties without one strong navigation intent.",
+      "options": [
+        "Keep the three proposed topics",
+        "Consolidate its useful points into a stronger roof-longevity guide",
+        "Convert it to an about/process standards page"
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/things-you-need-to-know-about-your-roof",
+      "slug": "things-you-need-to-know-about-your-roof",
+      "title": "5 Things You Need to Know About Your Roof",
+      "reason": "This short roundup spans four durable subjects but lacks a single dominant taxonomy intent.",
+      "options": [
+        "Migrate as-is with the three approved topics",
+        "Consolidate into a comprehensive roof-care guide",
+        "Split the strongest points into topic-specific evergreen posts"
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/storm-damage-roof-repair",
+      "slug": "storm-damage-roof-repair",
+      "title": "Don’t Wait for Storm Damage: Get the Wheels of Roof Repair in Motion Now",
+      "reason": "The title promises post-damage roof repair, while the body is predominantly pre-storm preparation and insurance readiness.",
+      "options": [
+        "Retitle and keep under hurricane-preparation",
+        "Rewrite to fulfill the storm-damage repair intent",
+        "Consolidate into a stronger pre-storm inspection guide"
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/why-roofs-last",
+      "slug": "why-roofs-last",
+      "title": "Why Some Roofs Fail When Others Last: One Roofer’s 30-Year Reflection",
+      "reason": "It works both as a roof-longevity article and as a founder/company-values story.",
+      "options": [
+        "Keep as a blog post with the proposed topics",
+        "Convert to an about/quality-standards story",
+        "Extract technical guidance into an evergreen longevity post"
+      ]
+    },
+    {
+      "url": "https://sonshineroofing.com/hurricane-proof-house",
+      "slug": "hurricane-proof-house",
+      "title": "The Hurricane-Proof House: Does It Exist? What You Need to Know about Roofing Materials That Can Stand up to Mother Nature",
+      "reason": "The article is a whole-home resilience guide, with substantial non-roofing content outside SonShine's core service scope.",
+      "options": [
+        "Keep intact under hurricane-preparation",
+        "Rewrite as a roof-specific resilience guide",
+        "Retire and redirect to a stronger hurricane-roof article"
+      ]
+    }
+  ],
+  "no_fit_posts": [
+    {
+      "url": "https://sonshineroofing.com/grouper-tacos",
+      "slug": "grouper-tacos",
+      "title": "Irresistible Blackened Grouper Tacos with Creamy Lime Crema",
+      "reason": "The body is a blackened grouper taco recipe with ingredients, cooking steps, and lime crema; it has no roofing subject.",
+      "recommendation": [
+        "Off-topic recipe. Do not create a one-off Recipes topic; exclude from the Directus blog migration or move to a separate personal/community content property."
+      ]
+    }
+  ],
+  "summary": {
+    "sitemap_url_count": 108,
+    "unique_sitemap_url_count": 108,
+    "audited_post_count": 108,
+    "migration_candidate_count": 106,
+    "migration_excluded_count": 2,
+    "proposed_topic_count": 21,
+    "ambiguous_post_count": 8,
+    "no_fit_post_count": 1,
+    "confidence_counts": {
+      "high": 98,
+      "medium": 9,
+      "low": 1
+    },
+    "posts_with_multiple_topics": 83,
+    "posts_above_default_topic_maximum": 0,
+    "posts_with_migration_notes": 95
+  },
+  "validation": {
+    "json_structure": "Generated with JSON.stringify using two-space indentation.",
+    "sitemap_urls_unique": true,
+    "every_sitemap_url_present_exactly_once": true,
+    "no_extra_post_urls": true,
+    "post_slugs_unique": true,
+    "topic_slugs_unique": true,
+    "all_topic_references_resolve": true,
+    "approved_migration_candidates_respect_default_topic_maximum": true,
+    "summary_counts_reconciled": true
+  }
+}
