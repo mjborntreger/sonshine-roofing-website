@@ -3,15 +3,7 @@ import 'server-only';
 import { sanitizeDirectusHtml } from '@/lib/content/directus-html';
 import type { PageResult } from '@/lib/ui/pagination';
 import {
-  getPostBySlug as getWordPressPostBySlug,
-  listBlogCategories as listWordPressBlogCategories,
-  listPostSlugs as listWordPressPostSlugs,
-  listPostsPaged as listWordPressPostsPaged,
-  listRecentPostNav as listWordPressRecentPostNav,
-  listRecentPosts as listWordPressRecentPosts,
-  listRecentPostsPool as listWordPressRecentPostsPool,
   stripHtml,
-  wpFetch,
   type FacetGroup,
   type Post,
   type PostCard,
@@ -23,6 +15,7 @@ import {
 
 const DIRECTUS_REVALIDATE_SECONDS = 900;
 const DIRECTUS_POST_LIMIT = 500;
+const SONSHINE_MICHAEL_PERSON_ID = 'f028dafd-c2fb-4d59-a561-2be5e46ea318';
 const DIRECTUS_POST_FIELDS = [
   'client.slug',
   'status',
@@ -41,8 +34,10 @@ const DIRECTUS_POST_FIELDS = [
   'featured_image.description',
   'featured_image.width',
   'featured_image.height',
+  'author.id',
   'author.first_name',
   'author.last_name',
+  'author.client.slug',
   'topics.blog_topic.name',
   'topics.blog_topic.slug',
   'topics.blog_topic.status',
@@ -50,7 +45,6 @@ const DIRECTUS_POST_FIELDS = [
 ] as const;
 
 type UnknownRecord = Record<string, unknown>;
-type BlogContentSource = 'wordpress' | 'directus';
 
 type DirectusConfig = {
   url: string;
@@ -120,17 +114,6 @@ const readRelationSlug = (value: unknown): string | null => readString(asRecord(
 
 const trimTrailingSlash = (value: string): string => value.replace(/\/+$/, '');
 
-export function getBlogContentSource(): BlogContentSource {
-  const configured = readString(process.env.BLOG_CONTENT_SOURCE)?.toLowerCase();
-
-  if (!configured || configured === 'wordpress') return 'wordpress';
-  if (configured === 'directus') return 'directus';
-
-  throw new Error(
-    `[blog] Unsupported BLOG_CONTENT_SOURCE "${configured}". Use "wordpress" or "directus".`,
-  );
-}
-
 function getDirectusConfig(): DirectusConfig {
   const url = readString(process.env.DIRECTUS_URL);
   const clientSlug = readString(process.env.DIRECTUS_CLIENT_SLUG);
@@ -139,7 +122,7 @@ function getDirectusConfig(): DirectusConfig {
 
   if (!url || !clientSlug || !token) {
     throw new Error(
-      '[blog] BLOG_CONTENT_SOURCE=directus requires DIRECTUS_URL, DIRECTUS_CLIENT_SLUG, and DIRECTUS_TOKEN or DIRECTUS_STATIC_TOKEN.',
+      '[blog] Directus blog content requires DIRECTUS_URL, DIRECTUS_CLIENT_SLUG, and DIRECTUS_TOKEN or DIRECTUS_STATIC_TOKEN.',
     );
   }
 
@@ -168,16 +151,28 @@ function mapDirectusImage(value: unknown, config: DirectusConfig): WpImage | nul
   };
 }
 
-function mapDirectusAuthor(value: unknown): string | null {
+function mapDirectusAuthor(value: unknown, config: DirectusConfig): string | null {
   const record = asRecord(value);
   if (!record) return null;
 
+  const id = readString(record.id);
+  const clientSlug = readRelationSlug(record.client);
   const name = [readString(record.first_name), readString(record.last_name)]
     .filter((part): part is string => Boolean(part))
     .join(' ')
     .trim();
 
-  return name || null;
+  if (
+    id !== SONSHINE_MICHAEL_PERSON_ID ||
+    clientSlug !== config.clientSlug ||
+    name !== 'Michael Borntreger'
+  ) {
+    throw new Error(
+      `[blog] Directus author relation must be the approved SonShine-scoped Michael Borntreger record.`,
+    );
+  }
+
+  return name;
 }
 
 function mapDirectusTopics(value: unknown, config: DirectusConfig): TermLite[] {
@@ -224,7 +219,7 @@ function mapDirectusPost(
   const featuredImage = mapDirectusImage(item.featured_image, config);
   const metaTitle = readString(item.meta_title);
   const metaDescription = readString(item.meta_description);
-  const authorName = mapDirectusAuthor(item.author);
+  const authorName = mapDirectusAuthor(item.author, config);
 
   if (categoryTerms.length === 0) {
     throw new Error(`[blog] Directus blog post ${slug} has no published client-scoped topics.`);
@@ -232,12 +227,6 @@ function mapDirectusPost(
 
   if (categoryTerms.length > 3) {
     throw new Error(`[blog] Directus blog post ${slug} exceeds the three-topic maximum.`);
-  }
-
-  if (authorName && authorName !== 'Michael Borntreger') {
-    throw new Error(
-      `[blog] Directus blog post ${slug} has unsupported author relation "${authorName}".`,
-    );
   }
 
   return {
@@ -317,9 +306,9 @@ async function fetchDirectusCollection<T>(
   url.searchParams.set(
     'filter',
     JSON.stringify({
+      ...(options.filter ?? {}),
       client: { slug: { _eq: config.clientSlug } },
       status: { _eq: 'published' },
-      ...(options.filter ?? {}),
     }),
   );
   url.searchParams.set('limit', String(options.limit ?? DIRECTUS_POST_LIMIT));
@@ -449,10 +438,6 @@ export async function listPostsPaged({
   after?: string | null;
   filters?: PostsFiltersInput;
 } = {}): Promise<PageResult<PostCard> & { facets: FacetGroup[] }> {
-  if (getBlogContentSource() === 'wordpress') {
-    return listWordPressPostsPaged({ first, after, filters });
-  }
-
   const size = Math.max(1, Math.min(first, 50));
   const offset = after ? Math.max(0, Number.parseInt(after, 10) || 0) : 0;
   const allPosts = await listDirectusPosts();
@@ -477,10 +462,6 @@ export async function listPostsPaged({
 }
 
 export async function listBlogCategories(limit = 100): Promise<TermLite[]> {
-  if (getBlogContentSource() === 'wordpress') {
-    return listWordPressBlogCategories(limit);
-  }
-
   const topics = await fetchDirectusCollection<{
     name?: unknown;
     slug?: unknown;
@@ -499,9 +480,6 @@ export async function listBlogCategories(limit = 100): Promise<TermLite[]> {
 }
 
 export async function listRecentPosts(limit = 12): Promise<PostCard[]> {
-  if (getBlogContentSource() === 'wordpress') {
-    return listWordPressRecentPosts(limit);
-  }
   return (await listDirectusPosts()).slice(0, limit).map(toPostCard);
 }
 
@@ -536,25 +514,16 @@ export async function listRecentPostsPoolForFilters(
 }
 
 export async function listRecentPostsPool(limit = 36): Promise<PostLite[]> {
-  if (getBlogContentSource() === 'wordpress') {
-    return listWordPressRecentPostsPool(limit);
-  }
   return (await listDirectusPosts()).slice(0, limit).map(toPostLite);
 }
 
 export async function listPostSlugs(limit = 200): Promise<string[]> {
-  if (getBlogContentSource() === 'wordpress') {
-    return listWordPressPostSlugs(limit);
-  }
   return (await listDirectusPosts()).slice(0, limit).map((post) => post.slug);
 }
 
 export async function listRecentPostNav(
   limit = 200,
 ): Promise<Array<{ slug: string; title: string; date: string }>> {
-  if (getBlogContentSource() === 'wordpress') {
-    return listWordPressRecentPostNav(limit);
-  }
   return (await listDirectusPosts()).slice(0, limit).map((post) => ({
     slug: post.slug,
     title: post.title,
@@ -563,136 +532,22 @@ export async function listRecentPostNav(
 }
 
 export async function getPostBySlug(slug: string): Promise<Post | null> {
-  return getBlogContentSource() === 'wordpress'
-    ? getWordPressPostBySlug(slug)
-    : getDirectusPostBySlug(slug);
+  return getDirectusPostBySlug(slug);
 }
 
 export async function listBlogSitemapEntries(): Promise<BlogSitemapEntry[]> {
-  if (getBlogContentSource() === 'directus') {
-    return (await listDirectusPosts()).map((post) => ({
-      uri: `/${post.slug}`,
-      modified: post.modified ?? post.date ?? null,
-    }));
-  }
-
-  type SitemapResult = {
-    posts?: {
-      pageInfo?: { hasNextPage?: boolean; endCursor?: string | null };
-      nodes?: Array<{ uri?: string | null; modifiedGmt?: string | null }>;
-    };
-  };
-  const query = /* GraphQL */ `
-    query SitemapPosts($first: Int!, $after: String) {
-      posts(
-        first: $first
-        after: $after
-        where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-      ) {
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-        nodes {
-          uri
-          modifiedGmt
-        }
-      }
-    }
-  `;
-  const entries: BlogSitemapEntry[] = [];
-  let after: string | null = null;
-
-  do {
-    const data: SitemapResult = await wpFetch<SitemapResult>(
-      query,
-      after ? { first: 200, after } : { first: 200 },
-    );
-    for (const node of data.posts?.nodes ?? []) {
-      const uri = readString(node.uri);
-      if (uri) entries.push({ uri, modified: readString(node.modifiedGmt) });
-    }
-    after = data.posts?.pageInfo?.hasNextPage ? (data.posts.pageInfo.endCursor ?? null) : null;
-  } while (after);
-
-  return entries;
+  return (await listDirectusPosts()).map((post) => ({
+    uri: `/${post.slug}`,
+    modified: post.modified ?? post.date ?? null,
+  }));
 }
 
 export async function listBlogImageSitemapEntries(): Promise<BlogImageSitemapEntry[]> {
-  if (getBlogContentSource() === 'directus') {
-    return (await listDirectusPosts()).map((post) => ({
-      uri: `/${post.slug}`,
-      modified: post.modified ?? post.date ?? null,
-      featuredImage: toWpImage(post.featuredImage),
-    }));
-  }
-
-  type ImageSitemapResult = {
-    posts?: {
-      pageInfo?: { hasNextPage?: boolean; endCursor?: string | null };
-      nodes?: Array<{
-        uri?: string | null;
-        modifiedGmt?: string | null;
-        featuredImage?: {
-          node?: {
-            sourceUrl?: string | null;
-            altText?: string | null;
-          } | null;
-        } | null;
-      }>;
-    };
-  };
-  const query = /* GraphQL */ `
-    query ImageSitemapPosts($first: Int!, $after: String) {
-      posts(
-        first: $first
-        after: $after
-        where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-      ) {
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-        nodes {
-          uri
-          modifiedGmt
-          featuredImage {
-            node {
-              sourceUrl
-              altText
-            }
-          }
-        }
-      }
-    }
-  `;
-  const entries: BlogImageSitemapEntry[] = [];
-  let after: string | null = null;
-
-  do {
-    const data: ImageSitemapResult = await wpFetch<ImageSitemapResult>(
-      query,
-      after ? { first: 200, after } : { first: 200 },
-    );
-    for (const node of data.posts?.nodes ?? []) {
-      const uri = readString(node.uri);
-      if (!uri) continue;
-      const imageUrl = readString(node.featuredImage?.node?.sourceUrl);
-      entries.push({
-        uri,
-        modified: readString(node.modifiedGmt),
-        featuredImage: imageUrl
-          ? {
-              url: imageUrl,
-              altText: readString(node.featuredImage?.node?.altText) ?? '',
-            }
-          : null,
-      });
-    }
-    after = data.posts?.pageInfo?.hasNextPage ? (data.posts.pageInfo.endCursor ?? null) : null;
-  } while (after);
-
-  return entries;
+  return (await listDirectusPosts()).map((post) => ({
+    uri: `/${post.slug}`,
+    modified: post.modified ?? post.date ?? null,
+    featuredImage: toWpImage(post.featuredImage),
+  }));
 }
 
 export type { FacetGroup, Post, PostCard, PostLite, PostsFiltersInput, TermLite };

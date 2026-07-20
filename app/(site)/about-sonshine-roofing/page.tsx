@@ -1,23 +1,31 @@
-import Section from "@/components/layout/Section";
-import { AboutVideo } from "@/components/marketing/about-page/AboutVideo";
-import { listPersons, listPersonsBySlugs } from '@/lib/content/wp';
-import PersonGrid from "@/components/dynamic-content/person/PersonGrid";
-import { HoursAndInformation } from "@/components/marketing/about-page/HoursAndInformation";
-import { Accordion } from "@/components/ui/Accordion";
-import { UserRoundSearch, ExternalLink, ShieldCheck, MapPin, HardHat, Heart, Users } from "lucide-react";
+import Section from '@/components/layout/Section';
+import { AboutVideo } from '@/components/marketing/about-page/AboutVideo';
+import { listTeamPersons } from '@/lib/content/persons';
+import PersonGrid from '@/components/dynamic-content/person/PersonGrid';
+import { HoursAndInformation } from '@/components/marketing/about-page/HoursAndInformation';
+import { Accordion } from '@/components/ui/Accordion';
+import {
+  UserRoundSearch,
+  ExternalLink,
+  ShieldCheck,
+  MapPin,
+  HardHat,
+  Heart,
+  Users,
+} from 'lucide-react';
 import type { Metadata } from 'next';
-import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks";
-import { getWebsitePageMetadata } from "@/lib/content/directus-site";
-import { JsonLd } from "@/lib/seo/json-ld";
-import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
-import { getServicePageConfig } from "@/lib/seo/service-pages";
-import { SITE_ORIGIN } from "@/lib/seo/site";
-import Image from "next/image";
-import Hero from "@/components/ui/Hero";
-import SmartLink from "@/components/utils/SmartLink";
-import SidebarCta from "@/components/cta/SidebarCta";
+import ResourcesQuickLinks from '@/components/global-nav/static-pages/ResourcesQuickLinks';
+import { getSiteSettings, getWebsitePageMetadata } from '@/lib/content/directus-site';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema, webPageSchema } from '@/lib/seo/schema';
+import { getServicePageConfig } from '@/lib/seo/service-pages';
+import { SITE_ORIGIN } from '@/lib/seo/site';
+import Image from 'next/image';
+import Hero from '@/components/ui/Hero';
+import SmartLink from '@/components/utils/SmartLink';
+import SidebarCta from '@/components/cta/SidebarCta';
 
-const SERVICE_PATH = "/about-sonshine-roofing";
+const SERVICE_PATH = '/about-sonshine-roofing';
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,8 +33,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
   if (!config) {
     return getWebsitePageMetadata({
-      title: "About SonShine Roofing",
-      description: "Learn about the SonShine Roofing team.",
+      title: 'About SonShine Roofing',
+      description: 'Learn about the SonShine Roofing team.',
       path: SERVICE_PATH,
     });
   }
@@ -39,43 +47,23 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const ORDER: string[] = [
-  'nathan-borntreger',
-  'angela',
-  'bob',
-  'dean',
-  'josh',
-  'jb',
-  'jeremy-k',
-  'tara',
-  'matthew',
-  'mina',
-  'steve',
-  'michael',
-  'erick',
-  'jose'
-];
-
 export default async function Page() {
-  const people = ORDER.length
-    ? await listPersonsBySlugs(ORDER)
-    : await listPersons(20);
+  const [people, settings] = await Promise.all([listTeamPersons(), getSiteSettings()]);
   const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
 
-  const breadcrumbsConfig =
-    config?.breadcrumbs ?? [
-      { name: "Home", path: "/" },
-      { name: "About SonShine Roofing", path: SERVICE_PATH },
-    ];
+  const breadcrumbsConfig = config?.breadcrumbs ?? [
+    { name: 'Home', path: '/' },
+    { name: 'About SonShine Roofing', path: SERVICE_PATH },
+  ];
 
   const webPageLd = webPageSchema({
-    name: config?.title ?? "About SonShine Roofing",
+    name: config?.title ?? 'About SonShine Roofing',
     description: config?.description,
     url: SERVICE_PATH,
     origin,
-    primaryImage: config?.image?.url ?? "/og-default.png",
-    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
+    primaryImage: config?.image?.url ?? '/og-default.png',
+    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: origin },
   });
 
   const breadcrumbsLd = breadcrumbSchema(
@@ -91,28 +79,30 @@ export default async function Page() {
       <Hero
         title="About Us"
         eyelash="Who we are"
-        subtitle="Family-owned roofing company based in Sarasota, Florida, serving Sarasota, Manatee, and Charlotte County residents with 38+ years of experience."
+        subtitle="Family-owned roofing company based in Sarasota, Florida, serving Sarasota, Manatee, and Charlotte County residents with 39+ years of experience."
         justifyStart
         imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Roofing-Team-Wide-Angle.webp"
         badges={[
-          { icon: ShieldCheck, label: "Licensed & Insured" },
-          { icon: MapPin, label: "Local & Family-owned" },
-          { icon: HardHat, label: "4 Decades of Experience" },
-          { icon: Heart, label: "Faith-based Values" },
-          { icon: Users, label: "Community Sponsor" },
+          { icon: ShieldCheck, label: 'Licensed & Insured' },
+          { icon: MapPin, label: 'Local & Family-owned' },
+          { icon: HardHat, label: '39+ Years of Experience' },
+          { icon: Heart, label: 'Faith-based Values' },
+          { icon: Users, label: 'Community Sponsor' },
         ]}
       >
         <div className="not-prose mt-2 mb-4 flex flex-wrap items-center gap-2">
-          <SmartLink
-            href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&amp;id=601EB27C16D2369E36FD9B81C20A0755"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="View Florida contractor license #CCC1331483 on myfloridalicense.com (opens in a new tab)"
-            className="btn btn-brand-blue btn-md inline-flex items-center"
-          >
-            <span>Lic. #CCC1331483</span>
-            <ExternalLink className="ml-1 inline h-3 w-3" aria-hidden="true" />
-          </SmartLink>
+          {settings?.licenseNumber && settings.licenseUrl ? (
+            <SmartLink
+              href={settings.licenseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`View Florida contractor license #${settings.licenseNumber} on myfloridalicense.com (opens in a new tab)`}
+              className="btn btn-brand-blue btn-md inline-flex items-center"
+            >
+              <span>Lic. #{settings.licenseNumber}</span>
+              <ExternalLink className="ml-1 inline h-3 w-3" aria-hidden="true" />
+            </SmartLink>
+          ) : null}
         </div>
       </Hero>
 
@@ -134,22 +124,29 @@ export default async function Page() {
               summaryClassName="bg-amber-50/25"
             >
               <p>
-                We specialize in <strong>residential roofing services</strong>, including <strong>roof repair</strong>, <strong>roof replacement</strong>, <strong>roof inspections</strong>, and our <strong>Roof Care Club</strong>, which is our preventative maintenance program uniquely designed for Sarasota-area homeowners. We work with a wide variety of materials, including <strong>asphalt shingles</strong>, <strong>metal panels</strong>, <strong>concrete tiles</strong>, and even some <strong>flat roofs</strong>.
+                We specialize in <strong>residential roofing services</strong>, including{' '}
+                <strong>roof repair</strong>, <strong>roof replacement</strong>,{' '}
+                <strong>roof inspections</strong>, and our <strong>Roof Care Club</strong>, which is
+                our preventative maintenance program uniquely designed for Sarasota-area homeowners.
+                We work with a wide variety of materials, including{' '}
+                <strong>asphalt shingles</strong>, <strong>metal panels</strong>,{' '}
+                <strong>concrete tiles</strong>, and even some <strong>flat roofs</strong>.
               </p>
               <AboutVideo />
               <p>
-                We&rsquo;ve learned that <strong>superior customer service</strong> and <strong>honesty</strong> with clients are the most reliable ways to
-                stay in business long term. The majority of our work is based on referrals and word-of-mouth, which
+                We&rsquo;ve learned that <strong>superior customer service</strong> and{' '}
+                <strong>honesty</strong> with clients are the most reliable ways to stay in business
+                long term. The majority of our work is based on referrals and word-of-mouth, which
                 we are very proud of, and you&apos;ll quickly see why that&apos;s the case.
               </p>
               <p className="mt-4">
-                By the way, when you ask us to inspect your roof, we&rsquo;ll tell you the <strong>flat-out honest truth&mdash;period</strong>.
-                Many of the other guys will prioritize their big-ticket customers during storm season, leaving budget-conscious and savvy homeowners out to dry.
-                Not us.
-                We always give our expert recommendation based on our <strong>38+ years</strong> of professional experience in the Sarasota area,
-                and we will <strong>NEVER</strong> sell you something you don&apos;t need.
+                By the way, when you ask us to inspect your roof, we&rsquo;ll tell you the{' '}
+                <strong>flat-out honest truth&mdash;period</strong>. Many of the other guys will
+                prioritize their big-ticket customers during storm season, leaving budget-conscious
+                and savvy homeowners out to dry. Not us. We always give our expert recommendation
+                based on our <strong>39+ years</strong> of professional experience in the Sarasota
+                area, and we will <strong>NEVER</strong> sell you something you don&apos;t need.
               </p>
-
             </Accordion>
 
             <Accordion
@@ -163,10 +160,11 @@ export default async function Page() {
               contentClassName="bg-sky-50 text-lg leading-loose"
             >
               <p>
-                Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota community.
-                Since we are keenly attuned to unpredictable nature of hurricane season, we focus
-                on <strong>quality</strong> over &lsquo;quick fixes,&rsquo; offering durable roofing solutions backed by
-                in-house crews, exclusive manufacturer warranties and our own 25-year Leak Free Guarantee.
+                Unlike storm-chasing contractors, SonShine Roofing is rooted in the Sarasota
+                community. Since we are keenly attuned to unpredictable nature of hurricane season,
+                we focus on <strong>quality</strong> over &lsquo;quick fixes,&rsquo; offering
+                durable roofing solutions backed by in-house crews, exclusive manufacturer
+                warranties and our own 25-year Leak Free Guarantee.
               </p>
               <div className="flex items-center justify-self-center">
                 <Image
@@ -179,13 +177,13 @@ export default async function Page() {
                 />
               </div>
               <p>
-                When you choose SonShine Roofing, you are showing that you value honesty,
-                reliable service, and unbeatable quality. We trust that you&rsquo;ll make <strong>the right choice</strong>.
+                When you choose SonShine Roofing, you are showing that you value honesty, reliable
+                service, and unbeatable quality. We trust that you&rsquo;ll make{' '}
+                <strong>the right choice</strong>.
               </p>
             </Accordion>
 
             <HoursAndInformation />
-
           </div>
 
           <aside className="lg:sticky top-16 self-start lg:h-fit">
@@ -193,12 +191,13 @@ export default async function Page() {
             <div className="h-[1px] w-full bg-blue-100 my-4" />
             <SidebarCta />
           </aside>
-
         </div>
       </Section>
 
       <Section>
-        <h2 id="meet-our-team" className="text-center mb-8 meet-our-team text-3xl lg:text-5xl">Meet Our Team</h2>
+        <h2 id="meet-our-team" className="text-center mb-8 meet-our-team text-3xl lg:text-5xl">
+          Meet Our Team
+        </h2>
         <div className="gradient-divider my-4" />
         <PersonGrid people={people} />
       </Section>

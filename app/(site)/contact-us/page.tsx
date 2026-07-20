@@ -1,33 +1,32 @@
-import { Suspense } from "react";
-import Section from "@/components/layout/Section";
-import SimpleLeadForm from "@/components/lead-capture/lead-form/SimpleLeadForm";
-import SmartLink from "@/components/utils/SmartLink";
-import { Smartphone, ShieldCheck, BadgeCheck, Star, HandCoins } from "lucide-react";
+import { Suspense } from 'react';
+import Section from '@/components/layout/Section';
+import SimpleLeadForm from '@/components/lead-capture/lead-form/SimpleLeadForm';
+import SmartLink from '@/components/utils/SmartLink';
+import { Smartphone, ShieldCheck, BadgeCheck, Star, HandCoins } from 'lucide-react';
 import Image from 'next/image';
 import type { Metadata } from 'next';
-import LiteMap from "@/components/utils/LiteMap";
-import OpenOrClosed from "@/components/utils/OpenOrClosed";
-import ResourcesQuickLinks from "@/components/global-nav/static-pages/ResourcesQuickLinks";
-import { getWebsitePageMetadata } from "@/lib/content/directus-site";
-import { JsonLd } from "@/lib/seo/json-ld";
-import { breadcrumbSchema, webPageSchema } from "@/lib/seo/schema";
-import { getServicePageConfig } from "@/lib/seo/service-pages";
-import { SITE_ORIGIN } from "@/lib/seo/site";
-import Hero from "@/components/ui/Hero";
-import CopyButton from "@/components/utils/CopyButton";
+import LiteMap from '@/components/utils/LiteMap';
+import OpenOrClosed from '@/components/utils/OpenOrClosed';
+import ResourcesQuickLinks from '@/components/global-nav/static-pages/ResourcesQuickLinks';
+import { getSiteSettings, getWebsitePageMetadata } from '@/lib/content/directus-site';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema, webPageSchema } from '@/lib/seo/schema';
+import { getServicePageConfig } from '@/lib/seo/service-pages';
+import { SITE_ORIGIN } from '@/lib/seo/site';
+import Hero from '@/components/ui/Hero';
+import CopyButton from '@/components/utils/CopyButton';
+import { getPersonProfileImage } from '@/lib/content/persons';
 
-const SERVICE_PATH = "/contact-us";
+const SERVICE_PATH = '/contact-us';
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
-const PHONE_E164 = "+19418664320";
-const PHONE_DISPLAY = "(941) 866-4320";
 
 export async function generateMetadata(): Promise<Metadata> {
   const config = SERVICE_CONFIG;
 
   if (!config) {
     return getWebsitePageMetadata({
-      title: "Contact SonShine Roofing",
-      description: "Get in touch with SonShine Roofing.",
+      title: 'Contact SonShine Roofing',
+      description: 'Get in touch with SonShine Roofing.',
       path: SERVICE_PATH,
     });
   }
@@ -40,25 +39,34 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-const contactInfoPillBase = "btn btn-lg rounded-xl btn-brand-blue not-prose px-3 py-2 justify-start phone-affordance w-fit";
-const contactInfoIconStyles = "h-5 w-5 inline mr-2 text-blue-50 h-6 w-6 phone-affordance-icon";
+const contactInfoPillBase =
+  'btn btn-lg rounded-xl btn-brand-blue not-prose px-3 py-2 justify-start phone-affordance w-fit';
+const contactInfoIconStyles = 'h-5 w-5 inline mr-2 text-blue-50 h-6 w-6 phone-affordance-icon';
 
 export default async function Page() {
+  const [taraImage, settings] = await Promise.all([
+    getPersonProfileImage('tara'),
+    getSiteSettings(),
+  ]);
+  const phoneHref = settings?.phoneHref ?? '#book-an-appointment';
+  const phoneDisplay = settings?.phone ?? 'Call our office';
+  const addressQuery = settings
+    ? `${settings.address.street}, ${settings.address.city}, ${settings.address.region} ${settings.address.postalCode}`
+    : '';
   const origin = SITE_ORIGIN;
   const config = SERVICE_CONFIG;
-  const breadcrumbsConfig =
-    config?.breadcrumbs ?? [
-      { name: "Home", path: "/" },
-      { name: "Contact", path: SERVICE_PATH },
-    ];
+  const breadcrumbsConfig = config?.breadcrumbs ?? [
+    { name: 'Home', path: '/' },
+    { name: 'Contact', path: SERVICE_PATH },
+  ];
 
   const webPageLd = webPageSchema({
-    name: config?.title ?? "Contact SonShine Roofing",
+    name: config?.title ?? 'Contact SonShine Roofing',
     description: config?.description,
     url: SERVICE_PATH,
     origin,
-    primaryImage: config?.image?.url ?? "/og-default.png",
-    isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
+    primaryImage: config?.image?.url ?? '/og-default.png',
+    isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: origin },
   });
 
   const breadcrumbsLd = breadcrumbSchema(
@@ -74,19 +82,16 @@ export default async function Page() {
         imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp"
         subtitle="Whether you want to schedule an appointment with one our expert Roofing Specialists or if you just have a few questions, we’re here to help! Give us a call or complete the form below to contact our office."
         badges={[
-          { icon: ShieldCheck, label: "Licensed & Insured" },
-          { icon: Star, label: "4.8 on Google" },
-          { icon: HandCoins, label: "Flexible Financing" },
-          { icon: BadgeCheck, label: "25-year Warranty" },
+          { icon: ShieldCheck, label: 'Licensed & Insured' },
+          { icon: Star, label: '4.8 on Google' },
+          { icon: HandCoins, label: 'Flexible Financing' },
+          { icon: BadgeCheck, label: '25-year Warranty' },
         ]}
-      >
-
-      </Hero>
+      ></Hero>
       <Section>
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
           {/* Main content */}
           <div className="max-w-full min-w-0">
-
             <JsonLd data={webPageLd} />
             <JsonLd data={breadcrumbsLd} />
 
@@ -99,11 +104,10 @@ export default async function Page() {
                       holidayClosures={['2026-11-26', '2026-11-27', '2026-01-02']}
                       recurringClosures={['12-24', '12-25', '12-26', '07-04', '01-01']}
                     />
-
                   </div>
                   <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
-                    alt="Tara – Project Support Specialist"
+                    src={taraImage.url}
+                    alt={taraImage.altText}
                     width={75}
                     height={107.25}
                     className="mb-2 block h-[107.25px] w-auto rounded-xl object-cover"
@@ -119,15 +123,15 @@ export default async function Page() {
                   <div>
                     <div className="flex flex-row items-center gap-2">
                       <SmartLink
-                        href={`tel:${PHONE_E164}`}
+                        href={phoneHref}
                         className={contactInfoPillBase}
                         title="Call SonShine Roofing"
                         proseGuard
                       >
                         <Smartphone className={contactInfoIconStyles} aria-hidden="true" />
-                        <p className="font-semibold">{PHONE_DISPLAY}</p>
+                        <p className="font-semibold">{phoneDisplay}</p>
                       </SmartLink>
-                      <CopyButton copyContent={PHONE_DISPLAY} ariaLabel="Copy phone number" />
+                      <CopyButton copyContent={phoneDisplay} ariaLabel="Copy phone number" />
                     </div>
                     <p className="mt-2 lg:hidden text-xs md:text-sm text-slate-500">Tap to call</p>
                   </div>
@@ -147,7 +151,9 @@ export default async function Page() {
                 </div>
               }
             >
-              <SimpleLeadForm selectableProjectTypes={['repair', 'retail', 'maintenance', 'something-else']} />
+              <SimpleLeadForm
+                selectableProjectTypes={['repair', 'retail', 'maintenance', 'something-else']}
+              />
             </Suspense>
           </div>
           <div className="lg:sticky top-16 self-start">
@@ -162,8 +168,8 @@ export default async function Page() {
                     />
                   </div>
                   <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp"
-                    alt="Tara – Project Support Specialist"
+                    src={taraImage.url}
+                    alt={taraImage.altText}
                     width={75}
                     height={107.25}
                     className="mb-2 block h-[107.25px] w-auto rounded-xl object-cover"
@@ -179,15 +185,15 @@ export default async function Page() {
                   <div>
                     <div className="flex flex-row items-center gap-2">
                       <SmartLink
-                        href={`tel:${PHONE_E164}`}
+                        href={phoneHref}
                         className={contactInfoPillBase}
                         title="Call SonShine Roofing"
                         proseGuard
                       >
                         <Smartphone className={contactInfoIconStyles} aria-hidden="true" />
-                        <p className="font-semibold">{PHONE_DISPLAY}</p>
+                        <p className="font-semibold">{phoneDisplay}</p>
                       </SmartLink>
-                      <CopyButton copyContent={PHONE_DISPLAY} ariaLabel="Copy phone number" />
+                      <CopyButton copyContent={phoneDisplay} ariaLabel="Copy phone number" />
                     </div>
                     <p className="lg:hidden text-xs md:text-sm text-slate-500">Tap to call</p>
                   </div>
@@ -197,12 +203,16 @@ export default async function Page() {
             <div>
               <ResourcesQuickLinks />
             </div>
-
           </div>
-
         </div>
         <div className="mt-6">
-          <LiteMap />
+          {settings ? (
+            <LiteMap
+              addressQuery={addressQuery}
+              brandName={settings.brandName}
+              googleBusinessProfile={settings.socials.googleBusinessProfile}
+            />
+          ) : null}
         </div>
       </Section>
     </>

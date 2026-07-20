@@ -1,5 +1,5 @@
--- Idempotent Directus read-policy additions required by the SonShine frontend
--- when BLOG_CONTENT_SOURCE=directus. This intentionally grants read only and
+-- Idempotent Directus read-policy additions required by the Directus-only
+-- SonShine blog frontend. This intentionally grants read only and
 -- copies the existing blog_posts policy scope (all fields, no row override).
 
 INSERT INTO public.directus_permissions (

@@ -1,6 +1,6 @@
 // app/sitemap_index/blog/route.ts
 import { NextResponse } from 'next/server';
-import { getBlogContentSource, listBlogSitemapEntries } from '@/lib/content/blog';
+import { listBlogSitemapEntries } from '@/lib/content/blog';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { unstable_cache } from 'next/cache';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
@@ -11,11 +11,10 @@ export const revalidate = 3600; // safety net; tag-based revalidation will be fa
 const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
-const BLOG_SOURCE = getBlogContentSource();
 
 const getPostUrls = unstable_cache(async () => {
   return listBlogSitemapEntries();
-}, [`sitemap-blog:${BLOG_SOURCE}`], { revalidate: 3600, tags: ['sitemap', 'sitemap:blog'] });
+}, ['sitemap-blog:directus'], { revalidate: 3600, tags: ['sitemap', 'sitemap:blog'] });
 
 export async function GET() {
   if (!SITEMAPS_ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });

@@ -18,31 +18,13 @@ import {
 import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from '@/lib/routes';
 import type { NavItem } from '@/lib/routes';
 import type { ServiceSummary, SiteSettings } from '@/lib/content/directus-site';
+import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_PREFIXED } from '@/lib/contact-hours';
 
 type SocialLink = {
   href: string;
   label: string;
   icon: LucideIcon;
 };
-
-const SOCIALS: SocialLink[] = [
-  { href: 'https://www.facebook.com/sonshineroofing', label: 'Facebook', icon: Facebook },
-  { href: 'https://www.instagram.com/sonshineroofing', label: 'Instagram', icon: Instagram },
-  { href: 'https://www.youtube.com/c/sonshineroofing', label: 'YouTube', icon: Youtube },
-  {
-    href: 'https://nextdoor.com/pages/sonshine-roofing-sarasota-fl',
-    label: 'Nextdoor',
-    icon: Home,
-  },
-  {
-    href: 'https://www.google.com/maps/place/SonShine+Roofing/@27.3105774,-82.4518265,16z/data=!3m1!4b1!4m6!3m5!1s0x88c34710987d2023:0x5318594fb175e958!8m2!3d27.3105727!4d-82.446961!16s%2Fg%2F1wh4gn84?entry=ttu&g_ep=EgoyMDI1MDkxMC4wIKXMDSoASAFQAw%3D%3D',
-    label: 'Google Business Profile',
-    icon: MapPin,
-  },
-  { href: 'https://www.yelp.com/biz/sonshine-roofing-sarasota', label: 'Yelp', icon: BadgeCheck },
-  { href: 'https://www.pinterest.com/sonshineroofing', label: 'Pinterest', icon: Pin },
-  { href: 'https://x.com/ssroofinginc', label: 'X (Twitter)', icon: Twitter },
-];
 
 const linkStyles =
   'text-xs md:text-sm text-[#cad8e6] transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
@@ -108,7 +90,7 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
     : [...NAV_RESOURCES];
   const openingHours = settings?.openingHours.length
     ? settings.openingHours
-    : ['Office: M-F 7:00 AM to 4:00 PM', 'Phone: 24/7'];
+    : [OFFICE_HOURS_PREFIXED, PHONE_HOURS_PREFIXED];
   const configuredSocials: SocialLink[] = [
     ...(settings?.socials.facebook
       ? [{ href: settings.socials.facebook, label: 'Facebook', icon: Facebook }]
@@ -119,12 +101,29 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
     ...(settings?.socials.youtube
       ? [{ href: settings.socials.youtube, label: 'YouTube', icon: Youtube }]
       : []),
+    ...(settings?.socials.nextdoor
+      ? [{ href: settings.socials.nextdoor, label: 'Nextdoor', icon: Home }]
+      : []),
+    ...(settings?.socials.googleBusinessProfile
+      ? [
+          {
+            href: settings.socials.googleBusinessProfile,
+            label: 'Google Business Profile',
+            icon: MapPin,
+          },
+        ]
+      : []),
+    ...(settings?.socials.yelp
+      ? [{ href: settings.socials.yelp, label: 'Yelp', icon: BadgeCheck }]
+      : []),
+    ...(settings?.socials.pinterest
+      ? [{ href: settings.socials.pinterest, label: 'Pinterest', icon: Pin }]
+      : []),
+    ...(settings?.socials.xTwitter
+      ? [{ href: settings.socials.xTwitter, label: 'X (Twitter)', icon: Twitter }]
+      : []),
   ];
-  const configuredLabels = new Set(configuredSocials.map((social) => social.label));
-  const socialLinks = [
-    ...configuredSocials,
-    ...SOCIALS.filter((social) => !configuredLabels.has(social.label)),
-  ];
+  const socialLinks = configuredSocials;
 
   return (
     <>
@@ -138,9 +137,11 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
         <ArrowUp className="inline w-4 h-4 ml-2 icon-affordance" />
       </SmartLink>
 
-      <div className="my-16 sm:my-24 md:my-32">
-        <FooterBadges />
-      </div>
+      {settings?.badges.length ? (
+        <div className="my-16 sm:my-24 md:my-32">
+          <FooterBadges badges={settings.badges} />
+        </div>
+      ) : null}
 
       <footer className="border-t-4 border-[#fb9216] bg-[#071b2b] pt-20 text-slate-100">
         <div className="max-w-6xl px-10 mx-auto">
@@ -167,22 +168,24 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
                 />
               </SmartLink>
               <ul className="mt-8 space-y-3 text-sm">
-                <li className="mb-8">
-                  <SmartLink
-                    className="font-display text-sm font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-md"
-                    href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
-                    aria-label="Florida Roofing Contractor's License Number CCC1331483"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    data-icon-affordance="up-right"
-                  >
-                    License: #CCC1331483
-                    <ArrowUpRight
-                      className="icon-affordance ml-1 inline h-3 w-3 align-[-0.125em] text-[#ffb45f] md:h-4 md:w-4"
-                      aria-hidden="true"
-                    />
-                  </SmartLink>
-                </li>
+                {settings?.licenseNumber && settings.licenseUrl ? (
+                  <li className="mb-8">
+                    <SmartLink
+                      className="font-display text-sm font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-md"
+                      href={settings.licenseUrl}
+                      aria-label={`Florida Roofing Contractor's License Number ${settings.licenseNumber}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      data-icon-affordance="up-right"
+                    >
+                      License: #{settings.licenseNumber}
+                      <ArrowUpRight
+                        className="icon-affordance ml-1 inline h-3 w-3 align-[-0.125em] text-[#ffb45f] md:h-4 md:w-4"
+                        aria-hidden="true"
+                      />
+                    </SmartLink>
+                  </li>
+                ) : null}
                 {companyLinks.map((r) => (
                   <li key={r.href}>
                     <SmartLink href={r.href} className={linkStyles}>

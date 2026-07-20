@@ -8,7 +8,7 @@ import YouMayAlsoLike from '@/components/engagement/YouMayAlsoLike';
 import TipTopRoofCheckup from '@/components/marketing/service-pages/TipTopRoofCheckup';
 import type { Metadata } from 'next';
 import ServicesAside from '@/components/global-nav/static-pages/ServicesAside';
-import { getWebsitePageMetadata } from '@/lib/content/directus-site';
+import { getSiteSettings, getWebsitePageMetadata } from '@/lib/content/directus-site';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, webPageSchema } from '@/lib/seo/schema';
 import { getServicePageConfig } from '@/lib/seo/service-pages';
@@ -27,6 +27,7 @@ import {
 import { STRIPE_PAYMENT_LINK } from '@/components/marketing/service-pages/TipTopRoofCheckup';
 import { Suspense } from 'react';
 import EvenSimplerLeadForm from '@/components/lead-capture/lead-form/EvenSimplerLeadForm';
+import { getPersonProfileImage } from '@/lib/content/persons';
 
 const SERVICE_PATH = '/roof-inspection';
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -38,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
     return getWebsitePageMetadata({
       title: 'Residential Roof Inspection | SonShine Roofing',
       description:
-        'Roof inspections with ZERO hassle | Fast, Friendly, Professional | (941) 866-4320 | Call Us Today!',
+        'Roof inspections with ZERO hassle | Fast, Friendly, Professional | Call Us Today!',
       path: SERVICE_PATH,
     });
   }
@@ -52,9 +53,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const [pool, faqs] = await Promise.all([
+  const [pool, faqs, nathanImage, settings] = await Promise.all([
     listRecentPostsPool(36),
     listFaqs({ pagePath: '/roof-inspection', limit: 8 }).catch(() => []),
+    getPersonProfileImage('nathan-borntreger'),
+    getSiteSettings(),
   ]);
 
   const origin = SITE_ORIGIN;
@@ -109,10 +112,10 @@ export default async function Page() {
           <div className="flex flex-row flex-wrap mx-auto mt-8 justify-center gap-4">
             <SmartLink
               className="text-white phone-affordance hover:bg-slate-600 flex-row flex-nowrap gap-x-1 not-prose py-4 btn btn-lg sm:btn-xl btn-outline h-[60px]"
-              href="tel:+19418664320"
+              href={settings?.phoneHref ?? '#book-an-appointment'}
             >
               <Smartphone className="phone-affordance-icon h-4 w-4 sm:h-5 sm:w-5 inline mr-2" />
-              Call (941) 866-4320
+              Call {settings?.phone ?? 'our office'}
             </SmartLink>
             <div>
               <SmartLink
@@ -189,8 +192,8 @@ export default async function Page() {
               <figure className="not-prose mt-4">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
                   <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp"
-                    alt="Nathan Borntreger, owner of SonShine Roofing, Roof Inspection Expert"
+                    src={nathanImage.url}
+                    alt={nathanImage.altText}
                     fill
                     className="object-cover mb-2"
                     sizes="(max-width: 768px) 100vw, 800px"
@@ -198,8 +201,8 @@ export default async function Page() {
                   />
                 </div>
                 <figcaption className="mt-2 text-sm text-slate-600">
-                  <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC:
-                  #CCC1331483 |{' '}
+                  <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #
+                  {settings?.licenseNumber ?? 'Licensed Florida contractor'} |{' '}
                   <SmartLink className="text-[--brand-blue]" href="/person/nathan-borntreger">
                     See full bio
                   </SmartLink>
@@ -275,11 +278,11 @@ export default async function Page() {
                 </span>
                 <SmartLink
                   className="phone-affordance mt-4 w-full not-prose"
-                  href="tel:+19418664320"
+                  href={settings?.phoneHref ?? '#book-an-appointment'}
                 >
                   <div className="btn btn-md btn-outline w-full">
                     <Smartphone className="phone-affordance-icon inline h-4 w-4 mr-2" />
-                    Call (941) 866-4320
+                    Call {settings?.phone ?? 'our office'}
                   </div>
                 </SmartLink>
               </div>

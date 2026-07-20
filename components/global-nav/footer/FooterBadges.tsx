@@ -1,82 +1,52 @@
-import SmartLink from "../../utils/SmartLink";
-import Image from "next/image";
+import Image from 'next/image';
+import SmartLink from '@/components/utils/SmartLink';
+import type { FooterBadge } from '@/lib/content/directus-site';
 
-const imageHeight = 100;
-const imageWidth = 150;
-const imageStyles = "my-6 h-[100px] w-auto";
+const imageStyles = 'my-6 h-[100px] w-auto object-contain';
 
-const badges = [
-  {
-    href: "https://mysafeflhome.com",
-    title: "My Safe Florida Home Certified Contractor",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png",
-  },
-  {
-    href: "https://business.sarasotachamber.com/active-member-directory/Details/sonshine-roofing-3821919",
-    title: "Sarasota Chamber of Commerce",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/Chamber-Accreditation-Logo-4C-5STAR-400x106.png",
-  },
-  {
-    href: "https://business.manateechamber.com/list/member/sonshine-roofing-37287",
-    title: "Manatee Chamber of Commerce",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/2020-Chamber-Proud-Member-Logo_WEB-VERSION_small.bak.webp",
-  },
-  {
-    href: "https://www.northportareachamber.com/list/member/sonshine-roofing-inc-4041",
-    title: "North Port Chamber of Commerce",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/NPChamberLogo.webp",
-  },
-  {
-    href: "https://www.floridaroof.com/SONSHINE-ROOFING-INC-10-1104.html",
-    title: "FRSA",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/FRSA-400x401.webp",
-  },
-  {
-    href: "https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick",
-    title: "A+ Rated Roofing Contractor with the BBB",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp",
-  },
-  {
-    href: "https://www.nrca.net/Members/Members/Detail/26f0eca5-8397-4524-8ea3-807a1735e028#",
-    title: "National Roofing Contractors Association",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/National-Roofing-Contractors-Association.webp",
-  },
-  {
-    href: "https://www.gaf.com/en-us/roofing-contractors/residential/sonshine-roofing-inc-1104247",
-    title: "GAF Master Elite Certified",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp",
-  },
-  {
-    href: "https://www.expertise.com/fl/sarasota/roofing",
-    title: "Expertise.com",
-    src: "https://res.cloudinary.com/expertise-com/image/upload/v1767650446/remote_media/assets/awards/fl_sarasota_roofing_2026.svg",
-  },
-];
+type FooterBadgesProps = {
+  badges: FooterBadge[];
+};
 
-export default function FooterBadges() {
+function BadgeImage({ badge }: { badge: FooterBadge }) {
+  return (
+    <Image
+      src={badge.image.url}
+      alt={badge.image.description}
+      title={badge.image.description}
+      height={badge.image.height ?? 100}
+      width={badge.image.width ?? 150}
+      sizes="(max-width: 150px) 25vw, 366px"
+      className={imageStyles}
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
+
+export default function FooterBadges({ badges }: FooterBadgesProps) {
+  if (!badges.length) return null;
+
   return (
     <div className="mx-auto max-w-6xl px-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 place-items-center justify-center gap-3">
-      {badges.map((badge) => (
-        <SmartLink
-          key={badge.href}
-          href={badge.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          title={badge.title}
-          className={imageStyles}
-        >
-          <Image
-            src={badge.src}
-            alt={badge.title}
-            title={badge.title}
-            height={imageHeight}
-            width={imageWidth}
-            sizes="(max-width: 150px) 25vw, 366px"
-            loading="lazy"
-            decoding="async"
-          />
-        </SmartLink>
-      ))}
+      {badges.map((badge) =>
+        badge.href ? (
+          <SmartLink
+            key={badge.id}
+            href={badge.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={badge.image.description}
+            className={imageStyles}
+          >
+            <BadgeImage badge={badge} />
+          </SmartLink>
+        ) : (
+          <div key={badge.id} className={imageStyles}>
+            <BadgeImage badge={badge} />
+          </div>
+        ),
+      )}
     </div>
   );
 }

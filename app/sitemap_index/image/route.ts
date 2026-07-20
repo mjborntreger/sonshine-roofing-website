@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
 import { wpFetch, mapImages, type WpImageNode } from '@/lib/content/wp';
-import { getBlogContentSource, listBlogImageSitemapEntries } from '@/lib/content/blog';
+import { listBlogImageSitemapEntries } from '@/lib/content/blog';
+import { listPersonSitemapEntries } from '@/lib/content/persons';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { serializeImageEntry, type ImageSitemapEntry } from './serialization';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
@@ -12,7 +13,6 @@ export const revalidate = 3600;
 const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
-const BLOG_SOURCE = getBlogContentSource();
 
 type Maybe<T> = T | null | undefined;
 
@@ -43,12 +43,6 @@ type LocationImageNode = {
   }>;
 };
 
-type PersonImageNode = {
-  uri?: string | null;
-  modifiedGmt?: string | null;
-  featuredImage?: Maybe<ImageNodeWrapper>;
-};
-
 type ProjectImageResult = {
   projects?: {
     pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
@@ -63,27 +57,19 @@ type LocationImageResult = {
   } | null;
 };
 
-type PersonImageResult = {
-  persons?: {
-    pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
-    nodes?: Maybe<PersonImageNode>[] | null;
-  } | null;
-};
-
 const mapWrapperImages = (wrapper?: Maybe<ImageNodeWrapper>) => {
   const node = wrapper?.node;
   return node ? mapImages([node]) : [];
 };
 
 const toImageNodeArray = (
-  nodes?: Maybe<WpImageNode>[] | null
-): ReadonlyArray<Maybe<WpImageNode>> | undefined =>
-  Array.isArray(nodes) ? nodes : undefined;
+  nodes?: Maybe<WpImageNode>[] | null,
+): ReadonlyArray<Maybe<WpImageNode>> | undefined => (Array.isArray(nodes) ? nodes : undefined);
 
 const getBlogImageNodes = unstable_cache(
   async () => listBlogImageSitemapEntries(),
-  [`sitemap-image-blog:${BLOG_SOURCE}`],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:blog'] }
+  ['sitemap-image-blog:directus'],
+  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:blog'] },
 );
 
 const getProjectImageNodes = unstable_cache(
@@ -95,7 +81,10 @@ const getProjectImageNodes = unstable_cache(
           after: $after
           where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
         ) {
-          pageInfo { hasNextPage endCursor }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           nodes {
             uri
             modifiedGmt
@@ -131,13 +120,13 @@ const getProjectImageNodes = unstable_cache(
       for (const node of pageNodes) {
         if (node) nodes.push(node);
       }
-      after = page?.pageInfo?.hasNextPage ? page?.pageInfo?.endCursor ?? null : null;
+      after = page?.pageInfo?.hasNextPage ? (page?.pageInfo?.endCursor ?? null) : null;
     } while (after);
 
     return nodes;
   },
   ['sitemap-image-projects'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:projects'] }
+  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:projects'] },
 );
 
 const getLocationImageNodes = unstable_cache(
@@ -149,7 +138,10 @@ const getLocationImageNodes = unstable_cache(
           after: $after
           where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
         ) {
-          pageInfo { hasNextPage endCursor }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
           nodes {
             uri
             modifiedGmt
@@ -188,59 +180,13 @@ const getLocationImageNodes = unstable_cache(
       for (const node of pageNodes) {
         if (node) nodes.push(node);
       }
-      after = page?.pageInfo?.hasNextPage ? page?.pageInfo?.endCursor ?? null : null;
+      after = page?.pageInfo?.hasNextPage ? (page?.pageInfo?.endCursor ?? null) : null;
     } while (after);
 
     return nodes;
   },
   ['sitemap-image-locations'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:locations'] }
-);
-
-const getPersonImageNodes = unstable_cache(
-  async () => {
-    const query = /* GraphQL */ `
-      query ImageSitemapPersons($first: Int!, $after: String) {
-        persons(
-          first: $first
-          after: $after
-          where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-        ) {
-          pageInfo { hasNextPage endCursor }
-          nodes {
-            uri
-            modifiedGmt
-            featuredImage {
-              node {
-                sourceUrl
-                altText
-              }
-            }
-          }
-        }
-      }
-    `;
-
-    const nodes: PersonImageNode[] = [];
-    let after: string | null = null;
-
-    do {
-      const variables: { first: number; after?: string | null } = after
-        ? { first: 200, after }
-        : { first: 200 };
-      const data = await wpFetch<PersonImageResult>(query, variables);
-      const page = data?.persons;
-      const pageNodes = page?.nodes ?? [];
-      for (const node of pageNodes) {
-        if (node) nodes.push(node);
-      }
-      after = page?.pageInfo?.hasNextPage ? page?.pageInfo?.endCursor ?? null : null;
-    } while (after);
-
-    return nodes;
-  },
-  ['sitemap-image-persons'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:person'] }
+  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:locations'] },
 );
 
 const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
@@ -248,7 +194,7 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
     getBlogImageNodes(),
     getProjectImageNodes(),
     getLocationImageNodes(),
-    getPersonImageNodes(),
+    listPersonSitemapEntries(),
   ]);
 
   const entries: ImageSitemapEntry[] = [];
@@ -288,19 +234,22 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
 
     const mapImage = mapWrapperImages(node.locationAttributes?.map);
     const neighborhoodImages =
-      node.locationAttributes?.neighborhoodsServed?.reduce((acc, item) => {
-        if (!item) return acc;
-        const images = mapWrapperImages(item.neighborhoodImage);
-        if (!images.length) return acc;
-        const fallback = item.neighborhood?.trim();
-        images.forEach((img) => {
-          acc.push({
-            ...img,
-            altText: img.altText || fallback || img.altText,
+      node.locationAttributes?.neighborhoodsServed?.reduce(
+        (acc, item) => {
+          if (!item) return acc;
+          const images = mapWrapperImages(item.neighborhoodImage);
+          if (!images.length) return acc;
+          const fallback = item.neighborhood?.trim();
+          images.forEach((img) => {
+            acc.push({
+              ...img,
+              altText: img.altText || fallback || img.altText,
+            });
           });
-        });
-        return acc;
-      }, [] as ReturnType<typeof mapWrapperImages>) ?? [];
+          return acc;
+        },
+        [] as ReturnType<typeof mapWrapperImages>,
+      ) ?? [];
 
     const images = [...mapImage, ...neighborhoodImages];
     if (!images.length) continue;
@@ -311,14 +260,14 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
     });
   }
 
-  for (const node of personNodes) {
-    const path = normalizeEntryPath(node.uri ?? '');
+  for (const person of personNodes) {
+    const path = normalizeEntryPath(person.uri);
     if (path === '/') continue;
-    const images = mapWrapperImages(node.featuredImage);
+    const images = person.featuredImage ? [person.featuredImage] : [];
     if (!images.length) continue;
     entries.push({
       loc: path,
-      lastmod: formatLastmod(node.modifiedGmt),
+      lastmod: formatLastmod(person.modified),
       images,
     });
   }

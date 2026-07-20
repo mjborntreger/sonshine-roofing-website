@@ -4,11 +4,31 @@
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
-import { Check, HelpCircle, ArrowRight, Undo2, SearchCheck, LockKeyholeOpen, ArrowDown, UserRoundPen, Forward, Calculator, DollarSign, ChartBar, ChevronRight, HandCoins, Wallet } from 'lucide-react';
+import {
+  Check,
+  HelpCircle,
+  ArrowRight,
+  Undo2,
+  SearchCheck,
+  LockKeyholeOpen,
+  ArrowDown,
+  UserRoundPen,
+  Forward,
+  Calculator,
+  DollarSign,
+  ChartBar,
+  ChevronRight,
+  HandCoins,
+  Wallet,
+} from 'lucide-react';
 import ProjectTestimonial from '@/components/dynamic-content/project/ProjectTestimonial';
 import Turnstile from '@/components/lead-capture/Turnstile';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
-import { FINANCING_PRESETS, FINANCING_PROGRAMS, monthlyPayment } from '@/components/marketing/financing/financing-programs';
+import {
+  FINANCING_PRESETS,
+  FINANCING_PROGRAMS,
+  monthlyPayment,
+} from '@/components/marketing/financing/financing-programs';
 import { readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
 import {
   buildN8nLeadPayload,
@@ -28,10 +48,22 @@ import {
 } from '@/lib/lead-capture/contact-lead';
 import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import { formatPhoneForDisplay } from '@/lib/lead-capture/phone';
+import SitePhoneLink from '@/components/utils/SitePhoneLink';
 
 const COOKIE_NAME = 'ss_financing_calc';
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-const EMAIL_DOMAINS = ['.com', '.net', '.org', '.edu', '.gov', '.co', '.us', '.io', '.info', '.biz'];
+const EMAIL_DOMAINS = [
+  '.com',
+  '.net',
+  '.org',
+  '.edu',
+  '.gov',
+  '.co',
+  '.us',
+  '.io',
+  '.info',
+  '.biz',
+];
 
 const US_STATES = [
   { value: '', label: 'Select state' },
@@ -114,7 +146,7 @@ const MAX_SCORE = 27;
 const quizQuestions: QuizQuestion[] = [
   {
     id: 'priority',
-    prompt: "What’s your biggest priority?",
+    prompt: 'What’s your biggest priority?',
     options: [
       { value: 'low-monthly-payments', label: 'Low monthly payments' },
       { value: 'fast-approval', label: 'Fast approval' },
@@ -286,7 +318,10 @@ export function calculateFinancingScores(userAnswers: string[]): FinancingScores
   };
 }
 
-const MATCH_PROGRAMS: Record<FinancingProgramKey, { label: string; programIds: string[]; description: string }> = {
+const MATCH_PROGRAMS: Record<
+  FinancingProgramKey,
+  { label: string; programIds: string[]; description: string }
+> = {
   serviceFinance: {
     label: 'Service Finance',
     programIds: ['same-as-cash-12', 'term-10yr-999', 'term-15yr-79'],
@@ -305,14 +340,18 @@ const PROGRAM_DETAIL_ANCHORS: Record<FinancingProgramKey, string> = {
 };
 
 // ============ STYLE CONSTANTS ====================== //
-const pillBase = 'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-tight shadow-sm';
+const pillBase =
+  'inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-tight shadow-sm';
 const successPillClass = `${pillBase} bg-emerald-500 text-white`;
-const gradientShell = 'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
+const gradientShell =
+  'rounded-3xl bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan] p-[1.5px] shadow-xl shadow-[rgba(0,69,215,0.12)]';
 const innerPanelBase = 'rounded-3xl bg-white';
 const innerPanelLocked = `${innerPanelBase} overflow-hidden`;
 const innerPanelUnlocked = `${innerPanelBase} overflow-hidden`;
-const stepCardClass = 'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
-const inputBaseClass = 'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
+const stepCardClass =
+  'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
+const inputBaseClass =
+  'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
 
 type FormValues = {
   firstName: string;
@@ -434,7 +473,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     }
   }, [defaultAmount, summaryStepIndex]);
 
-  const [quizAnswers, setQuizAnswers] = useState<(string | null)[]>(() => Array(totalQuizQuestions).fill(null));
+  const [quizAnswers, setQuizAnswers] = useState<(string | null)[]>(() =>
+    Array(totalQuizQuestions).fill(null),
+  );
   const computedScores = useMemo(() => {
     if (quizAnswers.some((answer) => answer == null)) return null;
     return calculateFinancingScores(quizAnswers as string[]);
@@ -446,7 +487,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         program,
         amount: monthlyPayment(calculatorAmount, program.apr, program.termMonths),
       })),
-    [calculatorAmount]
+    [calculatorAmount],
   );
 
   const amountChips = useMemo(() => {
@@ -458,8 +499,12 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   }, [submittedAmount]);
 
   const groupedPayments = useMemo(() => {
-    const service = paymentRows.filter(({ program }) => MATCH_PROGRAMS.serviceFinance.programIds.includes(program.id));
-    const ygrene = paymentRows.filter(({ program }) => MATCH_PROGRAMS.ygrene.programIds.includes(program.id));
+    const service = paymentRows.filter(({ program }) =>
+      MATCH_PROGRAMS.serviceFinance.programIds.includes(program.id),
+    );
+    const ygrene = paymentRows.filter(({ program }) =>
+      MATCH_PROGRAMS.ygrene.programIds.includes(program.id),
+    );
     return { service, ygrene };
   }, [paymentRows]);
 
@@ -500,7 +545,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       const container = stepContentRef.current;
       if (!container) return;
       const focusable = container.querySelector<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
       if (focusable) {
         focusable.focus({ preventScroll: true });
@@ -588,16 +633,20 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       if (!isValidZip(zipValue)) nextErrors.zip = 'Enter 5-digit ZIP';
     }
     if (currentStep === thirdFormStepIndex) {
-      if (!isEmailValid(formValues.email)) nextErrors.email = 'Enter a valid email (example@domain.com)';
+      if (!isEmailValid(formValues.email))
+        nextErrors.email = 'Enter a valid email (example@domain.com)';
       if (!formValues.phone) {
         nextErrors.phone = 'Enter your phone number.';
       } else if (!isUsPhoneComplete(formValues.phone)) {
         nextErrors.phone = 'Enter a valid phone number (10 digits, optional country code).';
       }
-      Object.assign(nextErrors, validateSmsConsentDraft({
-        smsProjectConsent: formValues.smsProjectConsent,
-        smsMarketingConsent: formValues.smsMarketingConsent,
-      }));
+      Object.assign(
+        nextErrors,
+        validateSmsConsentDraft({
+          smsProjectConsent: formValues.smsProjectConsent,
+          smsMarketingConsent: formValues.smsMarketingConsent,
+        }),
+      );
     }
     return nextErrors;
   };
@@ -731,7 +780,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
   const friendlyError = (raw?: unknown) => {
     if (!raw || typeof raw !== 'string') return 'We could not send your request. Please try again.';
-    if (raw.toLowerCase().includes('rating')) return 'We could not send your request just now. Please try again in a moment.';
+    if (raw.toLowerCase().includes('rating'))
+      return 'We could not send your request just now. Please try again in a moment.';
     return raw;
   };
 
@@ -897,10 +947,11 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   key={option.value}
                   type="button"
                   onClick={() => handleQuizAnswer(stepIndex, option.value)}
-                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${selected
-                    ? 'border-[--brand-blue] bg-[--brand-blue]/10 text-[--brand-blue] focus-visible:ring-[--brand-blue]/40'
-                    : 'border-blue-100 bg-white text-slate-700 hover:border-[--brand-blue]/40 hover:bg-[--brand-blue]/5 focus-visible:ring-[--brand-blue]/40'
-                    }`}
+                  className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${
+                    selected
+                      ? 'border-[--brand-blue] bg-[--brand-blue]/10 text-[--brand-blue] focus-visible:ring-[--brand-blue]/40'
+                      : 'border-blue-100 bg-white text-slate-700 hover:border-[--brand-blue]/40 hover:bg-[--brand-blue]/5 focus-visible:ring-[--brand-blue]/40'
+                  }`}
                   aria-pressed={selected}
                 >
                   <span>{option.label}</span>
@@ -918,16 +969,16 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
         id: question.id,
         prompt: question.prompt,
         answer: quizAnswers[idx],
-        answerLabel: question.options.find((option) => option.value === quizAnswers[idx])?.label ?? 'Not answered',
+        answerLabel:
+          question.options.find((option) => option.value === quizAnswers[idx])?.label ??
+          'Not answered',
       }));
 
       return (
         <div className={stepCardClass} aria-live="polite">
-          <p
-            className="text-base font-semibold text-slate-900"
-          >
+          <p className="text-base font-semibold text-slate-900">
             Your answers
-            <ArrowDown className='h-4 w-4 inline ml-2' />
+            <ArrowDown className="h-4 w-4 inline ml-2" />
           </p>
           <ul className="mt-3 space-y-2 text-sm text-slate-700">
             {summaryItems.map((item) => (
@@ -937,7 +988,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-xs italic text-slate-500">Almost there! Hit “Next” to continue.</p>
+          <p className="mt-4 text-xs italic text-slate-500">
+            Almost there! Hit “Next” to continue.
+          </p>
         </div>
       );
     }
@@ -946,7 +999,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       return (
         <div className={stepCardClass} aria-live="polite">
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="firstName">First name*</label>
+            <label className="block text-sm font-medium text-slate-700" htmlFor="firstName">
+              First name*
+            </label>
             <input
               id="firstName"
               name="firstName"
@@ -958,11 +1013,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               aria-describedby={errors.firstName ? 'firstName-error' : undefined}
             />
             {errors.firstName && (
-              <p id="firstName-error" className="mt-1 text-sm text-red-600">{errors.firstName}</p>
+              <p id="firstName-error" className="mt-1 text-sm text-red-600">
+                {errors.firstName}
+              </p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="lastName">Last name*</label>
+            <label className="block text-sm font-medium text-slate-700" htmlFor="lastName">
+              Last name*
+            </label>
             <input
               id="lastName"
               name="lastName"
@@ -974,13 +1033,19 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               aria-describedby={errors.lastName ? 'lastName-error' : undefined}
             />
             {errors.lastName && (
-              <p id="lastName-error" className="mt-1 text-sm text-red-600">{errors.lastName}</p>
+              <p id="lastName-error" className="mt-1 text-sm text-red-600">
+                {errors.lastName}
+              </p>
             )}
           </div>
           <div>
-            <label className="block text-md font-medium text-slate-700" htmlFor="amount">Project Budget*</label>
+            <label className="block text-md font-medium text-slate-700" htmlFor="amount">
+              Project Budget*
+            </label>
             <div className="mt-1 flex items-center gap-2">
-              <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">$</span>
+              <span className="inline-flex h-10 items-center rounded-lg bg-[--brand-blue] px-3 text-white shadow-sm">
+                $
+              </span>
               <input
                 id="amount"
                 name="amount"
@@ -996,9 +1061,13 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 aria-describedby={errors.amount ? 'amount-error' : undefined}
               />
             </div>
-            <p className="mt-2 text-xs text-slate-500">We will prefill the calculator with this amount.</p>
+            <p className="mt-2 text-xs text-slate-500">
+              We will prefill the calculator with this amount.
+            </p>
             {errors.amount && (
-              <p id="amount-error" className="mt-1 text-sm text-red-600">{errors.amount}</p>
+              <p id="amount-error" className="mt-1 text-sm text-red-600">
+                {errors.amount}
+              </p>
             )}
           </div>
         </div>
@@ -1009,7 +1078,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       return (
         <div className={stepCardClass} aria-live="polite">
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="address1">Property address*</label>
+            <label className="block text-sm font-medium text-slate-700" htmlFor="address1">
+              Property address*
+            </label>
             <input
               id="address1"
               name="address1"
@@ -1021,11 +1092,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               aria-describedby={errors.address1 ? 'address1-error' : undefined}
             />
             {errors.address1 && (
-              <p id="address1-error" className="mt-1 text-sm text-red-600">{errors.address1}</p>
+              <p id="address1-error" className="mt-1 text-sm text-red-600">
+                {errors.address1}
+              </p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-700" htmlFor="address2">Address line 2 (optional)</label>
+            <label className="block text-sm font-medium text-slate-700" htmlFor="address2">
+              Address line 2 (optional)
+            </label>
             <input
               id="address2"
               name="address2"
@@ -1037,7 +1112,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="md:col-span-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="city">City*</label>
+              <label className="block text-sm font-medium text-slate-700" htmlFor="city">
+                City*
+              </label>
               <input
                 id="city"
                 name="city"
@@ -1049,11 +1126,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 aria-describedby={errors.city ? 'city-error' : undefined}
               />
               {errors.city && (
-                <p id="city-error" className="mt-1 text-sm text-red-600">{errors.city}</p>
+                <p id="city-error" className="mt-1 text-sm text-red-600">
+                  {errors.city}
+                </p>
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700" htmlFor="state">State*</label>
+              <label className="block text-sm font-medium text-slate-700" htmlFor="state">
+                State*
+              </label>
               <select
                 id="state"
                 name="state"
@@ -1071,11 +1152,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 ))}
               </select>
               {errors.state && (
-                <p id="state-error" className="mt-1 text-sm text-red-600">{errors.state}</p>
+                <p id="state-error" className="mt-1 text-sm text-red-600">
+                  {errors.state}
+                </p>
               )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700" htmlFor="zip">ZIP code*</label>
+              <label className="block text-sm font-medium text-slate-700" htmlFor="zip">
+                ZIP code*
+              </label>
               <input
                 id="zip"
                 name="zip"
@@ -1091,7 +1176,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 aria-describedby={errors.zip ? 'zip-error' : undefined}
               />
               {errors.zip && (
-                <p id="zip-error" className="mt-1 text-sm text-red-600">{errors.zip}</p>
+                <p id="zip-error" className="mt-1 text-sm text-red-600">
+                  {errors.zip}
+                </p>
               )}
             </div>
           </div>
@@ -1102,7 +1189,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     return (
       <div className={stepCardClass} aria-live="polite">
         <div>
-          <label className="block text-sm font-medium text-slate-700" htmlFor="email">Email*</label>
+          <label className="block text-sm font-medium text-slate-700" htmlFor="email">
+            Email*
+          </label>
           <input
             id="email"
             name="email"
@@ -1115,11 +1204,15 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             aria-describedby={errors.email ? 'email-error' : undefined}
           />
           {errors.email && (
-            <p id="email-error" className="mt-1 text-sm text-red-600">{errors.email}</p>
+            <p id="email-error" className="mt-1 text-sm text-red-600">
+              {errors.email}
+            </p>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700" htmlFor="phone">Phone*</label>
+          <label className="block text-sm font-medium text-slate-700" htmlFor="phone">
+            Phone*
+          </label>
           <input
             id="phone"
             name="phone"
@@ -1128,12 +1221,16 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             autoComplete="tel"
             className={inputBaseClass}
             value={formatPhoneForDisplay(formValues.phone)}
-            onChange={(e) => setFormValues((prev) => ({ ...prev, phone: sanitizePhoneInput(e.target.value) }))}
+            onChange={(e) =>
+              setFormValues((prev) => ({ ...prev, phone: sanitizePhoneInput(e.target.value) }))
+            }
             aria-invalid={Boolean(errors.phone)}
             aria-describedby={errors.phone ? 'phone-error phone-example' : 'phone-example'}
           />
           {errors.phone && (
-            <p id="phone-error" className="mt-1 text-sm text-red-600">{errors.phone}</p>
+            <p id="phone-error" className="mt-1 text-sm text-red-600">
+              {errors.phone}
+            </p>
           )}
           <p id="phone-example" className="mt-1 text-xs text-slate-500">
             Digits only, US numbers. Example: {formatPhoneExample(formValues.phone)}
@@ -1157,7 +1254,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             smsMarketingConsent: errors.smsMarketingConsent,
           }}
         />
-        <p className="mt-3 text-xs italic text-slate-500">Quick verification keeps spam away. It never impacts your credit.</p>
+        <p className="mt-3 text-xs italic text-slate-500">
+          Quick verification keeps spam away. It never impacts your credit.
+        </p>
         <div className="pt-2">
           <Turnstile className="pt-1" />
         </div>
@@ -1165,12 +1264,13 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     );
   };
 
-
   if (!unlocked || !showCalculator) {
     return (
       <div id="estimator" className={gradientShell}>
         <form onSubmit={handleSubmit} noValidate className={innerPanelLocked}>
-          <span className="sr-only" aria-live="polite">{liveStatus}</span>
+          <span className="sr-only" aria-live="polite">
+            {liveStatus}
+          </span>
           <input
             type="text"
             name="company"
@@ -1194,15 +1294,16 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 className="text-sm font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
                 data-icon-affordance="right"
               >
-                <Calculator className='h-4 w-4 inline mr-2 text-[--brand-blue]' />
+                <Calculator className="h-4 w-4 inline mr-2 text-[--brand-blue]" />
                 To Calculator
-                <Forward className='icon-affordance h-5 w-5 inline ml-2 text-[--brand-blue]' />
+                <Forward className="icon-affordance h-5 w-5 inline ml-2 text-[--brand-blue]" />
               </button>
             </div>
           )}
 
           <div className="bg-blue-50/40 text-sm text-slate-600 px-8 pt-6">
-            Take this quiz and discover the best roof financing plan for your particular budget and amount of equity in your home.
+            Take this quiz and discover the best roof financing plan for your particular budget and
+            amount of equity in your home.
           </div>
           <div className="bg-blue-50/40 px-6 py-6 rounded-b-3xl">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -1224,7 +1325,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                           style={{ width: `${progressPercent}%` }}
                         />
                       </div>
-                      <span className="min-w-[3ch] text-xs font-semibold text-slate-600">{progressPercent}%</span>
+                      <span className="min-w-[3ch] text-xs font-semibold text-slate-600">
+                        {progressPercent}%
+                      </span>
                     </div>
                   </div>
                   <span className="text-sm text-slate-500">{stepSubtitle}</span>
@@ -1249,7 +1352,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 </LayoutGroup>
 
                 {globalError && (
-                  <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm" role="alert">
+                  <div
+                    className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm"
+                    role="alert"
+                  >
                     {globalError}
                   </div>
                 )}
@@ -1266,7 +1372,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                       className={`icon-affordance h-4 w-4 ${step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}`}
                       aria-hidden="true"
                     />
-                    <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>Back</span>
+                    <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>
+                      Back
+                    </span>
                   </button>
 
                   <div className="px-1 flex-1 text-center italic text-sm text-slate-500">
@@ -1292,7 +1400,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                       data-icon-affordance={submission === 'submitting' ? undefined : 'right'}
                     >
                       {submission === 'submitting' ? 'Sending…' : 'Show my results'}
-                      {submission !== 'submitting' && <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />}
+                      {submission !== 'submitting' && (
+                        <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+                      )}
                     </button>
                   )}
                 </div>
@@ -1329,7 +1439,6 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     );
   }
 
-
   return (
     <div id="estimator" className={gradientShell}>
       <section className={innerPanelUnlocked}>
@@ -1361,28 +1470,32 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               className="text-xs font-medium text-slate-500 underline-offset-2 transition hover:text-[--brand-blue] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
             >
               Update Contact Info
-              <UserRoundPen className='h-4 w-4 ml-2 inline' />
+              <UserRoundPen className="h-4 w-4 ml-2 inline" />
             </button>
           </div>
 
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-6 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
               <h3 className="text-xl md:text-2xl font-semibold text-emerald-700">
-                <ChartBar className='h-5 w-5 md:h-6 md:w-6 inline text-emerald-700 mr-3' />
+                <ChartBar className="h-5 w-5 md:h-6 md:w-6 inline text-emerald-700 mr-3" />
                 Program Fit Snapshot
               </h3>
               {displayScores ? (
                 leadingProgram ? (
                   <span className="text-sm font-semibold text-emerald-600">
                     Leading Fit
-                    <ArrowRight className='inline h-4 w-4 text-emerald-600 mx-2' />
+                    <ArrowRight className="inline h-4 w-4 text-emerald-600 mx-2" />
                     {MATCH_PROGRAMS[leadingProgram].label}
                   </span>
                 ) : (
-                  <span className="text-sm font-semibold text-emerald-600">Scores based on your answers</span>
+                  <span className="text-sm font-semibold text-emerald-600">
+                    Scores based on your answers
+                  </span>
                 )
               ) : (
-                <span className="text-sm font-semibold text-amber-600">Take the quiz to personalise your results</span>
+                <span className="text-sm font-semibold text-amber-600">
+                  Take the quiz to personalise your results
+                </span>
               )}
             </div>
             <div className="mt-3 space-y-3">
@@ -1399,28 +1512,42 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 const clampedAnimated = displayScores
                   ? Math.min(Math.max(rawAnimated, 0), baseScore)
                   : 0;
-                const displayedMatch = displayScores ? Math.min(Math.round(clampedAnimated), baseScore) : 0;
+                const displayedMatch = displayScores
+                  ? Math.min(Math.round(clampedAnimated), baseScore)
+                  : 0;
                 const barPercent = displayScores ? Math.min(Math.max(clampedAnimated, 0), 100) : 0;
                 return (
                   <div key={programKey} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="text-lg font-semibold text-slate-800">{MATCH_PROGRAMS[programKey].label}</span>
+                        <span className="text-lg font-semibold text-slate-800">
+                          {MATCH_PROGRAMS[programKey].label}
+                        </span>
                         <a
                           href={detailHref}
                           className="group inline-flex items-center gap-[0.10rem] text-xs font-semibold text-[--brand-blue] underline-offset-2 transition hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]"
                           data-icon-affordance="right"
                         >
                           see details
-                          <ChevronRight className="h-3 w-3 text-slate-600 icon-affordance" aria-hidden="true" />
+                          <ChevronRight
+                            className="h-3 w-3 text-slate-600 icon-affordance"
+                            aria-hidden="true"
+                          />
                         </a>
                       </div>
-                      <span className="text-lg font-semibold text-slate-800">{displayedMatch}% match</span>
+                      <span className="text-lg font-semibold text-slate-800">
+                        {displayedMatch}% match
+                      </span>
                     </div>
                     <div className="relative h-2 w-full overflow-hidden rounded-full bg-white/70">
-                      <div className={`absolute inset-y-0 left-0 rounded-full ${barColor}`} style={{ width: `${barPercent}%` }} />
+                      <div
+                        className={`absolute inset-y-0 left-0 rounded-full ${barColor}`}
+                        style={{ width: `${barPercent}%` }}
+                      />
                     </div>
-                    <p className="text-md text-slate-500">{MATCH_PROGRAMS[programKey].description}</p>
+                    <p className="text-md text-slate-500">
+                      {MATCH_PROGRAMS[programKey].description}
+                    </p>
                   </div>
                 );
               })}
@@ -1429,9 +1556,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-xs text-amber-800">
                 <p className="font-semibold">Looks like both programs may require a closer look.</p>
                 <p className="mt-1">Let’s chat and help you find the best fit.</p>
-                <a className="mt-2 inline-block font-semibold text-[--brand-blue]" href="tel:+19418664320">
-                  (941) 866-4320
-                </a>
+                <SitePhoneLink className="mt-2 inline-block font-semibold text-[--brand-blue]" />
               </div>
             )}
             {!displayScores && (
@@ -1441,13 +1566,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             )}
           </div>
 
-
           <div className="space-y-4 rounded-2xl px-4 py-4">
-            <label
-              htmlFor="activeAmount"
-              className="block text-md font-medium text-slate-700"
-            >
-              <Wallet className='h-4 w-4 mr-2 inline text-[--brand-blue]' />
+            <label htmlFor="activeAmount" className="block text-md font-medium text-slate-700">
+              <Wallet className="h-4 w-4 mr-2 inline text-[--brand-blue]" />
               Project Budget
             </label>
             <div className="flex items-center gap-[0.35rem]">
@@ -1471,7 +1592,10 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             <div className="flex flex-wrap gap-2 text-sm">
               {amountChips.map((value) => {
                 const selected = calculatorAmount === value;
-                const isCustom = submittedAmount != null && Math.round(submittedAmount) === value && !FINANCING_PRESETS.includes(value);
+                const isCustom =
+                  submittedAmount != null &&
+                  Math.round(submittedAmount) === value &&
+                  !FINANCING_PRESETS.includes(value);
                 const className = selected
                   ? isCustom
                     ? 'border-[--brand-orange] bg-[--brand-orange]/20 text-[--brand-orange] shadow-[0_0_0_2px_rgba(249,115,22,0.35)]'
@@ -1484,7 +1608,11 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                     key={value}
                     type="button"
                     className={`rounded-full border px-3 py-1 shadow-sm transition focus:outline-none focus:ring-2 focus:ring-offset-2 ${className}`}
-                    style={isCustom && selected && customPulse ? { animation: 'chip-pop 0.85s ease-out' } : undefined}
+                    style={
+                      isCustom && selected && customPulse
+                        ? { animation: 'chip-pop 0.85s ease-out' }
+                        : undefined
+                    }
                     onClick={() => handleSelectAmount(value)}
                     aria-label={`Set amount to ${currency(value)}`}
                     aria-pressed={selected}
@@ -1500,7 +1628,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             <div className="text-center border-b border-blue-100 p-4 text-2xl font-semibold text-[--brand-blue]">
               <HandCoins className="h-6 w-6 mr-2 inline text-[--brand-blue]" />
               Est. Monthly Payment
-              <ArrowDown className='h-6 w-6 text-[--brand-blue] inline ml-2' />
+              <ArrowDown className="h-6 w-6 text-[--brand-blue] inline ml-2" />
             </div>
             <div className="overflow-hidden">
               <table className="w-full text-sm">
@@ -1515,7 +1643,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                       <td className="text-md px-4 py-3 font-medium text-slate-900">
                         <div>{program.label}</div>
                         {program.summary && (
-                          <div className="text-sm font-normal text-slate-500">{program.summary}</div>
+                          <div className="text-sm font-normal text-slate-500">
+                            {program.summary}
+                          </div>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right font-medium text-slate-900">
@@ -1536,7 +1666,9 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                       <td className="text-md px-4 py-3 font-medium text-slate-900">
                         <div>{program.label}</div>
                         {program.summary && (
-                          <div className="text-sm font-normal text-slate-500">{program.summary}</div>
+                          <div className="text-sm font-normal text-slate-500">
+                            {program.summary}
+                          </div>
                         )}
                       </td>
                       <td className="text-md px-4 py-3 text-right font-semibold text-slate-900">
@@ -1574,7 +1706,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           </div>
 
           <p className="text-xs italic text-slate-500">
-            Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments are set by the lender. Estimates do not include loan origination fees.
+            Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments
+            are set by the lender. Estimates do not include loan origination fees.
           </p>
         </div>
       </section>
@@ -1593,9 +1726,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
           }
         }
-
       `}</style>
     </div>
   );
-
 }

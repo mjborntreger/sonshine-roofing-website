@@ -97,13 +97,12 @@ Content Workflow
 ================
 
 Where content lives
-- WordPress (via WPGraphQL): projects, glossary, faqs, persons, videos, and blog
-  posts while `BLOG_CONTENT_SOURCE=wordpress` (the default rollback source).
+- WordPress (via WPGraphQL): remaining legacy projects, glossary, videos, and
+  location landing pages.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
-  - `blog_posts` + flat, client-scoped `blog_topics`: canonical blog source when
-    `BLOG_CONTENT_SOURCE=directus`; the adapter covers archive pagination,
-    search/topic facets, detail pages, recommendations, metadata, and blog/image
-    sitemaps.
+  - `blog_posts` + flat, client-scoped `blog_topics`: the exclusive blog source;
+    the adapter covers archive pagination, search/topic facets, detail pages,
+    recommendations, metadata, and blog/image sitemaps.
   - `site_settings`: shared brand, contact, address, social, image, footer, and schema values.
   - `website_pages`: metadata, canonical, Open Graph, focus-keyword, noindex, and sitemap-policy records for static routes.
   - `services`: the four primary service records used by navigation and service quick links.
@@ -111,6 +110,7 @@ Where content lives
   - `redirects`: published legacy redirects loaded and validated at build time.
   - `special_offers`: offer pages and the featured offer popup.
   - `legal_copy`: WYSIWYG privacy/SMS terms content.
+  - `persons`: the exclusive SonShine team/profile source.
 - Next.js app pages: route layouts, components, and page body copy that has not yet moved to Directus.
 
 Directus-backed static page metadata falls back to the route's local metadata when Directus is unavailable outside production. Every referenced Directus image must have a `directus_files.description`; missing descriptions fail the content read instead of producing empty alt text.
@@ -127,15 +127,16 @@ Redirect ownership
 Legal copy in `legal_copy.privacy_policy` and `legal_copy.terms_of_use` is sanitized server-side before rendering. Use semantic HTML without classes, IDs, inline styles, scripts, or event-handler attributes. Body headings begin at `h2`; Next.js owns each page's primary `h1`, metadata, canonical URL, and layout.
 
 Publishing in WP
-- Ensure posts/projects are Published, not Draft.
+- Ensure remaining WordPress projects and other legacy content are Published,
+  not Draft.
 - Fill excerpts where available (used as SEO fallbacks).
 - Provide featured images for richer OG cards.
 
-Blog source cutover
-- `BLOG_CONTENT_SOURCE=wordpress` keeps the legacy WPGraphQL blog active.
-- `BLOG_CONTENT_SOURCE=directus` switches every blog consumer together. It
-  requires `DIRECTUS_URL`, `DIRECTUS_CLIENT_SLUG`, and `DIRECTUS_TOKEN` or
-  `DIRECTUS_STATIC_TOKEN`.
+Directus blog
+- Every blog consumer reads Directus. There is no content-source environment
+  switch and no WordPress blog fallback.
+- Blog reads require `DIRECTUS_URL`, `DIRECTUS_CLIENT_SLUG`, and
+  `DIRECTUS_TOKEN` or `DIRECTUS_STATIC_TOKEN`.
 - Directus posts use `published_at` and `source_updated_at`, relational topics,
   `meta_title`, `meta_description`, and the Directus featured image. A null
   author renders as the `SonShine Roofing` Organization fallback; the approved
@@ -143,6 +144,19 @@ Blog source cutover
 - Directus marks automation-owned `external_id` and `source_updated_at`
   read-only; editorial fields such as `published_at` and `featured` remain
   editable.
+
+Directus people
+- Team cards, profile routes, profile navigation, SEO metadata, and page/image
+  sitemaps read published `persons` records from Directus unconditionally.
+- WordPress person queries, a person-source environment flag, and WordPress
+  profile-image fallbacks are intentionally unsupported.
+- The active allowlist contains exactly ten profiles. Antonio, Tony, Angela,
+  Dean, Steve, and Matthew are denied by both the adapter and migration manifest.
+- SonShine person metadata is calculated from existing fields: name + role form
+  `meta_title`/`og_title`, cleaned biography text forms
+  `meta_description`/`og_description`, and the profile image forms `og_image`.
+- Both `show_on_team` and `seo_indexable` default to true and are true for the
+  approved ten published profiles.
 
 Glossary linking
 - Term pages auto-link other terms in the content body (first occurrence per term).
@@ -154,7 +168,8 @@ Images
 
 Noindex Policy
 - Utility pages (`/reviews`, `/tell-us-why`, `/thank-you`, `/truck-for-sale`, and the 404 page) are marked noindex and excluded from the static sitemap where applicable.
-- Person and glossary terms are noindex by business choice.
+- Person pages follow `seo_indexable`; the approved ten are indexable. Glossary
+  terms remain noindex by business choice.
 
 
 
@@ -169,9 +184,8 @@ Canonicals & Metadata
 Robots
 - Staging: `Disallow: /` (non-prod).
 - Production: `Allow: /` with sitemap at `/sitemap_index`.
-- Page-level `noindex, follow` used for:
-  - `/person/[slug]`
-  - `/roofing-glossary/[slug]`
+- Page-level `noindex, follow` is used for `/roofing-glossary/[slug]` and for any
+  person record whose `seo_indexable` flag is false.
   - `/reviews`, `/tell-us-why` (utility pages)
 
 Sitemaps

@@ -3,10 +3,15 @@
 import { useEffect, useRef, useState } from 'react';
 
 const PLACE_ID = 'ChIJIyB9mBBHw4gRWOl1sU9ZGFM';
-const ADDRESS_QUERY = '2555 Porter Lake Dr STE 109, Sarasota, FL 34240';
 const EMBED_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY;
 
-export default function LiteMap() {
+type LiteMapProps = {
+  addressQuery: string;
+  brandName: string;
+  googleBusinessProfile?: string | null;
+};
+
+export default function LiteMap({ addressQuery, brandName, googleBusinessProfile }: LiteMapProps) {
   const [active, setActive] = useState(false);
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -25,7 +30,7 @@ export default function LiteMap() {
             }
           });
         },
-        { rootMargin: '200px 0px' }
+        { rootMargin: '200px 0px' },
       );
       io.observe(el);
       return () => io.disconnect();
@@ -53,14 +58,14 @@ export default function LiteMap() {
   // Fallback to a no-key embed with a plain address query (supported by Google).
   const src = EMBED_KEY
     ? `https://www.google.com/maps/embed/v1/place?key=${EMBED_KEY}&q=place_id:${PLACE_ID}`
-    : `https://maps.google.com/maps?q=${encodeURIComponent(ADDRESS_QUERY)}&output=embed`;
+    : `https://maps.google.com/maps?q=${encodeURIComponent(addressQuery)}&output=embed`;
 
   return (
     <div ref={ref} id="map-lite" className="card overflow-hidden">
       {active ? (
         <iframe
           src={src}
-          title="Map to SonShine Roofing"
+          title={`Map to ${brandName}`}
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           className="w-full aspect-[16/9] border-0"
@@ -78,9 +83,10 @@ export default function LiteMap() {
       )}
       <noscript>
         <a
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-            ADDRESS_QUERY
-          )}`}
+          href={
+            googleBusinessProfile ??
+            `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressQuery)}`
+          }
           target="_blank"
           rel="noopener noreferrer"
         >

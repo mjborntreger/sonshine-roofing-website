@@ -9,6 +9,7 @@ import type { Route } from 'next';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useSiteSettings } from '@/lib/content/site-settings-context';
 import { deleteCookie } from '@/lib/telemetry/client-cookies';
 import type { LeadFormLayoutVariant } from './LeadForm';
 import {
@@ -41,10 +42,17 @@ import {
   isJourneyKey,
   restoreLeadSuccessState,
 } from '@/components/lead-capture/lead-form/config';
-import type { JourneyKey, LeadSuccessRestore, ProjectOption, LeadFormUtmParams } from '@/components/lead-capture/lead-form/config';
+import type {
+  JourneyKey,
+  LeadSuccessRestore,
+  ProjectOption,
+  LeadFormUtmParams,
+} from '@/components/lead-capture/lead-form/config';
 import { renderHighlight } from '@/components/utils/renderHighlight';
 import ProjectTestimonial from '@/components/dynamic-content/project/ProjectTestimonial';
-import LeadFormStepShell, { LeadFormStepControls } from '@/components/lead-capture/lead-form/LeadFormStepShell';
+import LeadFormStepShell, {
+  LeadFormStepControls,
+} from '@/components/lead-capture/lead-form/LeadFormStepShell';
 import {
   PROJECT_OPTION_CARD_BASE_CLASS,
   PROJECT_OPTION_CARD_SELECTED_CLASS,
@@ -55,10 +63,13 @@ import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
-const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
-  ssr: false,
-  loading: () => null,
-});
+const LeadFormSuccess = dynamic(
+  () => import('@/components/lead-capture/lead-form/LeadFormSuccess'),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 
 const INPUT_BASE_CLASS =
   'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-sm shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
@@ -68,11 +79,13 @@ const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-20
 const SELECTION_PILL_BASE_CLASS =
   'rounded-xl border px-4 py-2 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
 const SELECTION_PILL_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue] text-white shadow';
-const SELECTION_PILL_UNSELECTED_CLASS = 'border-blue-200 bg-white text-slate-700 hover:border-blue-300';
+const SELECTION_PILL_UNSELECTED_CLASS =
+  'border-blue-200 bg-white text-slate-700 hover:border-blue-300';
 
 const HELP_BUTTON_BASE_CLASS =
   'group flex flex-col gap-3 rounded-xl sm:rounded-2xl border p-3 sm:p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
-const HELP_BUTTON_SELECTED_CLASS = 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]';
+const HELP_BUTTON_SELECTED_CLASS =
+  'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]';
 const HELP_BUTTON_UNSELECTED_CLASS =
   'border-blue-200 bg-white hover:-translate-y-0.5 hover:border-blue-300 hover:shadow-md';
 
@@ -124,11 +137,6 @@ type LeadFormHistoryState = {
     stepIndex: number;
   };
 };
-
-
-
-
-
 
 type StepId = 'need' | 'context' | 'contact' | 'schedule';
 
@@ -189,14 +197,6 @@ interface FieldErrors {
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
-
-
-
-
-
-
-
-
 type Action =
   | { type: 'update'; field: keyof FormState; value: FormState[keyof FormState] }
   | { type: 'reset' }
@@ -217,13 +217,22 @@ function formReducer(state: FormState, action: Action): FormState {
 
 const STEP_ORDER: StepId[] = ['need', 'context', 'contact', 'schedule'];
 
-const clampStepIndex = (stepIndex: number) => Math.min(Math.max(stepIndex, 0), STEP_ORDER.length - 1);
+const clampStepIndex = (stepIndex: number) =>
+  Math.min(Math.max(stepIndex, 0), STEP_ORDER.length - 1);
 
 const STEP_FIELD_KEYS: Record<StepId, ReadonlyArray<keyof FormState>> = {
   need: ['projectType'],
   context: ['helpTopics', 'roofAge', 'notes'],
   contact: ['roofType', 'firstName', 'lastName', 'email', 'phone'],
-  schedule: ['address1', 'city', 'state', 'zip', 'bestTime', 'smsProjectConsent', 'smsMarketingConsent'],
+  schedule: [
+    'address1',
+    'city',
+    'state',
+    'zip',
+    'bestTime',
+    'smsProjectConsent',
+    'smsMarketingConsent',
+  ],
 };
 
 function validateStep(step: StepId, data: FormState): FieldErrors {
@@ -235,12 +244,15 @@ function validateStep(step: StepId, data: FormState): FieldErrors {
     }
   }
   if (step === 'contact') {
-    const identityErrors = validateContactIdentityDraft({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone,
-    }, { phoneRequired: true, emailRequired: true });
+    const identityErrors = validateContactIdentityDraft(
+      {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+      },
+      { phoneRequired: true, emailRequired: true },
+    );
     Object.assign(errors, identityErrors);
   }
   if (step === 'schedule') {
@@ -268,25 +280,22 @@ export default function LeadFormWizard({
   utm: utmProp,
   variant = 'default',
 }: LeadFormWizardProps = {}) {
+  const { phone, phoneHref } = useSiteSettings();
   const router = useRouter();
   const restoredSuccess = useMemo(
     () => restoredSuccessProp ?? restoreLeadSuccessState(),
-    [restoredSuccessProp]
+    [restoredSuccessProp],
   );
   const initialJourney = restoredSuccess
     ? null
     : initialJourneyProp && isJourneyKey(initialJourneyProp)
       ? initialJourneyProp
       : null;
-  const [form, dispatch] = useReducer(
-    formReducer,
-    INITIAL_STATE,
-    (initial) => {
-      if (restoredSuccess) return { ...initial, ...restoredSuccess.formPreset };
-      if (initialJourney) return { ...initial, projectType: initialJourney };
-      return initial;
-    }
-  );
+  const [form, dispatch] = useReducer(formReducer, INITIAL_STATE, (initial) => {
+    if (restoredSuccess) return { ...initial, ...restoredSuccess.formPreset };
+    if (initialJourney) return { ...initial, projectType: initialJourney };
+    return initial;
+  });
   const [activeStepIndex, setActiveStepIndex] = useState(() => {
     if (restoredSuccess) return STEP_ORDER.length - 1;
     if (initialJourney) return 1;
@@ -313,7 +322,10 @@ export default function LeadFormWizard({
   const hasNextStep = activeStepIndex < totalSteps - 1;
   const isFinalStep = activeStepIndex === totalSteps - 1;
   const journey = getJourneyConfig(form.projectType);
-  const helpSummary = useMemo(() => (form.helpTopics.length ? form.helpTopics.join(', ') : ''), [form.helpTopics]);
+  const helpSummary = useMemo(
+    () => (form.helpTopics.length ? form.helpTopics.join(', ') : ''),
+    [form.helpTopics],
+  );
 
   const utm = useMemo(() => utmProp ?? {}, [utmProp]);
 
@@ -357,7 +369,7 @@ export default function LeadFormWizard({
       }
       window.history.forward();
     },
-    [activeStepIndex, clearPendingHistoryNavigation, setStepIndex]
+    [activeStepIndex, clearPendingHistoryNavigation, setStepIndex],
   );
 
   useEffect(() => {
@@ -518,7 +530,10 @@ export default function LeadFormWizard({
     onResetSuccess?.();
     if (typeof window !== 'undefined') {
       window.requestAnimationFrame(() => {
-        formRef.current?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+        formRef.current?.scrollIntoView({
+          behavior: reduceMotion ? 'auto' : 'smooth',
+          block: 'start',
+        });
       });
     }
   };
@@ -606,23 +621,26 @@ export default function LeadFormWizard({
     setGlobalError(null);
 
     const roofAgeLabel = form.roofAge
-      ? journey?.roofAgeOptions.find((option) => option.value === form.roofAge)?.label || form.roofAge
+      ? journey?.roofAgeOptions.find((option) => option.value === form.roofAge)?.label ||
+        form.roofAge
       : '';
     const bestTimeLabel = form.bestTime
       ? BEST_TIME_OPTIONS.find((option) => option.value === form.bestTime)?.label || form.bestTime
       : '';
     const notesText = form.notes.trim();
     const roofTypeLabel = getRoofTypeLabel(form.roofType);
-      const combinedNotes = roofTypeLabel
-        ? [notesText, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
-        : notesText;
-      const resourceLinksForPayload = getSuccessLinks(form.projectType).map(
-        ({ label, description, href, external }) => ({
+    const combinedNotes = roofTypeLabel
+      ? [notesText, `Roof type: ${roofTypeLabel}`]
+          .filter((value) => Boolean(value && value.trim()))
+          .join('\n\n')
+      : notesText;
+    const resourceLinksForPayload = getSuccessLinks(form.projectType).map(
+      ({ label, description, href, external }) => ({
         label,
         description,
         href,
         external,
-      })
+      }),
     );
     const preferredContact = form.phone ? form.preferredContact : 'email';
     const payload = buildContactLeadForwardPayload({
@@ -685,13 +703,13 @@ export default function LeadFormWizard({
         console.error('Lead submission failed', result);
       }
       setStatus('error');
-      setGlobalError(result.error || 'We could not send your message. Please call us at (941) 866-4320.');
+      setGlobalError(result.error || `We could not send your message. Please call us at ${phone}.`);
       if (result.fieldErrors) {
         const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
         if (Object.keys(serverErrors).length) {
           setErrors(serverErrors);
           const firstErrorStepIndex = STEP_ORDER.findIndex((step) =>
-            STEP_FIELD_KEYS[step].some((field) => field in serverErrors)
+            STEP_FIELD_KEYS[step].some((field) => field in serverErrors),
           );
           if (firstErrorStepIndex >= 0) {
             setActiveStepIndex(firstErrorStepIndex);
@@ -701,22 +719,23 @@ export default function LeadFormWizard({
       return;
     }
 
-      setErrors({});
-      setGlobalError(null);
-      const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
-      const roofAgeLabelDisplay = roofAgeLabel || getRoofAgeLabelForDisplay(form.projectType, form.roofAge) || null;
-      const projectTypeForSuccess = form.projectType || 'contact';
-      const successPayload = buildContactLeadSuccessPayload({
-        projectType: projectTypeForSuccess,
-        helpTopics: form.helpTopics,
-        helpTopicLabels,
-        roofAge: form.roofAge,
-        roofAgeLabel: roofAgeLabelDisplay,
-        notes: notesText,
-        roofTypeLabel,
-      });
-      persistLeadSuccessCookie(successPayload);
-      redirectToThankYou(payload);
+    setErrors({});
+    setGlobalError(null);
+    const helpTopicLabels = getHelpTopicLabelsForDisplay(form.projectType, form.helpTopics);
+    const roofAgeLabelDisplay =
+      roofAgeLabel || getRoofAgeLabelForDisplay(form.projectType, form.roofAge) || null;
+    const projectTypeForSuccess = form.projectType || 'contact';
+    const successPayload = buildContactLeadSuccessPayload({
+      projectType: projectTypeForSuccess,
+      helpTopics: form.helpTopics,
+      helpTopicLabels,
+      roofAge: form.roofAge,
+      roofAgeLabel: roofAgeLabelDisplay,
+      notes: notesText,
+      roofTypeLabel,
+    });
+    persistLeadSuccessCookie(successPayload);
+    redirectToThankYou(payload);
   };
 
   const getStepMeta = (stepId: StepId) => {
@@ -739,7 +758,8 @@ export default function LeadFormWizard({
         return {
           title: 'How can we reach you?',
           highlightText: 'reach you?',
-          description: 'We respond within 30 minutes during business hours — faster if it’s an emergency.',
+          description:
+            'We respond within 30 minutes during business hours — faster if it’s an emergency.',
         };
       case 'schedule':
         return {
@@ -760,7 +780,7 @@ export default function LeadFormWizard({
   const renderNavigationControls = (className?: string) => (
     <LeadFormStepControls
       className={className}
-      start={(
+      start={
         <Button
           type="button"
           data-icon-affordance="left"
@@ -773,23 +793,36 @@ export default function LeadFormWizard({
           <ArrowLeft className="icon-affordance h-4 w-4" aria-hidden="true" />
           Back
         </Button>
-      )}
-      end={(
+      }
+      end={
         <>
           {hasNextStep && (
-            <Button type="button" data-icon-affordance="right" variant="brandBlue" size="sm" onClick={handleNext} className="gap-2">
+            <Button
+              type="button"
+              data-icon-affordance="right"
+              variant="brandBlue"
+              size="sm"
+              onClick={handleNext}
+              className="gap-2"
+            >
               Continue
               <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
             </Button>
           )}
           {isFinalStep && (
-            <Button type="submit" variant="brandOrange" size="sm" disabled={status === 'submitting'} className="gap-2">
+            <Button
+              type="submit"
+              variant="brandOrange"
+              size="sm"
+              disabled={status === 'submitting'}
+              className="gap-2"
+            >
               {status === 'submitting' ? 'Sending…' : 'Submit my request'}
               {status !== 'submitting' && <Check className="h-4 w-4" aria-hidden="true" />}
             </Button>
           )}
         </>
-      )}
+      }
     />
   );
 
@@ -797,45 +830,59 @@ export default function LeadFormWizard({
 
   const stepMotionProps = reduceMotion
     ? {
-      initial: false,
-      animate: { x: 0 },
-      exit: { x: 0 },
-    }
+        initial: false,
+        animate: { x: 0 },
+        exit: { x: 0 },
+      }
     : {
-      initial: isInitialRender ? false : { x: 40 },
-      animate: { x: 0 },
-      exit: { x: -30 },
-      transition: { duration: 0.3, ease: 'easeOut' as const },
-    };
+        initial: isInitialRender ? false : { x: 40 },
+        animate: { x: 0 },
+        exit: { x: -30 },
+        transition: { duration: 0.3, ease: 'easeOut' as const },
+      };
 
   if (status === 'success' && successMeta) {
-    return <LeadFormSuccess successMeta={successMeta} onReset={handleResetSuccess} variant={variant} />;
+    return (
+      <LeadFormSuccess successMeta={successMeta} onReset={handleResetSuccess} variant={variant} />
+    );
   }
 
   return (
-    <form ref={formRef} className={variant === 'heroOverlap' ? 'px-4' : 'px-4 py-16'} onSubmit={handleSubmit} noValidate>
+    <form
+      ref={formRef}
+      className={variant === 'heroOverlap' ? 'px-4' : 'px-4 py-16'}
+      onSubmit={handleSubmit}
+      noValidate
+    >
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
       <LeadFormStepShell
         stepLabel={`Step ${activeStepIndex + 1} of ${totalSteps}`}
         title={renderedTitle}
         description={description}
-        headerFooter={(
+        headerFooter={
           <>
             <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-blue-100">
-              <div className="h-full rounded-full bg-[--brand-blue] transition-[width]" style={{ width: `${progressPercent}%` }} />
+              <div
+                className="h-full rounded-full bg-[--brand-blue] transition-[width]"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
             <div className="mt-8 flex items-start gap-3">
               <CalendarClock className="mt-1 h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
               <div>
                 <p className="font-semibold text-slate-800">Need help now?</p>
                 <p className="mt-1">
-                  Call <a href="tel:+19418664320" className="font-semibold text-[--brand-blue]">(941) 866-4320</a> and we’ll fast-track your request.
+                  Call{' '}
+                  <a href={phoneHref} className="font-semibold text-[--brand-blue]">
+                    {phone}
+                  </a>{' '}
+                  and we’ll fast-track your request.
                 </p>
               </div>
             </div>
           </>
-        )}
+        }
         bottomSlot={showNavigationControls ? renderNavigationControls() : undefined}
       >
         {globalError && (
@@ -861,7 +908,9 @@ export default function LeadFormWizard({
                       onClick={() => handleProjectOption(option)}
                       className={cn(
                         PROJECT_OPTION_CARD_BASE_CLASS,
-                        selected ? PROJECT_OPTION_CARD_SELECTED_CLASS : PROJECT_OPTION_CARD_UNSELECTED_CLASS
+                        selected
+                          ? PROJECT_OPTION_CARD_SELECTED_CLASS
+                          : PROJECT_OPTION_CARD_UNSELECTED_CLASS,
                       )}
                       aria-pressed={selectable ? selected : undefined}
                     >
@@ -870,28 +919,36 @@ export default function LeadFormWizard({
                   );
                 })}
                 {errors.projectType && (
-                  <p className="text-sm font-medium text-red-600 lg:col-span-2">{errors.projectType}</p>
+                  <p className="text-sm font-medium text-red-600 lg:col-span-2">
+                    {errors.projectType}
+                  </p>
                 )}
               </div>
             )}
 
-              {activeStepId === 'context' && (
-                <div className="py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-                  <div>
-                    {!journey && (
-                      <p className="px-4 py-3 text-sm border rounded-xl border-amber-200 bg-amber-50 text-amber-700">
-                        Pick an option above if you want tailored suggestions — you can also continue without selecting one.
-                      </p>
-                    )}
+            {activeStepId === 'context' && (
+              <div className="py-2 grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
+                <div>
+                  {!journey && (
+                    <p className="px-4 py-3 text-sm border rounded-xl border-amber-200 bg-amber-50 text-amber-700">
+                      Pick an option above if you want tailored suggestions — you can also continue
+                      without selecting one.
+                    </p>
+                  )}
 
-                    {journey?.showHelpMulti && (
+                  {journey?.showHelpMulti && (
+                    <div>
                       <div>
-                        <div>
-                          <h4 className="text-base font-semibold tracking-wide uppercase text-slate-600">What&rsquo;s the situation?</h4>
-                          <p className="mt-2 mb-1 text-sm font-medium text-slate-500">Select all that apply</p>
-                        </div>
-                        <div className="grid gap-3 mt-3 grid-cols-2 md:grid-cols-3">
-                          {journey.helpOptions.map(({ value, label, description, icon: Icon, imageSrc, imageAlt }) => {
+                        <h4 className="text-base font-semibold tracking-wide uppercase text-slate-600">
+                          What&rsquo;s the situation?
+                        </h4>
+                        <p className="mt-2 mb-1 text-sm font-medium text-slate-500">
+                          Select all that apply
+                        </p>
+                      </div>
+                      <div className="grid gap-3 mt-3 grid-cols-2 md:grid-cols-3">
+                        {journey.helpOptions.map(
+                          ({ value, label, description, icon: Icon, imageSrc, imageAlt }) => {
                             const selected = form.helpTopics.includes(value);
                             return (
                               <button
@@ -900,7 +957,9 @@ export default function LeadFormWizard({
                                 onClick={() => handleHelpToggle(value)}
                                 className={cn(
                                   HELP_BUTTON_BASE_CLASS,
-                                  selected ? HELP_BUTTON_SELECTED_CLASS : HELP_BUTTON_UNSELECTED_CLASS
+                                  selected
+                                    ? HELP_BUTTON_SELECTED_CLASS
+                                    : HELP_BUTTON_UNSELECTED_CLASS,
                                 )}
                                 aria-pressed={selected}
                               >
@@ -921,354 +980,408 @@ export default function LeadFormWizard({
                                 </div>
                                 <div className="flex items-start justify-between gap-3">
                                   <div>
-                                    <p className="text-base font-semibold text-slate-900">{label}</p>
-                                    <p className="mt-1 text-xs sm:text-sm text-slate-500">{description}</p>
+                                    <p className="text-base font-semibold text-slate-900">
+                                      {label}
+                                    </p>
+                                    <p className="mt-1 text-xs sm:text-sm text-slate-500">
+                                      {description}
+                                    </p>
                                   </div>
                                   <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
-                                    <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
+                                    <Check
+                                      className={cn(
+                                        'h-4 w-4',
+                                        selected ? 'text-[--brand-blue]' : 'text-slate-300',
+                                      )}
+                                      aria-hidden="true"
+                                    />
                                   </div>
                                 </div>
                               </button>
                             );
-                          })}
-                        </div>
-                        {errors.helpTopics && <p className="mt-2 text-sm font-medium text-red-600">{errors.helpTopics}</p>}
-                      </div>
-                    )}
-
-                    {journey?.showRoofAge && (
-                      <div className="mt-4">
-                        <h4 className="text-sm font-semibold tracking-wide uppercase text-slate-500">How old is your roof?</h4>
-                        <p className="mt-1 text-sm text-slate-500">Share your roof&apos;s age or click &quot;Not sure.&quot;</p>
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {journey.roofAgeOptions.map(({ value, label }) => {
-                            const selected = form.roofAge === value;
-                            return (
-                              <button
-                                key={value}
-                                type="button"
-                                onClick={() => handleRoofAgeSelect(value)}
-                                className={cn(
-                                  SELECTION_PILL_BASE_CLASS,
-                                  selected ? SELECTION_PILL_SELECTED_CLASS : SELECTION_PILL_UNSELECTED_CLASS,
-                                  !selected && 'hover:text-slate-900'
-                                )}
-                                aria-pressed={selected}
-                              >
-                                {label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                        {errors.roofAge && <p className="mt-2 text-sm font-medium text-red-600">{errors.roofAge}</p>}
-                      </div>
-                    )}
-
-                    {journey?.showNotes && (
-                      <div className="mt-4">
-                        <label htmlFor="notes" className="text-sm font-semibold text-slate-700">
-                          {journey.notesLabel}{journey.requireNotes ? '*' : ''}
-                        </label>
-                        <textarea
-                          id="notes"
-                          name="notes"
-                          rows={journey.requireNotes ? 8 : 3}
-                          required={journey.requireNotes}
-                          autoComplete="off"
-                          className="mt-2 w-full rounded-2xl border border-blue-200 px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
-                          placeholder={journey.notesPlaceholder}
-                          value={form.notes}
-                          onChange={(event) => onSelect('notes', event.target.value)}
-                        />
-                        {errors.notes && journey.requireNotes && (
-                          <p className="mt-2 text-sm font-medium text-red-600">{errors.notes}</p>
+                          },
                         )}
                       </div>
-                    )}
-                  </div>
-                  <aside className="hidden lg:flex flex-col gap-4 text-sm h-fit text-slate-600">     
-                    <ProjectTestimonial
-                      customerName="Pasquale A."
-                      formattedDate="November 4th, 2025"
-                      customerReview="SonShine roofing did an excellent job of replacing our entire roof. Their staff was professional in every aspect. We received multiple updates on the progress, including house calls. Whenever we had a question and called the office, the staff was always polite, and we were immediately put through to the production manager. This company was very easy to work with and came in with a very fair price for the job. We would highly recommend them."
-                      reviewUrl="https://www.google.com/maps/contrib/103054944051170712920/place/ChIJIyB9mBBHw4gRWOl1sU9ZGFM/@27.3105727,-83.1061407,311254m/data=!3m1!1e3!4m6!1m5!8m4!1e1!2s103054944051170712920!3m1!1e1?hl=en&entry=ttu&g_ep=EgoyMDI1MTEwNC4xIKXMDSoASAFQAw%3D%3D"
-                      ownerReply="Hi Pat! Thanks for trusting us to perform a tile roof replacement on your Sarasota home. We pride ourselves on great communication, so we're glad to see that it shows."
-                      reviewPlatform="google"
-                    />
-                  </aside>
-                </div>
-              )}
+                      {errors.helpTopics && (
+                        <p className="mt-2 text-sm font-medium text-red-600">{errors.helpTopics}</p>
+                      )}
+                    </div>
+                  )}
 
-              {activeStepId === 'contact' && (
-                <div className="grid gap-4 py-2 md:grid-cols-2">
-                  <div className="md:col-span-2">
-                    <p className="text-sm font-semibold uppercase text-slate-500">What type of roof do you currently have?</p>
-                    <div className="grid gap-3 my-3 grid-cols-2 md:grid-cols-4">
-                      {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
-                        const selected = form.roofType === value;
-                        return (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => onSelect('roofType', value)}
-                            className={cn(
-                              HELP_BUTTON_BASE_CLASS,
-                              selected ? HELP_BUTTON_SELECTED_CLASS : HELP_BUTTON_UNSELECTED_CLASS
-                            )}
-                            aria-pressed={selected}
-                          >
-                            <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 aspect-[5/2]">
-                              <Image
-                                src={imageSrc}
-                                alt={imageAlt}
-                                fill
-                                sizes="(min-width: 768px) 320px, 100vw"
-                                className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  {journey?.showRoofAge && (
+                    <div className="mt-4">
+                      <h4 className="text-sm font-semibold tracking-wide uppercase text-slate-500">
+                        How old is your roof?
+                      </h4>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Share your roof&apos;s age or click &quot;Not sure.&quot;
+                      </p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {journey.roofAgeOptions.map(({ value, label }) => {
+                          const selected = form.roofAge === value;
+                          return (
+                            <button
+                              key={value}
+                              type="button"
+                              onClick={() => handleRoofAgeSelect(value)}
+                              className={cn(
+                                SELECTION_PILL_BASE_CLASS,
+                                selected
+                                  ? SELECTION_PILL_SELECTED_CLASS
+                                  : SELECTION_PILL_UNSELECTED_CLASS,
+                                !selected && 'hover:text-slate-900',
+                              )}
+                              aria-pressed={selected}
+                            >
+                              {label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {errors.roofAge && (
+                        <p className="mt-2 text-sm font-medium text-red-600">{errors.roofAge}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {journey?.showNotes && (
+                    <div className="mt-4">
+                      <label htmlFor="notes" className="text-sm font-semibold text-slate-700">
+                        {journey.notesLabel}
+                        {journey.requireNotes ? '*' : ''}
+                      </label>
+                      <textarea
+                        id="notes"
+                        name="notes"
+                        rows={journey.requireNotes ? 8 : 3}
+                        required={journey.requireNotes}
+                        autoComplete="off"
+                        className="mt-2 w-full rounded-2xl border border-blue-200 px-3 py-3 text-sm text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
+                        placeholder={journey.notesPlaceholder}
+                        value={form.notes}
+                        onChange={(event) => onSelect('notes', event.target.value)}
+                      />
+                      {errors.notes && journey.requireNotes && (
+                        <p className="mt-2 text-sm font-medium text-red-600">{errors.notes}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <aside className="hidden lg:flex flex-col gap-4 text-sm h-fit text-slate-600">
+                  <ProjectTestimonial
+                    customerName="Pasquale A."
+                    formattedDate="November 4th, 2025"
+                    customerReview="SonShine roofing did an excellent job of replacing our entire roof. Their staff was professional in every aspect. We received multiple updates on the progress, including house calls. Whenever we had a question and called the office, the staff was always polite, and we were immediately put through to the production manager. This company was very easy to work with and came in with a very fair price for the job. We would highly recommend them."
+                    reviewUrl="https://www.google.com/maps/contrib/103054944051170712920/place/ChIJIyB9mBBHw4gRWOl1sU9ZGFM/@27.3105727,-83.1061407,311254m/data=!3m1!1e3!4m6!1m5!8m4!1e1!2s103054944051170712920!3m1!1e1?hl=en&entry=ttu&g_ep=EgoyMDI1MTEwNC4xIKXMDSoASAFQAw%3D%3D"
+                    ownerReply="Hi Pat! Thanks for trusting us to perform a tile roof replacement on your Sarasota home. We pride ourselves on great communication, so we're glad to see that it shows."
+                    reviewPlatform="google"
+                  />
+                </aside>
+              </div>
+            )}
+
+            {activeStepId === 'contact' && (
+              <div className="grid gap-4 py-2 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <p className="text-sm font-semibold uppercase text-slate-500">
+                    What type of roof do you currently have?
+                  </p>
+                  <div className="grid gap-3 my-3 grid-cols-2 md:grid-cols-4">
+                    {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
+                      const selected = form.roofType === value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => onSelect('roofType', value)}
+                          className={cn(
+                            HELP_BUTTON_BASE_CLASS,
+                            selected ? HELP_BUTTON_SELECTED_CLASS : HELP_BUTTON_UNSELECTED_CLASS,
+                          )}
+                          aria-pressed={selected}
+                        >
+                          <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 aspect-[5/2]">
+                            <Image
+                              src={imageSrc}
+                              alt={imageAlt}
+                              fill
+                              sizes="(min-width: 768px) 320px, 100vw"
+                              className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                            />
+                          </div>
+                          <div className="flex items-center justify-between gap-3">
+                            <p className="text-sm font-semibold text-slate-900">{label}</p>
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
+                              <Check
+                                className={cn(
+                                  'h-4 w-4',
+                                  selected ? 'text-[--brand-blue]' : 'text-slate-300',
+                                )}
+                                aria-hidden="true"
                               />
                             </div>
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="text-sm font-semibold text-slate-900">{label}</p>
-                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
-                                <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
-                              </div>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <label className="flex flex-col text-sm font-medium text-slate-700">
-                    First name*
-                    <input
-                      type="text"
-                      name="firstName"
-                      autoComplete="given-name"
-                      value={form.firstName}
-                      onChange={(event) => onSelect('firstName', event.target.value)}
-                      className={cn(
-                        INPUT_BASE_CLASS,
-                        errors.firstName ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
-                      )}
-                      aria-invalid={Boolean(errors.firstName)}
-                    />
-                    {errors.firstName && <span className="mt-1 text-xs text-red-600">{errors.firstName}</span>}
-                  </label>
-
-                  <label className="flex flex-col text-sm font-medium text-slate-700">
-                    Last name*
-                    <input
-                      type="text"
-                      name="lastName"
-                      autoComplete="family-name"
-                      value={form.lastName}
-                      onChange={(event) => onSelect('lastName', event.target.value)}
-                      className={cn(
-                        INPUT_BASE_CLASS,
-                        errors.lastName ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
-                      )}
-                      aria-invalid={Boolean(errors.lastName)}
-                    />
-                    {errors.lastName && <span className="mt-1 text-xs text-red-600">{errors.lastName}</span>}
-                  </label>
-
-                  <label className="flex flex-col text-sm font-medium text-slate-700">
-                    Email*
-                    <input
-                      type="email"
-                      name="email"
-                      autoComplete="email"
-                      value={form.email}
-                      onChange={(event) => onSelect('email', event.target.value)}
-                      className={cn(
-                        INPUT_BASE_CLASS,
-                        errors.email ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
-                      )}
-                      aria-invalid={Boolean(errors.email)}
-                    />
-                    {errors.email && <span className="mt-1 text-xs text-red-600">{errors.email}</span>}
-                  </label>
-
-                  <label className="flex flex-col text-sm font-medium text-slate-700">
-                    Phone*
-                    <input
-                      type="tel"
-                      name="phone"
-                      autoComplete="tel"
-                      inputMode="tel"
-                      value={form.phone}
-                      onChange={(event) => onSelect('phone', sanitizePhoneInput(event.target.value))}
-                      className={cn(
-                        INPUT_BASE_CLASS,
-                        errors.phone ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
-                      )}
-                      aria-invalid={Boolean(errors.phone)}
-                    />
-                    {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
-                    <p className="mt-1 text-xs text-slate-500">
-                      Ex: {formatPhoneExample(form.phone)}
-                    </p>
-                  </label>
-
-                  <div className="md:col-span-2">
-                    <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">Preferred contact method</p>
-                    <div className="flex flex-wrap gap-3 mt-3">
-                      {CONTACT_PREF_OPTIONS.map(({ value, label, icon: Icon }) => {
-                        const selected = form.preferredContact === value;
-                        return (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => onSelect('preferredContact', value)}
-                            className={cn(
-                              'inline-flex items-center gap-2',
-                              SELECTION_PILL_BASE_CLASS,
-                              selected ? SELECTION_PILL_SELECTED_CLASS : SELECTION_PILL_UNSELECTED_CLASS
-                            )}
-                            aria-pressed={selected}
-                          >
-                            <Icon className="w-4 h-4" aria-hidden="true" />
-                            {label}
-                          </button>
-                        );
-                      })}
-                    </div>
+                          </div>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-              )}
-
-              {activeStepId === 'schedule' && (
-                <div className="grid gap-4 py-2 md:grid-cols-2">
-                  <label className="flex flex-col text-sm font-medium text-slate-700 md:col-span-2">
-                    Street address*
-                    <input
-                      type="text"
-                      name="address1"
-                      autoComplete="address-line1"
-                      required
-                      value={form.address1}
-                      onChange={(event) => onSelect('address1', event.target.value)}
-                      className={cn(
-                        INPUT_BASE_CLASS,
-                        errors.address1 ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
-                      )}
-                      aria-invalid={Boolean(errors.address1)}
-                    />
-                    {errors.address1 && <span className="mt-1 text-xs text-red-600">{errors.address1}</span>}
-                  </label>
-
-                  <label className="flex flex-col text-sm font-medium text-slate-700">
-                    Unit / suite (optional)
-                    <input
-                      type="text"
-                      name="address2"
-                      autoComplete="address-line2"
-                      value={form.address2}
-                      onChange={(event) => onSelect('address2', event.target.value)}
-                      className={cn(INPUT_BASE_CLASS, INPUT_DEFAULT_CLASS)}
-                    />
-                  </label>
-
-                  <label className="flex flex-col text-sm font-medium text-slate-700">
-                    City*
-                    <input
-                      type="text"
-                      name="city"
-                      autoComplete="address-level2"
-                      required
-                      value={form.city}
-                      onChange={(event) => onSelect('city', event.target.value)}
-                      className={cn(
-                        INPUT_BASE_CLASS,
-                        errors.city ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
-                      )}
-                      aria-invalid={Boolean(errors.city)}
-                    />
-                    {errors.city && <span className="mt-1 text-xs text-red-600">{errors.city}</span>}
-                  </label>
-
-                  <label className="flex flex-col text-sm font-medium text-slate-700">
-                    State*
-                    <input
-                      type="text"
-                      name="state"
-                      autoComplete="address-level1"
-                      required
-                      value={form.state}
-                      onChange={(event) => onSelect('state', normalizeState(event.target.value))}
-                      className={cn(
-                        INPUT_BASE_CLASS,
-                        'uppercase',
-                        errors.state ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
-                      )}
-                      aria-invalid={Boolean(errors.state)}
-                    />
-                    {errors.state && <span className="mt-1 text-xs text-red-600">{errors.state}</span>}
-                  </label>
-
-                  <label className="flex flex-col text-sm font-medium text-slate-700">
-                    ZIP*
-                    <input
-                      type="text"
-                      name="zip"
-                      inputMode="numeric"
-                      maxLength={5}
-                      autoComplete="postal-code"
-                      required
-                      value={form.zip}
-                      onChange={(event) => onSelect('zip', normalizeZip(event.target.value))}
-                      className={cn(
-                        INPUT_BASE_CLASS,
-                        errors.zip ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS
-                      )}
-                      aria-invalid={Boolean(errors.zip)}
-                    />
-                    {errors.zip && <span className="mt-1 text-xs text-red-600">{errors.zip}</span>}
-                  </label>
-
-                  <div className="md:col-span-2">
-                    <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">When should we connect?</p>
-                    <div className="flex flex-wrap gap-3 mt-3">
-                      {BEST_TIME_OPTIONS.map(({ value, label }) => {
-                        const selected = form.bestTime === value;
-                        return (
-                          <button
-                            key={value}
-                            type="button"
-                            onClick={() => onSelect('bestTime', value)}
-                            className={cn(
-                              SELECTION_PILL_BASE_CLASS,
-                              selected ? SELECTION_PILL_SELECTED_CLASS : SELECTION_PILL_UNSELECTED_CLASS
-                            )}
-                            aria-pressed={selected}
-                          >
-                            {label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {errors.bestTime && <p className="mt-2 text-sm font-medium text-red-600">{errors.bestTime}</p>}
-                  </div>
-
-                  <SmsConsentFields
-                    className="md:col-span-2"
-                    smsProjectConsent={form.smsProjectConsent}
-                    smsMarketingConsent={form.smsMarketingConsent}
-                    onChange={(field, value) => onSelect(field, value)}
-                    errors={{
-                      smsProjectConsent: errors.smsProjectConsent,
-                      smsMarketingConsent: errors.smsMarketingConsent,
-                    }}
+                <label className="flex flex-col text-sm font-medium text-slate-700">
+                  First name*
+                  <input
+                    type="text"
+                    name="firstName"
+                    autoComplete="given-name"
+                    value={form.firstName}
+                    onChange={(event) => onSelect('firstName', event.target.value)}
+                    className={cn(
+                      INPUT_BASE_CLASS,
+                      errors.firstName ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS,
+                    )}
+                    aria-invalid={Boolean(errors.firstName)}
                   />
+                  {errors.firstName && (
+                    <span className="mt-1 text-xs text-red-600">{errors.firstName}</span>
+                  )}
+                </label>
 
-                  <div className="md:col-span-2">
-                    <Turnstile className="pt-1" action="lead-form" />
-                    {errors.cfToken && <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>}
+                <label className="flex flex-col text-sm font-medium text-slate-700">
+                  Last name*
+                  <input
+                    type="text"
+                    name="lastName"
+                    autoComplete="family-name"
+                    value={form.lastName}
+                    onChange={(event) => onSelect('lastName', event.target.value)}
+                    className={cn(
+                      INPUT_BASE_CLASS,
+                      errors.lastName ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS,
+                    )}
+                    aria-invalid={Boolean(errors.lastName)}
+                  />
+                  {errors.lastName && (
+                    <span className="mt-1 text-xs text-red-600">{errors.lastName}</span>
+                  )}
+                </label>
+
+                <label className="flex flex-col text-sm font-medium text-slate-700">
+                  Email*
+                  <input
+                    type="email"
+                    name="email"
+                    autoComplete="email"
+                    value={form.email}
+                    onChange={(event) => onSelect('email', event.target.value)}
+                    className={cn(
+                      INPUT_BASE_CLASS,
+                      errors.email ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS,
+                    )}
+                    aria-invalid={Boolean(errors.email)}
+                  />
+                  {errors.email && (
+                    <span className="mt-1 text-xs text-red-600">{errors.email}</span>
+                  )}
+                </label>
+
+                <label className="flex flex-col text-sm font-medium text-slate-700">
+                  Phone*
+                  <input
+                    type="tel"
+                    name="phone"
+                    autoComplete="tel"
+                    inputMode="tel"
+                    value={form.phone}
+                    onChange={(event) => onSelect('phone', sanitizePhoneInput(event.target.value))}
+                    className={cn(
+                      INPUT_BASE_CLASS,
+                      errors.phone ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS,
+                    )}
+                    aria-invalid={Boolean(errors.phone)}
+                  />
+                  {errors.phone && (
+                    <span className="mt-1 text-xs text-red-600">{errors.phone}</span>
+                  )}
+                  <p className="mt-1 text-xs text-slate-500">
+                    Ex: {formatPhoneExample(form.phone)}
+                  </p>
+                </label>
+
+                <div className="md:col-span-2">
+                  <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">
+                    Preferred contact method
+                  </p>
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    {CONTACT_PREF_OPTIONS.map(({ value, label, icon: Icon }) => {
+                      const selected = form.preferredContact === value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => onSelect('preferredContact', value)}
+                          className={cn(
+                            'inline-flex items-center gap-2',
+                            SELECTION_PILL_BASE_CLASS,
+                            selected
+                              ? SELECTION_PILL_SELECTED_CLASS
+                              : SELECTION_PILL_UNSELECTED_CLASS,
+                          )}
+                          aria-pressed={selected}
+                        >
+                          <Icon className="w-4 h-4" aria-hidden="true" />
+                          {label}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
-              )}
-            </motion.div>
-          </AnimatePresence>
-        </LeadFormStepShell>
-      </form>
-    );
+              </div>
+            )}
+
+            {activeStepId === 'schedule' && (
+              <div className="grid gap-4 py-2 md:grid-cols-2">
+                <label className="flex flex-col text-sm font-medium text-slate-700 md:col-span-2">
+                  Street address*
+                  <input
+                    type="text"
+                    name="address1"
+                    autoComplete="address-line1"
+                    required
+                    value={form.address1}
+                    onChange={(event) => onSelect('address1', event.target.value)}
+                    className={cn(
+                      INPUT_BASE_CLASS,
+                      errors.address1 ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS,
+                    )}
+                    aria-invalid={Boolean(errors.address1)}
+                  />
+                  {errors.address1 && (
+                    <span className="mt-1 text-xs text-red-600">{errors.address1}</span>
+                  )}
+                </label>
+
+                <label className="flex flex-col text-sm font-medium text-slate-700">
+                  Unit / suite (optional)
+                  <input
+                    type="text"
+                    name="address2"
+                    autoComplete="address-line2"
+                    value={form.address2}
+                    onChange={(event) => onSelect('address2', event.target.value)}
+                    className={cn(INPUT_BASE_CLASS, INPUT_DEFAULT_CLASS)}
+                  />
+                </label>
+
+                <label className="flex flex-col text-sm font-medium text-slate-700">
+                  City*
+                  <input
+                    type="text"
+                    name="city"
+                    autoComplete="address-level2"
+                    required
+                    value={form.city}
+                    onChange={(event) => onSelect('city', event.target.value)}
+                    className={cn(
+                      INPUT_BASE_CLASS,
+                      errors.city ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS,
+                    )}
+                    aria-invalid={Boolean(errors.city)}
+                  />
+                  {errors.city && <span className="mt-1 text-xs text-red-600">{errors.city}</span>}
+                </label>
+
+                <label className="flex flex-col text-sm font-medium text-slate-700">
+                  State*
+                  <input
+                    type="text"
+                    name="state"
+                    autoComplete="address-level1"
+                    required
+                    value={form.state}
+                    onChange={(event) => onSelect('state', normalizeState(event.target.value))}
+                    className={cn(
+                      INPUT_BASE_CLASS,
+                      'uppercase',
+                      errors.state ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS,
+                    )}
+                    aria-invalid={Boolean(errors.state)}
+                  />
+                  {errors.state && (
+                    <span className="mt-1 text-xs text-red-600">{errors.state}</span>
+                  )}
+                </label>
+
+                <label className="flex flex-col text-sm font-medium text-slate-700">
+                  ZIP*
+                  <input
+                    type="text"
+                    name="zip"
+                    inputMode="numeric"
+                    maxLength={5}
+                    autoComplete="postal-code"
+                    required
+                    value={form.zip}
+                    onChange={(event) => onSelect('zip', normalizeZip(event.target.value))}
+                    className={cn(
+                      INPUT_BASE_CLASS,
+                      errors.zip ? INPUT_ERROR_CLASS : INPUT_DEFAULT_CLASS,
+                    )}
+                    aria-invalid={Boolean(errors.zip)}
+                  />
+                  {errors.zip && <span className="mt-1 text-xs text-red-600">{errors.zip}</span>}
+                </label>
+
+                <div className="md:col-span-2">
+                  <p className="text-xs font-semibold tracking-wide uppercase text-slate-500">
+                    When should we connect?
+                  </p>
+                  <div className="flex flex-wrap gap-3 mt-3">
+                    {BEST_TIME_OPTIONS.map(({ value, label }) => {
+                      const selected = form.bestTime === value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          onClick={() => onSelect('bestTime', value)}
+                          className={cn(
+                            SELECTION_PILL_BASE_CLASS,
+                            selected
+                              ? SELECTION_PILL_SELECTED_CLASS
+                              : SELECTION_PILL_UNSELECTED_CLASS,
+                          )}
+                          aria-pressed={selected}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.bestTime && (
+                    <p className="mt-2 text-sm font-medium text-red-600">{errors.bestTime}</p>
+                  )}
+                </div>
+
+                <SmsConsentFields
+                  className="md:col-span-2"
+                  smsProjectConsent={form.smsProjectConsent}
+                  smsMarketingConsent={form.smsMarketingConsent}
+                  onChange={(field, value) => onSelect(field, value)}
+                  errors={{
+                    smsProjectConsent: errors.smsProjectConsent,
+                    smsMarketingConsent: errors.smsMarketingConsent,
+                  }}
+                />
+
+                <div className="md:col-span-2">
+                  <Turnstile className="pt-1" action="lead-form" />
+                  {errors.cfToken && (
+                    <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </LeadFormStepShell>
+    </form>
+  );
 }

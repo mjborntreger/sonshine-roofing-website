@@ -7,6 +7,7 @@ import { JsonLd } from '@/lib/seo/json-ld';
 import { serviceSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { ArrowLeftRight, ArrowUpRight, CircleCheck, Smartphone } from 'lucide-react';
+import { useSiteSettings } from '@/lib/content/site-settings-context';
 
 // -----------------------------
 // Types & Data
@@ -32,8 +33,7 @@ const BENEFITS: Benefit[] = [
   {
     id: 'annual-checkup',
     label: 'One complimentary Tip Top Roof Check-up per year',
-    why:
-      'Annual inspections catch early warning signs and help extend the life of your roof.',
+    why: 'Annual inspections catch early warning signs and help extend the life of your roof.',
   },
   {
     id: 'inspection-checklist',
@@ -53,8 +53,7 @@ const BENEFITS: Benefit[] = [
   {
     id: 'giftable-inspection',
     label: 'One complimentary giftable roof inspection per year',
-    why:
-      'Use for family, neighbors, or friends to create referral opportunities without pressure.',
+    why: 'Use for family, neighbors, or friends to create referral opportunities without pressure.',
   },
 ];
 
@@ -117,6 +116,7 @@ type RoofCareClubProps = {
 };
 
 export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
+  const { phone, phoneHref } = useSiteSettings();
   // Default term: 3 years
   const [term, setTerm] = useState<Term>(3);
 
@@ -127,21 +127,21 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
   const offerItems = useMemo(
     () =>
       TERM_PLANS.map((plan) => ({
-        "@type": "Offer" as const,
+        '@type': 'Offer' as const,
         name: `Roof Care Club - ${plan.term}-Year Membership`,
-        category: "Roof Care Club Membership",
+        category: 'Roof Care Club Membership',
         price: plan.total,
-        priceCurrency: "USD",
-        offeredBy: { "@id": providerId },
-        itemOffered: { "@type": "Service", name: "Roof Maintenance (Membership)" },
+        priceCurrency: 'USD',
+        offeredBy: { '@id': providerId },
+        itemOffered: { '@type': 'Service', name: 'Roof Maintenance (Membership)' },
         additionalProperty: [
           {
-            "@type": "PropertyValue",
-            name: "Term",
-            value: `${plan.term} year${plan.term > 1 ? "s" : ""}`,
+            '@type': 'PropertyValue',
+            name: 'Term',
+            value: `${plan.term} year${plan.term > 1 ? 's' : ''}`,
           },
-          { "@type": "PropertyValue", name: "Annual price", value: plan.annual },
-          { "@type": "PropertyValue", name: "Total price", value: plan.total },
+          { '@type': 'PropertyValue', name: 'Annual price', value: plan.annual },
+          { '@type': 'PropertyValue', name: 'Total price', value: plan.total },
         ],
       })),
     [providerId],
@@ -150,19 +150,15 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
   const serviceLd = useMemo(
     () =>
       serviceSchema({
-        name: "Roof Care Club",
+        name: 'Roof Care Club',
         description:
-          "Membership maintenance plan with scheduled inspections, discounts, and member benefits.",
-        url: "/roof-maintenance",
+          'Membership maintenance plan with scheduled inspections, discounts, and member benefits.',
+        url: '/roof-maintenance',
         origin: resolvedOrigin,
         provider: providerId,
-        areaServed: [
-          "Sarasota County, FL",
-          "Manatee County, FL",
-          "Charlotte County, FL",
-        ],
+        areaServed: ['Sarasota County, FL', 'Manatee County, FL', 'Charlotte County, FL'],
         offers: offerItems,
-        serviceType: "Roof Maintenance",
+        serviceType: 'Roof Maintenance',
         id: `${resolvedOrigin}/#roof-care-club`,
       }),
     [offerItems, providerId, resolvedOrigin],
@@ -239,10 +235,10 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                     )}
                   </div>
                 </div>
-                <SmartLink className="phone-affordance mt-4 w-full not-prose" href="tel:+19418664320">
+                <SmartLink className="phone-affordance mt-4 w-full not-prose" href={phoneHref}>
                   <div className="btn btn-md btn-brand-blue w-full">
                     <Smartphone className="phone-affordance-icon inline h-4 w-4 mr-2" />
-                    Call (941) 866-4320
+                    Call {phone}
                   </div>
                 </SmartLink>
                 <p className="mt-3 text-sm text-slate-500">
@@ -263,7 +259,12 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                   {BENEFITS.map((benefit) => (
                     <li key={benefit.id}>
                       <Accordion
-                        summary={<h5 className="text-lg"><CircleCheck className="inline mr-2 text-green-600 h-5 w-5" />{benefit.label}</h5>}
+                        summary={
+                          <h5 className="text-lg">
+                            <CircleCheck className="inline mr-2 text-green-600 h-5 w-5" />
+                            {benefit.label}
+                          </h5>
+                        }
                         radius="2xl"
                         tone="soft"
                         size="md"

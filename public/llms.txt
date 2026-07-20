@@ -2,8 +2,8 @@
 # Edit to match your policy. Served at /llms.txt
 
 Owner: SonShine Roofing
-Contact: info@sonshineroofing.com
-Last-Updated: 2025-09-12
+Contact: messages@sonshineroofing.com
+Last-Updated: 2026-07-19
 
 # High-level policy
 # Options: allow | disallow | limited

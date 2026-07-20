@@ -1,32 +1,41 @@
-"use client";
+'use client';
 
-import Head from "next/head";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowRight, ShieldCheck, Smartphone } from "lucide-react";
-import SmartLink from "@/components/utils/SmartLink";
-import { renderHighlight } from "@/components/utils/renderHighlight";
-import Image from "next/image";
-import LeadForm from "@/components/lead-capture/lead-form/LeadForm";
-import { LeadFormFallback } from "@/components/lead-capture/lead-form/Fallback";
-import { restoreLeadSuccessState, type LeadSuccessRestore } from "@/components/lead-capture/lead-form/config";
+import Head from 'next/head';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { ArrowRight, ShieldCheck, Smartphone } from 'lucide-react';
+import SmartLink from '@/components/utils/SmartLink';
+import { renderHighlight } from '@/components/utils/renderHighlight';
+import Image from 'next/image';
+import LeadForm from '@/components/lead-capture/lead-form/LeadForm';
+import { LeadFormFallback } from '@/components/lead-capture/lead-form/Fallback';
+import {
+  restoreLeadSuccessState,
+  type LeadSuccessRestore,
+} from '@/components/lead-capture/lead-form/config';
+import { useSiteSettings } from '@/lib/content/site-settings-context';
 
-const VIDEO_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/updated-website-hero-apr-2026.mp4";
-const POSTER_SRC = "https://wp.sonshineroofing.com/wp-content/uploads/updated-website-hero-fallback-apr-2026.webp";
+const VIDEO_SRC =
+  'https://wp.sonshineroofing.com/wp-content/uploads/updated-website-hero-apr-2026.mp4';
+const POSTER_SRC =
+  'https://wp.sonshineroofing.com/wp-content/uploads/updated-website-hero-fallback-apr-2026.webp';
 
 type HeroProps = {
-  title?: string
+  title?: string;
 };
 
-export default function Hero({ title = "The BEST Roofing Company in Sarasota, Manatee, and Charlotte Counties for Over 39 Years" }: HeroProps) {
+export default function Hero({
+  title = 'The BEST Roofing Company in Sarasota, Manatee, and Charlotte Counties for over 39 years',
+}: HeroProps) {
+  const { licenseNumber, licenseUrl } = useSiteSettings();
   const sectionRef = useRef<HTMLElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [shouldShowVideo, setShouldShowVideo] = useState(false);
   const restoredSuccess = useMemo<LeadSuccessRestore | null>(() => restoreLeadSuccessState(), []);
-  const renderedTitle = renderHighlight(title, ["BEST", "Over 39 Years"], "text-[--brand-cyan]");
+  const renderedTitle = renderHighlight(title, ['BEST', 'over 39 years'], 'text-[--brand-cyan]');
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (typeof window === 'undefined') return;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     const target = sectionRef.current;
@@ -39,7 +48,7 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
           observer.disconnect();
         }
       },
-      { rootMargin: "200px 0px" }
+      { rootMargin: '200px 0px' },
     );
 
     observer.observe(target);
@@ -65,9 +74,7 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
         <link rel="preload" as="image" href={POSTER_SRC} />
       </Head>
 
-      <section
-        ref={sectionRef}
-        className="relative h-auto overflow-hidden text-white isolate">
+      <section ref={sectionRef} className="relative h-auto overflow-hidden text-white isolate">
         {/* Fallback image (paints immediately; video swaps in after intersection) */}
         <Image
           src={POSTER_SRC}
@@ -94,10 +101,7 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
           poster={POSTER_SRC}
         />
 
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 -z-[5] bg-black/70"
-        />
+        <div aria-hidden="true" className="absolute inset-0 -z-[5] bg-black/70" />
 
         {/* Content */}
         <div className="relative z-10 mx-auto max-w-[1440px] px-4 pb-32 pt-24 md:pt-32 not-prose">
@@ -107,13 +111,16 @@ export default function Hero({ title = "The BEST Roofing Company in Sarasota, Ma
                 <p className="font-script text-2xl font-semibold text-[--brand-cyan] sm:text-4xl">
                   Since 1987, we&apos;ve got you covered.
                 </p>
-                <SmartLink
-                  href="https://www.myfloridalicense.com/LicenseDetail.asp?SID=&id=601EB27C16D2369E36FD9B81C20A0755"
-                  showExternalIcon
-                  className="mt-4 font-semibold text-xs md:text-sm tracking-wider text-orange-300">
-                  <ShieldCheck className="mr-1 inline h-3 w-3 text-orange-300" />
-                  INSURED | LICENSE #CCC1331483
-                </SmartLink>
+                {licenseNumber && licenseUrl ? (
+                  <SmartLink
+                    href={licenseUrl}
+                    showExternalIcon
+                    className="mt-4 font-semibold text-xs md:text-sm tracking-wider text-orange-300"
+                  >
+                    <ShieldCheck className="mr-1 inline h-3 w-3 text-orange-300" />
+                    INSURED | LICENSE #{licenseNumber}
+                  </SmartLink>
+                ) : null}
               </div>
 
               <h1 className="my-8 text-3xl sm:4xl leading-[3rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">

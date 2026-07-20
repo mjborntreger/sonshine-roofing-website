@@ -1,22 +1,23 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import Script from "next/script";
-import { envFlagTrue, isProdEnv, isSiteHost, SITE_HOST } from "@/lib/seo/site";
-import type { GtmWindow } from "@/lib/telemetry/gtm";
+import { useEffect } from 'react';
+import Script from 'next/script';
+import { envFlagTrue, isProdEnv, isSiteHost, SITE_HOST } from '@/lib/seo/site';
+import type { GtmWindow } from '@/lib/telemetry/gtm';
 
-const GTM = (process.env.NEXT_PUBLIC_GTM_ID || "").trim();
-const META_PIXEL_ID = (process.env.NEXT_PUBLIC_META_PIXEL_ID || "").trim();
+const GTM = (process.env.NEXT_PUBLIC_GTM_ID || '').trim();
+const META_PIXEL_ID = (process.env.NEXT_PUBLIC_META_PIXEL_ID || '').trim();
 
-if (isProdEnv() && typeof console !== "undefined" && typeof console.error === "function") {
-  if (!GTM) console.error("[env] Missing required environment variable: NEXT_PUBLIC_GTM_ID");
-  if (!META_PIXEL_ID) console.error("[env] Missing required environment variable: NEXT_PUBLIC_META_PIXEL_ID");
+if (isProdEnv() && typeof console !== 'undefined' && typeof console.error === 'function') {
+  if (!GTM) console.error('[env] Missing required environment variable: NEXT_PUBLIC_GTM_ID');
+  if (!META_PIXEL_ID)
+    console.error('[env] Missing required environment variable: NEXT_PUBLIC_META_PIXEL_ID');
 }
 
 function ensureGtmGlobals(win: GtmWindow) {
   win.dataLayer = win.dataLayer ?? [];
   win.__gtmQueue = win.__gtmQueue ?? [];
-  if (typeof win.__gtmLoaded !== "boolean") {
+  if (typeof win.__gtmLoaded !== 'boolean') {
     win.__gtmLoaded = false;
   }
 }
@@ -36,15 +37,14 @@ export function flushQueuedEvents(win: GtmWindow) {
   }
 }
 
-export default function AnalyticsScripts() {
+export default function AnalyticsScripts({ enabled }: { enabled: boolean }) {
   // Enable only in production by default; allow preview on staging if explicitly toggled and host is allowed
   const HOST_ALLOWED =
-    typeof window !== "undefined" ? isSiteHost(window.location.hostname) : isSiteHost(SITE_HOST);
+    typeof window !== 'undefined' ? isSiteHost(window.location.hostname) : isSiteHost(SITE_HOST);
   const ENABLED =
-    HOST_ALLOWED &&
-    (isProdEnv() || envFlagTrue("NEXT_PUBLIC_ENABLE_GTM_PREVIEW"));
+    enabled && HOST_ALLOWED && (isProdEnv() || envFlagTrue('NEXT_PUBLIC_ENABLE_GTM_PREVIEW'));
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
     const win = window as GtmWindow;
     ensureGtmGlobals(win);
   }, []);
@@ -58,14 +58,14 @@ export default function AnalyticsScripts() {
         id="gtm-init"
         strategy="lazyOnload"
         onLoad={() => {
-          if (typeof window === "undefined") return;
+          if (typeof window === 'undefined') return;
           const win = window as GtmWindow;
           ensureGtmGlobals(win);
           win.__gtmLoaded = true;
           flushQueuedEvents(win);
         }}
         onReady={() => {
-          if (typeof window === "undefined") return;
+          if (typeof window === 'undefined') return;
           const win = window as GtmWindow;
           ensureGtmGlobals(win);
           win.__gtmLoaded = true;
@@ -101,7 +101,7 @@ export default function AnalyticsScripts() {
           src={`https://www.googletagmanager.com/ns.html?id=${GTM}`}
           height="0"
           width="0"
-          style={{ display: "none", visibility: "hidden" }}
+          style={{ display: 'none', visibility: 'hidden' }}
         />
       </noscript>
       <noscript>
@@ -109,7 +109,7 @@ export default function AnalyticsScripts() {
         <img
           height="1"
           width="1"
-          style={{ display: "none" }}
+          style={{ display: 'none' }}
           src={`https://www.facebook.com/tr?id=${META_PIXEL_ID}&ev=PageView&noscript=1`}
           alt=""
         />

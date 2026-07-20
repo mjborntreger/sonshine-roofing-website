@@ -24,15 +24,21 @@ import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { type LeadSuccessRestore } from '@/components/lead-capture/lead-form/config';
 import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import LeadFormStepShell from '@/components/lead-capture/lead-form/LeadFormStepShell';
-import SmsConsentFields, { SmsConsentFooter } from '@/components/lead-capture/shared/SmsConsentFields';
+import SmsConsentFields, {
+  SmsConsentFooter,
+} from '@/components/lead-capture/shared/SmsConsentFields';
 import { renderHighlight } from '@/components/utils/renderHighlight';
 import { cn } from '@/lib/utils';
+import { useSiteSettings } from '@/lib/content/site-settings-context';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
-const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
-  ssr: false,
-  loading: () => null,
-});
+const LeadFormSuccess = dynamic(
+  () => import('@/components/lead-capture/lead-form/LeadFormSuccess'),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 
 const INPUT_BASE_CLASS =
   'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-sm shadow-lg focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-orange]/30';
@@ -122,8 +128,12 @@ type LeadFormContactFieldsProps = {
 
 function LeadFormContactFields({ tone, form, errors, onFieldChange }: LeadFormContactFieldsProps) {
   const isHero = tone === 'hero';
-  const labelClassName = isHero ? 'block text-sm font-semibold text-slate-300' : 'block font-medium text-slate-700';
-  const phoneLabelClassName = isHero ? 'mt-4 block text-sm font-semibold text-slate-300' : 'mt-4 block font-medium text-slate-700';
+  const labelClassName = isHero
+    ? 'block text-sm font-semibold text-slate-300'
+    : 'block font-medium text-slate-700';
+  const phoneLabelClassName = isHero
+    ? 'mt-4 block text-sm font-semibold text-slate-300'
+    : 'mt-4 block font-medium text-slate-700';
   const inputClassName = isHero ? HERO_INPUT_BASE_CLASS : INPUT_BASE_CLASS;
   const errorClassName = isHero ? 'mt-1 text-xs text-red-200' : 'mt-1 text-xs text-red-600';
 
@@ -200,7 +210,12 @@ type LeadFormSmsConsentSectionProps = {
   onFieldChange: SetFormField;
 };
 
-function LeadFormSmsConsentSection({ tone, form, errors, onFieldChange }: LeadFormSmsConsentSectionProps) {
+function LeadFormSmsConsentSection({
+  tone,
+  form,
+  errors,
+  onFieldChange,
+}: LeadFormSmsConsentSectionProps) {
   const isHero = tone === 'hero';
 
   return (
@@ -251,7 +266,13 @@ function LeadFormTurnstileSection({ tone, errors }: LeadFormTurnstileSectionProp
     <div className="mt-6">
       <Turnstile className="pt-1" action="contact-lead" />
       {errors.cfToken ? (
-        <p className={tone === 'hero' ? 'mt-2 text-sm font-medium text-red-200' : 'mt-2 text-sm font-medium text-red-600'}>
+        <p
+          className={
+            tone === 'hero'
+              ? 'mt-2 text-sm font-medium text-red-200'
+              : 'mt-2 text-sm font-medium text-red-600'
+          }
+        >
           {errors.cfToken}
         </p>
       ) : null}
@@ -279,7 +300,9 @@ function LeadFormSubmitSection({ tone, status }: LeadFormSubmitSectionProps) {
           data-icon-affordance="right"
         >
           {isSubmitting ? 'Sending…' : 'Submit'}
-          {!isSubmitting ? <ArrowRight className="ml-2 h-4 w-4 icon-affordance" aria-hidden="true" /> : null}
+          {!isSubmitting ? (
+            <ArrowRight className="ml-2 h-4 w-4 icon-affordance" aria-hidden="true" />
+          ) : null}
         </Button>
       </div>
     );
@@ -287,15 +310,24 @@ function LeadFormSubmitSection({ tone, status }: LeadFormSubmitSectionProps) {
 
   return (
     <div className="mt-6 flex justify-end">
-      <Button data-icon-affordance="right" type="submit" size="xl" variant="brandOrange" disabled={isSubmitting}>
+      <Button
+        data-icon-affordance="right"
+        type="submit"
+        size="xl"
+        variant="brandOrange"
+        disabled={isSubmitting}
+      >
         {isSubmitting ? 'Sending…' : 'Submit my free estimate request'}
-        {!isSubmitting ? <ArrowRight className="ml-2 h-4 w-4 icon-affordance" aria-hidden="true" /> : null}
+        {!isSubmitting ? (
+          <ArrowRight className="ml-2 h-4 w-4 icon-affordance" aria-hidden="true" />
+        ) : null}
       </Button>
     </div>
   );
 }
 
 export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadFormProps = {}) {
+  const { phone, phoneHref } = useSiteSettings();
   const pathname = usePathname() || '/';
   const utm = useUtmParams();
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
@@ -340,7 +372,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
         email: form.email,
         phone: form.phone,
       },
-      { emailRequired: true, phoneRequired: true }
+      { emailRequired: true, phoneRequired: true },
     );
     const smsErrors = validateSmsConsentDraft({
       smsProjectConsent: form.smsProjectConsent,
@@ -407,7 +439,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
         console.error('Lead submission failed', result);
       }
       setStatus('error');
-      setGlobalError(result.error || 'We could not send your request. Please call us at (941) 866-4320.');
+      setGlobalError(result.error || `We could not send your request. Please call us at ${phone}.`);
       if (result.fieldErrors) {
         const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
         if (Object.keys(serverErrors).length) {
@@ -452,8 +484,8 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
                 </p>
                 <p className="mt-1 text-lg text-slate-300">
                   Call{' '}
-                  <a href="tel:+19418664320" className="font-semibold text-blue-200">
-                    (941) 866-4320
+                  <a href={phoneHref} className="font-semibold text-blue-200">
+                    {phone}
                   </a>{' '}
                   to reach our office.
                 </p>
@@ -463,7 +495,12 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
 
           <LeadFormAlert tone="hero" message={globalError} />
           <LeadFormContactFields tone="hero" form={form} errors={errors} onFieldChange={setField} />
-          <LeadFormSmsConsentSection tone="hero" form={form} errors={errors} onFieldChange={setField} />
+          <LeadFormSmsConsentSection
+            tone="hero"
+            form={form}
+            errors={errors}
+            onFieldChange={setField}
+          />
           <LeadFormTurnstileSection tone="hero" errors={errors} />
           <LeadFormSubmitSection tone="hero" status={status} />
           <LeadFormGeneralDisclosureSection tone="hero" />
@@ -481,24 +518,34 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
           stepLabel="Free Estimate"
           title={renderedFormHeading}
           description="FREE ESTIMATE"
-          headerFooter={(
+          headerFooter={
             <div className="mt-6 flex items-start gap-3 rounded-2xl border border-blue-100 bg-white/70 px-4 py-4">
               <div>
                 <p className="font-semibold text-slate-800">Need help right now?</p>
                 <p className="mt-1 text-sm text-slate-600">
                   Call{' '}
-                  <a href="tel:+19418664320" className="font-semibold text-[--brand-blue]">
-                    (941) 866-4320
+                  <a href={phoneHref} className="font-semibold text-[--brand-blue]">
+                    {phone}
                   </a>{' '}
                   if a storm is moving in or water is coming inside.
                 </p>
               </div>
             </div>
-          )}
+          }
         >
           <LeadFormAlert tone="default" message={globalError} />
-          <LeadFormContactFields tone="default" form={form} errors={errors} onFieldChange={setField} />
-          <LeadFormSmsConsentSection tone="default" form={form} errors={errors} onFieldChange={setField} />
+          <LeadFormContactFields
+            tone="default"
+            form={form}
+            errors={errors}
+            onFieldChange={setField}
+          />
+          <LeadFormSmsConsentSection
+            tone="default"
+            form={form}
+            errors={errors}
+            onFieldChange={setField}
+          />
           <LeadFormTurnstileSection tone="default" errors={errors} />
           <LeadFormSubmitSection tone="default" status={status} />
           <LeadFormGeneralDisclosureSection tone="default" />

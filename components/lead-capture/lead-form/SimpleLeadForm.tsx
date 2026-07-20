@@ -27,6 +27,7 @@ import {
   validateSmsConsentDraft,
 } from '@/lib/lead-capture/contact-lead';
 import { cn } from '@/lib/utils';
+import { useSiteSettings } from '@/lib/content/site-settings-context';
 import {
   PROJECT_OPTIONS,
   STANDARD_ROOF_AGE_OPTIONS,
@@ -47,16 +48,20 @@ import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
 
 // STYLES
-const INPUT_BASE_CLASS = 'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
+const INPUT_BASE_CLASS =
+  'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
-const SECTION_TITLE_BASE_CLASS = "text-xl sm:text-2xl font-semibold tracking-wide text-slate-700";
-const SECTION_EYELASH = "text-sm my-1 text-slate-500";
+const SECTION_TITLE_BASE_CLASS = 'text-xl sm:text-2xl font-semibold tracking-wide text-slate-700';
+const SECTION_EYELASH = 'text-sm my-1 text-slate-500';
 
 const Turnstile = dynamic(() => import('@/components/lead-capture/Turnstile'), { ssr: false });
-const LeadFormSuccess = dynamic(() => import('@/components/lead-capture/lead-form/LeadFormSuccess'), {
-  ssr: false,
-  loading: () => null,
-});
+const LeadFormSuccess = dynamic(
+  () => import('@/components/lead-capture/lead-form/LeadFormSuccess'),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 
 type Status = 'idle' | 'submitting' | 'success' | 'error';
 
@@ -103,12 +108,14 @@ const DEFAULT_SELECTABLE_PROJECT_TYPES = PROJECT_OPTIONS.reduce<JourneyKey[]>((a
   return acc;
 }, []);
 
-function getSelectableProjectOptions(selectableProjectTypes: readonly JourneyKey[]): Array<ProjectOption & { value: JourneyKey }> {
+function getSelectableProjectOptions(
+  selectableProjectTypes: readonly JourneyKey[],
+): Array<ProjectOption & { value: JourneyKey }> {
   const allowedProjectTypes = new Set(selectableProjectTypes);
 
   return PROJECT_OPTIONS.filter(
     (option): option is ProjectOption & { value: JourneyKey } =>
-      isJourneyKey(option.value) && allowedProjectTypes.has(option.value)
+      isJourneyKey(option.value) && allowedProjectTypes.has(option.value),
   );
 }
 
@@ -184,17 +191,18 @@ function buildSuccessMetaFromPayload(payload: LeadSuccessCookiePayload): Success
 export default function SimpleLeadForm({
   selectableProjectTypes = DEFAULT_SELECTABLE_PROJECT_TYPES,
 }: SimpleLeadFormProps = {}) {
+  const { phone } = useSiteSettings();
   const parsedCookie = useMemo(() => parseLeadSuccessCookie(), []);
   const projectOptions = useMemo(
     () => getSelectableProjectOptions(selectableProjectTypes),
-    [selectableProjectTypes]
+    [selectableProjectTypes],
   );
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>('idle');
   const [successMeta, setSuccessMeta] = useState<SuccessMeta | null>(
-    parsedCookie ? buildSuccessMetaFromPayload(parsedCookie) : null
+    parsedCookie ? buildSuccessMetaFromPayload(parsedCookie) : null,
   );
 
   const utmParams = useUtmParams();
@@ -215,12 +223,15 @@ export default function SimpleLeadForm({
     if (status === 'submitting') return;
 
     const validation: Record<string, string> = {};
-    const identityErrors = validateContactIdentityDraft({
-      firstName: form.firstName,
-      lastName: form.lastName,
-      email: form.email,
-      phone: form.phone,
-    }, { phoneRequired: true, emailRequired: true });
+    const identityErrors = validateContactIdentityDraft(
+      {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        phone: form.phone,
+      },
+      { phoneRequired: true, emailRequired: true },
+    );
     const addressErrors = validateContactAddressDraft({
       address1: form.address1,
       address2: form.address2,
@@ -258,7 +269,9 @@ export default function SimpleLeadForm({
     const notes = form.notes.trim();
     const roofTypeLabel = getRoofTypeLabel(form.roofType);
     const combinedNotes = roofTypeLabel
-      ? [notes, `Roof type: ${roofTypeLabel}`].filter((value) => Boolean(value && value.trim())).join('\n\n')
+      ? [notes, `Roof type: ${roofTypeLabel}`]
+          .filter((value) => Boolean(value && value.trim()))
+          .join('\n\n')
       : notes;
     const preferredContact = DEFAULT_PREFERRED_CONTACT;
     const payload = buildContactLeadForwardPayload({
@@ -317,7 +330,7 @@ export default function SimpleLeadForm({
         console.error('Lead submission failed', result);
       }
       setStatus('error');
-      setGlobalError(result.error || 'We could not send your message. Please call us at (941) 866-4320.');
+      setGlobalError(result.error || `We could not send your message. Please call us at ${phone}.`);
       if (result.fieldErrors) {
         const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
         if (Object.keys(serverErrors).length) {
@@ -352,7 +365,11 @@ export default function SimpleLeadForm({
     return (
       <>
         <div id="book-an-appointment" className="h-0" aria-hidden="true" />
-        <LeadFormSuccess successMeta={successMeta} onReset={handleResetSuccess} maxWidthClassName="max-w-5xl" />
+        <LeadFormSuccess
+          successMeta={successMeta}
+          onReset={handleResetSuccess}
+          maxWidthClassName="max-w-5xl"
+        />
       </>
     );
   }
@@ -370,13 +387,17 @@ export default function SimpleLeadForm({
               <Mail className="h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
               <span>{renderHighlight('Contact Our Office', 'Our Office')}</span>
             </h2>
-            <p className="text-slate-500 mt-1 text-sm md:text-base pb-2">We respond within 30 minutes during business hours. After hours, we&apos;ll contact you in the next business day.</p>
+            <p className="text-slate-500 mt-1 text-sm md:text-base pb-2">
+              We respond within 30 minutes during business hours. After hours, we&apos;ll contact
+              you in the next business day.
+            </p>
           </div>
 
           <div className="p-4 sm:p-6">
-
             {globalError && (
-              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{globalError}</div>
+              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {globalError}
+              </div>
             )}
 
             <div className="grid gap-8">
@@ -393,7 +414,9 @@ export default function SimpleLeadForm({
                       className={cn(INPUT_BASE_CLASS, errors.firstName && INPUT_ERROR_CLASS)}
                       placeholder="First Name"
                     />
-                    {errors.firstName && <span className="mt-1 text-xs text-red-600">{errors.firstName}</span>}
+                    {errors.firstName && (
+                      <span className="mt-1 text-xs text-red-600">{errors.firstName}</span>
+                    )}
                   </label>
                   <label className="block font-medium text-slate-700">
                     Last Name*
@@ -406,7 +429,9 @@ export default function SimpleLeadForm({
                       className={cn(INPUT_BASE_CLASS, errors.lastName && INPUT_ERROR_CLASS)}
                       placeholder="Last Name"
                     />
-                    {errors.lastName && <span className="mt-1 text-xs text-red-600">{errors.lastName}</span>}
+                    {errors.lastName && (
+                      <span className="mt-1 text-xs text-red-600">{errors.lastName}</span>
+                    )}
                   </label>
                 </div>
 
@@ -422,7 +447,9 @@ export default function SimpleLeadForm({
                       className={cn(INPUT_BASE_CLASS, errors.email && INPUT_ERROR_CLASS)}
                       placeholder="example@domain.com"
                     />
-                    {errors.email && <span className="mt-1 text-xs text-red-600">{errors.email}</span>}
+                    {errors.email && (
+                      <span className="mt-1 text-xs text-red-600">{errors.email}</span>
+                    )}
                   </label>
                   <label className="block font-medium text-slate-700">
                     Phone*
@@ -431,12 +458,16 @@ export default function SimpleLeadForm({
                       name="phone"
                       autoComplete="tel"
                       value={form.phone}
-                      onChange={(event) => setField('phone', sanitizePhoneInput(event.target.value))}
+                      onChange={(event) =>
+                        setField('phone', sanitizePhoneInput(event.target.value))
+                      }
                       className={cn(INPUT_BASE_CLASS, errors.phone && INPUT_ERROR_CLASS)}
                       inputMode="tel"
                       placeholder={`Example: ${formatPhoneExample(form.phone)}`}
                     />
-                    {errors.phone && <span className="mt-1 text-xs text-red-600">{errors.phone}</span>}
+                    {errors.phone && (
+                      <span className="mt-1 text-xs text-red-600">{errors.phone}</span>
+                    )}
                   </label>
                 </section>
 
@@ -452,7 +483,9 @@ export default function SimpleLeadForm({
                       className={cn(INPUT_BASE_CLASS, errors.address1 && INPUT_ERROR_CLASS)}
                       placeholder="123 Sesame St."
                     />
-                    {errors.address1 && <span className="mt-1 text-xs text-red-600">{errors.address1}</span>}
+                    {errors.address1 && (
+                      <span className="mt-1 text-xs text-red-600">{errors.address1}</span>
+                    )}
                   </label>
                   <label className="block text-slate-500">
                     Apt, suite, etc. (optional)
@@ -478,7 +511,9 @@ export default function SimpleLeadForm({
                       className={cn(INPUT_BASE_CLASS, errors.city && INPUT_ERROR_CLASS)}
                       placeholder="City"
                     />
-                    {errors.city && <span className="mt-1 text-xs text-red-600">{errors.city}</span>}
+                    {errors.city && (
+                      <span className="mt-1 text-xs text-red-600">{errors.city}</span>
+                    )}
                   </label>
                   <label className="block font-medium text-slate-700">
                     State*
@@ -491,7 +526,9 @@ export default function SimpleLeadForm({
                       className={cn(INPUT_BASE_CLASS, errors.state && INPUT_ERROR_CLASS)}
                       maxLength={2}
                     />
-                    {errors.state && <span className="mt-1 text-xs text-red-600">{errors.state}</span>}
+                    {errors.state && (
+                      <span className="mt-1 text-xs text-red-600">{errors.state}</span>
+                    )}
                   </label>
                   <label className="block font-medium text-slate-700">
                     ZIP*
@@ -523,7 +560,9 @@ export default function SimpleLeadForm({
                         onClick={() => setField('projectType', option.value)}
                         className={cn(
                           PROJECT_OPTION_CARD_BASE_CLASS,
-                          selected ? PROJECT_OPTION_CARD_SELECTED_CLASS : PROJECT_OPTION_CARD_UNSELECTED_CLASS
+                          selected
+                            ? PROJECT_OPTION_CARD_SELECTED_CLASS
+                            : PROJECT_OPTION_CARD_UNSELECTED_CLASS,
                         )}
                         aria-pressed={selected}
                       >
@@ -531,13 +570,19 @@ export default function SimpleLeadForm({
                       </button>
                     );
                   })}
-                  {errors.projectType && <p className="md:col-span-2 text-sm font-medium text-red-600">{errors.projectType}</p>}
+                  {errors.projectType && (
+                    <p className="md:col-span-2 text-sm font-medium text-red-600">
+                      {errors.projectType}
+                    </p>
+                  )}
                 </div>
               </section>
 
               <section>
                 <h3 className={SECTION_TITLE_BASE_CLASS}>How old is your roof?</h3>
-                <p className={SECTION_EYELASH}>Share your roof&apos;s age or click &quot;Not sure.&quot;</p>
+                <p className={SECTION_EYELASH}>
+                  Share your roof&apos;s age or click &quot;Not sure.&quot;
+                </p>
                 <div className="mt-3 grid gap-3 grid-cols-3 sm:grid-cols-6">
                   {STANDARD_ROOF_AGE_OPTIONS.map(({ value, label }) => {
                     const selected = form.roofAge === value;
@@ -550,7 +595,7 @@ export default function SimpleLeadForm({
                           'font-medium text-slate-600 rounded-xl border px-4 py-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                           selected
                             ? 'border-[--brand-blue] bg-[--brand-blue] text-white shadow'
-                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300',
                         )}
                         aria-pressed={selected}
                       >
@@ -559,11 +604,15 @@ export default function SimpleLeadForm({
                     );
                   })}
                 </div>
-                {errors.roofAge && <p className="mt-2 text-sm font-medium text-red-600">{errors.roofAge}</p>}
+                {errors.roofAge && (
+                  <p className="mt-2 text-sm font-medium text-red-600">{errors.roofAge}</p>
+                )}
               </section>
 
               <section>
-                <h3 className={SECTION_TITLE_BASE_CLASS}>What type of roof do you currently have?</h3>
+                <h3 className={SECTION_TITLE_BASE_CLASS}>
+                  What type of roof do you currently have?
+                </h3>
                 <p className={SECTION_EYELASH}>Helps us prep for your project</p>
                 <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-4">
                   {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
@@ -577,7 +626,7 @@ export default function SimpleLeadForm({
                           'group flex flex-col gap-3 rounded-2xl border px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
                           selected
                             ? 'border-[--brand-blue] bg-[--brand-blue]/5 shadow-[0_8px_20px_rgba(15,76,129,0.12)]'
-                            : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md'
+                            : 'border-slate-200 bg-white hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md',
                         )}
                         aria-pressed={selected}
                       >
@@ -593,7 +642,13 @@ export default function SimpleLeadForm({
                         <div className="flex items-center justify-between gap-3">
                           <p className="font-semibold text-slate-900">{label}</p>
                           <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-inner">
-                            <Check className={cn('h-4 w-4', selected ? 'text-[--brand-blue]' : 'text-slate-300')} aria-hidden="true" />
+                            <Check
+                              className={cn(
+                                'h-4 w-4',
+                                selected ? 'text-[--brand-blue]' : 'text-slate-300',
+                              )}
+                              aria-hidden="true"
+                            />
                           </div>
                         </div>
                       </button>
@@ -604,7 +659,9 @@ export default function SimpleLeadForm({
 
               <section>
                 <label className="block ">
-                  <h3 className="text-lg sm:text-xl font-semibold text-slate-600">Anything else you’d like us to know? (optional) </h3>
+                  <h3 className="text-lg sm:text-xl font-semibold text-slate-600">
+                    Anything else you’d like us to know? (optional){' '}
+                  </h3>
                   <textarea
                     name="notes"
                     rows={4}
@@ -628,11 +685,20 @@ export default function SimpleLeadForm({
 
               <section>
                 <Turnstile className="pt-1" action="contact-lead" />
-                {errors.cfToken && <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>}
+                {errors.cfToken && (
+                  <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>
+                )}
               </section>
 
               <div className="flex w-full">
-                <Button className="w-full" data-icon-affordance="right" type="submit" size="xl" variant="brandOrange" disabled={status === 'submitting'}>
+                <Button
+                  className="w-full"
+                  data-icon-affordance="right"
+                  type="submit"
+                  size="xl"
+                  variant="brandOrange"
+                  disabled={status === 'submitting'}
+                >
                   {status === 'submitting' ? 'Sending…' : 'Submit Request'}
                   <ArrowRight className="ml-2 h-4 w-4 inline icon-affordance" />
                 </Button>

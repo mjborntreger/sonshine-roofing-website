@@ -1,14 +1,14 @@
-import Image from "next/image";
-import { MapPin } from "lucide-react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import type { LocationNeighborhood, WpImage } from "@/lib/content/wp";
+import Image from 'next/image';
+import { MapPin } from 'lucide-react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import type { LocationNeighborhood, WpImage } from '@/lib/content/wp';
 import {
   FEATURE_LIST_CLASS,
   FEATURE_PILL_CLASS,
   SECTION_HEADING,
   SECTION_SUBTITLE,
-} from "@/components/location/sectionStyles";
-import { renderHighlight } from "@/components/utils/renderHighlight";
+} from '@/components/location/sectionStyles';
+import { renderHighlight } from '@/components/utils/renderHighlight';
 
 type ServiceAreaSectionProps = {
   mapImage: WpImage | null;
@@ -32,27 +32,29 @@ export default function ServiceAreaSection({
   fallbackLocationLabel,
   locationName,
   heading,
-  headingHighlight = "Affordable Roofing Services",
+  headingHighlight = 'Affordable Roofing Services',
   eyebrow,
   className,
-  emptyMapMessage = "No map uploaded for this location yet.",
-  emptyLandmarksMessage = "No landmarks captured yet.",
-  emptyNeighborhoodsMessage = "No neighborhoods have been listed yet.",
+  emptyMapMessage = 'No map uploaded for this location yet.',
+  emptyLandmarksMessage = 'No landmarks captured yet.',
+  emptyNeighborhoodsMessage = 'No neighborhoods have been listed yet.',
 }: ServiceAreaSectionProps) {
-  const sectionClassName = className ? `mt-24 px-4 ${className}` : "mt-24 px-4";
+  const sectionClassName = className ? `mt-24 px-4 ${className}` : 'mt-24 px-4';
   const locationLabel = locationName ?? fallbackLocationLabel;
   const computedHeading =
     heading ??
-    (locationLabel ? `Affordable Roofing Services in ${locationLabel}` : "Affordable Roofing Services");
+    (locationLabel
+      ? `Affordable Roofing Services in ${locationLabel}`
+      : 'Affordable Roofing Services');
   const renderedHeading = renderHighlight(computedHeading, headingHighlight);
   const eyebrowText =
     eyebrow ??
     (locationLabel
-      ? `During our 38-year tenure in ${locationLabel}, we've always kept prices competitive without sacrificing on a quality roofing experience. We adapt to your neighborhood, not the other way around.`
+      ? `For over 39 years in ${locationLabel}, we've kept prices competitive without sacrificing a quality roofing experience. We adapt to your neighborhood, not the other way around.`
       : undefined);
 
   const mapImageUrl = mapImage?.url;
-  const mapAltLabel = locationLabel ? `${locationLabel} Service Area Map` : "Service Area Map";
+  const mapAltLabel = locationLabel ? `${locationLabel} Service Area Map` : 'Service Area Map';
   const neighborhoodsEmpty = neighborhoods.length === 0;
   const landmarksEmpty = landmarks.length === 0;
 
@@ -68,11 +70,13 @@ export default function ServiceAreaSection({
           {mapImageUrl ? (
             <>
               <div className="lg:row-span-2 col-span-full lg:col-span-2">
-                <h3 className="mb-2"><span className="text-[--brand-blue]">{`${locationName}`} </span>Service Area Map</h3>
+                <h3 className="mb-2">
+                  <span className="text-[--brand-blue]">{`${locationName}`} </span>Service Area Map
+                </h3>
                 <figure className="space-y-2">
                   <div
                     className="relative w-full overflow-hidden rounded-3xl bg-blue-200"
-                    style={{ aspectRatio: "1080 / 907" }}
+                    style={{ aspectRatio: '1080 / 907' }}
                   >
                     <Image
                       src={mapImageUrl}
@@ -84,7 +88,9 @@ export default function ServiceAreaSection({
                     />
                   </div>
                   {mapImage?.altText ? (
-                    <figcaption className="ml-2 text-sm italic text-slate-500">{mapAltLabel}</figcaption>
+                    <figcaption className="ml-2 text-sm italic text-slate-500">
+                      {mapAltLabel}
+                    </figcaption>
                   ) : null}
                 </figure>
                 <div className="mt-4">
@@ -109,9 +115,10 @@ export default function ServiceAreaSection({
             </p>
           )}
 
-
           {neighborhoodsEmpty ? (
-            <p className="col-span-full text-sm text-slate-600 lg:col-span-1">{emptyNeighborhoodsMessage}</p>
+            <p className="col-span-full text-sm text-slate-600 lg:col-span-1">
+              {emptyNeighborhoodsMessage}
+            </p>
           ) : (
             neighborhoods.map((neighborhood, index) => {
               const title = neighborhood.neighborhood || `Neighborhood ${index + 1}`;
@@ -119,7 +126,7 @@ export default function ServiceAreaSection({
 
               return (
                 <div
-                  key={`${neighborhood.neighborhood ?? "neighborhood"}-${index}`}
+                  key={`${neighborhood.neighborhood ?? 'neighborhood'}-${index}`}
                   className="col-span-full lg:col-span-1"
                 >
                   <Card className="h-fit overflow-hidden transition hover:shadow-lg">
@@ -130,13 +137,13 @@ export default function ServiceAreaSection({
                     {neighborhood.neighborhoodImage?.url ? (
                       <div
                         className="relative w-full overflow-hidden bg-blue-200"
-                        style={{ aspectRatio: "16 / 9" }}
+                        style={{ aspectRatio: '16 / 9' }}
                       >
                         <Image
                           src={neighborhood.neighborhoodImage.url}
                           alt={
                             neighborhood.neighborhoodImage.altText ||
-                            `${neighborhood.neighborhood ?? "Neighborhood"} image`
+                            `${neighborhood.neighborhood ?? 'Neighborhood'} image`
                           }
                           fill
                           sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
@@ -151,7 +158,7 @@ export default function ServiceAreaSection({
                     <CardContent className="px-5 pb-4 pt-5 sm:px-6 sm:pb-6">
                       {zipCodes.length ? (
                         <p className="text-sm text-slate-600">
-                          <span className="font-semibold">ZIP Code(s):</span> {zipCodes.join(", ")}
+                          <span className="font-semibold">ZIP Code(s):</span> {zipCodes.join(', ')}
                         </p>
                       ) : null}
                     </CardContent>

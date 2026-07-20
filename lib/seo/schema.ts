@@ -1,21 +1,25 @@
-import { ensureAbsoluteUrl, SITE_ORIGIN } from "./site";
-import { DEFAULT_REVIEW_PLATFORM, getReviewPlatformMeta, type ReviewPlatform } from "@/lib/reviews/platforms";
-import { faqHtmlToPlainText } from "@/lib/content/directus-faq-html";
+import { ensureAbsoluteUrl, SITE_ORIGIN } from './site';
+import {
+  DEFAULT_REVIEW_PLATFORM,
+  getReviewPlatformMeta,
+  type ReviewPlatform,
+} from '@/lib/reviews/platforms';
+import { faqHtmlToPlainText } from '@/lib/content/directus-faq-html';
 
 type MaybeString = string | null | undefined;
 
-const SCHEMA_CONTEXT = "https://schema.org";
+const SCHEMA_CONTEXT = 'https://schema.org';
 
 type SchemaInit = Record<string, unknown>;
 
 function applyContext<T extends SchemaInit>(schema: T, includeContext: boolean) {
   if (!includeContext) return schema;
-  return { "@context": SCHEMA_CONTEXT, ...schema };
+  return { '@context': SCHEMA_CONTEXT, ...schema };
 }
 
 function compact<T>(value: T | null | undefined): value is T {
   if (value === null || value === undefined) return false;
-  if (typeof value === "string") return value.trim().length > 0;
+  if (typeof value === 'string') return value.trim().length > 0;
   if (Array.isArray(value)) return value.length > 0;
   return true;
 }
@@ -27,9 +31,7 @@ function uniqueStrings(values: MaybeString[]) {
     if (!value) continue;
     const trimmed = value.trim();
     if (!trimmed) continue;
-    const normalized = trimmed.toLowerCase().startsWith("http")
-      ? trimFragment(trimmed)
-      : trimmed;
+    const normalized = trimmed.toLowerCase().startsWith('http') ? trimFragment(trimmed) : trimmed;
     if (seen.has(normalized)) continue;
     seen.add(normalized);
     out.push(trimmed);
@@ -38,20 +40,11 @@ function uniqueStrings(values: MaybeString[]) {
 }
 
 function trimFragment(value: string): string {
-  return value.replace(/#.*$/, "");
+  return value.replace(/#.*$/, '');
 }
 
-const DEFAULT_POSTAL_ADDRESS = {
-  streetAddress: "2555 Porter Lake Dr STE 109",
-  addressLocality: "Sarasota",
-  addressRegion: "FL",
-  postalCode: "34240",
-  addressCountry: "US",
-} as const;
-
-const DEFAULT_BUSINESS_PHONE = "+1-941-866-4320";
-const DEFAULT_BUSINESS_NAME = "SonShine Roofing";
-const DEFAULT_BUSINESS_TYPE = "RoofingContractor";
+const DEFAULT_BUSINESS_NAME = 'SonShine Roofing';
+const DEFAULT_BUSINESS_TYPE = 'RoofingContractor';
 const DEFAULT_MAX_REVIEWS = 40;
 const DEFAULT_BEST_RATING = 5;
 const DEFAULT_WORST_RATING = 1;
@@ -65,8 +58,8 @@ const trimOrNull = (value: string | null | undefined): string | null => {
 };
 
 const toFiniteNumber = (value: MaybeNumber): number | null => {
-  if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  if (typeof value === "string" && value.trim().length > 0) {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null;
+  if (typeof value === 'string' && value.trim().length > 0) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : null;
   }
@@ -81,7 +74,7 @@ const toPositiveInteger = (value: MaybeNumber): number | null => {
 };
 
 const toIsoDate = (unixSeconds?: number | null): string | null => {
-  if (typeof unixSeconds !== "number" || !Number.isFinite(unixSeconds)) return null;
+  if (typeof unixSeconds !== 'number' || !Number.isFinite(unixSeconds)) return null;
   if (unixSeconds <= 0) return null;
   const date = new Date(unixSeconds * 1000);
   if (Number.isNaN(date.getTime())) return null;
@@ -99,9 +92,9 @@ const toIsoDateString = (value?: string | null): string | null => {
 const stripToPlainText = (html: string | null | undefined): string | null => {
   if (!html) return null;
   const text = html
-    .replace(/<[^>]*>/g, " ")
-    .replace(/\s+/g, " ")
-    .replace(/\s+([.,;:!?])/g, "$1")
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .replace(/\s+([.,;:!?])/g, '$1')
     .trim();
   return text.length ? text : null;
 };
@@ -109,7 +102,7 @@ const stripToPlainText = (html: string | null | undefined): string | null => {
 const normalizeRelativeUrl = (value: string | null | undefined, origin: string): string | null => {
   const trimmed = trimOrNull(value);
   if (!trimmed) return null;
-  if (trimmed.startsWith("//")) {
+  if (trimmed.startsWith('//')) {
     return ensureAbsoluteUrl(`https:${trimmed}`, origin);
   }
   return ensureAbsoluteUrl(trimmed, origin);
@@ -134,16 +127,16 @@ export function faqSchema(
   const mainEntity = items.map((item) => {
     const answerText = faqHtmlToPlainText(item.answerHtml);
     const entity: SchemaInit = {
-      "@type": "Question",
+      '@type': 'Question',
       name: item.question,
-      acceptedAnswer: { "@type": "Answer", text: answerText },
+      acceptedAnswer: { '@type': 'Answer', text: answerText },
     };
     if (item.url) entity.url = ensureAbsoluteUrl(item.url, origin);
     return entity;
   });
 
   const schema: SchemaInit = {
-    "@type": "FAQPage",
+    '@type': 'FAQPage',
     mainEntity,
   };
 
@@ -167,14 +160,14 @@ export function breadcrumbSchema(
   { origin = SITE_ORIGIN, withContext = true }: BreadcrumbSchemaOptions = {},
 ) {
   const itemListElement = breadcrumbs.map((crumb, index) => ({
-    "@type": "ListItem",
+    '@type': 'ListItem',
     position: index + 1,
     name: crumb.name,
     item: ensureAbsoluteUrl(crumb.item, origin),
   }));
 
   const schema: SchemaInit = {
-    "@type": "BreadcrumbList",
+    '@type': 'BreadcrumbList',
     itemListElement,
   };
 
@@ -201,7 +194,7 @@ export function webPageSchema({
   withContext = true,
 }: WebPageSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "WebPage",
+    '@type': 'WebPage',
     name,
     url: ensureAbsoluteUrl(url, origin),
   };
@@ -209,7 +202,7 @@ export function webPageSchema({
   if (description) schema.description = description;
   if (primaryImage)
     schema.primaryImageOfPage = {
-      "@type": "ImageObject",
+      '@type': 'ImageObject',
       url: ensureAbsoluteUrl(primaryImage, origin),
     };
   if (isPartOf) schema.isPartOf = isPartOf;
@@ -221,16 +214,13 @@ export type CollectionPageSchemaInput = WebPageSchemaInput & {
   itemList?: SchemaInit;
 };
 
-export function collectionPageSchema({
-  itemList,
-  ...rest
-}: CollectionPageSchemaInput) {
+export function collectionPageSchema({ itemList, ...rest }: CollectionPageSchemaInput) {
   const base = webPageSchema(rest);
 
-  if (Array.isArray(base["@type"])) {
-    base["@type"] = Array.from(new Set(["CollectionPage", ...base["@type"]]));
-  } else if (base["@type"]) {
-    base["@type"] = ["WebPage", "CollectionPage"];
+  if (Array.isArray(base['@type'])) {
+    base['@type'] = Array.from(new Set(['CollectionPage', ...base['@type']]));
+  } else if (base['@type']) {
+    base['@type'] = ['WebPage', 'CollectionPage'];
   }
 
   if (itemList && compact(itemList)) {
@@ -270,16 +260,16 @@ export function howToSchema({
   withContext = true,
 }: HowToSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "HowTo",
+    '@type': 'HowTo',
     name,
   };
 
   const sectionEntities =
     sections?.map((section) => ({
-      "@type": "HowToSection",
+      '@type': 'HowToSection',
       name: section.name,
       itemListElement: section.steps.map((step) => ({
-        "@type": "HowToStep",
+        '@type': 'HowToStep',
         name: step.name,
         ...(step.text ? { text: step.text } : {}),
       })),
@@ -287,7 +277,7 @@ export function howToSchema({
 
   const stepEntities =
     steps?.map((step) => ({
-      "@type": "HowToStep",
+      '@type': 'HowToStep',
       name: step.name,
       ...(step.text ? { text: step.text } : {}),
     })) ?? [];
@@ -340,17 +330,17 @@ export function serviceSchema({
   additionalProperties,
 }: ServiceSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "Service",
+    '@type': 'Service',
     name,
     url: ensureAbsoluteUrl(url, origin),
   };
 
   if (description) schema.description = description;
-  if (id) schema["@id"] = ensureAbsoluteUrl(id, origin);
+  if (id) schema['@id'] = ensureAbsoluteUrl(id, origin);
 
   const normalizeImage = (value: string | SchemaInit | null | undefined) => {
     if (!value) return null;
-    if (typeof value === "string") return ensureAbsoluteUrl(value, origin);
+    if (typeof value === 'string') return ensureAbsoluteUrl(value, origin);
     return value;
   };
 
@@ -367,23 +357,23 @@ export function serviceSchema({
   if (about?.length) schema.about = about;
   if (areaServed?.length) {
     schema.areaServed = areaServed.map((name) => ({
-      "@type": "AdministrativeArea",
+      '@type': 'AdministrativeArea',
       name,
     }));
   }
 
   const resolvedProvider: SchemaInit =
-    typeof provider === "string"
-      ? { "@id": ensureAbsoluteUrl(provider, origin) }
-      : provider ?? {
-        "@type": DEFAULT_BUSINESS_TYPE,
-        name: DEFAULT_BUSINESS_NAME,
-        url: origin,
-      };
+    typeof provider === 'string'
+      ? { '@id': ensureAbsoluteUrl(provider, origin) }
+      : (provider ?? {
+          '@type': DEFAULT_BUSINESS_TYPE,
+          name: DEFAULT_BUSINESS_NAME,
+          url: origin,
+        });
   schema.provider = resolvedProvider;
 
   if (subjectOf) schema.subjectOf = subjectOf;
-  if (offers?.length) schema.hasOfferCatalog = { "@type": "OfferCatalog", itemListElement: offers };
+  if (offers?.length) schema.hasOfferCatalog = { '@type': 'OfferCatalog', itemListElement: offers };
   if (additionalProperties) {
     Object.assign(schema, additionalProperties);
   }
@@ -417,7 +407,7 @@ export function blogPostingSchema({
   withContext = true,
 }: BlogPostingSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "BlogPosting",
+    '@type': 'BlogPosting',
     headline,
     url: ensureAbsoluteUrl(url, origin),
   };
@@ -457,12 +447,12 @@ export function videoObjectSchema({
   thumbnailUrls = [],
   origin = SITE_ORIGIN,
   withContext = true,
-  publisherName = "SonShine Roofing",
+  publisherName = 'SonShine Roofing',
   potentialAction,
   isFamilyFriendly,
 }: VideoObjectSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "VideoObject",
+    '@type': 'VideoObject',
   };
 
   if (name) schema.name = name.trim();
@@ -481,7 +471,7 @@ export function videoObjectSchema({
 
   if (publisherName) {
     schema.publisher = {
-      "@type": "Organization",
+      '@type': 'Organization',
       name: publisherName,
     };
   }
@@ -509,7 +499,7 @@ export function definedTermSchema({
   withContext = true,
 }: DefinedTermSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "DefinedTerm",
+    '@type': 'DefinedTerm',
     name,
     url: ensureAbsoluteUrl(url, origin),
   };
@@ -546,7 +536,7 @@ export function personSchema({
   withContext = true,
 }: PersonSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "Person",
+    '@type': 'Person',
     name,
     url: ensureAbsoluteUrl(url, origin),
   };
@@ -556,9 +546,7 @@ export function personSchema({
   if (jobTitle) schema.jobTitle = jobTitle;
   if (worksFor) {
     schema.worksFor =
-      typeof worksFor === "string"
-        ? { "@id": ensureAbsoluteUrl(worksFor, origin) }
-        : worksFor;
+      typeof worksFor === 'string' ? { '@id': ensureAbsoluteUrl(worksFor, origin) } : worksFor;
   }
   if (sameAs?.length) schema.sameAs = sameAs;
 
@@ -595,7 +583,7 @@ export function offerSchema({
   withContext = true,
 }: OfferSchemaInput) {
   const schema: SchemaInit = {
-    "@type": "Offer",
+    '@type': 'Offer',
     name,
     url: ensureAbsoluteUrl(url, origin),
   };
@@ -608,14 +596,12 @@ export function offerSchema({
   if (validThrough) schema.validThrough = validThrough;
   if (seller) {
     schema.seller =
-      typeof seller === "string"
-        ? { "@id": ensureAbsoluteUrl(seller, origin) }
-        : seller;
+      typeof seller === 'string' ? { '@id': ensureAbsoluteUrl(seller, origin) } : seller;
   }
   if (itemOffered) {
     schema.itemOffered =
-      typeof itemOffered === "string"
-        ? { "@id": ensureAbsoluteUrl(itemOffered, origin) }
+      typeof itemOffered === 'string'
+        ? { '@id': ensureAbsoluteUrl(itemOffered, origin) }
         : itemOffered;
   }
 
@@ -701,19 +687,15 @@ export const buildReviewSchema = ({
     toPositiveInteger(ratingCount) ??
     (ratingValues.length > 0 ? ratingValues.length : reviews.length);
 
-  const effectiveRatingCount =
-    toPositiveInteger(ratingCount) ?? effectiveReviewCount;
+  const effectiveRatingCount = toPositiveInteger(ratingCount) ?? effectiveReviewCount;
 
   const providerUrl = normalizeRelativeUrl(safeOptions.providerUrl, origin);
-  const businessName =
-    trimOrNull(safeOptions.businessName) ?? DEFAULT_BUSINESS_NAME;
+  const businessName = trimOrNull(safeOptions.businessName) ?? DEFAULT_BUSINESS_NAME;
   const businessType = trimOrNull(safeOptions.businessType) ?? DEFAULT_BUSINESS_TYPE;
-  const businessUrlInput =
-    trimOrNull(safeOptions.businessUrl) ?? SITE_ORIGIN;
+  const businessUrlInput = trimOrNull(safeOptions.businessUrl) ?? SITE_ORIGIN;
   const businessUrl = ensureAbsoluteUrl(businessUrlInput, origin);
-  const maxReviews =
-    toPositiveInteger(safeOptions.maxReviews) ?? DEFAULT_MAX_REVIEWS;
-  const telephone = trimOrNull(safeOptions.telephone) ?? DEFAULT_BUSINESS_PHONE;
+  const maxReviews = toPositiveInteger(safeOptions.maxReviews) ?? DEFAULT_MAX_REVIEWS;
+  const telephone = trimOrNull(safeOptions.telephone);
 
   const sameAs = (safeOptions.sameAs ?? [])
     .concat(providerUrl ? [providerUrl] : [])
@@ -722,21 +704,21 @@ export const buildReviewSchema = ({
 
   const limitedReviews = reviews.slice(0, maxReviews).map((review, index) => {
     const authorName = trimOrNull(review.author_name) || `Reviewer ${index + 1}`;
-    const reviewBody = trimOrNull(review.text) || "No review text provided.";
+    const reviewBody = trimOrNull(review.text) || 'No review text provided.';
     const rating = toFiniteNumber(review.rating) ?? bestRating;
     const datePublished = toIsoDate(review.time);
     const reviewUrl = trimOrNull(review.author_url) ?? providerUrl ?? businessUrl;
     const ownerReply = trimOrNull(review.ownerReply);
 
     const result: Record<string, unknown> = {
-      "@type": "Review",
+      '@type': 'Review',
       author: {
-        "@type": "Person",
+        '@type': 'Person',
         name: authorName,
       },
       reviewBody,
       reviewRating: {
-        "@type": "Rating",
+        '@type': 'Rating',
         ratingValue: rating,
         bestRating,
         worstRating,
@@ -747,10 +729,10 @@ export const buildReviewSchema = ({
     if (datePublished) result.datePublished = datePublished;
     if (ownerReply) {
       result.comment = {
-        "@type": "Comment",
+        '@type': 'Comment',
         text: ownerReply,
         author: {
-          "@type": "Organization",
+          '@type': 'Organization',
           name: businessName,
         },
       };
@@ -759,21 +741,18 @@ export const buildReviewSchema = ({
     return result;
   });
 
-  const resolvedAddress = {
-    ...DEFAULT_POSTAL_ADDRESS,
-    ...(safeOptions.address ?? {}),
-  };
+  const resolvedAddress = safeOptions.address ?? {};
 
   const baseTypes = Array.from(
-    new Set(["LocalBusiness", businessType, ...(safeOptions.additionalTypes ?? [])]),
+    new Set(['LocalBusiness', businessType, ...(safeOptions.additionalTypes ?? [])]),
   );
 
   const schema: SchemaInit = {
-    "@type": baseTypes,
+    '@type': baseTypes,
     name: businessName,
     url: businessUrl,
     aggregateRating: {
-      "@type": "AggregateRating",
+      '@type': 'AggregateRating',
       ratingValue,
       bestRating,
       worstRating,
@@ -781,12 +760,12 @@ export const buildReviewSchema = ({
       ratingCount: effectiveRatingCount,
     },
     address: {
-      "@type": "PostalAddress",
+      '@type': 'PostalAddress',
       ...resolvedAddress,
     },
   };
 
-  if (safeOptions.id) schema["@id"] = ensureAbsoluteUrl(safeOptions.id, origin);
+  if (safeOptions.id) schema['@id'] = ensureAbsoluteUrl(safeOptions.id, origin);
   if (telephone) schema.telephone = telephone;
   if (sameAs.length > 0) schema.sameAs = Array.from(new Set(sameAs));
   if (limitedReviews.length > 0) schema.review = limitedReviews;
@@ -795,14 +774,14 @@ export const buildReviewSchema = ({
   const longitude = safeOptions.geo?.longitude ?? null;
   if (latitude !== null && longitude !== null) {
     schema.geo = {
-      "@type": "GeoCoordinates",
+      '@type': 'GeoCoordinates',
       latitude,
       longitude,
     };
   }
 
   const includeContext = safeOptions.withContext ?? true;
-  return includeContext ? { "@context": SCHEMA_CONTEXT, ...schema } : schema;
+  return includeContext ? { '@context': SCHEMA_CONTEXT, ...schema } : schema;
 };
 
 export type ProjectReviewSchemaInput = {
@@ -832,22 +811,22 @@ export function projectReviewSchema({
   const reviewBody = trimOrNull(testimonial.customerReview);
   if (!reviewBody) return null;
 
-  const authorName = trimOrNull(testimonial.customerName) || "SonShine Roofing Homeowner";
+  const authorName = trimOrNull(testimonial.customerName) || 'SonShine Roofing Homeowner';
   const canonicalProjectUrl = ensureAbsoluteUrl(projectUrl, origin);
   const reviewUrl = testimonial.reviewUrl
     ? ensureAbsoluteUrl(testimonial.reviewUrl, origin)
     : canonicalProjectUrl;
 
   const itemReviewed: SchemaInit = {
-    "@type": "LocalBusiness",
+    '@type': 'LocalBusiness',
     name: projectName,
     url: canonicalProjectUrl,
     provider: {
-      "@type": DEFAULT_BUSINESS_TYPE,
+      '@type': DEFAULT_BUSINESS_TYPE,
       name: DEFAULT_BUSINESS_NAME,
       url: origin,
     },
-    serviceType: "Roof Replacement",
+    serviceType: 'Roof Replacement',
   };
 
   if (projectImage) {
@@ -860,29 +839,29 @@ export function projectReviewSchema({
 
   const publisher: SchemaInit = reviewIsExternal
     ? {
-        "@type": "Organization",
+        '@type': 'Organization',
         name: platformMeta.publisherName,
         url: platformMeta.publisherUrl,
         sameAs: [reviewUrl],
       }
     : {
-        "@type": "Organization",
+        '@type': 'Organization',
         name: DEFAULT_BUSINESS_NAME,
         url: origin,
       };
 
   const schema: SchemaInit = {
-    "@type": "Review",
+    '@type': 'Review',
     url: reviewUrl,
     reviewBody,
     author: {
-      "@type": "Person",
+      '@type': 'Person',
       name: authorName,
     },
     itemReviewed,
     publisher,
     reviewRating: {
-      "@type": "Rating",
+      '@type': 'Rating',
       ratingValue: DEFAULT_BEST_RATING,
       bestRating: DEFAULT_BEST_RATING,
       worstRating: DEFAULT_WORST_RATING,
@@ -895,10 +874,10 @@ export function projectReviewSchema({
   const ownerReply = trimOrNull(testimonial.ownerReply);
   if (ownerReply) {
     schema.comment = {
-      "@type": "Comment",
+      '@type': 'Comment',
       text: ownerReply,
       author: {
-        "@type": "Organization",
+        '@type': 'Organization',
         name: DEFAULT_BUSINESS_NAME,
       },
     };
@@ -954,7 +933,7 @@ export const sponsorFeaturesItemListSchema = ({
       const logoUrl = normalizeRelativeUrl(feature.featuredImage?.url, origin);
 
       const organization: SchemaInit = {
-        "@type": "Organization",
+        '@type': 'Organization',
         name: title,
       };
 
@@ -962,7 +941,7 @@ export const sponsorFeaturesItemListSchema = ({
       if (descriptionText) organization.description = descriptionText;
       if (logoUrl) {
         organization.logo = {
-          "@type": "ImageObject",
+          '@type': 'ImageObject',
           url: logoUrl,
           ...(feature.featuredImage?.altText ? { caption: feature.featuredImage.altText } : {}),
         };
@@ -970,7 +949,7 @@ export const sponsorFeaturesItemListSchema = ({
       if (sameAs.length) organization.sameAs = sameAs;
 
       const listItem: SchemaInit = {
-        "@type": "ListItem",
+        '@type': 'ListItem',
         position: index + 1,
         name: title,
         item: organization,
@@ -985,15 +964,15 @@ export const sponsorFeaturesItemListSchema = ({
   if (itemListElement.length === 0) return null;
 
   const schema: SchemaInit = {
-    "@type": "ItemList",
+    '@type': 'ItemList',
     name,
     numberOfItems: itemListElement.length,
     itemListElement,
   };
 
   if (description) schema.description = description;
-  if (providerId) schema.provider = { "@id": ensureAbsoluteUrl(providerId, origin) };
-  if (id) schema["@id"] = ensureAbsoluteUrl(id, origin);
+  if (providerId) schema.provider = { '@id': ensureAbsoluteUrl(providerId, origin) };
+  if (id) schema['@id'] = ensureAbsoluteUrl(id, origin);
 
   return applyContext(schema, withContext);
 };
@@ -1005,7 +984,7 @@ export type GraphSchemaInput = {
 
 export function graphSchema({ items }: GraphSchemaInput) {
   return {
-    "@context": SCHEMA_CONTEXT,
-    "@graph": items,
+    '@context': SCHEMA_CONTEXT,
+    '@graph': items,
   };
 }

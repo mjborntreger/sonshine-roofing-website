@@ -1,8 +1,23 @@
 # SonShine WordPress Blog to Directus — n8n Migration Plan
 
-Status: design only; no n8n, Directus, WordPress, or other remote writes were made in this pass.
+Status: executed and reconciled on 2026-07-19. This document retains the approved design and records the completed implementation below.
 
 Prepared: 2026-07-19
+
+Completion record:
+
+- Queue: 106 `verified`, two `excluded`, no pending/running/retry/failed row, no duplicate Directus ID, and an idle/cleared control lease.
+- Published workflows: `SRI WordPress Blog Migration — Orchestrator` (`bqIVeYxuLw6dyCJN`) and `SRI WordPress Blog Migration — Post Worker` (`e2AA9vGpPmZIXU1K`), both Manual Trigger/caller-only with no execution-data retention.
+- Directus: 106 published posts, 220 exact topic junctions, 21 approved topics, 11 Michael relations, 95 null-author organization fallbacks, maximum three topics, both exclusions absent, and exact body plus title/excerpt/date/SEO scalar reconciliation against the live singular-post source snapshot. The migration itself and all staged n8n apply executions remained draft-first; publication was a later explicitly authorized Directus-only action.
+- The temporary Directus service user is suspended and its token is cleared, making the retained encrypted n8n credential inert.
+- A post-migration identity correction keeps the two Michael records separate: all 11 blog relations, the least-privilege author read, both current/active workflow graphs, and all 106 canonical queue hashes now agree on the SonShine-scoped Michael. The corrected workflow versions were statically validated and published but were not runtime-executed.
+- The final queue does not retain `dry_run_verified_at`: apply success overwrote those values with null. The complete dry run is evidenced by the documented staged executions; future worker changes should preserve the existing timestamp rather than fabricating a backfill.
+- Two independent read-only reviews completed sequentially. Reviewer-one findings were resolved and re-verified; the fresh second review reported no unresolved issue.
+- The 106 verified Directus posts were published on 2026-07-19 under Michael's
+  later explicit authorization. The local frontend cutover now makes Directus
+  the only blog source, with no environment switch or WordPress blog fallback.
+  Production deployment, WordPress retirement, and legacy-field cleanup were
+  not performed.
 
 ## Approved scope
 
@@ -20,7 +35,14 @@ Prepared: 2026-07-19
 
 - The live Directus `blog_posts` collection currently has `title`, `slug`, `body`, `excerpt`, `client`, `featured_image`, scalar `topic`, `author`, `status`, `meta_title`, `meta_description`, `primary_focus_keyword`, and `focus_keywords`. It does **not** yet have the approved M2M topics relation, `published_at`, `featured`, a stable source key, a source-modified timestamp, or dedicated canonical/Open Graph fields.
 - The scalar `topic` field is a four-choice Borntreger Digital dropdown. It must remain during a frontend dual-read/backfill period; this migration must not overwrite it with SonShine terms.
-- Directus currently has no SonShine `persons` records. WordPress exposes two authors for the published set: Michael Borntreger and the SonShine Roofing organization. Across all 108 source posts, 11 are attributed to Michael and 97 to SonShine; both exclusions belong to the SonShine organization, leaving 11/95 in the 106-post candidate set. Michael approved reusing the existing Michael Borntreger `persons` record even though it is scoped to Borntreger Digital; this is one explicit cross-client author exception, not a general permission to fuzzy-match or reuse other client-scoped people.
+- Directus keeps separate Borntreger Digital and SonShine Roofing Michael
+  Borntreger person records. WordPress exposes two authors for the published
+  set: Michael Borntreger and the SonShine Roofing organization. Across all 108
+  source posts, 11 are attributed to Michael and 97 to SonShine; both exclusions
+  belong to the SonShine organization, leaving 11/95 in the 106-post candidate
+  set. The exact approved blog mapping is the SonShine-scoped person UUID
+  `f028dafd-c2fb-4d59-a561-2be5e46ea318`; do not fuzzy-match or collapse the two
+  Michael records.
 - The public WordPress GraphQL source exposes the fields already used by the SonShine frontend: rendered content/excerpt, publication and modified dates, author, featured image, categories, and Rank Math title/description/canonical/Open Graph values.
 - The existing `SRI WordPress Media Migration Manifest` n8n Data Table is the durable source-to-Directus media map. Per `n8n.md`, it is complete: 190 verified imports plus one verified existing asset, with source URL, WordPress media IDs, post slugs, roles, and Directus file IDs. The old migration workflow is no longer MCP-visible, but the state table remains available.
 - The media manifest covered 107 posts and excluded only `grouper-tacos`; media belonging only to the newly excluded `lead-safe-certified` post can remain unused. The post migration should never delete it.
@@ -96,7 +118,11 @@ The migration must not be created as a write-capable workflow until these prereq
 4. Add a unique namespaced migration identity field. Recommended name: `external_id`, value `wordpress:sonshine-roofing:{databaseId}`. A single unique string closes duplicate-create ambiguity better than separate non-unique source/source-ID fields. Mark it read-only in the Directus editor because automation owns it.
 5. Add `source_updated_at` for the original WordPress modified timestamp and mark it read-only in the Directus editor because automation owns it. `date_created` must remain the Directus record-creation audit timestamp. Keep `published_at`, `featured`, and ordinary content fields editable.
 6. Do not add `canonical_path`, `og_title`, or `og_description` initially. The frontend derives the canonical public path from the slug and uses `meta_title`, `meta_description`, and the Directus featured image for social metadata.
-7. Resolve Michael's WordPress author identity to the existing Michael Borntreger `persons` UUID by exact approved mapping. Leave all 95 organization-authored candidates' `author` relation null and preserve the frontend organization fallback display `SonShine Roofing`. The author resolver must allow only this explicitly approved cross-client person relation and must not fuzzy-match names.
+7. Resolve Michael's WordPress author identity to the SonShine-scoped `persons`
+   UUID `f028dafd-c2fb-4d59-a561-2be5e46ea318` by exact approved mapping. Leave
+   all 95 organization-authored candidates' `author` relation null and preserve
+   the frontend organization fallback display `SonShine Roofing`. Keep the
+   Borntreger Digital Michael record separate; do not fuzzy-match names.
 8. Keep the legacy scalar `topic` field until `borntreger-digital-website` is migrated/backfilled and both frontends consume the new relation. The SonShine importer writes only `topics`.
 9. Pre-create the exact approved 21 SonShine topic records. The migration workflow should verify them, not invent or rename taxonomy during a post run.
 10. Add/verify a database or workflow guard that a post and every related topic have the same client.
@@ -313,7 +339,9 @@ After three automatic claims, set `failed`. A retry requires `manual_retry_reque
 - Directus posts are created as drafts, so stopping the workflow has no public effect.
 - The preferred rollback is to stop, inspect queue/readback state, and correct/resume the affected drafts. Do not delete automatically.
 - If a migration-created draft must be removed or archived, that is a separate explicit destructive/production-data authorization with exact IDs.
-- Frontend cutover should use a reversible source flag/dual-read period. If a post-cutover regression occurs, switch the frontend back to WordPress and revalidate caches; do not erase Directus data.
+- The approved final frontend has no source flag or WordPress blog fallback. If
+  a post-cutover regression requires restoring WordPress, revert the frontend
+  cutover code and redeploy deliberately; do not erase Directus data.
 - Retain the queue and media manifest until final reconciliation, frontend cutover, and the later freshness pass are complete. Archive/rename cleanup is separately approved.
 
 ## Security and production safeguards
@@ -349,9 +377,10 @@ Its costs in this environment are significant:
 
 ## Staged implementation and testing plan
 
-This pass stops at Stage 0.
+The implementation followed the staged sequence below; the completion record at
+the top of this document is authoritative for the resulting state.
 
-### Stage 0 — complete in this pass: written design only
+### Stage 0 — completed: written design
 
 - Read `n8n.md`, the approved manifest, live Directus schema, relevant frontend adapters/sanitizer, public sitemap, public WordPress author/source shape, and the existing media-table schema.
 - Produce this plan.
@@ -401,17 +430,24 @@ This pass stops at Stage 0.
 - Stop on any invariant failure; do not skip a failed post merely to reach 106.
 - After draft tests and exact saved-version readback pass, publish only the exact tested orchestrator and worker versions. Reconfirm the active versions match before any subsequent published execution.
 
-### Stage 7 — final reconciliation and reversible frontend cutover
+### Stage 7 — final reconciliation and Directus-only frontend cutover
 
 - Prove the exact 106/2 terminal contract.
 - Complete the SonShine Directus adapter and Borntreger Digital M2M topic frontend/backfill work before removing scalar-topic support.
 - Run builds, sitemap/canonical/structured-data/archive/filter/detail/image/date checks.
-- Publication of Directus posts, cache revalidation, frontend source switch, WordPress retirement, and any deployment each require separate explicit approval.
+- Publication of Directus posts, local frontend cutover, cache revalidation,
+  WordPress retirement, and deployment each require separate explicit approval.
+  Publication and the local Directus-only cutover were later approved and
+  completed; deployment, cache revalidation, and WordPress retirement remain
+  separate.
 
 ### Stage 8 — first independent read-only review
 
-- After the full operation is implemented, migrated, cut over, and locally/remotely reconciled, spawn one independent subagent with read-only authority only.
-- Review the current Directus schema/data, 106/2 counts, topic and author mappings, media/body fidelity, n8n queue/workflow state and exact versions, both frontend implementations, builds, routes, sitemaps, metadata, and rollback posture.
+- After the authorized draft-migration operation is implemented and
+  locally/remotely reconciled, spawn one independent subagent with read-only
+  authority only. Publication, local cutover, and deployment were separate
+  gates and were not prerequisites for reviewing the completed draft migration.
+- Review the current Directus schema/data, 106/2 counts, topic and author mappings, media/body fidelity, n8n queue/workflow state and exact versions, both frontend implementations, builds, routes, sitemaps, metadata, and recovery posture.
 - The primary agent evaluates every finding, rejects unsupported suggestions with evidence, merges warranted corrections, updates documentation, and reruns affected verification before proceeding.
 
 ### Stage 9 — second independent read-only review
@@ -423,7 +459,10 @@ This pass stops at Stage 0.
 ## Approved decisions and execution authority
 
 1. Add unique `external_id`, plus `published_at`, `source_updated_at`, and `featured` to `blog_posts`.
-2. Reuse the existing Michael Borntreger `persons` record for the 11 Michael-authored candidates through one exact approved mapping, despite its Borntreger Digital client scope.
+2. Keep separate Borntreger Digital and SonShine Roofing Michael records, and
+   use the SonShine-scoped `persons` record
+   `f028dafd-c2fb-4d59-a561-2be5e46ea318` for the 11 Michael-authored candidates
+   through one exact approved mapping.
 3. Leave the 95 organization-authored candidates' `author` relation null and use the existing `SonShine Roofing` organization fallback.
 4. Do not add dedicated canonical/Open Graph text fields initially; derive canonical paths from slugs and use `meta_title`, `meta_description`, and the Directus featured image.
 5. Leave focus-keyword fields empty when WordPress does not expose exact values; do not infer them.

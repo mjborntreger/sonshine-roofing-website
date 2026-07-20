@@ -51,13 +51,40 @@ type DirectusSiteSettingsItem = {
   facebook?: unknown;
   instagram?: unknown;
   youtube?: unknown;
+  nextdoor?: unknown;
+  yelp?: unknown;
+  pinterest?: unknown;
+  x_twitter?: unknown;
+  google_business_profile?: unknown;
   schema_type?: unknown;
   price_range?: unknown;
   opening_hours?: unknown;
+  robots_disallow?: unknown;
+  content_security_policy?: unknown;
   footer_include_legal?: unknown;
   footer_include_socials?: unknown;
   footer_include_services?: unknown;
   enable_site_analytics?: unknown;
+  public_location?: unknown;
+  founding_date?: unknown;
+  license_number?: unknown;
+  license_url?: unknown;
+  payment_methods?: unknown;
+  languages_served?: unknown;
+  timezone?: unknown;
+  brands_used?: unknown;
+  discounts?: unknown;
+  services?: unknown;
+  associations?: unknown;
+  llms_txt?: unknown;
+  badges?: Array<{
+    footer_badges_id?: {
+      id?: unknown;
+      badge?: DirectusFileValue;
+      href?: unknown;
+      sort_order?: unknown;
+    } | null;
+  }> | null;
 };
 
 type DirectusWebsitePageItem = {
@@ -130,14 +157,46 @@ export type SiteSettings = {
     facebook: string | null;
     instagram: string | null;
     youtube: string | null;
+    nextdoor: string | null;
+    yelp: string | null;
+    pinterest: string | null;
+    xTwitter: string | null;
+    googleBusinessProfile: string | null;
   };
   schemaType: string;
   priceRange: string;
   openingHours: string[];
+  robotsDisallow: string[];
+  contentSecurityPolicy: string;
   footerIncludeLegal: boolean;
   footerIncludeSocials: boolean;
   footerIncludeServices: boolean;
   enableSiteAnalytics: boolean;
+  publicLocation: string | null;
+  foundingDate: string;
+  licenseNumber: string;
+  licenseUrl: string;
+  paymentMethods: SiteSettingsLink[];
+  languagesServed: string[];
+  timezone: string;
+  brandsUsed: SiteSettingsLink[];
+  discounts: SiteSettingsLink[];
+  services: SiteSettingsLink[];
+  associations: SiteSettingsLink[];
+  llmsTxt: string;
+  badges: FooterBadge[];
+};
+
+export type SiteSettingsLink = {
+  label: string;
+  href: string | null;
+};
+
+export type FooterBadge = {
+  id: string;
+  image: DirectusAsset;
+  href: string | null;
+  sortOrder: number;
 };
 
 export type WebsitePage = {
@@ -282,10 +341,13 @@ function getDirectusConfig(): DirectusConfig | null {
   const token = readString(process.env.DIRECTUS_TOKEN);
 
   if (!url || !clientSlug || !token) {
-    if (!warnedForMissingConfig && process.env.NODE_ENV === 'production') {
-      console.error(
-        '[directus-site] Missing DIRECTUS_URL, DIRECTUS_CLIENT_SLUG, or DIRECTUS_TOKEN.',
-      );
+    const message =
+      '[directus-site] Missing DIRECTUS_URL, DIRECTUS_CLIENT_SLUG, or DIRECTUS_TOKEN.';
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(message);
+    }
+    if (!warnedForMissingConfig) {
+      console.warn(message);
       warnedForMissingConfig = true;
     }
     return null;
@@ -390,6 +452,114 @@ function mapOpeningHours(value: unknown): string[] {
     .filter((entry): entry is string => Boolean(entry));
 }
 
+function optionalAbsoluteUrl(value: unknown, field: string): string | null {
+  const parsed = readString(value);
+  if (!parsed) return null;
+
+  let url: URL;
+  try {
+    url = new URL(parsed);
+  } catch {
+    throw new Error(`[directus-site] site_settings.${field} must be an absolute http(s) URL.`);
+  }
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error(`[directus-site] site_settings.${field} must be an absolute http(s) URL.`);
+  }
+
+  return url.toString();
+}
+
+function requiredAbsoluteUrl(value: unknown, field: string): string {
+  return optionalAbsoluteUrl(value, field) ?? requiredString(value, 'site_settings', field);
+}
+
+function optionalSiteHref(value: unknown, field: string): string | null {
+  const parsed = readString(value);
+  if (!parsed) return null;
+
+  if (parsed.startsWith('/') && !parsed.startsWith('//')) return parsed;
+  return optionalAbsoluteUrl(parsed, field);
+}
+
+function mapStringList(value: unknown, itemField: string, field: string): string[] {
+  if (value === null || value === undefined) return [];
+  if (!Array.isArray(value)) {
+    throw new Error(`[directus-site] site_settings.${field} must be a list.`);
+  }
+
+  return value.map((entry, index) => {
+    if (!entry || typeof entry !== 'object') {
+      throw new Error(`[directus-site] site_settings.${field}[${index}] must be an object.`);
+    }
+    return requiredString(
+      (entry as UnknownRecord)[itemField],
+      'site_settings',
+      `${field}[${index}].${itemField}`,
+    );
+  });
+}
+
+function mapLinkList(value: unknown, itemField: string, field: string): SiteSettingsLink[] {
+  if (value === null || value === undefined) return [];
+  if (!Array.isArray(value)) {
+    throw new Error(`[directus-site] site_settings.${field} must be a list.`);
+  }
+
+  return value.map((entry, index) => {
+    if (!entry || typeof entry !== 'object') {
+      throw new Error(`[directus-site] site_settings.${field}[${index}] must be an object.`);
+    }
+    const record = entry as UnknownRecord;
+    return {
+      label: requiredString(record[itemField], 'site_settings', `${field}[${index}].${itemField}`),
+      href: optionalSiteHref(record.href, `${field}[${index}].href`),
+    };
+  });
+}
+
+function mapRobotsDisallow(value: unknown): string[] {
+  return mapStringList(value, 'rule', 'robots_disallow').map((rule, index) => {
+    if (!rule.startsWith('/')) {
+      throw new Error(
+        `[directus-site] site_settings.robots_disallow[${index}].rule must start with "/".`,
+      );
+    }
+    return rule;
+  });
+}
+
+function mapFooterBadges(
+  value: DirectusSiteSettingsItem['badges'],
+  config: DirectusConfig,
+): FooterBadge[] {
+  if (!value) return [];
+
+  return value
+    .map((entry, index) => {
+      const badge = entry.footer_badges_id;
+      if (!badge) {
+        throw new Error(
+          `[directus-site] site_settings.badges[${index}] is missing its badge record.`,
+        );
+      }
+
+      return {
+        id: requiredString(badge.id, 'footer_badges', 'id'),
+        image: mapAsset(
+          badge.badge ?? null,
+          config,
+          'footer_badges',
+          `badges[${index}].badge`,
+          true,
+        )!,
+        href: optionalAbsoluteUrl(badge.href, `badges[${index}].href`),
+        sortOrder: readNumber(badge.sort_order) ?? index + 1,
+      };
+    })
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
 export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
   const config = getDirectusConfig();
   if (!config) return null;
@@ -433,13 +603,40 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
       'facebook',
       'instagram',
       'youtube',
+      'nextdoor',
+      'yelp',
+      'pinterest',
+      'x_twitter',
+      'google_business_profile',
       'schema_type',
       'price_range',
       'opening_hours',
+      'robots_disallow',
+      'content_security_policy',
       'footer_include_legal',
       'footer_include_socials',
       'footer_include_services',
       'enable_site_analytics',
+      'public_location',
+      'founding_date',
+      'license_number',
+      'license_url',
+      'payment_methods',
+      'languages_served',
+      'timezone',
+      'brands_used',
+      'discounts',
+      'services',
+      'associations',
+      'llms_txt',
+      'badges.footer_badges_id.id',
+      'badges.footer_badges_id.badge.id',
+      'badges.footer_badges_id.badge.description',
+      'badges.footer_badges_id.badge.width',
+      'badges.footer_badges_id.badge.height',
+      'badges.footer_badges_id.badge.type',
+      'badges.footer_badges_id.href',
+      'badges.footer_badges_id.sort_order',
     ],
     { client: { slug: { _eq: config.clientSlug } } },
     { limit: 2 },
@@ -487,17 +684,44 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
       country: requiredString(item.address_country, 'site_settings', 'address_country'),
     },
     socials: {
-      facebook: readString(item.facebook),
-      instagram: readString(item.instagram),
-      youtube: readString(item.youtube),
+      facebook: optionalAbsoluteUrl(item.facebook, 'facebook'),
+      instagram: optionalAbsoluteUrl(item.instagram, 'instagram'),
+      youtube: optionalAbsoluteUrl(item.youtube, 'youtube'),
+      nextdoor: optionalAbsoluteUrl(item.nextdoor, 'nextdoor'),
+      yelp: optionalAbsoluteUrl(item.yelp, 'yelp'),
+      pinterest: optionalAbsoluteUrl(item.pinterest, 'pinterest'),
+      xTwitter: optionalAbsoluteUrl(item.x_twitter, 'x_twitter'),
+      googleBusinessProfile: optionalAbsoluteUrl(
+        item.google_business_profile,
+        'google_business_profile',
+      ),
     },
     schemaType: requiredString(item.schema_type, 'site_settings', 'schema_type'),
     priceRange: requiredString(item.price_range, 'site_settings', 'price_range'),
     openingHours: mapOpeningHours(item.opening_hours),
+    robotsDisallow: mapRobotsDisallow(item.robots_disallow),
+    contentSecurityPolicy: requiredString(
+      item.content_security_policy,
+      'site_settings',
+      'content_security_policy',
+    ).replace(/\s+/g, ' '),
     footerIncludeLegal: readBoolean(item.footer_include_legal, true),
     footerIncludeSocials: readBoolean(item.footer_include_socials, true),
     footerIncludeServices: readBoolean(item.footer_include_services, true),
     enableSiteAnalytics: readBoolean(item.enable_site_analytics, false),
+    publicLocation: readString(item.public_location),
+    foundingDate: requiredString(item.founding_date, 'site_settings', 'founding_date'),
+    licenseNumber: requiredString(item.license_number, 'site_settings', 'license_number'),
+    licenseUrl: requiredAbsoluteUrl(item.license_url, 'license_url'),
+    paymentMethods: mapLinkList(item.payment_methods, 'payment_method', 'payment_methods'),
+    languagesServed: mapStringList(item.languages_served, 'language', 'languages_served'),
+    timezone: requiredString(item.timezone, 'site_settings', 'timezone'),
+    brandsUsed: mapLinkList(item.brands_used, 'brand', 'brands_used'),
+    discounts: mapLinkList(item.discounts, 'discount', 'discounts'),
+    services: mapLinkList(item.services, 'service', 'services'),
+    associations: mapLinkList(item.associations, 'association', 'associations'),
+    llmsTxt: typeof item.llms_txt === 'string' && item.llms_txt.trim().length ? item.llms_txt : '',
+    badges: mapFooterBadges(item.badges, config),
   };
 });
 

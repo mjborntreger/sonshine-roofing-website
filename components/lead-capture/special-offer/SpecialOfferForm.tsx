@@ -19,6 +19,7 @@ import {
 import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import { endOfDay, parseSpecialOfferDate } from '@/lib/lead-capture/specialOfferDates';
 import { cn } from '@/lib/utils';
+import SitePhoneLink from '@/components/utils/SitePhoneLink';
 
 type Props = {
   offerCode: string;
@@ -61,7 +62,8 @@ function writeOfferCookie(name: string, code: string, expiration?: string | null
   if (typeof document === 'undefined') return;
   const expiresDate = parseExpirationDate(expiration);
   const payload = { code, exp: expiresDate.toISOString() };
-  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+  const secure =
+    typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
   document.cookie = `${name}=${encodeURIComponent(JSON.stringify(payload))}; expires=${expiresDate.toUTCString()}; path=/; SameSite=Lax${secure}`;
 }
 
@@ -128,10 +130,13 @@ export default function SpecialOfferForm({
     } else if (!isUsPhoneComplete(values.phone)) {
       next.phone = 'Enter a valid US phone number (10 digits).';
     }
-    Object.assign(next, validateSmsConsentDraft({
-      smsProjectConsent: values.smsProjectConsent,
-      smsMarketingConsent: values.smsMarketingConsent,
-    }));
+    Object.assign(
+      next,
+      validateSmsConsentDraft({
+        smsProjectConsent: values.smsProjectConsent,
+        smsMarketingConsent: values.smsMarketingConsent,
+      }),
+    );
     return next;
   };
 
@@ -266,11 +271,11 @@ export default function SpecialOfferForm({
         </div>
 
         <p className="mt-6 text-sm text-slate-600 print:text-black">
-          Prefer to call? Just mention <span className="font-semibold">{offerCode}</span> and we’ll apply your discount instantly.
-          {' '}
-          <a href="tel:+19418664320" className="text-brand-blue underline print:no-underline">
-            Call (941) 866-4320
-          </a>
+          Prefer to call? Just mention <span className="font-semibold">{offerCode}</span> and we’ll
+          apply your discount instantly.{' '}
+          <SitePhoneLink className="text-brand-blue underline print:no-underline">
+            Call
+          </SitePhoneLink>
         </p>
       </div>
     );
@@ -409,7 +414,9 @@ export default function SpecialOfferForm({
           disabled={submission === 'submitting'}
         >
           {submission === 'submitting' ? 'Sending…' : 'Claim This Offer'}
-          {submission !== 'submitting' ? <ArrowRight className="icon-affordance ml-2 h-4 w-4" aria-hidden="true" /> : null}
+          {submission !== 'submitting' ? (
+            <ArrowRight className="icon-affordance ml-2 h-4 w-4" aria-hidden="true" />
+          ) : null}
         </Button>
       </form>
     </div>

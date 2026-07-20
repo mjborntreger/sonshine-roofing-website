@@ -1,12 +1,14 @@
 # SonShine WordPress Blog to Directus — Master Plan
 
-Status: execution in progress; paused at the Phase 4 Directus-credential gate described below.
+Status: Directus publication and the local Directus-only frontend cutover are complete after the verified draft migration and two sequential independent reviews; production deployment remains a separate gate.
 
 Prepared: 2026-07-19
 
 Supporting artifacts:
 
 - `blog-topic-migration-manifest.json` — approved 108-post audit and topic assignments.
+- `blog-migration-source-verification.json` — live singular-post WordPress/media/body verification for the 106 candidates.
+- `scripts/verify-blog-directus-migration.mjs` — repeatable manifest-to-Directus reconciliation.
 - `BLOG_MIGRATION_N8N_PLAN.md` — detailed queue/orchestrator/worker design.
 
 ## Approved outcome
@@ -17,7 +19,9 @@ Supporting artifacts:
 - Enforce a default maximum of three topics per post; the approved manifest has no candidate above three.
 - Reuse the completed WordPress media migration mapping; never automatically re-import a missing asset.
 - Preserve original slugs, publication and source-modified dates, rendered semantic body content, excerpt intent, SEO title/description, featured state/image, inline media, and approved authors/topics.
-- Import posts as Directus drafts first. Publication, deployment, source cutover, WordPress retirement, and destructive cleanup remain distinct gates.
+- Import posts as Directus drafts first. Publication, local frontend cutover,
+  deployment, WordPress retirement, and destructive cleanup remain distinct
+  gates.
 - Defer content freshness, consolidation, and rewriting to a later agent session.
 
 ## Authority and role boundaries
@@ -50,7 +54,11 @@ The builder subagent must read `n8n.md`, the Workflow SDK reference, applicable 
 5. Add unique `blog_posts.external_id`, plus `published_at`, `source_updated_at`, and `featured`. Mark the automation-owned `external_id` and `source_updated_at` fields read-only in the Directus editor; keep `published_at`, `featured`, and ordinary content fields editorially editable.
 6. Keep the legacy scalar `blog_posts.topic` during dual-read/backfill compatibility.
 7. Seed and read back the exact 21 SonShine topic records.
-8. Map Michael-authored WordPress posts to the existing Michael Borntreger `persons` record by exact approved identity. This is one explicit cross-client author exception.
+8. Keep the Borntreger Digital and SonShine Roofing Michael Borntreger person
+   records separate. Map Michael-authored WordPress posts by exact approved
+   identity to the SonShine-scoped `persons` record
+   (`f028dafd-c2fb-4d59-a561-2be5e46ea318`); do not fuzzy-match or collapse the
+   two records.
 9. Leave the 95 organization-authored candidates' `author` relation null and use the frontend `SonShine Roofing` Organization fallback.
 10. Do not add separate canonical or Open Graph text fields initially. Leave focus-keyword fields empty when WordPress exposes no exact value.
 
@@ -73,7 +81,8 @@ Exit gate:
 
 - Add a Directus blog adapter that returns the current frontend's normalized post/card/filter shape.
 - Implement relational-topic list/filter/facet reads, post detail, recent-post recommendations, API responses, and blog/image sitemap sources.
-- Use a reversible source flag or equivalent dual-read boundary so WordPress remains the production fallback until cutover.
+- Cut every blog consumer to Directus together. Do not retain an environment
+  source switch or WordPress blog fallback after the approved cutover.
 - Render author `Person` for the exact Michael relation and `Organization: SonShine Roofing` when author is null.
 - Use `meta_title`, `meta_description`, slug-derived canonical paths, the Directus featured image, `published_at`, and `source_updated_at`.
 
@@ -81,7 +90,8 @@ Exit gate:
 
 - Both repositories lint/build successfully against empty or pilot Directus blog results.
 - Borntreger Digital remains compatible with its existing content.
-- SonShine can switch between WordPress and Directus without deployment-time schema ambiguity.
+- SonShine's blog adapter has a single Directus source with no deployment-time
+  source ambiguity.
 
 ## Phase 3 — delegated n8n construction
 
@@ -108,7 +118,13 @@ Primary review gate:
 
 The builder subagent does not participate in execution, testing, or publication.
 
-Current gate (2026-07-19): local source/media/render verification is green for all 106 candidates, and the primary-hardened n8n drafts remain inactive/unpublished. Four bounded manual attempts stopped before any post claim or Directus post write while runtime incompatibilities were corrected. The latest attempt passed sitemap, queue, and WordPress reconciliation, then received HTTP `403` on the first read-only Directus `clients` query through the existing n8n Directus credential. The queue remains 106 `pending` plus two `excluded`, with zero attempts. Continue only after Michael explicitly approves either repairing/rebinding that business-critical credential or creating a temporary least-privilege Directus migration identity and n8n credential; the latter is recommended. After the credential gate, restart with the same one-post dry-run pilot and retain the approved progression.
+Completion note (2026-07-19): all 106 candidates passed the read-only dry run,
+including the modern pilot, deterministic replay, legacy pilot, 5 → 5 → 10
+progression, and empty-selection no-op. The exact tested worker and orchestrator
+versions were published before apply. Runtime compatibility and temporary-policy
+validation issues were corrected under fail-closed leases, with no unintended
+post, relation, media, or publication side effect. The temporary Directus service
+user was suspended and its token cleared after reconciliation.
 
 ## Phase 5 — staged draft migration
 
@@ -124,21 +140,45 @@ Run serially and stop on any invariant failure:
 
 Every post remains `draft`. A missing media mapping is terminal/manual repair; it never triggers an automatic import. Automatic claims retry after 5 and 30 minutes, with the third failed claim terminal. Manual retries preserve attempts, IDs, hashes, and checkpoints.
 
-## Phase 6 — end-to-end reconciliation and reversible cutover
+Completion note (2026-07-19): the staged apply progression completed at
+`106 verified / 2 excluded`, with no pending, running, retry, or failed row.
+The empty-selection apply run left counters and timestamps unchanged. All leases
+are clear.
+
+## Phase 6 — end-to-end reconciliation and Directus-only cutover
 
 - Prove exactly 106 unique SonShine `external_id` records and zero record for either excluded slug/source ID.
 - Verify exact body hashes, zero WordPress upload-host references, media relations, topic sets, author policy, dates, featured state, excerpt, SEO fields, and draft status.
 - Run both frontend builds plus route, filter/facet, recommendation, metadata, structured-data, sitemap, image, and date checks.
 - Publish Directus posts, deploy frontends, revalidate caches, and switch the SonShine source only under the applicable production-change authorization.
-- Keep the WordPress source and source flag available for rollback. Do not delete WordPress posts, media, queue state, or legacy scalar fields during this phase.
+- Remove the WordPress blog fallback and source flag from the frontend. Retain
+  WordPress data, media, queue state, and legacy scalar fields until separately
+  approved cleanup; recovering the old frontend source requires reverting the
+  cutover code rather than changing an environment variable.
 - Leave the two migration workflows in their exact reviewed state; any later unpublish/archive/cleanup is a separate action.
+
+Current gate (2026-07-19): data reconciliation, Directus publication, local
+frontend verification, and the local Directus-only source cutover are complete.
+Directus has 106 unique published posts and
+220 exact topic junctions; the
+two exclusions are absent; all 106 body hashes match the live singular-post
+WordPress transformation used by the worker, and all 106 title, excerpt,
+publication/source-update date, meta-title, and meta-description values match
+the same source snapshot. All 106 queue payload hashes also match the corrected
+SonShine-scoped author payloads. After publication, a clean-cache Directus build
+generated 453 pages and all 106 post routes. The final frontend contains no
+blog source environment switch, draft-preview bypass, or WordPress blog fallback;
+published Directus records are the only blog source. Borntreger Digital's Astro
+build passes. Production deployment, cache revalidation, WordPress retirement,
+and legacy-field cleanup remain unperformed and require their own
+production-change gate.
 
 ## Phase 7 — sequential independent final reviews
 
 ### Reviewer one
 
 - Spawn one independent subagent after the operation is otherwise complete.
-- Grant read-only access only and ask for an end-to-end review of Directus schema/data, 106/2 reconciliation, authors/topics/media/body fidelity, n8n queue/workflow versions and safety, both frontends, builds, sitemaps, metadata, and rollback posture.
+- Grant read-only access only and ask for an end-to-end review of Directus schema/data, 106/2 reconciliation, authors/topics/media/body fidelity, n8n queue/workflow versions and safety, both frontends, builds, sitemaps, metadata, and recovery posture.
 - The primary assesses every finding, merges only evidence-backed in-scope corrections, updates documentation, and reruns affected checks.
 
 ### Reviewer two
@@ -149,12 +189,23 @@ Every post remains `draft`. A missing media mapping is terminal/manual repair; i
 
 Neither reviewer may mutate local files, Directus, n8n, WordPress, deployments, or other systems.
 
+Completion note (2026-07-19): reviewer one identified three warranted issues.
+The primary added the explicit local-only draft adapter build (all 106 routes),
+reconciled the SonShine-scoped Michael relation through Directus, both workflow
+graphs, the least-privilege permission, and all 106 queue hashes, and documented
+the null final `dry_run_verified_at` behavior plus the static-only scope of the
+post-migration workflow correction. After those changes and re-verification, a
+fresh second read-only reviewer reported no unresolved findings. Neither reviewer
+made a write or executed a workflow.
+
 ## Final completion contract
 
 - Manifest: 108 unique audited rows, 106 migrate, two exclude, maximum three topics.
 - Directus: exact approved schema, 21 SonShine topics, 106 fully verified posts, approved author mapping, no excluded post.
 - Media: every referenced asset resolves through the completed verified media mapping; no duplicate import.
 - n8n: queue terminal `106 verified / 2 excluded`, no active lease/failure, exact reviewed/tested published versions, documentation current.
-- Frontends: Borntreger Digital consumes relational topics/new dates; SonShine consumes Directus posts with reversible fallback; builds and smoke checks pass.
+- Frontends: Borntreger Digital consumes relational topics/new dates; SonShine
+  consumes published Directus posts without a WordPress blog fallback; builds
+  and smoke checks pass.
 - Reviews: two independent read-only reviews completed sequentially, with primary-agent disposition and re-verification after each.
 - Cleanup/freshness: deferred unless separately authorized.

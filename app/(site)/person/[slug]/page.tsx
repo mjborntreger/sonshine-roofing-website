@@ -1,63 +1,68 @@
-import { listPersonNav, listPersonsBySlug, stripHtml } from "@/lib/content/wp";
-import type { Metadata } from "next";
-import Image from "next/image";
-import SmartLink from "@/components/utils/SmartLink";
-import Section from "@/components/layout/Section";
-import { notFound } from "next/navigation";
-import { buildProfileMetadata } from "@/lib/seo/meta";
-import { JsonLd } from "@/lib/seo/json-ld";
-import { breadcrumbSchema, personSchema, webPageSchema } from "@/lib/seo/schema";
-import { SITE_ORIGIN } from "@/lib/seo/site";
+import { listPersonNav, listPersonsBySlug } from '@/lib/content/persons';
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import SmartLink from '@/components/utils/SmartLink';
+import Section from '@/components/layout/Section';
+import { notFound } from 'next/navigation';
+import { buildProfileMetadata } from '@/lib/seo/meta';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema, personSchema, webPageSchema } from '@/lib/seo/schema';
+import { SITE_ORIGIN } from '@/lib/seo/site';
 
 export const revalidate = 86400;
-const PERSON_REVALIDATE_SECONDS = revalidate;
 
 // Dynamic metadata per person
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
-  let person = null;
-  try {
-    person = await listPersonsBySlug(slug, { revalidateSeconds: PERSON_REVALIDATE_SECONDS });
-  } catch {
-    person = null;
-  }
-  const isNathan = slug === 'nathan-borntreger';
-
+  const person = await listPersonsBySlug(slug);
   const canonicalPath = `/person/${slug}`;
-  const title = person ? `${person.title} | SonShine Roofing` : 'Team Member | SonShine Roofing';
-  const description = person?.contentHtml
-    ? stripHtml(person.contentHtml).slice(0, 160)
-    : 'Meet the SonShine Roofing team serving Sarasota, Manatee, and Charlotte Counties.';
-  const ogImage = person?.featuredImage?.url || '/og-default.png';
+  const title = person?.seo.meta_title ?? 'Team Member | SonShine Roofing';
+  const description =
+    person?.seo.meta_description ??
+    'Meet the SonShine Roofing team serving Sarasota, Manatee, and Charlotte Counties.';
+  const ogImage = person?.seo.og_image;
 
-  const [firstName, ...restName] = person?.title?.split(" ") ?? [];
+  const [firstName, ...restName] = person?.title?.split(' ') ?? [];
   const metadata = buildProfileMetadata({
     title,
     description,
+    openGraphTitle: person?.seo.og_title,
+    openGraphDescription: person?.seo.og_description,
     path: canonicalPath,
-    image: { url: ogImage, width: 1200, height: 630 },
+    image: ogImage
+      ? {
+          url: ogImage.url,
+          width: ogImage.width ?? undefined,
+          height: ogImage.height ?? undefined,
+          alt: ogImage.altText || person?.title,
+        }
+      : { url: '/og-default.png', width: 1200, height: 630 },
     profile: firstName
       ? {
           firstName,
-          lastName: restName.length ? restName.join(" ") : undefined,
+          lastName: restName.length ? restName.join(' ') : undefined,
         }
       : undefined,
   });
 
-  metadata.robots = { index: isNathan, follow: true };
+  metadata.robots = { index: person?.seoIndexable ?? false, follow: true };
   return metadata;
 }
 
 export async function generateStaticParams() {
-  const navItems = await listPersonNav(50).catch(() => [] as Awaited<ReturnType<typeof listPersonNav>>);
+  const navItems = await listPersonNav(50);
   return navItems.map(({ slug }) => ({ slug }));
 }
 
 export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [person, navItems] = await Promise.all([
-    listPersonsBySlug(slug, { revalidateSeconds: PERSON_REVALIDATE_SECONDS }).catch(() => null),
-    listPersonNav(50).catch(() => [] as Awaited<ReturnType<typeof listPersonNav>>),
+    listPersonsBySlug(slug),
+    listPersonNav(50),
   ]);
   if (!person) return notFound();
 
@@ -70,7 +75,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
 
   const personLd = personSchema({
     name: person.title,
-    description: stripHtml(person.contentHtml).slice(0, 160),
+    description: person.seo.meta_description,
     url: pagePath,
     origin,
     jobTitle: person.positionTitle ?? undefined,
@@ -88,8 +93,8 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
   );
 
   const webPageLd = webPageSchema({
-    name: `${person.title} | SonShine Roofing`,
-    description: stripHtml(person.contentHtml).slice(0, 160),
+    name: person.seo.meta_title,
+    description: person.seo.meta_description,
     url: pagePath,
     origin,
     primaryImage: person.featuredImage?.url ?? '/og-default.png',
@@ -100,10 +105,14 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
     <Section>
       <div className="container-edge py-8">
         <div className="gap-4 overflow-visible items-start">
-
           <article className="mx-auto max-w-5xl">
             <div className="my-4">
-              <SmartLink href="/about-sonshine-roofing/#meet-our-team" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← Back to Team</SmartLink>
+              <SmartLink
+                href="/about-sonshine-roofing/#meet-our-team"
+                className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline"
+              >
+                ← Back to Team
+              </SmartLink>
             </div>
             <header className="flex flex-col gap-6 p-5">
               {person.featuredImage && (
@@ -116,7 +125,6 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
                     className="object-cover"
                   />
                 </div>
-
               )}
               <div className="min-w-0">
                 <h1 className="text-3xl font-bold text-slate-900">{person.title}</h1>
@@ -124,17 +132,25 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
                 <JsonLd data={breadcrumbsLd} />
                 <JsonLd data={webPageLd} />
                 {person.positionTitle && (
-                  <p className="mt-1 text-base font-medium text-[#0045d7]">{person.positionTitle}</p>
+                  <p className="mt-1 text-base font-medium text-[#0045d7]">
+                    {person.positionTitle}
+                  </p>
                 )}
               </div>
             </header>
 
-            <div className="mt-8 prose max-w-none border border-blue-300 bg-white p-5 rounded-2xl" dangerouslySetInnerHTML={{ __html: person.contentHtml }} />
+            <div
+              className="mt-8 prose max-w-none border border-blue-300 bg-white p-5 rounded-2xl"
+              dangerouslySetInnerHTML={{ __html: person.contentHtml }}
+            />
 
             {(prev || next) && (
               <nav className="mt-8 grid gap-4 rounded-2xl border border-blue-200 bg-white p-4 shadow-sm sm:grid-cols-2">
                 {prev ? (
-                  <SmartLink href={`/person/${prev.slug}`} className="block rounded-xl p-3 hover:bg-slate-50">
+                  <SmartLink
+                    href={`/person/${prev.slug}`}
+                    className="block rounded-xl p-3 hover:bg-slate-50"
+                  >
                     <div className="text-xs uppercase tracking-wide text-slate-500">Previous</div>
                     <div className="mt-1 font-medium text-slate-900">{prev.title}</div>
                     {prev.positionTitle && (
@@ -145,7 +161,10 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
                   <span />
                 )}
                 {next ? (
-                  <SmartLink href={`/person/${next.slug}`} className="block rounded-xl p-3 text-right hover:bg-slate-50">
+                  <SmartLink
+                    href={`/person/${next.slug}`}
+                    className="block rounded-xl p-3 text-right hover:bg-slate-50"
+                  >
                     <div className="text-xs uppercase tracking-wide text-slate-500">Next</div>
                     <div className="mt-1 font-medium text-slate-900">{next.title}</div>
                     {next.positionTitle && (

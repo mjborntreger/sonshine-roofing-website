@@ -40,10 +40,12 @@ Coolify Environment Variables
   - `NEXT_PUBLIC_GTM_ID`
   - `NEXT_PUBLIC_META_PIXEL_ID`
   - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
-- Mark these server variables as build-time and runtime variables because Directus redirects, shared site content, reviews, review-carousel settings, and special offers are fetched during the build or runtime ISR:
+- Mark these server variables as build-time and runtime variables because Directus blog posts/topics, redirects, shared site content, reviews, review-carousel settings, and special offers are fetched during the build or runtime ISR:
   - `DIRECTUS_URL`
   - `DIRECTUS_CLIENT_SLUG`
   - `DIRECTUS_TOKEN`
+- Do not set a blog content-source variable. The frontend has no WordPress blog
+  fallback; all blog consumers read Directus.
 - Set these as runtime secrets:
   - `N8N_WEBHOOK_URL`
   - `N8N_WEBHOOK_SECRET`
@@ -96,7 +98,7 @@ Lead Payload Contract (v2)
 Sitemaps & Robots
 - Production
   - robots.txt: Allow all, sitemap at `${NEXT_PUBLIC_BASE_URL}/sitemap_index`.
-  - app/robots.ts builds from `NEXT_PUBLIC_BASE_URL`.
+  - app/robots.ts uses `site_settings.site_url` and applies optional `site_settings.robots_disallow` rules.
 - Staging
   - robots.txt: Disallow all. Sitemap endpoints exist but are not to be crawled.
   - You can enable sitemap preview endpoints by setting:
@@ -114,7 +116,8 @@ Static sitemap (pages not in CMS)
 
 Security headers & CSP
 - next.config.mjs adds security headers for all requests.
-- CSP is currently enforced with `Content-Security-Policy` in all environments.
+- CSP is read from `site_settings.content_security_policy` and enforced with `Content-Security-Policy`.
+- Production builds fail when Directus is unavailable, the client record is not unique, or CSP is empty.
 - If something breaks after the Coolify cutover, check browser console CSP violations first.
 - `/instant-quote` embeds QuickQuote with contractor id `d9d4c0ba-e0cc-4f1c-a12e-5c30d9b2ce8d`.
 - QuickQuote CSP dependencies:
@@ -124,11 +127,18 @@ Security headers & CSP
 - QuickQuote submissions are bridged into `lead_form_submitted` and `ads_lead_submit` dataLayer events as roof replacement conversions.
 
 Cache/Invalidation
-- WordPress GraphQL data uses Next fetch revalidation where configured. Directus special offers revalidate every 15 minutes; shared site content revalidates hourly.
+- Remaining WordPress GraphQL data uses Next fetch revalidation where configured.
+  Directus blog content and special offers revalidate every 15 minutes; shared
+  site content revalidates hourly.
 - Static sitemap: regenerated on build; read dynamically per request.
 - Published Directus redirects are fetched and validated by `next.config.mjs` at build time. Redirect changes require a new build.
 - Static generation is limited to two workers with one page per worker at a time to avoid bursting WordPress or Directus.
-- Analytics remains controlled by the existing environment/config path; `site_settings.enable_site_analytics` is intentionally not wired.
+- `site_settings.enable_site_analytics` controls whether the configured GTM and Meta Pixel scripts render.
+
+llms.txt
+- `scripts/generate-llms-txt.mjs` writes `public/llms.txt` verbatim from `site_settings.llms_txt` during prebuild.
+- Empty or whitespace-only CMS content removes/skips the generated file.
+- `public/llms.txt` is generated and gitignored; edit the Directus field rather than the build artifact.
 
 GTMetrix/Analytics
 - GTM loads only when `NEXT_PUBLIC_GTM_ID` is set and env permits.
@@ -137,7 +147,8 @@ GTMetrix/Analytics
 Coolify Smoke Checks
 - Before DNS cutover:
   - App boots and `/robots.txt` returns 200.
-  - `/`, `/contact-us`, `/sitemap_index`, `/sitemap_index/static`, and one WP-backed dynamic page render.
+  - `/`, `/contact-us`, `/sitemap_index`, `/sitemap_index/static`, one Directus
+    blog post, and one remaining WP-backed dynamic page render.
   - `www.sonshineroofing.com` redirects to `sonshineroofing.com` once both domains point at Coolify.
   - Legacy redirects and configured 410 routes still behave correctly.
   - A deprecated static landing-page URL returns 404 without redirecting.

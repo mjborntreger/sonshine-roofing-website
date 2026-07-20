@@ -1,21 +1,25 @@
-import type { Metadata } from "next";
-import { Suspense } from "react";
-import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
-import { ArrowDown, BadgePercent, CalendarClock, Smartphone, Tag } from "lucide-react";
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { ArrowDown, BadgePercent, CalendarClock, Smartphone, Tag } from 'lucide-react';
 
-import Section from "@/components/layout/Section";
-import SpecialOfferForm from "@/components/lead-capture/special-offer/SpecialOfferForm";
-import ServicesAside from "@/components/global-nav/static-pages/ServicesAside";
-import Hero from "@/components/ui/Hero";
-import SmartLink from "@/components/utils/SmartLink";
-import { getSpecialOfferBySlug, listSpecialOfferSlugs } from "@/lib/content/directus-special-offers";
-import isExpired from "@/lib/lead-capture/isExpired";
-import { formatSpecialOfferExpiration } from "@/lib/lead-capture/specialOfferDates";
-import { buildBasicMetadata } from "@/lib/seo/meta";
-import { JsonLd } from "@/lib/seo/json-ld";
-import { breadcrumbSchema, offerSchema } from "@/lib/seo/schema";
-import { SITE_ORIGIN } from "@/lib/seo/site";
+import Section from '@/components/layout/Section';
+import SpecialOfferForm from '@/components/lead-capture/special-offer/SpecialOfferForm';
+import ServicesAside from '@/components/global-nav/static-pages/ServicesAside';
+import Hero from '@/components/ui/Hero';
+import SmartLink from '@/components/utils/SmartLink';
+import {
+  getSpecialOfferBySlug,
+  listSpecialOfferSlugs,
+} from '@/lib/content/directus-special-offers';
+import isExpired from '@/lib/lead-capture/isExpired';
+import { formatSpecialOfferExpiration } from '@/lib/lead-capture/specialOfferDates';
+import { buildBasicMetadata } from '@/lib/seo/meta';
+import { JsonLd } from '@/lib/seo/json-ld';
+import { breadcrumbSchema, offerSchema } from '@/lib/seo/schema';
+import { SITE_ORIGIN } from '@/lib/seo/site';
+import { getSiteSettings } from '@/lib/content/directus-site';
 
 export const revalidate = 900;
 
@@ -34,19 +38,19 @@ function buildRobotsMeta() {
 }
 
 function collapseText(value: string | null | undefined): string {
-  return (value ?? "").replace(/\s+/g, " ").trim();
+  return (value ?? '').replace(/\s+/g, ' ').trim();
 }
 
 function splitParagraphs(value: string | null | undefined): string[] {
-  return (value ?? "")
+  return (value ?? '')
     .split(/\n{2,}|\r\n{2,}/)
-    .map((paragraph) => paragraph.replace(/\s+/g, " ").trim())
+    .map((paragraph) => paragraph.replace(/\s+/g, ' ').trim())
     .filter(Boolean);
 }
 
 function buildHeroSubtitle(value: string): string {
   if (!value) {
-    return "Claim this special offer from SonShine Roofing.";
+    return 'Claim this special offer from SonShine Roofing.';
   }
 
   if (value.length <= HERO_SUBTITLE_MAX_LENGTH) {
@@ -66,8 +70,8 @@ export async function generateMetadata({
 
   if (!offer) {
     const metadata = buildBasicMetadata({
-      title: "Special Offer · SonShine Roofing",
-      description: "This special offer is not available right now.",
+      title: 'Special Offer · SonShine Roofing',
+      description: 'This special offer is not available right now.',
       path: `/special-offers/${slug}`,
     });
     metadata.robots = buildRobotsMeta();
@@ -76,13 +80,13 @@ export async function generateMetadata({
 
   const description =
     collapseText(offer.description).slice(0, 160) ||
-    "Claim this special offer from SonShine Roofing.";
+    'Claim this special offer from SonShine Roofing.';
   const metadata = buildBasicMetadata({
     title: `${offer.title} · SonShine Roofing`,
     description,
     path: `/special-offers/${offer.slug}`,
     image: {
-      url: offer.featuredImage?.url || "/og-default.png",
+      url: offer.featuredImage?.url || '/og-default.png',
       width: offer.featuredImage?.width || 1200,
       height: offer.featuredImage?.height || 630,
     },
@@ -93,7 +97,7 @@ export async function generateMetadata({
 
 export default async function SpecialOfferPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const offer = await getSpecialOfferBySlug(slug);
+  const [offer, settings] = await Promise.all([getSpecialOfferBySlug(slug), getSiteSettings()]);
 
   if (!offer) {
     notFound();
@@ -105,7 +109,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   const descriptionParagraphs = splitParagraphs(offer.description);
   const heroSubtitle = buildHeroSubtitle(description);
   const expirationBadge = expirationLabel
-    ? `${expired ? "Expired on" : "Valid through"} ${expirationLabel}`
+    ? `${expired ? 'Expired on' : 'Valid through'} ${expirationLabel}`
     : null;
 
   const cookieStore = await cookies();
@@ -117,8 +121,8 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
 
   const breadcrumbsLd = breadcrumbSchema(
     [
-      { name: "Home", item: "/" },
-      { name: "Special Offers", item: "/special-offers" },
+      { name: 'Home', item: '/' },
+      { name: 'Special Offers', item: '/special-offers' },
       { name: offer.title, item: pagePath },
     ],
     { origin },
@@ -130,10 +134,10 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
     url: pagePath,
     origin,
     validThrough: offer.expirationDate || undefined,
-    availability: expired ? "https://schema.org/Discontinued" : "https://schema.org/InStock",
+    availability: expired ? 'https://schema.org/Discontinued' : 'https://schema.org/InStock',
     seller: {
-      "@type": "Organization",
-      name: "SonShine Roofing",
+      '@type': 'Organization',
+      name: 'SonShine Roofing',
       url: origin,
     },
   });
@@ -142,7 +146,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   if (!expired && offer.offerCode && cookieValue) {
     try {
       const parsed = JSON.parse(decodeURIComponent(cookieValue));
-      const code = typeof parsed?.code === "string" ? parsed.code : null;
+      const code = typeof parsed?.code === 'string' ? parsed.code : null;
       const expValue = parsed?.exp ? new Date(parsed.exp) : null;
       const stillValid = expValue ? expValue.getTime() >= Date.now() : true;
       if (code === offer.offerCode && stillValid) {
@@ -165,7 +169,7 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
         justifyStart
         imageSrc={offer.featuredImage?.url || undefined}
         badges={[
-          { icon: Tag, label: "Limited-Time Offer" },
+          { icon: Tag, label: 'Limited-Time Offer' },
           ...(offer.discount ? [{ icon: BadgePercent, label: offer.discount }] : []),
           ...(expirationBadge ? [{ icon: CalendarClock, label: expirationBadge }] : []),
         ]}
@@ -183,13 +187,13 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
             <ArrowDown className="icon-affordance ml-2 inline h-4 w-4" aria-hidden="true" />
           </SmartLink>
           <SmartLink
-            href="tel:+19418664320"
+            href={settings?.phoneHref ?? '#claim-offer'}
             className="btn-outline phone-affordance btn-lg rounded-lg px-3 py-2 text-white hover:bg-transparent"
             aria-label="Call SonShine Roofing"
             proseGuard
           >
             <Smartphone className="phone-affordance-icon mr-2 inline h-4 w-4" aria-hidden="true" />
-            Call (941) 866-4320
+            Call {settings?.phone ?? 'our office'}
           </SmartLink>
         </div>
       </Hero>
@@ -221,8 +225,11 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
                   <p className="mt-2 text-sm text-slate-600">
                     This special offer has expired. Reach out to our team for current promotions.
                   </p>
-                  <a href="tel:+19418664320" className="btn btn-brand-blue btn-md mt-4 inline-flex justify-center">
-                    Call (941) 866-4320
+                  <a
+                    href={settings?.phoneHref ?? '#claim-offer'}
+                    className="btn btn-brand-blue btn-md mt-4 inline-flex justify-center"
+                  >
+                    Call {settings?.phone ?? 'our office'}
                   </a>
                 </div>
               )}
@@ -230,7 +237,9 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
 
             {offer.legalDisclaimer !== null ? (
               <div className="not-prose text-xs italic leading-[1.3rem] text-slate-600 print:text-black">
-                <strong className="font-semibold text-slate-800 print:text-black">Disclaimer:</strong>{" "}
+                <strong className="font-semibold text-slate-800 print:text-black">
+                  Disclaimer:
+                </strong>{' '}
                 {offer.legalDisclaimer}
               </div>
             ) : null}

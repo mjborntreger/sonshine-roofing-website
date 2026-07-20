@@ -7,6 +7,7 @@ import { sanitizeDirectusHtml } from '../lib/content/directus-html.ts';
 const WORDPRESS_GRAPHQL = 'https://wp.sonshineroofing.com/graphql';
 const PUBLIC_HOST = 'https://sonshineroofing.com';
 const WORDPRESS_HOST = 'https://wp.sonshineroofing.com';
+const WORDPRESS_HTTP_HOST = 'http://wp.sonshineroofing.com';
 const MANIFEST_PATH = new URL('../blog-topic-migration-manifest.json', import.meta.url);
 const REPORT_PATH = new URL('../blog-migration-source-verification.json', import.meta.url);
 const EXPECTED_HASH = 'f5e17569da2f1644ef3b643931e8f4faaeb5d247286e7b95df4eb56d0dd7a30e';
@@ -40,6 +41,29 @@ function normalizeText(html) {
     .replace(/\u00a0/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function decodeRendered(value) {
+  return String(value ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (_, number) => String.fromCodePoint(parseInt(number, 10)))
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&apos;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function gmtIso(value) {
+  const raw = String(value ?? '').trim();
+  const stamped = /(?:Z|[+-]\d\d:\d\d)$/.test(raw) ? raw : `${raw}Z`;
+  const date = new Date(stamped);
+  assert.ok(raw && Number.isFinite(date.getTime()), `Invalid GMT date: ${value}`);
+  return date.toISOString();
 }
 
 function parseJsonList(value, label) {
@@ -124,7 +148,7 @@ function transformBody(post, mediaMap) {
     if (!srcMatch || DIRECTUS_ASSET_PATTERN.test(srcMatch[2])) return tag;
     const mediaId =
       tag.match(/\bdata-id=(['"])(\d+)\1/i)?.[2] ??
-      tag.match(/\bclass=(['"])[^'"]*\bwp-image-(\d+)\b[^'"]*\1/i)?.[2];
+      tag.match(/\bwp-image-(\d+)\b/i)?.[1];
     const fileId = mediaId ? mediaMap.aliases.get(`wp-id:${mediaId}`) : null;
     return fileId
       ? tag.replace(srcMatch[0], `src=${srcMatch[1]}/assets/${fileId}${srcMatch[1]}`)
@@ -132,6 +156,7 @@ function transformBody(post, mediaMap) {
   });
   body = body.replace(RESPONSIVE_ATTRIBUTES, '');
   body = body.split(WORDPRESS_HOST).join(PUBLIC_HOST);
+  body = body.split(WORDPRESS_HTTP_HOST).join(PUBLIC_HOST);
   return body;
 }
 
@@ -150,7 +175,8 @@ async function fetchAllPosts() {
       posts(first: $first, after: $after, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
         pageInfo { hasNextPage endCursor }
         nodes {
-          databaseId slug uri status title date modified excerpt content
+          databaseId slug uri status title date modified
+          excerpt(format: RENDERED) content(format: RENDERED)
           author { node { databaseId name slug } }
           featuredImage { node { databaseId sourceUrl altText mediaItemUrl } }
           categories(first: 100) { nodes { databaseId name slug } }
@@ -183,6 +209,38 @@ async function fetchAllPosts() {
   return posts;
 }
 
+async function fetchPostBySlug(slug) {
+  const query = `
+    query MigrationPost($slug: ID!) {
+      post(id: $slug, idType: SLUG) {
+        databaseId slug uri status title date dateGmt modified modifiedGmt
+        excerpt(format: RENDERED) content(format: RENDERED)
+        author { node { databaseId name slug } }
+        featuredImage { node { databaseId sourceUrl altText mediaItemUrl } }
+        categories(first: 100) { nodes { databaseId name slug } }
+        seo {
+          title description canonicalUrl
+          openGraph { title description type image { url secureUrl width height type } }
+        }
+      }
+    }
+  `;
+  const response = await fetch(WORDPRESS_GRAPHQL, {
+    method: 'POST',
+    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query, variables: { slug } }),
+  });
+  assert.equal(response.status, 200, `${slug}: WPGraphQL HTTP ${response.status}`);
+  const payload = await response.json();
+  assert.deepEqual(
+    payload.errors,
+    undefined,
+    `${slug}: WPGraphQL errors: ${JSON.stringify(payload.errors)}`,
+  );
+  assert.ok(payload.data?.post, `${slug}: singular source post missing`);
+  return payload.data.post;
+}
+
 const [manifestRaw, mediaRows, sourcePosts] = await Promise.all([
   readFile(MANIFEST_PATH, 'utf8'),
   readStdinJson(),
@@ -203,7 +261,11 @@ assert.deepEqual([...manifestSlugs].filter((slug) => !sourceBySlug.has(slug)), [
 const reports = [];
 for (const decision of manifest.posts) {
   if (EXCLUDED_SLUGS.has(decision.slug)) continue;
-  const post = sourceBySlug.get(decision.slug);
+  const indexedPost = sourceBySlug.get(decision.slug);
+  const post = await fetchPostBySlug(decision.slug);
+  assert.equal(post.databaseId, indexedPost.databaseId, `${post.slug}: index database id drift`);
+  assert.equal(post.slug, indexedPost.slug, `${post.slug}: index slug drift`);
+  assert.equal(post.modified, indexedPost.modified, `${post.slug}: index modified drift`);
   const mediaMap = buildMediaMap(mediaRows, decision.slug);
   const beforeImages = elements(post.content, 'img');
   const body = transformBody(post, mediaMap);
@@ -253,6 +315,12 @@ for (const decision of manifest.posts) {
     database_id: post.databaseId,
     author: post.author?.node?.name ?? null,
     topics: decision.proposed_topic_slugs,
+    title: decodeRendered(post.title),
+    excerpt: decodeRendered(post.excerpt),
+    published_at: gmtIso(post.dateGmt),
+    source_updated_at: gmtIso(post.modifiedGmt),
+    meta_title: decodeRendered(post.seo?.title),
+    meta_description: decodeRendered(post.seo?.description),
     featured: (post.categories?.nodes ?? []).some((category) => category.slug === 'featured'),
     featured_file_id: featuredFileId,
     source_body_sha256: sha256(post.content),

@@ -1,23 +1,8 @@
 import { getDirectusRedirects } from './lib/content/directus-redirects.mjs';
+import { getDirectusBuildSettings } from './lib/content/directus-build-settings.mjs';
 
-// Security headers (CSP enforced in all environments)
-const csp = `
-  default-src 'self' https://connect.facebook.net https://storage.googleapis.com https://wp.sonshineroofing.com;
-  base-uri 'self';
-  form-action 'self' https://*.acculynx.com;
-  frame-ancestors https://www.google.com;
-  frame-src https://connect.facebook.net https://cdn.socket.io https://www.youtube-nocookie.com https://www.facebook.com https://www.instagram.com https://www.youtube.com https://*.acculynx.com https://challenges.cloudflare.com https://www.google.com https://maps.google.com https://www.googletagmanager.com https://www.googleadservices.com https://insight.adsrvr.org https://ct.pinterest.com https://tag.brandcdn.com https://adservices.brandcdn.com https://d1eoo1tco6rr5e.cloudfront.net https://calendly.com;
-  img-src 'self' data: blob: https: https://directus.borntregerdigital.com https://connect.facebook.net https://*.amazon-adsystem.com https://*.brandcdn.com https://assets.calendly.com;
-  media-src 'self' blob: https:;
-  font-src 'self' https://fonts.gstatic.com https://assets.calendly.com data:;
-  style-src 'self' 'unsafe-inline' https://cdn.socket.io https://fonts.bunny.net https://cdn.jsdelivr.net https://fonts.googleapis.com https://www.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://assets.calendly.com;
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' data: https://connect.facebook.net https://www.gstatic.com https://maps.googleapis.com https://www.google.com https://storage.googleapis.com https://www.googletagmanager.com https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://qq.leadsbyquickquote.com https://challenges.cloudflare.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.googleadservices.com blob: https://*.amazon-adsystem.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://*.tvsquared.com https://ct.pinterest.com https://assets.calendly.com https://hatch-javascript.s3.amazonaws.com https://unpkg.com https://app.usehatchapp.com;
-  script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' data: https://cdn.socket.io https://connect.facebook.net https://www.gstatic.com https://maps.googleapis.com https://www.google.com https://storage.googleapis.com https://qq.leadsbyquickquote.com https://www.googletagmanager.com https://*.googletagmanager.com https://googletagmanager.com https://tagmanager.google.com https://challenges.cloudflare.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.googleadservices.com blob: https://*.amazon-adsystem.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://*.tvsquared.com https://ct.pinterest.com https://assets.calendly.com https://hatch-javascript.s3.amazonaws.com https://unpkg.com https://app.usehatchapp.com;
-  connect-src 'self' ws: wss: https://cdn.socket.io https://connect.facebook.net https://places.googleapis.com https://maps.googleapis.com https://cdn.jsdelivr.net https://storage.googleapis.com https://quickquote-api-628343900656.us-central1.run.app https://quickquote-api-223492134056.us-central1.run.app https://quickquote-api-78479757910.us-central1.run.app https://sonshineroofing.com https://wp.sonshineroofing.com https://*.acculynx.com https://challenges.cloudflare.com https://www.googletagmanager.com https://*.googletagmanager.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.google.com https://google.com https://*.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.g.doubleclick.net https://ad.doubleclick.net https://pagead2.googlesyndication.com https://stats.g.doubleclick.net/g/collect https://*.amazon-adsystem.com https://www.facebook.com https://connect.facebook.net https://ct.pinterest.com https://s.pinimg.com https://*.brandcdn.com https://js.adsrvr.org https://insight.adsrvr.org https://*.tvsquared.com https://*.paa-reporting-advertising.amazon https://*.amazon https://calendly.com https://assets.calendly.com https://app.usehatchapp.com;
-  object-src 'none';
-`
-  .replace(/\s{2,}/g, ' ')
-  .trim();
+const directusBuildSettings = await getDirectusBuildSettings();
+const csp = directusBuildSettings?.contentSecurityPolicy ?? '';
 
 const imageRemotePatterns = [
   { protocol: 'https', hostname: 'sonshineroofing.com' },
@@ -102,7 +87,7 @@ const nextConfig = {
       {
         source: '/(.*)',
         headers: [
-          { key: cspHeaderKey, value: csp },
+          ...(csp ? [{ key: cspHeaderKey, value: csp }] : []),
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Permissions-Policy', value: 'geolocation=(), camera=(), microphone=()' },

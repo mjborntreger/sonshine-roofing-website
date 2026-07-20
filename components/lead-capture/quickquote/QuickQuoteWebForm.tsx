@@ -1,31 +1,34 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import QuickQuoteWebFormSkeleton from "./QuickQuoteWebFormSkeleton";
-import { getLeadAttributionForSubmit, type AttributionQueryField } from "@/lib/lead-capture/attribution";
-import { pushToDataLayer } from "@/lib/telemetry/gtm";
+import { useEffect, useState } from 'react';
+import QuickQuoteWebFormSkeleton from './QuickQuoteWebFormSkeleton';
+import {
+  getLeadAttributionForSubmit,
+  type AttributionQueryField,
+} from '@/lib/lead-capture/attribution';
+import { pushToDataLayer } from '@/lib/telemetry/gtm';
+import SitePhoneLink from '@/components/utils/SitePhoneLink';
 
-const QUICKQUOTE_TARGET_ID = "quickquote-web-form";
-const QUICKQUOTE_CONTRACTOR_ID = "d9d4c0ba-e0cc-4f1c-a12e-5c30d9b2ce8d";
-const QUICKQUOTE_API_BASE = "https://quickquote-api-628343900656.us-central1.run.app";
-const QUICKQUOTE_LOADER_SRC =
-  `https://qq.leadsbyquickquote.com/roofs/integration?target=${QUICKQUOTE_TARGET_ID}&contractorId=${QUICKQUOTE_CONTRACTOR_ID}`;
+const QUICKQUOTE_TARGET_ID = 'quickquote-web-form';
+const QUICKQUOTE_CONTRACTOR_ID = 'd9d4c0ba-e0cc-4f1c-a12e-5c30d9b2ce8d';
+const QUICKQUOTE_API_BASE = 'https://quickquote-api-628343900656.us-central1.run.app';
+const QUICKQUOTE_LOADER_SRC = `https://qq.leadsbyquickquote.com/roofs/integration?target=${QUICKQUOTE_TARGET_ID}&contractorId=${QUICKQUOTE_CONTRACTOR_ID}`;
 
 const ATTRIBUTION_FIELDS: AttributionQueryField[] = [
-  "utm_campaign",
-  "utm_source",
-  "utm_medium",
-  "utm_content",
-  "utm_term",
-  "gclid",
+  'utm_campaign',
+  'utm_source',
+  'utm_medium',
+  'utm_content',
+  'utm_term',
+  'gclid',
 ];
 
-const BRIDGED_IDS_KEY = "ss_quickquote_bridged_ids_v1";
-const CONVERTED_IDS_KEY = "ss_quickquote_converted_ids_v1";
-const FALLBACK_LEAD_ID_KEY = "ss_quickquote_fallback_lead_id";
+const BRIDGED_IDS_KEY = 'ss_quickquote_bridged_ids_v1';
+const CONVERTED_IDS_KEY = 'ss_quickquote_converted_ids_v1';
+const FALLBACK_LEAD_ID_KEY = 'ss_quickquote_fallback_lead_id';
 
 type DataLayerEvent = Record<string, unknown>;
-type QuickQuoteLoadStatus = "loading" | "ready" | "error";
+type QuickQuoteLoadStatus = 'loading' | 'ready' | 'error';
 type QuickQuoteRenderResult = unknown | PromiseLike<unknown>;
 
 type QuickQuoteGlobal = {
@@ -42,26 +45,28 @@ type QuickQuoteWindow = Window & {
 const memorySeen = new Map<string, Set<string>>();
 
 function cleanString(value: unknown): string | undefined {
-  if (typeof value === "string") {
+  if (typeof value === 'string') {
     const trimmed = value.trim();
     return trimmed || undefined;
   }
-  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
   return undefined;
 }
 
 function isRecord(value: unknown): value is DataLayerEvent {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
 function readIds(key: string): Set<string> {
-  if (typeof window === "undefined") return memorySeen.get(key) ?? new Set();
+  if (typeof window === 'undefined') return memorySeen.get(key) ?? new Set();
 
   try {
     const raw = window.sessionStorage.getItem(key);
     const parsed = raw ? JSON.parse(raw) : null;
     const ids = Array.isArray(parsed?.ids) ? parsed.ids : [];
-    return new Set(ids.filter((id: unknown): id is string => typeof id === "string" && id.trim().length > 0));
+    return new Set(
+      ids.filter((id: unknown): id is string => typeof id === 'string' && id.trim().length > 0),
+    );
   } catch {
     return memorySeen.get(key) ?? new Set();
   }
@@ -70,7 +75,7 @@ function readIds(key: string): Set<string> {
 function writeIds(key: string, ids: Set<string>) {
   memorySeen.set(key, ids);
 
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   try {
     window.sessionStorage.setItem(key, JSON.stringify({ ids: Array.from(ids).slice(-100) }));
   } catch {
@@ -87,13 +92,13 @@ function markOnce(key: string, id: string): boolean {
 }
 
 function getFallbackLeadId(): string {
-  if (typeof window === "undefined") return "quickquote-fallback";
+  if (typeof window === 'undefined') return 'quickquote-fallback';
 
   try {
     const existing = window.sessionStorage.getItem(FALLBACK_LEAD_ID_KEY);
     if (existing) return existing;
     const generated =
-      typeof window.crypto?.randomUUID === "function"
+      typeof window.crypto?.randomUUID === 'function'
         ? `quickquote-${window.crypto.randomUUID()}`
         : `quickquote-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     window.sessionStorage.setItem(FALLBACK_LEAD_ID_KEY, generated);
@@ -109,8 +114,8 @@ function getQuickQuoteLeadId(event: DataLayerEvent): string {
 
 function buildQuickQuoteRenderConfig() {
   return {
-    vertical: "roofs",
-    mode: "inline",
+    vertical: 'roofs',
+    mode: 'inline',
     target: `#${QUICKQUOTE_TARGET_ID}`,
     contractorID: QUICKQUOTE_CONTRACTOR_ID,
     contractorId: QUICKQUOTE_CONTRACTOR_ID,
@@ -126,12 +131,12 @@ function buildQuickQuoteRenderConfig() {
 
 function targetHasQuickQuoteContent(target: HTMLElement | null): boolean {
   if (!target) return false;
-  if (target.querySelector("[data-qq-fallback]")) return true;
+  if (target.querySelector('[data-qq-fallback]')) return true;
 
   const shadowRoot = target.shadowRoot;
   if (!shadowRoot) return false;
 
-  if (shadowRoot.querySelector("#dynamicContractorForm, #qq-config-error, .qq-inline-wrapper")) {
+  if (shadowRoot.querySelector('#dynamicContractorForm, #qq-config-error, .qq-inline-wrapper')) {
     return true;
   }
 
@@ -140,7 +145,7 @@ function targetHasQuickQuoteContent(target: HTMLElement | null): boolean {
 }
 
 function watchQuickQuoteTarget(onReady: () => void): () => void {
-  if (typeof document === "undefined" || typeof window === "undefined") return () => {};
+  if (typeof document === 'undefined' || typeof window === 'undefined') return () => {};
 
   const target = document.getElementById(QUICKQUOTE_TARGET_ID);
   if (!target) return () => {};
@@ -181,7 +186,7 @@ function watchQuickQuoteTarget(onReady: () => void): () => void {
   };
 
   const observer =
-    typeof MutationObserver !== "undefined" ? new MutationObserver(scheduleCheck) : null;
+    typeof MutationObserver !== 'undefined' ? new MutationObserver(scheduleCheck) : null;
 
   observer?.observe(target, { attributes: true, childList: true, subtree: true });
   intervalId = window.setInterval(scheduleCheck, 125);
@@ -205,7 +210,7 @@ function watchQuickQuoteTarget(onReady: () => void): () => void {
 
 function hydrateQuickQuoteAttributionUrl() {
   const attribution = getLeadAttributionForSubmit();
-  if (!attribution || typeof window === "undefined") return;
+  if (!attribution || typeof window === 'undefined') return;
 
   const url = new URL(window.location.href);
   let changed = false;
@@ -218,7 +223,11 @@ function hydrateQuickQuoteAttributionUrl() {
   }
 
   if (changed) {
-    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${url.pathname}${url.search}${url.hash}`,
+    );
   }
 }
 
@@ -226,18 +235,18 @@ function pushQuickQuoteConversionEvents(event: DataLayerEvent) {
   const leadId = getQuickQuoteLeadId(event);
   if (!markOnce(BRIDGED_IDS_KEY, leadId)) return;
 
-  const mode = cleanString(event.mode) ?? "web_form";
-  const leadSource = cleanString(event.lead_source) ?? "web_form";
+  const mode = cleanString(event.mode) ?? 'web_form';
+  const leadSource = cleanString(event.lead_source) ?? 'web_form';
   const contractorId = cleanString(event.contractor_id) ?? QUICKQUOTE_CONTRACTOR_ID;
 
   pushToDataLayer({
-    event: "lead_form_submitted",
-    form: "quickquote_web_form",
-    form_location: "/instant-quote",
+    event: 'lead_form_submitted',
+    form: 'quickquote_web_form',
+    form_location: '/instant-quote',
     lead_id: leadId,
-    lead_type: "roof_replacement",
-    projectType: "retail",
-    event_source: "quickquote_bridge",
+    lead_type: 'roof_replacement',
+    projectType: 'retail',
+    event_source: 'quickquote_bridge',
     quickquote_mode: mode,
     quickquote_lead_source: leadSource,
     contractor_id: contractorId,
@@ -246,26 +255,26 @@ function pushQuickQuoteConversionEvents(event: DataLayerEvent) {
   if (!markOnce(CONVERTED_IDS_KEY, leadId)) return;
 
   pushToDataLayer({
-    event: "ads_lead_submit",
+    event: 'ads_lead_submit',
     city: null,
     zip: null,
-    form_location: "/instant-quote",
+    form_location: '/instant-quote',
     conversion_value: 1500,
-    currency: "USD",
+    currency: 'USD',
     current_roof_type: null,
     roof_age_bucket: null,
     lead_id: leadId,
-    lead_type: "roof_replacement",
+    lead_type: 'roof_replacement',
   });
 }
 
 function handleDataLayerItem(item: unknown) {
-  if (!isRecord(item) || item.event !== "qq_form_submit_success") return;
+  if (!isRecord(item) || item.event !== 'qq_form_submit_success') return;
   pushQuickQuoteConversionEvents(item);
 }
 
 function installQuickQuoteDataLayerBridge() {
-  if (typeof window === "undefined") return;
+  if (typeof window === 'undefined') return;
   const win = window as QuickQuoteWindow;
 
   if (!Array.isArray(win.dataLayer)) {
@@ -288,10 +297,10 @@ function installQuickQuoteDataLayerBridge() {
 }
 
 function renderExistingQuickQuote(onReady: () => void, onError: () => void): boolean {
-  if (typeof window === "undefined") return false;
+  if (typeof window === 'undefined') return false;
   const win = window as QuickQuoteWindow;
 
-  if (typeof win.QuickQuote?.render !== "function") return false;
+  if (typeof win.QuickQuote?.render !== 'function') return false;
   if (!document.getElementById(QUICKQUOTE_TARGET_ID)) return false;
 
   try {
@@ -312,36 +321,38 @@ function renderExistingQuickQuote(onReady: () => void, onError: () => void): boo
 }
 
 function loadQuickQuoteScript(onError: () => void): () => void {
-  if (typeof document === "undefined") return () => {};
+  if (typeof document === 'undefined') return () => {};
 
-  const existing = document.querySelector<HTMLScriptElement>("script[data-ss-quickquote-loader='true']");
+  const existing = document.querySelector<HTMLScriptElement>(
+    "script[data-ss-quickquote-loader='true']",
+  );
   if (existing) {
-    if (existing.dataset.ssQuickquoteLoadError === "true") {
+    if (existing.dataset.ssQuickquoteLoadError === 'true') {
       onError();
       return () => {};
     }
 
-    existing.addEventListener("error", onError, { once: true });
+    existing.addEventListener('error', onError, { once: true });
     return () => {
-      existing.removeEventListener("error", onError);
+      existing.removeEventListener('error', onError);
     };
   }
 
-  const script = document.createElement("script");
+  const script = document.createElement('script');
   script.src = QUICKQUOTE_LOADER_SRC;
   script.async = true;
-  script.dataset.ssQuickquoteLoader = "true";
+  script.dataset.ssQuickquoteLoader = 'true';
 
   const handleError = () => {
-    script.dataset.ssQuickquoteLoadError = "true";
+    script.dataset.ssQuickquoteLoadError = 'true';
     onError();
   };
 
-  script.addEventListener("error", handleError, { once: true });
+  script.addEventListener('error', handleError, { once: true });
   document.head.appendChild(script);
 
   return () => {
-    script.removeEventListener("error", handleError);
+    script.removeEventListener('error', handleError);
   };
 }
 
@@ -351,18 +362,15 @@ function QuickQuoteLoadError() {
       role="alert"
       className="mx-auto w-full max-w-[480px] rounded-[16px] border border-amber-200 bg-amber-50 px-5 pb-8 text-sm text-amber-950 shadow-[0_16px_36px_rgba(15,23,42,0.12)]"
     >
-      The 60-sec quote form is taking longer than expected to load. Please refresh the page or call{" "}
-      <a className="font-semibold underline" href="tel:+19418664320">
-        (941) 866-4320
-      </a>
-      .
+      The 60-sec quote form is taking longer than expected to load. Please refresh the page or call{' '}
+      <SitePhoneLink className="font-semibold underline" />.
     </div>
   );
 }
 
 export default function QuickQuoteWebForm() {
-  const [loadStatus, setLoadStatus] = useState<QuickQuoteLoadStatus>("loading");
-  const isLoading = loadStatus === "loading";
+  const [loadStatus, setLoadStatus] = useState<QuickQuoteLoadStatus>('loading');
+  const isLoading = loadStatus === 'loading';
 
   useEffect(() => {
     let active = true;
@@ -377,13 +385,13 @@ export default function QuickQuoteWebForm() {
 
       readyFrame = window.requestAnimationFrame(() => {
         readyFrame = 0;
-        if (active) setLoadStatus("ready");
+        if (active) setLoadStatus('ready');
       });
     };
 
     const markError = () => {
       if (active) {
-        setLoadStatus((current) => (current === "ready" ? current : "error"));
+        setLoadStatus((current) => (current === 'ready' ? current : 'error'));
       }
     };
 
@@ -416,7 +424,7 @@ export default function QuickQuoteWebForm() {
           </div>
         ) : null}
 
-        {loadStatus === "error" ? (
+        {loadStatus === 'error' ? (
           <div className="absolute inset-0 z-10 py-16">
             <QuickQuoteLoadError />
           </div>
@@ -425,17 +433,18 @@ export default function QuickQuoteWebForm() {
         <div
           id={QUICKQUOTE_TARGET_ID}
           className={[
-            "min-h-[720px] w-full overflow-hidden py-16",
-            isLoading || loadStatus === "error" ? "pointer-events-none opacity-0" : null,
+            'min-h-[720px] w-full overflow-hidden py-16',
+            isLoading || loadStatus === 'error' ? 'pointer-events-none opacity-0' : null,
           ]
             .filter(Boolean)
-            .join(" ")}
+            .join(' ')}
           aria-live="polite"
         />
       </div>
       <noscript>
         <p className="mt-4 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          JavaScript is required to load the 60-sec quote form. Please call (941) 866-4320 for help.
+          JavaScript is required to load the 60-sec quote form. Please call <SitePhoneLink /> for
+          help.
         </p>
       </noscript>
     </>

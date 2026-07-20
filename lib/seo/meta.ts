@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata } from 'next';
 
 export type OgImageInput = {
   url: string;
@@ -7,13 +7,13 @@ export type OgImageInput = {
   alt?: string;
 };
 
-type OpenGraphMetadata = NonNullable<Metadata["openGraph"]>;
+type OpenGraphMetadata = NonNullable<Metadata['openGraph']>;
 type OpenGraphWithType = Extract<OpenGraphMetadata, { type: string }>;
-type OpenGraphType = OpenGraphWithType["type"];
+type OpenGraphType = OpenGraphWithType['type'];
 type TypedOpenGraph<TType extends OpenGraphType> = Extract<OpenGraphWithType, { type: TType }>;
 
 function ensureOpenGraphType<TType extends OpenGraphType>(
-  openGraph: Metadata["openGraph"],
+  openGraph: Metadata['openGraph'],
   type: TType,
 ): TypedOpenGraph<TType> {
   return {
@@ -22,8 +22,8 @@ function ensureOpenGraphType<TType extends OpenGraphType>(
   } as TypedOpenGraph<TType>;
 }
 
-export const DEFAULT_OG_IMAGE: Required<Omit<OgImageInput, "alt">> & { alt?: string } = {
-  url: "/og-default.png",
+export const DEFAULT_OG_IMAGE: Required<Omit<OgImageInput, 'alt'>> & { alt?: string } = {
+  url: '/og-default.png',
   width: 1200,
   height: 630,
 };
@@ -41,21 +41,25 @@ function normalizeOgImage(image?: OgImageInput) {
 export type BasicMetadataInput = {
   title: string;
   description: string;
+  openGraphTitle?: string;
+  openGraphDescription?: string;
   path?: string;
   keywords?: string[];
   image?: OgImageInput;
-  robots?: Metadata["robots"];
+  robots?: Metadata['robots'];
   openGraphType?: OpenGraphType;
 };
 
 export function buildBasicMetadata({
   title,
   description,
-  path = "/",
+  openGraphTitle,
+  openGraphDescription,
+  path = '/',
   keywords,
   image,
   robots,
-  openGraphType = "website",
+  openGraphType = 'website',
 }: BasicMetadataInput): Metadata {
   const ogImage = normalizeOgImage(image);
 
@@ -65,15 +69,15 @@ export function buildBasicMetadata({
     alternates: { canonical: path },
     openGraph: {
       type: openGraphType,
-      title,
-      description,
+      title: openGraphTitle ?? title,
+      description: openGraphDescription ?? description,
       url: path,
       images: [ogImage],
     },
     twitter: {
-      card: "summary_large_image",
-      title,
-      description,
+      card: 'summary_large_image',
+      title: openGraphTitle ?? title,
+      description: openGraphDescription ?? description,
       images: [ogImage.url],
     },
   };
@@ -102,10 +106,10 @@ export function buildArticleMetadata({
 }: ArticleMetadataInput): Metadata {
   const metadata = buildBasicMetadata({
     ...rest,
-    openGraphType: "article",
+    openGraphType: 'article',
   });
 
-  const openGraph = ensureOpenGraphType(metadata.openGraph, "article");
+  const openGraph = ensureOpenGraphType(metadata.openGraph, 'article');
 
   if (publishedTime) openGraph.publishedTime = publishedTime;
   if (modifiedTime) openGraph.modifiedTime = modifiedTime;
@@ -126,7 +130,7 @@ export type CollectionMetadataInput = BasicMetadataInput & {
 export function buildCollectionMetadata(input: CollectionMetadataInput): Metadata {
   return buildBasicMetadata({
     ...input,
-    openGraphType: "website",
+    openGraphType: 'website',
   });
 }
 
@@ -135,20 +139,17 @@ export type ProfileMetadataInput = BasicMetadataInput & {
     firstName?: string;
     lastName?: string;
     username?: string;
-    gender?: "male" | "female";
+    gender?: 'male' | 'female';
   };
 };
 
-export function buildProfileMetadata({
-  profile,
-  ...rest
-}: ProfileMetadataInput): Metadata {
+export function buildProfileMetadata({ profile, ...rest }: ProfileMetadataInput): Metadata {
   const metadata = buildBasicMetadata({
     ...rest,
-    openGraphType: "profile",
+    openGraphType: 'profile',
   });
 
-  const openGraph = ensureOpenGraphType(metadata.openGraph, "profile");
+  const openGraph = ensureOpenGraphType(metadata.openGraph, 'profile');
 
   if (profile) {
     openGraph.firstName = profile.firstName ?? undefined;

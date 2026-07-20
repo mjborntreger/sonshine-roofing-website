@@ -1,9 +1,9 @@
-import type { ComponentType, SVGProps } from "react";
+import type { ComponentType, SVGProps } from 'react';
 
-import { Accordion } from "@/components/ui/Accordion";
-import { renderHighlight } from "@/components/utils/renderHighlight";
+import { Accordion } from '@/components/ui/Accordion';
+import { renderHighlight } from '@/components/utils/renderHighlight';
 
-import SmartLink from "../../utils/SmartLink";
+import SmartLink from '../../utils/SmartLink';
 import {
   ShieldCheck,
   Shield,
@@ -15,27 +15,31 @@ import {
   Star,
   Banknote,
   ArrowRight,
-} from "lucide-react";
-import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
+} from 'lucide-react';
+import { SECTION_HEADING, SECTION_SUBTITLE } from '@/components/location/sectionStyles';
 
-const SECTION_CONTAINER = "px-2";
-const FEATURE_PILL_CLASS = "inline-flex items-center gap-2 badge badge--accent";
-const FEATURE_LIST_CLASS = "mt-3 flex flex-wrap justify-center gap-2 text-sm";
-const FEATURE_PILL_ICON_CLASS_BLUE = "h-4 w-4 text-[--brand-blue]";
-const FEATURE_PILL_ICON_CLASS_ORANGE = "h-4 w-4 text-amber-500";
-const MOBILE_COLUMN_CLASS = "md:hidden my-8 space-y-4";
-const GRID_LAYOUT_CLASS = "mt-8 grid grid-cols-2 gap-5 items-start auto-rows-fr";
-const CARD_SHELL_BASE = "overflow-hidden rounded-3xl bg-white/95 backdrop-blur-sm flex h-full flex-col";
+const SECTION_CONTAINER = 'px-2';
+const FEATURE_PILL_CLASS = 'inline-flex items-center gap-2 badge badge--accent';
+const FEATURE_LIST_CLASS = 'mt-3 flex flex-wrap justify-center gap-2 text-sm';
+const FEATURE_PILL_ICON_CLASS_BLUE = 'h-4 w-4 text-[--brand-blue]';
+const FEATURE_PILL_ICON_CLASS_ORANGE = 'h-4 w-4 text-amber-500';
+const MOBILE_COLUMN_CLASS = 'md:hidden my-8 space-y-4';
+const GRID_LAYOUT_CLASS = 'mt-8 grid grid-cols-2 gap-5 items-start auto-rows-fr';
+const CARD_SHELL_BASE =
+  'overflow-hidden rounded-3xl bg-white/95 backdrop-blur-sm flex h-full flex-col';
 const ACCORDION_SHELL_BASE = `group ${CARD_SHELL_BASE}`;
-const CARD_SUMMARY_BASE = "flex cursor-pointer select-none items-center justify-between gap-3 rounded-t-3xl px-6 py-5 text-left text-lg font-semibold text-slate-900 transition-colors";
-const CARD_HEADER_BASE = "flex items-center gap-3 rounded-t-4xl px-6 pt-6 pb-4 text-lg font-semibold text-slate-900";
-const CARD_BODY_BASE = "flex-1 rounded-b-4xl md:text-lg px-6 pb-6 pt-4 leading-relaxed";
-const ICON_BASE = "grid h-10 w-10 place-items-center rounded-md transition-transform duration-200";
+const CARD_SUMMARY_BASE =
+  'flex cursor-pointer select-none items-center justify-between gap-3 rounded-t-3xl px-6 py-5 text-left text-lg font-semibold text-slate-900 transition-colors';
+const CARD_HEADER_BASE =
+  'flex items-center gap-3 rounded-t-4xl px-6 pt-6 pb-4 text-lg font-semibold text-slate-900';
+const CARD_BODY_BASE = 'flex-1 rounded-b-4xl md:text-lg px-6 pb-6 pt-4 leading-relaxed';
+const ICON_BASE = 'grid h-10 w-10 place-items-center rounded-md transition-transform duration-200';
 const CHEVRON_BASE =
-  "h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open/accordion:rotate-180";
-const TITLE_BASE = "text-xl md:text-2xl relative inline-block text-slate-900 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:transition-all after:duration-300";
+  'h-5 w-5 text-slate-500 transition-transform duration-300 group-open:rotate-180 group-open/accordion:rotate-180';
+const TITLE_BASE =
+  'text-xl md:text-2xl relative inline-block text-slate-900 after:absolute after:-bottom-1 after:left-0 after:h-[2px] after:w-0 after:transition-all after:duration-300';
 
-type ThemeKey = "blue" | "orange";
+type ThemeKey = 'blue' | 'orange';
 
 type WhyHomeownersChooseUsProps = {
   title?: string;
@@ -43,34 +47,36 @@ type WhyHomeownersChooseUsProps = {
   description?: string;
 };
 
-
-const CARD_THEMES: Record<ThemeKey, {
-  frame: string;
-  shell: string;
-  summary: string;
-  body: string;
-  icon: string;
-  titleAccent: string;
-}> = {
+const CARD_THEMES: Record<
+  ThemeKey,
+  {
+    frame: string;
+    shell: string;
+    summary: string;
+    body: string;
+    icon: string;
+    titleAccent: string;
+  }
+> = {
   blue: {
     frame:
-      "group rounded-3xl p-[1px] bg-gradient-to-r from-[--brand-blue] via-[--brand-blue]/80 to-[--brand-cyan] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl h-full",
-    shell: "ring-1 ring-blue-100/60",
-    summary: "bg-blue-10/80 group-open:bg-blue-10/80 border-b border-blue-100/60",
-    body: "bg-blue-10/10 text-slate-800",
-    icon: "bg-blue-100 text-[--brand-blue] ring-1 ring-blue-200/70 shadow-sm group-hover:scale-105",
+      'group rounded-3xl p-[1px] bg-gradient-to-r from-[--brand-blue] via-[--brand-blue]/80 to-[--brand-cyan] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl h-full',
+    shell: 'ring-1 ring-blue-100/60',
+    summary: 'bg-blue-10/80 group-open:bg-blue-10/80 border-b border-blue-100/60',
+    body: 'bg-blue-10/10 text-slate-800',
+    icon: 'bg-blue-100 text-[--brand-blue] ring-1 ring-blue-200/70 shadow-sm group-hover:scale-105',
     titleAccent:
-      "after:bg-gradient-to-r after:from-[--brand-blue] after:via-[--brand-cyan] after:to-[--brand-blue] group-hover:after:w-14 group-open:after:w-14",
+      'after:bg-gradient-to-r after:from-[--brand-blue] after:via-[--brand-cyan] after:to-[--brand-blue] group-hover:after:w-14 group-open:after:w-14',
   },
   orange: {
     frame:
-      "group rounded-3xl p-[1px] bg-gradient-to-r from-[--brand-orange] via-amber-400 to-amber-300 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl",
-    shell: "ring-1 ring-orange-200/70",
-    summary: "bg-orange-10/80 group-open:bg-orange-50 border-b border-orange-100/60",
-    body: "bg-orange-10/10 text-slate-800",
-    icon: "bg-orange-100 text-[--brand-orange] ring-1 ring-orange-200/70 shadow-sm group-hover:scale-105",
+      'group rounded-3xl p-[1px] bg-gradient-to-r from-[--brand-orange] via-amber-400 to-amber-300 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl',
+    shell: 'ring-1 ring-orange-200/70',
+    summary: 'bg-orange-10/80 group-open:bg-orange-50 border-b border-orange-100/60',
+    body: 'bg-orange-10/10 text-slate-800',
+    icon: 'bg-orange-100 text-[--brand-orange] ring-1 ring-orange-200/70 shadow-sm group-hover:scale-105',
     titleAccent:
-      "after:bg-gradient-to-r after:from-[--brand-orange] after:via-amber-400 after:to-[--brand-orange] group-hover:after:w-14 group-open:after:w-14",
+      'after:bg-gradient-to-r after:from-[--brand-orange] after:via-amber-400 after:to-[--brand-orange] group-hover:after:w-14 group-open:after:w-14',
   },
 };
 
@@ -92,50 +98,50 @@ type Pillar = {
 
 const pillars: Pillar[] = [
   {
-    id: "flexible-financing",
-    title: "Flexible Financing",
+    id: 'flexible-financing',
+    title: 'Flexible Financing',
     description:
-      "Compare YGrene’s equity-secured plans (tax-bill payments, 18–24 month deferrals) with Service Finance signature loans and 0% promos. We guide you through the quick quiz, paperwork, and monthly estimator so you know your payment before you ever sign.",
+      'Compare YGrene’s equity-secured plans (tax-bill payments, 18–24 month deferrals) with Service Finance signature loans and 0% promos. We guide you through the quick quiz, paperwork, and monthly estimator so you know your payment before you ever sign.',
     icon: HandCoins,
-    theme: "orange",
+    theme: 'orange',
     defaultOpen: true,
     cta: {
-      href: "/financing",
-      label: "Get started",
-      title: "Get started with financing",
+      href: '/financing',
+      label: 'Get started',
+      title: 'Get started with financing',
     },
   },
   {
-    id: "local-expertise",
-    title: "Family-owned & Local",
+    id: 'local-expertise',
+    title: 'Family-owned & Local',
     description:
       "As residential roofing pros located in the Sarasota area, we deeply understand your local roofing needs (because they're the same as ours). We live right here with you in Sarasota, Bradenton, Venice, North Port, and we always treat your roof like it's our own.",
     icon: MapPin,
-    theme: "blue",
+    theme: 'blue',
   },
   {
-    id: "quality-craftsmanship",
-    title: "Quality Craftsmanship",
+    id: 'quality-craftsmanship',
+    title: 'Quality Craftsmanship',
     description:
-      "Our crews don’t cut corners. Every shingle, tile, metal panel, nail, and screw, is installed with pride, precision, and care. 100% of our work is done by our in-house crews (we NEVER use subcontractors) and we back it with industry-leading warranties, a handshake, and a smile.",
+      'Our crews don’t cut corners. Every shingle, tile, metal panel, nail, and screw, is installed with pride, precision, and care. 100% of our work is done by our in-house crews (we NEVER use subcontractors) and we back it with industry-leading warranties, a handshake, and a smile.',
     icon: ShieldCheck,
-    theme: "blue",
+    theme: 'blue',
   },
   {
-    id: "durable-materials",
-    title: "Durable Materials",
+    id: 'durable-materials',
+    title: 'Durable Materials',
     description:
-      "Salty air, blistering heat, and devastating storms? We use materials tough enough to take it all. As a certified GAF Master Elite roofer, we have the materials and know-how to give you the most durable and energy-efficient roof you will ever buy.",
+      'Salty air, blistering heat, and devastating storms? We use materials tough enough to take it all. As a certified GAF Master Elite roofer, we have the materials and know-how to give you the most durable and energy-efficient roof you will ever buy.',
     icon: Shield,
-    theme: "blue",
+    theme: 'blue',
   },
 ];
 
 const DEFAULT_DESCRIPTION =
-  "Since 1987, SonShine Roofing has been a pillar of the Sarasota community. Over the past 38 years, we've always honored a tradition of honesty, respect, and integrity in everything we do.";
+  "For over 39 years, SonShine Roofing has been a pillar of the Sarasota community. We've always honored a tradition of honesty, respect, and integrity in everything we do.";
 
 export default async function WhyHomeownersChooseUs({
-  title = "Family-owned Roofing Company",
+  title = 'Family-owned Roofing Company',
   highlightText,
   description = DEFAULT_DESCRIPTION,
 }: WhyHomeownersChooseUsProps) {
@@ -146,7 +152,7 @@ export default async function WhyHomeownersChooseUs({
       <div className="text-center">
         <h2 className={SECTION_HEADING}>{renderedTitle}</h2>
         <p className={SECTION_SUBTITLE}>{description}</p>
-        
+
         <div className={FEATURE_LIST_CLASS}>
           <span className={FEATURE_PILL_CLASS}>
             <Award className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />
@@ -154,7 +160,7 @@ export default async function WhyHomeownersChooseUs({
           </span>
           <span className={FEATURE_PILL_CLASS}>
             <CalendarDays className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />
-            38+ Years Expertise
+            39+ Years of Expertise
           </span>
           <span className={FEATURE_PILL_CLASS}>
             <BadgeCheck className={FEATURE_PILL_ICON_CLASS_BLUE} aria-hidden="true" />

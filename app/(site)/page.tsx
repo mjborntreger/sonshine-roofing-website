@@ -18,7 +18,7 @@ import FaqInlineList from '@/components/dynamic-content/faq/FaqInlineList';
 import LeadFormSection from '@/components/lead-capture/lead-form/InitialNavigation';
 import LocalPartnershipsSection from '@/components/location/LocalPartnershipsSection';
 import SidebarCta from '@/components/cta/SidebarCta';
-import { getWebsitePageMetadata } from '@/lib/content/directus-site';
+import { getSiteSettings, getWebsitePageMetadata } from '@/lib/content/directus-site';
 
 // ===== STYLE CONSTANTS ===== //
 const leadFormLayout = 'mx-auto w-full';
@@ -28,16 +28,15 @@ const narrowLayout =
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Best Roofing Company in Sarasota';
-const SEO_DESCRIPTION_HOME =
-  'Fast, Friendly, & Reliable | (941) 866-4320 | Licensed & Insured | Your trusted local roofing contractor serving Sarasota, Manatee & Charlotte Counties.';
 const SEO_CANONICAL_HOME = '/';
 const SEO_OG_IMAGE_DEFAULT =
   'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
   return getWebsitePageMetadata({
     title: SEO_TITLE_HOME,
-    description: SEO_DESCRIPTION_HOME,
+    description: `Fast, Friendly, & Reliable | ${settings?.phone ?? 'Call us'} | Licensed & Insured | Your trusted local roofing contractor serving Sarasota, Manatee & Charlotte Counties.`,
     path: SEO_CANONICAL_HOME,
     image: { url: SEO_OG_IMAGE_DEFAULT, width: 1200, height: 630 },
   });

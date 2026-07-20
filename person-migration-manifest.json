@@ -1,0 +1,195 @@
+{
+  "schema_version": "1.0.0",
+  "source": {
+    "cms": "wordpress",
+    "graphql_url": "https://wp.sonshineroofing.com/graphql"
+  },
+  "target": {
+    "client_slug": "sonshine-roofing",
+    "folder_name": "persons",
+    "status": "published"
+  },
+  "excluded_slugs": ["antonio", "tony", "angela", "dean", "steve", "matthew"],
+  "persons": [
+    {
+      "sort": 1,
+      "slug": "nathan-borntreger",
+      "display_name": "Nathan Borntreger",
+      "first_name": "Nathan",
+      "last_name": "Borntreger",
+      "source_database_id": 16353,
+      "source_modified_gmt": "2025-08-20T22:17:57",
+      "source_title": "Nathan Borntreger",
+      "source_position": "Owner",
+      "source_content_sha256": "16fde605742812028090020b5d904d77294e3c5378fefeac9c60518b815d1ade",
+      "image": {
+        "source_database_id": 12279,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/Nathan-Borntreger-Owner-President-Sonshine-Roofing.webp",
+        "title": "Nathan-Borntreger-Owner-President-Sonshine-Roofing",
+        "description": "About Nathan Borntreger Owner of SonShine Roofing"
+      }
+    },
+    {
+      "sort": 2,
+      "slug": "bob",
+      "display_name": "Bob",
+      "first_name": "Bob",
+      "last_name": null,
+      "source_database_id": 16359,
+      "source_modified_gmt": "2025-10-09T03:04:52",
+      "source_title": "Bob",
+      "source_position": "Production Supervisor",
+      "source_content_sha256": "9ed136c3e994b9f80c4a186ad81d87ec4603347b15a35554dfe7e317fdbc64a0",
+      "image": {
+        "source_database_id": 12273,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/Bob-Production-Supervisor-Sonshine-Roofing.webp",
+        "title": "Bob-Production-Supervisor-Sonshine-Roofing",
+        "description": "robert (bob) albertson, production supervisor of SonShine Roofing"
+      }
+    },
+    {
+      "sort": 3,
+      "slug": "josh",
+      "display_name": "Josh",
+      "first_name": "Josh",
+      "last_name": null,
+      "source_database_id": 16364,
+      "source_modified_gmt": "2025-08-24T23:56:05",
+      "source_title": "Josh",
+      "source_position": "Production Coordinator",
+      "source_content_sha256": "fbb7754ace0a8187c5d852bf30f4934f749810f8b847a153ee661739be10e248",
+      "image": {
+        "source_database_id": 12280,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/Josh-Production-Coordinator-Sonshine-Roofing.webp",
+        "title": "Josh-Production-Coordinator-Sonshine-Roofing",
+        "description": "Josh, Production Coordinator SonShine Roofing"
+      }
+    },
+    {
+      "sort": 4,
+      "slug": "jb",
+      "display_name": "JB",
+      "first_name": "JB",
+      "last_name": null,
+      "source_database_id": 16367,
+      "source_modified_gmt": "2025-08-25T16:34:33",
+      "source_title": "JB",
+      "source_position": "Roofing Specialist",
+      "source_content_sha256": "e2ff8ea7ccf96f4a3ee88120e72697ca3d8c46b0927b5498e10ee26977763b2e",
+      "image": {
+        "source_database_id": 11982,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/JB.webp",
+        "title": "JB",
+        "description": "JB, Roofing Specialist, SonShine Roofing"
+      }
+    },
+    {
+      "sort": 5,
+      "slug": "jeremy-k",
+      "display_name": "Jeremy K.",
+      "first_name": "Jeremy",
+      "last_name": null,
+      "source_database_id": 16368,
+      "source_modified_gmt": "2025-08-25T16:43:22",
+      "source_title": "Jeremy K.",
+      "source_position": "Roofing Specialist",
+      "source_content_sha256": "40917b224aae78b28ae3591ff3ea5a796b25dfef56894aecb966802bf0812fc5",
+      "image": {
+        "source_database_id": 16369,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/Jeremy-K-1.webp",
+        "title": "Jeremy-K",
+        "description": "Jeremy Knoll, Roofing Specialist, SonShine Roofing"
+      }
+    },
+    {
+      "sort": 6,
+      "slug": "tara",
+      "display_name": "Tara",
+      "first_name": "Tara",
+      "last_name": null,
+      "source_database_id": 16370,
+      "source_modified_gmt": "2025-08-25T16:45:21",
+      "source_title": "Tara",
+      "source_position": "Project Support Specialist",
+      "source_content_sha256": "ddfff5bd03516cbc25ba1381f016832a9deea2651f6549b59e6cf5d128bb5d5b",
+      "image": {
+        "source_database_id": 12283,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/Tara-Project-Support.webp",
+        "title": "Tara-Project-Support",
+        "description": "Tara, Project Support Specialist, SonShine Roofing"
+      }
+    },
+    {
+      "sort": 7,
+      "slug": "mina",
+      "display_name": "Mina",
+      "first_name": "Mina",
+      "last_name": null,
+      "source_database_id": 16374,
+      "source_modified_gmt": "2025-08-25T16:57:01",
+      "source_title": "Mina",
+      "source_position": "Team Support",
+      "source_content_sha256": "d35cb9f8590a95365c025aca7cdc0f1b01b1ac203dcb68ae196299c446a88be7",
+      "image": {
+        "source_database_id": 16375,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/Mina-1.webp",
+        "title": "Mina",
+        "description": "Mina, Team Support, SonShine Roofing"
+      }
+    },
+    {
+      "sort": 8,
+      "slug": "michael",
+      "display_name": "Michael",
+      "first_name": "Michael",
+      "last_name": "Borntreger",
+      "source_database_id": 16377,
+      "source_modified_gmt": "2025-11-22T23:38:55",
+      "source_title": "Michael",
+      "source_position": "Marketing/Automation",
+      "source_content_sha256": "85f13f9442f22a48aa2fee0060772dc3fbaeffe6f285f0e6c1d2ca37b7d4b0c1",
+      "image": {
+        "source_database_id": 16379,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/Michael.webp",
+        "title": "Michael",
+        "description": "Michael Borntreger, Marketing & Automation Specialist, SonShine Roofing"
+      }
+    },
+    {
+      "sort": 9,
+      "slug": "erick",
+      "display_name": "Erick",
+      "first_name": "Erick",
+      "last_name": null,
+      "source_database_id": 17721,
+      "source_modified_gmt": "2025-09-12T18:54:20",
+      "source_title": "Erick",
+      "source_position": "Installation Crew Leader",
+      "source_content_sha256": "55092f6ad09e68884ae86fd1e800201295845669096121719f45d9a7d4b2f05e",
+      "image": {
+        "source_database_id": 14664,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/20250703_095255-scaled-e1752520161771.webp",
+        "title": "erick-solo",
+        "description": "erick sonshine roofing crew leader"
+      }
+    },
+    {
+      "sort": 10,
+      "slug": "jose",
+      "display_name": "José",
+      "first_name": "José",
+      "last_name": null,
+      "source_database_id": 17724,
+      "source_modified_gmt": "2025-09-12T18:53:47",
+      "source_title": "José",
+      "source_position": "Installation Crew Leader",
+      "source_content_sha256": "55092f6ad09e68884ae86fd1e800201295845669096121719f45d9a7d4b2f05e",
+      "image": {
+        "source_database_id": 14666,
+        "source_url": "https://wp.sonshineroofing.com/wp-content/uploads/20250703_095528-scaled-e1752520461973.webp",
+        "title": "jose-solo",
+        "description": "jose sonshine roofing crew leader"
+      }
+    }
+  ]
+}
