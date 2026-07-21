@@ -137,8 +137,8 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
         additionalProperty: [
           {
             '@type': 'PropertyValue',
-            name: 'Term',
-            value: `${plan.term} year${plan.term > 1 ? 's' : ''}`,
+            name: 'Included future annual inspections',
+            value: `${plan.term}`,
           },
           { '@type': 'PropertyValue', name: 'Annual price', value: plan.annual },
           { '@type': 'PropertyValue', name: 'Total price', value: plan.total },
@@ -224,7 +224,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                         {currency(selected.annual)}/yr
                       </span>
                       <span className="text-slate-500 text-lg">
-                        {currency(selected.total)} total for {selected.term} year
+                        {currency(selected.total)} total for {selected.term} future annual inspection
                         {selected.term > 1 ? 's' : ''}
                       </span>
                     </div>

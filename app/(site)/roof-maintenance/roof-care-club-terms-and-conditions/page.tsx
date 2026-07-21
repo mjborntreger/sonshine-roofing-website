@@ -103,23 +103,41 @@ export default async function RoofCareClubTermsPage() {
             that has already been paid for or activated unless required by law or agreed in writing.
           </p>
           <p>
+            The 1-, 2-, and 3-year labels identify the number of future annual Roof Care Club
+            inspections included with the Membership. The roof has already been inspected in
+            connection with the retail, repair, or inspection service associated with enrollment.
+            Accordingly, the first included Roof Care Club inspection is targeted for the first
+            anniversary of the Membership effective date, and later included inspections are
+            targeted for subsequent annual anniversaries.
+          </p>
+          <p>
+            Non-inspection ancillary Membership benefits, including applicable discounts, begin on
+            the effective date and continue through the Membership expiration date. Unless otherwise
+            stated in writing, expiration is the anniversary immediately following the final
+            included annual inspection: two years after the effective date for a 1-year Membership,
+            three years after the effective date for a 2-year Membership, and four years after the
+            effective date for a 3-year Membership.
+          </p>
+          <p>
             Taxes, permit fees, third-party charges, and non-covered services are not included
             unless expressly stated.
           </p>
 
           <h2>3. Included Benefits</h2>
           <p>
-            Unless otherwise stated in writing, each active Membership includes the following during
-            each Membership Year:
+            Unless otherwise stated in writing, each active Membership includes the following:
           </p>
           <ul>
-            <li>One complimentary Tip Top Roof Check-up for the enrolled property</li>
+            <li>
+              The tier&apos;s included future annual Tip Top Roof Check-ups for the enrolled property
+            </li>
             <li>SonShine Roofing&apos;s standard inspection checklist</li>
             <li>Photo documentation retained in the customer record</li>
             <li>General notes for maintenance planning and insurance reference</li>
             <li>
-              One complimentary giftable roof inspection per Membership Year, subject to SonShine
-              Roofing&apos;s service area, scheduling availability, and standard service limitations
+              One complimentary giftable roof inspection for each included future annual inspection
+              period, subject to SonShine Roofing&apos;s service area, scheduling availability, and
+              standard service limitations
             </li>
           </ul>
           <p>
@@ -150,20 +168,24 @@ export default async function RoofCareClubTermsPage() {
 
           <h2>5. Target Inspection Dates, Scheduling Window, and Annual Inspection Use</h2>
           <p>
-            Each Membership includes{' '}
-            <strong>one complimentary inspection per Membership Year</strong>.
+            Each Membership includes the number of future annual inspections identified by its tier:
+            one for a 1-year Membership, two for a 2-year Membership, or three for a 3-year
+            Membership.
           </p>
           <p>
-            For purposes of these Terms, a <strong>&quot;Membership Year&quot;</strong> means each
-            12-month period beginning on the Member&apos;s original enrollment date, activation
-            date, or complimentary activation date, as reflected in SonShine Roofing&apos;s records.
+            The <strong>&quot;Membership Effective Date&quot;</strong> is the enrollment, activation,
+            or complimentary activation date reflected in SonShine Roofing&apos;s records. It marks
+            the beginning of ancillary Membership benefits. The inspection completed in connection
+            with the underlying customer job is not counted as one of the future annual Roof Care
+            Club inspections purchased or provided by the Membership.
           </p>
           <p>
             A Member&apos;s <strong>&quot;Target Inspection Date&quot;</strong> is the annual
-            anniversary of that enrollment or activation date for each Membership Year. For
-            multi-year terms, Target Inspection Dates repeat once per year during each covered
-            Membership Year. By way of example, a 3-year Membership includes three separate
-            Membership Years and three separate annual Target Inspection Dates.
+            anniversary of the Membership Effective Date for each included future inspection. For
+            multi-year tiers, Target Inspection Dates repeat once per year until all included
+            inspections have been offered. By way of example, a 3-year Membership has Target
+            Inspection Dates on the first, second, and third anniversaries of the effective date,
+            while ancillary benefits remain active until expiration on the fourth anniversary.
           </p>
           <p>
             Members must <strong>schedule</strong> their included annual inspection within a{' '}
@@ -184,12 +206,12 @@ export default async function RoofCareClubTermsPage() {
             forfeited inspection:
           </p>
           <ul>
-            <li>does not roll over into a later Membership Year,</li>
+            <li>does not roll over into a later annual inspection period,</li>
             <li>does not create a credit, refund, or cash value,</li>
             <li>does not extend the Membership term, and</li>
             <li>
               does not entitle the Member to an additional inspection outside the applicable
-              Membership Year.
+              annual inspection period.
             </li>
           </ul>
           <p>
@@ -227,11 +249,11 @@ export default async function RoofCareClubTermsPage() {
             </li>
           </ul>
           <p>
-            An approved exception applies only to the specific Membership Year and circumstance for
-            which it is granted unless SonShine Roofing confirms otherwise in writing. Approval of
-            one exception does not guarantee approval of future exceptions and does not permanently
-            change the Member&apos;s Target Inspection Date unless SonShine Roofing expressly agrees
-            in writing.
+            An approved exception applies only to the specific annual inspection period and
+            circumstance for which it is granted unless SonShine Roofing confirms otherwise in
+            writing. Approval of one exception does not guarantee approval of future exceptions and
+            does not permanently change the Member&apos;s Target Inspection Date unless SonShine
+            Roofing expressly agrees in writing.
           </p>
           <p>Late exception requests may be denied.</p>
 
