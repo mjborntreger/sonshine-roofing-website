@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { cookies } from 'next/headers';
 import { ArrowDown, BadgePercent, CalendarClock, Smartphone, Tag } from 'lucide-react';
 
 import Section from '@/components/layout/Section';
@@ -19,20 +18,27 @@ import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, offerSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
+import {
+  isSpecialOfferIndexable,
+  type SpecialOfferIndexingState,
+} from '@/lib/seo/special-offer-indexing';
 import { getSiteSettings } from '@/lib/content/directus-site';
 
-export const revalidate = 900;
+export const dynamic = 'force-static';
+export const dynamicParams = false;
+export const fetchCache = 'force-cache';
+export const revalidate = false;
 
 const HERO_SUBTITLE_MAX_LENGTH = 180;
 
 export async function generateStaticParams() {
-  const slugs = await listSpecialOfferSlugs(200).catch(() => []);
+  const slugs = await listSpecialOfferSlugs(200);
   return slugs.map((slug) => ({ slug }));
 }
 
-function buildRobotsMeta() {
+function buildRobotsMeta(offer: SpecialOfferIndexingState) {
   return {
-    index: false,
+    index: isSpecialOfferIndexable(offer),
     follow: true,
   } as const;
 }
@@ -66,7 +72,10 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const offer = await getSpecialOfferBySlug(slug).catch(() => null);
+  const [offer, settings] = await Promise.all([
+    getSpecialOfferBySlug(slug).catch(() => null),
+    getSiteSettings(),
+  ]);
 
   if (!offer) {
     const metadata = buildBasicMetadata({
@@ -74,24 +83,29 @@ export async function generateMetadata({
       description: 'This special offer is not available right now.',
       path: `/special-offers/${slug}`,
     });
-    metadata.robots = buildRobotsMeta();
+    metadata.robots = buildRobotsMeta({ noindex: true });
     return metadata;
   }
 
   const description =
-    collapseText(offer.description).slice(0, 160) ||
-    'Claim this special offer from SonShine Roofing.';
+    offer.metaDescription ??
+    (collapseText(offer.description).slice(0, 160) ||
+      'Claim this special offer from SonShine Roofing.');
+  const image = offer.ogImageOverride ?? offer.featuredImage ?? settings?.defaultOgImage;
   const metadata = buildBasicMetadata({
-    title: `${offer.title} · SonShine Roofing`,
+    title: offer.metaTitle ?? `${offer.title} · SonShine Roofing`,
     description,
+    openGraphTitle: offer.ogTitle ?? offer.metaTitle ?? undefined,
+    openGraphDescription: offer.ogDescription ?? offer.metaDescription ?? undefined,
     path: `/special-offers/${offer.slug}`,
+    keywords: offer.focusKeywords,
     image: {
-      url: offer.featuredImage?.url || '/og-default.png',
-      width: offer.featuredImage?.width || 1200,
-      height: offer.featuredImage?.height || 630,
+      url: image?.url || '/og-default.png',
+      width: image?.width || 1200,
+      height: image?.height || 630,
     },
   });
-  metadata.robots = buildRobotsMeta();
+  metadata.robots = buildRobotsMeta(offer);
   return metadata;
 }
 
@@ -111,10 +125,6 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   const expirationBadge = expirationLabel
     ? `${expired ? 'Expired on' : 'Valid through'} ${expirationLabel}`
     : null;
-
-  const cookieStore = await cookies();
-  const cookieKey = `ss_offer_${offer.slug}`;
-  const cookieValue = cookieStore.get(cookieKey)?.value ?? null;
 
   const origin = SITE_ORIGIN;
   const pagePath = `/special-offers/${offer.slug}`;
@@ -141,21 +151,6 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
       url: origin,
     },
   });
-
-  let initialUnlock: { offerCode: string } | null = null;
-  if (!expired && offer.offerCode && cookieValue) {
-    try {
-      const parsed = JSON.parse(decodeURIComponent(cookieValue));
-      const code = typeof parsed?.code === 'string' ? parsed.code : null;
-      const expValue = parsed?.exp ? new Date(parsed.exp) : null;
-      const stillValid = expValue ? expValue.getTime() >= Date.now() : true;
-      if (code === offer.offerCode && stillValid) {
-        initialUnlock = { offerCode: code };
-      }
-    } catch {
-      // ignore malformed cookie
-    }
-  }
 
   return (
     <>
@@ -216,7 +211,6 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
                     offerTitle={offer.title}
                     offerDiscount={offer.discount ?? null}
                     offerExpiration={offer.expirationDate ?? null}
-                    initialUnlock={initialUnlock}
                   />
                 </Suspense>
               ) : (

@@ -24,11 +24,20 @@ type DirectusWebsitePage = {
   client?: { slug?: unknown } | null;
 };
 
+type DirectusService = {
+  id?: unknown;
+  slug?: unknown;
+  nav_label?: unknown;
+  status?: unknown;
+  client?: { slug?: unknown } | null;
+};
+
 type DirectusFaqItem = {
   id?: unknown;
   question?: unknown;
   answer?: unknown;
   website_page?: DirectusWebsitePage | string | null;
+  service?: DirectusService | string | null;
   sort_order?: unknown;
   status?: unknown;
 };
@@ -39,11 +48,18 @@ export type FaqWebsitePage = {
   navLabel: string;
 };
 
+export type FaqService = {
+  id: string;
+  path: string;
+  navLabel: string;
+};
+
 export type DirectusFaq = {
   id: string;
   title: string;
   contentHtml: string;
   websitePage: FaqWebsitePage | null;
+  service: FaqService | null;
   sortOrder: number;
 };
 
@@ -56,6 +72,7 @@ export type DirectusFaqGroup = {
 
 type ListFaqsOptions = {
   pagePath?: string;
+  serviceSlug?: string;
   limit?: number;
 };
 
@@ -68,6 +85,11 @@ const FAQ_FIELDS = [
   'website_page.nav_label',
   'website_page.status',
   'website_page.client.slug',
+  'service.id',
+  'service.slug',
+  'service.nav_label',
+  'service.status',
+  'service.client.slug',
   'sort_order',
   'status',
 ] as const;
@@ -142,6 +164,26 @@ function mapWebsitePage(
   };
 }
 
+function mapService(
+  value: DirectusFaqItem['service'],
+  expectedClientSlug: string,
+): FaqService | null {
+  if (!value) return null;
+  if (typeof value === 'string' || Array.isArray(value)) {
+    throw new Error('[directus-faqs] service must include id, slug, and nav_label.');
+  }
+  if (readString(value.client?.slug) !== expectedClientSlug) {
+    throw new Error('[directus-faqs] service belongs to another client.');
+  }
+
+  const slug = requiredString(value.slug, 'service.slug');
+  return {
+    id: requiredString(value.id, 'service.id'),
+    path: `/${slug}`,
+    navLabel: requiredString(value.nav_label, 'service.nav_label'),
+  };
+}
+
 function mapFaq(item: DirectusFaqItem, config: DirectusConfig): DirectusFaq {
   const rawAnswer = requiredString(item.answer, 'answer');
   const contentHtml = sanitizeFaqHtml(rawAnswer);
@@ -154,12 +196,36 @@ function mapFaq(item: DirectusFaqItem, config: DirectusConfig): DirectusFaq {
     title: requiredString(item.question, 'question'),
     contentHtml,
     websitePage: mapWebsitePage(item.website_page, config.clientSlug),
+    service: mapService(item.service, config.clientSlug),
     sortOrder: readNumber(item.sort_order),
   };
 }
 
-function faqFilter(config: DirectusConfig, pagePath?: string): UnknownRecord {
+function faqFilter(config: DirectusConfig, pagePath?: string, serviceSlug?: string): UnknownRecord {
   const base = [{ client: { slug: { _eq: config.clientSlug } } }, { status: { _eq: 'published' } }];
+  const globalScope = {
+    _and: [{ website_page: { _null: true } }, { service: { _null: true } }],
+  };
+
+  if (serviceSlug) {
+    return {
+      _and: [
+        ...base,
+        {
+          _or: [
+            globalScope,
+            {
+              service: {
+                slug: { _eq: serviceSlug },
+                status: { _eq: 'published' },
+                client: { slug: { _eq: config.clientSlug } },
+              },
+            },
+          ],
+        },
+      ],
+    };
+  }
 
   if (pagePath) {
     const normalizedPath = normalizePagePath(pagePath);
@@ -168,7 +234,7 @@ function faqFilter(config: DirectusConfig, pagePath?: string): UnknownRecord {
         ...base,
         {
           _or: [
-            { website_page: { _null: true } },
+            globalScope,
             {
               website_page: {
                 path: { _eq: normalizedPath },
@@ -183,7 +249,7 @@ function faqFilter(config: DirectusConfig, pagePath?: string): UnknownRecord {
   }
 
   return {
-    _and: [...base, { website_page: { _null: true } }],
+    _and: [...base, globalScope],
   };
 }
 
@@ -194,12 +260,30 @@ function allFaqsFilter(config: DirectusConfig): UnknownRecord {
       { status: { _eq: 'published' } },
       {
         _or: [
-          { website_page: { _null: true } },
           {
-            website_page: {
-              status: { _eq: 'published' },
-              client: { slug: { _eq: config.clientSlug } },
-            },
+            _and: [{ website_page: { _null: true } }, { service: { _null: true } }],
+          },
+          {
+            _and: [
+              { service: { _null: true } },
+              {
+                website_page: {
+                  status: { _eq: 'published' },
+                  client: { slug: { _eq: config.clientSlug } },
+                },
+              },
+            ],
+          },
+          {
+            _and: [
+              { website_page: { _null: true } },
+              {
+                service: {
+                  status: { _eq: 'published' },
+                  client: { slug: { _eq: config.clientSlug } },
+                },
+              },
+            ],
           },
         ],
       },
@@ -253,13 +337,18 @@ export async function listFaqs(options: ListFaqsOptions = {}): Promise<DirectusF
   const config = getDirectusConfig();
   if (!config) return [];
   const limit = Math.min(500, Math.max(1, options.limit ?? 8));
-  const faqs = await fetchFaqs(faqFilter(config, options.pagePath), 500);
+  const faqs = await fetchFaqs(faqFilter(config, options.pagePath, options.serviceSlug), 500);
   const normalizedPagePath = options.pagePath ? normalizePagePath(options.pagePath) : null;
+  const normalizedServicePath = options.serviceSlug ? `/${options.serviceSlug}` : null;
 
   return faqs
     .sort((left, right) => {
-      const leftIsPageSpecific = left.websitePage?.path === normalizedPagePath;
-      const rightIsPageSpecific = right.websitePage?.path === normalizedPagePath;
+      const leftIsPageSpecific =
+        left.websitePage?.path === normalizedPagePath ||
+        left.service?.path === normalizedServicePath;
+      const rightIsPageSpecific =
+        right.websitePage?.path === normalizedPagePath ||
+        right.service?.path === normalizedServicePath;
       if (leftIsPageSpecific !== rightIsPageSpecific) {
         return leftIsPageSpecific ? -1 : 1;
       }
@@ -282,7 +371,8 @@ export function groupFaqsForArchive(faqs: DirectusFaq[]): DirectusFaqGroup[] {
   const groups = new Map<string, DirectusFaqGroup>();
 
   for (const faq of faqs) {
-    const key = faq.websitePage?.id ?? 'global';
+    const owner = faq.websitePage ?? faq.service;
+    const key = owner?.id ?? 'global';
     const existing = groups.get(key);
     if (existing) {
       existing.items.push(faq);
@@ -290,8 +380,8 @@ export function groupFaqsForArchive(faqs: DirectusFaq[]): DirectusFaqGroup[] {
     }
     groups.set(key, {
       key,
-      title: faq.websitePage?.navLabel ?? 'General',
-      path: faq.websitePage?.path ?? null,
+      title: owner?.navLabel ?? 'General',
+      path: owner?.path ?? null,
       items: [faq],
     });
   }

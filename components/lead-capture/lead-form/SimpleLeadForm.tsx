@@ -673,6 +673,20 @@ export default function SimpleLeadForm({
                 </label>
               </section>
 
+              <div className="flex w-full">
+                <Button
+                  className="w-full"
+                  data-icon-affordance="right"
+                  type="submit"
+                  size="xl"
+                  variant="brandOrange"
+                  disabled={status === 'submitting'}
+                >
+                  {status === 'submitting' ? 'Sending…' : 'Submit Request'}
+                  <ArrowRight className="ml-2 h-4 w-4 inline icon-affordance" />
+                </Button>
+              </div>
+
               <SmsConsentFields
                 smsProjectConsent={form.smsProjectConsent}
                 smsMarketingConsent={form.smsMarketingConsent}
@@ -689,20 +703,6 @@ export default function SimpleLeadForm({
                   <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>
                 )}
               </section>
-
-              <div className="flex w-full">
-                <Button
-                  className="w-full"
-                  data-icon-affordance="right"
-                  type="submit"
-                  size="xl"
-                  variant="brandOrange"
-                  disabled={status === 'submitting'}
-                >
-                  {status === 'submitting' ? 'Sending…' : 'Submit Request'}
-                  <ArrowRight className="ml-2 h-4 w-4 inline icon-affordance" />
-                </Button>
-              </div>
             </div>
           </div>
         </div>

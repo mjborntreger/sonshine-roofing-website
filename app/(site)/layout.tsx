@@ -23,12 +23,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
   const homePage = await getWebsitePage('/');
   const title =
-    homePage?.title ?? 'SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte';
+    homePage?.metaTitle ?? 'SonShine Roofing – Expert Roofer in Sarasota, Manatee & Charlotte';
   const description =
-    homePage?.description ??
+    homePage?.metaDescription ??
     settings?.brandDescription ??
     "SonShine Roofing is Sarasota's trusted expert roofing contractor with 39+ years of experience in roof repair, replacement, and maintenance. Call us today!";
-  const ogImage = homePage?.image ?? settings?.defaultOgImage;
+  const ogImage = homePage?.ogImageOverride ?? settings?.defaultOgImage;
   const favicon = settings?.favicon;
 
   return {

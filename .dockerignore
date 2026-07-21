@@ -2,20 +2,45 @@
 .github
 .next
 node_modules
+.pnp
+.pnp.*
 coverage
+.nyc_output
+playwright-report
+test-results
 out
 build
+public/llms.txt
+public/__sitemaps/static-routes.json
+wordpress
 
 .DS_Store
+Thumbs.db
+.idea
+.vscode
+logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+
+.npm
+.pnpm-store
+.yarn
 
 .env
 .env.*
-!.env.example
+.envrc
+.direnv
+*.pem
+*.key
+*.p12
+*.pfx
 
 .vercel
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 next-env.d.ts
+.eslintcache
+.stylelintcache
+.vite

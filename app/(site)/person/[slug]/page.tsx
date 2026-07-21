@@ -8,6 +8,7 @@ import { buildProfileMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, personSchema, webPageSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
+import { getSiteSettings } from '@/lib/content/directus-site';
 
 export const revalidate = 86400;
 
@@ -18,7 +19,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const person = await listPersonsBySlug(slug);
+  const [person, settings] = await Promise.all([listPersonsBySlug(slug), getSiteSettings()]);
   const canonicalPath = `/person/${slug}`;
   const title = person?.seo.meta_title ?? 'Team Member | SonShine Roofing';
   const description =
@@ -40,16 +41,24 @@ export async function generateMetadata({
           height: ogImage.height ?? undefined,
           alt: ogImage.altText || person?.title,
         }
-      : { url: '/og-default.png', width: 1200, height: 630 },
+      : settings?.defaultOgImage
+        ? {
+            url: settings.defaultOgImage.url,
+            width: settings.defaultOgImage.width ?? undefined,
+            height: settings.defaultOgImage.height ?? undefined,
+            alt: settings.defaultOgImage.description,
+          }
+        : { url: '/og-default.png', width: 1200, height: 630 },
     profile: firstName
       ? {
           firstName,
           lastName: restName.length ? restName.join(' ') : undefined,
         }
       : undefined,
+    keywords: person?.focusKeywords,
   });
 
-  metadata.robots = { index: person?.seoIndexable ?? false, follow: true };
+  metadata.robots = { index: person ? !person.noindex : false, follow: true };
   return metadata;
 }
 
@@ -60,10 +69,7 @@ export async function generateStaticParams() {
 
 export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [person, navItems] = await Promise.all([
-    listPersonsBySlug(slug),
-    listPersonNav(50),
-  ]);
+  const [person, navItems] = await Promise.all([listPersonsBySlug(slug), listPersonNav(50)]);
   if (!person) return notFound();
 
   const idx = navItems.findIndex((item) => item.slug === slug);

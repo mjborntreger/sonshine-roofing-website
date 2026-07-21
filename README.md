@@ -1,6 +1,7 @@
 # SonShine Roofing — Next.js Frontend
 
 Runbook (Staging vs Prod)
+
 - Env flag: `NEXT_PUBLIC_ENV` → `production` for prod, anything else for staging.
 - Robots
   - Staging: `Disallow: /`
@@ -13,17 +14,16 @@ Runbook (Staging vs Prod)
   - CSP enforced on staging, report-only on production
 - GTM
   - Loads when `NEXT_PUBLIC_GTM_ID` set and env permits; GA4 Enhanced Measurement handles page views.
- 
 
-
-Deployment Runbook
-===================
+# Deployment Runbook
 
 Environments
+
 - NEXT_PUBLIC_ENV=production → Production
-- NEXT_PUBLIC_ENV=staging    → Staging (or anything not "production")
+- NEXT_PUBLIC_ENV=staging → Staging (or anything not "production")
 
 Sitemaps & Robots
+
 - Production
   - robots.txt: Allow all, sitemap at `${NEXT_PUBLIC_BASE_URL}/sitemap_index`.
   - app/robots.ts builds from `NEXT_PUBLIC_BASE_URL`.
@@ -34,6 +34,7 @@ Sitemaps & Robots
   - Preview adds `X-Robots-Tag: noindex, nofollow` on sitemap responses.
 
 Static sitemap (pages not in CMS)
+
 - Generated at build by `scripts/make-static-sitemap.mjs` → `public/__sitemaps/static-routes.json`.
 - Endpoint reads the manifest at request time: `/sitemap_index/static`.
 - If empty:
@@ -42,6 +43,7 @@ Static sitemap (pages not in CMS)
   - Confirm `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true` on staging if needed.
 
 Security headers & CSP
+
 - next.config.mjs adds security headers for all requests.
 - CSP behavior:
   - Production: Report-Only (Content-Security-Policy-Report-Only)
@@ -55,20 +57,20 @@ Security headers & CSP
   - The site hydrates stored `utm_*` and `gclid` into the URL before loading QuickQuote; unsupported webhook fields such as `gbraid`, `wbraid`, landing page, and referrer require QuickQuote vendor support.
 
 Cache/Invalidation
-- WordPress GraphQL data uses Next fetch revalidation where configured. Directus FAQs and shared site content revalidate hourly; special offers revalidate every 15 minutes.
+
+- WordPress GraphQL and Directus content use timed revalidation where configured. Directus FAQs revalidate hourly and Directus blog content revalidates every 15 minutes. Shared Directus site content and special offers are build-only; their changes require a new build.
 - Static sitemap: regenerated on build; read dynamically per request.
 - Redirects are loaded from Directus during each build, so redirect changes require a new build to take effect.
 
 GTMetrix/Analytics
+
 - GTM loads only when `NEXT_PUBLIC_GTM_ID` is set and env permits.
 - GA4 Enhanced Measurement should remain enabled for single-page route tracking.
 
-
-
-Operations
-==========
+# Operations
 
 Quick Checks
+
 - Robots
   - Staging: robots.txt = Disallow: /
   - Prod: robots.txt = Allow: /
@@ -80,23 +82,24 @@ Quick Checks
   - `NEXT_PUBLIC_GTM_ID` set; GA4 Enhanced Measurement is enabled for page views.
 
 Revalidation
+
 - GraphQL-backed pages cache by tag. Use your `/api/revalidate` endpoint (if present) to bust tags.
 - Static sitemap manifest regenerates on build.
 
 Enable preview sitemaps on staging
+
 - Set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`.
 - Sitemaps respond with `X-Robots-Tag: noindex, nofollow`.
 
 Security headers
+
 - CSP is enforced on staging, report-only on production.
 - If staging breaks, check console for CSP violations; then update `next.config.mjs`.
 
-
-
-Content Workflow
-================
+# Content Workflow
 
 Where content lives
+
 - WordPress (via WPGraphQL): remaining legacy projects, glossary, videos, and
   location landing pages.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
@@ -104,20 +107,35 @@ Where content lives
     the adapter covers archive pagination, search/topic facets, detail pages,
     recommendations, metadata, and blog/image sitemaps.
   - `site_settings`: shared brand, contact, address, social, image, footer, and schema values.
-  - `website_pages`: metadata, canonical, Open Graph, focus-keyword, noindex, and sitemap-policy records for static routes.
-  - `services`: the four primary service records used by navigation and service quick links.
+  - `website_pages`: normalized SEO records for fixed routes only; canonicals are route-derived.
+  - `services`: the four primary service route owners, including their SEO metadata.
   - `navigation_items`: header navigation and matching footer link groups.
   - `redirects`: published legacy redirects loaded and validated at build time.
-  - `special_offers`: offer pages and the featured offer popup.
+  - `special_offers`: offer pages, route-owned SEO, and the featured offer popup.
   - `legal_copy`: WYSIWYG privacy/SMS terms content.
   - `persons`: the exclusive SonShine team/profile source.
 - Next.js app pages: route layouts, components, and page body copy that has not yet moved to Directus.
 
 Directus-backed static page metadata falls back to the route's local metadata when Directus is unavailable outside production. Every referenced Directus image must have a `directus_files.description`; missing descriptions fail the content read instead of producing empty alt text.
 
-For static pages, `focus_keywords` contains the complete keyword set and `primary_focus_keyword` must match one of those values exactly (case-insensitive). Invalid JSON fails with `DIRECTUS_FOCUS_KEYWORDS_INVALID`; a primary/tag mismatch fails with `DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH`. WordPress-backed location landing pages remain a deliberate code-owned exception until they move to a dedicated Directus `location_landing_pages` collection.
+The route-owning `website_pages`, `services`, `blog_posts`, `special_offers`, and
+`persons` collections use one `seo` field group: `noindex`, `meta_title`,
+`meta_description`, `primary_focus_keyword`, `focus_keywords`, `og_title`,
+`og_description`, and `og_image_override`. `noindex` stays visible; the remaining
+fields hide when it is true, and meta/keyword fields are editor-required when it
+is false. Directus values are authoritative. Frontend calculations are fallback
+only. Social images fall back from the override to the route's featured, hero,
+or profile image, then the site default.
+
+`focus_keywords` contains the complete keyword set with
+`primary_focus_keyword` first. Invalid JSON fails with
+`DIRECTUS_FOCUS_KEYWORDS_INVALID`; a primary/tag mismatch fails with
+`DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH`. WordPress-backed location landing
+pages remain a deliberate code-owned exception until they move to a dedicated
+Directus `location_landing_pages` collection.
 
 Redirect ownership
+
 - Content-specific legacy redirects live in Directus and are fetched by `next.config.mjs` during a build.
 - Canonical-host, global de-pagination, global `.html`, and WordPress sitemap-pattern rules remain in code because they depend on host or regex matching.
 - Published redirect records must have unique source paths, a supported status (`301`, `302`, `303`, `307`, or `308`), and `preserve_query=true`; invalid records fail the build.
@@ -127,12 +145,14 @@ Redirect ownership
 Legal copy in `legal_copy.privacy_policy` and `legal_copy.terms_of_use` is sanitized server-side before rendering. Use semantic HTML without classes, IDs, inline styles, scripts, or event-handler attributes. Body headings begin at `h2`; Next.js owns each page's primary `h1`, metadata, canonical URL, and layout.
 
 Publishing in WP
+
 - Ensure remaining WordPress projects and other legacy content are Published,
   not Draft.
 - Fill excerpts where available (used as SEO fallbacks).
 - Provide featured images for richer OG cards.
 
 Directus blog
+
 - Every blog consumer reads Directus. There is no content-source environment
   switch and no WordPress blog fallback.
 - Blog reads require `DIRECTUS_URL`, `DIRECTUS_CLIENT_SLUG`, and
@@ -146,59 +166,73 @@ Directus blog
   editable.
 
 Directus people
+
 - Team cards, profile routes, profile navigation, SEO metadata, and page/image
   sitemaps read published `persons` records from Directus unconditionally.
 - WordPress person queries, a person-source environment flag, and WordPress
   profile-image fallbacks are intentionally unsupported.
 - The active allowlist contains exactly ten profiles. Antonio, Tony, Angela,
   Dean, Steve, and Matthew are denied by both the adapter and migration manifest.
-- SonShine person metadata is calculated from existing fields: name + role form
-  `meta_title`/`og_title`, cleaned biography text forms
-  `meta_description`/`og_description`, and the profile image forms `og_image`.
-- Both `show_on_team` and `seo_indexable` default to true and are true for the
-  approved ten published profiles.
+- Person SEO is declared on each Directus record. Name/role, biography, and the
+  profile image are fallback sources only.
+- `show_on_team` defaults to true. `noindex` defaults to true globally, while
+  the approved ten SonShine profiles are explicitly set to false.
 
 Glossary linking
+
 - Term pages auto-link other terms in the content body (first occurrence per term).
 - Avoid keyword stuffing; links are budgeted to prevent overlinking.
 
 Images
+
 - For brand images, prefer Next.js `Image` component where possible.
 - Default OG image: `/og-default.png` (1200×630).
 
 Noindex Policy
+
 - Utility pages (`/reviews`, `/tell-us-why`, `/thank-you`, `/truck-for-sale`, and the 404 page) are marked noindex and excluded from the static sitemap where applicable.
-- Person pages follow `seo_indexable`; the approved ten are indexable. Glossary
-  terms remain noindex by business choice.
+- Person pages follow `noindex`; the approved ten are explicitly indexable.
+- Special offers default to `noindex=true`, but editors can enable indexing.
+  The stored toggle alone controls robots metadata and sitemap inclusion. Expiration
+  only controls offer availability and featured-popup eligibility.
+- Glossary terms remain noindex by business choice.
 
-
-
-SEO Guide
-=========
+# SEO Guide
 
 Canonicals & Metadata
+
 - Base metadata in `app/layout.tsx`.
 - Per-page metadata in each route’s `generateMetadata`.
 - Use `NEXT_PUBLIC_BASE_URL` for absolute canonical urls if needed.
 
 Robots
+
 - Staging: `Disallow: /` (non-prod).
 - Production: `Allow: /` with sitemap at `/sitemap_index`.
 - Page-level `noindex, follow` is used for `/roofing-glossary/[slug]` and for any
-  person record whose `seo_indexable` flag is false.
+  Directus route owner whose `noindex` flag is true. Special-offer expiration
+  never overrides the stored toggle.
   - `/reviews`, `/tell-us-why` (utility pages)
 
 Sitemaps
+
 - Index: `/sitemap_index`
 - Children:
   - `/sitemap_index/static` (build-time manifest)
-  - `/sitemap_index/blog`, `/project`, `/roofing-glossary`, `/person`, `/video`
+  - `/sitemap_index/blog`, `/project`, `/roofing-glossary`, `/person`,
+    `/special-offer`, `/video`
 - Preview mode on staging: set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`.
 
+Special-offer pages and `/sitemap_index/special-offer` are generated only during
+the build. The authenticated revalidation endpoint rejects those paths so a
+Directus edit cannot trigger request-time regeneration.
+
 Structured Data
+
 - RoofingContractor + Services JSON-LD injected in `app/layout.tsx`.
 - Person, DefinedTerm, and FAQ JSON-LD where relevant.
 - Ensure visible content matches JSON-LD.
 
 Open Graph/Twitter
+
 - Default image: `/og-default.png` (all references standardized).

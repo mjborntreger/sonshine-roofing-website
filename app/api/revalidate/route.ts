@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 
+import { isBuildOnlyRevalidationPath } from "@/lib/content/build-only-revalidation";
+
 export const dynamic = "force-dynamic"; // never cache this endpoint
 
 // --- helpers ---------------------------------------------------------------
@@ -62,6 +64,17 @@ export async function POST(req: Request) {
   );
   const tags = uniq<string>([...toStringArray(body.tags), ...toStringArray(body.tag)]);
 
+  const blockedPaths = paths.filter(isBuildOnlyRevalidationPath);
+  if (blockedPaths.length) {
+    return ok(
+      {
+        error: "Special-offer routes are build-only and cannot be revalidated at runtime.",
+        blocked: { paths: blockedPaths },
+      },
+      { status: 400 },
+    );
+  }
+
   const revalidated = { paths: [] as string[], tags: [] as string[] };
 
   for (const p of paths) {
@@ -95,6 +108,17 @@ export async function GET(req: Request) {
     ...url.searchParams.getAll("tag"),
     ...(url.searchParams.get("tags")?.split(",") ?? []),
   ]).map(String);
+
+  const blockedPaths = paths.filter(isBuildOnlyRevalidationPath);
+  if (blockedPaths.length) {
+    return ok(
+      {
+        error: "Special-offer routes are build-only and cannot be revalidated at runtime.",
+        blocked: { paths: blockedPaths },
+      },
+      { status: 400 },
+    );
+  }
 
   const revalidated = { paths: [] as string[], tags: [] as string[] };
 

@@ -129,7 +129,7 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
     <>
       <SmartLink
         href="#page-top"
-        className="mx-auto flex w-fit rounded-xl items-center border border-[#24445f] bg-[#071b2b] px-5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:border-[#fb9216] hover:bg-[#0d2942] hover:text-[#ffb45f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2"
+        className="mx-auto mb-16 flex w-fit rounded-xl items-center border border-[#24445f] bg-[#071b2b] px-5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:border-[#fb9216] hover:bg-[#0d2942] hover:text-[#ffb45f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2"
         data-icon-affordance="up"
         aria-label="Return to top of page"
       >
