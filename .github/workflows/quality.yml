@@ -40,3 +40,7 @@ jobs:
         run: npm run verify:person-html
       - name: Verify person SEO
         run: npm run verify:person-seo
+      - name: Verify special-offer indexing
+        run: npm run verify:special-offer-indexing
+      - name: Verify build-only revalidation
+        run: npm run verify:build-only-revalidation
