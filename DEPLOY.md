@@ -40,7 +40,7 @@ Coolify Environment Variables
   - `NEXT_PUBLIC_GTM_ID`
   - `NEXT_PUBLIC_META_PIXEL_ID`
   - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
-- Mark these server variables as build-time and runtime variables because Directus blog posts/topics, redirects, shared site content, reviews, review-carousel settings, and special offers are fetched during the build or runtime ISR:
+- Mark these server variables as build-time and runtime variables. Shared site content, redirects, and special offers need them during builds; Directus blog, review, and other ISR-backed content also needs them at runtime:
   - `DIRECTUS_URL`
   - `DIRECTUS_CLIENT_SLUG`
   - `DIRECTUS_TOKEN`
@@ -128,8 +128,9 @@ Security headers & CSP
 
 Cache/Invalidation
 - Remaining WordPress GraphQL data uses Next fetch revalidation where configured.
-  Directus blog content and special offers revalidate every 15 minutes; shared
-  site content revalidates hourly.
+  Directus blog content revalidates every 15 minutes and Directus FAQs hourly.
+  Shared Directus site content and special offers are build-only and require a
+  rebuild. The revalidation API rejects special-offer routes and their sitemap.
 - Static sitemap: regenerated on build; read dynamically per request.
 - Published Directus redirects are fetched and validated by `next.config.mjs` at build time. Redirect changes require a new build.
 - Static generation is limited to two workers with one page per worker at a time to avoid bursting WordPress or Directus.

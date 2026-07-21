@@ -7,7 +7,7 @@ import YouMayAlsoLike from '@/components/engagement/YouMayAlsoLike';
 import RoofCareClub from '@/components/marketing/service-pages/RoofCareClub';
 import type { Metadata } from 'next';
 import ServicesAside from '@/components/global-nav/static-pages/ServicesAside';
-import { getWebsitePageMetadata } from '@/lib/content/directus-site';
+import { getServiceMetadata } from '@/lib/content/directus-site';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, webPageSchema } from '@/lib/seo/schema';
 import { getServicePageConfig } from '@/lib/seo/service-pages';
@@ -21,14 +21,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const config = SERVICE_CONFIG;
 
   if (!config) {
-    return getWebsitePageMetadata({
+    return getServiceMetadata({
+      slug: SERVICE_PATH.slice(1),
       title: 'Roof Maintenance | SonShine Roofing',
       description: 'Roof maintenance services from SonShine Roofing.',
       path: SERVICE_PATH,
     });
   }
 
-  return getWebsitePageMetadata({
+  return getServiceMetadata({
+    slug: SERVICE_PATH.slice(1),
     title: config.title,
     description: config.description,
     path: SERVICE_PATH,
@@ -39,7 +41,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const [pool, faqs] = await Promise.all([
     listRecentPostsPool(36),
-    listFaqs({ pagePath: '/roof-maintenance', limit: 8 }).catch(() => []),
+    listFaqs({ serviceSlug: 'roof-maintenance', limit: 8 }).catch(() => []),
   ]);
 
   const origin = SITE_ORIGIN;

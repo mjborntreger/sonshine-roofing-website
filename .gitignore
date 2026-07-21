@@ -3,32 +3,46 @@
 # dependencies
 /node_modules
 /.pnp
-.pnp.js
+.pnp.*
 
 # testing
 /coverage
+.nyc_output/
+playwright-report/
+test-results/
 
 # next.js
 /.next/
 /out/
 /public/llms.txt
+/public/__sitemaps/static-routes.json
 
 # production
 /build
 
 # misc
 .DS_Store
+Thumbs.db
 *.pem
+*.key
+*.p12
+*.pfx
 
 # debug
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 /.npm/
+/.pnpm-store/
+/.yarn/
 
 # local env files
 .env*
 !.env.example
+.direnv/
 
 # vercel
 .vercel
@@ -37,9 +51,12 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# WordPress
-graphql-relevanssi-bridge.php
-sonshine-headless-cleanup.php
+# Tooling caches
+.eslintcache
+.stylelintcache
+.vite/
 
-# VS Code Settings
-.vscode/settings.json
+# Local editor files
+.idea/
+.vscode/*
+!.vscode/extensions.json

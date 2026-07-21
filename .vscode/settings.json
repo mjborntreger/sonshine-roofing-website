@@ -1,7 +1,0 @@
-{
-    "editor.defaultFormatter": "vscode.typescript-language-features",
-    "workbench.colorTheme": "Default Dark+",
-    "editor.autoIndent": "full",
-    "editor.tabSize": 2,
-    "editor.insertSpaces": true
-}

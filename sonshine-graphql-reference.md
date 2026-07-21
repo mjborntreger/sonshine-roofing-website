@@ -437,10 +437,11 @@ fragment GlossaryFields on GlossaryTerm {
 
 ## Special offers (`special_offers` in Directus)
 
-- **Fetcher module** – `lib/content/directus-special-offers.ts` uses the Directus Items REST API with `Authorization: Bearer ${DIRECTUS_TOKEN}` and a 900 s Next fetch revalidation window.
+- **Fetcher module** – `lib/content/directus-special-offers.ts` uses the Directus Items REST API with `Authorization: Bearer ${DIRECTUS_TOKEN}` and build-only `force-cache` fetches. Directus changes require a new site build.
 - **Collection filter** – all reads filter `special_offers` by related `client.slug = DIRECTUS_CLIENT_SLUG` and `status = published`; there is no WordPress fallback.
-- **Fields** – the site reads `client.slug`, `title`, `slug`, `featured_image.id`, `featured_image.description`, `featured_image.width`, `featured_image.height`, `offer_code`, `discount`, `description`, `expiration_date`, `legal_disclaimer`, `status`, and `featured`.
-- **Next usage** – `app/special-offers/[slug]/page.tsx` seeds static params via `listSpecialOfferSlugs`, renders offer pages with `getSpecialOfferBySlug`, and preserves the existing special-offer lead form payload.
+- **Fields** – the site reads the offer content fields plus `noindex`, `meta_title`, `meta_description`, `primary_focus_keyword`, `focus_keywords`, `og_title`, `og_description`, `og_image_override` file metadata, and `date_updated`.
+- **Next usage** – `app/(site)/special-offers/[slug]/page.tsx` seeds static params via `listSpecialOfferSlugs`, renders offer pages with `getSpecialOfferBySlug`, and preserves the existing special-offer lead form payload. The route and `/sitemap_index/special-offer` are fully static and protected from the runtime revalidation endpoint.
+- **Indexing and expiration** – the stored `noindex` toggle alone controls page robots metadata and special-offer sitemap inclusion. Expiration controls the unavailable state and popup eligibility without overriding indexing.
 - **Featured popup** – `app/(site)/layout.tsx` fetches `getFeaturedSpecialOffer`; if multiple published, unexpired offers are featured, the soonest-expiring offer wins. The popup excludes `offer_code`, links to the offer page, and suppresses itself in browser storage for 7 days after dismissal or CTA click.
 - **Directus docs** – see Directus Items API, Query Parameters, Authentication, and Assets API:
   - `https://directus.com/docs/api/items`
@@ -451,7 +452,7 @@ fragment GlossaryFields on GlossaryTerm {
 REST smoke-test shape:
 
 ```http
-GET /items/special_offers?fields=client.slug,title,slug,featured_image.id,featured_image.description,offer_code,discount,description,expiration_date,legal_disclaimer,featured&filter={"client":{"slug":{"_eq":"<DIRECTUS_CLIENT_SLUG>"}},"status":{"_eq":"published"},"slug":{"_eq":"<slug>"}}&limit=1
+GET /items/special_offers?fields=client.slug,title,slug,featured_image.id,featured_image.description,featured_image.width,featured_image.height,offer_code,discount,description,expiration_date,legal_disclaimer,featured,noindex,meta_title,meta_description,primary_focus_keyword,focus_keywords,og_title,og_description,og_image_override.id,og_image_override.description,og_image_override.width,og_image_override.height,date_updated&filter={"client":{"slug":{"_eq":"<DIRECTUS_CLIENT_SLUG>"}},"status":{"_eq":"published"},"slug":{"_eq":"<slug>"}}&limit=1
 Authorization: Bearer <DIRECTUS_TOKEN>
 ```
 

@@ -25,7 +25,7 @@ import RepairVsReplace from '@/components/marketing/service-pages/RepairVsReplac
 import type { Metadata } from 'next';
 import FinancingBand from '@/components/cta/FinancingBand';
 import ServicesAside from '@/components/global-nav/static-pages/ServicesAside';
-import { getSiteSettings, getWebsitePageMetadata } from '@/lib/content/directus-site';
+import { getServiceMetadata, getSiteSettings } from '@/lib/content/directus-site';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, webPageSchema } from '@/lib/seo/schema';
 import { getServicePageConfig } from '@/lib/seo/service-pages';
@@ -43,14 +43,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const config = SERVICE_CONFIG;
 
   if (!config) {
-    return getWebsitePageMetadata({
+    return getServiceMetadata({
+      slug: SERVICE_PATH.slice(1),
       title: 'Roof Repair | SonShine Roofing',
       description: 'Roof repair services from SonShine Roofing.',
       path: SERVICE_PATH,
     });
   }
 
-  return getWebsitePageMetadata({
+  return getServiceMetadata({
+    slug: SERVICE_PATH.slice(1),
     title: config.title,
     description: config.description,
     path: SERVICE_PATH,
@@ -61,7 +63,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const [pool, faqs, settings] = await Promise.all([
     listRecentPostsPool(36),
-    listFaqs({ pagePath: '/roof-repair', limit: 8 }).catch(() => []),
+    listFaqs({ serviceSlug: 'roof-repair', limit: 8 }).catch(() => []),
     getSiteSettings(),
   ]);
   const origin = SITE_ORIGIN;

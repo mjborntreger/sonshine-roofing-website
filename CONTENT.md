@@ -1,7 +1,7 @@
-Content Workflow
-================
+# Content Workflow
 
 Where content lives
+
 - WordPress (via WPGraphQL): remaining legacy projects, glossary, videos, and
   location landing pages.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
@@ -9,9 +9,9 @@ Where content lives
     source for archives, filters, post pages, recommendations, metadata, and
     blog/image sitemaps.
   - `site_settings`: shared brand, contact, address, social, image, footer badges, company facts, robots, CSP, analytics switch, schema values, and optional raw `llms.txt` content.
-  - `website_pages`: metadata, canonical, Open Graph, focus-keyword, noindex, and sitemap-policy records for static routes.
-  - `services`: primary service records used by navigation and service quick links.
-  - `faqs`: published WYSIWYG-authored semantic HTML answers. A null `website_page` is global; otherwise the relation defines the FAQ's single primary page scope and supplies the archive group title from `website_pages.nav_label`.
+  - `website_pages`: normalized SEO records for fixed routes only; canonicals are route-derived.
+  - `services`: primary service route owners, including their SEO metadata.
+  - `faqs`: published WYSIWYG-authored semantic HTML answers. Fixed routes use `website_page`, service routes use `service`, and a record is global only when both are null.
   - `navigation_items`: header navigation and matching footer link groups.
   - `redirects`: published legacy redirect rules loaded at build time.
   - `special_offers`: special-offer pages and popup content.
@@ -22,11 +22,20 @@ Where content lives
 - Next.js app pages: route layouts, components, and page body copy not yet moved to Directus.
 
 Publishing shared site content in Directus
+
 - Keep exactly one `site_settings` record for the SonShine client.
 - Use unique normalized paths in `website_pages`; the 404 record is `/404` even though it has no public canonical.
-- Keep the four primary `services` records published and linked from their matching `website_pages` records.
-- Publish navigation only after its target `website_pages` records exist.
-- Store the complete keyword set in `focus_keywords` and select one of those exact values in `primary_focus_keyword`. A mismatch fails the build with `DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH`.
+- Keep the four primary `services` records published; they own their public
+  routes and SEO. There are no duplicate service records in `website_pages`.
+- Navigation links to service routes use `link_type=service` and the `service`
+  relation. Fixed routes continue to use `link_type=page`.
+- Store the complete keyword set in `focus_keywords` with the exact
+  `primary_focus_keyword` first. A mismatch fails the build with
+  `DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH`.
+- Route owners use the shared `seo` group: `noindex`, `meta_title`,
+  `meta_description`, `primary_focus_keyword`, `focus_keywords`, `og_title`,
+  `og_description`, and `og_image_override`. Keep explicit Directus values;
+  frontend derivation exists only as a fallback.
 - Every Directus image must have a `directus_files.description`.
 - Footer badges are image-only records in `site_settings.badges`; each image needs a description. Embedded badge HTML is not rendered.
 - Populated social fields must contain absolute HTTP(S) URLs. Invalid values fail production builds.
@@ -37,18 +46,23 @@ Publishing shared site content in Directus
 - Operational hours and timezone intervals in `lib/contact-hours.ts` are a documented code-controlled exception because UI state and JSON-LD require normalized schedules.
 
 Publishing FAQs in Directus
-- Keep each FAQ assigned to one client and no more than one `website_page`.
-- Leave `website_page` empty only for genuinely global FAQs.
+
+- Keep each FAQ assigned to one client and one scope: `website_page` for a fixed
+  route or `service` for a service route.
+- Leave both scope relations empty only for genuinely global FAQs.
 - Use only paragraphs, links, bold/italic emphasis, ordered or unordered lists, list items, and line breaks in `answer` (`p`, `a`, `strong`, `em`, `ul`, `ol`, `li`, and `br`).
 - Link attributes are limited to `href`, `rel`, `target`, and `title`. Destinations must begin with exactly one `/`, begin with `#`, or use `http`, `https`, `mailto`, or `tel`. Do not use protocol-relative or unsafe-protocol URLs.
 - Do not add images, headings, tables, classes, IDs, inline styles, scripts, event handlers, or arbitrary editor/source markup.
 - The editor toolbar guides authors, but the restricted frontend sanitizer is the authoritative security boundary. `_blank` links receive `rel="noopener noreferrer"`.
 - FAQ JSON-LD uses parser-derived, entity-decoded plain text from `faqHtmlToPlainText()`; never remove tags with a regex.
-- Publication uses only `status`; page scope uses only `website_page`.
-- Page sections render global FAQs plus FAQs whose related page path matches the current route.
-- The `/faq` archive renders General first, then page groups alphabetically by `website_pages.nav_label`.
+- Publication uses only `status`; scope uses `website_page` or `service`.
+- Page sections render global FAQs plus FAQs whose related fixed-page path or
+  service slug matches the current route.
+- The `/faq` archive renders General first, then fixed-page/service groups by
+  their editor-facing labels.
 
 Publishing redirects in Directus
+
 - Redirect changes become active only after a new site build.
 - Keep `source_path` unique, set `preserve_query=true`, and use a supported status code (`301`, `302`, `303`, `307`, or `308`).
 - Use `/prefix/*` for prefix wildcards. Invalid, duplicate, or self-redirect records fail the build.
@@ -56,6 +70,7 @@ Publishing redirects in Directus
 - Deleted deprecated landing-page routes intentionally return 404; do not add redirects for them.
 
 Publishing in WP
+
 - Ensure remaining WordPress projects and other legacy content are Published,
   not Draft.
 - Fill excerpts where available (used as SEO fallbacks).
@@ -63,6 +78,7 @@ Publishing in WP
 - Location landing pages remain a deliberate WordPress/code exception until they move to a dedicated Directus `location_landing_pages` collection.
 
 Publishing blog posts in Directus
+
 - Directus is the only frontend blog source. There is no environment-controlled
   WordPress fallback.
 - Set `status=published` to expose a post and provide one to three published,
@@ -76,47 +92,58 @@ Publishing blog posts in Directus
   remain editable.
 
 Publishing SonShine people in Directus
+
 - The ten approved profiles are published and Directus is the only frontend
   source. WordPress person queries and fallback images are intentionally not
   supported.
 - The approved order is Nathan Borntreger, Bob, Josh, JB, Jeremy K., Tara, Mina,
   Michael, Erick, and José. Antonio, Tony, Angela, Dean, Steve, and Matthew are
   explicitly excluded and must not be recreated by the migration script.
-- `show_on_team` and `seo_indexable` default to `true`; both are explicitly true
-  on all ten published profiles. Records still require the correct
+- `show_on_team` defaults to true. `noindex` defaults to true globally and is
+  explicitly false on all ten published SonShine profiles. Records still
+  require the correct
   SonShine client, slug, display name, role, biography, sort value, and described
   profile image.
 - `bio` allows only paragraphs, H2–H4 headings, links, bold/italic emphasis,
   ordered/unordered lists, list items, and line breaks. The frontend sanitizer
   is authoritative; images, media, tables, code, classes, IDs, colors, inline
   styles, scripts, and arbitrary source HTML are unsupported.
-- Person SEO is derived in the SonShine adapter rather than stored redundantly:
-  `meta_title` and `og_title` use display name + role + brand;
-  `meta_description` and `og_description` use cleaned biography text (with a
-  role-based fallback for placeholder biographies); `og_image` reuses the
-  described profile image.
+- Person SEO is stored explicitly in Directus, including the independently
+  reviewed focus keywords. Display name/role, cleaned biography text, and the
+  described profile image remain fallback sources only.
 
 Publishing special offers in Directus
+
 - Set `status=published` to make an offer routable.
 - Set `featured=true` to make an unexpired offer eligible for the sitewide popup.
+- New offers default to `noindex=true`; editors may turn indexing on. The stored
+  toggle alone controls robots metadata and special-offer sitemap inclusion.
+  Expiration disables the claim form and featured-popup eligibility, but does
+  not override indexing.
 - Use `featured_image.description` for image alt text and `legal_disclaimer` for disclaimer copy.
+- Special-offer content is build-only. Publish a new site build for Directus
+  changes to reach the public offer route or its sitemap entry.
 
 Publishing legal copy in Directus
+
 - Edit `legal_copy.privacy_policy` and `legal_copy.terms_of_use` with the WYSIWYG editor.
 - Use semantic HTML without classes, IDs, inline styles, scripts, or event-handler attributes.
 - Begin body headings at `h2`; the Next.js page shell owns the primary `h1`.
 - `/privacy-policy` consumes `privacy_policy`; `/sms-terms-and-conditions` consumes `terms_of_use`.
 
 Glossary linking
+
 - Term pages auto-link other terms in the content body (first occurrence per term).
 - Avoid keyword stuffing; links are budgeted to prevent overlinking.
 
 Images
+
 - For brand images, prefer Next.js `Image` component where possible.
 - Default OG image: `/og-default.png` (1200×630).
 
 Noindex Policy
+
 - Utility pages (`/reviews`, `/tell-us-why`, `/thank-you`, `/truck-for-sale`, and the 404 page) are marked noindex and excluded from the static sitemap where applicable.
-- Published SonShine person pages follow `seo_indexable`; the approved ten are
+- Published SonShine person pages follow `noindex`; the approved ten are
   indexable and the person page/image sitemaps remain aligned. Glossary terms
   remain noindex by business choice.

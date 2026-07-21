@@ -3,8 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
+    "predev": "npm run prebuild:codex",
     "dev": "next dev",
-    "prebuild": "node scripts/prebuild.mjs",
+    "prebuild": "npm run verify:special-offer-indexing && npm run verify:build-only-revalidation && node scripts/prebuild.mjs",
     "build": "next build",
     "prebuild:codex": "node scripts/prebuild.mjs",
     "build:codex": "NODE_OPTIONS=\"--require ./scripts/codex-fetch-proxy.cjs $NODE_OPTIONS\" next build --webpack",
@@ -15,6 +16,8 @@
     "verify:faq-html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-faq-html.mjs",
     "verify:person-html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-person-html.mjs",
     "verify:person-seo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-person-seo.mjs",
+    "verify:special-offer-indexing": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-special-offer-indexing.mjs",
+    "verify:build-only-revalidation": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-build-only-revalidation.mjs",
     "migrate:persons:dry-run": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --dry-run",
     "migrate:persons:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --apply"
   },

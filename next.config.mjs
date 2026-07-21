@@ -57,10 +57,6 @@ const nextConfig = {
         ],
       },
       {
-        source: '/_next/static/:path*',
-        headers: [{ key: 'Cache-Control', value: immutableAssetCache }],
-      },
-      {
         source: '/fonts/:path*',
         headers: [{ key: 'Cache-Control', value: immutableAssetCache }],
       },

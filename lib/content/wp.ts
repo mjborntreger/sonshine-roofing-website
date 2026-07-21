@@ -233,6 +233,9 @@ export type Post = {
   categoryTerms?: TermLite[];
   /** Optional short HTML excerpt (rendered), useful for previews & SEO fallbacks */
   excerpt?: string;
+  noindex?: boolean;
+  primaryFocusKeyword?: string | null;
+  focusKeywords?: string[];
   /** RankMath SEO (as exposed by WPGraphQL Rank Math) */
   seo?: {
     title?: string | null;

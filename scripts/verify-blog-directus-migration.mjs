@@ -58,6 +58,7 @@ const [posts, topics] = await Promise.all([
     fields: [
       "id",
       "status",
+      "noindex",
       "external_id",
       "slug",
       "title",
@@ -137,6 +138,13 @@ let michaelAuthors = 0;
 let organizationFallbacks = 0;
 let featuredPosts = 0;
 let junctions = 0;
+const keywordValidation = {
+  checked: 0,
+  missing_primary: 0,
+  primary_mismatches: 0,
+  duplicate_phrases: 0,
+  invalid_arrays: 0,
+};
 const workerPayloadHashes = new Map();
 
 for (const post of posts) {
@@ -215,11 +223,45 @@ for (const post of posts) {
   if (sha256(post.body) !== expected.transformed_body_sha256) {
     errors.push(`${post.slug}: transformed body hash mismatch.`);
   }
-  if (post.primary_focus_keyword !== null) {
-    errors.push(`${post.slug}: primary focus keyword is not empty.`);
-  }
-  if (!Array.isArray(post.focus_keywords) || post.focus_keywords.length !== 0) {
-    errors.push(`${post.slug}: focus keywords are not empty.`);
+  const primaryFocusKeyword = normalizedScalar(
+    post.primary_focus_keyword,
+  ).trim();
+  const focusKeywordsAreValid =
+    Array.isArray(post.focus_keywords) &&
+    post.focus_keywords.every(
+      (keyword) => typeof keyword === "string" && keyword.trim().length > 0,
+    );
+  const focusKeywords = focusKeywordsAreValid
+    ? post.focus_keywords.map((keyword) => keyword.trim())
+    : [];
+  const validateKeywords =
+    post.noindex !== true ||
+    primaryFocusKeyword.length > 0 ||
+    focusKeywords.length > 0;
+
+  if (validateKeywords) {
+    keywordValidation.checked += 1;
+
+    if (!primaryFocusKeyword) {
+      keywordValidation.missing_primary += 1;
+      errors.push(`${post.slug}: primary focus keyword is missing.`);
+    }
+    if (!focusKeywordsAreValid || focusKeywords.length === 0) {
+      keywordValidation.invalid_arrays += 1;
+      errors.push(`${post.slug}: focus keywords must be a nonempty string array.`);
+    } else {
+      if (focusKeywords[0] !== primaryFocusKeyword) {
+        keywordValidation.primary_mismatches += 1;
+        errors.push(`${post.slug}: primary focus keyword is not first in focus keywords.`);
+      }
+      const normalizedKeywords = focusKeywords.map((keyword) =>
+        keyword.toLocaleLowerCase("en-US"),
+      );
+      if (new Set(normalizedKeywords).size !== normalizedKeywords.length) {
+        keywordValidation.duplicate_phrases += 1;
+        errors.push(`${post.slug}: focus keywords contain duplicate phrases.`);
+      }
+    }
   }
   if (/wp\.sonshineroofing\.com\/wp-content\/uploads/i.test(post.body)) {
     errors.push(`${post.slug}: WordPress media URL remains.`);
@@ -264,6 +306,8 @@ for (const post of posts) {
           author: expectedAuthor,
           meta_title: expected.meta_title,
           meta_description: expected.meta_description,
+          // Preserve the original migration worker payload. SEO keywords were
+          // intentionally populated in a later, separately verified backfill.
           primary_focus_keyword: null,
           focus_keywords: [],
         },
@@ -362,6 +406,7 @@ const summary = {
   ),
   body_hashes_verified: posts.length,
   scalar_fields_verified: posts.length,
+  keyword_validation: keywordValidation,
   queue_payload_hashes_verified: queueHashesVerified,
   errors,
 };

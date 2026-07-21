@@ -8,7 +8,7 @@ import YouMayAlsoLike from '@/components/engagement/YouMayAlsoLike';
 import TipTopRoofCheckup from '@/components/marketing/service-pages/TipTopRoofCheckup';
 import type { Metadata } from 'next';
 import ServicesAside from '@/components/global-nav/static-pages/ServicesAside';
-import { getSiteSettings, getWebsitePageMetadata } from '@/lib/content/directus-site';
+import { getServiceMetadata, getSiteSettings } from '@/lib/content/directus-site';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, webPageSchema } from '@/lib/seo/schema';
 import { getServicePageConfig } from '@/lib/seo/service-pages';
@@ -36,7 +36,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const config = SERVICE_CONFIG;
 
   if (!config) {
-    return getWebsitePageMetadata({
+    return getServiceMetadata({
+      slug: SERVICE_PATH.slice(1),
       title: 'Residential Roof Inspection | SonShine Roofing',
       description:
         'Roof inspections with ZERO hassle | Fast, Friendly, Professional | Call Us Today!',
@@ -44,7 +45,8 @@ export async function generateMetadata(): Promise<Metadata> {
     });
   }
 
-  return getWebsitePageMetadata({
+  return getServiceMetadata({
+    slug: SERVICE_PATH.slice(1),
     title: config.title,
     description: config.description,
     path: SERVICE_PATH,
@@ -55,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const [pool, faqs, nathanImage, settings] = await Promise.all([
     listRecentPostsPool(36),
-    listFaqs({ pagePath: '/roof-inspection', limit: 8 }).catch(() => []),
+    listFaqs({ serviceSlug: 'roof-inspection', limit: 8 }).catch(() => []),
     getPersonProfileImage('nathan-borntreger'),
     getSiteSettings(),
   ]);

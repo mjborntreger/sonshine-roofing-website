@@ -25,6 +25,15 @@ const DIRECTUS_POST_FIELDS = [
   'excerpt',
   'meta_title',
   'meta_description',
+  'noindex',
+  'primary_focus_keyword',
+  'focus_keywords',
+  'og_title',
+  'og_description',
+  'og_image_override.id',
+  'og_image_override.description',
+  'og_image_override.width',
+  'og_image_override.height',
   'published_at',
   'source_updated_at',
   'date_created',
@@ -66,6 +75,12 @@ type DirectusBlogPost = {
   excerpt?: unknown;
   meta_title?: unknown;
   meta_description?: unknown;
+  noindex?: unknown;
+  primary_focus_keyword?: unknown;
+  focus_keywords?: unknown;
+  og_title?: unknown;
+  og_description?: unknown;
+  og_image_override?: unknown;
   published_at?: unknown;
   source_updated_at?: unknown;
   date_created?: unknown;
@@ -202,10 +217,37 @@ function requiredPostString(value: unknown, field: string, fallbackSlug?: string
   );
 }
 
-function mapDirectusPost(
-  item: DirectusBlogPost,
-  config: DirectusConfig,
-): NormalizedBlogPost {
+function readFocusKeywords(
+  primaryValue: unknown,
+  keywordValue: unknown,
+  slug: string,
+): { primaryFocusKeyword: string | null; focusKeywords: string[] } {
+  if (!Array.isArray(keywordValue)) {
+    throw new Error(`[blog] Directus blog_posts.focus_keywords must be an array for ${slug}.`);
+  }
+  const focusKeywords = keywordValue.map((value) =>
+    requiredPostString(value, 'focus_keywords', slug),
+  );
+  const primaryFocusKeyword = requiredPostString(primaryValue, 'primary_focus_keyword', slug);
+  const primaryIndex = focusKeywords.findIndex(
+    (keyword) =>
+      keyword.toLocaleLowerCase('en-US') === primaryFocusKeyword.toLocaleLowerCase('en-US'),
+  );
+  if (primaryIndex < 0) {
+    throw new Error(
+      `[blog] Directus primary focus keyword is missing from focus_keywords for ${slug}.`,
+    );
+  }
+  return {
+    primaryFocusKeyword: focusKeywords[primaryIndex],
+    focusKeywords: [
+      focusKeywords[primaryIndex],
+      ...focusKeywords.filter((_, index) => index !== primaryIndex),
+    ],
+  };
+}
+
+function mapDirectusPost(item: DirectusBlogPost, config: DirectusConfig): NormalizedBlogPost {
   const slug = requiredPostString(item.slug, 'slug');
   const title = requiredPostString(item.title, 'title', slug);
   const publishedAt = requiredPostString(item.published_at, 'published_at', slug);
@@ -219,6 +261,13 @@ function mapDirectusPost(
   const featuredImage = mapDirectusImage(item.featured_image, config);
   const metaTitle = readString(item.meta_title);
   const metaDescription = readString(item.meta_description);
+  const ogTitle = readString(item.og_title);
+  const ogDescription = readString(item.og_description);
+  const ogImageOverride = mapDirectusImage(item.og_image_override, config);
+  const noindex = readBoolean(item.noindex);
+  const focusKeywordMetadata = noindex
+    ? { primaryFocusKeyword: null, focusKeywords: [] }
+    : readFocusKeywords(item.primary_focus_keyword, item.focus_keywords, slug);
   const authorName = mapDirectusAuthor(item.author, config);
 
   if (categoryTerms.length === 0) {
@@ -241,22 +290,25 @@ function mapDirectusPost(
     categoryTerms,
     featured: readBoolean(item.featured),
     excerpt: readString(item.excerpt) ?? undefined,
+    noindex,
+    ...focusKeywordMetadata,
     seo: {
       title: metaTitle,
       description: metaDescription,
       openGraph: {
-        title: metaTitle,
-        description: metaDescription,
+        title: ogTitle ?? metaTitle,
+        description: ogDescription ?? metaDescription,
         type: 'article',
-        image: featuredImage
-          ? {
-              url: featuredImage.url,
-              secureUrl: featuredImage.url,
-              width: featuredImage.width ?? null,
-              height: featuredImage.height ?? null,
-              type: null,
-            }
-          : null,
+        image:
+          (ogImageOverride ?? featuredImage)
+            ? {
+                url: (ogImageOverride ?? featuredImage)!.url,
+                secureUrl: (ogImageOverride ?? featuredImage)!.url,
+                width: (ogImageOverride ?? featuredImage)!.width ?? null,
+                height: (ogImageOverride ?? featuredImage)!.height ?? null,
+                type: null,
+              }
+            : null,
       },
     },
   };
@@ -536,18 +588,22 @@ export async function getPostBySlug(slug: string): Promise<Post | null> {
 }
 
 export async function listBlogSitemapEntries(): Promise<BlogSitemapEntry[]> {
-  return (await listDirectusPosts()).map((post) => ({
-    uri: `/${post.slug}`,
-    modified: post.modified ?? post.date ?? null,
-  }));
+  return (await listDirectusPosts())
+    .filter((post) => !post.noindex)
+    .map((post) => ({
+      uri: `/${post.slug}`,
+      modified: post.modified ?? post.date ?? null,
+    }));
 }
 
 export async function listBlogImageSitemapEntries(): Promise<BlogImageSitemapEntry[]> {
-  return (await listDirectusPosts()).map((post) => ({
-    uri: `/${post.slug}`,
-    modified: post.modified ?? post.date ?? null,
-    featuredImage: toWpImage(post.featuredImage),
-  }));
+  return (await listDirectusPosts())
+    .filter((post) => !post.noindex)
+    .map((post) => ({
+      uri: `/${post.slug}`,
+      modified: post.modified ?? post.date ?? null,
+      featuredImage: toWpImage(post.featuredImage),
+    }));
 }
 
 export type { FacetGroup, Post, PostCard, PostLite, PostsFiltersInput, TermLite };

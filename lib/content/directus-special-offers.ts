@@ -1,8 +1,8 @@
 import { isProdEnv } from "@/lib/seo/site";
+import { isSpecialOfferIndexable } from "@/lib/seo/special-offer-indexing";
 import { isSpecialOfferExpired, parseSpecialOfferDate } from "@/lib/lead-capture/specialOfferDates";
 
 const DIRECTUS_COLLECTION = "special_offers";
-const DIRECTUS_REVALIDATE_SECONDS = 900;
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -28,6 +28,15 @@ type DirectusSpecialOfferItem = {
   legal_disclaimer?: unknown;
   status?: unknown;
   featured?: unknown;
+  noindex?: unknown;
+  meta_title?: unknown;
+  meta_description?: unknown;
+  primary_focus_keyword?: unknown;
+  focus_keywords?: unknown;
+  og_title?: unknown;
+  og_description?: unknown;
+  og_image_override?: DirectusFileValue;
+  date_updated?: unknown;
 };
 
 type DirectusListResponse<T> = {
@@ -59,6 +68,15 @@ export type SpecialOffer = {
   expirationDate: string | null;
   legalDisclaimer: string | null;
   featured: boolean;
+  noindex: boolean;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  primaryFocusKeyword: string | null;
+  focusKeywords: string[];
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImageOverride: SpecialOfferImage | null;
+  dateUpdated: string | null;
 };
 
 const SPECIAL_OFFER_FIELDS = [
@@ -76,6 +94,18 @@ const SPECIAL_OFFER_FIELDS = [
   "legal_disclaimer",
   "status",
   "featured",
+  "noindex",
+  "meta_title",
+  "meta_description",
+  "primary_focus_keyword",
+  "focus_keywords",
+  "og_title",
+  "og_description",
+  "og_image_override.id",
+  "og_image_override.description",
+  "og_image_override.width",
+  "og_image_override.height",
+  "date_updated",
 ] as const;
 
 let warnedForMissingConfig = false;
@@ -154,6 +184,15 @@ function mapSpecialOffer(item: DirectusSpecialOfferItem, config: DirectusConfig)
   const title = readString(item.title);
   if (!slug || !title) return null;
 
+  const noindex = readBoolean(item.noindex);
+  const primaryFocusKeyword = readString(item.primary_focus_keyword);
+  const focusKeywords = Array.isArray(item.focus_keywords)
+    ? item.focus_keywords.map((value) => readString(value)).filter((value): value is string => Boolean(value))
+    : [];
+  if (!noindex && (!primaryFocusKeyword || !focusKeywords.includes(primaryFocusKeyword))) {
+    throw new Error(`Directus special_offers focus keywords are incomplete for ${slug}.`);
+  }
+
   return {
     slug,
     title,
@@ -164,6 +203,15 @@ function mapSpecialOffer(item: DirectusSpecialOfferItem, config: DirectusConfig)
     expirationDate: readString(item.expiration_date),
     legalDisclaimer: readString(item.legal_disclaimer),
     featured: readBoolean(item.featured),
+    noindex,
+    metaTitle: readString(item.meta_title),
+    metaDescription: readString(item.meta_description),
+    primaryFocusKeyword,
+    focusKeywords,
+    ogTitle: readString(item.og_title),
+    ogDescription: readString(item.og_description),
+    ogImageOverride: mapFeaturedImage(item.og_image_override ?? null, config),
+    dateUpdated: readString(item.date_updated),
   };
 }
 
@@ -212,7 +260,7 @@ async function fetchSpecialOfferItems({
       Accept: "application/json",
       Authorization: `Bearer ${config.token}`,
     },
-    next: { revalidate: DIRECTUS_REVALIDATE_SECONDS },
+    cache: "force-cache",
   });
 
   if (!res.ok) {
@@ -260,4 +308,16 @@ export async function getFeaturedSpecialOffer(): Promise<SpecialOffer | null> {
   return offers
     .filter((offer) => !isSpecialOfferExpired(offer.expirationDate))
     .sort(compareFeaturedOffers)[0] ?? null;
+}
+
+export async function listSpecialOfferSitemapEntries(): Promise<
+  Array<{ uri: string; modified: string | null }>
+> {
+  const offers = await fetchSpecialOfferItems({ sort: ['slug'], limit: 500 });
+  return offers
+    .filter(isSpecialOfferIndexable)
+    .map((offer) => ({
+      uri: `/special-offers/${offer.slug}`,
+      modified: offer.dateUpdated,
+    }));
 }

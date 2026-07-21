@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { DomUtils, parseDocument } from 'htmlparser2';
 import { preparePersonBioHtml } from '../lib/content/directus-person-html.ts';
+import { calculatePersonSeo } from '../lib/content/person-seo.ts';
 
 const REPO_ROOT = new URL('../', import.meta.url);
 const MANIFEST_URL = new URL('../person-migration-manifest.json', import.meta.url);
@@ -205,6 +206,12 @@ function createDirectusClient(baseUrl, token) {
 
 function scalarPayload(row, clientId, imageId, status) {
   const { decision, biography, externalId, sourceUpdatedAt } = row;
+  const seo = calculatePersonSeo({
+    title: decision.display_name,
+    positionTitle: decision.source_position,
+    contentPlain: biography.text,
+    featuredImage: null,
+  });
   return {
     client: clientId,
     status,
@@ -217,7 +224,14 @@ function scalarPayload(row, clientId, imageId, status) {
     profile_image: imageId,
     sort: decision.sort,
     show_on_team: true,
-    seo_indexable: true,
+    noindex: false,
+    meta_title: seo.meta_title,
+    meta_description: seo.meta_description,
+    primary_focus_keyword: decision.primary_focus_keyword,
+    focus_keywords: decision.focus_keywords,
+    og_title: seo.og_title,
+    og_description: seo.og_description,
+    og_image_override: imageId,
     external_id: externalId,
     source_updated_at: sourceUpdatedAt,
   };
@@ -246,13 +260,21 @@ function assertExistingPerson(existing, expected, slug) {
     'profile_image',
     'sort',
     'show_on_team',
-    'seo_indexable',
+    'noindex',
+    'meta_title',
+    'meta_description',
+    'primary_focus_keyword',
+    'focus_keywords',
+    'og_title',
+    'og_description',
+    'og_image_override',
     'external_id',
     'source_updated_at',
   ];
   for (const field of fields) {
     const actual =
-      field === 'profile_image' && typeof existing[field] === 'object'
+      (field === 'profile_image' || field === 'og_image_override') &&
+      typeof existing[field] === 'object'
         ? existing[field]?.id
         : existing[field];
     if (field === 'source_updated_at') {
@@ -305,7 +327,14 @@ async function main() {
       'profile_image.id',
       'sort',
       'show_on_team',
-      'seo_indexable',
+      'noindex',
+      'meta_title',
+      'meta_description',
+      'primary_focus_keyword',
+      'focus_keywords',
+      'og_title',
+      'og_description',
+      'og_image_override.id',
       'external_id',
       'source_updated_at',
     ],
@@ -385,7 +414,7 @@ async function main() {
           folder_action: folders[0] ? 'reuse' : 'create',
           target_status: manifest.target.status,
           show_on_team: true,
-          seo_indexable: true,
+          noindex: false,
         },
         null,
         2,
@@ -456,7 +485,7 @@ async function main() {
   }
 
   const finalPeople = await directus.list('items/persons', {
-    fields: ['id', 'slug', 'external_id', 'status', 'show_on_team', 'seo_indexable'],
+    fields: ['id', 'slug', 'external_id', 'status', 'show_on_team', 'noindex'],
     filter: { client: { _eq: clientId }, external_id: { _in: rows.map((row) => row.externalId) } },
   });
   assert.equal(finalPeople.length, 10, 'Final Directus person count');
@@ -469,8 +498,8 @@ async function main() {
     'show_on_team mismatch',
   );
   assert.ok(
-    finalPeople.every((person) => person.seo_indexable === true),
-    'seo_indexable mismatch',
+    finalPeople.every((person) => person.noindex === false),
+    'noindex mismatch',
   );
 
   console.log(

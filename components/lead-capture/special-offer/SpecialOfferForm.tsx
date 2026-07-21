@@ -27,7 +27,6 @@ type Props = {
   offerTitle?: string | null;
   offerDiscount?: string | null;
   offerExpiration?: string | null;
-  initialUnlock?: { offerCode: string } | null;
 };
 
 type FormValues = {
@@ -94,7 +93,6 @@ export default function SpecialOfferForm({
   offerTitle,
   offerDiscount,
   offerExpiration,
-  initialUnlock,
 }: Props) {
   const searchParams = useSearchParams();
   const [values, setValues] = useState<FormValues>({
@@ -155,12 +153,6 @@ export default function SpecialOfferForm({
   };
 
   const cookieName = useMemo(() => `ss_offer_${offerSlug}`, [offerSlug]);
-
-  useEffect(() => {
-    if (!initialUnlock) return;
-    // Ensure any existing cookie is respected client-side
-    writeOfferCookie(cookieName, initialUnlock.offerCode, offerExpiration);
-  }, [initialUnlock, cookieName, offerExpiration]);
 
   useEffect(() => {
     if (submission === 'success') return;

@@ -5,7 +5,6 @@ import { cache } from 'react';
 import type { NavItem } from '@/lib/routes';
 import { buildBasicMetadata, type BasicMetadataInput, type OgImageInput } from '@/lib/seo/meta';
 
-const DIRECTUS_REVALIDATE_SECONDS = 3600;
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -89,17 +88,13 @@ type DirectusSiteSettingsItem = {
 
 type DirectusWebsitePageItem = {
   path?: unknown;
-  title?: unknown;
-  description?: unknown;
-  image?: DirectusFileValue;
+  meta_title?: unknown;
+  meta_description?: unknown;
+  og_image_override?: DirectusFileValue;
   noindex?: unknown;
   og_title?: unknown;
   og_description?: unknown;
-  canonical_path?: unknown;
   nav_label?: unknown;
-  include_in_sitemap?: unknown;
-  sitemap_priority?: unknown;
-  sitemap_changefreq?: unknown;
   page_type?: unknown;
   primary_focus_keyword?: unknown;
   focus_keywords?: unknown;
@@ -111,6 +106,14 @@ type DirectusServiceItem = {
   intro?: unknown;
   lucide_icon?: unknown;
   sort_order?: unknown;
+  noindex?: unknown;
+  meta_title?: unknown;
+  meta_description?: unknown;
+  primary_focus_keyword?: unknown;
+  focus_keywords?: unknown;
+  og_title?: unknown;
+  og_description?: unknown;
+  og_image_override?: DirectusFileValue;
 };
 
 type DirectusNavigationItem = {
@@ -119,6 +122,7 @@ type DirectusNavigationItem = {
   label?: unknown;
   link_type?: unknown;
   page?: { path?: unknown } | string | null;
+  service?: { slug?: unknown } | string | null;
   url?: unknown;
   anchor?: unknown;
   sort?: unknown;
@@ -201,17 +205,13 @@ export type FooterBadge = {
 
 export type WebsitePage = {
   path: string;
-  title: string;
-  description: string;
-  image: DirectusAsset | null;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogImageOverride: DirectusAsset | null;
   noindex: boolean;
   ogTitle: string | null;
   ogDescription: string | null;
-  canonicalPath: string | null;
   navLabel: string | null;
-  includeInSitemap: boolean;
-  sitemapPriority: number | null;
-  sitemapChangefreq: string | null;
   pageType: string;
   primaryFocusKeyword: string | null;
   focusKeywords: string[];
@@ -224,6 +224,14 @@ export type ServiceSummary = {
   intro: string;
   lucideIcon: string;
   sortOrder: number;
+  noindex: boolean;
+  metaTitle: string | null;
+  metaDescription: string | null;
+  ogTitle: string | null;
+  ogDescription: string | null;
+  ogImageOverride: DirectusAsset | null;
+  primaryFocusKeyword: string | null;
+  focusKeywords: string[];
 };
 
 export type SiteBundle = {
@@ -263,11 +271,12 @@ function readBoolean(value: unknown, fallback = false): boolean {
 function readFocusKeywords(
   primaryValue: unknown,
   keywordValue: unknown,
+  collection: string,
   path: string,
 ): { primaryFocusKeyword: string | null; focusKeywords: string[] } {
   if (keywordValue !== null && keywordValue !== undefined && !Array.isArray(keywordValue)) {
     throw new Error(
-      `[DIRECTUS_FOCUS_KEYWORDS_INVALID] website_pages.focus_keywords for route "${path}" must be a JSON array of non-empty strings.`,
+      `[DIRECTUS_FOCUS_KEYWORDS_INVALID] ${collection}.focus_keywords for route "${path}" must be a JSON array of non-empty strings.`,
     );
   }
 
@@ -278,7 +287,7 @@ function readFocusKeywords(
     const keyword = readString(item);
     if (!keyword) {
       throw new Error(
-        `[DIRECTUS_FOCUS_KEYWORDS_INVALID] website_pages.focus_keywords for route "${path}" must contain only non-empty strings.`,
+        `[DIRECTUS_FOCUS_KEYWORDS_INVALID] ${collection}.focus_keywords for route "${path}" must contain only non-empty strings.`,
       );
     }
 
@@ -301,7 +310,7 @@ function readFocusKeywords(
 
   if (!matchedPrimary) {
     throw new Error(
-      `[DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH] website_pages record for route "${path}" has primary focus keyword "${primaryFocusKeyword}", but that phrase is missing from focus_keywords. Add the exact phrase as a Focus Keywords tag or clear the primary field.`,
+      `[DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH] ${collection} record for route "${path}" has primary focus keyword "${primaryFocusKeyword}", but that phrase is missing from focus_keywords. Add the exact phrase as a Focus Keywords tag or clear the primary field.`,
     );
   }
 
@@ -374,10 +383,7 @@ async function fetchCollection<T>(
       Accept: 'application/json',
       Authorization: `Bearer ${config.token}`,
     },
-    next: {
-      revalidate: DIRECTUS_REVALIDATE_SECONDS,
-      tags: [`directus:${collection}:${config.clientSlug}`],
-    },
+    cache: 'force-cache',
   });
 
   if (!response.ok) {
@@ -734,21 +740,17 @@ export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
     'website_pages',
     [
       'path',
-      'title',
-      'description',
-      'image.id',
-      'image.description',
-      'image.width',
-      'image.height',
-      'image.type',
+      'meta_title',
+      'meta_description',
+      'og_image_override.id',
+      'og_image_override.description',
+      'og_image_override.width',
+      'og_image_override.height',
+      'og_image_override.type',
       'noindex',
       'og_title',
       'og_description',
-      'canonical_path',
       'nav_label',
-      'include_in_sitemap',
-      'sitemap_priority',
-      'sitemap_changefreq',
       'page_type',
       'primary_focus_keyword',
       'focus_keywords',
@@ -767,25 +769,34 @@ export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
       throw new Error(`[directus-site] Duplicate website_pages path "${path}".`);
     }
     seen.add(path);
-    const focusKeywordMetadata = readFocusKeywords(
-      item.primary_focus_keyword,
-      item.focus_keywords,
-      path,
-    );
+    const noindex = readBoolean(item.noindex, false);
+    const focusKeywordMetadata = noindex
+      ? { primaryFocusKeyword: null, focusKeywords: [] }
+      : readFocusKeywords(
+          item.primary_focus_keyword,
+          item.focus_keywords,
+          'website_pages',
+          path,
+        );
 
     return {
       path,
-      title: requiredString(item.title, 'website_pages', 'title'),
-      description: requiredString(item.description, 'website_pages', 'description'),
-      image: mapAsset(item.image ?? null, config, 'website_pages', 'image'),
-      noindex: readBoolean(item.noindex, false),
+      metaTitle: noindex
+        ? readString(item.meta_title)
+        : requiredString(item.meta_title, 'website_pages', 'meta_title'),
+      metaDescription: noindex
+        ? readString(item.meta_description)
+        : requiredString(item.meta_description, 'website_pages', 'meta_description'),
+      ogImageOverride: mapAsset(
+        item.og_image_override ?? null,
+        config,
+        'website_pages',
+        'og_image_override',
+      ),
+      noindex,
       ogTitle: readString(item.og_title),
       ogDescription: readString(item.og_description),
-      canonicalPath: readString(item.canonical_path),
       navLabel: readString(item.nav_label),
-      includeInSitemap: readBoolean(item.include_in_sitemap, true),
-      sitemapPriority: readNumber(item.sitemap_priority),
-      sitemapChangefreq: readString(item.sitemap_changefreq),
       pageType: requiredString(item.page_type, 'website_pages', 'page_type'),
       ...focusKeywordMetadata,
     };
@@ -805,7 +816,25 @@ export const getServices = cache(async (): Promise<ServiceSummary[]> => {
   const items = await fetchCollection<DirectusServiceItem>(
     config,
     'services',
-    ['slug', 'nav_label', 'intro', 'lucide_icon', 'sort_order'],
+    [
+      'slug',
+      'nav_label',
+      'intro',
+      'lucide_icon',
+      'sort_order',
+      'noindex',
+      'meta_title',
+      'meta_description',
+      'primary_focus_keyword',
+      'focus_keywords',
+      'og_title',
+      'og_description',
+      'og_image_override.id',
+      'og_image_override.description',
+      'og_image_override.width',
+      'og_image_override.height',
+      'og_image_override.type',
+    ],
     {
       client: { slug: { _eq: config.clientSlug } },
       status: { _eq: 'published' },
@@ -815,13 +844,39 @@ export const getServices = cache(async (): Promise<ServiceSummary[]> => {
 
   return items.map((item) => {
     const slug = requiredString(item.slug, 'services', 'slug');
+    const href = `/${slug}`;
+    const noindex = readBoolean(item.noindex, false);
+    const focusKeywordMetadata = noindex
+      ? { primaryFocusKeyword: null, focusKeywords: [] }
+      : readFocusKeywords(
+          item.primary_focus_keyword,
+          item.focus_keywords,
+          'services',
+          href,
+        );
     return {
       slug,
-      href: `/${slug}`,
+      href,
       navLabel: requiredString(item.nav_label, 'services', 'nav_label'),
       intro: requiredString(item.intro, 'services', 'intro'),
       lucideIcon: requiredString(item.lucide_icon, 'services', 'lucide_icon'),
       sortOrder: readNumber(item.sort_order) ?? 0,
+      noindex,
+      metaTitle: noindex
+        ? readString(item.meta_title)
+        : requiredString(item.meta_title, 'services', 'meta_title'),
+      metaDescription: noindex
+        ? readString(item.meta_description)
+        : requiredString(item.meta_description, 'services', 'meta_description'),
+      ogTitle: readString(item.og_title),
+      ogDescription: readString(item.og_description),
+      ogImageOverride: mapAsset(
+        item.og_image_override ?? null,
+        config,
+        'services',
+        'og_image_override',
+      ),
+      ...focusKeywordMetadata,
     };
   });
 });
@@ -831,6 +886,10 @@ function navigationHref(item: DirectusNavigationItem): string | undefined {
   if (linkType === 'page' && item.page && typeof item.page === 'object') {
     const path = readString(item.page.path);
     return path ? normalizeWebsitePath(path) : undefined;
+  }
+  if (linkType === 'service' && item.service && typeof item.service === 'object') {
+    const slug = readString(item.service.slug);
+    return slug ? `/${slug}` : undefined;
   }
   if (linkType === 'external_url') return readString(item.url) ?? undefined;
   if (linkType === 'anchor') return readString(item.anchor) ?? undefined;
@@ -844,7 +903,17 @@ export const getHeaderNavigation = cache(async (): Promise<NavItem[]> => {
   const items = await fetchCollection<DirectusNavigationItem>(
     config,
     'navigation_items',
-    ['id', 'parent.id', 'label', 'link_type', 'page.path', 'url', 'anchor', 'sort'],
+    [
+      'id',
+      'parent.id',
+      'label',
+      'link_type',
+      'page.path',
+      'service.slug',
+      'url',
+      'anchor',
+      'sort',
+    ],
     {
       menu: {
         client: { slug: { _eq: config.clientSlug } },
@@ -919,8 +988,8 @@ export async function getWebsitePageMetadata({
   }
 
   const settings = await getSiteSettings();
-  const image = page.image
-    ? assetToOgImage(page.image)
+  const image = page.ogImageOverride
+    ? assetToOgImage(page.ogImageOverride)
     : settings
       ? assetToOgImage(settings.defaultOgImage)
       : fallback.image;
@@ -930,11 +999,13 @@ export async function getWebsitePageMetadata({
         index: false,
       }
     : fallback.robots;
+  const title = page.metaTitle ?? fallback.title;
+  const description = page.metaDescription ?? fallback.description;
   const metadata = buildBasicMetadata({
     ...fallback,
-    title: page.title,
-    description: page.description,
-    path: page.canonicalPath ?? page.path,
+    title,
+    description,
+    path: page.path,
     image,
     robots,
     keywords: page.focusKeywords,
@@ -942,8 +1013,65 @@ export async function getWebsitePageMetadata({
 
   if (!includeCanonical) delete metadata.alternates;
 
-  const socialTitle = page.ogTitle ?? page.title;
-  const socialDescription = page.ogDescription ?? page.description;
+  const socialTitle = page.ogTitle ?? title;
+  const socialDescription = page.ogDescription ?? description;
+  if (metadata.openGraph && typeof metadata.openGraph === 'object') {
+    metadata.openGraph.title = socialTitle;
+    metadata.openGraph.description = socialDescription;
+  }
+  if (metadata.twitter && typeof metadata.twitter === 'object') {
+    metadata.twitter.title = socialTitle;
+    metadata.twitter.description = socialDescription;
+  }
+
+  return metadata;
+}
+
+export type ServiceMetadataInput = BasicMetadataInput & {
+  slug: string;
+  includeCanonical?: boolean;
+};
+
+export async function getServiceMetadata({
+  slug,
+  includeCanonical = true,
+  ...fallback
+}: ServiceMetadataInput): Promise<Metadata> {
+  const service = (await getServices()).find((entry) => entry.slug === slug);
+  if (!service) {
+    const metadata = buildBasicMetadata(fallback);
+    if (!includeCanonical) delete metadata.alternates;
+    return metadata;
+  }
+
+  const settings = await getSiteSettings();
+  const image = service.ogImageOverride
+    ? assetToOgImage(service.ogImageOverride)
+    : settings
+      ? assetToOgImage(settings.defaultOgImage)
+      : fallback.image;
+  const robots = service.noindex
+    ? {
+        ...(fallback.robots && typeof fallback.robots === 'object' ? fallback.robots : {}),
+        index: false,
+      }
+    : fallback.robots;
+  const title = service.metaTitle ?? fallback.title;
+  const description = service.metaDescription ?? fallback.description;
+  const metadata = buildBasicMetadata({
+    ...fallback,
+    title,
+    description,
+    path: service.href,
+    image,
+    robots,
+    keywords: service.focusKeywords,
+  });
+
+  if (!includeCanonical) delete metadata.alternates;
+
+  const socialTitle = service.ogTitle ?? title;
+  const socialDescription = service.ogDescription ?? description;
   if (metadata.openGraph && typeof metadata.openGraph === 'object') {
     metadata.openGraph.title = socialTitle;
     metadata.openGraph.description = socialDescription;

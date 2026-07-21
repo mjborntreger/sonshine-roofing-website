@@ -19,6 +19,7 @@ export function GET() {
     `${BASE}/sitemap_index/location`,
     `${BASE}/sitemap_index/roofing-glossary`,
     `${BASE}/sitemap_index/person`,
+    `${BASE}/sitemap_index/special-offer`,
     `${BASE}/sitemap_index/video`,
     `${BASE}/sitemap_index/image`,
   ];
