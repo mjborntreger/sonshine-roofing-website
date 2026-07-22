@@ -1,7 +1,6 @@
 import type { Review, ReviewOwnerImage } from "@/components/reviews-widget/types";
 import { isProdEnv } from "@/lib/seo/site";
 
-const DIRECTUS_REVALIDATE_SECONDS = 900;
 const REVIEWS_COLLECTION = "reviews";
 const CAROUSELS_COLLECTION = "reviews_carousels";
 
@@ -185,13 +184,10 @@ async function fetchDirectusItems<T>(
   if (options.sort?.length) url.searchParams.set("sort", options.sort.join(","));
 
   const response = await fetch(url, {
+    cache: "force-cache",
     headers: {
       Accept: "application/json",
       Authorization: `Bearer ${config.token}`,
-    },
-    next: {
-      revalidate: DIRECTUS_REVALIDATE_SECONDS,
-      tags: [`directus:reviews:${config.clientSlug}`],
     },
   });
 

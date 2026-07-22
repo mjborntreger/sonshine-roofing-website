@@ -1,7 +1,6 @@
 import { sanitizeFaqHtml } from '@/lib/content/directus-faq-html';
 
 const DIRECTUS_COLLECTION = 'faqs';
-const DIRECTUS_REVALIDATE_SECONDS = 3_600;
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -302,13 +301,10 @@ async function fetchFaqs(filter: UnknownRecord, limit: number): Promise<Directus
   url.searchParams.set('limit', String(limit));
 
   const response = await fetch(url, {
+    cache: 'force-cache',
     headers: {
       Accept: 'application/json',
       Authorization: `Bearer ${config.token}`,
-    },
-    next: {
-      revalidate: DIRECTUS_REVALIDATE_SECONDS,
-      tags: [`directus:faqs:${config.clientSlug}`],
     },
   });
 

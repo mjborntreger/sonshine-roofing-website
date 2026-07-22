@@ -1,7 +1,6 @@
 import { sanitizeDirectusHtml } from '@/lib/content/directus-html';
 
 const DIRECTUS_COLLECTION = 'legal_copy';
-const DIRECTUS_REVALIDATE_SECONDS = 86400;
 
 type DirectusConfig = {
   url: string;
@@ -97,13 +96,10 @@ export async function getLegalCopy(): Promise<LegalCopy> {
   url.searchParams.set('limit', '2');
 
   const response = await fetch(url, {
+    cache: 'force-cache',
     headers: {
       Accept: 'application/json',
       Authorization: `Bearer ${config.token}`,
-    },
-    next: {
-      revalidate: DIRECTUS_REVALIDATE_SECONDS,
-      tags: [`directus:legal-copy:${config.clientSlug}`],
     },
   });
 

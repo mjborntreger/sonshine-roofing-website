@@ -1,0 +1,194 @@
+{
+  "schema_version": "1.0.0",
+  "captured_at": "2026-07-22T19:42:00Z",
+  "source": {
+    "system": "wordpress",
+    "post_type": "sponsor_feature",
+    "statuses_included": ["publish", "draft", "pending", "private", "future", "trash"],
+    "total": 6,
+    "counts": {
+      "publish": 6,
+      "draft": 0,
+      "pending": 0,
+      "private": 0,
+      "future": 0,
+      "trash": 0
+    }
+  },
+  "destination": {
+    "collection": "sponsor_features",
+    "client_id": "772d4bae-eaae-49c4-b136-864d22f520bd",
+    "client_slug": "sonshine-roofing",
+    "asset_folder_id": "5ed7c43d-06a7-4045-bd68-0df79e37519a"
+  },
+  "approved_transformations": [
+    "made up of the the men and women -> made up of the men and women",
+    "qualifies them to play the against -> qualifies them to play against",
+    "remove ?utm_source=qr from the Imagine Band & Choir Instagram URL",
+    "strip WordPress block wrappers while preserving semantic HTML and rendered wording"
+  ],
+  "sponsors": [
+    {
+      "source": {
+        "database_id": 18771,
+        "status": "publish",
+        "modified_gmt": "2026-02-10 20:38:54",
+        "content_sha256": "d495b95fc8b8dc68b6bf4d761205ee974979c41851a452fb962d6c24e406a4f6",
+        "image_database_id": 18772,
+        "image_url": "https://wp.sonshineroofing.com/wp-content/uploads/port-charlotte-high-school-baseball-logo-optimized-for-web.webp",
+        "image_sha256": "7eb0ac979e0284d435f2e7f7d0d639d7745b52fba1f3edf6c54926bc5c97784a"
+      },
+      "directus": {
+        "item_id": "2f490036-c9f2-4998-9fd4-ada9000ed485",
+        "asset_id": "b86cd722-716f-4a5c-a5b1-a4ea7830513a",
+        "external_id": "wordpress:sonshine-roofing:18771",
+        "status": "published",
+        "sort": 1,
+        "title": "Port Charlotte High School “Pirates” Baseball Team",
+        "slug": "port-charlotte-high-school-pirates-baseball-team",
+        "description": "<p>The <strong>Port Charlotte High School Pirates Baseball Team</strong> represents dedication, teamwork, and school pride on and off the field. SonShine Roofing is proud to be a sponsor supporting local student-athletes who put in the work every practice and every game. Backing programs like Pirates Baseball means investing in discipline, leadership, and community spirit.</p>",
+        "website_url": "https://pchs.yourcharlotteschools.net",
+        "facebook_url": "https://www.facebook.com/PCHSPiratesBaseball",
+        "instagram_url": "https://www.instagram.com/pcpiratebaseball/",
+        "service_area_slugs": ["port-charlotte"],
+        "published_at": "2026-02-10T20:38:52.000Z",
+        "source_updated_at": "2026-02-10T20:38:54.000Z"
+      }
+    },
+    {
+      "source": {
+        "database_id": 18768,
+        "status": "publish",
+        "modified_gmt": "2026-02-10 19:49:46",
+        "content_sha256": "6fe85c6811533638ae1e010d41daa36e29dd6eff61f9b5153489d275fa6af979",
+        "image_database_id": 18770,
+        "image_url": "https://wp.sonshineroofing.com/wp-content/uploads/imaginebandandchoirlogo-ezgif.com-optiwebp.webp",
+        "image_sha256": "84e4a8122b6986f64d6a489392fa3f36993a106faf5722e04d936f90a5f5940e"
+      },
+      "directus": {
+        "item_id": "70f6ed05-22ac-44f4-bc25-c368daced7cf",
+        "asset_id": "9ae4cb0c-28bf-425d-9ac3-727a545cc920",
+        "external_id": "wordpress:sonshine-roofing:18768",
+        "status": "published",
+        "sort": 2,
+        "title": "Imagine School at North Port Band & Choir",
+        "slug": "imagine-school-at-north-port-music-program",
+        "description": "<p>The Imagine School at North Port Music Program enriches students’ education through band and chorus opportunities for middle and high school learners, fostering creativity, discipline, and teamwork. SonShine Roofing is proud to serve as the <strong>Gold Sponsor</strong> of the school’s Winter Concert, supporting arts education that brings families and the community together while helping young musicians grow in confidence, skill, and self-expression through live performance.</p>",
+        "website_url": "https://imagineschoolatnorthport.org",
+        "facebook_url": "https://www.facebook.com/isnpbandchoir",
+        "instagram_url": "https://www.instagram.com/isnpbandchoir",
+        "service_area_slugs": ["north-port"],
+        "published_at": "2026-02-10T19:45:52.000Z",
+        "source_updated_at": "2026-02-10T19:49:46.000Z"
+      }
+    },
+    {
+      "source": {
+        "database_id": 18041,
+        "status": "publish",
+        "modified_gmt": "2025-10-19 17:14:32",
+        "content_sha256": "c5ee8bc87c0b1853cab45b0d4bc72609141d4f181d497521f5017e249144088c",
+        "image_database_id": 18042,
+        "image_url": "https://wp.sonshineroofing.com/wp-content/uploads/nppoa-logo.webp",
+        "image_sha256": "fc4d2ff41f2f2cc1634b2d06803463423c2aa35ff07d068bd77318f822d8f644"
+      },
+      "directus": {
+        "item_id": "cd33b48f-cc7e-46f6-ae04-f185a4af3997",
+        "asset_id": "02b3c3f4-388e-4e7a-88e7-666ae06b6e2c",
+        "external_id": "wordpress:sonshine-roofing:18041",
+        "status": "published",
+        "sort": 3,
+        "title": "North Port Police Officer’s Association (NPPOA)",
+        "slug": "north-port-police-officers-association-nppoa",
+        "description": "<p>We’re honored to support the North Port Police Officer’s Association, a dedicated 501(c)(3) made up of the men and women whose main mission is to protect and serve our community. From hurricane relief to “Shop with a Cop,” our officers are an integral pillar of the North Port community and beyond, which is why SonShine Roofing is proud to be the Presenting Sponsor at the 2025 North Port Police Officer’s Association Gala.</p>",
+        "website_url": "https://northportpoa.com",
+        "facebook_url": "https://www.facebook.com/NorthPortPOA",
+        "instagram_url": "https://www.instagram.com/northportpd",
+        "service_area_slugs": ["north-port"],
+        "published_at": "2025-10-19T17:14:30.000Z",
+        "source_updated_at": "2025-10-19T17:14:32.000Z"
+      }
+    },
+    {
+      "source": {
+        "database_id": 18036,
+        "status": "publish",
+        "modified_gmt": "2025-10-19 17:14:45",
+        "content_sha256": "698229f6c89c497b2f85b9aa77a9a88f49da70d2e227630287e4f446b3af52f4",
+        "image_database_id": 18037,
+        "image_url": "https://wp.sonshineroofing.com/wp-content/uploads/nphs-boys-soccer-logo.webp",
+        "image_sha256": "b1149ac2a981a714edff238b4dcd87f1b57f78d8e501d4272d03f70e80addf87"
+      },
+      "directus": {
+        "item_id": "140bc4a8-5c47-4774-9add-a3a0b08f949b",
+        "asset_id": "aee7059d-349e-4957-9cf9-047d1cdc127c",
+        "external_id": "wordpress:sonshine-roofing:18036",
+        "status": "published",
+        "sort": 4,
+        "title": "North Port High School Boy’s Soccer Team",
+        "slug": "north-port-high-school-boys-soccer-team",
+        "description": "<p>SonShine Roofing proudly supports the North Port High School Bobcats Boys Soccer team—a group that embodies dedication, teamwork, and community spirit. These athletes bring relentless energy to every match, competing hard in Florida’s Class 7A division while representing North Port with pride. Their discipline and unity on the field mirror the same values that drive our crew every day—commitment, integrity, and striving for excellence. We’re honored to stand behind a team that plays with heart and uplifts our community one goal at a time.</p>",
+        "website_url": "https://www.sarasotacountyschools.net/o/northporthigh",
+        "facebook_url": "https://www.facebook.com/Nopobobcats",
+        "instagram_url": "https://www.instagram.com/noponation",
+        "service_area_slugs": ["north-port"],
+        "published_at": "2025-10-19T16:53:20.000Z",
+        "source_updated_at": "2025-10-19T17:14:45.000Z"
+      }
+    },
+    {
+      "source": {
+        "database_id": 18032,
+        "status": "publish",
+        "modified_gmt": "2025-10-19 16:44:01",
+        "content_sha256": "e112700ca5dcfa430031839cf60ae26d436b9140859629beb6d00ee2cccaa33a",
+        "image_database_id": 18035,
+        "image_url": "https://wp.sonshineroofing.com/wp-content/uploads/cats-baseball-logo.webp",
+        "image_sha256": "052001ca827b2f169d0e02101ff09f08d1a628ba7ce2f91836fdc07445d4f0ab"
+      },
+      "directus": {
+        "item_id": "c97b9483-04ee-40e4-9672-9ff2b3b05aa3",
+        "asset_id": "0313d752-a1c5-4fc0-96bf-33e0e8612429",
+        "external_id": "wordpress:sonshine-roofing:18032",
+        "status": "published",
+        "sort": 5,
+        "title": "North Port High School “Cats” Baseball Team",
+        "slug": "north-port-high-school-cats-baseball-team",
+        "description": "<p>North Port High School (NPHS) “Cats” Baseball Team is a hardworking and talented group of young, dedicated athletes committed to their team’s success and serving the North Port community. They compete at the 7A level in District 8 of the Florida High School Athletic Association which qualifies them to play against the top-rated schools in the state. SonShine Roofing is proud to support this excellent group of young men.</p>",
+        "website_url": null,
+        "facebook_url": "https://www.facebook.com/CatsBaseballClub",
+        "instagram_url": "https://www.instagram.com/cats_baseball_boosters_",
+        "service_area_slugs": ["north-port"],
+        "published_at": "2025-10-19T16:40:29.000Z",
+        "source_updated_at": "2025-10-19T16:44:01.000Z"
+      }
+    },
+    {
+      "source": {
+        "database_id": 18029,
+        "status": "publish",
+        "modified_gmt": "2025-10-19 05:52:00",
+        "content_sha256": "8353aed2fae9ad0d9cf58c89ab8c34413d089dcfbe76a91577009da1012256e8",
+        "image_database_id": 18008,
+        "image_url": "https://wp.sonshineroofing.com/wp-content/uploads/ISNP-cross-country-logo.webp",
+        "image_sha256": "67b1fee6a30dec2a8e66d24ccb37ea339945813886c6d7b82a7853e2a4f90b92"
+      },
+      "directus": {
+        "item_id": "0f970fa1-f129-457f-867b-267daef3d8f1",
+        "asset_id": "11a1c35a-2675-4fb7-9f95-d03b6caa8f39",
+        "external_id": "wordpress:sonshine-roofing:18029",
+        "status": "published",
+        "sort": 6,
+        "title": "Imagine School at North Port Cross Country (ISNPXC)",
+        "slug": "imagine-school-at-north-port-cross-country-isnpxc",
+        "description": "<p>Imagine School at North Port’s Cross Country Team is made up of hardworking local student-athletes who proudly run under the Sharks banner. Competing in Florida’s FHSAA Class 1A division, they represent our community at meets across the region, including favorites like the North Port and Venice Invitationals. Known for their grit, teamwork, and school pride, these runners put in the miles—both on and off the course—showing what dedication and heart look like right here in North Port.</p>",
+        "website_url": "https://www.isnpathletics.com/crosscountry",
+        "facebook_url": "https://www.facebook.com/groups/1446500183444539",
+        "instagram_url": "https://www.instagram.com/isnpxc/",
+        "service_area_slugs": ["north-port"],
+        "published_at": "2025-10-18T19:23:59.000Z",
+        "source_updated_at": "2025-10-19T05:52:00.000Z"
+      }
+    }
+  ]
+}

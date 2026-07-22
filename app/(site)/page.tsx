@@ -3,10 +3,8 @@ import HeroTrustBar from '@/components/marketing/landing-page/HeroTrustBar';
 import ReviewsCarousel from '@/components/reviews-widget/ReviewsCarousel';
 import WhyHomeownersChooseUs from '@/components/marketing/landing-page/WhyHomeownersChooseUs';
 import LatestProjectsFilter from '@/components/dynamic-content/latest-filters/LatestProjectsFilter';
-import {
-  listRecentProjectsPoolForFilters,
-  listSponsorFeaturesByServiceArea,
-} from '@/lib/content/wp';
+import { listRecentProjectsPoolForFilters } from '@/lib/content/wp';
+import { listSponsorFeaturesByServiceArea } from '@/lib/content/sponsor-features';
 import { listRecentPostsPoolForFilters } from '@/lib/content/blog';
 import { listFaqs } from '@/lib/content/directus-faqs';
 import LatestPostsFilters from '@/components/dynamic-content/latest-filters/LatestPostsFilter';

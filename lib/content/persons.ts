@@ -4,7 +4,6 @@ import { preparePersonBioHtml } from '@/lib/content/directus-person-html';
 import { calculatePersonSeo, type PersonSeo } from '@/lib/content/person-seo';
 
 const DIRECTUS_COLLECTION = 'persons';
-const DIRECTUS_REVALIDATE_SECONDS = 900;
 const DIRECTUS_LIMIT = 100;
 
 export const ACTIVE_PERSON_SLUGS = [
@@ -238,11 +237,8 @@ async function fetchDirectusPeople(
   url.searchParams.set('limit', String(options.limit ?? DIRECTUS_LIMIT));
   if (options.sort?.length) url.searchParams.set('sort', options.sort.join(','));
   const response = await fetch(url, {
+    cache: 'force-cache',
     headers: { Accept: 'application/json', Authorization: `Bearer ${config.token}` },
-    next: {
-      revalidate: DIRECTUS_REVALIDATE_SECONDS,
-      tags: [`directus:persons:${config.clientSlug}`],
-    },
   });
   if (!response.ok) {
     throw new Error(`[persons] Directus HTTP ${response.status} ${response.statusText}.`);

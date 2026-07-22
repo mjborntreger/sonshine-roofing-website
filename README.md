@@ -58,7 +58,9 @@ Security headers & CSP
 
 Cache/Invalidation
 
-- WordPress GraphQL and Directus content use timed revalidation where configured. Directus FAQs revalidate hourly and Directus blog content revalidates every 15 minutes. Shared Directus site content and special offers are build-only; their changes require a new build.
+- WordPress GraphQL keeps its existing timed/tagged caching where configured.
+- Directus-backed reads use ordinary fetch caching with no Next.js ISR options. Directus content changes require a new build to appear on the site.
+- The authenticated revalidation endpoint and existing review workflow remain in place during this transition, but Directus fetchers do not depend on tag or timed revalidation.
 - Static sitemap: regenerated on build; read dynamically per request.
 - Redirects are loaded from Directus during each build, so redirect changes require a new build to take effect.
 
@@ -114,6 +116,7 @@ Where content lives
   - `special_offers`: offer pages, route-owned SEO, and the featured offer popup.
   - `legal_copy`: WYSIWYG privacy/SMS terms content.
   - `persons`: the exclusive SonShine team/profile source.
+  - `sponsor_features`: the exclusive homepage and location-page partnership-card source.
   - `roofing_glossary_terms`: the exclusive glossary archive, term-route, SEO,
     contextual-linking, and glossary-sitemap source.
 - Next.js app pages: route layouts, components, and page body copy that has not yet moved to Directus.
@@ -180,6 +183,20 @@ Directus people
   profile image are fallback sources only.
 - `show_on_team` defaults to true. `noindex` defaults to true globally, while
   the approved ten SonShine profiles are explicitly set to false.
+
+Directus sponsor features
+
+- Homepage and location partnership cards read published `sponsor_features`
+  records from Directus unconditionally; there is no WordPress fallback.
+- `service_area_slugs` is an optional JSON tag list. A record with no values is
+  fallback-only. When at least four local matches exist, only those local
+  records render; otherwise local matches are merged ahead of the global,
+  manually sorted fallback.
+- The section heading and introductory copy remain code-owned. Sponsor title,
+  description, links, ordering, targeting, and logo are content-owned.
+- Every logo must have a Directus file description. The image pipeline fills
+  blank title/description metadata after upload, and the frontend rejects a
+  published sponsor whose logo description is missing.
 
 Directus roofing glossary
 
