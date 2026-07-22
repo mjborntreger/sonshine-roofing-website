@@ -127,11 +127,8 @@ Publishing roofing glossary terms in Directus
   superscript/subscript, ordered/unordered lists, list items, and line breaks.
   Images, headings, tables, classes, IDs, styles, scripts, and arbitrary source
   markup are unsupported; the frontend sanitizer is authoritative.
-- `external_id` and `source_updated_at` preserve WordPress migration provenance
-  and are read-only in the editor. Ordinary content and SEO fields remain
-  editorially owned by Directus after migration.
-- The migration utilities default to dry-run, import as drafts, verify source
-  parity independently, and publish only in a separate explicit operation.
+- Directus `date_updated` is the authoritative freshness timestamp for any
+  glossary term that is later made indexable and emitted in the sitemap.
 
 Publishing special offers in Directus
 

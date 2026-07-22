@@ -40,7 +40,6 @@ type DirectusGlossaryItem = {
   og_title?: unknown;
   og_description?: unknown;
   og_image_override?: unknown;
-  source_updated_at?: unknown;
   date_updated?: unknown;
 };
 
@@ -95,7 +94,6 @@ const DIRECTUS_FIELDS = [
   'og_image_override.description',
   'og_image_override.width',
   'og_image_override.height',
-  'source_updated_at',
   'date_updated',
 ] as const;
 
@@ -183,7 +181,7 @@ function mapGlossaryTerm(item: DirectusGlossaryItem, config: DirectusConfig): Gl
     contentPlain: glossaryHtmlToPlainText(definition.html),
     ...seo,
     ogImageOverride: mapImage(item.og_image_override, config),
-    modified: readString(item.source_updated_at) ?? readString(item.date_updated),
+    modified: readString(item.date_updated),
   };
 }
 

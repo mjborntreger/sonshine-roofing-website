@@ -21,12 +21,7 @@
     "verify:special-offer-indexing": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-special-offer-indexing.mjs",
     "verify:build-only-revalidation": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-build-only-revalidation.mjs",
     "migrate:persons:dry-run": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --dry-run",
-    "migrate:persons:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --apply",
-    "migrate:glossary:dry-run": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-glossary.mjs --dry-run",
-    "migrate:glossary:apply-drafts": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-glossary.mjs --apply-drafts",
-    "migrate:glossary:publish": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-glossary.mjs --publish",
-    "verify:glossary-migration:draft": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-glossary-directus-migration.mjs --expected-status=draft",
-    "verify:glossary-migration:published": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-glossary-directus-migration.mjs --expected-status=published"
+    "migrate:persons:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --apply"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",

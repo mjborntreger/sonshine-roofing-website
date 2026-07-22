@@ -92,7 +92,7 @@ export default function AnalyticsScripts({ enabled }: { enabled: boolean }) {
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
           fbq('init', '${META_PIXEL_ID}');
-          fbq('track', 'PageView', {value: 100.00, currency: USD});
+          fbq('track', 'PageView', {value: 100.00, currency: 'USD'});
         `}
       </Script>
       {/* Google Tag Manager (noscript) – place near start of body */}

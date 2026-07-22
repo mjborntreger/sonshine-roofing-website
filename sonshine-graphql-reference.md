@@ -410,16 +410,13 @@ Publication uses only `status`, and page scope uses only `website_page`.
   metadata and DefinedTerm schema.
 - **SEO and sitemap** – each term consumes its own `noindex` and optional SEO
   fields. The sitemap adapter excludes noindex terms; all migrated terms are
-  intentionally noindex while the glossary archive remains indexable.
-- **Migration utilities** – `scripts/migrate-wordpress-glossary.mjs` performs
-  dry-run, draft import, and separate publication modes. The independent
-  `scripts/verify-glossary-directus-migration.mjs` checks all 239 source/target
-  records, visible text, timestamps, route scope, publication, and indexing.
+  intentionally noindex while the glossary archive remains indexable. Directus
+  `date_updated` supplies freshness for any future sitemap entry.
 
 REST smoke-test shape:
 
 ```http
-GET /items/roofing_glossary_terms?fields=client.slug,status,slug,title,definition,noindex,meta_title,meta_description,primary_focus_keyword,focus_keywords,og_title,og_description,og_image_override.id,og_image_override.description,og_image_override.width,og_image_override.height,source_updated_at,date_updated&filter={"client":{"slug":{"_eq":"<DIRECTUS_CLIENT_SLUG>"}},"status":{"_eq":"published"},"slug":{"_eq":"<slug>"}}&limit=1
+GET /items/roofing_glossary_terms?fields=client.slug,status,slug,title,definition,noindex,meta_title,meta_description,primary_focus_keyword,focus_keywords,og_title,og_description,og_image_override.id,og_image_override.description,og_image_override.width,og_image_override.height,date_updated&filter={"client":{"slug":{"_eq":"<DIRECTUS_CLIENT_SLUG>"}},"status":{"_eq":"published"},"slug":{"_eq":"<slug>"}}&limit=1
 ```
 
 ---
