@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
-import { wpFetch } from '@/lib/content/wp';
+import { listGlossarySitemapEntries } from '@/lib/content/glossary';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
@@ -12,47 +12,10 @@ const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
 
-// Minimal node shape for sitemap entries
-interface Node { uri: string; modifiedGmt?: string | null }
-
-interface SitemapGlossaryResult {
-  glossaryTerms: {
-    pageInfo: { hasNextPage: boolean; endCursor: string | null };
-    nodes: Node[];
-  };
-}
-
-// Cache the list with a tag so WP can ping /api/revalidate to bust it
 const getGlossaryUrls = unstable_cache(
-  async () => {
-    const q = /* GraphQL */ `
-      query SitemapGlossary($first: Int!, $after: String) {
-        glossaryTerms(
-          first: $first,
-          after: $after,
-          where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-        ) {
-          pageInfo { hasNextPage endCursor }
-          nodes { uri modifiedGmt }
-        }
-      }
-    `;
-
-    const nodes: Node[] = [];
-    let after: string | undefined;
-
-    do {
-      const vars: { first: number; after?: string } = after ? { first: 200, after } : { first: 200 };
-      const data = await wpFetch<SitemapGlossaryResult>(q, vars);
-      const page = data?.glossaryTerms;
-      if (page?.nodes?.length) nodes.push(...page.nodes);
-      after = page?.pageInfo?.hasNextPage ? (page.pageInfo.endCursor ?? undefined) : undefined;
-    } while (after);
-
-    return nodes;
-  },
-  ['sitemap-glossary'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:glossary'] }
+  async () => listGlossarySitemapEntries(),
+  ['sitemap-glossary:directus'],
+  { revalidate: 3600, tags: ['sitemap', 'sitemap:glossary'] },
 );
 
 export async function GET() {
@@ -70,12 +33,9 @@ export async function GET() {
     head,
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
     ...items.map((n) => {
-      const rawPath = normalizeEntryPath(n.uri);
-      const path = rawPath.startsWith('/glossary_term/')
-        ? rawPath.replace('/glossary_term/', '/roofing-glossary/')
-        : rawPath;
+      const path = normalizeEntryPath(n.uri);
       const loc = `${BASE}${path}`;
-      const isoLastmod = formatLastmod(n.modifiedGmt);
+      const isoLastmod = formatLastmod(n.modified);
       const lastmod = isoLastmod ? `<lastmod>${isoLastmod}</lastmod>` : '';
       return `<url><loc>${loc}</loc>${lastmod}</url>`;
     }),

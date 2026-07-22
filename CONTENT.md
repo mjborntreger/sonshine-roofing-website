@@ -2,8 +2,8 @@
 
 Where content lives
 
-- WordPress (via WPGraphQL): remaining legacy projects, glossary, videos, and
-  location landing pages.
+- WordPress (via WPGraphQL): remaining legacy projects, videos, and location
+  landing pages.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
   - `blog_posts` and flat, client-scoped `blog_topics`: the exclusive blog
     source for archives, filters, post pages, recommendations, metadata, and
@@ -19,6 +19,8 @@ Where content lives
   - `persons`: the exclusive source for the ten approved SonShine profiles. The
     adapter covers team cards, profile routes, person navigation, metadata, and
     page/image sitemaps.
+  - `roofing_glossary_terms`: the exclusive source for the glossary archive,
+    term routes, route-owned SEO, contextual term linking, and glossary sitemap.
 - Next.js app pages: route layouts, components, and page body copy not yet moved to Directus.
 
 Publishing shared site content in Directus
@@ -111,6 +113,25 @@ Publishing SonShine people in Directus
 - Person SEO is stored explicitly in Directus, including the independently
   reviewed focus keywords. Display name/role, cleaned biography text, and the
   described profile image remain fallback sources only.
+
+Publishing roofing glossary terms in Directus
+
+- Directus is the only frontend glossary source; there is no WordPress fallback.
+- Every record requires the SonShine client, `status`, a client-scoped URL-safe
+  `slug`, `title`, restricted `definition` HTML, and database-maintained
+  `scope_key`.
+- Keep `noindex=true` on every glossary term. The `/roofing-glossary` archive
+  remains indexable through its separate `website_pages` record, while the
+  glossary sitemap emits only terms whose own `noindex` value is false.
+- `definition` allows paragraphs, links, bold/italic emphasis, inline code,
+  superscript/subscript, ordered/unordered lists, list items, and line breaks.
+  Images, headings, tables, classes, IDs, styles, scripts, and arbitrary source
+  markup are unsupported; the frontend sanitizer is authoritative.
+- `external_id` and `source_updated_at` preserve WordPress migration provenance
+  and are read-only in the editor. Ordinary content and SEO fields remain
+  editorially owned by Directus after migration.
+- The migration utilities default to dry-run, import as drafts, verify source
+  parity independently, and publish only in a separate explicit operation.
 
 Publishing special offers in Directus
 

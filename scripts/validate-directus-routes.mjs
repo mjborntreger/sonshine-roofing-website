@@ -189,9 +189,10 @@ if (clientSlug === "borntreger-digital") {
 }
 
 if (clientSlug === "sonshine-roofing") {
-  const [offers, persons] = await Promise.all([
+  const [offers, persons, glossaryTerms] = await Promise.all([
     readCollection("special_offers", ["id", "slug", "scope_key"]),
     readCollection("persons", ["id", "slug", "scope_key"]),
+    readCollection("roofing_glossary_terms", ["id", "slug", "scope_key"]),
   ]);
   for (const offer of offers) {
     const slug = normalizeSlug(offer.slug, "special_offers " + offer.id);
@@ -200,6 +201,15 @@ if (clientSlug === "sonshine-roofing") {
   for (const person of persons) {
     const slug = normalizeSlug(person.slug, "persons " + person.id);
     addOwner("persons", person.id, "/person/" + slug, person.scope_key);
+  }
+  for (const term of glossaryTerms) {
+    const slug = normalizeSlug(term.slug, "roofing_glossary_terms " + term.id);
+    addOwner(
+      "roofing_glossary_terms",
+      term.id,
+      "/roofing-glossary/" + slug,
+      term.scope_key,
+    );
   }
 }
 

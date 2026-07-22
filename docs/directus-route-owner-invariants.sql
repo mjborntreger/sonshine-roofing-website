@@ -2,6 +2,13 @@
 -- Directus exposes scope_key as hidden and read-only; this trigger is the
 -- authority and rewrites it whenever client, path/slug, or scope_key changes.
 
+UPDATE public.directus_fields
+SET validation = '{"_and":[{"slug":{"_regex":"^[a-z0-9]+(?:-[a-z0-9]+)*$"}}]}'::json,
+    validation_message =
+      'Use a lowercase URL slug with letters, numbers, and single hyphens only.'
+WHERE collection = 'roofing_glossary_terms'
+  AND field = 'slug';
+
 CREATE OR REPLACE FUNCTION public.maintain_client_route_scope_key()
 RETURNS trigger
 LANGUAGE plpgsql
@@ -85,6 +92,13 @@ ON public.persons
 FOR EACH ROW
 EXECUTE FUNCTION public.maintain_client_route_scope_key('slug');
 
+DROP TRIGGER IF EXISTS roofing_glossary_term_scope_key ON public.roofing_glossary_terms;
+CREATE TRIGGER roofing_glossary_term_scope_key
+BEFORE INSERT OR UPDATE OF client, slug, scope_key
+ON public.roofing_glossary_terms
+FOR EACH ROW
+EXECUTE FUNCTION public.maintain_client_route_scope_key('slug');
+
 -- Populate all existing rows through the same trigger path.
 UPDATE public.website_pages SET scope_key = scope_key;
 UPDATE public.services SET scope_key = scope_key;
@@ -92,6 +106,7 @@ UPDATE public.blog_posts SET scope_key = scope_key;
 UPDATE public.case_studies SET scope_key = scope_key;
 UPDATE public.special_offers SET scope_key = scope_key;
 UPDATE public.persons SET scope_key = scope_key;
+UPDATE public.roofing_glossary_terms SET scope_key = scope_key;
 
 ALTER TABLE public.website_pages
   ALTER COLUMN scope_key SET NOT NULL,
@@ -102,3 +117,6 @@ ALTER TABLE public.blog_posts ALTER COLUMN scope_key SET NOT NULL;
 ALTER TABLE public.case_studies ALTER COLUMN scope_key SET NOT NULL;
 ALTER TABLE public.special_offers ALTER COLUMN scope_key SET NOT NULL;
 ALTER TABLE public.persons ALTER COLUMN scope_key SET NOT NULL;
+ALTER TABLE public.roofing_glossary_terms
+  ALTER COLUMN scope_key SET DEFAULT '',
+  ALTER COLUMN scope_key SET NOT NULL;

@@ -21,6 +21,9 @@ Sitemaps
   - `/sitemap_index/static` (build-time manifest)
   - `/sitemap_index/blog`, `/project`, `/location`, `/roofing-glossary`, `/person`, `/special-offer`, `/video`, `/image`
 - The `/faq` archive remains in the static manifest; individual FAQ anchors are not sitemap URLs.
+- `/sitemap_index/roofing-glossary` reads Directus and emits only term records
+  whose own `noindex` value is false. All current glossary terms are noindex, so
+  the child sitemap is intentionally empty while the archive remains indexable.
 - Preview mode on staging: set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`.
 - After releases that touch image content, resubmit `/sitemap_index/image` in Search Console.
 

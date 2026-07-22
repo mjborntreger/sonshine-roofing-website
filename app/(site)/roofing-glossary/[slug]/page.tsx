@@ -1,508 +1,181 @@
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
 import Section from '@/components/layout/Section';
 import SmartLink from '@/components/utils/SmartLink';
-import { createElement, Fragment, ReactNode } from 'react';
-import { notFound } from 'next/navigation';
-import { getGlossaryTerm, listGlossaryIndex, stripHtml } from '@/lib/content/wp';
-import type { Metadata } from 'next';
+import {
+  getGlossaryTerm,
+  listGlossaryIndex,
+  type GlossarySummary,
+} from '@/lib/content/glossary';
+import { getSiteSettings } from '@/lib/content/directus-site';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, definedTermSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 
-// Escapes a string for safe use inside a RegExp
-function escapeRegExp(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function decodeHtmlEntities(input: string): string {
-  if (!input) return "";
-  const namedEntityMap: Record<string, string> = {
-    amp: "&",
-    lt: "<",
-    gt: ">",
-    quot: '"',
-    apos: "'",
-    nbsp: " ",
-    rsquo: "’",
-    lsquo: "‘",
-    ldquo: "“",
-    rdquo: "”",
-    ndash: "–",
-    mdash: "—",
-    hellip: "…",
-  };
-  return input
-    .replace(/&#(\d+);/g, (_, dec: string) => {
-      const codePoint = Number.parseInt(dec, 10);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : "";
-    })
-    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => {
-      const codePoint = Number.parseInt(hex, 16);
-      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : "";
-    })
-    .replace(/&([a-zA-Z]+);/g, (_, name: string) => {
-      const mapped = namedEntityMap[name.toLowerCase()];
-      return mapped ?? `&${name};`;
-    });
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 /**
- * Auto-link occurrences of glossary terms in an HTML string.
- * - Skips the current term
- * - Avoids replacing inside <a>, <code>, or <pre>
- * - Links the first occurrence of each term (longest titles matched first)
- * - Word-boundary aware (letters/digits/underscore/hyphen)
+ * Link the first plain-text occurrence of each other glossary term. Directus
+ * HTML is sanitized before this helper runs, and inserted href/class values
+ * are generated exclusively from validated slugs and static markup.
  */
 function autoLinkGlossary(
   html: string,
-  index: { slug: string; title: string }[],
-  currentSlug: string
+  index: Array<Pick<GlossarySummary, 'slug' | 'title'>>,
+  currentSlug: string,
 ): string {
-  if (!html || !Array.isArray(index)) return html;
+  if (!html || !index.length) return html;
 
-  // Build candidate list (exclude current term)
   const candidates = index
-    .filter((t) => t && t.slug !== currentSlug && t.title)
-    // Sort longest first so multi-word terms win before single words
-    .sort((a, b) => b.title.length - a.title.length);
-
+    .filter((term) => term.slug !== currentSlug && term.title)
+    .sort((left, right) => right.title.length - left.title.length);
   if (!candidates.length) return html;
 
-  // Build quick lookup by lowercase title for replacement callback
-  const byTitle = new Map<string, string>(); // titleLower -> slug
-  for (const t of candidates) byTitle.set(t.title.toLowerCase(), t.slug);
-
-  // Build a single alternation regex of escaped titles
-  // Use custom word boundaries to avoid partial matches (allow hyphens)
-  const pattern = candidates
-    .map((t) => escapeRegExp(t.title))
-    .join("|");
+  const byTitle = new Map(candidates.map((term) => [term.title.toLowerCase(), term.slug]));
+  const pattern = candidates.map((term) => escapeRegExp(term.title)).join('|');
   if (!pattern) return html;
-  const re = new RegExp(
-    `(?<![\\w-])(${pattern})(?![\\w-])`,
-    "gi"
-  );
-
-  // Tokenize by tags so we only replace in text nodes, and track when inside <a>, <code>, <pre>
+  const matcher = new RegExp(`(?<![\\w-])(${pattern})(?![\\w-])`, 'gi');
   const tokens = html.split(/(<[^>]+>)/g);
+  const linkedOnce = new Set<string>();
   let inAnchor = false;
-  let inCodeLike = false;
-  const linkedOnce = new Set<string>(); // slug -> linked?
-  let linkBudget = 40; // avoid overlinking
+  let inCode = false;
+  let linkBudget = 40;
 
-  for (let i = 0; i < tokens.length; i++) {
-    const tok = tokens[i];
-    if (!tok) continue;
-
-    if (tok.startsWith("<")) {
-      const isOpenA = /^<a\b/i.test(tok);
-      const isCloseA = /^<\/a\b/i.test(tok);
-      const isOpenCode = /^<(code|pre)\b/i.test(tok);
-      const isCloseCode = /^<\/(code|pre)\b/i.test(tok);
-      if (isOpenA) inAnchor = true;
-      else if (isCloseA) inAnchor = false;
-      if (isOpenCode) inCodeLike = true;
-      else if (isCloseCode) inCodeLike = false;
-      continue; // tags unchanged
-    }
-
-    // Text node
-    if (!inAnchor && !inCodeLike && linkBudget > 0) {
-      tokens[i] = tok.replace(re, (match) => {
-        if (linkBudget <= 0) return match;
-        const key = match.toLowerCase();
-        const slug = byTitle.get(key);
-        if (!slug || linkedOnce.has(slug)) return match;
-        linkedOnce.add(slug);
-        linkBudget--;
-        return `<a href="/roofing-glossary/${slug}" class="underline decoration-dotted hover:decoration-solid">${match}</a>`;
-      });
-    }
-  }
-
-  return tokens.join("");
-}
-
-type TextNode = { type: 'text'; content: string };
-type ElementNode = { type: 'element'; tag: string; attrs: Record<string, string>; children: HtmlNode[] };
-type HtmlNode = TextNode | ElementNode;
-
-const VOID_ELEMENTS = new Set([
-  'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'
-]);
-
-const BOOLEAN_ATTRIBUTES = new Set([
-  'allowfullscreen', 'allowpaymentrequest', 'async', 'autofocus', 'autoplay', 'checked', 'controls', 'default',
-  'defer', 'disabled', 'formnovalidate', 'hidden', 'loop', 'multiple', 'muted', 'nomodule', 'novalidate', 'open',
-  'playsinline', 'readonly', 'required', 'reversed', 'scoped', 'seamless', 'selected'
-]);
-
-function parseAttributes(raw: string): Record<string, string> {
-  const attrs: Record<string, string> = {};
-  const attrRegex = /([\w:-]+)(?:\s*=\s*("([^"]*)"|'([^']*)'|([^\s"'`=<>]+)))?/g;
-  let match: RegExpExecArray | null;
-  while ((match = attrRegex.exec(raw))) {
-    const name = match[1];
-    const value = match[3] ?? match[4] ?? match[5] ?? '';
-    attrs[name] = value;
-  }
-  return attrs;
-}
-
-function parseHtmlToTree(html: string): HtmlNode[] {
-  if (!html) return [];
-  const root: ElementNode = { type: 'element', tag: '__root__', attrs: {}, children: [] };
-  const stack: ElementNode[] = [root];
-  const tokens = html.split(/(<[^>]+>)/g);
-
-  for (const token of tokens) {
+  for (let indexPosition = 0; indexPosition < tokens.length; indexPosition += 1) {
+    const token = tokens[indexPosition];
     if (!token) continue;
     if (token.startsWith('<')) {
-      if (/^<!/.test(token)) continue; // skip comments/doctypes
-      const closing = /^<\//.test(token);
-      if (closing) {
-        const closeMatch = token.match(/^<\/([\w:-]+)>/);
-        if (!closeMatch) continue;
-        const tag = closeMatch[1].toLowerCase();
-        for (let i = stack.length - 1; i >= 0; i -= 1) {
-          const node = stack[i];
-          if (node.type === 'element' && node.tag === tag) {
-            stack.length = i;
-            break;
-          }
-        }
-        continue;
-      }
-
-      const openMatch = token.match(/^<([\w:-]+)([\s\S]*?)(\/?)>$/);
-      if (!openMatch) {
-        // treat malformed tag as text
-        const parent = stack[stack.length - 1];
-        if (parent && parent.type === 'element') {
-          parent.children.push({ type: 'text', content: token });
-        }
-        continue;
-      }
-
-      const tag = openMatch[1].toLowerCase();
-      const attrString = openMatch[2] || '';
-      const selfClosing = Boolean(openMatch[3]) || VOID_ELEMENTS.has(tag);
-      const attrs = parseAttributes(attrString);
-      const elementNode: ElementNode = { type: 'element', tag, attrs, children: [] };
-      const parent = stack[stack.length - 1];
-      parent.children.push(elementNode);
-      if (!selfClosing) {
-        stack.push(elementNode);
-      }
+      if (/^<a\b/i.test(token)) inAnchor = true;
+      else if (/^<\/a\b/i.test(token)) inAnchor = false;
+      if (/^<code\b/i.test(token)) inCode = true;
+      else if (/^<\/code\b/i.test(token)) inCode = false;
       continue;
     }
+    if (inAnchor || inCode || linkBudget <= 0) continue;
 
-    const parent = stack[stack.length - 1];
-    parent.children.push({ type: 'text', content: token });
-  }
-
-  return root.children;
-}
-
-const ALLOWED_TAGS = new Set([
-  'p', 'ul', 'ol', 'li', 'strong', 'em', 'b', 'i', 'a', 'code', 'sup', 'sub', 'br'
-]);
-const DROP_TAGS = new Set(['script', 'style', 'iframe', 'object', 'embed', 'template', 'noscript']);
-
-function sanitizeHref(href: string): string | null {
-  const trimmed = href.trim();
-  if (!trimmed) return null;
-  const lower = trimmed.toLowerCase();
-  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) return null;
-
-  // Allow https/http/mailto/tel schemes, otherwise require relative/hash links
-  if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) {
-    const scheme = trimmed.split(':', 1)[0].toLowerCase();
-    if (scheme === 'https' || scheme === 'http' || scheme === 'mailto' || scheme === 'tel') {
-      return trimmed;
-    }
-    return null;
-  }
-
-  return trimmed;
-}
-
-function sanitizeGlossaryNodes(nodes: HtmlNode[]): HtmlNode[] {
-  const out: HtmlNode[] = [];
-  for (const node of nodes) {
-    if (node.type === 'text') {
-      out.push({ type: 'text', content: decodeHtmlEntities(node.content) });
-      continue;
-    }
-
-    const tag = node.tag.toLowerCase();
-    if (DROP_TAGS.has(tag)) continue;
-
-    const children = sanitizeGlossaryNodes(node.children);
-
-    if (!ALLOWED_TAGS.has(tag)) {
-      out.push(...children);
-      continue;
-    }
-
-    if (tag === 'br') {
-      out.push({ type: 'element', tag, attrs: {}, children: [] });
-      continue;
-    }
-
-    if (tag === 'a') {
-      const href = typeof node.attrs.href === 'string' ? sanitizeHref(node.attrs.href) : null;
-      if (!href) {
-        out.push(...children);
-        continue;
-      }
-      const attrs: Record<string, string> = { href };
-      if (typeof node.attrs.title === 'string') attrs.title = node.attrs.title;
-      if (typeof node.attrs.class === 'string') attrs.class = node.attrs.class;
-      out.push({ type: 'element', tag, attrs, children });
-      continue;
-    }
-
-    out.push({ type: 'element', tag, attrs: {}, children });
-  }
-  return out;
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
-
-function escapeAttribute(value: string) {
-  return escapeHtml(value).replace(/"/g, '&quot;');
-}
-
-function serializeNodes(nodes: HtmlNode[]): string {
-  return nodes
-    .map((node) => {
-      if (node.type === 'text') return escapeHtml(node.content);
-      const attrs = Object.entries(node.attrs ?? {})
-        .map(([name, value]) => `${name}="${escapeAttribute(String(value))}"`)
-        .join(' ');
-      const openTag = attrs ? `<${node.tag} ${attrs}>` : `<${node.tag}>`;
-      if (VOID_ELEMENTS.has(node.tag)) return openTag;
-      const children = serializeNodes(node.children || []);
-      return `${openTag}${children}</${node.tag}>`;
-    })
-    .join('');
-}
-
-function sanitizeGlossaryHtml(html: string): string {
-  if (!html) return '';
-  const parsed = parseHtmlToTree(html);
-  const sanitized = sanitizeGlossaryNodes(parsed);
-  return serializeNodes(sanitized);
-}
-
-const dashedToCamel = (prop: string) => prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-
-function parseStyle(value: string) {
-  const style: Record<string, string> = {};
-  value
-    .split(';')
-    .map((segment) => segment.trim())
-    .filter(Boolean)
-    .forEach((segment) => {
-      const [prop, rawVal] = segment.split(':');
-      if (!prop) return;
-      const formattedProp = dashedToCamel(prop.trim());
-      const val = (rawVal ?? '').trim();
-      if (formattedProp) style[formattedProp] = val;
+    tokens[indexPosition] = token.replace(matcher, (match) => {
+      if (linkBudget <= 0) return match;
+      const slug = byTitle.get(match.toLowerCase());
+      if (!slug || linkedOnce.has(slug)) return match;
+      linkedOnce.add(slug);
+      linkBudget -= 1;
+      return `<a href="/roofing-glossary/${slug}" class="underline decoration-dotted hover:decoration-solid">${match}</a>`;
     });
-  return style;
-}
-
-const ATTRIBUTE_RENAME: Record<string, string> = {
-  class: 'className',
-  for: 'htmlFor',
-};
-
-function attributeNameToProp(name: string) {
-  if (ATTRIBUTE_RENAME[name]) return ATTRIBUTE_RENAME[name];
-  if (name.startsWith('data-') || name.startsWith('aria-')) return name;
-  return dashedToCamel(name);
-}
-
-function attributesToProps(attrs: Record<string, string>) {
-  const props: Record<string, unknown> = {};
-  for (const [name, rawValue] of Object.entries(attrs)) {
-    const lower = name.toLowerCase();
-    if (lower === 'style') continue; // strip inline styles
-    if (lower.startsWith('on')) continue; // drop event handlers
-    const propName = attributeNameToProp(name);
-    if (propName === 'style') {
-      props.style = parseStyle(rawValue);
-      continue;
-    }
-    if (BOOLEAN_ATTRIBUTES.has(name.toLowerCase()) && rawValue === '') {
-      props[propName] = true;
-      continue;
-    }
-    props[propName] = rawValue;
-  }
-  return props;
-}
-
-function isInternalHref(href: string): boolean {
-  if (!href) return false;
-  return (
-    href.startsWith('/') ||
-    href.startsWith('#') ||
-    href.startsWith('./') ||
-    href.startsWith('../')
-  );
-}
-
-function renderNodes(nodes: HtmlNode[], keyPrefix = 'glossary'):
-  ReactNode[] {
-  return nodes.map((node, idx) => renderNode(node, `${keyPrefix}-${idx}`));
-}
-
-function renderNode(node: HtmlNode, key: string): ReactNode {
-  if (node.type === 'text') {
-    return createElement(Fragment, { key }, node.content);
   }
 
-  const props = attributesToProps(node.attrs);
-  const children = node.children.length ? renderNodes(node.children, key) : [];
-
-  if (node.tag === 'a') {
-    const { href, ...rest } = props;
-    if (typeof href === 'string' && isInternalHref(href)) {
-      return createElement(
-        SmartLink,
-        { key, href, ...rest },
-        ...children
-      );
-    }
-    return createElement('a', { key, href, ...rest }, ...children);
-  }
-
-  if (VOID_ELEMENTS.has(node.tag)) {
-    return createElement(node.tag, { key, ...props });
-  }
-
-  return createElement(node.tag, { key, ...props }, ...children);
-}
-
-function renderGlossaryHtml(
-  html: string,
-  index: { slug: string; title: string }[],
-  currentSlug: string
-): ReactNode {
-  if (!html) return null;
-  const sanitized = sanitizeGlossaryHtml(html);
-  const linked = autoLinkGlossary(sanitized, index, currentSlug);
-  const nodes = parseHtmlToTree(linked);
-  const safeNodes = sanitizeGlossaryNodes(nodes);
-  return renderNodes(safeNodes);
+  return tokens.join('');
 }
 
 export const revalidate = 86400;
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
   const { slug } = await params;
-
-  try {
-    const term = await getGlossaryTerm(slug);
-    if (!term) notFound();
-
-    const title = `${term.title} | Roofing Glossary`;
-    const description = stripHtml(term.contentHtml || '').slice(0, 160);
-
-    const metadata = buildBasicMetadata({
-      title,
-      description,
-      path: `/roofing-glossary/${term.slug}`,
-      image: { url: '/og-default.png', width: 1200, height: 630 },
-    });
-    metadata.robots = { index: true, follow: true };
-    return metadata;
-  } catch {
-    notFound();
-  }
-}
-
-// (Optional) Prebuild many static pages:
-export async function generateStaticParams() {
-  const index = await listGlossaryIndex(1000).catch(() => []);
-  return index.map((t) => ({ slug: t.slug }));
-}
-
-export default async function GlossaryTermPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const [index, term] = await Promise.all([
-    listGlossaryIndex(1000).catch(() => []),
-    getGlossaryTerm(slug),
-  ]);
-
+  const [term, settings] = await Promise.all([getGlossaryTerm(slug), getSiteSettings()]);
   if (!term) notFound();
 
-  // Compute prev/next from the index
-  const pos = index.findIndex((t) => t.slug === slug);
-  const hasPos = pos >= 0;
-  const prev = hasPos && pos > 0 ? index[pos - 1] : hasPos ? index[index.length - 1] : null;
-  const next = hasPos && pos < index.length - 1 ? index[pos + 1] : hasPos ? index[0] : null;
+  const description =
+    term.metaDescription ?? term.contentPlain.slice(0, 160) ?? 'SonShine Roofing glossary term.';
+  const image = term.ogImageOverride ?? settings?.defaultOgImage;
+  return buildBasicMetadata({
+    title: term.metaTitle ?? `${term.title} | Roofing Glossary`,
+    description,
+    openGraphTitle: term.ogTitle ?? term.metaTitle ?? undefined,
+    openGraphDescription: term.ogDescription ?? term.metaDescription ?? undefined,
+    path: `/roofing-glossary/${term.slug}`,
+    keywords: term.focusKeywords,
+    image: image
+      ? {
+          url: image.url,
+          width: image.width ?? undefined,
+          height: image.height ?? undefined,
+          alt: 'altText' in image ? image.altText : image.description,
+        }
+      : { url: '/og-default.png', width: 1200, height: 630 },
+    robots: { index: !term.noindex, follow: true },
+  });
+}
 
-  const origin = SITE_ORIGIN;
+export async function generateStaticParams() {
+  const index = await listGlossaryIndex(500);
+  return index.map((term) => ({ slug: term.slug }));
+}
+
+export default async function GlossaryTermPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const [index, term] = await Promise.all([listGlossaryIndex(500), getGlossaryTerm(slug)]);
+  if (!term) notFound();
+
+  const position = index.findIndex((item) => item.slug === slug);
+  const hasPosition = position >= 0;
+  const previous =
+    hasPosition && position > 0 ? index[position - 1] : hasPosition ? index[index.length - 1] : null;
+  const next =
+    hasPosition && position < index.length - 1 ? index[position + 1] : hasPosition ? index[0] : null;
   const termPath = `/roofing-glossary/${term.slug}`;
+  const linkedHtml = autoLinkGlossary(term.contentHtml, index, term.slug);
 
   const definedTermLd = definedTermSchema({
     name: term.title,
-    description: stripHtml(term.contentHtml || '').slice(0, 300),
+    description: term.contentPlain.slice(0, 300),
     url: termPath,
     inDefinedTermSet: '/roofing-glossary',
-    origin,
+    origin: SITE_ORIGIN,
   });
-
   const breadcrumbsLd = breadcrumbSchema(
     [
       { name: 'Home', item: '/' },
       { name: 'Roofing Glossary', item: '/roofing-glossary' },
       { name: term.title, item: termPath },
     ],
-    { origin },
+    { origin: SITE_ORIGIN },
   );
 
   return (
     <Section>
-      <div className="py-8 container-edge">
+      <div className="container-edge py-8">
         <nav className="mb-4 text-sm text-slate-600">
-          <SmartLink href="/roofing-glossary" className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline">← Back to Glossary</SmartLink>
+          <SmartLink
+            href="/roofing-glossary"
+            className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline"
+          >
+            ← Back to Glossary
+          </SmartLink>
         </nav>
 
         <article className="prose max-w-none">
           <h1>{term.title}</h1>
-          {/* JSON-LD: DefinedTerm + Breadcrumbs */}
           <JsonLd data={definedTermLd} />
           <JsonLd data={breadcrumbsLd} />
-          {/* definition body from WordPress */}
-          <div>
-            {renderGlossaryHtml(term.contentHtml || '', index, term.slug)}
-          </div>
+          <div dangerouslySetInnerHTML={{ __html: linkedHtml }} />
         </article>
 
-        {/* Prev / Next navigation */}
-        {hasPos && (
-          <nav className="flex items-center justify-between gap-4 mt-10" aria-label="Term navigation">
-            {prev ? (
+        {hasPosition && (
+          <nav className="mt-10 flex items-center justify-between gap-4" aria-label="Term navigation">
+            {previous ? (
               <SmartLink
-                href={`/roofing-glossary/${prev.slug}`}
+                href={`/roofing-glossary/${previous.slug}`}
                 rel="prev"
                 className="group inline-flex max-w-[48%] items-center gap-2 rounded-md border border-blue-200 bg-white px-3 py-2 text-sm hover:bg-slate-50"
-                aria-label={`Previous term: ${prev.title}`}
+                aria-label={`Previous term: ${previous.title}`}
               >
                 <span aria-hidden>←</span>
-                <span className="truncate">{prev.title}</span>
+                <span className="truncate">{previous.title}</span>
               </SmartLink>
-            ) : <span />}
+            ) : (
+              <span />
+            )}
 
             {next ? (
               <SmartLink
@@ -514,7 +187,9 @@ export default async function GlossaryTermPage({ params }: { params: Promise<{ s
                 <span className="truncate">{next.title}</span>
                 <span aria-hidden>→</span>
               </SmartLink>
-            ) : <span />}
+            ) : (
+              <span />
+            )}
           </nav>
         )}
       </div>

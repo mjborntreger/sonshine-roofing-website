@@ -1,5 +1,5 @@
 import Section from '@/components/layout/Section';
-import { listGlossaryIndex, stripHtml } from '@/lib/content/wp';
+import { listGlossaryIndex } from '@/lib/content/glossary';
 import GlossaryQuickSearch from '@/components/dynamic-content/roofing-glossary/GlossaryQuickSearch';
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import type { Metadata } from 'next';
@@ -27,13 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GlossaryArchivePage() {
-  let terms: Awaited<ReturnType<typeof listGlossaryIndex>> = [];
-  try {
-    terms = await listGlossaryIndex(500);
-  } catch (error) {
-    console.error('[roofing-glossary] Failed to load glossary index:', error);
-    terms = [];
-  }
+  const terms = await listGlossaryIndex(500);
 
   // Group by first letter (A-Z, then # for non-letters)
   const groups = new Map<string, { title: string; slug: string }[]>();
@@ -52,7 +46,7 @@ export default async function GlossaryArchivePage() {
   const definedTerms = terms.map((t) =>
     definedTermSchema({
       name: t.title,
-      description: stripHtml(t.excerpt ?? '').slice(0, 200),
+      description: t.excerpt.slice(0, 200),
       url: `${PAGE_PATH}/${t.slug}`,
       inDefinedTermSet: PAGE_PATH,
       origin,

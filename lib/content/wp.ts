@@ -675,19 +675,6 @@ export async function listSponsorFeaturesByServiceArea(
   return merged;
 }
 
-// ----- Glossary Types -----
-export type GlossarySummary = {
-  slug: string;
-  title: string;
-  excerpt?: string | null;
-};
-
-export type GlossaryTerm = {
-  slug: string;
-  title: string;
-  contentHtml: string;
-};
-
 // ----- Core fetcher -----
 function getAuthHeader(): string | null {
   if (!WP_USER || !WP_PASS) return null;
@@ -899,90 +886,7 @@ export function youtubeThumb(id: string) {
   return `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
 }
 
-// Internal: WPGraphQL response shape for glossary index pagination
-type GlossaryIndexResponse = {
-  glossaryTerms: {
-    nodes: Array<{ slug: string; title: string; content?: string | null }>;
-    pageInfo: { hasNextPage: boolean; endCursor: string | null };
-  };
-};
-
 // ----- Queries -----
-
-// List lightweight glossary index (title + slug), A→Z
-export async function listGlossaryIndex(limit = 500): Promise<GlossarySummary[]> {
-  const query = /* GraphQL */ `
-    query GlossaryIndex($first: Int!, $after: String) {
-      glossaryTerms(
-        first: $first,
-        after: $after,
-        where: { status: PUBLISH, orderby: { field: TITLE, order: ASC } }
-      ) {
-        nodes { slug title content(format: RENDERED) }
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-      }
-    }
-  `;
-
-  const pageSize = Math.min(100, Math.max(1, limit)); // WPGraphQL often caps ~100
-  const out: GlossarySummary[] = [];
-  let after: string | null = null;
-  let hasNext = true;
-
-  while (hasNext && out.length < limit) {
-    const resp: GlossaryIndexResponse = await wpFetch<GlossaryIndexResponse>(
-      query,
-      { first: pageSize, after }
-    );
-
-    const nodes: GlossaryIndexResponse['glossaryTerms']['nodes'] = resp?.glossaryTerms?.nodes ?? [];
-    for (const n of nodes) {
-      const raw = typeof n.content === 'string' ? n.content : '';
-      const text = raw ? stripHtml(raw) : '';
-      out.push({
-        slug: String(n.slug || ''),
-        title: String(n.title || ''),
-        excerpt: text || null,
-      });
-      if (out.length >= limit) break;
-    }
-
-    const pageInfo: GlossaryIndexResponse['glossaryTerms']['pageInfo'] | null =
-      resp?.glossaryTerms?.pageInfo ?? null;
-    hasNext = Boolean(pageInfo?.hasNextPage);
-    after = pageInfo?.endCursor ?? null;
-  }
-
-  return out;
-}
-
-// Fetch one term by slug
-export async function getGlossaryTerm(slug: string): Promise<GlossaryTerm | null> {
-  const query = /* GraphQL */ `
-    query GlossaryBySlug($slug: ID!) {
-      glossaryTerm(id: $slug, idType: SLUG) {
-        slug
-        title
-        content(format: RENDERED)
-      }
-    }
-  `;
-
-  const data = await wpFetch<{ glossaryTerm: UnknownRecord | null }>(query, { slug });
-  const n = data?.glossaryTerm;
-  if (!n) return null;
-
-  return {
-    slug: String(n.slug || slug),
-    title: String(n.title || ''),
-    contentHtml: String(n.content || ''),
-  };
-}
-
-
 // ----- VIDEO ENTRY (Commercials, Accolades, Education, etc.) -----
 export async function listRecentVideoEntries(limit = 50): Promise<VideoItem[]> {
   const query = /* GraphQL */ `

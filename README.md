@@ -100,8 +100,8 @@ Security headers
 
 Where content lives
 
-- WordPress (via WPGraphQL): remaining legacy projects, glossary, videos, and
-  location landing pages.
+- WordPress (via WPGraphQL): remaining legacy projects, videos, and location
+  landing pages.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
   - `blog_posts` + flat, client-scoped `blog_topics`: the exclusive blog source;
     the adapter covers archive pagination, search/topic facets, detail pages,
@@ -114,12 +114,15 @@ Where content lives
   - `special_offers`: offer pages, route-owned SEO, and the featured offer popup.
   - `legal_copy`: WYSIWYG privacy/SMS terms content.
   - `persons`: the exclusive SonShine team/profile source.
+  - `roofing_glossary_terms`: the exclusive glossary archive, term-route, SEO,
+    contextual-linking, and glossary-sitemap source.
 - Next.js app pages: route layouts, components, and page body copy that has not yet moved to Directus.
 
 Directus-backed static page metadata falls back to the route's local metadata when Directus is unavailable outside production. Every referenced Directus image must have a `directus_files.description`; missing descriptions fail the content read instead of producing empty alt text.
 
-The route-owning `website_pages`, `services`, `blog_posts`, `special_offers`, and
-`persons` collections use one `seo` field group: `noindex`, `meta_title`,
+The route-owning `website_pages`, `services`, `blog_posts`, `special_offers`,
+`persons`, and `roofing_glossary_terms` collections use one `seo` field group:
+`noindex`, `meta_title`,
 `meta_description`, `primary_focus_keyword`, `focus_keywords`, `og_title`,
 `og_description`, and `og_image_override`. `noindex` stays visible; the remaining
 fields hide when it is true, and meta/keyword fields are editor-required when it
@@ -177,6 +180,18 @@ Directus people
   profile image are fallback sources only.
 - `show_on_team` defaults to true. `noindex` defaults to true globally, while
   the approved ten SonShine profiles are explicitly set to false.
+
+Directus roofing glossary
+
+- Archive, search data, term pages, previous/next navigation, contextual
+  linking, metadata, structured data, static params, and the glossary sitemap
+  read published `roofing_glossary_terms` records from Directus unconditionally.
+- Every term owns its SEO fields and remains `noindex=true`; the separate
+  `/roofing-glossary` `website_pages` record remains indexable.
+- The restricted HTML sanitizer permits paragraphs, links, emphasis, inline
+  code, superscript/subscript, lists, and line breaks only.
+- WordPress glossary queries and a glossary-source fallback are intentionally
+  unsupported.
 
 Glossary linking
 

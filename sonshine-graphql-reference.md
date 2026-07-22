@@ -1,6 +1,6 @@
 # SonShine Roofing – WPGraphQL Reference
 
-`lib/content/wp.ts` centralises every GraphQL interaction with the headless WordPress instance. This document inventories those calls, with an emphasis on how dynamic slugs and custom post types flow into Next.js routes. Special offers now live in Directus and are documented separately below.
+`lib/content/wp.ts` centralises the remaining GraphQL interactions with the headless WordPress instance. This document inventories those calls, with an emphasis on how dynamic slugs and custom post types flow into Next.js routes. Directus-backed domains, including the roofing glossary, are documented separately below.
 
 ---
 
@@ -35,7 +35,6 @@ const data = await wpFetch<MyQuery>(query, vars, { revalidateSeconds: 3600, cach
 | Blog posts | `post` / `posts` | `listPostSlugs` (600 s) | `getPostBySlug` | `app/[slug]/page.tsx` |
 | Projects | `project` / `projects` | `listProjectSlugs` (600 s) | `getProjectBySlug` (URI-based) | `app/project/[slug]/page.tsx` |
 | Locations | `location` / `locations` | `listLocationSlugs` (600 s) | `getLocationBySlug` | `app/locations/[slug]/page.tsx` |
-| Glossary terms | `glossaryTerm` / `glossaryTerms` | `listGlossaryIndex` (batched, 600 s) | `getGlossaryTerm` | `app/roofing-glossary/[slug]/page.tsx` |
 | Team members | `person` / `persons` | `listPersonNav` (86 400 s) | `listPersonsBySlug` (caller sets revalidate) | `app/person/[slug]/page.tsx` |
 | Video entries | `videoEntry` / `videoEntries` | n/a (pool only) | `getVideoEntryBySlug` (900 s) | Consumed by `components/dynamic-content/video/*` |
 
@@ -396,41 +395,31 @@ Publication uses only `status`, and page scope uses only `website_page`.
 
 ---
 
-## Glossary terms (`glossaryTerm`)
+## Roofing glossary (`roofing_glossary_terms` in Directus)
 
-- **Index as slug source** – `listGlossaryIndex(limit = 500)` paginates through `glossaryTerms` (status = PUBLISH, title ASC), collecting slugs, titles, and stripped excerpts. Each page fetch honours the default 600 s cache.
-- **Single fetch** – `getGlossaryTerm(slug)` pulls rendered content via `glossaryTerm(id: $slug, idType: SLUG)`.
-- **Next usage** – `app/roofing-glossary/[slug]/page.tsx` calls the index to build static params and contextual linking, then hydrates with `getGlossaryTerm`.
-- **Client helpers** – `stripHtml` plus custom auto-linking in the page ensure internal references between terms.
+- **Fetcher module** – `lib/content/glossary.ts` uses the Directus Items REST
+  API with the server-only Directus token and a 900-second tagged cache.
+- **Collection filter** – every read requires related
+  `client.slug = DIRECTUS_CLIENT_SLUG` and `status = published`; there is no
+  WordPress fallback.
+- **Index and single fetches** – `listGlossaryIndex(limit = 500)` returns
+  title-sorted slugs, titles, and parser-derived definition text;
+  `getGlossaryTerm(slug)` reads one scoped record.
+- **HTML boundary** – `lib/content/directus-glossary-html.ts` sanitizes the
+  restricted `definition` field and derives entity-decoded plain text for
+  metadata and DefinedTerm schema.
+- **SEO and sitemap** – each term consumes its own `noindex` and optional SEO
+  fields. The sitemap adapter excludes noindex terms; all migrated terms are
+  intentionally noindex while the glossary archive remains indexable.
+- **Migration utilities** – `scripts/migrate-wordpress-glossary.mjs` performs
+  dry-run, draft import, and separate publication modes. The independent
+  `scripts/verify-glossary-directus-migration.mjs` checks all 239 source/target
+  records, visible text, timestamps, route scope, publication, and indexing.
 
-```graphql
-query GlossarySmokeTest($slug: ID!, $first: Int = 50) {
-  glossaryTerms(
-    first: $first
-    where: { status: PUBLISH, orderby: { field: TITLE, order: ASC } }
-  ) {
-    nodes {
-      ...GlossaryFields
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-  }
+REST smoke-test shape:
 
-  glossaryTerm(id: $slug, idType: SLUG) {
-    ...GlossaryFields
-    content(format: RENDERED)
-  }
-}
-
-fragment GlossaryFields on GlossaryTerm {
-  databaseId
-  id
-  slug
-  title
-  content(format: RENDERED)
-}
+```http
+GET /items/roofing_glossary_terms?fields=client.slug,status,slug,title,definition,noindex,meta_title,meta_description,primary_focus_keyword,focus_keywords,og_title,og_description,og_image_override.id,og_image_override.description,og_image_override.width,og_image_override.height,source_updated_at,date_updated&filter={"client":{"slug":{"_eq":"<DIRECTUS_CLIENT_SLUG>"}},"status":{"_eq":"published"},"slug":{"_eq":"<slug>"}}&limit=1
 ```
 
 ---
