@@ -19,6 +19,8 @@ Where content lives
   - `persons`: the exclusive source for the ten approved SonShine profiles. The
     adapter covers team cards, profile routes, person navigation, metadata, and
     page/image sitemaps.
+  - `sponsor_features`: the exclusive source for partnership cards on the
+    homepage and location landing pages.
   - `roofing_glossary_terms`: the exclusive source for the glossary archive,
     term routes, route-owned SEO, contextual term linking, and glossary sitemap.
 - Next.js app pages: route layouts, components, and page body copy not yet moved to Directus.
@@ -113,6 +115,24 @@ Publishing SonShine people in Directus
 - Person SEO is stored explicitly in Directus, including the independently
   reviewed focus keywords. Display name/role, cleaned biography text, and the
   described profile image remain fallback sources only.
+
+Publishing sponsor features in Directus
+
+- Published records are client-scoped and sorted by `sort`, then `title`.
+  Homepage and location-page partnership cards have no WordPress fallback.
+- Each record requires `slug`, `title`, restricted `description` HTML, and a
+  logo with a non-empty Directus file description. Optional website, Facebook,
+  and Instagram fields must use absolute HTTP(S) URLs.
+- `service_area_slugs` is an optional JSON string list. The location adapter
+  returns up to eight matching records when at least four exist. Otherwise it
+  appends the configured leading entries from the full sorted pool—six in the
+  current homepage and location routes—and removes duplicate slugs.
+- `description` allows paragraphs, links, bold/italic emphasis, ordered or
+  unordered lists, list items, and line breaks. The frontend sanitizer removes
+  images, unsafe links, classes, styles, scripts, and unsupported markup.
+- The partnership heading and introductory copy remain code-owned. Directus
+  changes use the build-driven content path and require a new site build to
+  appear publicly.
 
 Publishing roofing glossary terms in Directus
 
