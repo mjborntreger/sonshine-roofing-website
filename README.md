@@ -9,7 +9,7 @@ the frontend adapters for Directus and WordPress.
 - Next.js 16 runs as a Node 22 standalone image on Coolify.
 - Directus is the primary content platform. It owns shared site content, fixed
   page and service SEO, blog posts, FAQs, people, roofing glossary terms,
-  special offers, legal copy, navigation, and redirects.
+  sponsor features, special offers, legal copy, navigation, and redirects.
 - WordPress/WPGraphQL remains authoritative for projects, videos, and location
   landing pages.
 - `POST /api/lead` validates public form submissions, verifies Turnstile, and

@@ -42,7 +42,9 @@ Coolify Environment Variables
   - `NEXT_PUBLIC_GTM_ID`
   - `NEXT_PUBLIC_META_PIXEL_ID`
   - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
-- Mark these server variables as build-time and runtime variables. Shared site content, redirects, and special offers need them during builds; Directus blog, review, and other ISR-backed content also needs them at runtime:
+- Mark these server variables as build-time and runtime variables. Directus
+  content and redirects are read during builds, and the same values remain
+  available if a route renders at runtime:
   - `DIRECTUS_URL`
   - `DIRECTUS_CLIENT_SLUG`
   - `DIRECTUS_TOKEN`
@@ -59,12 +61,13 @@ Coolify Environment Variables
   - `WP_PROJECT_BASE` only if the WordPress project CPT base changes.
 - Do not set `WP_BASIC_AUTH_USER` or `WP_BASIC_AUTH_PASS` unless WPGraphQL becomes protected.
 
-Directus Reviews Cache
+Directus Reviews
 
 - `ReviewsCarousel` reads published five-star Google records from Directus for `DIRECTUS_CLIENT_SLUG`.
 - The default carousel limit and Google Business Profile link come from the matching `reviews_carousels` record.
-- Review and carousel reads use a 15-minute ISR safety cache tagged `directus:reviews:<client-slug>`.
-- The reviews synchronization workflow should revalidate that tag only after its Directus write/readback cycle succeeds.
+- Review and carousel reads use `force-cache` without ISR options or cache tags.
+  The existing review workflow and revalidation endpoint do not supply a
+  Directus fetch tag.
 
 Lead Delivery (n8n)
 
@@ -111,9 +114,10 @@ Security headers & CSP
 Cache/Invalidation
 
 - Remaining WordPress GraphQL data uses Next fetch revalidation where configured.
-  Directus blog content revalidates every 15 minutes and Directus FAQs hourly.
-  Shared Directus site content and special offers are build-only and require a
-  rebuild. The revalidation API rejects special-offer routes and their sitemap.
+- Directus fetchers use ordinary `force-cache` reads without ISR options or
+  cache tags. Publish Directus content changes through a new build. The
+  authenticated revalidation endpoint remains for other path/tag consumers,
+  while special-offer routes and their sitemap are explicitly build-only.
 - Static sitemap: regenerated on build; read dynamically per request.
 - Published Directus redirects are fetched and validated by `next.config.mjs` at build time. Redirect changes require a new build.
 - Static generation is limited to two workers with one page per worker at a time to avoid bursting WordPress or Directus.

@@ -13,7 +13,6 @@ import {
   type WpImage,
 } from '@/lib/content/wp';
 
-const DIRECTUS_REVALIDATE_SECONDS = 900;
 const DIRECTUS_POST_LIMIT = 500;
 const SONSHINE_MICHAEL_PERSON_ID = 'f028dafd-c2fb-4d59-a561-2be5e46ea318';
 const DIRECTUS_POST_FIELDS = [
@@ -367,13 +366,10 @@ async function fetchDirectusCollection<T>(
   if (options.sort?.length) url.searchParams.set('sort', options.sort.join(','));
 
   const response = await fetch(url, {
+    cache: 'force-cache',
     headers: {
       Accept: 'application/json',
       Authorization: `Bearer ${config.token}`,
-    },
-    next: {
-      revalidate: DIRECTUS_REVALIDATE_SECONDS,
-      tags: [`directus:${collection}:${config.clientSlug}`],
     },
   });
 

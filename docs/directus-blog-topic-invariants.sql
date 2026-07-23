@@ -37,6 +37,26 @@ ON public.blog_topics
 FOR EACH ROW
 EXECUTE FUNCTION public.maintain_blog_topic_scope_key();
 
+-- Directus validates physical NOT NULL columns before PostgreSQL defaults and
+-- BEFORE triggers run. Keep scope_key physically nullable so hidden values may
+-- be omitted from API payloads, while an explicit CHECK constraint preserves
+-- the stored non-null/nonblank invariant after the trigger generates the
+-- canonical client-slug:topic-slug value.
+--
+-- Do not toggle scope_key nullability through the Directus Data Model UI. Its
+-- column.alter() path also emits a redundant ALTER TYPE, which PostgreSQL
+-- rejects because scope_key appears in this trigger's UPDATE OF definition.
+ALTER TABLE public.blog_topics
+  ADD CONSTRAINT blog_topics_scope_key_nonblank
+  CHECK (scope_key IS NOT NULL AND btrim(scope_key) <> '') NOT VALID;
+
+ALTER TABLE public.blog_topics
+  VALIDATE CONSTRAINT blog_topics_scope_key_nonblank;
+
+ALTER TABLE public.blog_topics
+  ALTER COLUMN scope_key DROP DEFAULT,
+  ALTER COLUMN scope_key DROP NOT NULL;
+
 CREATE OR REPLACE FUNCTION public.enforce_blog_topic_assignment_invariants()
 RETURNS trigger
 LANGUAGE plpgsql

@@ -4,8 +4,8 @@ import {
   listRecentPostsPoolForFilters,
   listRecentProjectsByServiceArea,
   listLocationSlugs,
-  listSponsorFeaturesByServiceArea,
 } from '@/lib/content/wp';
+import { listSponsorFeaturesByServiceArea } from '@/lib/content/sponsor-features';
 import { listFaqs } from '@/lib/content/directus-faqs';
 import type { LocationRecord } from '@/lib/content/wp';
 import Hero from '@/components/marketing/landing-page/LandingHero';

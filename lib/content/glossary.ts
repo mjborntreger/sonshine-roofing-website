@@ -11,7 +11,6 @@ import {
 } from '@/lib/content/directus-glossary-policy';
 
 const DIRECTUS_COLLECTION = 'roofing_glossary_terms';
-const DIRECTUS_REVALIDATE_SECONDS = 900;
 const MAX_GLOSSARY_TERMS = 500;
 
 type UnknownRecord = Record<string, unknown>;
@@ -205,11 +204,8 @@ async function fetchGlossaryItems(options: {
   if (options.sort?.length) url.searchParams.set('sort', options.sort.join(','));
 
   const response = await fetch(url, {
+    cache: 'force-cache',
     headers: { Accept: 'application/json', Authorization: `Bearer ${config.token}` },
-    next: {
-      revalidate: DIRECTUS_REVALIDATE_SECONDS,
-      tags: [`directus:${DIRECTUS_COLLECTION}:${config.clientSlug}`],
-    },
   });
   if (!response.ok) {
     throw new Error(

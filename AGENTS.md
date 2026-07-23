@@ -11,14 +11,16 @@ and serves it on port 3000.
 - Read `CONTENT.md` before changing content ownership.
 - Directus, scoped by `DIRECTUS_CLIENT_SLUG`, owns blog posts/topics, site
   settings, fixed-page SEO, services, navigation, FAQs, redirects, special
-  offers, legal copy, people, roofing glossary terms, and their media.
+  offers, legal copy, people, sponsor features, roofing glossary terms, and
+  their media.
 - WordPress/WPGraphQL remains authoritative for projects, videos, and location
   landing pages.
 - Local Next.js code owns route composition, components, body copy not yet
   migrated, and the normalized operational schedule in
   `lib/contact-hours.ts`.
-- Directus is the exclusive frontend source for blog, person, and roofing
-  glossary records. Do not add a WordPress fallback for those areas.
+- Directus is the exclusive frontend source for blog, person, sponsor-feature,
+  and roofing-glossary records. Do not add a WordPress fallback for those
+  areas.
 - Directus content described as build-only does not become public until a new
   site build is deployed.
 
@@ -43,9 +45,9 @@ Use Node 22 and install with `npm ci`.
 - Baseline: `npm run lint`; `npm test` is currently an alias for lint.
 - Sanitizer/SEO work: run the applicable
   `verify:directus-html`, `verify:faq-html`, `verify:person-html`,
-  `verify:glossary-html`, `verify:glossary-policy`,
-  `verify:person-seo`, `verify:special-offer-indexing`, or
-  `verify:build-only-revalidation` script.
+  `verify:sponsor-html`, `verify:glossary-html`, `verify:person-seo`,
+  `verify:special-offer-indexing`, `verify:build-only-revalidation`,
+  `verify:glossary-policy`, or `verify:directus-fetch-policy` script.
 - Full confidence: run a credentialed `npm run build`.
 - Sandboxed Codex build: use `npm run build:codex` when its proxy contract is
   required.

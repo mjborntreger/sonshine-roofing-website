@@ -108,15 +108,72 @@ UPDATE public.special_offers SET scope_key = scope_key;
 UPDATE public.persons SET scope_key = scope_key;
 UPDATE public.roofing_glossary_terms SET scope_key = scope_key;
 
+-- Directus validates physical NOT NULL columns before PostgreSQL defaults and
+-- BEFORE triggers run. Keep scope_key physically nullable so hidden values may
+-- be omitted from API payloads, while explicit CHECK constraints preserve the
+-- stored non-null/nonblank invariant after the triggers generate canonical
+-- client-slug:path-or-slug values.
+--
+-- Do not toggle scope_key nullability through the Directus Data Model UI. Its
+-- column.alter() path also emits a redundant ALTER TYPE, which PostgreSQL
+-- rejects because scope_key appears in each trigger's UPDATE OF definition.
 ALTER TABLE public.website_pages
-  ALTER COLUMN scope_key SET NOT NULL,
+  ADD CONSTRAINT website_pages_scope_key_nonblank
+  CHECK (scope_key IS NOT NULL AND btrim(scope_key) <> '') NOT VALID;
+ALTER TABLE public.services
+  ADD CONSTRAINT services_scope_key_nonblank
+  CHECK (scope_key IS NOT NULL AND btrim(scope_key) <> '') NOT VALID;
+ALTER TABLE public.blog_posts
+  ADD CONSTRAINT blog_posts_scope_key_nonblank
+  CHECK (scope_key IS NOT NULL AND btrim(scope_key) <> '') NOT VALID;
+ALTER TABLE public.case_studies
+  ADD CONSTRAINT case_studies_scope_key_nonblank
+  CHECK (scope_key IS NOT NULL AND btrim(scope_key) <> '') NOT VALID;
+ALTER TABLE public.special_offers
+  ADD CONSTRAINT special_offers_scope_key_nonblank
+  CHECK (scope_key IS NOT NULL AND btrim(scope_key) <> '') NOT VALID;
+ALTER TABLE public.persons
+  ADD CONSTRAINT persons_scope_key_nonblank
+  CHECK (scope_key IS NOT NULL AND btrim(scope_key) <> '') NOT VALID;
+ALTER TABLE public.roofing_glossary_terms
+  ADD CONSTRAINT roofing_glossary_terms_scope_key_nonblank
+  CHECK (scope_key IS NOT NULL AND btrim(scope_key) <> '') NOT VALID;
+
+ALTER TABLE public.website_pages
+  VALIDATE CONSTRAINT website_pages_scope_key_nonblank;
+ALTER TABLE public.services
+  VALIDATE CONSTRAINT services_scope_key_nonblank;
+ALTER TABLE public.blog_posts
+  VALIDATE CONSTRAINT blog_posts_scope_key_nonblank;
+ALTER TABLE public.case_studies
+  VALIDATE CONSTRAINT case_studies_scope_key_nonblank;
+ALTER TABLE public.special_offers
+  VALIDATE CONSTRAINT special_offers_scope_key_nonblank;
+ALTER TABLE public.persons
+  VALIDATE CONSTRAINT persons_scope_key_nonblank;
+ALTER TABLE public.roofing_glossary_terms
+  VALIDATE CONSTRAINT roofing_glossary_terms_scope_key_nonblank;
+
+ALTER TABLE public.website_pages
+  ALTER COLUMN scope_key DROP DEFAULT,
+  ALTER COLUMN scope_key DROP NOT NULL,
   ALTER COLUMN noindex SET DEFAULT false,
   ALTER COLUMN noindex SET NOT NULL;
-ALTER TABLE public.services ALTER COLUMN scope_key SET NOT NULL;
-ALTER TABLE public.blog_posts ALTER COLUMN scope_key SET NOT NULL;
-ALTER TABLE public.case_studies ALTER COLUMN scope_key SET NOT NULL;
-ALTER TABLE public.special_offers ALTER COLUMN scope_key SET NOT NULL;
-ALTER TABLE public.persons ALTER COLUMN scope_key SET NOT NULL;
+ALTER TABLE public.services
+  ALTER COLUMN scope_key DROP DEFAULT,
+  ALTER COLUMN scope_key DROP NOT NULL;
+ALTER TABLE public.blog_posts
+  ALTER COLUMN scope_key DROP DEFAULT,
+  ALTER COLUMN scope_key DROP NOT NULL;
+ALTER TABLE public.case_studies
+  ALTER COLUMN scope_key DROP DEFAULT,
+  ALTER COLUMN scope_key DROP NOT NULL;
+ALTER TABLE public.special_offers
+  ALTER COLUMN scope_key DROP DEFAULT,
+  ALTER COLUMN scope_key DROP NOT NULL;
+ALTER TABLE public.persons
+  ALTER COLUMN scope_key DROP DEFAULT,
+  ALTER COLUMN scope_key DROP NOT NULL;
 ALTER TABLE public.roofing_glossary_terms
-  ALTER COLUMN scope_key SET DEFAULT '',
-  ALTER COLUMN scope_key SET NOT NULL;
+  ALTER COLUMN scope_key DROP DEFAULT,
+  ALTER COLUMN scope_key DROP NOT NULL;

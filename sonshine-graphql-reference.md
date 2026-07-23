@@ -13,10 +13,11 @@ WordPress/WPGraphQL remains authoritative for:
 - video-library entries and project-sourced videos; and
 - location landing pages.
 
-Blog posts, FAQs, people, roofing glossary terms, special offers, shared site
-content, and fixed-page/service SEO are Directus-backed. Although `wp.ts` still
-contains some legacy blog helpers and shared blog-shaped types, public blog
-routes and archives read `lib/content/blog.ts`; do not add a WordPress fallback.
+Blog posts, FAQs, people, sponsor features, roofing glossary terms, special
+offers, shared site content, and fixed-page/service SEO are Directus-backed.
+Although `wp.ts` still contains some legacy blog helpers and shared blog-shaped
+types, public blog routes and archives read `lib/content/blog.ts`; do not add a
+WordPress fallback.
 
 ## Runtime configuration
 
@@ -47,7 +48,7 @@ const data = await wpFetch<MyQuery>(query, variables, {
 
 | Domain    | Primary adapter functions                                                                   | Public consumers                                                             |
 | --------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| Locations | `listLocationSlugs`, `getLocationBySlug`, `listSponsorFeaturesByServiceArea`                | `app/(site)/locations/[slug]`, location and image sitemaps                   |
+| Locations | `listLocationSlugs`, `getLocationBySlug`                                                    | `app/(site)/locations/[slug]`, location and image sitemaps                   |
 | Projects  | `listProjectSlugs`, `getProjectBySlug`, archive/filter helpers                              | `app/(site)/project/[slug]`, project archive/API, project and image sitemaps |
 | Videos    | `listRecentVideoEntries`, `getVideoEntryBySlug`, `listProjectVideos`, `listVideoItemsPaged` | `app/(site)/video-library`, resources API, video sitemap                     |
 
@@ -59,9 +60,9 @@ the `locationAttributes` fields for the location name, landmarks, map, featured
 reviews, and neighborhoods. The adapter normalizes nullable GraphQL connections
 before they reach route components.
 
-`listSponsorFeaturesByServiceArea` first reads service-area-specific sponsor
-records and then fills any shortfall from the configured fallback area. Keep
-the returned list deduplicated.
+The location route combines this WordPress record with Directus-backed sponsor
+features from `lib/content/sponsor-features.ts`. Their publishing and targeting
+rules live in [CONTENT.md](CONTENT.md).
 
 ## Projects
 
