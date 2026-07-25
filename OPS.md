@@ -1,78 +1,70 @@
-Operations
-==========
+# Lead Operations
 
-Quick Checks
-- Robots
-  - Staging: robots.txt = Disallow: /
-  - Prod: robots.txt = Allow: /
-- Sitemaps
-  - `/sitemap_index` lists child sitemaps.
-  - `/sitemap_index/static` shows static routes (with human-friendly XSL view).
-  - `/sitemap_index/video` surfaces video metadata (with enhanced XSL preview).
-  - `/sitemap_index/image` surfaces primary blog/project/location images.
-  - `/faq` appears in the static sitemap; there is no separate FAQ child sitemap.
-- GTM
-  - `NEXT_PUBLIC_GTM_ID` set and GA4 Enhanced Measurement enabled for page views.
+This document is the operational contract for public lead delivery. Deployment
+configuration and general smoke checks live in [DEPLOY.md](DEPLOY.md).
 
-Revalidation
-- GraphQL-backed pages cache by tag. Use your `/api/revalidate` endpoint (if present) to bust tags.
-- Static sitemap manifest regenerates on build.
+## Ingress and forwarding
 
-Enable preview sitemaps on staging
-- Set `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true`.
-- Sitemaps respond with `X-Robots-Tag: noindex, nofollow`.
+- Browser forms submit JSON to `POST /api/lead`.
+- When `ALLOWED_ORIGIN` is populated, the route rejects requests whose Origin or
+  Referer origin is not in the comma-separated allowlist.
+- The route silently accepts honeypot submissions, validates the v2 payload,
+  verifies `antiSpam.cfToken` with Cloudflare Turnstile, and then forwards the
+  normalized payload to n8n.
+- n8n receives `Content-Type: application/json`, the shared secret in
+  `x-ss-secret`, and the canonical site origin.
+- Forwarding times out after seven seconds. Upstream rejection or timeout is
+  returned as a failed API response; the route does not claim success first.
 
-Security headers
-- CSP is enforced on staging, report-only on production.
-- If staging breaks, check console for CSP violations; then update `next.config.mjs`.
-- QuickQuote on `/instant-quote` needs CSP access to:
-  - `qq.leadsbyquickquote.com`
-  - `storage.googleapis.com`
-  - `quickquote-api-628343900656.us-central1.run.app`
-  - `quickquote-api-223492134056.us-central1.run.app`
-  - `quickquote-api-78479757910.us-central1.run.app`
-  - Google reCAPTCHA, Google Fonts, jsDelivr CSS, and HTTPS media assets.
+Required server variables:
 
-Lead Pipeline (n8n)
-- Browser forms submit to `POST /api/lead`.
-- Server route validates payload and anti-spam, then forwards to n8n with header `x-ss-secret`.
-- Required server env vars:
-  - `N8N_WEBHOOK_URL` (target n8n webhook URL)
-  - `N8N_WEBHOOK_SECRET` (shared secret sent as `x-ss-secret`)
-  - `TURNSTILE_SECRET_KEY` (Cloudflare Turnstile verification)
-- Optional CORS allowlist:
-  - `ALLOWED_ORIGIN` (comma-separated origins)
-- QuickQuote submissions do not use `/api/lead`; the vendor script submits to QuickQuote APIs. The site listens for the vendor success event and pushes `lead_form_submitted` plus a one-time `ads_lead_submit` roof replacement conversion. Stored `utm_*` and `gclid` are hydrated into the URL before the script loads; other webhook fields require vendor support.
+- `N8N_WEBHOOK_URL`
+- `N8N_WEBHOOK_SECRET`
+- `TURNSTILE_SECRET_KEY`
 
-Lead Payload Contract (v2)
-- Root fields:
-  - `version: "v2"`
-  - `sri_lead_id` (site-generated dedupe/conversion ID)
-  - `lead_source: "google_ads" | "seo"` (`google_ads` when `source.gclid`, `source.gbraid`, or `source.wbraid` exists; otherwise `seo`)
-  - `formType: "contact-lead" | "financing-calculator" | "special-offer" | "feedback" | "referral"`
-  - `submittedAt` (ISO timestamp)
-  - `source.page` (required)
-  - `contact.firstName`, `contact.lastName` (required)
-  - `contact.email` (required for non-`contact-lead` forms)
-  - `contact.email` or `contact.phone` (required for `contact-lead`)
-  - `smsConsent.projectSms`, `smsConsent.marketingSms` (`yes`/`no`)
-  - `antiSpam.cfToken` (Turnstile token, required)
-- Optional fields:
-  - `source.gclid`, `source.gbraid`, `source.wbraid`
-  - `source.utm_source`, `source.utm_medium`, `source.utm_campaign`, `source.utm_term`, `source.utm_content`
-  - `source.landing_page`, `source.referrer`, `source.ua`, `source.tz`
-  - `contact.phone`
-  - `address.{address1,address2,city,state,zip}`
-  - `details` (form-specific object)
-  - `antiSpam.hp_field` (honeypot)
-- Referral submissions:
-  - Root `contact` is the referrer.
-  - `details.referredHomeowner` is the referred homeowner.
-  - Referral forms do not show SMS consent UI and submit `smsConsent.projectSms: "no"` and `smsConsent.marketingSms: "no"`.
+`ALLOWED_ORIGIN` is optional but should contain the production apex and `www`
+origins in production.
 
-Status Checklist (handoff)
-- [ ] Robots staging: Disallow all
-- [ ] Sitemaps preview: ON/OFF as expected
-- [ ] Image sitemap (`/sitemap_index/image`) returns expected entries
-- [ ] Search Console: property verified, sitemap submitted (prod)
-- [ ] GTM: container ID set, GA4 Enhanced Measurement capturing page views
+QuickQuote does not use `/api/lead`. Its vendor script submits to QuickQuote,
+while the site translates the vendor success event into analytics events.
+
+## Normalized v2 payload
+
+The route requires:
+
+- `version: "v2"`
+- `sri_lead_id`
+- `formType`: `contact-lead`, `financing-calculator`, `special-offer`,
+  `feedback`, or `referral`
+- `submittedAt`
+- `source.page`
+- `contact.firstName`, `contact.lastName`, a valid `contact.email`, and a
+  complete US `contact.phone`
+- `smsConsent.projectSms` and `smsConsent.marketingSms`, each `yes` or `no`
+- `antiSpam.cfToken`
+
+The route derives `lead_source` as `google_ads` when `gclid`, `gbraid`, or
+`wbraid` is present; otherwise it uses `seo`. It also fixes
+`smsConsent.disclosureVersion` to `sms-consent-v1`.
+
+Optional source fields are `gclid`, `gbraid`, `wbraid`, `utm_source`,
+`utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `landing_page`,
+`referrer`, `ua`, and `tz`. Optional address fields are `address1`, `address2`,
+`city`, `state`, and `zip`. `details` is form-specific, and
+`antiSpam.hp_field` is the supported nested honeypot.
+
+Additional validation:
+
+- Feedback requires `details.message`.
+- Referral requires a complete US phone number at
+  `details.referredHomeowner.phone`.
+- Referral forms submit both SMS choices as `no`; the root contact is the
+  referrer and `details.referredHomeowner` is the referred homeowner.
+
+## Safety
+
+Lead payloads contain contact, address, attribution, consent, and IP-derived
+data. Do not log payloads, copy real submissions into fixtures, or use real
+customer data for testing. Production submissions, n8n executions, and workflow
+changes require explicit authorization; use synthetic data when testing is
+authorized.
