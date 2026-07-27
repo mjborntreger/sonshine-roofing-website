@@ -54,7 +54,10 @@ Use Node 22 and install with `npm ci`.
 
 Build presteps generate or remove sitemap and `llms.txt` artifacts and can
 dirty a worktree. Inspect generated changes and never include them
-accidentally. Do not run `migrate:persons:apply`; it writes to Directus.
+accidentally. The `migrate:persons:*` commands and retained blog migration
+verifiers require historical JSON inputs that are not tracked in a clean
+checkout; they are not routine validation commands. Do not run
+`migrate:persons:apply`; it writes to Directus.
 
 ## Content, Security, and Privacy
 

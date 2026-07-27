@@ -55,6 +55,8 @@ not authoring sources.
   behavior, and deployment smoke checks.
 - [OPS.md](OPS.md): public lead ingress and the normalized v2 payload contract.
 - [SEO.md](SEO.md): robots, sitemap, metadata, and structured-data behavior.
+- [docs/gtm-datalayer.md](docs/gtm-datalayer.md): Google Ads conversion events,
+  value mapping, and browser-side deduplication.
 - [sonshine-graphql-reference.md](sonshine-graphql-reference.md): the remaining
   WordPress/WPGraphQL surface.
 - [SECURITY.md](SECURITY.md): private reporting and safe-testing expectations.
