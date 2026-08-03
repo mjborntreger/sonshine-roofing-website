@@ -21,6 +21,8 @@
     page/image sitemaps.
   - `sponsor_features`: the exclusive source for partnership cards on the
     homepage and location landing pages.
+  - `reviews` and `reviews_carousels`: the site-wide Google review feed and its
+    per-client display settings.
   - `roofing_glossary_terms`: the exclusive source for the glossary archive,
     term routes, route-owned SEO, contextual term linking, and glossary sitemap.
 - Next.js app pages: route layouts, components, and page body copy not yet moved to Directus.
@@ -49,6 +51,17 @@
 - Header, body, and footer script fields remain intentionally disabled.
 - Operational hours and timezone intervals in `lib/contact-hours.ts` are a documented code-controlled exception because UI state and JSON-LD require normalized schedules.
 
+## Publishing reviews in Directus
+
+- The site-wide review widget reads published, SonShine-scoped Google reviews
+  whose rating is five and whose `external_id` is populated. Records also need
+  an author name and review text to render.
+- Keep exactly one SonShine-scoped `reviews_carousels` record. Its `limit` and
+  `gbp_profile_link` configure the widget; its optional `owner_headshot` renders
+  only when the file has a description.
+- These collections do not replace the `featuredReviews` embedded in
+  WordPress-owned location landing pages.
+
 ## Publishing FAQs in Directus
 
 - Keep each FAQ assigned to one client and one scope: `website_page` for a fixed
@@ -75,8 +88,7 @@
 
 ## Publishing in WordPress
 
-- Ensure remaining WordPress projects and other legacy content are Published,
-  not Draft.
+- Keep projects, video entries, and location landing pages Published, not Draft.
 - Fill excerpts where available (used as SEO fallbacks).
 - Provide featured images for richer OG cards.
 - Location landing pages remain a deliberate WordPress/code exception until they move to a dedicated Directus `location_landing_pages` collection.
@@ -179,13 +191,6 @@
 - Prefer the described `site_settings.default_og_image` for shared Open Graph
   fallbacks. Several legacy routes still reference `/og-default.png`, but that
   asset is not tracked; do not add new dependencies on it.
-
-## Noindex policy
-
-- Utility pages (`/reviews`, `/tell-us-why`, `/thank-you`, `/truck-for-sale`, and the 404 page) are marked noindex and excluded from the static sitemap where applicable.
-- Published SonShine person pages follow their stored `noindex` value, and the
-  person page/image sitemaps apply the same value. Keep approved public profiles
-  indexable and glossary terms noindex unless the business policy changes.
 
 ## Repository migration artifacts
 

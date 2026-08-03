@@ -11,8 +11,8 @@ and serves it on port 3000.
 - Read `CONTENT.md` before changing content ownership.
 - Directus, scoped by `DIRECTUS_CLIENT_SLUG`, owns blog posts/topics, site
   settings, fixed-page SEO, services, navigation, FAQs, redirects, special
-  offers, legal copy, people, sponsor features, roofing glossary terms, and
-  their media.
+  offers, legal copy, people, sponsor features, reviews and review-carousel
+  settings, roofing glossary terms, and their media.
 - WordPress/WPGraphQL remains authoritative for projects, videos, and location
   landing pages.
 - Local Next.js code owns route composition, components, body copy not yet

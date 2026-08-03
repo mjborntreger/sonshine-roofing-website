@@ -33,8 +33,8 @@
 
 ## Environments
 
-- NEXT_PUBLIC_ENV=production → Production
-- NEXT_PUBLIC_ENV=staging → Staging (or anything not "production")
+- `NEXT_PUBLIC_ENV=production` enables production behavior.
+- Any other value, including the conventional `staging`, is non-production.
 
 ## Coolify environment variables
 
@@ -74,14 +74,6 @@
   protected. The current Dockerfile does not pass these values into the build
   stage, so protected build-time queries would also require a Dockerfile change.
 
-## Directus reviews
-
-- `ReviewsCarousel` reads published five-star Google records from Directus for `DIRECTUS_CLIENT_SLUG`.
-- The default carousel limit and Google Business Profile link come from the matching `reviews_carousels` record.
-- Review and carousel reads use `force-cache` without ISR options or cache tags.
-  The existing review workflow and revalidation endpoint do not supply a
-  Directus fetch tag.
-
 ## Lead delivery (n8n)
 
 - Set `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`, and `TURNSTILE_SECRET_KEY` in
@@ -90,20 +82,9 @@
 - [OPS.md](OPS.md) is the canonical public ingress and normalized v2 payload
   contract. Keep deployment values here and payload semantics there.
 
-## Sitemaps and robots
-
-- Production
-  - robots.txt: Allow all, sitemap at `${NEXT_PUBLIC_BASE_URL}/sitemap_index`.
-  - app/robots.ts uses `site_settings.site_url` and applies optional `site_settings.robots_disallow` rules.
-- Staging
-  - robots.txt: Disallow all. Sitemap endpoints exist but are not to be crawled.
-  - You can enable sitemap preview endpoints by setting:
-    - NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true
-  - Preview adds `X-Robots-Tag: noindex, nofollow` on sitemap responses.
-  - The `/faq` archive is part of the static sitemap; individual FAQ anchors are not sitemap URLs.
-
 ## Static sitemap (pages not in CMS)
 
+- [SEO.md](SEO.md) is the canonical robots and sitemap behavior reference.
 - Generated at build by `scripts/make-static-sitemap.mjs` → `public/__sitemaps/static-routes.json`.
 - Endpoint reads the manifest at request time: `/sitemap_index/static`.
 - If empty:
@@ -133,10 +114,11 @@
   Directus changes. The authenticated endpoint accepts paths and tags for other
   consumers, but explicitly rejects special-offer routes and their sitemap as
   build-only.
+- Directus review and review-carousel reads use the same untagged `force-cache`
+  behavior; the revalidation endpoint has no review-specific tag.
 - Static sitemap: regenerated on build; read dynamically per request.
 - Published Directus redirects are fetched and validated by `next.config.mjs` at build time. Redirect changes require a new build.
 - Static generation is limited to two workers with one page per worker at a time to avoid bursting WordPress or Directus.
-- `site_settings.enable_site_analytics` controls whether the configured GTM and Meta Pixel scripts render.
 
 ## llms.txt
 
@@ -146,8 +128,12 @@
 
 ## Analytics
 
-- GTM loads only when `NEXT_PUBLIC_GTM_ID` is set and env permits.
-- GA4 Enhanced Measurement should be enabled to track SPA route changes.
+- GTM and Meta Pixel render together only when Directus
+  `site_settings.enable_site_analytics` is enabled, both public IDs are set, the
+  browser host matches the configured site origin, and the environment is
+  production or `NEXT_PUBLIC_ENABLE_GTM_PREVIEW` is enabled.
+- This repository loads GTM but does not configure GA4. Validate GA4 and SPA
+  route-change tracking in the external GTM/GA4 control plane.
 
 ## Coolify smoke checks
 
