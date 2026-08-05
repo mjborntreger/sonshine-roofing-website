@@ -104,3 +104,26 @@ open through `/video-library` query state.
 - Keep project permalinks and `WP_PROJECT_BASE` aligned.
 - Keep WordPress diagnostics staging-gated and do not expose raw upstream
   errors in production.
+
+## Staging diagnostic
+
+`GET /api/wp-debug` returns data only when both gates pass:
+
+- `VERCEL_GIT_COMMIT_REF` equals `WP_DEBUG_ALLOWED_BRANCH`, which defaults to
+  `staging`; and
+- the request `x-forwarded-host` or `host` equals `WP_DEBUG_ALLOWED_HOST`, which
+  defaults to `staging.sonshineroofing.com`.
+
+A missing or mismatched value returns 404. Keep this diagnostic disabled on the
+production branch and host.
+
+## Repository-held WordPress artifacts
+
+- `wordpress/graphql-relevanssi-bridge.php` contains the WordPress-side search
+  bridge expected by the adapter's search and facet behavior. The repository
+  does not establish whether it is deployed.
+- `wordpress/sonshine-headless-cleanup.php` identifies itself as a draft
+  prototype and is not an installation runbook.
+
+Applying either file changes the production WordPress control plane and requires
+explicit authorization and a separate review.
