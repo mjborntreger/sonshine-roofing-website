@@ -136,7 +136,13 @@ function renderChipList(
         btn.className = CHIP_BUTTON_CLASS;
         btn.setAttribute("data-chip", chip.slug);
         if (chip.group) btn.setAttribute("data-group", chip.group);
-        btn.innerHTML = `<span>${chip.label}</span><span aria-hidden="true" class="text-slate-500">×</span>`;
+        const label = document.createElement("span");
+        label.textContent = chip.label;
+        const removeIcon = document.createElement("span");
+        removeIcon.setAttribute("aria-hidden", "true");
+        removeIcon.className = "text-slate-500";
+        removeIcon.textContent = "×";
+        btn.append(label, removeIcon);
         btn.addEventListener("click", () => onRemove(chip));
         wrap.appendChild(btn);
     }
