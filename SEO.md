@@ -13,10 +13,11 @@
   there is no host-wide staging header.
 - Production: `Allow: /` with sitemap at `/sitemap_index`.
 - Page-level robots overrides:
-  - `noindex, nofollow`: `/thank-you`, `/truck-for-sale`, and the 404 metadata.
-  - `noindex, follow`: `/reviews`, `/tell-us-why` (and children),
-    `/roofing-glossary/[slug]`, and any Directus route owner whose `noindex`
-    field is true unless the route supplies a stricter follow policy.
+  - `noindex, nofollow`: `/thank-you`, `/tell-us-why`, `/truck-for-sale`, and
+    the 404 metadata.
+  - `noindex, follow`: `/reviews`, `/roofing-glossary/[slug]`, and any Directus
+    route owner whose `noindex` field is true unless the route supplies a
+    stricter follow policy.
   - Directus `persons` and `special_offers` use their stored `noindex` toggle.
     Keep approved public profiles indexable. Special-offer expiration does not
     override the toggle.

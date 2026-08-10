@@ -109,11 +109,12 @@
 ## Cache and invalidation
 
 - Remaining WordPress GraphQL data uses Next fetch revalidation where configured.
-- Directus fetchers use ordinary `force-cache` reads without ISR options or
-  cache tags, so a new build is the supported publication path for current
-  Directus changes. The authenticated endpoint accepts paths and tags for other
-  consumers, but explicitly rejects special-offer routes and their sitemap as
-  build-only.
+- Page-facing Directus content adapters use ordinary `force-cache` reads without
+  ISR options or cache tags. Build settings and redirects use `no-store` while
+  generating build outputs and configuration. A new build is the supported
+  publication path for current Directus changes. The authenticated endpoint
+  accepts paths and tags for other consumers, but explicitly rejects
+  special-offer routes and their sitemap as build-only.
 - Directus review and review-carousel reads use the same untagged `force-cache`
   behavior; the revalidation endpoint has no review-specific tag.
 - Static sitemap: regenerated on build; read dynamically per request.

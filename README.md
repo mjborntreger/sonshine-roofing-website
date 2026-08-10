@@ -27,9 +27,10 @@ npm ci
 npm run dev
 ```
 
-The application needs the environment described in [DEPLOY.md](DEPLOY.md) to
-read live CMS content. Do not put secrets in public variables or commit local
-environment files.
+`npm run dev` first runs the CMS-backed prebuild. Provide the Directus variables
+described in [DEPLOY.md](DEPLOY.md) before startup; the prebuild validates route
+ownership and regenerates the ignored static-sitemap and `llms.txt` artifacts.
+Do not put secrets in public variables or commit local environment files.
 
 ## Validation
 
