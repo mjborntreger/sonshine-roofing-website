@@ -11,8 +11,6 @@ import SmartLink from '@/components/utils/SmartLink';
 
 type Item = { label: string; why: string };
 
-export const STRIPE_PAYMENT_LINK = "https://buy.stripe.com/28E28r98Ja2ncbS8Y89bO06"
-
 type GroupKey = 'interior' | 'attic' | 'exterior' | 'safety';
 
 const CHECKLIST: Record<GroupKey, { title: string; blurb: string; items: Item[] }> = {
@@ -160,7 +158,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                     <span>How it Works</span>
                 </h3>
                 <p className="text-base md:text-lg text-slate-700">
-                    1. You schedule a roof inspection <SmartLink href={STRIPE_PAYMENT_LINK}>online</SmartLink> or by <SmartLink href="/contact-us">contacting our office</SmartLink>.
+                    1. You schedule a roof inspection <SmartLink href="#book-an-appointment">online</SmartLink> or by <SmartLink href="/contact-us">contacting our office</SmartLink>.
                     <br /><br />
                     2. We reach out to the provided phone/email to confirm date/time.
                     <br /><br />
