@@ -6,6 +6,7 @@ import {
   normalizeReviewPlatform,
   type ReviewPlatform,
 } from "@/lib/reviews/platforms";
+import { sanitizeWordPressHtml } from "@/lib/content/wordpress-html";
 import type { PageInfo, PageResult } from "../ui/pagination";
 
 type Json = Record<string, unknown>;
@@ -51,6 +52,12 @@ const toStringSafe = (value: unknown, fallback = ""): string => {
 
 const stringOrNull = (value: unknown): string | null =>
   typeof value === "string" ? value : null;
+
+const sanitizeOptionalWordPressHtml = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const sanitized = sanitizeWordPressHtml(value).trim();
+  return sanitized || null;
+};
 
 const readTrimmedString = (value: unknown): string | null => {
   if (typeof value !== "string") return null;
@@ -432,7 +439,9 @@ export async function getLocationBySlug(slug: string): Promise<LocationRecord | 
 
     return {
       neighborhood: stringOrNull(record?.neighborhood),
-      neighborhoodDescription: stringOrNull(record?.neighborhoodDescription),
+      neighborhoodDescription: sanitizeOptionalWordPressHtml(
+        record?.neighborhoodDescription,
+      ),
       zipCodes,
       neighborhoodImage: pickImageFrom(record?.neighborhoodImage),
     };
@@ -441,7 +450,7 @@ export async function getLocationBySlug(slug: string): Promise<LocationRecord | 
   return {
     slug: toStringSafe(node.slug) || slug,
     title: toStringSafe(node.title),
-    contentHtml: toStringSafe(node.content),
+    contentHtml: sanitizeWordPressHtml(toStringSafe(node.content)),
     date: stringOrNull(node.date),
     modified: stringOrNull(node.modified),
     locationName: stringOrNull(attrs?.locationName),
@@ -2284,7 +2293,7 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
     year: pickYear(isoDate),
     date: isoDate,
     modified: toStringSafe(p.modified) || null,
-    contentHtml: typeof p.content === 'string' ? p.content : '',
+    contentHtml: sanitizeWordPressHtml(typeof p.content === 'string' ? p.content : ''),
     heroImage: pickImageFrom(p.featuredImage),
 
     projectDescription: readProjectDescription(projectDetails),
