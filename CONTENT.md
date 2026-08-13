@@ -8,7 +8,7 @@ Where content lives
   - `blog_posts` and flat, client-scoped `blog_topics`: the exclusive blog
     source for archives, filters, post pages, recommendations, metadata, and
     blog/image sitemaps.
-  - `site_settings`: shared brand, contact, address, social, image, footer badges, company facts, robots, CSP, analytics switch, schema values, and optional raw `llms.txt` content.
+  - `site_settings`: shared brand, contact, address, social, image, hero media, footer badges, company facts, robots, CSP, analytics switch, schema values, and optional raw `llms.txt` content.
   - `website_pages`: normalized SEO records for fixed routes only; canonicals are route-derived.
   - `services`: primary service route owners, including their SEO metadata.
   - `faqs`: published WYSIWYG-authored semantic HTML answers. Fixed routes use `website_page`, service routes use `service`, and a record is global only when both are null.
@@ -41,6 +41,11 @@ Publishing shared site content in Directus
   `og_description`, and `og_image_override`. Keep explicit Directus values;
   frontend derivation exists only as a fallback.
 - Every Directus image must have a `directus_files.description`.
+- `site_settings.hero_image` and `site_settings.hero_video` are the exclusive
+  hero-media sources for the homepage and location landing pages. Both files
+  require a description; the image must use an image MIME type and the video
+  must use a video MIME type. These fields are build-only and require a new
+  site build before changes become public.
 - Footer badges are image-only records in `site_settings.badges`; each image needs a description. Embedded badge HTML is not rendered.
 - Populated social fields must contain absolute HTTP(S) URLs. Invalid values fail production builds.
 - `site_settings.content_security_policy` is required and production builds fail when it is empty or unavailable.

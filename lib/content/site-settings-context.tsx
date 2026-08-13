@@ -2,6 +2,14 @@
 
 import { createContext, useContext } from 'react';
 
+export type PublicSiteAsset = {
+  url: string;
+  description: string;
+  width: number | null;
+  height: number | null;
+  type: string | null;
+};
+
 export type PublicSiteSettings = {
   brandName: string;
   phone: string;
@@ -9,6 +17,8 @@ export type PublicSiteSettings = {
   email: string;
   licenseNumber: string;
   licenseUrl: string;
+  heroImage: PublicSiteAsset | null;
+  heroVideo: PublicSiteAsset | null;
 };
 
 const SiteSettingsContext = createContext<PublicSiteSettings | null>(null);
