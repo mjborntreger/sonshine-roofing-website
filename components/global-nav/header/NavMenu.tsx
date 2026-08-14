@@ -21,8 +21,6 @@ import {
   Home as HomeIcon,
   Image as ImageIcon,
   HardHat,
-  Menu,
-  X,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -58,16 +56,9 @@ const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
   const prefersReducedMotion = useReducedMotion();
-
-  if (prefersReducedMotion) {
-    return open ? (
-      <X className="h-2 w-2 text-white" aria-hidden="true" />
-    ) : (
-      <Menu className="h-2 w-2 text-white" aria-hidden="true" />
-    );
-  }
-
-  const transition = { duration: 0.16, ease: [0.32, 0, 0.67, 1] } as const;
+  const transition = prefersReducedMotion
+    ? ({ duration: 0 } as const)
+    : ({ duration: 0.16, ease: [0.32, 0, 0.67, 1] } as const);
 
   return (
     <span className="relative flex h-4 w-4 items-center justify-center" aria-hidden="true">
