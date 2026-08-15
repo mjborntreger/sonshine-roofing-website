@@ -44,8 +44,8 @@ Use Node 22 and install with `npm ci`.
 
 - Baseline: `npm run lint`; `npm test` is currently an alias for lint.
 - Sanitizer/SEO work: run the applicable
-  `verify:directus-html`, `verify:faq-html`, `verify:person-html`,
-  `verify:sponsor-html`, `verify:glossary-html`, `verify:person-seo`,
+  `verify:directus-html`, `verify:wordpress-html`, `verify:faq-html`,
+  `verify:person-html`, `verify:sponsor-html`, `verify:glossary-html`, `verify:person-seo`,
   `verify:special-offer-indexing`, `verify:build-only-revalidation`,
   `verify:glossary-policy`, or `verify:directus-fetch-policy` script.
 - Full confidence: run a credentialed `npm run build`.
