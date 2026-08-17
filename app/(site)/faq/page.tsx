@@ -1,7 +1,7 @@
 import Section from '@/components/layout/Section';
 import { groupFaqsForArchive, listAllFaqs } from '@/lib/content/directus-faqs';
 import type { Metadata } from 'next';
-import ResourceSearchController from '@/components/dynamic-content/ResourceSearchController';
+import FaqSearchController from '@/components/dynamic-content/faq/FaqSearchController';
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
 import { Accordion } from '@/components/ui/Accordion';
@@ -187,13 +187,9 @@ export default async function FAQArchivePage() {
       </div>
 
       <FaqBulkToggleClient />
-      <ResourceSearchController
-        kind="faq"
+      <FaqSearchController
         ids={{
           query: '#faq-search',
-          grid: '#faq-topics',
-          chips: '', // not used on FAQ
-          skeleton: '', // not used by default
           noResults: '#faq-no-results',
           resultCount: '#faq-result-count',
         }}
