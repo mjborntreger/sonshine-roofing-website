@@ -2,7 +2,6 @@
 import SmartLink from "@/components/utils/SmartLink";
 import { useRef, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { motion, useReducedMotion } from "framer-motion";
 import {
   ChevronDown,
   ChevronRight,
@@ -55,30 +54,30 @@ const CONTACT_LABELS = new Set(["Contact", "Contact Us"]);
 const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
-  const prefersReducedMotion = useReducedMotion();
-  const transition = prefersReducedMotion
-    ? ({ duration: 0 } as const)
-    : ({ duration: 0.16, ease: [0.32, 0, 0.67, 1] } as const);
+  const barClassName =
+    "absolute h-[1.5px] w-full rounded-full bg-white transition-[transform,opacity] duration-[160ms] ease-[cubic-bezier(0.32,0,0.67,1)] motion-reduce:transition-none";
 
   return (
     <span className="relative flex h-4 w-4 items-center justify-center" aria-hidden="true">
-      <motion.span
-        className="absolute h-[1.5px] w-full origin-center rounded-full bg-white"
-        initial={false}
-        animate={open ? { y: 0, rotate: 45 } : { y: -4, rotate: 0 }}
-        transition={transition}
+      <span
+        className={cn(
+          barClassName,
+          "origin-center",
+          open ? "translate-y-0 rotate-45" : "-translate-y-1 rotate-0"
+        )}
       />
-      <motion.span
-        className="absolute h-[1.5px] w-full rounded-full bg-white"
-        initial={false}
-        animate={open ? { opacity: 0, scaleX: 0.4 } : { opacity: 1, scaleX: 1 }}
-        transition={transition}
+      <span
+        className={cn(
+          barClassName,
+          open ? "scale-x-[0.4] opacity-0" : "scale-x-100 opacity-100"
+        )}
       />
-      <motion.span
-        className="absolute h-[1.5px] w-full origin-center rounded-full bg-white"
-        initial={false}
-        animate={open ? { y: 0, rotate: -45 } : { y: 4, rotate: 0 }}
-        transition={transition}
+      <span
+        className={cn(
+          barClassName,
+          "origin-center",
+          open ? "translate-y-0 -rotate-45" : "translate-y-1 rotate-0"
+        )}
       />
     </span>
   );
@@ -687,6 +686,7 @@ function MobileMenu({ navigation }: { navigation: Item[] }) {
         aria-expanded={open}
         aria-controls="mobile-nav"
         aria-haspopup="menu"
+        aria-label={open ? "Close menu" : "Open menu"}
         data-open={open}
       >
 
