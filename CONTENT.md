@@ -35,8 +35,9 @@
   routes and SEO. There are no duplicate service records in `website_pages`.
 - Navigation links to service routes use `link_type=service` and the `service`
   relation. Fixed routes continue to use `link_type=page`.
-- Store the complete keyword set in `focus_keywords` with the exact
-  `primary_focus_keyword` first. A mismatch fails the build with
+- Store the complete keyword set in `focus_keywords` and include the
+  `primary_focus_keyword` phrase. The adapter matches it case-insensitively and
+  returns it first; a missing match fails content loading with
   `DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH`.
 - Route owners use the shared `seo` group: `noindex`, `meta_title`,
   `meta_description`, `primary_focus_keyword`, `focus_keywords`, `og_title`,
@@ -170,6 +171,9 @@
 
 - Set `status=published` to make an offer routable.
 - Set `featured=true` to make an unexpired offer eligible for the sitewide popup.
+- Popup route suppression is code-owned in
+  `components/lead-capture/special-offer/SpecialOfferPopup.tsx`; Directus cannot
+  override the excluded lead, legal, review, offer, or confirmation routes.
 - New offers default to `noindex=true`; editors may turn indexing on. The stored
   toggle alone controls robots metadata and special-offer sitemap inclusion.
   Expiration disables the claim form and featured-popup eligibility, but does
