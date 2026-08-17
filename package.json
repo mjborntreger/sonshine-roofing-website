@@ -11,6 +11,7 @@
     "build:codex": "NODE_OPTIONS=\"--require ./scripts/codex-fetch-proxy.cjs $NODE_OPTIONS\" next build --webpack",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit --incremental false",
     "test": "npm run lint",
     "verify:tailwind-utilities": "node ./scripts/verify-tailwind-utilities.mjs",
     "verify:directus-html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-directus-html.mjs",

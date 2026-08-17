@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   quality:
-    name: Lint and contract checks
+    name: Lint, typecheck, and contract checks
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -32,16 +32,26 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
       - name: Verify Tailwind utilities
         run: npm run verify:tailwind-utilities
       - name: Verify Directus HTML
         run: npm run verify:directus-html
+      - name: Verify Directus fetch policy
+        run: npm run verify:directus-fetch-policy
       - name: Verify FAQ HTML
         run: npm run verify:faq-html
       - name: Verify person HTML
         run: npm run verify:person-html
+      - name: Verify sponsor HTML
+        run: npm run verify:sponsor-html
       - name: Verify person SEO
         run: npm run verify:person-seo
+      - name: Verify glossary HTML
+        run: npm run verify:glossary-html
+      - name: Verify glossary route policy
+        run: npm run verify:glossary-policy
       - name: Verify special-offer indexing
         run: npm run verify:special-offer-indexing
       - name: Verify build-only revalidation
