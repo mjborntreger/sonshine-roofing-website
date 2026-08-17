@@ -34,6 +34,7 @@ import {
   getReviewsCarouselSettings,
 } from '@/lib/content/directus-reviews';
 import { getSiteSettings } from '@/lib/content/directus-site';
+import { allura } from '@/lib/ui/allura-font';
 
 type Params = { slug: string };
 export const revalidate = 600;
@@ -332,7 +333,10 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   return (
     <>
       {structuredData ? <JsonLd data={structuredData} /> : null}
-      <Hero title={`The Best Roofing Company in ${location.locationName} for over 39 years`} />
+      <Hero
+        scriptFontClassName={allura.variable}
+        title={`The Best Roofing Company in ${location.locationName} for over 39 years`}
+      />
       <div className="bg-blue-200/50 border border-b-blue-300/70">
         {hasDisplayReviews ? (
           <ReviewsCarousel

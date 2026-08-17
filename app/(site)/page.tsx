@@ -17,6 +17,7 @@ import LeadFormSection from '@/components/lead-capture/lead-form/InitialNavigati
 import LocalPartnershipsSection from '@/components/location/LocalPartnershipsSection';
 import SidebarCta from '@/components/cta/SidebarCta';
 import { getSiteSettings, getWebsitePageMetadata } from '@/lib/content/directus-site';
+import { allura } from '@/lib/ui/allura-font';
 
 // ===== STYLE CONSTANTS ===== //
 const leadFormLayout = 'mx-auto w-full';
@@ -58,7 +59,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   ]);
   return (
     <>
-      <Hero />
+      <Hero scriptFontClassName={allura.variable} />
       <div className="bg-blue-200/50 border border-b-blue-300/70">
         <ReviewsCarousel showOwnerReplies={false} />
       </div>

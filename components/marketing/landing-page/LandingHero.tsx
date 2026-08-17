@@ -14,10 +14,12 @@ import {
 import { useSiteSettings } from '@/lib/content/site-settings-context';
 
 type HeroProps = {
+  scriptFontClassName: string;
   title?: string;
 };
 
 export default function Hero({
+  scriptFontClassName,
   title = 'The BEST Roofing Company in Sarasota, Manatee, and Charlotte Counties for over 39 years',
 }: HeroProps) {
   const { heroImage, heroVideo, licenseNumber, licenseUrl } = useSiteSettings();
@@ -81,7 +83,7 @@ export default function Hero({
   return (
     <section
       ref={sectionRef}
-      className="relative isolate h-auto overflow-hidden bg-black text-white"
+      className={`${scriptFontClassName} relative isolate h-auto overflow-hidden bg-black text-white`}
     >
       {heroImage ? (
         <Image
