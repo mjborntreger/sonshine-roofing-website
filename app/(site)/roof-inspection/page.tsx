@@ -195,7 +195,7 @@ export default async function Page() {
               </figure>
               {/* Inline callout (#6) */}
               <div
-                className="shadow-sm my-4 rounded-xl border border-[#fb9216/5] bg-amber-50/50 p-4"
+                className="shadow-sm my-4 rounded-xl border border-[#fb9216]/5 bg-amber-50/50 p-4"
                 role="note"
                 aria-label="Important"
               >
@@ -233,7 +233,7 @@ export default async function Page() {
               </SmartLink>
             </div>
             <div
-              className="my-6 rounded-xl border border-[#fb9216/5] bg-amber-50/50 p-4 shadow-sm"
+              className="my-6 rounded-xl border border-[#fb9216]/5 bg-amber-50/50 p-4 shadow-sm"
               role="note"
               aria-label="Advisory"
             >

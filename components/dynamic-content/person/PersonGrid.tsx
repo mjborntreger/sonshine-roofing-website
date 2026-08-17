@@ -47,7 +47,7 @@ export default function PersonGrid({ people }: { people: Person[] }) {
                   </CardContent>
 
                   <CardFooter className="flex justify-end border-t border-blue-200 bg-blue-50 font-semibold px-5 py-4 text-slate-700 sm:px-6">
-                    <span className="items-center gap-2 text-md font-semibold tracking-wide">
+                    <span className="items-center gap-2 text-base font-semibold tracking-wide">
                       See profile
                       <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
                     </span>

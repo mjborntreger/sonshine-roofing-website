@@ -117,7 +117,7 @@ export default async function Page() {
                     <h2 className="text-2xl font-semibold text-slate-800">
                       You&apos;ll likely talk to <span className="text-[--brand-blue]">Tara</span>
                     </h2>
-                    <p className="text-md text-slate-600 mb-2">Fast, friendly & reliable.</p>
+                    <p className="text-base text-slate-600 mb-2">Fast, friendly & reliable.</p>
                   </div>
 
                   <div>
@@ -179,7 +179,7 @@ export default async function Page() {
                     <h2 className="text-2xl font-semibold text-slate-800">
                       You&apos;ll likely talk to <span className="text-[--brand-blue]">Tara</span>
                     </h2>
-                    <p className="text-md text-slate-600 mb-2">Fast, friendly & reliable.</p>
+                    <p className="text-base text-slate-600 mb-2">Fast, friendly & reliable.</p>
                   </div>
 
                   <div>

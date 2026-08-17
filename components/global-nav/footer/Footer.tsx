@@ -29,7 +29,7 @@ type SocialLink = {
 const linkStyles =
   'text-xs md:text-sm text-[#cad8e6] transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
 const h3Styles =
-  'text-sm md:text-md font-bold uppercase tracking-wider text-white after:mt-2 after:block after:h-0.5 after:w-8 after:rounded-full after:bg-[#fb9216]';
+  'text-sm md:text-base font-bold uppercase tracking-wider text-white after:mt-2 after:block after:h-0.5 after:w-8 after:rounded-full after:bg-[#fb9216]';
 const hoursStyles = 'text-xs md:text-sm text-[#cad8e6]';
 const hoursLabelStyles = 'text-xs md:text-sm font-semibold text-white';
 const legalLinkStyles =
@@ -170,7 +170,7 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
                 {settings?.licenseNumber && settings.licenseUrl ? (
                   <li className="mb-8">
                     <SmartLink
-                      className="font-display text-sm font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-md"
+                      className="font-display text-sm font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-base"
                       href={settings.licenseUrl}
                       aria-label={`Florida Roofing Contractor's License Number ${settings.licenseNumber}`}
                       target="_blank"
@@ -266,7 +266,7 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
           <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
             <SmartLink
               href="/reviews"
-              className="btn bg-[#fb9216] px-3 py-2 text-sm font-bold !text-[#071b2b] shadow-lg shadow-black/25 transition-colors hover:bg-[#ffb45f] focus-visible:!ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-md"
+              className="btn bg-[#fb9216] px-3 py-2 text-sm font-bold !text-[#071b2b] shadow-lg shadow-black/25 transition-colors hover:bg-[#ffb45f] focus-visible:!ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-base"
               data-icon-affordance="up-right"
             >
               <Star className="mr-2 h-3 w-3 text-[#071b2b] md:h-4 md:w-4" />

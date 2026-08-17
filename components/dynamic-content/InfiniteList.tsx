@@ -180,7 +180,7 @@ const renderVideoItem = (
                         type="button"
                         onClick={handleOpen}
                         data-video-slug={safeSlug}
-                        className="items-center gap-2 text-md font-semibold tracking-wide"
+                        className="items-center gap-2 text-base font-semibold tracking-wide"
                         data-icon-affordance="right"
                     >
                         Watch video

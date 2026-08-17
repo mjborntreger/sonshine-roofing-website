@@ -32,6 +32,8 @@ jobs:
         run: npm ci
       - name: Lint
         run: npm run lint
+      - name: Verify Tailwind utilities
+        run: npm run verify:tailwind-utilities
       - name: Verify Directus HTML
         run: npm run verify:directus-html
       - name: Verify FAQ HTML

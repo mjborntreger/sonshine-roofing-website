@@ -300,7 +300,7 @@ export default function TocFromHeadings({
         {title}
         <ArrowDown className="h-4 w-4 inline ml-2 text-[--brand-blue]" aria-hidden="true" />
       </div>
-      <ul className={[styles.tocList, styles.tocListRoot, 'space-y-2 text-md'].join(' ')}>
+      <ul className={[styles.tocList, styles.tocListRoot, 'space-y-2 text-base'].join(' ')}>
         {structured.map((section) => {
           const isH3Root = section.level === 3;
           const active = section.id === activeId;

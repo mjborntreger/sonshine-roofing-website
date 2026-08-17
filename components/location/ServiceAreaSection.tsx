@@ -166,7 +166,7 @@ export default function ServiceAreaSection({
                       <details className="ont-normal text-slate-800">
                         <summary
                           data-icon-affordance="down"
-                          className="not-prose flex cursor-pointer select-none items-center gap-2 text-md font-semibold tracking-wide text-slate-700"
+                          className="not-prose flex cursor-pointer select-none items-center gap-2 text-base font-semibold tracking-wide text-slate-700"
                         >
                           See Details
                         </summary>

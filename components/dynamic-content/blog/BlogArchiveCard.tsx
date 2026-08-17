@@ -105,7 +105,7 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
           </CardContent>
 
           <CardFooter className="mt-auto flex justify-end border-t border-blue-200 bg-blue-50 px-5 py-4 font-semibold text-slate-700 sm:px-6">
-            <span className="inline-flex items-center gap-2 text-md font-semibold tracking-wide">
+            <span className="inline-flex items-center gap-2 text-base font-semibold tracking-wide">
               Read full article
               <ArrowRight className="w-4 h-4 inline ml-2 icon-affordance" />
             </span>

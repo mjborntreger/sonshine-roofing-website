@@ -123,7 +123,7 @@ export default function ProjectTestimonial({
               loading="lazy"
             />
             <div>
-              <p className="pt-2 text-md font-semibold text-slate-700 hover:text-[--brand-blue] transition-colors">Nathan Borntreger</p>
+              <p className="pt-2 text-base font-semibold text-slate-700 hover:text-[--brand-blue] transition-colors">Nathan Borntreger</p>
               <span className="pb-2 text-xs text-slate-500">Owner/Operator</span>
             </div>
           </SmartLink>

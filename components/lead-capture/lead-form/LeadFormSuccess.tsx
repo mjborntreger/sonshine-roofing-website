@@ -49,7 +49,7 @@ export default function LeadFormSuccess({
   const panelClassName = cn(
     'w-full mx-auto rounded-3xl p-8',
     isHeroEmbedded
-      ? 'border border-white/15 bg-slate-950/72 text-white shadow-[0_30px_90px_rgba(0,0,0,0.4)] backdrop-blur-xl'
+      ? 'border border-white/15 bg-slate-950/[0.72] text-white shadow-[0_30px_90px_rgba(0,0,0,0.4)] backdrop-blur-xl'
       : 'border border-emerald-200 bg-white/95 shadow-md',
     maxWidthClassName,
   );

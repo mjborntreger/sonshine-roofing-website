@@ -137,13 +137,13 @@ export default function Hero({
               ) : null}
             </div>
 
-            <h1 className="my-8 text-3xl sm:4xl leading-[3rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">
+            <h1 className="my-8 text-3xl sm:text-4xl leading-[3rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">
               {renderedTitle}
             </h1>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
               <SmartLink
-                className="inline-flex items-center gap-2 rounded-xl border border-blue-100/50 bg-[--brand-blue] px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
+                className="inline-flex items-center gap-2 rounded-xl border border-blue-100/50 bg-[--brand-blue] px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
                 href="/contact-us"
                 title="Contact SonShine Roofing"
                 aria-label="Contact SonShine Roofing"
@@ -152,7 +152,7 @@ export default function Hero({
                 Contact Us
               </SmartLink>
               <SmartLink
-                className="backdrop-blur-sm inline-flex items-center gap-2 rounded-xl border border-white/40 px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
+                className="backdrop-blur-sm inline-flex items-center gap-2 rounded-xl border border-white/40 px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
                 href="/about-sonshine-roofing"
                 title="About SonShine Roofing"
                 aria-label="About SonShine Roofing"

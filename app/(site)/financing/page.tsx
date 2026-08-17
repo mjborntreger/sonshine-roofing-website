@@ -141,7 +141,7 @@ export default async function FinancingPage() {
           <h2 id="get-started" className='mb-4 mt-6 text-3xl md:text-4xl text-center font-semibold text-slate-900'>
             Free <span className="text-[--brand-blue]">Roof Financing</span> Monthly Payment Estimator
           </h2>
-          <p className="text-center mx-auto max-w-3xl text-slate-600 mb-8 text-sm md:text-md">Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.</p>
+          <p className="text-center mx-auto max-w-3xl text-slate-600 mb-8 text-sm md:text-base">Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.</p>
           <Suspense
             fallback={
               <div className="rounded-3xl border border-blue-100 bg-white/90 p-6 text-center text-sm text-slate-600 shadow-sm">

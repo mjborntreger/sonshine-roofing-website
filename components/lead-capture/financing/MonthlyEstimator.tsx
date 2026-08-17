@@ -1039,7 +1039,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             )}
           </div>
           <div>
-            <label className="block text-md font-medium text-slate-700" htmlFor="amount">
+            <label className="block text-base font-medium text-slate-700" htmlFor="amount">
               Project Budget*
             </label>
             <div className="mt-1 flex items-center gap-2">
@@ -1545,7 +1545,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                         style={{ width: `${barPercent}%` }}
                       />
                     </div>
-                    <p className="text-md text-slate-500">
+                    <p className="text-base text-slate-500">
                       {MATCH_PROGRAMS[programKey].description}
                     </p>
                   </div>
@@ -1567,7 +1567,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           </div>
 
           <div className="space-y-4 rounded-2xl px-4 py-4">
-            <label htmlFor="activeAmount" className="block text-md font-medium text-slate-700">
+            <label htmlFor="activeAmount" className="block text-base font-medium text-slate-700">
               <Wallet className="h-4 w-4 mr-2 inline text-[--brand-blue]" />
               Project Budget
             </label>
@@ -1633,14 +1633,14 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             <div className="overflow-hidden">
               <table className="w-full text-sm">
                 <tbody>
-                  <tr className="bg-blue-100/60 border-b border-blue-100 text-md font-semibold uppercase tracking-wide text-slate-600">
+                  <tr className="bg-blue-100/60 border-b border-blue-100 text-base font-semibold uppercase tracking-wide text-slate-600">
                     <td className="px-4 py-2" colSpan={2}>
                       {MATCH_PROGRAMS.serviceFinance.label} Programs
                     </td>
                   </tr>
                   {groupedPayments.service.map(({ program, amount }, idx) => (
                     <tr key={program.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-blue-50/40'}>
-                      <td className="text-md px-4 py-3 font-medium text-slate-900">
+                      <td className="text-base px-4 py-3 font-medium text-slate-900">
                         <div>{program.label}</div>
                         {program.summary && (
                           <div className="text-sm font-normal text-slate-500">
@@ -1656,14 +1656,14 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                       </td>
                     </tr>
                   ))}
-                  <tr className="bg-amber-100/60 border-t border-b border-amber-100 text-md font-semibold uppercase tracking-wide text-slate-600">
+                  <tr className="bg-amber-100/60 border-t border-b border-amber-100 text-base font-semibold uppercase tracking-wide text-slate-600">
                     <td className="px-4 py-2" colSpan={2}>
                       {MATCH_PROGRAMS.ygrene.label} Financing
                     </td>
                   </tr>
                   {groupedPayments.ygrene.map(({ program, amount }, idx) => (
                     <tr key={program.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-amber-50/40'}>
-                      <td className="text-md px-4 py-3 font-medium text-slate-900">
+                      <td className="text-base px-4 py-3 font-medium text-slate-900">
                         <div>{program.label}</div>
                         {program.summary && (
                           <div className="text-sm font-normal text-slate-500">
@@ -1671,7 +1671,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                           </div>
                         )}
                       </td>
-                      <td className="text-md px-4 py-3 text-right font-semibold text-slate-900">
+                      <td className="text-base px-4 py-3 text-right font-semibold text-slate-900">
                         {currency(amount)}/mo
                         {program.footnote && (
                           <span className="ml-2 text-sm text-slate-500">{program.footnote}</span>
@@ -1686,7 +1686,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
           <div className="flex gap-6 flex-wrap justify-center">
             <a
-              className="group inline-flex items-center text-md font-semibold text-[--brand-blue] hover:underline"
+              className="group inline-flex items-center text-base font-semibold text-[--brand-blue] hover:underline"
               href="#docs"
               data-icon-affordance="right"
             >
@@ -1695,7 +1695,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
               <ChevronRight className="h-4 w-4 ml-[0.10rem] inline text-slate-600 icon-affordance" />
             </a>
             <a
-              className="group inline-flex items-center text-md font-semibold text-[--brand-blue] hover:underline"
+              className="group inline-flex items-center text-base font-semibold text-[--brand-blue] hover:underline"
               href="#pick-a-plan"
               data-icon-affordance="right"
             >

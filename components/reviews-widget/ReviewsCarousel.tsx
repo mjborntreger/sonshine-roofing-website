@@ -150,7 +150,7 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
                     />
                   ) : null}
                   <div>
-                    <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+                    <p className="pt-2 text-base font-semibold text-slate-700">Nathan Borntreger</p>
                     <span className="pb-2 text-xs text-slate-500">Owner</span>
                   </div>
                 </div>
@@ -180,7 +180,7 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
               All reviews shown below are automatically pulled from Google using the official API.
             </p>) : null}
           {showBusinessProfileLink ? (
-            <p className="text-md text-slate-700 font-semibold transition hover:text-[--brand-blue]">
+            <p className="text-base text-slate-700 font-semibold transition hover:text-[--brand-blue]">
               <SmartLink
                 href={resolvedGbpUrl}
                 target="_blank"

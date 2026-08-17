@@ -43,7 +43,7 @@ const LeadFormSuccess = dynamic(
 const INPUT_BASE_CLASS =
   'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-sm shadow-lg focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-orange]/30';
 const HERO_INPUT_BASE_CLASS =
-  'mt-2 w-full rounded-xl border border-white/12 bg-white/80 px-4 py-3 text-base text-slate-900 shadow-none placeholder:text-slate-500 focus:border-[--brand-orange] focus:ring-4 focus:ring-[--brand-orange]/15';
+  'mt-2 w-full rounded-xl border border-white/[0.12] bg-white/80 px-4 py-3 text-base text-slate-900 shadow-none placeholder:text-slate-500 focus:border-[--brand-orange] focus:ring-4 focus:ring-[--brand-orange]/15';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
 const HERO_PANEL_CLASS =
   'mt-8 sm:mt-0 rounded-3xl border border-blue-100/50 bg-[#0045d7]/5 p-5 shadow-none ring-1 ring-white/5 backdrop-blur-xl sm:p-6';
@@ -55,7 +55,7 @@ const HERO_SMS_CLASS_NAMES = {
   label: 'text-sm font-semibold leading-6 text-slate-300',
   options: 'mt-4 flex flex-wrap gap-3',
   optionLabel:
-    'inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] px-4 py-2.5 text-slate-300',
+    'inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.04] px-4 py-2.5 text-slate-300',
   optionLabelSelected: 'border-slate-200 bg-[--brand-orange] text-slate-200',
   radio: 'sr-only',
   optionText: 'text-sm font-semibold leading-none',

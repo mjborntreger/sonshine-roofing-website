@@ -277,7 +277,7 @@ export default function ReviewsSlider({
                       <Quote className="flex-none w-10 h-10 mt-1 text-[--brand-cyan]" aria-hidden />
                     </div>
                   </header>
-                  <p className="text-md md:text-lg text-slate-700">{text}</p>
+                  <p className="text-base md:text-lg text-slate-700">{text}</p>
                   {showOwnerReplies && r.ownerReply ? (
                     <div className="mt-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3">
                       <div className="flex items-start gap-3">
@@ -292,7 +292,7 @@ export default function ReviewsSlider({
                           />
                         ) : null}
                         <div>
-                          <p className="pt-2 text-md font-semibold text-slate-700">Nathan Borntreger</p>
+                          <p className="pt-2 text-base font-semibold text-slate-700">Nathan Borntreger</p>
                           <span className="pb-2 text-xs text-slate-500">Owner</span>
                         </div>
                       </div>
@@ -378,7 +378,7 @@ export default function ReviewsSlider({
 
                 </header>
                 <div className="max-h-[80vh] overflow-auto px-5 py-4 bg-amber-50/50 space-y-4">
-                  <p className="m-0 whitespace-pre-wrap text-md md:text-lg text-slate-700">{r.text || ''}</p>
+                  <p className="m-0 whitespace-pre-wrap text-base md:text-lg text-slate-700">{r.text || ''}</p>
                   {showOwnerReplies && r.ownerReply ? (
                     <div className="mt-6 rounded-2xl border border-blue-200 bg-slate-50 px-4 py-3">
                       <SmartLink href="/person/nathan-borntreger" title="Nathan Borntreger's Profile" className="flex items-start gap-3">
@@ -393,7 +393,7 @@ export default function ReviewsSlider({
                           />
                         ) : null}
                         <div>
-                          <p className="transition-colors pt-2 text-md font-semibold text-slate-700 hover:text-[--brand-blue]">Nathan Borntreger</p>
+                          <p className="transition-colors pt-2 text-base font-semibold text-slate-700 hover:text-[--brand-blue]">Nathan Borntreger</p>
                           <span className="pb-2 text-xs text-slate-500">Owner</span>
                         </div>
                       </SmartLink>
