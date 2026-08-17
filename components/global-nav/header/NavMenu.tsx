@@ -52,6 +52,8 @@ const NAV_ICONS: Record<string, LucideIcon> = {
 const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);
 const CONTACT_LABELS = new Set(["Contact", "Contact Us"]);
 const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
+const ENTRY_MOTION_CLASS =
+  "transition-all duration-150 ease-out motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
   const barClassName =
@@ -220,7 +222,7 @@ function DesktopMenu({
                 <div
                   className={cn(
                     "absolute left-0 top-full mt-2 min-w-[300px] rounded-3xl border bg-white border-blue-200 shadow-lg origin-top",
-                    "transition-all duration-150 ease-out",
+                    ENTRY_MOTION_CLASS,
                     enteredPanel ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
                   )}
                   style={{ transitionDuration: `${PANEL_DURATION_MS}ms` }}
@@ -271,7 +273,8 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
           <li
             key={child.label}
             className={cn(
-              "relative transition-all duration-150 ease-out",
+              "relative",
+              ENTRY_MOTION_CLASS,
               entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
             )}
             style={{ transitionDelay: `${Math.min(300, ITEM_STAGGER_BASE_MS + i * ITEM_STAGGER_STEP_MS + (level - 1) * LEVEL_BONUS_MS)}ms` }}
@@ -339,7 +342,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
                     "md:absolute md:left-full md:top-0",
                     "md:pl-2",
                     "min-w-[240px] rounded3xl border bg-white shadow-lg origin-top-left",
-                    "transition-all duration-150 ease-out",
+                    ENTRY_MOTION_CLASS,
                     entered ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-1 scale-[0.98]"
                   )}
                   style={{ transitionDuration: `${PANEL_DURATION_MS}ms` }}
@@ -537,7 +540,7 @@ function MobileMenu({ navigation }: { navigation: Item[] }) {
         <ul className="space-y-1">
           <li
             className={cn(
-              "transition-all duration-150 ease-out",
+              ENTRY_MOTION_CLASS,
               enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
             )}
             // ANIM: Mobile Home item stagger — base
@@ -559,7 +562,7 @@ function MobileMenu({ navigation }: { navigation: Item[] }) {
               <li
                 key={k}
                 className={cn(
-                  "transition-all duration-150 ease-out",
+                  ENTRY_MOTION_CLASS,
                   enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
                 )}
                 // ANIM: Mobile top-level stagger — base + per-item step
@@ -624,7 +627,8 @@ function MobileMenu({ navigation }: { navigation: Item[] }) {
                         <li
                           key={ck}
                           className={cn(
-                            "py-1 transition-all duration-150 ease-out",
+                            "py-1",
+                            ENTRY_MOTION_CLASS,
                             entered[k] ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
                           )}
                           // ANIM: Mobile child stagger — base + per-item step
@@ -657,7 +661,7 @@ function MobileMenu({ navigation }: { navigation: Item[] }) {
           })}
           <li
             className={cn(
-              "transition-all duration-150 ease-out",
+              ENTRY_MOTION_CLASS,
               enteredTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
             )}
             // ANIM: Mobile CTA1 stagger — base + NAV length step
