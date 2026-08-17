@@ -185,7 +185,6 @@ export default function Header({
             aria-label={`${brandName} logo`}
             width={106}
             height={40}
-            sizes="(max-width: 120px) 20vw, 768px"
             loading="eager"
             priority
             fetchPriority="high"

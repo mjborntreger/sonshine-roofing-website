@@ -3,6 +3,13 @@ import SmartLink from '@/components/utils/SmartLink';
 import type { FooterBadge } from '@/lib/content/directus-site';
 
 const imageStyles = 'my-6 h-[100px] w-auto object-contain';
+const footerBadgeSizes =
+  '(min-width: 1152px) 109px, ' +
+  '(min-width: 1024px) calc((100vw - 176px) / 9), ' +
+  '(min-width: 768px) calc((100vw - 128px) / 5), ' +
+  '(min-width: 640px) calc((100vw - 116px) / 4), ' +
+  '(min-width: 320px) calc((100vw - 104px) / 3), ' +
+  '27vw';
 
 type FooterBadgesProps = {
   badges: FooterBadge[];
@@ -16,7 +23,7 @@ function BadgeImage({ badge }: { badge: FooterBadge }) {
       title={badge.image.description}
       height={badge.image.height ?? 100}
       width={badge.image.width ?? 150}
-      sizes="(max-width: 150px) 25vw, 366px"
+      sizes={footerBadgeSizes}
       className={imageStyles}
       loading="lazy"
       decoding="async"

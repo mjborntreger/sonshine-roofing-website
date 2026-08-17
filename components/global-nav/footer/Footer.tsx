@@ -162,7 +162,6 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
                   aria-label={`${brandName} logo`}
                   width={180}
                   height={75}
-                  sizes="(max-width: 120px) 20vw, 768px"
                   loading="lazy"
                   fetchPriority="low"
                 />
