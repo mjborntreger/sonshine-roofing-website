@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 
@@ -26,6 +27,18 @@ type Props = {
 
 const STORAGE_KEY = "ss_featured_offer_popup_hidden";
 const SUPPRESSION_SECONDS = 60 * 60 * 24 * 7;
+const EXACT_PATHNAME_BLACKLIST = new Set([
+  "/contact-us",
+  "/homeowner-referral-program/terms-and-conditions",
+  "/instant-quote",
+  "/privacy-policy",
+  "/reviews",
+  "/roof-maintenance/roof-care-club-terms-and-conditions",
+  "/sms-terms-and-conditions",
+  "/tell-us-why",
+  "/thank-you",
+]);
+const PATHNAME_PREFIX_BLACKLIST = ["/special-offers"];
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), area[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
@@ -105,7 +118,20 @@ function splitParagraphs(value: string): string[] {
     .filter(Boolean);
 }
 
+function isPathnameBlacklisted(pathname: string): boolean {
+  const normalizedPathname =
+    pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  return (
+    EXACT_PATHNAME_BLACKLIST.has(normalizedPathname) ||
+    PATHNAME_PREFIX_BLACKLIST.some(
+      (prefix) => normalizedPathname === prefix || normalizedPathname.startsWith(`${prefix}/`),
+    )
+  );
+}
+
 export default function SpecialOfferPopup({ offer }: Props) {
+  const pathname = usePathname();
+  const isBlacklisted = isPathnameBlacklisted(pathname);
   const [isOpen, setIsOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -116,7 +142,7 @@ export default function SpecialOfferPopup({ offer }: Props) {
   const paragraphs = useMemo(() => splitParagraphs(offer.description), [offer.description]);
 
   useEffect(() => {
-    if (isSuppressed()) return undefined;
+    if (isBlacklisted || isSuppressed()) return undefined;
 
     let timer: number | undefined;
     const show = () => {
@@ -135,10 +161,14 @@ export default function SpecialOfferPopup({ offer }: Props) {
       window.removeEventListener("load", show);
       if (timer) window.clearTimeout(timer);
     };
-  }, [offer.slug]);
+  }, [isBlacklisted, offer.slug]);
 
   useEffect(() => {
-    if (!isOpen) return undefined;
+    if (isBlacklisted) setIsOpen(false);
+  }, [isBlacklisted]);
+
+  useEffect(() => {
+    if (!isOpen || isBlacklisted) return undefined;
 
     const dismissFromEffect = () => {
       writeSuppression(offer.slug);
@@ -205,14 +235,14 @@ export default function SpecialOfferPopup({ offer }: Props) {
         previouslyFocused.current = null;
       });
     };
-  }, [isOpen, offer.slug]);
+  }, [isBlacklisted, isOpen, offer.slug]);
 
   const dismiss = () => {
     writeSuppression(offer.slug);
     setIsOpen(false);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || isBlacklisted) return null;
 
   return (
     <div

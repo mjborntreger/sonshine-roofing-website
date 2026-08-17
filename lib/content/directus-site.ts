@@ -42,6 +42,8 @@ type DirectusSiteSettingsItem = {
   logo_inverted?: DirectusFileValue;
   favicon?: DirectusFileValue;
   default_og_image?: DirectusFileValue;
+  hero_image?: DirectusFileValue;
+  hero_video?: DirectusFileValue;
   address_street?: unknown;
   address_city?: unknown;
   address_region?: unknown;
@@ -150,6 +152,8 @@ export type SiteSettings = {
   logoInverted: DirectusAsset;
   favicon: DirectusAsset;
   defaultOgImage: DirectusAsset;
+  heroImage: DirectusAsset;
+  heroVideo: DirectusAsset;
   address: {
     street: string;
     city: string;
@@ -440,6 +444,19 @@ function mapAsset(
   };
 }
 
+function mapMediaAsset(
+  value: DirectusFileValue,
+  config: DirectusConfig,
+  field: 'hero_image' | 'hero_video',
+  mediaKind: 'image' | 'video',
+): DirectusAsset {
+  const asset = mapAsset(value, config, 'site_settings', field, true)!;
+  if (!asset.type?.startsWith(`${mediaKind}/`)) {
+    throw new Error(`[directus-site] site_settings.${field} must reference a ${mediaKind} file.`);
+  }
+  return asset;
+}
+
 function phoneHref(value: string): string {
   const digits = value.replace(/\D/g, '');
   if (digits.length === 10) return `tel:+1${digits}`;
@@ -601,6 +618,16 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
       'default_og_image.width',
       'default_og_image.height',
       'default_og_image.type',
+      'hero_image.id',
+      'hero_image.description',
+      'hero_image.width',
+      'hero_image.height',
+      'hero_image.type',
+      'hero_video.id',
+      'hero_video.description',
+      'hero_video.width',
+      'hero_video.height',
+      'hero_video.type',
       'address_street',
       'address_city',
       'address_region',
@@ -682,6 +709,8 @@ export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
       'default_og_image',
       true,
     )!,
+    heroImage: mapMediaAsset(item.hero_image ?? null, config, 'hero_image', 'image'),
+    heroVideo: mapMediaAsset(item.hero_video ?? null, config, 'hero_video', 'video'),
     address: {
       street: requiredString(item.address_street, 'site_settings', 'address_street'),
       city: requiredString(item.address_city, 'site_settings', 'address_city'),

@@ -272,6 +272,24 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     email: settings?.email ?? 'messages@sonshineroofing.com',
     licenseNumber: settings?.licenseNumber ?? '',
     licenseUrl: settings?.licenseUrl ?? '',
+    heroImage: settings
+      ? {
+          url: settings.heroImage.url,
+          description: settings.heroImage.description,
+          width: settings.heroImage.width,
+          height: settings.heroImage.height,
+          type: settings.heroImage.type,
+        }
+      : null,
+    heroVideo: settings
+      ? {
+          url: settings.heroVideo.url,
+          description: settings.heroVideo.description,
+          width: settings.heroVideo.width,
+          height: settings.heroVideo.height,
+          type: settings.heroVideo.type,
+        }
+      : null,
   };
 
   return (
