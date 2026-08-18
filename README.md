@@ -34,14 +34,15 @@ environment files.
 
 ```bash
 npm run lint
-npm test
+npm run typecheck
+npm run verify:tailwind-utilities
 ```
 
-`npm test` currently aliases lint. Run the relevant `verify:*` command from
-`package.json` when changing a sanitizer, SEO rule, or cache/revalidation
-contract. Use `npm run build` for full confidence when the credentialed CMS
-environment is available; `npm run build:codex` supplies the sandbox fetch
-proxy when that contract is needed.
+`npm test` currently aliases lint. Run the relevant additional `verify:*`
+command from `package.json` when changing a sanitizer, SEO rule, or
+cache/revalidation contract. Use `npm run build` for full confidence when the
+credentialed CMS environment is available; `npm run build:codex` supplies the
+sandbox fetch proxy when that contract is needed.
 
 Build presteps generate `public/llms.txt` and
 `public/__sitemaps/static-routes.json`. Both files are ignored build artifacts,

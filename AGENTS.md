@@ -42,7 +42,9 @@ and serves it on port 3000.
 
 Use Node 22 and install with `npm ci`.
 
-- Baseline: `npm run lint`; `npm test` is currently an alias for lint.
+- Baseline: `npm run lint`, `npm run typecheck`, and
+  `npm run verify:tailwind-utilities`; `npm test` is currently an alias for
+  lint.
 - Sanitizer/SEO work: run the applicable
   `verify:directus-html`, `verify:faq-html`, `verify:person-html`,
   `verify:sponsor-html`, `verify:glossary-html`, `verify:person-seo`,
