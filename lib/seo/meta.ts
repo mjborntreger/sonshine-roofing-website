@@ -23,7 +23,7 @@ function ensureOpenGraphType<TType extends OpenGraphType>(
 }
 
 export const DEFAULT_OG_IMAGE: Required<Omit<OgImageInput, 'alt'>> & { alt?: string } = {
-  url: '/og-default.png',
+  url: '/og-default.png?v=20260818',
   width: 1200,
   height: 630,
 };
