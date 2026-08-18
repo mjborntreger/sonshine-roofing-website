@@ -24,7 +24,7 @@ export const dynamic = 'force-static';
 const SEO_TITLE = 'Video Library | SonShine Roofing';
 const SEO_DESCRIPTION = 'Highlights from our projects, commercials, and short video explainers.';
 const CANONICAL = '/video-library';
-const OG_IMAGE = '/og-default.png';
+const OG_IMAGE = '/og-default.png?v=20260818';
 const PAGE_SIZE = 8;
 
 type SearchParamsRecord = Record<string, string | string[] | undefined>;

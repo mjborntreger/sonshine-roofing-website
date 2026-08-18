@@ -193,7 +193,7 @@ export async function generateMetadata({
     (ogImage && typeof ogImage.url === 'string' && ogImage.url) ||
     post.featuredImage?.url ||
     settings?.defaultOgImage.url ||
-    `${SITE_ORIGIN}/og-default.png`;
+    `${SITE_ORIGIN}/og-default.png?v=20260818`;
   const ogWidth =
     (ogImage && typeof ogImage.width === 'number' && ogImage.width) ||
     (post.featuredImage?.url ? 1200 : settings?.defaultOgImage.width) ||
@@ -262,7 +262,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     (ogImageJsonLd && typeof ogImageJsonLd.secureUrl === 'string' && ogImageJsonLd.secureUrl) ||
     (ogImageJsonLd && typeof ogImageJsonLd.url === 'string' && ogImageJsonLd.url) ||
     post.featuredImage?.url ||
-    `${origin}/og-default.png`;
+    `${origin}/og-default.png?v=20260818`;
   const ogImgAbs = ogImgCandidate.startsWith('http')
     ? ogImgCandidate
     : `${origin}${ogImgCandidate}`;

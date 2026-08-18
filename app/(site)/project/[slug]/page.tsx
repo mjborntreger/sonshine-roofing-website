@@ -54,7 +54,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     (ogImageRecord && typeof ogImageRecord.secureUrl === "string" && ogImageRecord.secureUrl) ||
     (ogImageRecord && typeof ogImageRecord.url === "string" && ogImageRecord.url) ||
     project.heroImage?.url ||
-    "/og-default.png";
+    "/og-default.png?v=20260818";
   const ogWidth: number =
     (ogImageRecord && typeof ogImageRecord.width === "number" && ogImageRecord.width) || 1200;
   const ogHeight: number =
@@ -140,7 +140,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     (ogImageSecondary && typeof ogImageSecondary.secureUrl === "string" && ogImageSecondary.secureUrl) ||
     (ogImageSecondary && typeof ogImageSecondary.url === "string" && ogImageSecondary.url) ||
     heroImageUrl ||
-    "/og-default.png";
+    "/og-default.png?v=20260818";
   const ogImgAbs = ogImgMaybe.startsWith("http") ? ogImgMaybe : `${origin}${ogImgMaybe}`;
 
   const areaServed = (project.serviceAreas || []).map((t) => t.name);
