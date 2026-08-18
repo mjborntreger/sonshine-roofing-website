@@ -6,8 +6,9 @@ configuration and general smoke checks live in [DEPLOY.md](DEPLOY.md).
 ## Ingress and forwarding
 
 - Browser forms submit JSON to `POST /api/lead`.
-- When `ALLOWED_ORIGIN` is populated, the route rejects requests whose Origin or
-  Referer origin is not in the comma-separated allowlist.
+- When `ALLOWED_ORIGIN` is populated, the route rejects requests whose present
+  Origin or Referer origin is not in the comma-separated allowlist. Requests
+  with neither header continue to validation.
 - The route silently accepts honeypot submissions, validates the v2 payload,
   verifies `antiSpam.cfToken` with Cloudflare Turnstile, and then forwards the
   normalized payload to n8n.
@@ -63,8 +64,9 @@ Additional validation:
 
 ## Safety
 
-Lead payloads contain contact, address, attribution, consent, and IP-derived
-data. Do not log payloads, copy real submissions into fixtures, or use real
-customer data for testing. Production submissions, n8n executions, and workflow
-changes require explicit authorization; use synthetic data when testing is
-authorized.
+Lead payloads contain contact, address, attribution, and consent data. The route
+also processes the client IP for Turnstile verification but does not add it to
+the normalized n8n payload. Do not log payloads, copy real submissions into
+fixtures, or use real customer data for testing. Production submissions, n8n
+executions, and workflow changes require explicit authorization; use synthetic
+data when testing is authorized.
