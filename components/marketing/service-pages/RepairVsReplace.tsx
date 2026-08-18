@@ -82,7 +82,7 @@ const decisionSections = [
 export default async function RepairVsReplace() {
     return (
         <>
-            <h2 className="text-center">
+            <h2 id="repair-vs-replace" className="scroll-mt-28 text-center">
                 <ArrowLeftRight className="h-6 w-6 mr-2 inline text-[--brand-blue]" />
                 Repair vs. Replace
             </h2>
