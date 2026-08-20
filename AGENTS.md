@@ -10,14 +10,14 @@ and serves it on port 3000.
 
 - Read `CONTENT.md` before changing content ownership.
 - Directus, scoped by `DIRECTUS_CLIENT_SLUG`, owns blog posts/topics, site
-  settings, fixed-page SEO, services, navigation, FAQs, redirects, special
-  offers, legal copy, people, sponsor features, roofing glossary terms, and
-  their media.
+  settings, fixed-page SEO, services, navigation, FAQs, published CMS redirects,
+  special offers, legal copy, people, sponsor features, reviews and
+  review-carousel settings, roofing glossary terms, and their media.
 - WordPress/WPGraphQL remains authoritative for projects, videos, and location
   landing pages.
 - Local Next.js code owns route composition, components, body copy not yet
-  migrated, and the normalized operational schedule in
-  `lib/contact-hours.ts`.
+  migrated, code-only legacy redirect and 410 responses in `proxy.ts`, and the
+  normalized operational schedule in `lib/contact-hours.ts`.
 - Directus is the exclusive frontend source for blog, person, sponsor-feature,
   and roofing-glossary records. Do not add a WordPress fallback for those
   areas.
@@ -35,14 +35,16 @@ and serves it on port 3000.
 - `lib/content`: Directus/WordPress adapters and HTML sanitizers.
 - `lib/seo` and `lib/telemetry`: metadata/schema and analytics behavior.
 - `scripts`: generated artifacts, content verification, and migrations.
-- `next.config.mjs` and `Dockerfile`: redirects, headers, standalone output,
-  build behavior, and Coolify runtime.
+- `next.config.mjs`, `proxy.ts`, and `Dockerfile`: platform redirects, legacy
+  responses, headers, standalone output, build behavior, and Coolify runtime.
 
 ## Validation
 
 Use Node 22 and install with `npm ci`.
 
-- Baseline: `npm run lint`; `npm test` is currently an alias for lint.
+- Baseline: `npm run lint`, `npm run typecheck`, and
+  `npm run verify:tailwind-utilities`; `npm test` is currently an alias for
+  lint.
 - Sanitizer/SEO work: run the applicable
   `verify:directus-html`, `verify:faq-html`, `verify:person-html`,
   `verify:sponsor-html`, `verify:glossary-html`, `verify:person-seo`,
@@ -54,7 +56,10 @@ Use Node 22 and install with `npm ci`.
 
 Build presteps generate or remove sitemap and `llms.txt` artifacts and can
 dirty a worktree. Inspect generated changes and never include them
-accidentally. Do not run `migrate:persons:apply`; it writes to Directus.
+accidentally. The `migrate:persons:*` commands and retained blog migration
+verifiers require historical JSON inputs that are not tracked in a clean
+checkout; they are not routine validation commands. Do not run
+`migrate:persons:apply`; it writes to Directus.
 
 ## Content, Security, and Privacy
 
