@@ -90,6 +90,9 @@
 - Keep `source_path` unique, set `preserve_query=true`, and use a supported status code (`301`, `302`, `303`, `307`, or `308`).
 - Use `/prefix/*` for prefix wildcards. Invalid, duplicate, or self-redirect records fail the build.
 - Canonical-host, global de-pagination, global `.html`, and WordPress sitemap-pattern rules remain in `next.config.mjs`.
+- `proxy.ts` owns the normalized code-only legacy redirect and configured 410
+  responses. Keep their exact path list in code rather than duplicating it in
+  Directus.
 - Deleted deprecated landing-page routes intentionally return 404; do not add redirects for them.
 
 ## Publishing in WordPress
@@ -198,8 +201,8 @@
 
 - For brand images, prefer Next.js `Image` component where possible.
 - Prefer the described `site_settings.default_og_image` for shared Open Graph
-  fallbacks. Several legacy routes still reference `/og-default.png`, but that
-  asset is not tracked; do not add new dependencies on it.
+  fallbacks. [SEO.md](SEO.md) is the canonical guide for the tracked local
+  fallback asset and its cache-versioned metadata URL.
 
 ## Repository migration artifacts
 

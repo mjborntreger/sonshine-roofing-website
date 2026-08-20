@@ -48,6 +48,8 @@
 ## Open Graph and Twitter
 
 - Prefer the described Directus `site_settings.default_og_image` where the
-  route adapter exposes it. Legacy fallbacks are not yet standardized, and the
-  repository does not track the `/og-default.png` file referenced by several
-  routes.
+  route adapter exposes it.
+- The tracked local fallback is `public/og-default.png` (1200 x 630). Its
+  cache-versioned metadata URL is defined by `DEFAULT_OG_IMAGE` in
+  `lib/seo/meta.ts`; keep direct route fallbacks aligned with that value when
+  the asset changes.

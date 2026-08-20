@@ -10,9 +10,11 @@ the frontend adapters for Directus and WordPress.
 - Directus is the primary content platform. It owns shared site content, fixed
   page and service SEO, blog posts, FAQs, people, roofing glossary terms,
   sponsor features, reviews and review-carousel settings, special offers, legal
-  copy, navigation, and redirects.
+  copy, navigation, and published CMS redirects.
 - WordPress/WPGraphQL remains authoritative for projects, videos, and location
   landing pages.
+- Next.js configuration and `proxy.ts` retain code-owned platform redirects and
+  normalized legacy redirect/410 behavior.
 - `POST /api/lead` validates public form submissions, verifies Turnstile, and
   forwards the normalized v2 payload to n8n.
 
