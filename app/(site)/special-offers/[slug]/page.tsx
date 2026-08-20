@@ -100,7 +100,7 @@ export async function generateMetadata({
     path: `/special-offers/${offer.slug}`,
     keywords: offer.focusKeywords,
     image: {
-      url: image?.url || '/og-default.png',
+      url: image?.url || '/og-default.png?v=20260818',
       width: image?.width || 1200,
       height: image?.height || 630,
     },

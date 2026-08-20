@@ -102,7 +102,7 @@ export default async function HomeownerReferralProgramPage() {
     description: config?.description,
     url: SERVICE_PATH,
     origin,
-    primaryImage: config?.image?.url ?? '/og-default.png',
+    primaryImage: config?.image?.url ?? '/og-default.png?v=20260818',
     isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: origin },
   });
 

@@ -48,7 +48,7 @@ export async function generateMetadata({
             height: settings.defaultOgImage.height ?? undefined,
             alt: settings.defaultOgImage.description,
           }
-        : { url: '/og-default.png', width: 1200, height: 630 },
+        : { url: '/og-default.png?v=20260818', width: 1200, height: 630 },
     profile: firstName
       ? {
           firstName,
@@ -103,7 +103,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
     description: person.seo.meta_description,
     url: pagePath,
     origin,
-    primaryImage: person.featuredImage?.url ?? '/og-default.png',
+    primaryImage: person.featuredImage?.url ?? '/og-default.png?v=20260818',
     isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: origin },
   });
 

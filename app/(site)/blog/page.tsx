@@ -15,7 +15,7 @@ export const revalidate = 900;
 const PAGE_PATH = "/blog";
 const PAGE_TITLE = "Roofing Blog for Sarasota, Manatee & Charlotte Counties | SonShine Roofing";
 const PAGE_DESCRIPTION = "Practical roofing tips, how‑tos, and local insights from our Sarasota team. Serving SW Florida since 1987.";
-const PAGE_IMAGE = "/og-default.png";
+const PAGE_IMAGE = "/og-default.png?v=20260818";
 const PAGE_SIZE = 6;
 
 export async function generateMetadata(): Promise<Metadata> {

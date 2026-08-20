@@ -98,7 +98,7 @@ export async function generateMetadata({
           height: image.height ?? undefined,
           alt: 'altText' in image ? image.altText : image.description,
         }
-      : { url: '/og-default.png', width: 1200, height: 630 },
+      : { url: '/og-default.png?v=20260818', width: 1200, height: 630 },
     robots: { index: !term.noindex, follow: true },
   });
 }

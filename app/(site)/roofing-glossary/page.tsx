@@ -22,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     path: PAGE_PATH,
-    image: { url: '/og-default.png', width: 1200, height: 630 },
+    image: { url: '/og-default.png?v=20260818', width: 1200, height: 630 },
   });
 }
 

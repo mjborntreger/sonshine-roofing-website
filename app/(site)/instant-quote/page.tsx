@@ -25,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: PAGE_TITLE,
     description: PAGE_DESCRIPTION,
     path: PAGE_PATH,
-    image: { url: "/og-default.png", width: 1200, height: 630 },
+    image: { url: "/og-default.png?v=20260818", width: 1200, height: 630 },
   });
 }
 
@@ -41,7 +41,7 @@ export default async function InstantQuotePage() {
     description: PAGE_DESCRIPTION,
     url: PAGE_PATH,
     origin,
-    primaryImage: "/og-default.png",
+    primaryImage: "/og-default.png?v=20260818",
     isPartOf: { "@type": "WebSite", name: "SonShine Roofing", url: origin },
   });
   const breadcrumbsLd = breadcrumbSchema(
