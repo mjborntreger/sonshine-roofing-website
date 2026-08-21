@@ -88,7 +88,6 @@ const readProjectTestimonial = (details: unknown): ProjectTestimonial | null => 
   if (!customerReview) return null;
 
   const customerName = readTrimmedString(testimonial.customerName) ?? undefined;
-  const ownerReply = readTrimmedString(testimonial.ownerReply) ?? undefined;
   const reviewDate = readTrimmedString(testimonial.reviewDate) ?? undefined;
   const reviewUrlRaw = readTrimmedString(testimonial.reviewUrl);
   const reviewUrl = reviewUrlRaw ? ensureAbsoluteUrl(reviewUrlRaw, SITE_ORIGIN) : undefined;
@@ -98,7 +97,6 @@ const readProjectTestimonial = (details: unknown): ProjectTestimonial | null => 
   return {
     customerName,
     customerReview,
-    ownerReply,
     reviewUrl,
     reviewDate,
     reviewPlatform,
@@ -139,7 +137,6 @@ export type ProductLink = { productName: string; productLink: string | null };
 export type ProjectTestimonial = {
   customerName?: string;
   customerReview: string;
-  ownerReply?: string;
   reviewUrl?: string;
   reviewDate?: string;
   reviewPlatform: ReviewPlatform;
@@ -313,7 +310,6 @@ export type LocationRecord = {
   featuredReviews: {
     reviewAuthor: string | null;
     review: string | null;
-    ownerReply: string | null;
     reviewUrl: string | null;
     reviewDate: string | null;
   }[];
@@ -362,7 +358,6 @@ export async function getLocationBySlug(slug: string): Promise<LocationRecord | 
           featuredReviews {
             reviewAuthor
             review
-            ownerReply
             reviewUrl
             reviewDate
           }
@@ -418,7 +413,6 @@ export async function getLocationBySlug(slug: string): Promise<LocationRecord | 
     return {
       reviewAuthor: stringOrNull(review?.reviewAuthor),
       review: stringOrNull(review?.review),
-      ownerReply: stringOrNull(review?.ownerReply),
       reviewUrl: stringOrNull(review?.reviewUrl),
       reviewDate: stringOrNull(review?.reviewDate),
     };
@@ -2250,7 +2244,6 @@ export async function getProjectBySlug(slug: string): Promise<ProjectFull | null
           customerTestimonial {
             customerName
             customerReview
-            ownerReply
             reviewUrl
             reviewDate
             reviewType
