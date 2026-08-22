@@ -281,8 +281,6 @@ export default function ReviewsSlider({
         </div>
       </div>
 
-
-
       {/* Modal via portal to avoid transformed ancestor / z-index issues */}
       {mounted && modalIndex !== null && createPortal(
         (() => {
@@ -350,7 +348,6 @@ export default function ReviewsSlider({
                       </div>
                     </div>
                   </SmartLink>
-
                 </header>
                 <div className="max-h-[80vh] overflow-auto px-5 py-4 bg-amber-50/50 space-y-4">
                   <p className="m-0 whitespace-pre-wrap text-base md:text-lg text-slate-700">{r.text || ''}</p>

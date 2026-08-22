@@ -104,7 +104,6 @@ export default function ProjectTestimonial({
           <ArrowUpRight className="h-4 w-4 inline icon-affordance" />
         </SmartLink>
       ) : null}
-
     </section>
   );
 }
