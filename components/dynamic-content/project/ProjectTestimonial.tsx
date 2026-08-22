@@ -12,12 +12,8 @@ type Props = {
   formattedDate?: string;
   customerReview?: string;
   reviewUrl?: string;
-  ownerReply?: string;
   reviewPlatform?: ReviewPlatform;
 };
-
-const OWNER_RESPONSE_IMAGE =
-  "https://wp.sonshineroofing.com/wp-content/uploads/Nathan-Edited-Bio-Photo-175x175-1.webp";
 
 const formatReviewDate = (value?: string) => {
   if (!value) return null;
@@ -33,7 +29,6 @@ export default function ProjectTestimonial({
   formattedDate,
   customerReview,
   reviewUrl,
-  ownerReply,
   reviewPlatform,
 }: Props) {
   const resolvedReview = customerReview ?? testimonial?.customerReview;
@@ -42,7 +37,6 @@ export default function ProjectTestimonial({
   const resolvedName = customerName ?? testimonial?.customerName ?? "SonShine Roofing Homeowner";
   const resolvedDate = formattedDate ?? formatReviewDate(testimonial?.reviewDate);
   const resolvedUrl = reviewUrl ?? testimonial?.reviewUrl;
-  const resolvedOwnerReply = ownerReply ?? testimonial?.ownerReply;
   const resolvedPlatform = reviewPlatform ?? testimonial?.reviewPlatform ?? DEFAULT_REVIEW_PLATFORM;
   const platformMeta = getReviewPlatformMeta(resolvedPlatform);
 
@@ -109,26 +103,6 @@ export default function ProjectTestimonial({
           Read original review on {platformMeta.label}
           <ArrowUpRight className="h-4 w-4 inline icon-affordance" />
         </SmartLink>
-      ) : null}
-
-      {resolvedOwnerReply ? (
-        <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
-          <SmartLink className="flex items-start gap-3" href="/person/nathan-borntreger" title="See Nathan Borntreger's Profile">
-            <Image
-              src={OWNER_RESPONSE_IMAGE}
-              alt="Owner response avatar"
-              width={48}
-              height={48}
-              className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
-              loading="lazy"
-            />
-            <div>
-              <p className="pt-2 text-base font-semibold text-slate-700 hover:text-[--brand-blue] transition-colors">Nathan Borntreger</p>
-              <span className="pb-2 text-xs text-slate-500">Owner/Operator</span>
-            </div>
-          </SmartLink>
-          <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{resolvedOwnerReply}</p>
-        </div>
       ) : null}
     </section>
   );

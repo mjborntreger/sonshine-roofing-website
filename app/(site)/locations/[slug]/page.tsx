@@ -119,7 +119,6 @@ const normalizeFeaturedReviews = (reviews: LocationRecord['featuredReviews']): R
       if (!text) return null;
 
       const author = review.reviewAuthor?.trim() || 'Anonymous reviewer';
-      const ownerReply = review.ownerReply?.trim();
       const relative = review.reviewDate?.trim();
       const parsedTime = parseReviewDateToEpochSeconds(review.reviewDate);
       const fallbackTime = nowSeconds - index * FALLBACK_REVIEW_INTERVAL_SECONDS;
@@ -135,7 +134,6 @@ const normalizeFeaturedReviews = (reviews: LocationRecord['featuredReviews']): R
 
       if (authorUrl) normalized.author_url = authorUrl;
       if (relative) normalized.relative_time_description = relative;
-      if (ownerReply) normalized.ownerReply = ownerReply;
 
       return normalized;
     })
