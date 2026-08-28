@@ -18,6 +18,7 @@ import {
   type SiteSettings,
 } from '@/lib/content/directus-site';
 import { SiteSettingsProvider } from '@/lib/content/site-settings-context';
+import { JsonLd } from '@/lib/seo/json-ld';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -319,11 +320,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         />
         <main className="flex-1">{children}</main>
         <Footer settings={settings} services={services} navigation={navigation} />
-        <script
-          type="application/ld+json"
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(getGlobalSchema(settings)) }}
-        />
+        <JsonLd data={getGlobalSchema(settings)} />
       </div>
     </SiteSettingsProvider>
   );
