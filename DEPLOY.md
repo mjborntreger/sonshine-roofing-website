@@ -89,8 +89,8 @@
 - Endpoint reads the manifest at request time: `/sitemap_index/static`.
 - If empty:
   - Confirm prebuild ran (visible in build logs "Wrote N static routes").
-  - Confirm `proxy.ts` remains scoped to its explicit 410 routes and does not
-    match `^/__sitemaps/` or `^/sitemap_index`.
+  - Confirm `proxy.ts` passes `^/__sitemaps/` and `^/sitemap_index` through
+    unchanged; only the listed legacy paths should redirect or return 410.
   - Confirm `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true` on staging if needed.
 
 ## Security headers and CSP
