@@ -24,6 +24,7 @@
     "verify:person-seo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-person-seo.mjs",
     "verify:special-offer-indexing": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-special-offer-indexing.mjs",
     "verify:build-only-revalidation": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-build-only-revalidation.mjs",
+    "verify:request-body-limits": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-request-body-limits.mjs",
     "migrate:persons:dry-run": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --dry-run",
     "migrate:persons:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --apply"
   },

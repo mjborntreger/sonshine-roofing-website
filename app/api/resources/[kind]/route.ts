@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { readBoundedJsonBody } from "@/lib/http/read-json-body";
 import type { ResourceQuery } from "@/lib/ui/pagination";
 import {
   // PROJECTS
@@ -50,12 +51,17 @@ export async function POST(
   try {
     const { kind } = await context.params;
 
-    let rawBody: unknown;
-    try {
-      rawBody = await req.json();
-    } catch {
-      rawBody = null;
+    if (kind !== "project" && kind !== "video" && kind !== "blog") {
+      return NextResponse.json({ error: "Unknown resource kind" }, { status: 400 });
     }
+
+    const bodyResult = await readBoundedJsonBody(req);
+    if (!bodyResult.ok) {
+      const status = bodyResult.reason === "too_large" ? 413 : 400;
+      const error = bodyResult.reason === "too_large" ? "Payload too large" : "Invalid request body";
+      return NextResponse.json({ error }, { status });
+    }
+    const rawBody = bodyResult.value;
 
     if (!isRecord(rawBody)) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
@@ -104,8 +110,6 @@ export async function POST(
       // Cursor-based blog pagination with optional search/categories
       const blogResult = await listPostsPaged({ first, after, filters: filters as PostsFiltersInput });
       return NextResponse.json(blogResult);
-    } else {
-      return NextResponse.json({ error: "Unknown resource kind" }, { status: 400 });
     }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Server error";

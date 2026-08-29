@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { N8nLeadPayloadV2 as LeadForwardPayloadV2 } from '@/lib/lead-capture/contact-lead';
+import { readBoundedJsonBody } from '@/lib/http/read-json-body';
 import { isUsPhoneComplete, normalizePhoneForSubmit } from '@/lib/lead-capture/phone';
 import { isProdEnv, requireEnv, SITE_ORIGIN } from '@/lib/seo/site';
 
@@ -378,12 +379,14 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  let raw: unknown;
-  try {
-    raw = await req.json();
-  } catch {
+  const body = await readBoundedJsonBody(req);
+  if (!body.ok) {
+    if (body.reason === 'too_large') {
+      return json(413, { ok: false, error: 'Payload too large' });
+    }
     return json(400, { ok: false, error: 'Invalid JSON' });
   }
+  const raw = body.value;
 
   if (isRecord(raw) && isHoneypotTrippedV2(raw)) {
     return json(200, { ok: true });
