@@ -135,6 +135,8 @@
   production or `NEXT_PUBLIC_ENABLE_GTM_PREVIEW` is enabled.
 - This repository loads GTM but does not configure GA4. Validate GA4 and SPA
   route-change tracking in the external GTM/GA4 control plane.
+- [docs/gtm-datalayer.md](docs/gtm-datalayer.md) is the canonical browser event,
+  conversion-value, and deduplication reference.
 
 ## Coolify smoke checks
 

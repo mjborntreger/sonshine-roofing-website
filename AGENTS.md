@@ -75,7 +75,7 @@ checkout; they are not routine validation commands. Do not run
 - Keep Directus, WordPress, n8n, Turnstile, revalidation, Maps, and other
   secrets server-only. Prefer header-based revalidation authorization.
 - Preserve CSP/security headers, staging-only diagnostic gates, analytics
-  consent, and safe external URL validation.
+  enablement gates, and safe external URL validation.
 
 ## Git and pull-request workflow
 
