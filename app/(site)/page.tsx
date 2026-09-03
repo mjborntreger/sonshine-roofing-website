@@ -61,7 +61,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     <>
       <Hero scriptFontClassName={allura.variable} />
       <div className="bg-blue-200/50 border border-b-blue-300/70">
-        <ReviewsCarousel showOwnerReplies={false} />
+        <ReviewsCarousel />
       </div>
       <LeadFormSection />
       <div className={reviewsLayout}>
