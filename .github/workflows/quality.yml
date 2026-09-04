@@ -48,6 +48,8 @@ jobs:
         run: npm run verify:sponsor-html
       - name: Verify person SEO
         run: npm run verify:person-seo
+      - name: Verify JSON-LD serialization
+        run: npm run verify:json-ld
       - name: Verify glossary HTML
         run: npm run verify:glossary-html
       - name: Verify glossary route policy
