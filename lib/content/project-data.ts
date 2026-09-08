@@ -1,6 +1,13 @@
 import { readFileSync } from 'node:fs';
 import type { ProjectFull, ProjectSnapshot, ProjectSummary, ProjectsArchiveFilters, ProjectSearchResult } from './project-types';
 
+export function projectServiceLabel(description: string | null): string {
+  const scope = description?.match(/\broof (replacement|installation)\b/iu)?.[1].toLowerCase();
+  if (scope === 'installation') return 'Roof Installation';
+  if (scope === 'replacement') return 'Roof Replacement';
+  return 'Roofing Project';
+}
+
 export function readProjectSnapshot(filename: string): ProjectSnapshot {
   let snapshot: ProjectSnapshot;
   try {
@@ -31,7 +38,7 @@ export function queryProjectSnapshot(snapshot: ProjectSnapshot, {
     { key: 'serviceAreas', filter: 'serviceAreaSlugs', taxonomy: 'service_area', terms: snapshot.terms.serviceAreas },
   ] as const;
   const matches = (project: ProjectFull) => {
-    const searchable = `${project.title} ${project.contentPlain}`.toLocaleLowerCase('en-US');
+    const searchable = `${project.title} ${project.projectDescription ?? ''}`.toLocaleLowerCase('en-US');
     if (search && !searchable.includes(search)) return false;
     return dimensions.every(({ key, filter }) => {
       const selected = filters[filter]?.map((slug) => slug.trim().toLowerCase()).filter(Boolean) ?? [];
