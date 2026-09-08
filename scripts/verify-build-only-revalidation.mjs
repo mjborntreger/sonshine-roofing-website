@@ -4,6 +4,10 @@ import { isBuildOnlyRevalidationPath } from '../lib/content/build-only-revalidat
 
 const cases = [
   ['/special-offers', true],
+  ['/project', true],
+  ['/project/example-roof', true],
+  ['project/example-roof?preview=1', true],
+  ['/sitemap_index/project', true],
   ['/special-offers/', true],
   ['/special-offers/roof-care-club', true],
   ['special-offers/roof-care-club?preview=1', true],

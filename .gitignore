@@ -60,3 +60,6 @@ next-env.d.ts
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Build-only published CMS snapshot (packaged privately with each deployment)
+/.generated/

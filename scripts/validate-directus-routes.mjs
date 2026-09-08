@@ -189,6 +189,14 @@ if (clientSlug === "borntreger-digital") {
 }
 
 if (clientSlug === "sonshine-roofing") {
+  const projectSnapshot = JSON.parse(readFileSync(resolve(rootDir, ".generated/projects.json"), "utf8"));
+  if (projectSnapshot.version !== 1 || projectSnapshot.clientSlug !== clientSlug) {
+    throw new Error("[route-manifest] Project snapshot has an invalid client or version.");
+  }
+  for (const project of projectSnapshot.projects) {
+    addOwner("roofing_projects", project.slug, project.uri, project.scopeKey);
+  }
+
   const [offers, persons, glossaryTerms] = await Promise.all([
     readCollection("special_offers", ["id", "slug", "scope_key"]),
     readCollection("persons", ["id", "slug", "scope_key"]),

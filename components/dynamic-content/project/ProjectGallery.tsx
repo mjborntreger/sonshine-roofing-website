@@ -7,11 +7,11 @@ import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import Skeleton from "@/components/ui/Skeleton";
-import type { WpImage } from "@/lib/content/wp";
+import type { ProjectImage } from "@/lib/content/project-types";
 import { PROJECT_GALLERY_DEFAULT_HEIGHT, PROJECT_GALLERY_DEFAULT_WIDTH } from "./galleryConfig";
 
 type ProjectGalleryProps = {
-  images: WpImage[];
+  images: ProjectImage[];
   projectTitle: string;
 };
 
@@ -271,7 +271,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
 }
 
 type GalleryImageProps = {
-  image: WpImage;
+  image: ProjectImage;
   projectTitle: string;
   onOpen: () => void;
 };
@@ -320,7 +320,7 @@ function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
   );
 }
 
-function LightboxImage({ image, projectTitle }: { image: WpImage; projectTitle: string }) {
+function LightboxImage({ image, projectTitle }: { image: ProjectImage; projectTitle: string }) {
   const width = image.width ?? PROJECT_GALLERY_DEFAULT_WIDTH;
   const height = image.height ?? PROJECT_GALLERY_DEFAULT_HEIGHT;
   const aspectStyle: React.CSSProperties = {

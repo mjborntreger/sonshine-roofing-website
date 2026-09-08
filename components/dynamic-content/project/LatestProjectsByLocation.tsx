@@ -1,7 +1,7 @@
 import ProjectArchiveCard from "@/components/dynamic-content/project/ProjectArchiveCard";
 import SmartLink from "@/components/utils/SmartLink";
 import { ArrowRight } from "lucide-react";
-import type { ProjectSummary } from "@/lib/content/wp";
+import type { ProjectSummary } from "@/lib/content/project-types";
 import { renderHighlight } from "@/components/utils/renderHighlight";
 import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 

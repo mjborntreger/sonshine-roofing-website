@@ -3,8 +3,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ProjectSummary } from "@/lib/content/wp";
-import { stripHtml } from "@/lib/content/wp";
+import type { ProjectSummary } from "@/lib/content/project-types";
 import {
   lineClampStyle,
   PROJECT_PREVIEW_CARD_MIN_HEIGHT_CLASS,
@@ -31,7 +30,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
     buildProjectHrefFromUri(project.uri) ??
     project.uri ??
     ROUTES.project;
-  const summary = truncateText(stripHtml(project.projectDescription ?? ""), 260);
+  const summary = truncateText(project.projectDescription ?? "", 260);
   const pillItems = [
     ...(project.materialTypes ?? []).map((t) => ({
       key: `mat-${project.slug}-${t.slug}`,

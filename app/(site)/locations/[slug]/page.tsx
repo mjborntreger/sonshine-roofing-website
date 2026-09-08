@@ -1,13 +1,9 @@
 import { notFound } from 'next/navigation';
-import {
-  getLocationBySlug,
-  listRecentPostsPoolForFilters,
-  listRecentProjectsByServiceArea,
-  listLocationSlugs,
-} from '@/lib/content/wp';
+import { getLocationBySlug, listRecentPostsPoolForFilters, listLocationSlugs } from "@/lib/content/wp";
+import { listRecentProjectsByServiceArea } from "@/lib/content/projects";
 import { listSponsorFeaturesByServiceArea } from '@/lib/content/sponsor-features';
 import { listFaqs } from '@/lib/content/directus-faqs';
-import type { LocationRecord } from '@/lib/content/wp';
+import type { LocationRecord } from "@/lib/content/wp";
 import Hero from '@/components/marketing/landing-page/LandingHero';
 import LeadFormSection from '@/components/lead-capture/lead-form/InitialNavigation';
 import ReviewsCarousel from '@/components/reviews-widget/ReviewsCarousel';
@@ -211,7 +207,7 @@ export default async function LocationPage({ params }: { params: Promise<Params>
   ] = await Promise.all([
     locationPromise,
     listRecentPostsPoolForFilters(4, 4).catch(() => []),
-    listRecentProjectsByServiceArea(slug, 4).catch(() => []),
+    listRecentProjectsByServiceArea(slug, 4),
     listFaqs({ limit: 8 }).catch(() => []),
     sponsorFeaturesPromise,
     reviewsCarouselSettingsPromise,

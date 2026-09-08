@@ -11,7 +11,7 @@ export type PageResult<T> = {
 export type ResourceKind = "blog" | "project" | "video";
 
 export type ResourceQuery = {
-  // filters/search are per-kind, so keep this loose and pass-through to wp.ts
+  // filters/search are per-kind, so keep this loose and pass through to the selected content adapter
   filters?: Record<string, unknown>;
   first?: number;        // page size
   after?: string | null; // cursor

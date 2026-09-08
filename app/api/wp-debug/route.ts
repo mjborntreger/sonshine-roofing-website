@@ -85,19 +85,6 @@ const VIDEOS_QUERY = /* GraphQL */ `
   }
 `;
 
-const PROJECTS_QUERY = /* GraphQL */ `
-  query InspectProjects($limit: Int!) {
-    projects(first: $limit, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
-      nodes {
-        slug
-        title
-        date
-        projectVideoInfo { youtubeUrl }
-      }
-    }
-  }
-`;
-
 export async function GET(req: NextRequest) {
   if (!isAllowedBranch() || !isAllowedHost(req)) {
     return NextResponse.json(
@@ -107,14 +94,13 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [meta, videos, projects] = await Promise.all([
+    const [meta, videos] = await Promise.all([
       gq<{ generalSettings?: { title?: string; url?: string; description?: string } }>(META_QUERY),
       gq<{ videoEntries?: { nodes: unknown[] } }>(VIDEOS_QUERY, { limit: 3 }),
-      gq<{ projects?: { nodes: unknown[] } }>(PROJECTS_QUERY, { limit: 3 }),
     ]);
 
     return NextResponse.json(
-      { meta, videos, projects },
+      { meta, videos },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {

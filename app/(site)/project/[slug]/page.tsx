@@ -4,7 +4,7 @@ import { listFaqs } from "@/lib/content/directus-faqs";
 import SmartLink from "@/components/utils/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
-import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/content/wp";
+import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/content/projects";
 import ProjectVideo from "@/components/dynamic-content/project/ProjectVideo";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
@@ -31,16 +31,20 @@ type OgImageRecord = {
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
+export const dynamic = "force-static";
+export const dynamicParams = false;
+export const revalidate = false;
+
 // Static paths
 export async function generateStaticParams() {
-  const slugs = await listProjectSlugs(200).catch(() => []);
+  const slugs = await listProjectSlugs();
   return slugs.map((slug: string) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
 
-  const project = await getProjectBySlug(slug).catch(() => null);
+  const project = await getProjectBySlug(slug);
   if (!project) notFound();
 
   const seo = project.seo ?? {};
@@ -63,6 +67,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return buildArticleMetadata({
     title,
     description,
+    openGraphTitle: og.title || undefined,
+    openGraphDescription: og.description || undefined,
+    keywords: project.focusKeywords,
+    robots: project.noindex ? { index: false, follow: true } : undefined,
     path: `/project/${slug}`,
     image: { url: ogUrl, width: ogWidth, height: ogHeight },
     publishedTime: project.date ?? undefined,

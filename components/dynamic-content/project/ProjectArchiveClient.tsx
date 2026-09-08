@@ -6,7 +6,7 @@ import InfiniteList from "@/components/dynamic-content/InfiniteList";
 import ResourceArchiveClient, {
   type FilterGroupConfig,
 } from "@/components/dynamic-content/ResourceArchiveClient";
-import type { ProjectSearchResult, TermLite } from "@/lib/content/wp";
+import type { ProjectSearchResult, TermLite } from "@/lib/content/project-types";
 
 type FilterTerms = {
   materials: TermLite[];

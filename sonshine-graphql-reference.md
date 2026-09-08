@@ -9,11 +9,10 @@ publication rules.
 
 WordPress/WPGraphQL remains authoritative for:
 
-- projects and their filter taxonomies;
-- video-library entries and project-sourced videos; and
+- standalone video-library entries; and
 - location landing pages.
 
-Blog posts, FAQs, people, sponsor features, roofing glossary terms, special
+Projects and their filter lists/media, blog posts, FAQs, people, sponsor features, roofing glossary terms, special
 offers, shared site content, and fixed-page/service SEO are Directus-backed.
 Although `wp.ts` still contains some legacy blog helpers and shared blog-shaped
 types, public blog routes and archives read `lib/content/blog.ts`; do not add a
@@ -25,8 +24,6 @@ WordPress fallback.
   `https://wp.sonshineroofing.com/graphql`.
 - `WP_BASIC_AUTH_USER` and `WP_BASIC_AUTH_PASS` optionally add Basic Auth on the
   server. Do not expose or set them unless WPGraphQL is protected.
-- `WP_PROJECT_BASE` controls the project URI prefix and defaults to `project`.
-  Keep it aligned with the WordPress custom-post-type rewrite.
 - Development surfaces detailed GraphQL errors; production collapses them to a
   generic adapter error.
 
@@ -49,8 +46,7 @@ const data = await wpFetch<MyQuery>(query, variables, {
 | Domain    | Primary adapter functions                                                                   | Public consumers                                                             |
 | --------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Locations | `listLocationSlugs`, `getLocationBySlug`                                                    | `app/(site)/locations/[slug]`, location and image sitemaps                   |
-| Projects  | `listProjectSlugs`, `getProjectBySlug`, archive/filter helpers                              | `app/(site)/project/[slug]`, project archive/API, project and image sitemaps |
-| Videos    | `listRecentVideoEntries`, `getVideoEntryBySlug`, `listProjectVideos`, `listVideoItemsPaged` | `app/(site)/video-library`, resources API, video sitemap                     |
+| Videos    | `listRecentVideoEntries`, `getVideoEntryBySlug` | `app/(site)/video-library`, resources API, video sitemap                     |
 
 ## Locations
 
@@ -64,31 +60,14 @@ The location route combines this WordPress record with Directus-backed sponsor
 features from `lib/content/sponsor-features.ts`. Their publishing and targeting
 rules live in [CONTENT.md](CONTENT.md).
 
-## Projects
-
-`buildProjectUri(slug)` creates `/${WP_PROJECT_BASE}/${slug}/` because
-`getProjectBySlug` queries the project by `idType: URI`. The full mapper reads:
-
-- content, dates, featured image, and Rank Math SEO;
-- `projectDetails`, including description, product links, gallery images, and
-  customer testimonial;
-- `projectVideoInfo.youtubeUrl`; and
-- `projectFilters` for material type, roof color, and service area.
-
-`listProjectsPaged` powers the archive/resources API with search, taxonomy
-filters, offset cursors, and facet counts. `filterProjects` and the recent-pool
-helpers support route recommendations and landing-page project grids.
-`listProjectMaterialTypes`, `listProjectRoofColors`, and
-`listProjectServiceAreas` provide the filter vocabulary.
-
 ## Video library
 
 `listRecentVideoEntries(limit = 50)` reads published `videoEntry` records and
 keeps only entries with a parseable YouTube URL. `getVideoEntryBySlug` adds
 taxonomy and Rank Math metadata with a 900-second cache.
 
-`listProjectVideos(limit = 100)` converts project ACF video URLs into the same
-`VideoItem` shape. `listVideoItemsPaged` merges both sources, applies bucket,
+`lib/content/projects.ts` converts deployment-frozen Directus projects into the
+same `VideoItem` shape. `lib/content/videos.ts` merges the two sources, applies bucket,
 category, material, service-area, and text filters, and returns offset-based
 pagination plus facets. There is no dedicated video-detail route; selections
 open through `/video-library` query state.
@@ -101,6 +80,5 @@ open through `/video-library` query state.
   justifies changing them.
 - Normalize nullable GraphQL records and connections in the adapter instead of
   leaking inconsistent payload shapes into React components.
-- Keep project permalinks and `WP_PROJECT_BASE` aligned.
 - Keep WordPress diagnostics staging-gated and do not expose raw upstream
   errors in production.

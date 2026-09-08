@@ -1,7 +1,7 @@
 // /app/project/page.tsx
 import Section from "@/components/layout/Section";
 import ResourcesAside from "@/components/global-nav/static-pages/ResourcesAside";
-import { listProjectsPaged, listProjectFilterTerms } from "@/lib/content/wp";
+import { listProjectsPaged, listProjectFilterTerms } from "@/lib/content/projects";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import ProjectArchiveClient from "@/components/dynamic-content/project/ProjectArchiveClient";
@@ -11,13 +11,13 @@ import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
 
-export const revalidate = 900; // 15 minutes ISR
+export const revalidate = false;
 export const dynamic = "force-static";
 
 const PAGE_PATH = "/project";
 const PAGE_TITLE = "Roofing Project Gallery | SonShine Roofing";
 const PAGE_DESCRIPTION = "Browse photos and videos of our recent roof replacement projects in Sarasota and surrounding areas. Filter by material, color, and service area to find real projects like yours.";
-const PAGE_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/Project-Gallery-OpenGraph-Compressed.png";
+const PAGE_IMAGE = "https://directus.borntregerdigital.com/assets/48416474-93d0-5ed5-a69c-28712329ca36";
 const PAGE_SIZE = 6;
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -67,7 +67,7 @@ export default async function ProjectArchivePage() {
         title="Roofing Project Gallery"
         eyelash="See Our Past Work"
         subtitle="Explore our latest major roof replacements in Sarasota, Bradenton, Venice, North Port, and more. Filter by material (shingle, metal, tile), roof color, and service area — or search by phrase to find a specific project."
-        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/See-Our-Past-Work.webp"
+        imageSrc="https://directus.borntregerdigital.com/assets/6c766aeb-e715-5d95-b35f-5eed21000766"
         
       />
       <Section>

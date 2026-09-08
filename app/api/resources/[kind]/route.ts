@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
 import type { ResourceQuery } from "@/lib/ui/pagination";
-import {
-  // PROJECTS
-  listProjectsPaged,
-  type ProjectsArchiveFilters,
-  type ProjectSearchResult,
-  type PostsFiltersInput,
-  type VideoFiltersInput,
-  // VIDEOS
-  listVideoItemsPaged, // small adapter; see note below
-} from "@/lib/content/wp";
+import { listProjectsPaged } from "@/lib/content/projects";
+import { type ProjectsArchiveFilters, type ProjectSearchResult } from "@/lib/content/project-types";
+import { type PostsFiltersInput } from "@/lib/content/wp";
+import { type VideoFiltersInput, listVideoItemsPaged } from "@/lib/content/videos";
 import { listPostsPaged } from "@/lib/content/blog";
 
 type RouteContext = { params: Promise<{ kind: string }> };

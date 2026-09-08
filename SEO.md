@@ -34,3 +34,13 @@ Structured Data
 
 Open Graph/Twitter
 - Default image: `/og-default.png` (all references standardized).
+
+Project content and freshness
+
+- Project routes, image entries, and video entries use the same deployment-frozen
+  Directus snapshot. The project sitemap includes only published projects whose
+  stored `noindex` is false. Mixed sitemaps may refresh other content independently.
+- Project canonicals remain `/project/{slug}`. Archive SEO remains in the existing
+  `/project` `website_pages` record. Gallery order and the full image set are retained.
+- Project article and sitemap dates use the source-preserved `date_updated` on
+  import and later Directus editorial update dates after a new deployment.

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import LatestProjectsFilterClient from "./LatestProjectsFilter.client";
 import ProjectArchiveCard from "@/components/dynamic-content/project/ProjectArchiveCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { ProjectSummary } from "@/lib/content/wp";
+import type { ProjectSummary } from "@/lib/content/project-types";
 import {
   PROJECT_TAB_CONFIG,
   type MaterialKey,
