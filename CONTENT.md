@@ -121,9 +121,15 @@ Publishing roofing projects in Directus
   `client_testimonial_name`, `client_testimonial_date`, `review_source`, and
   `review_url`. It is independent of shared review synchronization and has no
   owner-reply field.
-- Optional `body` uses semantic paragraphs, H2–H4 headings, links, emphasis,
-  lists, line breaks, and blockquotes. The frontend sanitizer removes unsupported
-  markup, media, styles, classes, scripts, and unsafe links.
+- Brewster Rd has an owner-approved exception: keep its existing testimonial
+  and leave `review_url` empty. This does not block publication. New reviews
+  require editorial verification and a source link unless explicitly excepted.
+- Keep all project narrative in the plain-text `description`. There is no
+  separate project body in the frontend or migration/import path. Shared HTML
+  sanitizers remain required for other content types.
+- State the job type early in the description. Project badges and service
+  structured data use its first explicit "roof installation" or "roof replacement"
+  phrase; copy without either phrase receives the neutral "Roofing Project" label.
 - Project SEO uses the shared SEO fields and stored `noindex` policy. The
   migration preserves existing descriptions and rendered fallbacks. Legacy
   `wordpress:sonshine-roofing:` records may have empty keyword fields when the
@@ -133,10 +139,9 @@ Publishing roofing projects in Directus
   preserve migration identity; system `date_updated` starts at the source
   modified time and tracks later Directus edits. Import time is not editorial
   freshness.
-- Archive search preserves title/body matching. Counts and facets use that same
-  result set. The former WordPress pipeline could return one item for `tile`
-  while showing 20 in its description-aware facet total; the Directus adapter
-  removes that inconsistency without expanding search to descriptions.
+- Archive search matches the title plus plain-text description, without case
+  sensitivity. Results, totals, pagination, and all filter counts use that same
+  matching set, including when material, color, and service-area filters combine.
 - All project views use one build-generated dataset, including archive search,
   facets, pagination, homepage/location cards, video-library selections, metadata,
   and sitemaps. Save CMS changes, run a successful frontend production build,
@@ -147,6 +152,13 @@ Publishing roofing projects in Directus
   normal image-processing workflows. When replacing a published image, upload a
   new file and change the relation; overwriting an existing file would change
   media referenced by an older deployment before release and weaken rollback.
+- Follow [the project authoring procedure](docs/project-authoring.md) for verified
+  job facts, description copy, media, metadata review, and release checks.
+- Deployment order for retiring `roofing_projects.body`: deploy and verify the
+  frontend that no longer requests the field, recheck all clients for meaningful
+  body values and all integrations for consumers, then remove only that field.
+  Keep the field present while release approval is pending. Retain its schema
+  definition privately; an older frontend rebuild needs the field restored first.
 
 Publishing SonShine people in Directus
 

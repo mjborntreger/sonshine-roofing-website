@@ -4,7 +4,6 @@ import { readFile, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
-import { prepareProjectBody } from '../lib/content/directus-projects.mjs';
 
 // Run against private source exports only. Never commit exports or credentials.
 // The caller must separately authorize --apply and manage the image workflow.
@@ -55,7 +54,7 @@ const taxonomies = [
   ['service_area', 'roofing_service_areas', 13],
 ];
 const maps = {};
-const summary = { mode: apply ? 'apply' : verifyOnly ? 'verify-only' : 'dry-run', vocabularies: {}, projects: 0, galleries: 0, testimonials: 0, bodies: 0, seoDescriptionFallbacks: 0 };
+const summary = { mode: apply ? 'apply' : verifyOnly ? 'verify-only' : 'dry-run', vocabularies: {}, projects: 0, galleries: 0, testimonials: 0, seoDescriptionFallbacks: 0 };
 for (const [sourceName, collection, expected] of taxonomies) {
   const sourceRows = await json(`wordpress-${sourceName}.json`);
   assert.equal(sourceRows.length, expected, `${sourceName}: source inventory changed; review before proceeding.`);
@@ -157,7 +156,7 @@ for (const row of source.nodes) {
   const source_updated_at = utc(row.modifiedGmt);
   const mapped = {
     id, client, status: 'published', title: row.title, slug: row.slug,
-    description: details.projectDescription, body: prepareProjectBody(row.content) || null,
+    description: details.projectDescription,
     featured_image: imageId(row.featuredImage.node),
     product_links: (details.productLinks || []).map((link) => ({ label: link.productName, href: link.productLink })),
     youtube_url: row.projectVideoInfo?.youtubeUrl || null,
@@ -178,7 +177,6 @@ for (const row of source.nodes) {
   summary.projects += 1;
   summary.galleries += gallery.length;
   summary.testimonials += Number(hasTestimonial);
-  summary.bodies += Number(Boolean(mapped.body));
   summary.seoDescriptionFallbacks += Number(!seo.description);
   payloads.push({ mapped, prior });
 }
@@ -199,7 +197,7 @@ if (apply) {
 }
 if (apply || verifyOnly) {
   const verified = await request('roofing_projects', 'GET', undefined, {
-    fields: '*,gallery.id,gallery.sort,gallery.directus_files_id',
+    fields: [...Object.keys(payloads[0].mapped).filter((field) => field !== 'gallery'), 'gallery.id', 'gallery.sort', 'gallery.directus_files_id'].join(','),
     filter: { client: { _eq: client } }, limit: -1, deep: { gallery: { _limit: -1, _sort: ['sort'] } },
   });
   assert.equal(verified.length, payloads.length, 'Destination inventory mismatch.');
