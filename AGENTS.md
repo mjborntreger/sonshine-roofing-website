@@ -10,14 +10,14 @@ and serves it on port 3000.
 
 - Read `CONTENT.md` before changing content ownership.
 - Directus, scoped by `DIRECTUS_CLIENT_SLUG`, owns blog posts/topics, site
-  settings, fixed-page SEO, services, navigation, FAQs, redirects, special
-  offers, legal copy, people, sponsor features, roofing glossary terms, projects, and
-  their media.
+  settings, fixed-page SEO, services, navigation, FAQs, published CMS redirects,
+  special offers, legal copy, people, sponsor features, reviews and
+  review-carousel settings, roofing glossary terms, projects, and their media.
 - WordPress/WPGraphQL remains authoritative for standalone video entries and
   location landing pages.
 - Local Next.js code owns route composition, components, body copy not yet
-  migrated, and the normalized operational schedule in
-  `lib/contact-hours.ts`.
+  migrated, code-only legacy redirect and 410 responses in `proxy.ts`, and the
+  normalized operational schedule in `lib/contact-hours.ts`.
 - Directus is the exclusive frontend source for blog, person, sponsor-feature,
   roofing-glossary, and project records. Do not add a WordPress fallback for those
   areas.
@@ -36,27 +36,34 @@ and serves it on port 3000.
 - `lib/content`: Directus/WordPress adapters and HTML sanitizers.
 - `lib/seo` and `lib/telemetry`: metadata/schema and analytics behavior.
 - `scripts`: generated artifacts, content verification, and migrations.
-- `next.config.mjs` and `Dockerfile`: redirects, headers, standalone output,
-  build behavior, and Coolify runtime.
+- `next.config.mjs`, `proxy.ts`, and `Dockerfile`: platform redirects, legacy
+  responses, headers, standalone output, build behavior, and Coolify runtime.
 
 ## Validation
 
 Use Node 22 and install with `npm ci`.
 
-- Baseline: `npm run lint`; `npm test` is currently an alias for lint.
+- Baseline: `npm run lint`, `npm run typecheck`, and
+  `npm run verify:tailwind-utilities`; `npm test` is currently an alias for
+  lint.
 - Sanitizer/SEO work: run the applicable
   `verify:directus-html`, `verify:wordpress-html`, `verify:faq-html`,
   `verify:person-html`, `verify:sponsor-html`, `verify:glossary-html`, `verify:person-seo`,
   `verify:special-offer-indexing`, `verify:build-only-revalidation`,
-  `verify:glossary-policy`, `verify:project-pipeline`, or
-  `verify:directus-fetch-policy` script.
+  `verify:glossary-policy`, `verify:project-pipeline`,
+  `verify:directus-fetch-policy`,
+  `verify:security-input-handling`, `verify:request-body-limits`, or
+  `verify:json-ld` script.
 - Full confidence: run a credentialed `npm run build`.
 - Sandboxed Codex build: use `npm run build:codex` when its proxy contract is
   required.
 
 Build presteps generate or remove sitemap and `llms.txt` artifacts and can
 dirty a worktree. Inspect generated changes and never include them
-accidentally. Do not run `migrate:persons:apply`; it writes to Directus.
+accidentally. The `migrate:persons:*` commands and retained blog migration
+verifiers require historical JSON inputs that are not tracked in a clean
+checkout; they are not routine validation commands. Do not run
+`migrate:persons:apply`; it writes to Directus.
 
 ## Content, Security, and Privacy
 
@@ -72,7 +79,7 @@ accidentally. Do not run `migrate:persons:apply`; it writes to Directus.
 - Keep Directus, WordPress, n8n, Turnstile, revalidation, Maps, and other
   secrets server-only. Prefer header-based revalidation authorization.
 - Preserve CSP/security headers, staging-only diagnostic gates, analytics
-  consent, and safe external URL validation.
+  enablement gates, and safe external URL validation.
 
 ## Git and pull-request workflow
 
