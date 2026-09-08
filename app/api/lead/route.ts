@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { N8nLeadPayloadV2 as LeadForwardPayloadV2 } from '@/lib/lead-capture/contact-lead';
 import { readBoundedJsonBody } from '@/lib/http/read-json-body';
+import { isEmailComplete } from '@/lib/lead-capture/email';
 import { isUsPhoneComplete, normalizePhoneForSubmit } from '@/lib/lead-capture/phone';
 import { isProdEnv, requireEnv, SITE_ORIGIN } from '@/lib/seo/site';
 
@@ -82,10 +83,6 @@ function getRequiredTrimmed(record: UnknownRecord, key: string, path: string, er
   const value = trimString(record[key]);
   if (!value) addFieldError(errors, path, 'Required');
   return value;
-}
-
-function isEmailComplete(value: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim().toLowerCase());
 }
 
 function isHoneypotTrippedV2(raw: UnknownRecord): boolean {
