@@ -58,7 +58,6 @@ Coolify Environment Variables
   - `ALLOWED_ORIGIN=https://sonshineroofing.com,https://www.sonshineroofing.com`
 - Optional build-time variables:
   - `YOUTUBE_API_KEY` for YouTube metadata during static generation.
-  - `WP_PROJECT_BASE` only if the WordPress project CPT base changes.
 - Do not set `WP_BASIC_AUTH_USER` or `WP_BASIC_AUTH_PASS` unless WPGraphQL becomes protected.
 
 Directus Reviews
@@ -114,14 +113,55 @@ Security headers & CSP
 Cache/Invalidation
 
 - Remaining WordPress GraphQL data uses Next fetch revalidation where configured.
-- Directus fetchers use ordinary `force-cache` reads without ISR options or
-  cache tags. Publish Directus content changes through a new build. The
-  authenticated revalidation endpoint remains for other path/tag consumers,
-  while special-offer routes and their sitemap are explicitly build-only.
+- Directus route fetchers use ordinary `force-cache` reads without ISR options
+  or cache tags. The project prebuild fetcher uses fresh uncached reads to write
+  `.generated/projects.json`, which Docker packages privately with the standalone
+  application. Project runtime consumers read only that deployment artifact.
+- Publish Directus content changes through a new build. Project and special-offer
+  routes and their dedicated sitemaps reject runtime path revalidation. Mixed
+  video/image sitemaps and legacy location pages may still revalidate their other
+  content, while their project data stays fixed to the deployment snapshot.
 - Static sitemap: regenerated on build; read dynamically per request.
 - Published Directus redirects are fetched and validated by `next.config.mjs` at build time. Redirect changes require a new build.
 - Static generation is limited to two workers with one page per worker at a time to avoid bursting WordPress or Directus.
 - `site_settings.enable_site_analytics` controls whether the configured GTM and Meta Pixel scripts render.
+
+Project releases and rollback
+
+- Before a production release, use Node 22 to run `npm ci`, lint, the project and
+  applicable verification scripts, and a credentialed `npm run build`. Preview
+  that production build locally and check detail pages, full galleries, filters,
+  pagination, videos, testimonials, SEO, and project/image/video sitemaps. Rebuild
+  if content or code changes after verification.
+- `scripts/generate-project-snapshot.mjs` runs before route validation and Next's
+  build. It pages through every published, client-scoped project and managed
+  list and explicitly expands all ordered gallery entries. Missing configuration,
+  empty projects, invalid relations, missing image descriptions, or failed CMS
+  reads stop the build and remove any stale project snapshot.
+- Deploy the verified revision through Coolify. Project edits and new slugs stay
+  invisible until that release; `/api/revalidate` cannot publish them.
+- Keep the prior deployment and its referenced media until acceptance. Restore
+  the prior deployment to roll back frontend behavior. Keep WordPress projects
+  intact as migration recovery evidence; the current frontend has no fallback.
+- During the original-image migration only, pause Directus Unified Image Upload
+  Admission, drain admitted jobs, import originals and verify file hashes, then
+  restore the trigger on success or failure. Future uploads use the regular
+  processing workflows. Save alt text as file-description metadata independently.
+- The September 2026 import contains 53 published projects, 333 ordered gallery
+  entries, 355 unique project images, six supporting assets, 23 testimonials,
+  and 3 material / 34 color / 13 service-area terms. All 361 files were verified
+  against their source SHA-256 hashes; three visual reviewers covered every
+  project image before descriptions were saved separately.
+- The reusable `scripts/migrate-wordpress-projects.mjs` defaults to a read-only
+  dry run and accepts `--source-dir` outside the repository. Its `--verify-only`
+  mode checks exact source/destination parity. `--apply` is an explicitly
+  authorized migration operation, not part of a normal build. Keep source
+  exports and media manifests private and supply credentials through the
+  environment. After an import, run `scripts/sql/roofing-project-source-dates.sql`
+  through the approved database connection before `--verify-only`; Directus
+  otherwise substitutes import timestamps. Never restore source timestamps after
+  the Directus editorial handoff. The scope triggers are maintained separately
+  in `scripts/sql/roofing-project-scope.sql`.
 
 llms.txt
 

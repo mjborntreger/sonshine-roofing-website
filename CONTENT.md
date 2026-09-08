@@ -2,12 +2,14 @@
 
 Where content lives
 
-- WordPress (via WPGraphQL): remaining legacy projects, videos, and location
-  landing pages.
+- WordPress (via WPGraphQL): standalone video entries and location landing pages.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
   - `blog_posts` and flat, client-scoped `blog_topics`: the exclusive blog
     source for archives, filters, post pages, recommendations, metadata, and
     blog/image sitemaps.
+  - `roofing_projects` and client-scoped `roofing_material_types`,
+    `roofing_roof_colors`, and `roofing_service_areas`: the exclusive project
+    source, including project-derived videos and project media.
   - `site_settings`: shared brand, contact, address, social, image, hero media, footer badges, company facts, robots, CSP, analytics switch, schema values, and optional raw `llms.txt` content.
   - `website_pages`: normalized SEO records for fixed routes only; canonicals are route-derived.
   - `services`: primary service route owners, including their SEO metadata.
@@ -80,7 +82,7 @@ Publishing redirects in Directus
 
 Publishing in WP
 
-- Ensure remaining WordPress projects and other legacy content are Published,
+- Ensure remaining WordPress video entries and location content are Published,
   not Draft.
 - Fill excerpts where available (used as SEO fallbacks).
 - Provide featured images for richer OG cards.
@@ -99,6 +101,52 @@ Publishing blog posts in Directus
 - `external_id` and `source_updated_at` are automation-owned and read-only in
   the Directus editor. `published_at`, `featured`, and ordinary editorial fields
   remain editable.
+
+Publishing roofing projects in Directus
+
+- Edit projects only in `roofing_projects`. Keep the SonShine client, a unique
+  stable slug, `status`, `published_at`, plain-text `description`, and a described
+  `featured_image`. Published WordPress projects were the migration scope;
+  unpublished WordPress records remain excluded.
+- Select one published material and one published service area from the reusable
+  managed lists. Roof color is optional and single-select. Preserve existing
+  names/slugs because archive URLs use `mt`, `rc`, and `sa` query parameters.
+- Order all gallery entries explicitly with `roofing_projects_files.sort`.
+  Every gallery image appears; no default connection limit truncates the list.
+  Shared featured/gallery assets can reference the same Directus file.
+- Keep product links in their displayed order as `{ label, href }` entries.
+  Product and review links require absolute HTTP(S) URLs. Store the project
+  YouTube URL directly in `youtube_url`.
+- The testimonial belongs to the project: `client_testimonial`,
+  `client_testimonial_name`, `client_testimonial_date`, `review_source`, and
+  `review_url`. It is independent of shared review synchronization and has no
+  owner-reply field.
+- Optional `body` uses semantic paragraphs, H2–H4 headings, links, emphasis,
+  lists, line breaks, and blockquotes. The frontend sanitizer removes unsupported
+  markup, media, styles, classes, scripts, and unsafe links.
+- Project SEO uses the shared SEO fields and stored `noindex` policy. The
+  migration preserves existing descriptions and rendered fallbacks. Legacy
+  `wordpress:sonshine-roofing:` records may have empty keyword fields when the
+  source supplied none; new indexable projects require a primary keyword first
+  in `focus_keywords`.
+- `published_at` controls public chronology. `source_updated_at` and `external_id`
+  preserve migration identity; system `date_updated` starts at the source
+  modified time and tracks later Directus edits. Import time is not editorial
+  freshness.
+- Archive search preserves title/body matching. Counts and facets use that same
+  result set. The former WordPress pipeline could return one item for `tile`
+  while showing 20 in its description-aware facet total; the Directus adapter
+  removes that inconsistency without expanding search to descriptions.
+- All project views use one build-generated dataset, including archive search,
+  facets, pagination, homepage/location cards, video-library selections, metadata,
+  and sitemaps. Save CMS changes, run a successful frontend production build,
+  and deploy it to publish them. New slugs remain unavailable until deployment;
+  project routes have no ISR or on-demand generation.
+- Imported originals retain their bytes. Image descriptions were reviewed
+  separately and belong in `directus_files.description`. Future uploads use the
+  normal image-processing workflows. When replacing a published image, upload a
+  new file and change the relation; overwriting an existing file would change
+  media referenced by an older deployment before release and weaken rollback.
 
 Publishing SonShine people in Directus
 

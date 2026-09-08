@@ -1,5 +1,7 @@
 const BUILD_ONLY_PATH_PREFIXES = [
   '/special-offers',
+  '/project',
+  '/sitemap_index/project',
   '/sitemap_index/special-offer',
 ] as const;
 

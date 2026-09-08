@@ -4,13 +4,9 @@ import Section from '@/components/layout/Section';
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import VideoLibraryClient from '@/components/dynamic-content/video/VideoLibraryClient';
 import VideoShareBar from '@/components/dynamic-content/video/VideoShareBar';
-import {
-  listRecentVideoEntries,
-  listProjectVideos,
-  listVideoItemsPaged,
-  type VideoItem,
-  type TermLite,
-} from '@/lib/content/wp';
+import { listRecentVideoEntries, type VideoItem, type TermLite } from "@/lib/content/wp";
+import { listProjectVideos, getProjectBySlug, projectToVideoItem } from "@/lib/content/projects";
+import { listVideoItemsPaged } from "@/lib/content/videos";
 import type { Metadata } from 'next';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, collectionPageSchema } from '@/lib/seo/schema';
@@ -43,11 +39,6 @@ const heroImageUrl = (item: VideoItem): string | undefined => {
   return undefined;
 };
 
-type VideoModule = Pick<
-  typeof import('@/lib/content/wp'),
-  'getVideoEntryBySlug' | 'getProjectBySlug' | 'projectToVideoItem'
->;
-
 const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
   { slug: 'commercials', label: 'Commercials' },
   { slug: 'explainers', label: 'Explainers' },
@@ -62,18 +53,11 @@ const toFirstParam = (value: string | string[] | undefined): string => {
 };
 
 const fetchVideoForMetadata = cache(async (slug: string) => {
-  const mod: VideoModule = await import('@/lib/content/wp');
-  const getEntry = mod.getVideoEntryBySlug;
-  const getProject = mod.getProjectBySlug;
-  const toProjectItem = mod.projectToVideoItem;
-
-  const entry = typeof getEntry === 'function' ? await getEntry(slug).catch(() => null) : null;
+  const { getVideoEntryBySlug } = await import('@/lib/content/wp');
+  const entry = await getVideoEntryBySlug(slug).catch(() => null);
   if (entry) return entry;
-
-  if (typeof getProject === 'function' && typeof toProjectItem === 'function') {
-    const project = await getProject(slug).catch(() => null);
-    if (project) return toProjectItem(project);
-  }
+  const project = await getProjectBySlug(slug);
+  if (project) return projectToVideoItem(project);
 
   return null;
 });
@@ -159,10 +143,7 @@ export default async function VideoLibraryPage() {
       console.error('[videoEntries] GQL error:', e);
       return [];
     }),
-    listProjectVideos(200).catch((e) => {
-      console.error('[projectVideos] GQL error:', e);
-      return [];
-    }),
+    listProjectVideos(),
   ]);
 
   const allVideos: VideoItem[] = [...entries, ...projectVideos];

@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
-import { wpFetch, mapImages, type WpImageNode } from '@/lib/content/wp';
+import { wpFetch, mapImages, type WpImageNode } from "@/lib/content/wp";
 import { listBlogImageSitemapEntries } from '@/lib/content/blog';
+import { listProjectSitemapEntries } from '@/lib/content/projects';
 import { listPersonSitemapEntries } from '@/lib/content/persons';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { serializeImageEntry, type ImageSitemapEntry } from './serialization';
@@ -17,15 +18,6 @@ const PREVIEW_HEADERS = sitemapPreviewHeaders();
 type Maybe<T> = T | null | undefined;
 
 type ImageNodeWrapper = { node?: Maybe<WpImageNode> };
-
-type ProjectImageNode = {
-  uri?: string | null;
-  modifiedGmt?: string | null;
-  featuredImage?: Maybe<ImageNodeWrapper>;
-  projectDetails?: Maybe<{
-    projectImages?: Maybe<{ nodes?: Maybe<WpImageNode>[] | null }>;
-  }>;
-};
 
 type LocationImageNode = {
   uri?: string | null;
@@ -43,13 +35,6 @@ type LocationImageNode = {
   }>;
 };
 
-type ProjectImageResult = {
-  projects?: {
-    pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
-    nodes?: Maybe<ProjectImageNode>[] | null;
-  } | null;
-};
-
 type LocationImageResult = {
   locations?: {
     pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
@@ -62,71 +47,10 @@ const mapWrapperImages = (wrapper?: Maybe<ImageNodeWrapper>) => {
   return node ? mapImages([node]) : [];
 };
 
-const toImageNodeArray = (
-  nodes?: Maybe<WpImageNode>[] | null,
-): ReadonlyArray<Maybe<WpImageNode>> | undefined => (Array.isArray(nodes) ? nodes : undefined);
-
 const getBlogImageNodes = unstable_cache(
   async () => listBlogImageSitemapEntries(),
   ['sitemap-image-blog:directus'],
   { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:blog'] },
-);
-
-const getProjectImageNodes = unstable_cache(
-  async () => {
-    const query = /* GraphQL */ `
-      query ImageSitemapProjects($first: Int!, $after: String) {
-        projects(
-          first: $first
-          after: $after
-          where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-        ) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-          nodes {
-            uri
-            modifiedGmt
-            featuredImage {
-              node {
-                sourceUrl
-                altText
-              }
-            }
-            projectDetails {
-              projectImages {
-                nodes {
-                  sourceUrl
-                  altText
-                }
-              }
-            }
-          }
-        }
-      }
-    `;
-
-    const nodes: ProjectImageNode[] = [];
-    let after: string | null = null;
-
-    do {
-      const variables: { first: number; after?: string | null } = after
-        ? { first: 200, after }
-        : { first: 200 };
-      const data = await wpFetch<ProjectImageResult>(query, variables);
-      const page = data?.projects;
-      const pageNodes = page?.nodes ?? [];
-      for (const node of pageNodes) {
-        if (node) nodes.push(node);
-      }
-      after = page?.pageInfo?.hasNextPage ? (page?.pageInfo?.endCursor ?? null) : null;
-    } while (after);
-
-    return nodes;
-  },
-  ['sitemap-image-projects'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:projects'] },
 );
 
 const getLocationImageNodes = unstable_cache(
@@ -192,7 +116,7 @@ const getLocationImageNodes = unstable_cache(
 const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
   const [blogNodes, projectNodes, locationNodes, personNodes] = await Promise.all([
     getBlogImageNodes(),
-    getProjectImageNodes(),
+    listProjectSitemapEntries(),
     getLocationImageNodes(),
     listPersonSitemapEntries(),
   ]);
@@ -214,13 +138,11 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
   for (const node of projectNodes) {
     const path = normalizeEntryPath(node.uri ?? '');
     if (path === '/') continue;
-    const gallery = mapImages(toImageNodeArray(node.projectDetails?.projectImages?.nodes));
-    const hero = mapWrapperImages(node.featuredImage);
-    const images = [...hero, ...gallery];
+    const images = [...(node.heroImage ? [node.heroImage] : []), ...node.projectImages];
     if (!images.length) continue;
     entries.push({
       loc: path,
-      lastmod: formatLastmod(node.modifiedGmt),
+      lastmod: formatLastmod(node.modified),
       images,
     });
   }

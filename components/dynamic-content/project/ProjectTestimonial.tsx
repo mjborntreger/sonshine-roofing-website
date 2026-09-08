@@ -1,5 +1,5 @@
 import SmartLink from "@/components/utils/SmartLink";
-import type { ProjectTestimonial as ProjectTestimonialData } from "@/lib/content/wp";
+import type { ProjectTestimonial as ProjectTestimonialData } from "@/lib/content/project-types";
 import { DEFAULT_REVIEW_PLATFORM, getReviewPlatformMeta, type ReviewPlatform } from "@/lib/reviews/platforms";
 import { cn } from "@/lib/utils";
 import Image from "next/image";

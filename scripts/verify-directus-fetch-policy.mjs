@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 
 const DIRECTUS_FETCHERS = [
   'lib/content/blog.ts',
+  'lib/content/directus-projects.mjs',
   'lib/content/directus-build-settings.mjs',
   'lib/content/directus-faqs.ts',
   'lib/content/directus-legal-copy.ts',

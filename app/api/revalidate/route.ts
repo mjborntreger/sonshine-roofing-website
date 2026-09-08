@@ -68,7 +68,7 @@ export async function POST(req: Request) {
   if (blockedPaths.length) {
     return ok(
       {
-        error: "Special-offer routes are build-only and cannot be revalidated at runtime.",
+        error: "Requested routes are build-only and cannot be revalidated at runtime.",
         blocked: { paths: blockedPaths },
       },
       { status: 400 },
@@ -113,7 +113,7 @@ export async function GET(req: Request) {
   if (blockedPaths.length) {
     return ok(
       {
-        error: "Special-offer routes are build-only and cannot be revalidated at runtime.",
+        error: "Requested routes are build-only and cannot be revalidated at runtime.",
         blocked: { paths: blockedPaths },
       },
       { status: 400 },

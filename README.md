@@ -9,9 +9,9 @@ the frontend adapters for Directus and WordPress.
 - Next.js 16 runs as a Node 22 standalone image on Coolify.
 - Directus is the primary content platform. It owns shared site content, fixed
   page and service SEO, blog posts, FAQs, people, roofing glossary terms,
-  sponsor features, special offers, legal copy, navigation, and redirects.
-- WordPress/WPGraphQL remains authoritative for projects, videos, and location
-  landing pages.
+  sponsor features, projects, special offers, legal copy, navigation, and redirects.
+- WordPress/WPGraphQL remains authoritative for standalone video entries and
+  location landing pages.
 - `POST /api/lead` validates public form submissions, verifies Turnstile, and
   forwards the normalized v2 payload to n8n.
 
@@ -43,9 +43,12 @@ contract. Use `npm run build` for full confidence when the credentialed CMS
 environment is available; `npm run build:codex` supplies the sandbox fetch
 proxy when that contract is needed.
 
-Build presteps generate `public/llms.txt` and
-`public/__sitemaps/static-routes.json`. Both files are ignored build artifacts,
-not authoring sources.
+Build presteps generate `public/llms.txt`,
+`public/__sitemaps/static-routes.json`, and the private `.generated/projects.json`
+project snapshot. These are ignored build artifacts, not authoring sources.
+The snapshot travels with each deployment and powers every project consumer,
+including runtime resource requests. Project CMS changes require a new build
+and deployment. A failed or incomplete Directus project read stops prebuild.
 
 ## Repository guides
 

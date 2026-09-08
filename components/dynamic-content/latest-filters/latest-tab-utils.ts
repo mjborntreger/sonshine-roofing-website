@@ -1,4 +1,5 @@
-import type { ProjectSummary, PostCard } from "@/lib/content/wp";
+import type { ProjectSummary } from "@/lib/content/project-types";
+import type { PostCard } from "@/lib/content/wp";
 import type { CategoryKey, MaterialKey, TabConfig } from "./latest-tab-config";
 import { PROJECT_TAB_CONFIG, POST_TAB_CONFIG } from "./latest-tab-config";
 

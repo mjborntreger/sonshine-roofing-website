@@ -1,6 +1,7 @@
 import BlogArchiveCard from "@/components/dynamic-content/blog/BlogArchiveCard";
 import ProjectArchiveCard from "@/components/dynamic-content/project/ProjectArchiveCard";
-import type { PostCard, ProjectSummary } from "@/lib/content/wp";
+import type { PostCard } from "@/lib/content/wp";
+import type { ProjectSummary } from "@/lib/content/project-types";
 import { ArrowRight, Sparkles } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 

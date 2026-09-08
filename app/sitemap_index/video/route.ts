@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
-import { wpFetch, stripHtml, youtubeThumb } from '@/lib/content/wp';
+import { wpFetch, stripHtml, youtubeThumb } from "@/lib/content/wp";
+import { listProjectSitemapEntries } from '@/lib/content/projects';
 import { formatLastmod, normalizeEntryPath, xmlEscape, trimTo } from '../utils';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
@@ -29,35 +30,10 @@ type VideoEntryNode = {
   } | null;
 };
 
-type ProjectVideoNode = {
-  uri?: string | null;
-  slug?: string | null;
-  title?: string | null;
-  date?: string | null;
-  modifiedGmt?: string | null;
-  projectVideoInfo?: {
-    youtubeUrl?: string | null;
-  } | null;
-  projectDetails?: {
-    projectDescription?: string | null;
-  } | null;
-  projectFilters?: {
-    materialType?: { nodes?: Maybe<{ name?: string | null }>[] | null } | null;
-    serviceArea?: { nodes?: Maybe<{ name?: string | null }>[] | null } | null;
-  } | null;
-};
-
 type VideoEntriesResult = {
   videoEntries?: {
     pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
     nodes?: Maybe<VideoEntryNode>[] | null;
-  } | null;
-};
-
-type ProjectVideosResult = {
-  projects?: {
-    pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
-    nodes?: Maybe<ProjectVideoNode>[] | null;
   } | null;
 };
 
@@ -108,53 +84,6 @@ const getVideoEntryNodes = unstable_cache(
   { revalidate: 3600, tags: ['sitemap', 'sitemap:videos', 'sitemap:videos:entries'] }
 );
 
-const getProjectVideoNodes = unstable_cache(
-  async () => {
-    const query = /* GraphQL */ `
-      query ProjectSitemapVideos($first: Int!, $after: String) {
-        projects(
-          first: $first
-          after: $after
-          where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-        ) {
-          pageInfo { hasNextPage endCursor }
-          nodes {
-            uri
-            slug
-            title
-            date
-            modifiedGmt
-            projectVideoInfo { youtubeUrl }
-            projectDetails { projectDescription }
-            projectFilters {
-              materialType { nodes { name } }
-              serviceArea  { nodes { name } }
-            }
-          }
-        }
-      }
-    `;
-
-    const nodes: ProjectVideoNode[] = [];
-    let after: string | null = null;
-
-    do {
-      const variables: { first: number; after?: string | null } = after ? { first: 200, after } : { first: 200 };
-      const data = await wpFetch<ProjectVideosResult>(query, variables);
-      const page = data?.projects;
-      const pageNodes = page?.nodes ?? [];
-      for (const node of pageNodes) {
-        if (node) nodes.push(node);
-      }
-      after = page?.pageInfo?.hasNextPage ? page?.pageInfo?.endCursor ?? null : null;
-    } while (after);
-
-    return nodes;
-  },
-  ['sitemap-video-projects'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:videos', 'sitemap:videos:projects'] }
-);
-
 const VIDEO_NAMESPACE = 'http://www.google.com/schemas/sitemap-video/1.1';
 
 type VideoSitemapItem = {
@@ -194,7 +123,7 @@ const youtubeIdFromUrl = (url?: string | null): string | null => {
 const buildVideoItems = async () => {
   const [entryNodes, projectNodes] = await Promise.all([
     getVideoEntryNodes(),
-    getProjectVideoNodes(),
+    listProjectSitemapEntries(),
   ]);
 
   const items: VideoSitemapItem[] = [];
@@ -235,7 +164,7 @@ const buildVideoItems = async () => {
   }
 
   for (const node of projectNodes) {
-    const rawUrl = node?.projectVideoInfo?.youtubeUrl ?? '';
+    const rawUrl = node.youtubeUrl ?? '';
     const youtubeId = youtubeIdFromUrl(rawUrl);
     if (!youtubeId) continue;
 
@@ -246,23 +175,17 @@ const buildVideoItems = async () => {
 
     const title = (node?.title ?? '').trim() || 'Project Video';
 
-    const details = node?.projectDetails?.projectDescription ?? '';
+    const details = node.projectDescription ?? '';
     const descriptionSource = details ? stripHtml(details) : title;
     const description = trimTo(descriptionSource.trim() || title, 2048);
 
-    const materialTags =
-      node?.projectFilters?.materialType?.nodes
-        ?.map((n) => (n?.name ?? '').trim())
-        .filter(Boolean) ?? [];
-    const serviceTags =
-      node?.projectFilters?.serviceArea?.nodes
-        ?.map((n) => (n?.name ?? '').trim())
-        .filter(Boolean) ?? [];
+    const materialTags = node.materialTypes.map((term) => term.name);
+    const serviceTags = node.serviceAreas.map((term) => term.name);
     const tags = [...materialTags, ...serviceTags].slice(0, 32);
 
     items.push({
       loc,
-      lastmod: formatLastmod(node?.modifiedGmt) ?? formatLastmod(node?.date),
+      lastmod: formatLastmod(node.modified) ?? formatLastmod(node?.date),
       playerLoc: `https://www.youtube-nocookie.com/embed/${youtubeId}`,
       contentUrl: rawUrl || `https://www.youtube.com/watch?v=${youtubeId}`,
       thumbnailUrl: youtubeThumb(youtubeId),
