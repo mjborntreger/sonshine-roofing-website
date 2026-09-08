@@ -1,8 +1,12 @@
 # Content Workflow
 
-Where content lives
+## Where content lives
 
 - WordPress (via WPGraphQL): standalone video entries and location landing pages.
+- The WordPress host also serves hard-coded `/wp-content/uploads` assets used by
+  local routes and components. This media dependency is separate from
+  WPGraphQL content ownership; audit or migrate those URLs before retiring the
+  host.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
   - `blog_posts` and flat, client-scoped `blog_topics`: the exclusive blog
     source for archives, filters, post pages, recommendations, metadata, and
@@ -23,11 +27,13 @@ Where content lives
     page/image sitemaps.
   - `sponsor_features`: the exclusive source for partnership cards on the
     homepage and location landing pages.
+  - `reviews` and `reviews_carousels`: the site-wide Google review feed and its
+    per-client display settings.
   - `roofing_glossary_terms`: the exclusive source for the glossary archive,
     term routes, route-owned SEO, contextual term linking, and glossary sitemap.
 - Next.js app pages: route layouts, components, and page body copy not yet moved to Directus.
 
-Publishing shared site content in Directus
+## Publishing shared site content in Directus
 
 - Keep exactly one `site_settings` record for the SonShine client.
 - Use unique normalized paths in `website_pages`; the 404 record is `/404` even though it has no public canonical.
@@ -35,8 +41,9 @@ Publishing shared site content in Directus
   routes and SEO. There are no duplicate service records in `website_pages`.
 - Navigation links to service routes use `link_type=service` and the `service`
   relation. Fixed routes continue to use `link_type=page`.
-- Store the complete keyword set in `focus_keywords` with the exact
-  `primary_focus_keyword` first. A mismatch fails the build with
+- Store the complete keyword set in `focus_keywords` and include the
+  `primary_focus_keyword` phrase. The adapter matches it case-insensitively and
+  returns it first; a missing match fails content loading with
   `DIRECTUS_PRIMARY_FOCUS_KEYWORD_MISMATCH`.
 - Route owners use the shared `seo` group: `noindex`, `meta_title`,
   `meta_description`, `primary_focus_keyword`, `focus_keywords`, `og_title`,
@@ -56,7 +63,17 @@ Publishing shared site content in Directus
 - Header, body, and footer script fields remain intentionally disabled.
 - Operational hours and timezone intervals in `lib/contact-hours.ts` are a documented code-controlled exception because UI state and JSON-LD require normalized schedules.
 
-Publishing FAQs in Directus
+## Publishing reviews in Directus
+
+- The site-wide review widget reads published, SonShine-scoped Google reviews
+  whose rating is five and whose `external_id` is populated. Records also need
+  an author name and review text to render.
+- Keep exactly one SonShine-scoped `reviews_carousels` record. Its `limit` and
+  `gbp_profile_link` configure the widget.
+- These collections do not replace the `featuredReviews` embedded in
+  WordPress-owned location landing pages.
+
+## Publishing FAQs in Directus
 
 - Keep each FAQ assigned to one client and one scope: `website_page` for a fixed
   route or `service` for a service route.
@@ -72,15 +89,18 @@ Publishing FAQs in Directus
 - The `/faq` archive renders General first, then fixed-page/service groups by
   their editor-facing labels.
 
-Publishing redirects in Directus
+## Publishing redirects in Directus
 
 - Redirect changes become active only after a new site build.
 - Keep `source_path` unique, set `preserve_query=true`, and use a supported status code (`301`, `302`, `303`, `307`, or `308`).
 - Use `/prefix/*` for prefix wildcards. Invalid, duplicate, or self-redirect records fail the build.
 - Canonical-host, global de-pagination, global `.html`, and WordPress sitemap-pattern rules remain in `next.config.mjs`.
+- `proxy.ts` owns the normalized code-only legacy redirect and configured 410
+  responses. Keep their exact path list in code rather than duplicating it in
+  Directus.
 - Deleted deprecated landing-page routes intentionally return 404; do not add redirects for them.
 
-Publishing in WP
+## Publishing in WordPress
 
 - Ensure remaining WordPress video entries and location content are Published,
   not Draft.
@@ -88,7 +108,7 @@ Publishing in WP
 - Provide featured images for richer OG cards.
 - Location landing pages remain a deliberate WordPress/code exception until they move to a dedicated Directus `location_landing_pages` collection.
 
-Publishing blog posts in Directus
+## Publishing blog posts in Directus
 
 - Directus is the only frontend blog source. There is no environment-controlled
   WordPress fallback.
@@ -102,7 +122,7 @@ Publishing blog posts in Directus
   the Directus editor. `published_at`, `featured`, and ordinary editorial fields
   remain editable.
 
-Publishing roofing projects in Directus
+## Publishing roofing projects in Directus
 
 - Edit projects only in `roofing_projects`. Keep the SonShine client, a unique
   stable slug, `status`, `published_at`, plain-text `description`, and a described
@@ -121,9 +141,15 @@ Publishing roofing projects in Directus
   `client_testimonial_name`, `client_testimonial_date`, `review_source`, and
   `review_url`. It is independent of shared review synchronization and has no
   owner-reply field.
-- Optional `body` uses semantic paragraphs, H2–H4 headings, links, emphasis,
-  lists, line breaks, and blockquotes. The frontend sanitizer removes unsupported
-  markup, media, styles, classes, scripts, and unsafe links.
+- Brewster Rd has an owner-approved exception: keep its existing testimonial
+  and leave `review_url` empty. This does not block publication. New reviews
+  require editorial verification and a source link unless explicitly excepted.
+- Keep all project narrative in the plain-text `description`. There is no
+  separate project body in the frontend or migration/import path. Shared HTML
+  sanitizers remain required for other content types.
+- State the job type early in the description. Project badges and service
+  structured data use its first explicit "roof installation" or "roof replacement"
+  phrase; copy without either phrase receives the neutral "Roofing Project" label.
 - Project SEO uses the shared SEO fields and stored `noindex` policy. The
   migration preserves existing descriptions and rendered fallbacks. Legacy
   `wordpress:sonshine-roofing:` records may have empty keyword fields when the
@@ -133,10 +159,9 @@ Publishing roofing projects in Directus
   preserve migration identity; system `date_updated` starts at the source
   modified time and tracks later Directus edits. Import time is not editorial
   freshness.
-- Archive search preserves title/body matching. Counts and facets use that same
-  result set. The former WordPress pipeline could return one item for `tile`
-  while showing 20 in its description-aware facet total; the Directus adapter
-  removes that inconsistency without expanding search to descriptions.
+- Archive search matches the title plus plain-text description, without case
+  sensitivity. Results, totals, pagination, and all filter counts use that same
+  matching set, including when material, color, and service-area filters combine.
 - All project views use one build-generated dataset, including archive search,
   facets, pagination, homepage/location cards, video-library selections, metadata,
   and sitemaps. Save CMS changes, run a successful frontend production build,
@@ -147,17 +172,23 @@ Publishing roofing projects in Directus
   normal image-processing workflows. When replacing a published image, upload a
   new file and change the relation; overwriting an existing file would change
   media referenced by an older deployment before release and weaken rollback.
+- Follow [the project authoring procedure](docs/project-authoring.md) for verified
+  job facts, description copy, media, metadata review, and release checks.
+- Deployment order for retiring `roofing_projects.body`: deploy and verify the
+  frontend that no longer requests the field, recheck all clients for meaningful
+  body values and all integrations for consumers, then remove only that field.
+  Keep the field present while release approval is pending. Retain its schema
+  definition privately; an older frontend rebuild needs the field restored first.
 
-Publishing SonShine people in Directus
+## Publishing SonShine people in Directus
 
-- The ten approved profiles are published and Directus is the only frontend
-  source. WordPress person queries and fallback images are intentionally not
-  supported.
+- Directus is the only frontend source for the ten approved profiles.
+  WordPress person queries and fallback images are intentionally not supported.
 - The approved order is Nathan Borntreger, Bob, Josh, JB, Jeremy K., Tara, Mina,
   Michael, Erick, and José. Antonio, Tony, Angela, Dean, Steve, and Matthew are
   explicitly excluded and must not be recreated by the migration script.
-- `show_on_team` defaults to true. `noindex` defaults to true globally and is
-  explicitly false on all ten published SonShine profiles. Records still
+- `show_on_team` defaults to true. `noindex` defaults to true globally; keep it
+  false for approved profiles that should be publicly indexable. Records still
   require the correct
   SonShine client, slug, display name, role, biography, sort value, and described
   profile image.
@@ -169,7 +200,7 @@ Publishing SonShine people in Directus
   reviewed focus keywords. Display name/role, cleaned biography text, and the
   described profile image remain fallback sources only.
 
-Publishing sponsor features in Directus
+## Publishing sponsor features in Directus
 
 - Published records are client-scoped and sorted by `sort`, then `title`.
   Homepage and location-page partnership cards have no WordPress fallback.
@@ -187,7 +218,7 @@ Publishing sponsor features in Directus
   changes use the build-driven content path and require a new site build to
   appear publicly.
 
-Publishing roofing glossary terms in Directus
+## Publishing roofing glossary terms in Directus
 
 - Directus is the only frontend glossary source; there is no WordPress fallback.
 - Every record requires the SonShine client, `status`, a client-scoped URL-safe
@@ -203,10 +234,13 @@ Publishing roofing glossary terms in Directus
 - Directus `date_updated` is the authoritative freshness timestamp for any
   glossary term that is later made indexable and emitted in the sitemap.
 
-Publishing special offers in Directus
+## Publishing special offers in Directus
 
 - Set `status=published` to make an offer routable.
 - Set `featured=true` to make an unexpired offer eligible for the sitewide popup.
+- Popup route suppression is code-owned in
+  `components/lead-capture/special-offer/SpecialOfferPopup.tsx`; Directus cannot
+  override the excluded lead, legal, review, offer, or confirmation routes.
 - New offers default to `noindex=true`; editors may turn indexing on. The stored
   toggle alone controls robots metadata and special-offer sitemap inclusion.
   Expiration disables the claim form and featured-popup eligibility, but does
@@ -215,26 +249,33 @@ Publishing special offers in Directus
 - Special-offer content is build-only. Publish a new site build for Directus
   changes to reach the public offer route or its sitemap entry.
 
-Publishing legal copy in Directus
+## Publishing legal copy in Directus
 
 - Edit `legal_copy.privacy_policy` and `legal_copy.terms_of_use` with the WYSIWYG editor.
 - Use semantic HTML without classes, IDs, inline styles, scripts, or event-handler attributes.
 - Begin body headings at `h2`; the Next.js page shell owns the primary `h1`.
 - `/privacy-policy` consumes `privacy_policy`; `/sms-terms-and-conditions` consumes `terms_of_use`.
 
-Glossary linking
+## Glossary linking
 
 - Term pages auto-link other terms in the content body (first occurrence per term).
 - Avoid keyword stuffing; links are budgeted to prevent overlinking.
 
-Images
+## Images
 
 - For brand images, prefer Next.js `Image` component where possible.
-- Default OG image: `/og-default.png` (1200×630).
+- Prefer the described `site_settings.default_og_image` for shared Open Graph
+  fallbacks. [SEO.md](SEO.md) is the canonical guide for the tracked local
+  fallback asset and its cache-versioned metadata URL.
 
-Noindex Policy
+## Repository migration artifacts
 
-- Utility pages (`/reviews`, `/tell-us-why`, `/thank-you`, `/truck-for-sale`, and the 404 page) are marked noindex and excluded from the static sitemap where applicable.
-- Published SonShine person pages follow `noindex`; the approved ten are
-  indexable and the person page/image sitemaps remain aligned. Glossary terms
-  remain noindex by business choice.
+- Files under `docs/*.sql` are privileged Directus database migration and
+  verification artifacts, not local setup commands. They may depend on
+  already-applied database state and require explicit Directus write approval.
+- `docs/directus-route-owner-invariants.sql` is the canonical shared
+  client/route scope-key invariant for fixed pages, services, posts, offers,
+  people, and glossary terms.
+- The retained person and blog migration scripts require historical JSON inputs
+  that are not tracked in a clean checkout. Do not treat their package commands
+  as routine validation.

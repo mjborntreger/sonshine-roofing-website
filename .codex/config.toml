@@ -1,5 +1,7 @@
 # Project-local Codex permissions for SonShine Roofing.
-# Keep network domains in sync with the host sources in next.config.mjs CSP.
+# Keep network domains aligned with the external hosts required by the app.
+# The enforced CSP itself is owned by Directus site_settings and consumed by
+# next.config.mjs at build time.
 default_permissions = "sonshine-csp-net"
 
 [features.network_proxy]

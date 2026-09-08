@@ -38,8 +38,6 @@ export type ProjectFull = ProjectSummary & {
   scopeKey: string;
   noindex: boolean;
   focusKeywords: string[];
-  contentHtml: string;
-  contentPlain: string;
   /** Full ISO date (publish date) */
   date?: string | null;
   /** ISO last-modified date */

@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { videoObjectSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN, ensureAbsoluteUrl } from "@/lib/seo/site";
+import { sanitizeWordPressHtml } from "@/lib/content/wordpress-html";
 import type { PageInfo, PageResult } from "../ui/pagination";
 
 type Json = Record<string, unknown>;
@@ -46,6 +47,12 @@ const toStringSafe = (value: unknown, fallback = ""): string => {
 
 const stringOrNull = (value: unknown): string | null =>
   typeof value === "string" ? value : null;
+
+const sanitizeOptionalWordPressHtml = (value: unknown): string | null => {
+  if (typeof value !== "string") return null;
+  const sanitized = sanitizeWordPressHtml(value).trim();
+  return sanitized || null;
+};
 
 const readRecordString = (record: UnknownRecord | null, key: string): string | null => {
   if (!record) return null;
@@ -300,7 +307,9 @@ export async function getLocationBySlug(slug: string): Promise<LocationRecord | 
 
     return {
       neighborhood: stringOrNull(record?.neighborhood),
-      neighborhoodDescription: stringOrNull(record?.neighborhoodDescription),
+      neighborhoodDescription: sanitizeOptionalWordPressHtml(
+        record?.neighborhoodDescription,
+      ),
       zipCodes,
       neighborhoodImage: pickImageFrom(record?.neighborhoodImage),
     };
@@ -309,7 +318,7 @@ export async function getLocationBySlug(slug: string): Promise<LocationRecord | 
   return {
     slug: toStringSafe(node.slug) || slug,
     title: toStringSafe(node.title),
-    contentHtml: toStringSafe(node.content),
+    contentHtml: sanitizeWordPressHtml(toStringSafe(node.content)),
     date: stringOrNull(node.date),
     modified: stringOrNull(node.modified),
     locationName: stringOrNull(attrs?.locationName),

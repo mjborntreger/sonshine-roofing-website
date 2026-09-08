@@ -2,8 +2,14 @@ import assert from 'node:assert/strict';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { fetchDirectusProjectSnapshot, mapDirectusProject, prepareProjectBody, projectHtmlToPlainText } from '../lib/content/directus-projects.mjs';
-import { readProjectSnapshot, queryProjectSnapshot } from '../lib/content/project-data.ts';
+import { fetchDirectusProjectSnapshot, mapDirectusProject } from '../lib/content/directus-projects.mjs';
+import { readProjectSnapshot, queryProjectSnapshot, projectServiceLabel } from '../lib/content/project-data.ts';
+
+assert.equal(projectServiceLabel('New construction shingle roof installation in North Port.'), 'Roof Installation');
+assert.equal(projectServiceLabel('Metal roof installation on a new construction home.'), 'Roof Installation');
+assert.equal(projectServiceLabel('A TILE ROOF REPLACEMENT with new flashing installation.'), 'Roof Replacement');
+assert.equal(projectServiceLabel('A roofing project with a new skylight.'), 'Roofing Project');
+assert.equal(projectServiceLabel(null), 'Roofing Project');
 
 const config = { url: 'https://cms.example.test', clientSlug: 'fixture-client' };
 const term = (slug, name = slug) => ({ slug, name, status: 'published', client: { slug: config.clientSlug } });
@@ -12,7 +18,6 @@ const source = {
   id: 'one', scope_key: 'fixture-client:blue-roof', external_id: 'wordpress:sonshine-roofing:fixture',
   client: { slug: config.clientSlug }, status: 'published', title: 'Blue roof & sunny day', slug: 'blue-roof',
   description: 'A metal roof in Sarasota.', published_at: '2020-01-01T12:00:00Z', date_updated: '2021-02-01T12:00:00Z', source_updated_at: '2021-02-01T12:00:00Z',
-  body: '<p>AT&amp;T <strong>roof</strong> <a href="javascript:alert(1)">unsafe</a></p><script>alert(1)</script>',
   featured_image: file('hero'), gallery: Array.from({ length: 24 }, (_, i) => ({ sort: 24 - i, directus_files_id: file(`image-${24 - i}`) })),
   material_type: term('metal'), service_area: term('sarasota'), roof_color: null,
   product_links: [{ label: 'Standing seam', href: 'https://example.test/product' }],
@@ -28,10 +33,11 @@ assert.equal(project.modified, source.source_updated_at, 'import dates must not 
 assert.equal(mapDirectusProject({ ...source, date_updated: '2026-10-01T00:00:00Z' }, config).modified, '2026-10-01T00:00:00Z', 'later editorial updates must supersede source provenance');
 assert.equal(project.seo.description, null, 'existing route description fallback remains available');
 assert.deepEqual(project.roofColors, []);
-assert.equal(project.contentHtml, '<p>AT&amp;T <strong>roof</strong> <a>unsafe</a></p>');
-assert.equal(projectHtmlToPlainText(project.contentHtml), 'AT&T roof unsafe');
-assert.doesNotMatch(prepareProjectBody('<p class="lead"><a href="//unsafe.test" target="_blank">link</a><img src="https://wp.example.test/a.webp"></p>'), /class=|href=|<img/u);
-assert.match(prepareProjectBody('<a href="/project/roof" target="_blank">roof</a>'), /rel="noopener noreferrer"/u);
+assert.equal('contentHtml' in project, false);
+assert.equal('contentPlain' in project, false);
+const testimonial = mapDirectusProject({ ...source, client_testimonial: 'A synthetic approved testimonial.', review_source: 'Google', review_url: null }, config);
+assert.equal(testimonial.customerTestimonial.customerReview, 'A synthetic approved testimonial.');
+assert.equal(testimonial.customerTestimonial.reviewUrl, undefined, 'an approved testimonial can appear without a source URL');
 
 for (const patch of [
   { status: 'draft' }, { client: { slug: 'another-client' } },
@@ -53,10 +59,29 @@ assert.equal(queryProjectSnapshot(snapshot, { first: 1 }).pageInfo.endCursor, '1
 assert.deepEqual(queryProjectSnapshot(snapshot, { first: 1, after: '1' }).items.map((row) => row.slug), ['tile-roof']);
 assert.deepEqual(queryProjectSnapshot(snapshot, { filters: { materialTypeSlugs: ['metal', 'tile'], serviceAreaSlugs: ['venice'], roofColorSlugs: ['red'] } }).items.map((row) => row.slug), ['tile-roof']);
 assert.equal(queryProjectSnapshot(snapshot, { filters: { search: 'SUNNY' } }).total, 1);
-assert.equal(queryProjectSnapshot(snapshot, { filters: { search: 'Courtyard' } }).total, 0);
-const descriptionOnly = queryProjectSnapshot(snapshot, { filters: { search: 'Courtyard' } });
-assert.equal(descriptionOnly.meta.overallTotal, 0, 'facet totals must describe the same title/body result set');
-assert.ok(descriptionOnly.facets.every((facet) => facet.buckets.every((bucket) => bucket.count === 0)));
+const descriptionOnly = queryProjectSnapshot(snapshot, { first: 1, filters: { search: '  COURTYARD  ' } });
+assert.deepEqual(descriptionOnly.items.map((row) => row.slug), ['tile-roof']);
+assert.equal(descriptionOnly.total, 2);
+assert.equal(descriptionOnly.meta.overallTotal, 2, 'facet totals must describe the same title/description result set');
+assert.equal(descriptionOnly.meta.fullTotal, 3);
+assert.deepEqual(descriptionOnly.pageInfo, { hasNextPage: true, endCursor: '1' });
+assert.deepEqual(descriptionOnly.facets.map((facet) => facet.buckets.map(({ slug, count }) => ({ slug, count }))), [
+  [{ slug: 'metal', count: 1 }, { slug: 'tile', count: 1 }],
+  [{ slug: 'red', count: 2 }],
+  [{ slug: 'sarasota', count: 1 }, { slug: 'venice', count: 1 }, { slug: 'unused', count: 0 }],
+]);
+const nextDescriptionPage = queryProjectSnapshot(snapshot, { first: 1, after: descriptionOnly.pageInfo.endCursor, filters: { search: 'Courtyard' } });
+assert.deepEqual(nextDescriptionPage.items.map((row) => row.slug), ['another-metal']);
+assert.deepEqual(nextDescriptionPage.pageInfo, { hasNextPage: false, endCursor: null });
+assert.equal(nextDescriptionPage.total, descriptionOnly.total);
+assert.deepEqual(nextDescriptionPage.facets, descriptionOnly.facets);
+const filteredDescription = queryProjectSnapshot(snapshot, { filters: { search: 'Courtyard', materialTypeSlugs: ['tile'], roofColorSlugs: ['red'], serviceAreaSlugs: ['venice'] } });
+assert.deepEqual(filteredDescription.items.map((row) => row.slug), ['tile-roof']);
+assert.equal(filteredDescription.total, 1);
+assert.equal(filteredDescription.meta.overallTotal, 1);
+assert.equal(filteredDescription.facets[0].buckets.find((bucket) => bucket.slug === 'metal').count, 0);
+assert.equal(queryProjectSnapshot(snapshot, { filters: { search: 'undefined' } }).total, 0);
+assert.equal(queryProjectSnapshot(snapshot, { filters: { search: 'no matching description' } }).total, 0);
 const tileSearch = queryProjectSnapshot(snapshot, { filters: { search: 'tile' } });
 assert.equal(tileSearch.total, 1);
 assert.equal(tileSearch.meta.overallTotal, 1);
@@ -96,6 +121,11 @@ const full = await fetchDirectusProjectSnapshot(env, async (url, options) => {
   assert.equal(options.cache, 'no-store');
   assert.deepEqual(JSON.parse(url.searchParams.get('filter')), { client: { slug: { _eq: config.clientSlug } }, status: { _eq: 'published' } });
   const collection = url.pathname.split('/').at(-1);
+  if (collection === 'roofing_projects') {
+    const fields = url.searchParams.get('fields').split(',');
+    assert.ok(fields.includes('description'), 'project search requires the description');
+    assert.ok(!fields.includes('body') && !fields.some((field) => field.includes('*')), 'project fetches must work after body schema removal');
+  }
   const page = Number(url.searchParams.get('page'));
   const data = collection === 'roofing_projects'
     ? (page === 1 ? Array.from({ length: 100 }, (_, i) => ({ ...source, id: String(i), slug: `roof-${i}` })) : [{ ...source, id: 'last', slug: 'last-roof' }])
@@ -116,4 +146,4 @@ assert.match(await readFile(new URL('../app/(site)/project/[slug]/page.tsx', imp
 const runtime = await readFile(new URL('../lib/content/projects.ts', import.meta.url), 'utf8');
 assert.doesNotMatch(runtime, /\bfetch\(|wpFetch\(|fetchDirectusProjectSnapshot|unstable_cache/u);
 assert.match(await readFile(new URL('../Dockerfile', import.meta.url), 'utf8'), /\/app\/\.generated \.\/\.generated/u);
-console.log('Verified Directus project scoping, media, complete pagination, HTML, SEO dates, filters, and deployment-frozen runtime policy.');
+console.log('Verified Directus project scoping, media, description search, complete pagination, SEO dates, optional review links, filters, and deployment-frozen runtime policy.');

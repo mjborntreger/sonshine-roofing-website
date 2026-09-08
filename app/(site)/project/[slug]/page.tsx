@@ -5,6 +5,7 @@ import SmartLink from "@/components/utils/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
 import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/content/projects";
+import { projectServiceLabel } from "@/lib/content/project-data";
 import ProjectVideo from "@/components/dynamic-content/project/ProjectVideo";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
 import ShareWhatYouThink from "@/components/engagement/ShareWhatYouThink";
@@ -130,11 +131,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const videoId = getYouTubeId(project.youtubeUrl);
   const heroImageUrl = project.heroImage?.url ?? undefined;
   const heroImageAlt = project.heroImage?.altText || project.title;
+  const serviceLabel = projectServiceLabel(project.projectDescription);
   const heroBadges = [
     ...(project.materialTypes ?? []).map((t) => ({ label: t.name })),
     ...(project.roofColors ?? []).map((t) => ({ label: t.name })),
     ...(project.serviceAreas ?? []).map((t) => ({ label: t.name })),
-    { label: "Roof Replacement" },
+    { label: serviceLabel },
   ].filter((badge) => badge.label);
   const hasAnyBadges = heroBadges.length > 0;
 
@@ -224,7 +226,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     description: (project.seo?.description || project.projectDescription || "").slice(0, 160),
     url: shareUrl,
     image: galleryImageObjects.length > 0 ? galleryImageObjects : ogImgAbs,
-    serviceType: "Roof Replacement",
+    serviceType: serviceLabel,
     material: materials,
     about: colors,
     areaServed,
@@ -301,15 +303,17 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               </div>
             )}
 
-            <ShareWhatYouThink urlOverride={shareUrl} />
+            <div className="grid gap-8">
+              <ShareWhatYouThink urlOverride={shareUrl} />
 
-            {/* Customer Testimonial */}
-            {project.customerTestimonial ? (
-              <ProjectTestimonial testimonial={project.customerTestimonial} className="my-8" />
-            ) : null}
+              {/* Customer Testimonial */}
+              {project.customerTestimonial ? (
+                <ProjectTestimonial testimonial={project.customerTestimonial} />
+              ) : null}
 
-            {/* Gallery */}
-            <ProjectGallery images={project.projectImages} projectTitle={project.title} />
+              {/* Gallery */}
+              <ProjectGallery images={project.projectImages} projectTitle={project.title} />
+            </div>
           </div>
 
           {/* Right column: Project Details + Products */}
@@ -362,11 +366,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               </>
             )}
           </div>
-
-          {/* Block Editor Field */}
-          {project.contentHtml && (
-            <div className="mt-6 prose" dangerouslySetInnerHTML={{ __html: project.contentHtml }} />
-          )}
         </div>
 
         <YouMayAlsoLike
