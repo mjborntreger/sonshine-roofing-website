@@ -1,7 +1,6 @@
 import ReviewsSliderLazy from "@/components/reviews-widget/ReviewsSliderLazy";
 import SmartLink from "@/components/utils/SmartLink";
 import { ArrowUpRight } from "lucide-react";
-import Image from "next/image";
 import type { Review } from "./types";
 import ReviewStarRow from "@/components/reviews-widget/ReviewStarRow";
 import {
@@ -18,7 +17,6 @@ type ReviewsCarouselProps = {
   className?: string;
   showBusinessProfileLink?: boolean;
   showDisclaimer?: boolean;
-  showOwnerReplies?: boolean;
   limit?: number;
 };
 
@@ -74,7 +72,6 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
     className = DEFAULT_CONTAINER_CLASS,
     showBusinessProfileLink = true,
     showDisclaimer = true,
-    showOwnerReplies = true,
     limit,
   } = props ?? {};
 
@@ -136,27 +133,6 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
             <p className="mt-4 text-sm leading-7 whitespace-pre-line text-slate-700 flex-1">
               {review.text}
             </p>
-            {showOwnerReplies && review.ownerReply ? (
-              <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <div className="flex items-start gap-3">
-                  {settings?.ownerHeadshot ? (
-                    <Image
-                      src={settings.ownerHeadshot.url}
-                      alt={settings.ownerHeadshot.altText}
-                      width={48}
-                      height={48}
-                      className="h-12 w-12 rounded-full border border-[--brand-cyan] object-cover"
-                      loading="lazy"
-                    />
-                  ) : null}
-                  <div>
-                    <p className="pt-2 text-base font-semibold text-slate-700">Nathan Borntreger</p>
-                    <span className="pb-2 text-xs text-slate-500">Owner</span>
-                  </div>
-                </div>
-                <p className="mt-2 text-sm text-slate-700 whitespace-pre-line">{review.ownerReply}</p>
-              </div>
-            ) : null}
           </article>
         );
       })}
@@ -170,8 +146,6 @@ export default async function ReviewsCarousel(props?: ReviewsCarouselProps) {
         <ReviewsSliderLazy
           reviews={filtered}
           gbpUrl={resolvedGbpUrl}
-          ownerHeadshot={settings?.ownerHeadshot ?? null}
-          showOwnerReplies={showOwnerReplies}
           fallbackId={fallbackId}
         />
         <div className="mb-4 flex flex-wrap gap-y-4 justify-center mx-auto max-w-6xl">

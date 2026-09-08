@@ -614,7 +614,6 @@ export type ReviewForSchema = {
   rating?: number | null;
   text?: string;
   time?: number | null;
-  ownerReply?: string | null;
 };
 
 export type ReviewSchemaOptions = {
@@ -708,7 +707,6 @@ export const buildReviewSchema = ({
     const rating = toFiniteNumber(review.rating) ?? bestRating;
     const datePublished = toIsoDate(review.time);
     const reviewUrl = trimOrNull(review.author_url) ?? providerUrl ?? businessUrl;
-    const ownerReply = trimOrNull(review.ownerReply);
 
     const result: Record<string, unknown> = {
       '@type': 'Review',
@@ -727,16 +725,6 @@ export const buildReviewSchema = ({
     };
 
     if (datePublished) result.datePublished = datePublished;
-    if (ownerReply) {
-      result.comment = {
-        '@type': 'Comment',
-        text: ownerReply,
-        author: {
-          '@type': 'Organization',
-          name: businessName,
-        },
-      };
-    }
 
     return result;
   });
@@ -788,7 +776,6 @@ export type ProjectReviewSchemaInput = {
   testimonial: {
     customerName?: string;
     customerReview: string;
-    ownerReply?: string;
     reviewUrl?: string;
     reviewDate?: string;
     reviewPlatform?: ReviewPlatform;
@@ -870,18 +857,6 @@ export function projectReviewSchema({
 
   const isoDate = toIsoDateString(testimonial.reviewDate);
   if (isoDate) schema.datePublished = isoDate;
-
-  const ownerReply = trimOrNull(testimonial.ownerReply);
-  if (ownerReply) {
-    schema.comment = {
-      '@type': 'Comment',
-      text: ownerReply,
-      author: {
-        '@type': 'Organization',
-        name: DEFAULT_BUSINESS_NAME,
-      },
-    };
-  }
 
   return applyContext(schema, withContext);
 }

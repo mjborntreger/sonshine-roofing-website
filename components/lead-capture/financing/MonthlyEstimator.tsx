@@ -1413,7 +1413,6 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                     customerName="David B."
                     formattedDate="Sep. 9, 2025"
                     customerReview="Very professional from start to finish, from the first inspection to the final cleanup, they were great. And their communications were excellent, every day we got a text from Josh telling us what to expect. Can’t say enough good things about them."
-                    ownerReply="Thanks, David! Glad to hear our professionalism and communication were top-notch. Josh will be pumped to hear his daily updates were well received. He works hard to keep homeowners in the loop. And I have to say, your new roof looks stellar! University Park is such a beautiful area and your new tile roof really hits the mark. Glad we could do that for you. Appreciate the kind words!"
                     reviewUrl="https://maps.app.goo.gl/t6h2vXmDSigk9F3Y9"
                     reviewPlatform="google"
                   />
@@ -1427,7 +1426,6 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   customerName="David B."
                   formattedDate="Sep. 9, 2025"
                   customerReview="Very professional from start to finish, from the first inspection to the final cleanup, they were great. And their communications were excellent, every day we got a text from Josh telling us what to expect. Can’t say enough good things about them."
-                  ownerReply="Thanks, David! Glad to hear our professionalism and communication were top-notch. Josh will be pumped to hear his daily updates were well received. He works hard to keep homeowners in the loop. And I have to say, your new roof looks stellar! University Park is such a beautiful area and your new tile roof really hits the mark. Glad we could do that for you. Appreciate the kind words!"
                   reviewUrl="https://maps.app.goo.gl/t6h2vXmDSigk9F3Y9"
                   reviewPlatform="google"
                 />

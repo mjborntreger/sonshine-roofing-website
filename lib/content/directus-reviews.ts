@@ -1,4 +1,4 @@
-import type { Review, ReviewOwnerImage } from "@/components/reviews-widget/types";
+import type { Review } from "@/components/reviews-widget/types";
 import { isProdEnv } from "@/lib/seo/site";
 
 const REVIEWS_COLLECTION = "reviews";
@@ -20,21 +20,10 @@ type DirectusListResponse<T> = {
   errors?: Array<{ message?: string }>;
 };
 
-type DirectusFileValue =
-  | string
-  | {
-      id?: unknown;
-      description?: unknown;
-      width?: unknown;
-      height?: unknown;
-    }
-  | null;
-
 type DirectusReviewItem = {
   author_name?: unknown;
   rating?: unknown;
   review_text?: unknown;
-  owner_reply?: unknown;
   review_date?: unknown;
   source_created_at?: unknown;
   url?: unknown;
@@ -43,33 +32,23 @@ type DirectusReviewItem = {
 type DirectusReviewsCarouselItem = {
   limit?: unknown;
   gbp_profile_link?: unknown;
-  owner_headshot?: DirectusFileValue;
 };
 
 export type ReviewsCarouselSettings = {
   limit: number;
   gbpProfileLink: string;
-  ownerHeadshot: ReviewOwnerImage | null;
 };
 
 const REVIEW_FIELDS = [
   "author_name",
   "rating",
   "review_text",
-  "owner_reply",
   "review_date",
   "source_created_at",
   "url",
 ] as const;
 
-const CAROUSEL_FIELDS = [
-  "limit",
-  "gbp_profile_link",
-  "owner_headshot.id",
-  "owner_headshot.description",
-  "owner_headshot.width",
-  "owner_headshot.height",
-] as const;
+const CAROUSEL_FIELDS = ["limit", "gbp_profile_link"] as const;
 
 let warnedForMissingConfig = false;
 
@@ -107,10 +86,6 @@ function getDirectusConfig(): DirectusConfig | null {
   };
 }
 
-function getAssetUrl(config: DirectusConfig, fileId: string): string {
-  return `${config.url}/assets/${encodeURIComponent(fileId)}`;
-}
-
 function readValidUrl(value: unknown): string | null {
   const raw = readString(value);
   if (!raw) return null;
@@ -120,22 +95,6 @@ function readValidUrl(value: unknown): string | null {
   } catch {
     return null;
   }
-}
-
-function mapOwnerHeadshot(value: DirectusFileValue, config: DirectusConfig): ReviewOwnerImage | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-
-  const record = value as UnknownRecord;
-  const id = readString(record.id);
-  const altText = readString(record.description);
-  if (!id || !altText) return null;
-
-  return {
-    url: getAssetUrl(config, id),
-    altText,
-    width: readNumber(record.width),
-    height: readNumber(record.height),
-  };
 }
 
 function toEpochSeconds(sourceCreatedAt: unknown, reviewDate: unknown): number | null {
@@ -163,7 +122,6 @@ function mapReview(item: DirectusReviewItem): Review | null {
     rating,
     text,
     time: toEpochSeconds(item.source_created_at, item.review_date),
-    ownerReply: readString(item.owner_reply),
   };
 }
 
@@ -256,6 +214,5 @@ export async function getReviewsCarouselSettings(): Promise<ReviewsCarouselSetti
   return {
     limit: rawLimit && rawLimit > 0 ? Math.floor(rawLimit) : 20,
     gbpProfileLink: readValidUrl(item.gbp_profile_link) ?? DEFAULT_GOOGLE_BUSINESS_PROFILE_URL,
-    ownerHeadshot: mapOwnerHeadshot(item.owner_headshot ?? null, config),
   };
 }
