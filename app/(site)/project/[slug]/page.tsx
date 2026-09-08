@@ -303,15 +303,17 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               </div>
             )}
 
-            <ShareWhatYouThink urlOverride={shareUrl} />
+            <div className="grid gap-8">
+              <ShareWhatYouThink urlOverride={shareUrl} />
 
-            {/* Customer Testimonial */}
-            {project.customerTestimonial ? (
-              <ProjectTestimonial testimonial={project.customerTestimonial} className="my-8" />
-            ) : null}
+              {/* Customer Testimonial */}
+              {project.customerTestimonial ? (
+                <ProjectTestimonial testimonial={project.customerTestimonial} />
+              ) : null}
 
-            {/* Gallery */}
-            <ProjectGallery images={project.projectImages} projectTitle={project.title} />
+              {/* Gallery */}
+              <ProjectGallery images={project.projectImages} projectTitle={project.title} />
+            </div>
           </div>
 
           {/* Right column: Project Details + Products */}
