@@ -40,6 +40,7 @@ Do not put secrets in public variables or commit local environment files.
 npm run lint
 npm run typecheck
 npm run verify:tailwind-utilities
+npm run verify:archive-controls
 ```
 
 `npm test` currently aliases lint. Run the relevant additional `verify:*`
@@ -54,6 +55,27 @@ project snapshot. These are ignored build artifacts, not authoring sources.
 The snapshot travels with each deployment and powers every project consumer,
 including runtime resource requests. Project CMS changes require a new build
 and deployment. A failed or incomplete Directus project read stops prebuild.
+
+## Archive controls
+
+Projects, blog posts, and videos share a native single-selection search form.
+Editing fields changes only draft values; Search applies every field together,
+updates the URL, and restarts pagination. Clear all immediately resets the form
+and results. Browser Back/Forward restores applied searches. Legacy URLs with
+multiple values keep the first valid option per filter and display a notice.
+Unrelated query parameters, including shared-video links, are preserved.
+
+Option lists stay fixed and omit facet counts. Video material/location fields
+are available for all video types or roofing projects; choosing another type
+clears and disables them. The content adapters and project snapshot remain the
+source for matching and pagination.
+
+`verify:archive-controls` runs the actual shared React controller in JSDOM with
+synthetic results and a substituted Next navigation hook. It covers submission,
+reset, request races, retry, history, legacy links, video dependencies, and the
+shared accordion's readable fallback when animations cannot run. It needs no CMS
+credentials. Also check native controls, layout, focus, Enter submission, and
+reduced motion in a browser when changing this UI.
 
 ## Repository guides
 
