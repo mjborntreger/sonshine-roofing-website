@@ -400,6 +400,11 @@ test('Copy link uses the selected video and repeated route visits do not leak li
     assert.equal(writes.length, 2);
   }
   await click('Play Video beta');
+  assert.ok(
+    dialog()?.contains(document.getElementById('video-share-copy')),
+    'Copy link must be inside the active modal so the overlay and focus trap do not hide it',
+  );
+  assert.equal(document.querySelectorAll('#video-share-copy').length, 1);
   await click('Copy link');
   assert.equal(copied, 'https://video.test/video-library?v=beta');
   await act(async () => mounted.unmount());

@@ -7,7 +7,12 @@ import { useSearchParams } from 'next/navigation';
 import type { VideoItem } from '@/lib/content/wp';
 import type { PlaybackVideo } from './VideoModal';
 
-const VideoModal = dynamic<{ video: PlaybackVideo | null; isOpen: boolean; onClose: () => void }>(
+const VideoModal = dynamic<{
+  collectionUrl: string;
+  video: PlaybackVideo | null;
+  isOpen: boolean;
+  onClose: () => void;
+}>(
   () => import('./VideoModal'),
   { ssr: false },
 );
@@ -23,9 +28,11 @@ function updateVideoUrl(slug: string | null) {
 
 /** Keeps shared-video playback mounted independently of archive results, including empty searches. */
 export default function VideoPlayback({
+  collectionUrl,
   playbackVideos,
   children,
 }: {
+  collectionUrl: string;
   playbackVideos: PlaybackVideo[];
   children: (openVideo: (video: VideoItem) => void) => ReactNode;
 }) {
@@ -66,7 +73,12 @@ export default function VideoPlayback({
       {children(openModal)}
 
       {active || modalVideo ? (
-        <VideoModal video={active ?? modalVideo} isOpen={Boolean(active)} onClose={closeModal} />
+        <VideoModal
+          collectionUrl={collectionUrl}
+          video={active ?? modalVideo}
+          isOpen={Boolean(active)}
+          onClose={closeModal}
+        />
       ) : null}
     </>
   );

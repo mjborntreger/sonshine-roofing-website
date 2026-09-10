@@ -3,7 +3,6 @@ import { Suspense, cache } from 'react';
 import Section from '@/components/layout/Section';
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import VideoLibraryClient from '@/components/dynamic-content/video/VideoLibraryClient';
-import VideoShareBar from '@/components/dynamic-content/video/VideoShareBar';
 import { listRecentVideoEntries, type VideoItem, type TermLite } from "@/lib/content/wp";
 import { listProjectVideos, getProjectBySlug, projectToVideoItem } from "@/lib/content/projects";
 import { listVideoItemsPaged } from "@/lib/content/videos";
@@ -206,10 +205,6 @@ export default async function VideoLibraryPage() {
             <div>
               <JsonLd data={collectionLd} />
               <JsonLd data={breadcrumbsLd} />
-              <Suspense fallback={null}>
-                <VideoShareBar collectionUrl={collectionUrl} />
-              </Suspense>
-
               <Suspense
                 fallback={
                   <div className="rounded-2xl border border-blue-100 bg-white/90 p-4 text-sm text-slate-600">
@@ -218,6 +213,7 @@ export default async function VideoLibraryPage() {
                 }
               >
                 <VideoLibraryClient
+                  collectionUrl={collectionUrl}
                   initialResult={initialResult}
                   playbackVideos={allVideos.map(({ id, slug, title, youtubeId }) => ({
                     id, slug, title, youtubeId,

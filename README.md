@@ -83,6 +83,8 @@ handlers update that parameter once while preserving archive filters; restoring
 a link or using Back/Forward does not write history. Links accept video slugs
 and legacy IDs. A compact playback catalog from the page's existing content
 reads resolves shared videos beyond the first result page.
+The share controls sit inside the active player dialog so they remain reachable
+by pointer and keyboard while playback is open.
 
 `verify:video-playback` renders the actual video route, archive, grid, and modal
 in JSDOM using Next's bundled React. It substitutes CMS/network calls, navigation,

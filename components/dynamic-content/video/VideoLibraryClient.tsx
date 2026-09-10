@@ -13,6 +13,7 @@ import VideoPlayback from './VideoPlayback';
 import type { PlaybackVideo } from './VideoModal';
 
 type Props = {
+  collectionUrl: string;
   initialResult: PageResult<VideoItem> & { facets?: FacetGroup[] };
   playbackVideos: PlaybackVideo[];
   bucketOptions: Array<{ slug: string; label: string }>;
@@ -41,6 +42,7 @@ const buildVideoFilters = ({
 });
 
 export default function VideoLibraryClient({
+  collectionUrl,
   initialResult,
   playbackVideos,
   bucketOptions,
@@ -76,7 +78,7 @@ export default function VideoLibraryClient({
   );
 
   return (
-    <VideoPlayback playbackVideos={playbackVideos}>
+    <VideoPlayback collectionUrl={collectionUrl} playbackVideos={playbackVideos}>
       {(openVideo) => (
         <ResourceArchiveClient
           kind="video"

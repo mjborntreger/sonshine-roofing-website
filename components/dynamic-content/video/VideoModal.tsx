@@ -5,10 +5,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
 import type { VideoItem } from "@/lib/content/wp";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
+import VideoShareBar from './VideoShareBar';
 
 export type PlaybackVideo = Pick<VideoItem, 'id' | 'slug' | 'title' | 'youtubeId'>;
 
 type Props = {
+  collectionUrl: string;
   video: PlaybackVideo | null;
   isOpen: boolean;
   onClose: () => void;
@@ -28,7 +30,7 @@ const ANIM = {
   },
 } as const;
 
-export default function VideoModal({ video, isOpen, onClose }: Props) {
+export default function VideoModal({ collectionUrl, video, isOpen, onClose }: Props) {
   const modalRef = useRef<HTMLDivElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
   const scrollYRef = useRef(0);
@@ -126,18 +128,21 @@ export default function VideoModal({ video, isOpen, onClose }: Props) {
           >
             <motion.div
               key={videoKey}
-              className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black shadow-2xl"
+              className="relative max-h-[calc(100dvh-2rem)] w-full max-w-6xl overflow-y-auto rounded-2xl bg-black shadow-2xl"
               initial={ANIM.modal.initial}
               animate={ANIM.modal.animate}
               exit={ANIM.modal.exit}
             >
               <iframe
-                className="h-full w-full"
+                className="aspect-video max-h-[65dvh] w-full"
                 src={`https://www.youtube-nocookie.com/embed/${video.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
                 title={video.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
+              <div className="p-3 sm:p-4">
+                <VideoShareBar collectionUrl={collectionUrl} />
+              </div>
             </motion.div>
             <ModalCloseButton
               ref={closeBtnRef}
