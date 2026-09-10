@@ -614,6 +614,7 @@ export async function listRecentVideoEntries(limit = 50): Promise<VideoItem[]> {
 
     items.push({
       id: toStringSafe(entry.id) || id,
+      slug: toStringSafe(entry.slug) || undefined,
       title: toStringSafe(entry.title),
       youtubeUrl: url!,
       youtubeId: id,

@@ -41,6 +41,7 @@ npm run lint
 npm run typecheck
 npm run verify:tailwind-utilities
 npm run verify:archive-controls
+npm run verify:video-playback
 ```
 
 `npm test` currently aliases lint. Run the relevant additional `verify:*`
@@ -76,6 +77,19 @@ reset, request races, retry, history, legacy links, video dependencies, and the
 shared accordion's readable fallback when animations cannot run. It needs no CMS
 credentials. Also check native controls, layout, focus, Enter submission, and
 reduced motion in a browser when changing this UI.
+
+Video playback and the share bar follow the `v` query parameter. Open/close
+handlers update that parameter once while preserving archive filters; restoring
+a link or using Back/Forward does not write history. Links accept video slugs
+and legacy IDs. A compact playback catalog from the page's existing content
+reads resolves shared videos beyond the first result page.
+
+`verify:video-playback` renders the actual video route, archive, grid, and modal
+in JSDOM using Next's bundled React. It substitutes CMS/network calls, navigation,
+and animation rendering to check the client script warning, sharing, history,
+pagination, deep links, dismissal, and repeated visits. Browser checks must also
+include navigation from another route; a direct page load alone missed the
+original inline-script failure.
 
 ## Repository guides
 

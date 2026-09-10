@@ -6,8 +6,10 @@ import { createPortal } from "react-dom";
 import type { VideoItem } from "@/lib/content/wp";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 
+export type PlaybackVideo = Pick<VideoItem, 'id' | 'slug' | 'title' | 'youtubeId'>;
+
 type Props = {
-  video: VideoItem | null;
+  video: PlaybackVideo | null;
   isOpen: boolean;
   onClose: () => void;
 };

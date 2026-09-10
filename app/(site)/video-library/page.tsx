@@ -219,6 +219,9 @@ export default async function VideoLibraryPage() {
               >
                 <VideoLibraryClient
                   initialResult={initialResult}
+                  playbackVideos={allVideos.map(({ id, slug, title, youtubeId }) => ({
+                    id, slug, title, youtubeId,
+                  }))}
                   bucketOptions={BUCKET_OPTIONS}
                   materialOptions={materialOptions}
                   serviceOptions={serviceOptions}
@@ -231,45 +234,6 @@ export default async function VideoLibraryPage() {
             <ResourcesAside activePath={CANONICAL} />
           </div>
         </div>
-
-        <script
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: `(() => {
-            function setVParam(slug) {
-              try {
-                const url = new URL(window.location.href);
-                if (slug) {
-                  url.searchParams.set('v', String(slug));
-                } else {
-                  url.searchParams.delete('v');
-                }
-                history.pushState(null, '', url.toString());
-              } catch (_) {}
-            }
-
-            window.SSVideoUrl = {
-              open: (slug) => setVParam(slug),
-              close: () => setVParam(null),
-            };
-
-            document.addEventListener('click', (ev) => {
-              try {
-                const el = ev.target && ev.target.closest ? ev.target.closest('[data-video-slug]') : null;
-                if (el) {
-                  const slug = el.getAttribute('data-video-slug');
-                  if (slug) setVParam(slug);
-                }
-              } catch (_) {}
-            }, true);
-
-            window.addEventListener('video:open', (e) => {
-              try { setVParam(e.detail && e.detail.slug); } catch (_) {}
-            });
-            window.addEventListener('video:close', () => setVParam(null));
-          })();`,
-          }}
-        />
       </Section>
     </>
   );

@@ -31,7 +31,8 @@
     "migrate:persons:dry-run": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --dry-run",
     "migrate:persons:apply": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/migrate-wordpress-persons.mjs --apply",
     "verify:project-pipeline": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-project-pipeline.mjs",
-    "verify:archive-controls": "node scripts/verify-archive-controls.mjs"
+    "verify:archive-controls": "node scripts/verify-archive-controls.mjs",
+    "verify:video-playback": "node scripts/verify-video-playback.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.3",

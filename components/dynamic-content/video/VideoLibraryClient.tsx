@@ -8,10 +8,13 @@ import ResourceArchiveClient, {
 import type { FacetGroup, TermLite, VideoItem } from '@/lib/content/wp';
 import type { PageResult } from '@/lib/ui/pagination';
 
-import VideoGrid from './video-grid';
+import InfiniteList from '@/components/dynamic-content/InfiniteList';
+import VideoPlayback from './VideoPlayback';
+import type { PlaybackVideo } from './VideoModal';
 
 type Props = {
   initialResult: PageResult<VideoItem> & { facets?: FacetGroup[] };
+  playbackVideos: PlaybackVideo[];
   bucketOptions: Array<{ slug: string; label: string }>;
   materialOptions: TermLite[];
   serviceOptions: TermLite[];
@@ -39,6 +42,7 @@ const buildVideoFilters = ({
 
 export default function VideoLibraryClient({
   initialResult,
+  playbackVideos,
   bucketOptions,
   materialOptions,
   serviceOptions,
@@ -72,25 +76,36 @@ export default function VideoLibraryClient({
   );
 
   return (
-    <ResourceArchiveClient
-      kind="video"
-      apiPath="/api/resources/video"
-      pageSize={pageSize}
-      initialResult={initialResult}
-      initialFilters={{
-        search: initialFilters.search ?? '',
-        selections: {
-          bucket: initialFilters.bucketSlugs ?? [],
-          material: initialFilters.materialSlugs?.map((s) => s.toLowerCase()) ?? [],
-          area: initialFilters.serviceAreaSlugs?.map((s) => s.toLowerCase()) ?? [],
-        },
-      }}
-      groups={groups}
-      labels={{ itemSingular: 'video', itemPlural: 'videos' }}
-      buildFiltersPayload={buildVideoFilters}
-      renderResults={({ result, listFilters, listKey }) => (
-        <VideoGrid initial={result} filters={listFilters} pageSize={pageSize} listKey={listKey} />
+    <VideoPlayback playbackVideos={playbackVideos}>
+      {(openVideo) => (
+        <ResourceArchiveClient
+          kind="video"
+          apiPath="/api/resources/video"
+          pageSize={pageSize}
+          initialResult={initialResult}
+          initialFilters={{
+            search: initialFilters.search ?? '',
+            selections: {
+              bucket: initialFilters.bucketSlugs ?? [],
+              material: initialFilters.materialSlugs?.map((s) => s.toLowerCase()) ?? [],
+              area: initialFilters.serviceAreaSlugs?.map((s) => s.toLowerCase()) ?? [],
+            },
+          }}
+          groups={groups}
+          labels={{ itemSingular: 'video', itemPlural: 'videos' }}
+          buildFiltersPayload={buildVideoFilters}
+          renderResults={({ result, listFilters }) => (
+            <InfiniteList
+              kind="video"
+              initial={result}
+              filters={listFilters}
+              pageSize={pageSize}
+              gridClass="mt-8"
+              onVideoOpen={openVideo}
+            />
+          )}
+        />
       )}
-    />
+    </VideoPlayback>
   );
 }
