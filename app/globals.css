@@ -413,8 +413,8 @@
 
   /* Accordions */
   .accordion-motion {
-    opacity: 0;
-    transform: translateY(4px);
+    opacity: 1;
+    transform: none;
     animation: none;
   }
 

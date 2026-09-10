@@ -97,13 +97,6 @@ const renderVideoItem = (
         event.preventDefault();
         event.stopPropagation();
         onVideoOpen?.(video);
-        if (typeof window !== "undefined") {
-            try {
-                window.dispatchEvent(new CustomEvent("video:open", { detail: { slug: safeSlug } }));
-            } catch {
-                // ignore
-            }
-        }
     };
 
     return (

@@ -3,7 +3,6 @@ import { Suspense, cache } from 'react';
 import Section from '@/components/layout/Section';
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import VideoLibraryClient from '@/components/dynamic-content/video/VideoLibraryClient';
-import VideoShareBar from '@/components/dynamic-content/video/VideoShareBar';
 import { listRecentVideoEntries, type VideoItem, type TermLite } from "@/lib/content/wp";
 import { listProjectVideos, getProjectBySlug, projectToVideoItem } from "@/lib/content/projects";
 import { listVideoItemsPaged } from "@/lib/content/videos";
@@ -206,10 +205,6 @@ export default async function VideoLibraryPage() {
             <div>
               <JsonLd data={collectionLd} />
               <JsonLd data={breadcrumbsLd} />
-              <Suspense fallback={null}>
-                <VideoShareBar collectionUrl={collectionUrl} />
-              </Suspense>
-
               <Suspense
                 fallback={
                   <div className="rounded-2xl border border-blue-100 bg-white/90 p-4 text-sm text-slate-600">
@@ -218,7 +213,11 @@ export default async function VideoLibraryPage() {
                 }
               >
                 <VideoLibraryClient
+                  collectionUrl={collectionUrl}
                   initialResult={initialResult}
+                  playbackVideos={allVideos.map(({ id, slug, title, youtubeId }) => ({
+                    id, slug, title, youtubeId,
+                  }))}
                   bucketOptions={BUCKET_OPTIONS}
                   materialOptions={materialOptions}
                   serviceOptions={serviceOptions}
@@ -231,45 +230,6 @@ export default async function VideoLibraryPage() {
             <ResourcesAside activePath={CANONICAL} />
           </div>
         </div>
-
-        <script
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{
-            __html: `(() => {
-            function setVParam(slug) {
-              try {
-                const url = new URL(window.location.href);
-                if (slug) {
-                  url.searchParams.set('v', String(slug));
-                } else {
-                  url.searchParams.delete('v');
-                }
-                history.pushState(null, '', url.toString());
-              } catch (_) {}
-            }
-
-            window.SSVideoUrl = {
-              open: (slug) => setVParam(slug),
-              close: () => setVParam(null),
-            };
-
-            document.addEventListener('click', (ev) => {
-              try {
-                const el = ev.target && ev.target.closest ? ev.target.closest('[data-video-slug]') : null;
-                if (el) {
-                  const slug = el.getAttribute('data-video-slug');
-                  if (slug) setVParam(slug);
-                }
-              } catch (_) {}
-            }, true);
-
-            window.addEventListener('video:open', (e) => {
-              try { setVParam(e.detail && e.detail.slug); } catch (_) {}
-            });
-            window.addEventListener('video:close', () => setVParam(null));
-          })();`,
-          }}
-        />
       </Section>
     </>
   );
