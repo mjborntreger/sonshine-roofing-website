@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
-import type { VideoItem } from '@/lib/content/wp';
+import type { VideoItem } from '@/lib/content/video-types';
 import type { PlaybackVideo } from './VideoModal';
 
 const VideoModal = dynamic<{
@@ -57,7 +57,7 @@ export default function VideoPlayback({
     if (!selected) return null;
     return (
       [...openedVideos, ...playbackVideos].find(
-        (video) => video.slug === selected || video.id === selected,
+        (video) => video.slug === selected || video.id === selected || video.legacyIds.includes(selected),
       ) ?? null
     );
   }, [selected, openedVideos, playbackVideos]);

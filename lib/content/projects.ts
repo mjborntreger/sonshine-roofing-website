@@ -3,7 +3,6 @@ import 'server-only';
 import { join } from 'node:path';
 import { readProjectSnapshot, queryProjectSnapshot, projectSummary } from './project-data';
 import type { ProjectFull, ProjectSnapshot, ProjectsArchiveFilters } from './project-types';
-import { extractYouTubeId, youtubeThumb, type VideoItem } from './wp';
 
 export type { ProjectFull, ProjectSummary, ProjectTestimonial, ProjectsArchiveFilters, ProjectSearchResult, TermLite } from './project-types';
 
@@ -55,24 +54,4 @@ export async function listRecentProjectsByServiceArea(serviceAreaSlug: string | 
 
 export async function listProjectSitemapEntries() {
   return deployedProjects().projects.filter((project) => !project.noindex);
-}
-
-export async function listProjectVideos(limit?: number): Promise<VideoItem[]> {
-  const items = deployedProjects().projects.map(projectToVideoItem).filter((item): item is VideoItem => item !== null);
-  return limit == null ? items : items.slice(0, limit);
-}
-
-export function projectToVideoItem(project: ProjectFull): VideoItem | null {
-  const url = project.youtubeUrl?.trim();
-  const youtubeId = url ? extractYouTubeId(url) : null;
-  if (!url || !youtubeId) return null;
-  return {
-    id: `project-${project.slug}`, slug: project.slug, title: project.title,
-    youtubeUrl: url, youtubeId, thumbnailUrl: youtubeThumb(youtubeId),
-    source: 'project', date: project.date ?? undefined,
-    excerpt: project.projectDescription, materialTypes: project.materialTypes, serviceAreas: project.serviceAreas,
-    categories: [{ name: 'Roofing Projects', slug: 'roofing-project' }],
-    featuredImage: project.heroImage ? { url: project.heroImage.url } : undefined,
-    seo: project.seo,
-  };
 }

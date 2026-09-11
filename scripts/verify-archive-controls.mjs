@@ -91,16 +91,11 @@ const groups = [
 const videoGroups = [
   {
     key: 'bucket',
-    label: 'Video Type',
+    label: 'Category',
     paramKey: 'bk',
     options: options('roofing-project', 'commercials'),
   },
-  ...groups
-    .filter((group) => group.key !== 'roof')
-    .map((group) => ({
-      ...group,
-      enabledWhen: { key: 'bucket', values: ['', 'roofing-project'] },
-    })),
+  ...groups.filter((group) => group.key !== 'roof'),
 ];
 const page = (name, total = 1) => ({
   items: total ? [{ name }] : [],
@@ -308,7 +303,7 @@ await test('Clear all resets pending and applied filters, URL and first page', a
   assert.equal(rendered.result.total, 53);
 });
 
-await test('video type clears and disables project-only draft fields until applicable', async () => {
+await test('video categories preserve material and location draft fields for overlapping assignments', async () => {
   await mount('', videoGroups);
   await choose('project-material', 'metal');
   await choose('project-area', 'venice');
@@ -319,15 +314,15 @@ await test('video type clears and disables project-only draft fields until appli
   );
   await choose('project-bucket', 'commercials');
   for (const id of ['project-material', 'project-area']) {
-    assert.equal(document.getElementById(id).value, '');
-    assert.equal(document.getElementById(id).disabled, true);
+    assert.notEqual(document.getElementById(id).value, '');
+    assert.equal(document.getElementById(id).disabled, false);
   }
   assert.equal(requests.length, 0);
   await submit();
   assert.deepEqual(requests[0].body.filters.selections, {
     bucket: ['commercials'],
-    material: [],
-    area: [],
+    material: ['metal'],
+    area: ['venice'],
   });
   await choose('project-bucket', 'roofing-project');
   assert.equal(document.getElementById('project-material').disabled, false);

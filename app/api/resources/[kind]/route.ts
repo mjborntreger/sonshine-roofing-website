@@ -97,7 +97,7 @@ export async function POST(
       const projectResult: ProjectSearchResult = await listProjectsPaged({ first, after, filters: projectFilters });
       return NextResponse.json(projectResult);
     } else if (kind === "video") {
-      // Merge entries + project videos; paginate client-side
+      // Query the complete video inventory packaged with this deployment.
       const videoResult = await listVideoItemsPaged({ first, after, filters: filters as VideoFiltersInput });
       return NextResponse.json(videoResult);
     } else if (kind === "blog") {

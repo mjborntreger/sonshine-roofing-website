@@ -35,6 +35,7 @@ assert.equal(project.seo.description, null, 'existing route description fallback
 assert.deepEqual(project.roofColors, []);
 assert.equal('contentHtml' in project, false);
 assert.equal('contentPlain' in project, false);
+assert.equal('youtubeUrl' in project, false, 'the old project-owned URL must not be a frontend source');
 const testimonial = mapDirectusProject({ ...source, client_testimonial: 'A synthetic approved testimonial.', review_source: 'Google', review_url: null }, config);
 assert.equal(testimonial.customerTestimonial.customerReview, 'A synthetic approved testimonial.');
 assert.equal(testimonial.customerTestimonial.reviewUrl, undefined, 'an approved testimonial can appear without a source URL');
@@ -50,7 +51,7 @@ for (const patch of [
   { external_id: null }, { primary_focus_keyword: 'roof', focus_keywords: ['wrong', 'roof'] },
 ]) assert.throws(() => mapDirectusProject({ ...source, ...patch }, config));
 
-const snapshot = { version: 1, clientSlug: config.clientSlug, projects: [
+const snapshot = { version: 2, clientSlug: config.clientSlug, videos: [], projects: [
   project,
   { ...project, slug: 'tile-roof', title: 'Tile roof', materialTypes: [term('tile')], roofColors: [term('red')], serviceAreas: [term('venice')], projectDescription: 'Courtyard' },
   { ...project, slug: 'another-metal', title: 'Another metal roof', roofColors: [term('red')], projectDescription: 'Courtyard' },
@@ -114,7 +115,8 @@ try {
 await assert.rejects(fetchDirectusProjectSnapshot({}), /Build requires/u);
 const env = { DIRECTUS_URL: config.url, DIRECTUS_CLIENT_SLUG: config.clientSlug, DIRECTUS_TOKEN: 'synthetic-token' };
 await assert.rejects(fetchDirectusProjectSnapshot(env, async () => ({ ok: false, status: 403 })), /HTTP 403/u);
-await assert.rejects(fetchDirectusProjectSnapshot(env, async () => ({ ok: true, json: async () => ({ data: [] }) })), /inventory is empty/u);
+const emptyProjects = await fetchDirectusProjectSnapshot(env, async () => ({ ok: true, json: async () => ({ data: [], meta: { filter_count: 0 } }) }));
+assert.deepEqual(emptyProjects.projects, [], 'a verified empty project inventory is a valid publication state');
 const requests = [];
 const full = await fetchDirectusProjectSnapshot(env, async (url, options) => {
   requests.push(url);
@@ -130,7 +132,7 @@ const full = await fetchDirectusProjectSnapshot(env, async (url, options) => {
   const data = collection === 'roofing_projects'
     ? (page === 1 ? Array.from({ length: 100 }, (_, i) => ({ ...source, id: String(i), slug: `roof-${i}` })) : [{ ...source, id: 'last', slug: 'last-roof' }])
     : [{ id: collection, ...term(collection.replaceAll('_', '-')) }];
-  return { ok: true, json: async () => ({ data }) };
+  return { ok: true, json: async () => ({ data, meta: { filter_count: collection === 'roofing_projects' ? 101 : 1 } }) };
 });
 assert.equal(full.projects.length, 101, 'top-level pagination must include every published project');
 assert.deepEqual(JSON.parse(requests.find((url) => url.pathname.endsWith('/roofing_projects')).searchParams.get('deep')), { gallery: { _limit: -1, _sort: ['sort'] } });

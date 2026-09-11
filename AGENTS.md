@@ -12,18 +12,22 @@ and serves it on port 3000.
 - Directus, scoped by `DIRECTUS_CLIENT_SLUG`, owns blog posts/topics, site
   settings, fixed-page SEO, services, navigation, FAQs, published CMS redirects,
   special offers, legal copy, people, sponsor features, reviews and
-  review-carousel settings, roofing glossary terms, projects, and their media.
-- WordPress/WPGraphQL remains authoritative for standalone video entries and
-  location landing pages.
+  review-carousel settings, roofing glossary terms, projects, videos/categories,
+  and their media.
+- WordPress/WPGraphQL remains authoritative for location landing pages.
 - Local Next.js code owns route composition, components, body copy not yet
   migrated, code-only legacy redirect and 410 responses in `proxy.ts`, and the
   normalized operational schedule in `lib/contact-hours.ts`.
 - Directus is the exclusive frontend source for blog, person, sponsor-feature,
-  roofing-glossary, and project records. Do not add a WordPress fallback for those
+  roofing-glossary, project, and video records. Do not add a WordPress fallback for those
   areas.
 - Directus content described as build-only does not become public until a new
-  site build is deployed. Projects use the private generated snapshot described
-  in `CONTENT.md`; preserve that boundary in runtime APIs and mixed-source pages.
+  site build is deployed. Projects and videos share the private generated
+  snapshot described in `CONTENT.md`; preserve that boundary in runtime APIs,
+  players, and mixed-source pages. Video publication is independent of its
+  optional project's publication; follow the context visibility rules there.
+- Homepage/About YouTube placements remain code-owned. Exclude the entire
+  truck-sale page and its videos from Directus-backed content and CMS migrations.
 
 ## Important Paths
 

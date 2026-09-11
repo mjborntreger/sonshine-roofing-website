@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ArrowUp, Search } from 'lucide-react';
-import type { FacetGroup } from '@/lib/content/wp';
+import type { FacetGroup } from '@/lib/content/project-types';
 import type { PageResult, ResourceKind } from '@/lib/ui/pagination';
 import {
   archiveLocationKey,
@@ -245,8 +245,8 @@ export default function ResourceArchiveClient<Item>({
                       All{' '}
                       {group.label === 'Topic'
                         ? 'topics'
-                        : group.label === 'Video Type'
-                          ? 'video types'
+                        : group.label === 'Category'
+                          ? 'categories'
                           : `${group.label.toLowerCase()}s`}
                     </option>
                     {group.options.map((option) => (

@@ -2,7 +2,7 @@
 
 ## Where content lives
 
-- WordPress (via WPGraphQL): standalone video entries and location landing pages.
+- WordPress (via WPGraphQL): location landing pages.
 - The WordPress host also serves hard-coded `/wp-content/uploads` assets used by
   local routes and components. This media dependency is separate from
   WPGraphQL content ownership; audit or migrate those URLs before retiring the
@@ -13,7 +13,9 @@
     blog/image sitemaps.
   - `roofing_projects` and client-scoped `roofing_material_types`,
     `roofing_roof_colors`, and `roofing_service_areas`: the exclusive project
-    source, including project-derived videos and project media.
+    source for project records and project media.
+  - `videos`, `video_categories`, and `video_category_assignments`: the exclusive
+    video-library source, including the independently authored videos linked to projects.
   - `site_settings`: shared brand, contact, address, social, image, hero media, footer badges, company facts, robots, CSP, analytics switch, schema values, and optional raw `llms.txt` content.
   - `website_pages`: normalized SEO records for fixed routes only; canonicals are route-derived.
   - `services`: primary service route owners, including their SEO metadata.
@@ -32,6 +34,9 @@
   - `roofing_glossary_terms`: the exclusive source for the glossary archive,
     term routes, route-owned SEO, contextual term linking, and glossary sitemap.
 - Next.js app pages: route layouts, components, and page body copy not yet moved to Directus.
+- Homepage and About YouTube placements remain hard-coded. The entire
+  `/truck-for-sale` page, including both videos, is excluded from Directus-backed
+  content and CMS migration work. Its code remains the authoring source.
 
 ## Publishing shared site content in Directus
 
@@ -102,8 +107,7 @@
 
 ## Publishing in WordPress
 
-- Ensure remaining WordPress video entries and location content are Published,
-  not Draft.
+- Publish the remaining WordPress location content before release.
 - Fill excerpts where available (used as SEO fallbacks).
 - Provide featured images for richer OG cards.
 - Location landing pages remain a deliberate WordPress/code exception until they move to a dedicated Directus `location_landing_pages` collection.
@@ -136,7 +140,9 @@
   Shared featured/gallery assets can reference the same Directus file.
 - Keep product links in their displayed order as `{ label, href }` entries.
   Product and review links require absolute HTTP(S) URLs. Store the project
-  YouTube URL directly in `youtube_url`.
+  video relationship in the independently authored `videos` record. The old
+  project `youtube_url` remains only for migration rollback and is ignored by
+  the current frontend.
 - The testimonial belongs to the project: `client_testimonial`,
   `client_testimonial_name`, `client_testimonial_date`, `review_source`, and
   `review_url`. It is independent of shared review synchronization and has no
@@ -179,6 +185,49 @@
   body values and all integrations for consumers, then remove only that field.
   Keep the field present while release approval is pending. Retain its schema
   definition privately; an older frontend rebuild needs the field restored first.
+
+## Publishing videos in Directus
+
+- Author every library video in `videos`, including project clips. Keep the
+  SonShine client, stable `slug`, `status`, `title`, plain-text `description`,
+  `youtube_url`, and website `published_at`. Video wording is independent of
+  later project and YouTube edits. Existing Unicode selection slugs are valid.
+- Paste one YouTube reference. The database normalizes the URL and derives
+  `youtube_id`; the frontend derives watch/embed URLs and YouTube thumbnails.
+  Verify playback before publishing. No custom poster, uploaded video,
+  per-video SEO fields, or dedicated video pages are part of this model.
+- Set the optional `project` relation on the video. Each video has at most one
+  project and each project at most one video. Select the same client. Unlink a
+  video deliberately before deleting its related project.
+- Select any applicable published `video_categories` through `categories`.
+  Category names and sort values are editable; published slugs remain stable.
+  Roofing Projects (`roofing-project`) is derived from the project relationship;
+  Other (`other`) is derived when no relationship or published category exists.
+  Those reserved slugs cannot be ordinary categories. Overlapping assignments
+  match every assigned category without duplicating the video in the library.
+- Video and project publication are independent. A published video linked to
+  an unpublished project keeps its copy, selection link, and Roofing Projects
+  classification; it exposes no project link, material, or location. Its sitemap
+  destination becomes the library selection URL. Unpublishing a video removes
+  it from the library and project player while leaving the project page intact.
+- `published_at` controls newest-first website chronology. True YouTube upload
+  dates are separate metadata; absence of a verified upload date never causes
+  the website timestamp to be presented as YouTube's upload date.
+- Projects and videos share the private `.generated/projects.json` artifact.
+  Save CMS changes, complete a successful build, and deploy it to publish.
+  The library, player lookup, resources API, project players, and video sitemap
+  have no ISR, runtime CMS refresh, or WordPress fallback. Revalidation cannot
+  publish CMS changes. YouTube playback itself remains an external service.
+- Keep `external_id`, `source_updated_at`, `legacy_ids`, `youtube_id`, and
+  `scope_key` automation-owned. Existing GraphQL IDs and `project-<slug>` aliases
+  keep shared links working independently of later project changes. Import time
+  and initial publication do not replace the verified source modified date.
+- Archive metadata remains in the `/video-library` `website_pages` record.
+  Sharing from the player copies the stable library selection URL. Eligible
+  project cards retain their project link; the modal keeps its existing layout.
+- See [the migration tooling guide](docs/video-migration.md) for source exports,
+  schema invariants, recovery, and verification. The homepage/About placements
+  and the excluded truck-sale page retain the code-owned boundary above.
 
 ## Publishing SonShine people in Directus
 

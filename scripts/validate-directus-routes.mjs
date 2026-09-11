@@ -190,8 +190,10 @@ if (clientSlug === "borntreger-digital") {
 
 if (clientSlug === "sonshine-roofing") {
   const projectSnapshot = JSON.parse(readFileSync(resolve(rootDir, ".generated/projects.json"), "utf8"));
-  if (projectSnapshot.version !== 1 || projectSnapshot.clientSlug !== clientSlug) {
-    throw new Error("[route-manifest] Project snapshot has an invalid client or version.");
+  if (projectSnapshot.version !== 2 || projectSnapshot.clientSlug !== clientSlug
+    || !Array.isArray(projectSnapshot.projects) || !Array.isArray(projectSnapshot.videos)
+    || !Array.isArray(projectSnapshot.categories)) {
+    throw new Error("[route-manifest] Combined content snapshot has an invalid client, version, or inventory.");
   }
   for (const project of projectSnapshot.projects) {
     addOwner("roofing_projects", project.slug, project.uri, project.scopeKey);

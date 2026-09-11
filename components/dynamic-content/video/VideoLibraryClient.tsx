@@ -5,7 +5,8 @@ import { useMemo } from 'react';
 import ResourceArchiveClient, {
   type FilterGroupConfig,
 } from '@/components/dynamic-content/ResourceArchiveClient';
-import type { FacetGroup, TermLite, VideoItem } from '@/lib/content/wp';
+import type { FacetGroup, TermLite } from '@/lib/content/project-types';
+import type { VideoItem } from '@/lib/content/video-types';
 import type { PageResult } from '@/lib/ui/pagination';
 
 import InfiniteList from '@/components/dynamic-content/InfiniteList';
@@ -53,7 +54,7 @@ export default function VideoLibraryClient({
 }: Props) {
   const groups = useMemo<FilterGroupConfig[]>(
     () => [
-      { key: 'bucket', label: 'Video Type', paramKey: 'bk', options: bucketOptions },
+      { key: 'bucket', label: 'Category', paramKey: 'bk', options: bucketOptions },
       {
         key: 'material',
         label: 'Material',
@@ -62,7 +63,6 @@ export default function VideoLibraryClient({
           slug: term.slug.toLowerCase(),
           label: term.name,
         })),
-        enabledWhen: { key: 'bucket', values: ['', 'roofing-project'] },
       },
       {
         key: 'area',
@@ -71,7 +71,6 @@ export default function VideoLibraryClient({
         options: serviceOptions
           .map((term) => ({ slug: term.slug.toLowerCase(), label: term.name }))
           .sort((a, b) => a.label.localeCompare(b.label)),
-        enabledWhen: { key: 'bucket', values: ['', 'roofing-project'] },
       },
     ],
     [bucketOptions, materialOptions, serviceOptions],

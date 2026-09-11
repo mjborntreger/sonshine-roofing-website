@@ -70,12 +70,19 @@ const navigation = {
   },
 };
 const video = (slug, source = 'project') => ({
-  id: `${source}-${slug}`,
+  id: `directus-${slug}`,
+  legacyIds: [`${source}-${slug}`],
   slug,
   title: `Video ${slug}`,
   youtubeId: `youtube-${slug}`,
+  youtubeUrl: `https://www.youtube.com/watch?v=youtube-${slug}`,
+  thumbnailUrl: `https://i.ytimg.com/vi/youtube-${slug}/hqdefault.jpg`,
+  date: '2020-02-01T12:00:00Z',
+  modified: null,
+  uploadDate: null,
   source,
-  excerpt: '',
+  projectSlug: source === 'project' ? `${slug}-project` : undefined,
+  excerpt: 'Independent video description',
   categories: [],
   materialTypes: [],
   serviceAreas: [],
@@ -83,8 +90,17 @@ const video = (slug, source = 'project') => ({
 const alpha = video('alpha');
 const beta = video('beta');
 const later = video('later');
-const entry = { ...video('entry', 'video_entry'), id: 'video-entry' };
-const allVideos = [alpha, beta, later, entry];
+const entry = { ...video('entry', 'video_entry'), legacyIds: ['video-entry', 'dmlkZW9fZW50cnk6MQ=='] };
+const unicode = video('local-expertise-in-action-📸', 'video_entry');
+const allVideos = [alpha, beta, later, entry, unicode];
+const project = {
+  slug: 'alpha-project', title: 'Independent project title',
+  projectDescription: 'Roof replacement project narrative', video: alpha,
+  heroImage: { url: 'https://images.test/roof.jpg', altText: 'Roof' },
+  materialTypes: [], serviceAreas: [], roofColors: [], projectImages: [], productLinks: [],
+};
+const ProjectVideo = () => null;
+
 const page = (items, hasNextPage = false) => ({
   items,
   total: allVideos.length,
@@ -94,29 +110,6 @@ const initial = page([alpha, beta], true);
 const requests = [];
 globalThis.fetch = async (url, init) => {
   const body = JSON.parse(init.body);
-  if (body.query) {
-    assert.match(body.query, /query ListVideoEntries/);
-    return {
-      ok: true,
-      json: async () => ({
-        data: {
-          videoEntries: {
-            nodes: [
-              {
-                id: entry.id,
-                slug: entry.slug,
-                title: entry.title,
-                videoCategories: { nodes: [] },
-                videoLibraryMetadata: {
-                  youtubeUrl: `https://www.youtube.com/watch?v=${entry.youtubeId}`,
-                },
-              },
-            ],
-          },
-        },
-      }),
-    };
-  }
   requests.push(body);
   return {
     ok: true,
@@ -157,11 +150,42 @@ const mocks = {
   '@/components/layout/Section': element('section'),
   '@/components/ui/Hero': () => null,
   '@/components/global-nav/static-pages/ResourcesAside': () => null,
-  '@/lib/content/projects': { listProjectVideos: async () => [alpha, beta, later] },
-  '@/lib/content/videos': { listVideoItemsPaged: async () => initial },
+  '@/lib/content/videos': {
+    listVideoItemsPaged: async () => initial,
+    listAllVideos: async () => allVideos,
+    listVideoCategories: async () => [
+      { slug: 'roofing-project', name: 'Roofing Projects', sort: 0 },
+      { slug: 'explainers', name: 'Roofing Advice', sort: 1 },
+      { slug: 'commercials', name: 'Commercials', sort: 2 },
+    ],
+  },
   '@/lib/seo/json-ld': { JsonLd: () => null },
-  '@/lib/seo/schema': { breadcrumbSchema: () => ({}), collectionPageSchema: () => ({}) },
-  '@/lib/seo/site': { SITE_ORIGIN: 'https://video.test' },
+  '@/lib/seo/schema': {
+    breadcrumbSchema: () => ({}), collectionPageSchema: () => ({}),
+    serviceSchema: (value) => ({ '@type': 'Service', ...value }),
+    videoObjectSchema: (value) => ({ '@type': 'VideoObject', ...value }),
+    projectReviewSchema: () => null,
+  },
+  '@/lib/seo/meta': { buildArticleMetadata: () => ({}) },
+  '@/lib/content/projects': {
+    getProjectBySlug: async () => project,
+    listProjectSlugs: async () => [project.slug],
+    listRecentProjectsPool: async () => [],
+  },
+  '@/lib/content/project-data': { projectServiceLabel: () => 'Roof Replacement' },
+  '@/lib/content/directus-faqs': { listFaqs: async () => [] },
+  '@/components/dynamic-content/project/ProjectVideo': ProjectVideo,
+  '@/components/dynamic-content/project/ProjectGallery': () => null,
+  '@/components/dynamic-content/project/ProjectTestimonial': () => null,
+  '@/components/dynamic-content/project/BackToProjectsButton': () => null,
+  '@/components/dynamic-content/faq/FaqInlineList': () => null,
+  '@/components/engagement/YouMayAlsoLike': () => null,
+  '@/components/engagement/ShareWhatYouThink': () => null,
+  '@/lib/seo/site': {
+    SITE_ORIGIN: 'https://video.test',
+    sitemapEnabled: () => true,
+    sitemapPreviewHeaders: () => ({}),
+  },
   '@/lib/content/directus-site': { getWebsitePageMetadata: async () => ({}) },
 };
 const modules = new Map();
@@ -192,8 +216,9 @@ function loadSource(filename) {
   new Function('require', 'module', 'exports', compiled)(localRequire, loaded, loaded.exports);
   return loaded.exports;
 }
-const Page = loadSource(resolve(root, 'app/(site)/video-library/page.tsx')).default;
-const { listRecentVideoEntries } = loadSource(resolve(root, 'lib/content/wp.ts'));
+const pageModule = loadSource(resolve(root, 'app/(site)/video-library/page.tsx'));
+const Page = pageModule.default;
+const videoSitemap = loadSource(resolve(root, 'app/sitemap_index/video/route.ts'));
 let mounted;
 async function mount(query = '', strict = false) {
   await act(async () => {
@@ -228,6 +253,69 @@ async function travel(direction) {
   });
 }
 
+test('the project route uses independent video copy and omits a draft video player and schema', async () => {
+  const ProjectPage = loadSource(resolve(root, 'app/(site)/project/[slug]/page.tsx')).default;
+  const elements = (node) => React.isValidElement(node)
+    ? [node, ...React.Children.toArray(node.props.children).flatMap(elements)]
+    : [];
+  const original = project.video;
+  try {
+    let tree = elements(await ProjectPage({ params: Promise.resolve({ slug: project.slug }) }));
+    const player = tree.find((node) => node.type === ProjectVideo);
+    assert.equal(player.props.title, alpha.title);
+    assert.equal(player.props.posterUrl, alpha.thumbnailUrl);
+    const schema = tree.find((node) => node.props.id === 'project-video').props.data;
+    assert.equal(schema.name, alpha.title);
+    assert.equal(schema.description, alpha.excerpt);
+    assert.equal(schema.contentUrl, undefined, 'YouTube watch pages are not media-file URLs');
+    assert.equal(schema.uploadDate, null, 'never substitute a project or website date');
+    project.video = null;
+    tree = elements(await ProjectPage({ params: Promise.resolve({ slug: project.slug }) }));
+    assert.equal(tree.some((node) => node.type === ProjectVideo), false);
+    assert.equal(tree.some((node) => node.props.id === 'project-video'), false);
+    assert.ok(tree.some((node) => node.props.children === project.projectDescription),
+      'unpublishing the video retains the project narrative');
+  } finally {
+    project.video = original;
+  }
+});
+
+test('sitemap destinations follow public project availability while preserving video copy and dates', async () => {
+  const original = { ...alpha };
+  try {
+    alpha.projectUri = '/project/alpha-project/';
+    alpha.uploadDate = '2019-04-01T12:00:00Z';
+    let xml = await (await videoSitemap.GET()).text();
+    assert.match(xml, /<loc>https:\/\/video.test\/project\/alpha-project<\/loc>/);
+    assert.match(xml, /<video:description>Independent video description<\/video:description>/);
+    assert.doesNotMatch(xml, /<video:content_loc>/, 'YouTube videos provide their embed player instead');
+    assert.match(xml, /<video:publication_date>2019-04-01T12:00:00.000Z<\/video:publication_date>/);
+    assert.doesNotMatch(xml, /<video:publication_date>2020-/,
+      'website chronology never becomes a claimed YouTube upload date');
+    delete alpha.projectUri;
+    delete alpha.projectSlug;
+    xml = await (await videoSitemap.GET()).text();
+    assert.match(xml, /<loc>https:\/\/video.test\/video-library\?v=alpha<\/loc>/);
+    assert.doesNotMatch(xml, /<loc>https:\/\/video.test\/project\/alpha-project<\/loc>/);
+    assert.equal((xml.match(/<video:video>/g) ?? []).length, allVideos.length);
+    alpha.projectUri = '/project/alpha-project';
+    alpha.projectNoindex = true;
+    xml = await (await videoSitemap.GET()).text();
+    assert.match(xml, /<loc>https:\/\/video.test\/video-library\?v=alpha<\/loc>/,
+      'a nonindexable project does not become a sitemap destination');
+  } finally {
+    for (const key of Object.keys(alpha)) delete alpha[key];
+    Object.assign(alpha, original);
+  }
+});
+
+test('library metadata ignores player selection and video routes disable ISR', async () => {
+  const baseline = await pageModule.generateMetadata();
+  assert.deepEqual(await pageModule.generateMetadata({ searchParams: Promise.resolve({ v: 'alpha' }) }), baseline);
+  assert.equal(pageModule.revalidate, false);
+  assert.equal(videoSitemap.revalidate, false);
+});
+
 test('client rendering the actual video route emits no executable-script warning', async () => {
   const errors = [];
   const original = console.error;
@@ -240,10 +328,27 @@ test('client rendering the actual video route emits no executable-script warning
   assert.deepEqual(errors, []);
 });
 
-test('the WordPress video adapter preserves the slug used by playback links', async () => {
-  const [mapped] = await listRecentVideoEntries();
-  assert.equal(mapped.slug, entry.slug);
-  assert.equal(mapped.id, entry.id, 'existing ID links remain available');
+test('managed category names and cross-category material/location controls reach the archive', async () => {
+  await mount('?bk=explainers');
+  assert.match(document.querySelector('label[for="video-bucket"]').textContent, /Category/);
+  assert.match(document.getElementById('video-bucket').textContent, /Roofing Advice/);
+  assert.equal(document.getElementById('video-material').disabled, false);
+  assert.equal(document.getElementById('video-area').disabled, false);
+});
+
+test('only public project relationships expose a project link, independently of video slugs', async () => {
+  await mount();
+  assert.ok(document.querySelector('a[href="/project/alpha-project"]'));
+  const projectSlug = alpha.projectSlug;
+  try {
+    delete alpha.projectSlug;
+    await mount();
+    assert.equal(document.querySelector('a[href="/project/alpha-project"]'), null);
+    await click('Play Video alpha');
+    assert.ok(dialog(), 'published video remains playable without a public project');
+  } finally {
+    alpha.projectSlug = projectSlug;
+  }
 });
 
 test('Play and Watch video each update sharing once, preserving filters and hash', async () => {
@@ -281,14 +386,27 @@ test('slug and legacy ID links, including videos beyond page one, open without w
     'project-later',
     'entry',
     'video-entry',
+    'dmlkZW9fZW50cnk6MQ==',
+    unicode.slug,
+    unicode.legacyIds[0],
   ]) {
-    await mount(`?v=${value}`, true);
+    await mount(`?v=${encodeURIComponent(value)}`, true);
     assert.ok(dialog(), `opens ${value}`);
     assert.equal(writes.length, 0, 'URL restoration is read-only, including Strict Mode');
   }
   await mount('?v=missing-video');
   assert.equal(dialog(), null);
   assert.equal(writes.length, 0);
+});
+
+test('Unicode selection slugs preserve playback and their encoded share destination', async () => {
+  await mount(`?v=${encodeURIComponent(unicode.slug)}`);
+  assert.equal(dialog()?.getAttribute('aria-label'), unicode.title);
+  const shareUrl = document.getElementById('video-share-url').value;
+  assert.equal(new URL(shareUrl).searchParams.get('v'), unicode.slug);
+  assert.match(shareUrl, /%F0%9F%93%B8/);
+  const xml = await (await videoSitemap.GET()).text();
+  assert.ok(xml.includes(`https://video.test/video-library?v=${encodeURIComponent(unicode.slug)}`));
 });
 
 test('Back and Forward restore or close the modal without creating entries', async () => {

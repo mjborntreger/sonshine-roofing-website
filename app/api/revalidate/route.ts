@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 
-import { isBuildOnlyRevalidationPath } from "@/lib/content/build-only-revalidation";
+import { isBuildOnlyRevalidationPath, isBuildOnlyRevalidationTag } from "@/lib/content/build-only-revalidation";
 
 export const dynamic = "force-dynamic"; // never cache this endpoint
 
@@ -65,11 +65,12 @@ export async function POST(req: Request) {
   const tags = uniq<string>([...toStringArray(body.tags), ...toStringArray(body.tag)]);
 
   const blockedPaths = paths.filter(isBuildOnlyRevalidationPath);
-  if (blockedPaths.length) {
+  const blockedTags = tags.filter(isBuildOnlyRevalidationTag);
+  if (blockedPaths.length || blockedTags.length) {
     return ok(
       {
         error: "Requested routes are build-only and cannot be revalidated at runtime.",
-        blocked: { paths: blockedPaths },
+        blocked: { paths: blockedPaths, tags: blockedTags },
       },
       { status: 400 },
     );
@@ -110,11 +111,12 @@ export async function GET(req: Request) {
   ]).map(String);
 
   const blockedPaths = paths.filter(isBuildOnlyRevalidationPath);
-  if (blockedPaths.length) {
+  const blockedTags = tags.filter(isBuildOnlyRevalidationTag);
+  if (blockedPaths.length || blockedTags.length) {
     return ok(
       {
         error: "Requested routes are build-only and cannot be revalidated at runtime.",
-        blocked: { paths: blockedPaths },
+        blocked: { paths: blockedPaths, tags: blockedTags },
       },
       { status: 400 },
     );

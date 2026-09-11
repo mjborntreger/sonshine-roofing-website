@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import type { ProjectFull, ProjectSnapshot, ProjectSummary, ProjectsArchiveFilters, ProjectSearchResult } from './project-types';
+import type { VideoItem } from './video-types';
 
 export function projectServiceLabel(description: string | null): string {
   const scope = description?.match(/\broof (replacement|installation)\b/iu)?.[1].toLowerCase();
@@ -9,16 +10,25 @@ export function projectServiceLabel(description: string | null): string {
 }
 
 export function readProjectSnapshot(filename: string): ProjectSnapshot {
-  let snapshot: ProjectSnapshot;
+  let snapshot: Omit<ProjectSnapshot, 'projects'> & { projects: (Omit<ProjectFull, 'video'> & { videoId: string | null })[]; videos: VideoItem[] };
   try {
-    snapshot = JSON.parse(readFileSync(filename, 'utf8')) as ProjectSnapshot;
+    snapshot = JSON.parse(readFileSync(filename, 'utf8')) as typeof snapshot;
   } catch {
     throw new Error('Project snapshot is unavailable. Run the credentialed prebuild before starting the frontend.');
   }
-  if (snapshot.version !== 1 || !snapshot.clientSlug || !Array.isArray(snapshot.projects) || !snapshot.projects.length || !snapshot.terms) {
+  if (snapshot.version !== 2 || !snapshot.clientSlug || !Array.isArray(snapshot.projects) || !snapshot.terms || !Array.isArray(snapshot.videos)) {
     throw new Error('Project snapshot is invalid. Regenerate it with the credentialed prebuild.');
   }
-  return snapshot;
+  const videos = new Map(snapshot.videos.map((video) => [video.id, video]));
+  const projects = snapshot.projects.map((project) => {
+    const { videoId, ...fields } = project;
+    const video = videoId ? videos.get(videoId) : null;
+    if (videoId && (!video || video.projectSlug !== project.slug)) {
+      throw new Error('Project/video snapshot is inconsistent. Regenerate it with the credentialed prebuild.');
+    }
+    return { ...fields, video: video ?? null };
+  });
+  return { version: 2, clientSlug: snapshot.clientSlug, projects, terms: snapshot.terms };
 }
 
 export function projectSummary(project: ProjectSummary): ProjectSummary {

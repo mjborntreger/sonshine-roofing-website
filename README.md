@@ -9,10 +9,11 @@ the frontend adapters for Directus and WordPress.
 - Next.js 16 runs as a Node 22 standalone image on Coolify.
 - Directus is the primary content platform. It owns shared site content, fixed
   page and service SEO, blog posts, FAQs, people, roofing glossary terms,
-  sponsor features, projects, reviews and review-carousel settings, special
+  sponsor features, projects, videos/categories, reviews and review-carousel settings, special
   offers, legal copy, navigation, and published CMS redirects.
-- WordPress/WPGraphQL remains authoritative for standalone video entries and
-  location landing pages.
+- WordPress/WPGraphQL remains authoritative for location landing pages.
+- Homepage/About YouTube placements remain hard-coded. The entire truck-sale
+  page and its videos are excluded from Directus-backed content.
 - Next.js configuration and `proxy.ts` retain code-owned platform redirects and
   normalized legacy redirect/410 behavior.
 - `POST /api/lead` validates public form submissions, verifies Turnstile, and
@@ -52,10 +53,11 @@ sandbox fetch proxy when that contract is needed.
 
 Build presteps generate `public/llms.txt`,
 `public/__sitemaps/static-routes.json`, and the private `.generated/projects.json`
-project snapshot. These are ignored build artifacts, not authoring sources.
-The snapshot travels with each deployment and powers every project consumer,
-including runtime resource requests. Project CMS changes require a new build
-and deployment. A failed or incomplete Directus project read stops prebuild.
+combined project/video snapshot. These are ignored build artifacts, not authoring
+sources. The snapshot travels with each deployment and powers every project and
+video consumer, including runtime resource requests. CMS changes require a new
+build and deployment; these consumers have no ISR or runtime CMS fallback.
+Failed, partial, or invalid reads stop prebuild and invalidate the candidate artifact.
 
 ## Archive controls
 
@@ -66,14 +68,15 @@ and results. Browser Back/Forward restores applied searches. Legacy URLs with
 multiple values keep the first valid option per filter and display a notice.
 Unrelated query parameters, including shared-video links, are preserved.
 
-Option lists stay fixed and omit facet counts. Video material/location fields
-are available for all video types or roofing projects; choosing another type
-clears and disables them. The content adapters and project snapshot remain the
-source for matching and pagination.
+Option lists stay fixed and omit facet counts. Video categories can overlap,
+while the public selector still selects one category at a time. Material and
+location filters can combine with any category; they match context inherited
+from a published related project. The deployed snapshot supplies matching,
+distinct totals, category counts, and pagination.
 
 `verify:archive-controls` runs the actual shared React controller in JSDOM with
 synthetic results and a substituted Next navigation hook. It covers submission,
-reset, request races, retry, history, legacy links, video dependencies, and the
+reset, request races, retry, history, legacy links, and the
 shared accordion's readable fallback when animations cannot run. It needs no CMS
 credentials. Also check native controls, layout, focus, Enter submission, and
 reduced motion in a browser when changing this UI.
@@ -95,6 +98,8 @@ original inline-script failure.
 
 ## Repository guides
 
+- [docs/video-migration.md](docs/video-migration.md): additive video schema,
+  private migration exports, idempotent import, verification, and rollback.
 - [CONTENT.md](CONTENT.md): content ownership, Directus authoring rules, and
   publication behavior.
 - [DEPLOY.md](DEPLOY.md): Coolify configuration, environment variables, cache

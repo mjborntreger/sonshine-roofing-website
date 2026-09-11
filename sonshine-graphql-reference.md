@@ -7,12 +7,9 @@ publication rules.
 
 ## Source boundary
 
-WordPress/WPGraphQL remains authoritative for:
+WordPress/WPGraphQL remains authoritative for location landing pages.
 
-- standalone video-library entries; and
-- location landing pages.
-
-Projects and their filter lists/media, blog posts, FAQs, people, sponsor features, roofing glossary terms, special
+Videos and categories, projects and their filter lists/media, blog posts, FAQs, people, sponsor features, roofing glossary terms, special
 offers, shared site content, and fixed-page/service SEO are Directus-backed.
 Although `wp.ts` still contains some legacy blog helpers and shared blog-shaped
 types, public blog routes and archives read `lib/content/blog.ts`; do not add a
@@ -46,7 +43,6 @@ const data = await wpFetch<MyQuery>(query, variables, {
 | Domain    | Primary adapter functions                                                                   | Public consumers                                                             |
 | --------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | Locations | `listLocationSlugs`, `getLocationBySlug`                                                    | `app/(site)/locations/[slug]`, location and image sitemaps                   |
-| Videos    | `listRecentVideoEntries`, `getVideoEntryBySlug` | `app/(site)/video-library`, resources API, video sitemap                     |
 
 ## Locations
 
@@ -60,17 +56,14 @@ The location route combines this WordPress record with Directus-backed sponsor
 features from `lib/content/sponsor-features.ts`. Their publishing and targeting
 rules live in [CONTENT.md](CONTENT.md).
 
-## Video library
+## Retained video migration source
 
-`listRecentVideoEntries(limit = 50)` reads published `videoEntry` records and
-keeps only entries with a parseable YouTube URL. `getVideoEntryBySlug` adds
-taxonomy and Rank Math metadata with a 900-second cache.
-
-`lib/content/projects.ts` converts deployment-frozen Directus projects into the
-same `VideoItem` shape. `lib/content/videos.ts` merges the two sources, applies bucket,
-category, material, service-area, and text filters, and returns offset-based
-pagination plus facets. There is no dedicated video-detail route; selections
-open through `/video-library` query state.
+WordPress video records remain available for migration recovery, but the current
+frontend performs no standalone-video WordPress reads. Directus video records
+and their project relations are packaged in the same deployment snapshot.
+Existing WordPress GraphQL IDs remain compatibility aliases for library links.
+See [the migration guide](docs/video-migration.md); retained source records do
+not authorize restoring a WordPress fallback to the current frontend.
 
 ## Adapter rules
 

@@ -3,11 +3,11 @@
 import { useEffect, useMemo, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
-import type { VideoItem } from "@/lib/content/wp";
+import type { VideoItem } from "@/lib/content/video-types";
 import ModalCloseButton from "@/components/ui/ModalCloseButton";
 import VideoShareBar from './VideoShareBar';
 
-export type PlaybackVideo = Pick<VideoItem, 'id' | 'slug' | 'title' | 'youtubeId'>;
+export type PlaybackVideo = Pick<VideoItem, 'id' | 'slug' | 'title' | 'youtubeId' | 'legacyIds'>;
 
 type Props = {
   collectionUrl: string;

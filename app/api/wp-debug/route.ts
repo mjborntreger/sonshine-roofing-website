@@ -71,20 +71,6 @@ const META_QUERY = /* GraphQL */ `
   }
 `;
 
-const VIDEOS_QUERY = /* GraphQL */ `
-  query InspectVideos($limit: Int!) {
-    videoEntries(first: $limit, where: { status: PUBLISH, orderby: { field: DATE, order: DESC } }) {
-      nodes {
-        id
-        title
-        date
-        videoCategories(first: 10) { nodes { name slug } }
-        videoLibraryMetadata { youtubeUrl }
-      }
-    }
-  }
-`;
-
 export async function GET(req: NextRequest) {
   if (!isAllowedBranch() || !isAllowedHost(req)) {
     return NextResponse.json(
@@ -94,13 +80,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [meta, videos] = await Promise.all([
-      gq<{ generalSettings?: { title?: string; url?: string; description?: string } }>(META_QUERY),
-      gq<{ videoEntries?: { nodes: unknown[] } }>(VIDEOS_QUERY, { limit: 3 }),
-    ]);
+    const meta = await gq<{ generalSettings?: { title?: string; url?: string; description?: string } }>(META_QUERY);
 
     return NextResponse.json(
-      { meta, videos },
+      { meta },
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {

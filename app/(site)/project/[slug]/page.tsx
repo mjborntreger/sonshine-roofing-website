@@ -80,26 +80,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 // Extract YouTube ID from various URL formats
-function getYouTubeId(url?: string | null): string | null {
-  if (!url) return null;
-  const s = String(url).trim();
-  // Raw ID support
-  if (/^[A-Za-z0-9_-]{8,}$/.test(s)) return s;
-  try {
-    const u = new URL(s.startsWith("http") ? s : `https://${s}`);
-    if (u.hostname.includes("youtu.be")) return u.pathname.replace("/", "") || null;
-    const v = u.searchParams.get("v");
-    if (v) return v;
-    const parts = u.pathname.split("/").filter(Boolean);
-    const idx = parts.findIndex((p) => p === "embed" || p === "shorts" || p === "v");
-    if (idx >= 0 && parts[idx + 1]) return parts[idx + 1];
-    if (parts.length === 1 && /^[A-Za-z0-9_-]{8,}$/.test(parts[0])) return parts[0];
-    return null;
-  } catch {
-    return null;
-  }
-}
-
 const Badge = ({ children }: { children: React.ReactNode }) => (
   <span className="inline-block px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-slate-700">
     {children}
@@ -128,7 +108,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
       ? project.serviceAreas[0]?.name ?? null
       : null;
 
-  const videoId = getYouTubeId(project.youtubeUrl);
+  const video = project.video;
   const heroImageUrl = project.heroImage?.url ?? undefined;
   const heroImageAlt = project.heroImage?.altText || project.title;
   const serviceLabel = projectServiceLabel(project.projectDescription);
@@ -156,7 +136,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const areaServed = (project.serviceAreas || []).map((t) => t.name);
   const materials = (project.materialTypes || []).map((t) => t.name);
   const colors = (project.roofColors || []).map((t) => t.name);
-  const posterUrl = heroImageUrl ? ogImgAbs : undefined;
 
   const seenGalleryUrls = new Set<string>();
   const galleryImageObjects: Array<Record<string, unknown>> = [];
@@ -203,15 +182,14 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     );
   });
 
-  const videoSchemaInput = videoId
+  const videoSchemaInput = video
     ? {
-      name: project.title,
-      description: (project.seo?.description || project.projectDescription || "").slice(0, 160),
+      name: video.title,
+      description: video.excerpt,
       canonicalUrl: `/project/${slug}`,
-      embedUrl: `https://www.youtube.com/embed/${videoId}`,
-      contentUrl: project.youtubeUrl ?? undefined,
-      thumbnailUrls: [ogImgAbs],
-      uploadDate: project.date || undefined,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${video.youtubeId}`,
+      thumbnailUrls: [video.thumbnailUrl],
+      uploadDate: video.uploadDate,
       origin,
     }
     : null;
@@ -273,12 +251,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <div className="mt-6 grid grid-cols-1 items-start gap-8 lg:grid-cols-[4fr_2fr]">
           {/* Left column: Video facade (fallback to image) + badges */}
           <div>
-            {videoId ? (
+            {video ? (
               <ProjectVideo
-                title={project.title}
-                videoId={videoId}
-                posterUrl={posterUrl}
-                posterAlt={heroImageAlt}
+                title={video.title}
+                videoId={video.youtubeId}
+                posterUrl={video.thumbnailUrl}
+                posterAlt={video.title}
               />
             ) : (
               heroImageUrl && (

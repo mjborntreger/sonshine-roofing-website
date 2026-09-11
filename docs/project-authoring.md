@@ -1,6 +1,6 @@
 # SonShine Roofing project upload procedure
 
-Version 2 — September 8, 2026. This procedure applies to the frontend that uses project descriptions for narrative copy and title-and-description search. Deploy and verify that frontend before deleting the retired Directus field; see the release sequence in `CONTENT.md`.
+Version 3 — September 11, 2026. This procedure applies to the frontend that uses project descriptions for narrative copy and independently authored Directus video records. Publication rules and retained migration fields are documented in `CONTENT.md`.
 
 Every post should let a homeowner understand what work SonShine completed, where it happened, which roof system was installed, and what was distinctive about the job. Write every field from one verified set of facts.
 
@@ -73,7 +73,22 @@ Use `product_links` in this order:
 
 Use labels such as `[Manufacturer] [Product/profile] — [Color/finish]` and `[Company] — Gutter installer`. Link to the exact manufacturer product where possible. Check that the destination matches the label, product line, and applicable market. Remove duplicate entries and unnecessary tracking parameters; retain parameters needed to select the correct product/color. A generic company homepage is not a substitute for an exact product page.
 
-Video is optional. When used, put the project’s YouTube URL in `youtube_url` and verify the video plays, allows the intended display, and shows the same job. Do not add an unrelated video to make the field complete.
+Video is optional. Create or select the corresponding record in `videos` and
+set its `project` relation to this project. Each project and video may have only
+one relationship, and both must belong to SonShine. Verify that the clip plays,
+allows the intended display, and shows the same job. The old project
+`youtube_url` is retained for rollback and is ignored by the current frontend.
+
+Write the video's own title and plain-text description and set its website
+publication date. Later project edits do not rewrite video copy. Paste its
+YouTube URL; thumbnails come from YouTube. Assign any applicable ordinary
+categories on the video. Roofing Projects is derived automatically from the
+relationship, so it requires no manual category assignment.
+
+Publish the video separately when it should appear. A draft or archived video
+removes only the player from this project after deployment. An unpublished
+project hides its project link, material, and location in the library while a
+published video remains playable. See [CONTENT.md](../CONTENT.md#publishing-videos-in-directus).
 
 **5. Add and verify an optional review**
 

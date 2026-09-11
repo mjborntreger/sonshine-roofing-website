@@ -1,203 +1,41 @@
 import { NextResponse } from 'next/server';
-import { unstable_cache } from 'next/cache';
-import { wpFetch, stripHtml, youtubeThumb } from "@/lib/content/wp";
-import { listProjectSitemapEntries } from '@/lib/content/projects';
+import { listAllVideos } from '@/lib/content/videos';
 import { formatLastmod, normalizeEntryPath, xmlEscape, trimTo } from '../utils';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 export const dynamic = 'force-static';
-export const revalidate = 3600; // safety net; tag-based revalidation should refresh sooner
+export const revalidate = false;
 
 const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
-
-type Maybe<T> = T | null | undefined;
-
-type VideoCategoryNode = { name?: string | null };
-
-type VideoEntryNode = {
-  slug?: string | null;
-  title?: string | null;
-  date?: string | null;
-  modifiedGmt?: string | null;
-  videoLibraryMetadata?: {
-    youtubeUrl?: string | null;
-    description?: string | null;
-  } | null;
-  videoCategories?: {
-    nodes?: Maybe<VideoCategoryNode>[] | null;
-  } | null;
-};
-
-type VideoEntriesResult = {
-  videoEntries?: {
-    pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
-    nodes?: Maybe<VideoEntryNode>[] | null;
-  } | null;
-};
-
-const getVideoEntryNodes = unstable_cache(
-  async () => {
-    const query = /* GraphQL */ `
-      query VideoSitemapEntries($first: Int!, $after: String) {
-        videoEntries(
-          first: $first
-          after: $after
-          where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-        ) {
-          pageInfo { hasNextPage endCursor }
-          nodes {
-            slug
-            title
-            date
-            modifiedGmt
-            videoLibraryMetadata {
-              youtubeUrl
-              description
-            }
-            videoCategories(first: 10) {
-              nodes { name }
-            }
-          }
-        }
-      }
-    `;
-
-    const nodes: VideoEntryNode[] = [];
-    let after: string | null = null;
-
-    do {
-      const variables: { first: number; after?: string | null } = after ? { first: 200, after } : { first: 200 };
-      const data = await wpFetch<VideoEntriesResult>(query, variables);
-      const page = data?.videoEntries;
-      const pageNodes = page?.nodes ?? [];
-      for (const node of pageNodes) {
-        if (node) nodes.push(node);
-      }
-      after = page?.pageInfo?.hasNextPage ? page?.pageInfo?.endCursor ?? null : null;
-    } while (after);
-
-    return nodes;
-  },
-  ['sitemap-video-entries'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:videos', 'sitemap:videos:entries'] }
-);
-
 const VIDEO_NAMESPACE = 'http://www.google.com/schemas/sitemap-video/1.1';
 
-type VideoSitemapItem = {
-  loc: string;
-  lastmod?: string | null;
-  playerLoc: string;
-  contentUrl: string;
-  thumbnailUrl: string;
-  title: string;
-  description: string;
-  publicationDate?: string | null;
-  tags: string[];
-};
-
-const youtubeIdFromUrl = (url?: string | null): string | null => {
-  if (!url) return null;
-  try {
-    const u = new URL(url);
-    if (u.hostname === 'youtu.be') {
-      const id = u.pathname.replace(/^\//, '').trim();
-      return id || null;
-    }
-    if (u.searchParams.has('v')) {
-      const id = u.searchParams.get('v')?.trim();
-      return id || null;
-    }
-    const parts = u.pathname.split('/').filter(Boolean);
-    if (parts.length >= 2 && parts[0].toLowerCase() === 'embed') {
-      return parts[1] || null;
-    }
-    return parts.pop() || null;
-  } catch {
-    return null;
-  }
-};
-
 const buildVideoItems = async () => {
-  const [entryNodes, projectNodes] = await Promise.all([
-    getVideoEntryNodes(),
-    listProjectSitemapEntries(),
-  ]);
-
-  const items: VideoSitemapItem[] = [];
-  const seen = new Set<string>();
-
-  for (const node of entryNodes) {
-    const rawUrl = node?.videoLibraryMetadata?.youtubeUrl ?? '';
-    const youtubeId = youtubeIdFromUrl(rawUrl);
-    if (!youtubeId) continue;
-
-    const slug = (node?.slug ?? '').trim();
-    const slugOrId = slug || youtubeId;
-    const loc = `${BASE}/video-library?v=${encodeURIComponent(slugOrId)}`;
-    if (seen.has(loc)) continue;
-
-    const title = (node?.title ?? '').trim() || 'Video';
-    const rawDesc = node?.videoLibraryMetadata?.description ?? '';
-    const descriptionSource = rawDesc ? stripHtml(rawDesc) : title;
-    const description = trimTo(descriptionSource.trim() || title, 2048);
-    const tags =
-      node?.videoCategories?.nodes
-        ?.map((cat) => (cat?.name ?? '').trim())
-        .filter(Boolean)
-        .slice(0, 32) ?? [];
-
-    items.push({
+  const videos = await listAllVideos();
+  return videos.map((video) => {
+    // Published videos survive project unpublication. Only eligible public
+    // projects receive a project destination; every other clip keeps its player URL.
+    const loc = video.projectUri && !video.projectNoindex
+      ? `${BASE}${normalizeEntryPath(video.projectUri)}`
+      : `${BASE}/video-library?v=${encodeURIComponent(video.slug)}`;
+    return {
       loc,
-      lastmod: formatLastmod(node?.modifiedGmt) ?? formatLastmod(node?.date),
-      playerLoc: `https://www.youtube-nocookie.com/embed/${youtubeId}`,
-      contentUrl: rawUrl || `https://www.youtube.com/watch?v=${youtubeId}`,
-      thumbnailUrl: youtubeThumb(youtubeId),
-      title,
-      description,
-      publicationDate: formatLastmod(node?.date),
-      tags,
-    });
-    seen.add(loc);
-  }
-
-  for (const node of projectNodes) {
-    const rawUrl = node.youtubeUrl ?? '';
-    const youtubeId = youtubeIdFromUrl(rawUrl);
-    if (!youtubeId) continue;
-
-    const path = normalizeEntryPath(node?.uri ?? '');
-    if (path === '/') continue;
-    const loc = `${BASE}${path}`;
-    if (seen.has(loc)) continue;
-
-    const title = (node?.title ?? '').trim() || 'Project Video';
-
-    const details = node.projectDescription ?? '';
-    const descriptionSource = details ? stripHtml(details) : title;
-    const description = trimTo(descriptionSource.trim() || title, 2048);
-
-    const materialTags = node.materialTypes.map((term) => term.name);
-    const serviceTags = node.serviceAreas.map((term) => term.name);
-    const tags = [...materialTags, ...serviceTags].slice(0, 32);
-
-    items.push({
-      loc,
-      lastmod: formatLastmod(node.modified) ?? formatLastmod(node?.date),
-      playerLoc: `https://www.youtube-nocookie.com/embed/${youtubeId}`,
-      contentUrl: rawUrl || `https://www.youtube.com/watch?v=${youtubeId}`,
-      thumbnailUrl: youtubeThumb(youtubeId),
-      title,
-      description,
-      publicationDate: formatLastmod(node?.date),
-      tags,
-    });
-    seen.add(loc);
-  }
-
-  return items.sort((a, b) => (b.lastmod ?? '').localeCompare(a.lastmod ?? ''));
+      lastmod: formatLastmod(video.modified) ?? formatLastmod(video.date),
+      playerLoc: `https://www.youtube-nocookie.com/embed/${video.youtubeId}`,
+      thumbnailUrl: video.thumbnailUrl,
+      title: video.title,
+      description: trimTo(video.excerpt.trim() || video.title, 2048),
+      // This optional date describes the original YouTube publication, not migration
+      // time or the independently editable website chronology.
+      publicationDate: formatLastmod(video.uploadDate),
+      tags: [...new Set([
+        ...video.categories.map((term) => term.name),
+        ...video.materialTypes.map((term) => term.name),
+        ...video.serviceAreas.map((term) => term.name),
+      ])].slice(0, 32),
+    };
+  }).sort((a, b) => (b.lastmod ?? '').localeCompare(a.lastmod ?? ''));
 };
 
 export async function GET() {
@@ -232,7 +70,6 @@ export async function GET() {
         `<video:title>${xmlEscape(trimTo(item.title, 100))}</video:title>`,
         `<video:description>${xmlEscape(item.description)}</video:description>`,
         `<video:player_loc allow_embed="yes">${xmlEscape(item.playerLoc)}</video:player_loc>`,
-        `<video:content_loc>${xmlEscape(item.contentUrl)}</video:content_loc>`,
         publication,
         `<video:family_friendly>yes</video:family_friendly>`,
         tagsXml,

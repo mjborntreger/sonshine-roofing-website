@@ -1,11 +1,11 @@
-import { Suspense, cache } from 'react';
+import { Suspense } from 'react';
 
 import Section from '@/components/layout/Section';
 import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import VideoLibraryClient from '@/components/dynamic-content/video/VideoLibraryClient';
-import { listRecentVideoEntries, type VideoItem, type TermLite } from "@/lib/content/wp";
-import { listProjectVideos, getProjectBySlug, projectToVideoItem } from "@/lib/content/projects";
-import { listVideoItemsPaged } from "@/lib/content/videos";
+import type { VideoItem } from "@/lib/content/video-types";
+import type { TermLite } from "@/lib/content/project-types";
+import { listAllVideos, listVideoCategories, listVideoItemsPaged } from "@/lib/content/videos";
 import type { Metadata } from 'next';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, collectionPageSchema } from '@/lib/seo/schema';
@@ -13,7 +13,7 @@ import { SITE_ORIGIN } from '@/lib/seo/site';
 import Hero from '@/components/ui/Hero';
 import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 
-export const revalidate = 900;
+export const revalidate = false;
 export const dynamic = 'force-static';
 
 const SEO_TITLE = 'Video Library | SonShine Roofing';
@@ -22,99 +22,13 @@ const CANONICAL = '/video-library';
 const OG_IMAGE = '/og-default.png?v=20260818';
 const PAGE_SIZE = 8;
 
-type SearchParamsRecord = Record<string, string | string[] | undefined>;
-type SearchParamsPromise = Promise<SearchParamsRecord>;
-const EMPTY_SEARCH_PARAMS: SearchParamsRecord = {};
-
-type VideoWithHeroImage = VideoItem & {
-  heroImage?: { url?: string | null } | null;
-};
-
-const heroImageUrl = (item: VideoItem): string | undefined => {
-  if ('heroImage' in item) {
-    const hero = (item as VideoWithHeroImage).heroImage;
-    if (hero && typeof hero.url === 'string') return hero.url;
-  }
-  return undefined;
-};
-
-const BUCKET_OPTIONS: Array<{ slug: string; label: string }> = [
-  { slug: 'commercials', label: 'Commercials' },
-  { slug: 'explainers', label: 'Explainers' },
-  { slug: 'roofing-project', label: 'Roofing Projects' },
-  { slug: 'in-the-field', label: 'In the Field' },
-  { slug: 'other', label: 'Other' },
-];
-
-const toFirstParam = (value: string | string[] | undefined): string => {
-  if (Array.isArray(value)) return value[0] ?? '';
-  return value ?? '';
-};
-
-const fetchVideoForMetadata = cache(async (slug: string) => {
-  const { getVideoEntryBySlug } = await import('@/lib/content/wp');
-  const entry = await getVideoEntryBySlug(slug).catch(() => null);
-  if (entry) return entry;
-  const project = await getProjectBySlug(slug);
-  if (project) return projectToVideoItem(project);
-
-  return null;
-});
-
-export async function generateMetadata({
-  searchParams,
-}: {
-  searchParams?: SearchParamsPromise;
-}): Promise<Metadata> {
-  const spObj = searchParams ? await searchParams : EMPTY_SEARCH_PARAMS;
-  const v = toFirstParam(spObj.v).trim();
-
-  const defaultMeta = await getWebsitePageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  return getWebsitePageMetadata({
     title: SEO_TITLE,
     description: SEO_DESCRIPTION,
     path: CANONICAL,
     image: { url: OG_IMAGE, width: 1200, height: 630 },
   });
-
-  if (!v) return defaultMeta;
-
-  try {
-    const video = await fetchVideoForMetadata(v);
-    if (!video) return defaultMeta;
-
-    const og = video.seo?.openGraph ?? {};
-    const title = (video.seo?.title || og.title || video.title || SEO_TITLE).trim();
-    const description = (video.seo?.description || og.description || SEO_DESCRIPTION)
-      .trim()
-      .slice(0, 160);
-    const ogImage = og.image && typeof og.image === 'object' ? og.image : null;
-    const ogUrl =
-      (ogImage && typeof ogImage.secureUrl === 'string' && ogImage.secureUrl) ||
-      (ogImage && typeof ogImage.url === 'string' && ogImage.url) ||
-      video.featuredImage?.url ||
-      OG_IMAGE;
-
-    return {
-      title,
-      description,
-      alternates: { canonical: CANONICAL },
-      openGraph: {
-        type: 'video.other' as const,
-        title,
-        description,
-        url: `${CANONICAL}?v=${encodeURIComponent(v)}`,
-        images: [{ url: ogUrl, width: 1200, height: 630 }],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title,
-        description,
-        images: [ogUrl],
-      },
-    };
-  } catch {
-    return defaultMeta;
-  }
 }
 
 function uniqueTermsFromVideos(
@@ -136,16 +50,11 @@ function uniqueTermsFromVideos(
 }
 
 export default async function VideoLibraryPage() {
-  const [initialResult, entries, projectVideos] = await Promise.all([
+  const [initialResult, allVideos, categories] = await Promise.all([
     listVideoItemsPaged({ first: PAGE_SIZE, after: null }),
-    listRecentVideoEntries(200).catch((e) => {
-      console.error('[videoEntries] GQL error:', e);
-      return [];
-    }),
-    listProjectVideos(),
+    listAllVideos(),
+    listVideoCategories(),
   ]);
-
-  const allVideos: VideoItem[] = [...entries, ...projectVideos];
 
   const origin = SITE_ORIGIN;
   const collectionUrl = `${origin}${CANONICAL}`;
@@ -155,7 +64,7 @@ export default async function VideoLibraryPage() {
     const slug = (item.slug || '').trim();
     const url = slug ? `${collectionUrl}?v=${encodeURIComponent(slug)}` : collectionUrl;
     const name = (item.title || '').trim();
-    const imageUrl = item.thumbnailUrl || heroImageUrl(item);
+    const imageUrl = item.thumbnailUrl;
     return {
       '@type': 'ListItem',
       position: index + 1,
@@ -181,8 +90,8 @@ export default async function VideoLibraryPage() {
     { origin },
   );
 
-  const materialOptions = uniqueTermsFromVideos(projectVideos, 'materialTypes');
-  const serviceOptions = uniqueTermsFromVideos(projectVideos, 'serviceAreas');
+  const materialOptions = uniqueTermsFromVideos(allVideos, 'materialTypes');
+  const serviceOptions = uniqueTermsFromVideos(allVideos, 'serviceAreas');
 
   const initialFilters = {
     search: '',
@@ -215,10 +124,10 @@ export default async function VideoLibraryPage() {
                 <VideoLibraryClient
                   collectionUrl={collectionUrl}
                   initialResult={initialResult}
-                  playbackVideos={allVideos.map(({ id, slug, title, youtubeId }) => ({
-                    id, slug, title, youtubeId,
+                  playbackVideos={allVideos.map(({ id, slug, title, youtubeId, legacyIds }) => ({
+                    id, slug, title, youtubeId, legacyIds,
                   }))}
-                  bucketOptions={BUCKET_OPTIONS}
+                  bucketOptions={categories.map(({ slug, name }) => ({ slug, label: name }))}
                   materialOptions={materialOptions}
                   serviceOptions={serviceOptions}
                   pageSize={PAGE_SIZE}

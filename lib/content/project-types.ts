@@ -1,5 +1,6 @@
 import type { ReviewPlatform } from "../reviews/platforms";
 import type { PageInfo } from "../ui/pagination";
+import type { VideoItem } from './video-types';
 
 export type ProjectImage = { url: string; altText: string; width?: number | null; height?: number | null };
 export type TermLite = { name: string; slug: string };
@@ -48,7 +49,8 @@ export type ProjectFull = ProjectSummary & {
   materialTypes: TermLite[];
   roofColors: TermLite[];
   serviceAreas: TermLite[];
-  youtubeUrl?: string | null;
+  /** Hydrated from the same deployed video inventory; draft videos are null. */
+  video: VideoItem | null;
   customerTestimonial?: ProjectTestimonial | null;
   /** Normalized Directus SEO block for OG/Twitter + JSON-LD mapping */
   seo?: {
@@ -85,7 +87,7 @@ export type ProjectSearchResult = {
   meta: { overallTotal: number; fullTotal: number };
 };
 export type ProjectSnapshot = {
-  version: 1;
+  version: 2;
   clientSlug: string;
   projects: ProjectFull[];
   terms: { materials: TermLite[]; roofColors: TermLite[]; serviceAreas: TermLite[] };

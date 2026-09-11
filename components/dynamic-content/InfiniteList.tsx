@@ -4,7 +4,8 @@ import Image from "next/image";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import type { PageResult, ResourceKind, ResourceQuery } from "@/lib/ui/pagination";
-import type { PostCard, VideoItem } from "@/lib/content/wp";
+import type { PostCard } from "@/lib/content/wp";
+import type { VideoItem } from "@/lib/content/video-types";
 import type { ProjectSummary } from "@/lib/content/project-types";
 import { fetchPage, getCachedPages, setCachedPages } from "@/lib/content/resource-fetch";
 import { useIntersection } from "@/lib/ui/useIntersection";
@@ -16,9 +17,8 @@ import ProjectArchiveCard from "@/components/dynamic-content/project/ProjectArch
 import SmartLink from "@/components/utils/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
-import { stripHtml } from "@/lib/content/wp";
 import { lineClampStyle, truncateText } from "@/components/dynamic-content/card-utils";
-import { buildProjectHref, ROUTES } from "@/lib/routes";
+import { buildProjectHref } from "@/lib/routes";
 
 const smallPillClass =
     "inline-flex min-w-0 max-w-full items-center rounded-xl font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-[0.75rem] sm:text-xs text-slate-800 sm:px-3 sm:py-1 sm:text-sm";
@@ -91,7 +91,7 @@ const renderVideoItem = (
         .map((term) => term.slug ?? "")
         .filter(Boolean)
         .join(",");
-    const description = truncateText(stripHtml(String(video.excerpt ?? "")), 220);
+    const description = truncateText(String(video.excerpt ?? ""), 220);
 
     const handleOpen = (event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -158,10 +158,10 @@ const renderVideoItem = (
                         ))}
                     </div>
 
-                    {video.source === "project" && video.slug ? (
+                    {video.projectSlug ? (
                         <div className="mt-3">
                             <SmartLink
-                                href={buildProjectHref(video.slug) ?? ROUTES.project}
+                                href={buildProjectHref(video.projectSlug)!}
                                 className="text-sm font-medium text-[#0045d7] hover:underline"
                             >
                                 See full project details
