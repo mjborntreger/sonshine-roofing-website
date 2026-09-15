@@ -1,10 +1,145 @@
 # Location migration candidate verification
 
-Status: implementation and migration preparation. No production schema/data apply,
-workflow publication, or application deployment was performed by this task.
-Full release acceptance remains incomplete.
+Status: Directus schema/privacy, draft migration, project enrichment and required
+constraint applied and verified. Workflow publication and website deployment remain
+held. Full release acceptance remains incomplete.
 
-## Version record
+The A1–A4 sections below preserve historical preparation evidence. The applied-phase
+record immediately below supersedes their pre-apply status statements.
+
+## Applied-phase verification — 2026-09-15
+
+Execution code: `43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`. Application behavior is
+unchanged from independently reviewed A4; intervening changes fix the permission
+inventory response, JSON-default comparison and new-file timestamp recovery.
+Shared contract `location-v3`, model `location-model-v4`, SQL `location-invariants-v3`.
+
+| Artifact | Canonical SHA-256 / result |
+| --- | --- |
+| Applied location plan | `a86b32efe0f8066a0c3feb3ba51d6b7883918a4e401fc723b44407bd62fde710` |
+| Fresh post-import replan | `8b4ba11f266c8762c037da95cb211ae5eced22295e8d293be181ad80ac4831d1`; zero operations/conflicts |
+| Applied enrichment plan | `7b74818c99e51db4da303bfb5a07428e335dce67904dcdc9a7627cdebc2912b2`; 53 exact updates |
+| Original workflow | Original graph below remains active; no workflow save/publication |
+| Current deployed application | `0271ec70f46a2b31c4eb012da28459f6a9144184`; unchanged |
+
+Independent actual readback verified every approved field of all 219 migration
+targets, all 89 file byte hashes, 218 before/after pairs plus the recovered first
+file, and 89 guarded source-timestamp restorations. Same-plan repeat matched 219
+with zero writes. Reviews remain exactly equal to pre-import inventory: 20 published
+and 12 archived. Taxonomy IDs/slugs/scope/external identity and legacy compatibility
+fields remain unchanged. All five landing pages and 85 neighborhoods are drafts.
+
+Independent enrichment/privacy review verified all 53 populated unique job IDs and
+ZIPs, unchanged areas, null neighborhoods, actual SonShine-only required constraint
+and direct/nested/alias public denial. Global optionality for other clients and the
+existing required primary area are preserved. No customer lookup payloads or private
+identifiers appear in these reports.
+
+### Live compatibility fixes and independent dispositions
+
+| Finding | Resolution and evidence |
+| --- | --- |
+| Directus permissions endpoint returns a complete unpaginated response with virtual system rows | Narrow virtual-row exclusion, persistent identity validation and client-side matching; independent review, focused checks and live apply/readback pass (`b5e412d`). |
+| Directus returns parsed JSON defaults rather than serialized defaults | JSON-only semantic comparison preserves drift rejection; synthetic and actual zero-action schema verification pass (`05d1f6b`). |
+| Directus upload overwrites source timestamps; API updates refresh modified_on | New-file creation-proof SQL helper conditions on exact ID, metadata and both current timestamps; byte verification, durable before/after receipts and API readback. No ordinary existing-file repair (`43fbd45`). |
+| P2: already-correct timestamp retry could omit recovery evidence | Fresh readback and durable match receipt added. Independent reproduction and 41 checks including PostgreSQL-compatible SQL pass; finding closed before execution. |
+
+All 30 repository-prescribed/applicable Node 22 checks pass, including lint,
+typecheck, sanitizers, JSON-LD, fetch policy, project/video pipeline, archive/player,
+location selection/components/model/review-sync/migration/enrichment and shared shell.
+A credentialed candidate build passes: 451 generated pages, 53 projects, 79 videos,
+333 gallery images and 438 published CMS route owners. Its five fewer pages than
+the historical baseline are the five intentionally draft location hubs. No stale
+location snapshot was used. This build does not approve publishing those drafts.
+
+Production-flag credentialed build also passed. It reported missing local lead and
+analytics environment values; no live form submission or analytics test was performed.
+The standalone production-flag runtime returned 404 for the five drafts, two
+additional taxonomy-only areas and an unknown slug. All 53 project pages, project
+and video resource APIs, FAQ and location/project/video/image sitemaps responded
+successfully. The location sitemap is empty because no landing page is published.
+Snapshot digests: project/video
+`941ae39d93a20420d6a13e7b35d4b8cc72d240a34f6e2b68f80e8e5e82e82c93`,
+location `f0debe9f1468796304d3ee4d94926e8738bce13df72b4861103cec2373cfad53`.
+Live local resource pagination returns all 53 projects and 79 videos in two pages
+each without duplicate IDs. The Sarasota archive filter returns exactly the 18
+matching snapshot projects. Recursive public-object inspection passes for 11,327
+fields; the configured business address postal code is intentionally public.
+A scan of all 53 actual private job references and configured credential values
+found zero occurrences in 4,066 generated/build/changed-source files and 72 response
+bodies. The private receipt is `candidate-runtime-privacy-43fbd45-01.json`.
+
+The independent migration/release reviewer found no material execution or recovery
+defect and confirmed all source dispositions and no-op receipts against this exact
+code/plan. The original workflow remains compatible with the unchanged review set;
+feed membership is zero and must be seeded before deploying the new consumers.
+
+### Actual draft visual and publication preparation
+
+Private capture `draft-preview/input.json` is bound to input digest
+`c6a6568925edb4da4b947a8c91079a756b052204ac48c20c094e3bf2d5570360`.
+It combines current draft page/neighborhood projections with published project,
+video and shared-shell data. All five pages were inspected at 1440px and 390px;
+images loaded and no horizontal overflow was observed. Mobile evidence uses six
+viewport captures per page because full-page capture exceeded the browser limit.
+Each page shows six selected project/video facades. The private preview adapter
+was corrected to attach each published video by videoId, matching the application
+snapshot reader, before final capture. Application code did not change.
+
+| Page | Neighborhoods | Local / nearby projects | Local / nearby sponsors |
+| --- | ---: | ---: | ---: |
+| Sarasota | 21 | 6 / 0 | 2 / 1 |
+| Bradenton | 19 | 2 / 4 | 1 / 2 |
+| Lakewood Ranch | 20 | 1 / 5 | 0 / 3 |
+| Venice | 15 | 6 / 0 | 0 / 3 |
+| North Port | 10 | 6 / 0 | 6 / 0 |
+
+All five maps describe coverage without observed customer-home pins. All visible
+images have descriptions. The 30 project links and 20 service links use canonical
+published destinations; nearby cards retain actual location labels. Every project
+neighborhood is null, and its label/wrapper is absent. Local review groups are
+empty. Each preview has eight shared FAQs; this does not create local FAQ content.
+Existing independent project testimonials remain, without a business rating aggregate.
+
+Two image associations need editorial evidence: Newtown / Washington Park's
+waterfront image, and the photo shared by Waterford and Sawgrass. The prepared
+safe default omits those three optional photo links while retaining files and
+provenance. This recommendation has not changed CMS records.
+
+`draft-preview/publication-content-proposal-v1.md` and its guarded JSON companion
+prepare the five missing shared SEO/publication-date fields per page. The original
+WordPress dateGmt supplies published_at; no current date is substituted. Titles,
+descriptions and keyword sets use verified service categories and existing local
+copy. All five proposed pages pass the actual normalizer with publication simulated
+only in memory. No hypothetical snapshot was persisted into the application.
+The future apply must recheck the recorded modification dates and empty before-values.
+Proposal file hash: `f7276557a5841c7d9313ba1829db68ccbc8c9bcd7d17341aef929e00e3202eb1`.
+Visual evidence file hash: `7b1ffa6343399d96cac71104aec6d1c219751e5c46e1dc9421322bffa6bf9a75`.
+
+An independent reviewer confirmed the exact proposal/source/input hashes, all five
+original publication dates and modification dates, the five-field/null-before
+projections, and service/copy consistency. Twenty mobile hero/project/coverage/FAQ
+captures across all five cities passed independent visual spot inspection and hash
+checks. No new material finding was reported. The reviewer supported omitting the
+three uncertain optional image associations pending evidence and confirmed the
+absence of neighborhood-route links and AggregateRating markup.
+
+These static component previews exclude hydration, real form submission, video
+playback, production header/footer and deployed metadata. External link syntax is
+checked; destination availability was not tested. They do not replace final
+published-page build, browser and deployed acceptance after authorization.
+
+Independent documentation review found one P2 omission: the release checklist
+originally named only page publication. The corrected sequence explicitly reviews
+and publishes eligible neighborhood drafts before building, retaining held records
+and omitting uncertain media. The reviewer independently confirmed closure.
+A minor pre-apply enrichment inventory wording error was also corrected.
+
+All five existing production location routes and the homepage, project archive,
+video library and FAQ still returned HTTP 200 after migration. This verifies
+continued availability of the old deployed application, not a new location release.
+
+## Historical preparation version record
 
 - Starting application and refreshed deployed revision:
   `0271ec70f46a2b31c4eb012da28459f6a9144184`.
@@ -120,7 +255,7 @@ and cannot establish the five migrated pages' editorial, geographic or interacti
 acceptance. Preview generator: `scripts/preview-location-components.mjs`.
 Private preview index: `/private/tmp/sonshine-location-migration-20260915/visual-preview/index.html`.
 
-## Outstanding acceptance dependencies
+## Historical pre-apply acceptance dependencies
 
 - All 53 manual project-to-job mappings and authenticated job lookups are verified,
   with 53 valid ZIPs and preserved primary areas. Neighborhoods remain unverified.

@@ -153,7 +153,7 @@
   stable slug, `status`, `published_at`, plain-text `description`, and a described
   `featured_image`. Published WordPress projects were the migration scope;
   unpublished WordPress records remain excluded.
-- Internal `job_id` is the private AccuLynx reference; populated values are unique within the client. ZIP and neighborhood start optional. After documented successful enrichment, job ID and ZIP become required for SonShine only. Actual public/website permissions exclude job ID and ZIP; neither is fetched or packaged by the website. Neighborhood stays optional and its label disappears when absent.
+- Internal `job_id` is the private AccuLynx reference; populated values are unique within the client. The verified 53-project backfill and SonShine-only job ID/ZIP requirement were applied on 2026-09-15. Unrelated clients keep optional fields. Actual public/website permissions exclude job ID and ZIP; neither is fetched or packaged by the website. Neighborhood stays optional and its label disappears when absent. See [enrichment evidence](docs/location-enrichment-evidence.md).
 - Select one published material and one published service area from the reusable
   managed lists. Roof color is optional and single-select. Preserve existing
   names/slugs because archive URLs use `mt`, `rc`, and `sa` query parameters.

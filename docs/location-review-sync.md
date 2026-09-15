@@ -1,7 +1,9 @@
 # Review feed and location review synchronization
 
 Contract: [location-v3](location-contract.md). This is a **prepared local change**;
-no workflow, seed, import, or rollback has been applied to production.
+no workflow, membership seed, review import, or rollback has been applied to production.
+The additive schema/privacy phase is applied; the existing active workflow and
+32-review set remain unchanged. Follow the coordinator's [release sequence](location-release.md).
 
 ## Ownership and queries
 
@@ -36,14 +38,15 @@ mode-0700 private directory, with mode-0600 files. Output writes use exclusive
 creation to preserve previous recovery evidence and reject symlink replacement.
 
 ```sh
+export LOCATION_MIGRATION_PRIVATE_ROOT='/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15'
 fnm exec --using 22 node scripts/verify-location-review-sync.mjs
 
 fnm exec --using 22 node scripts/location-reviews/build-patch.mjs \
-  --recovery /private/tmp/sonshine-location-migration-20260915/review-workflow-current-active.json \
-  --out /private/tmp/sonshine-location-migration-20260915/review-workflow-patch-candidate.json
+  --recovery /Users/home/Documents/SonShine-Migration-Recovery/2026-09-15/review-workflow-current-active.json \
+  --out /Users/home/Documents/SonShine-Migration-Recovery/2026-09-15/review-workflow-patch-candidate.json
 
 fnm exec --using 22 node scripts/verify-location-review-sync.mjs \
-  --private-recovery /private/tmp/sonshine-location-migration-20260915/review-workflow-current-active.json
+  --private-recovery /Users/home/Documents/SonShine-Migration-Recovery/2026-09-15/review-workflow-current-active.json
 ```
 
 The patch builder requires the exact refreshed source graph hash and identical
@@ -86,8 +89,8 @@ published-count assertion remains.
 ```sh
 fnm exec --using 22 node scripts/location-reviews/prepare-data.mjs \
   --mode seed \
-  --input /private/tmp/sonshine-location-migration-20260915/review-seed-input.json \
-  --out /private/tmp/sonshine-location-migration-20260915/review-seed-plan.json
+  --input /Users/home/Documents/SonShine-Migration-Recovery/2026-09-15/review-seed-input.json \
+  --out /Users/home/Documents/SonShine-Migration-Recovery/2026-09-15/review-seed-plan.json
 ```
 
 The private input contains `clientId`, `reviews`, an ordered
@@ -118,8 +121,8 @@ the 20 selected updates.
 ```sh
 fnm exec --using 22 node scripts/location-reviews/prepare-data.mjs \
   --mode rollback \
-  --input /private/tmp/sonshine-location-migration-20260915/review-rollback-input.json \
-  --out /private/tmp/sonshine-location-migration-20260915/review-rollback-plan.json
+  --input /Users/home/Documents/SonShine-Migration-Recovery/2026-09-15/review-rollback-input.json \
+  --out /Users/home/Documents/SonShine-Migration-Recovery/2026-09-15/review-rollback-plan.json
 ```
 
 Input contains `beforeImages` and `currentRows`. Each narrow image has a canonical
@@ -134,20 +137,22 @@ created records or mutates production.
 
 The coordinator authorizes and executes each external step. Retain the prior
 application artifact, the exact workflow current/active recovery graphs, and
-narrow record before-images. Temporary recovery storage must be copied to an
-approved durable private destination before relying on it for a release.
+narrow record before-images. The approved durable private root above now contains
+the verified prior application image and schema/data recovery receipts. Refresh
+workflow state and membership evidence before the remaining release.
 
 1. Apply verified additive schema and permissions. Keep historical review
    retention disabled while the old archiving workflow can still execute.
 2. During the authorized maintenance window, pause the old schedule and verify
    no old execution remains running. Capture current selected identities and
    narrow record before-images. Seed membership and verify exact readback.
-3. Deploy the compatible application with membership-gated sitewide consumers
-   before expanding the published historical collection. Until that point,
-   preserve the existing 20-review public set.
-4. Apply the reviewed workflow operations while paused; verify the saved graph,
+3. Apply the reviewed workflow operations while paused; verify the saved graph,
    queries, error behavior and unchanged credential references. Complete any
    required authorized synthetic node checks without live side effects.
+4. Publish the reviewed page and eligible neighborhood records, then build/deploy
+   the compatible application with membership-gated sitewide consumers before
+   expanding the published historical collection. Until then, preserve the
+   existing 20-review public set. Keep held geography and uncertain media excluded.
 5. Apply reviewed imports/editorial decisions; deploy the final normalized
    location snapshot. Verify route/content/snapshot identities. Enable the
    revised workflow only after both application and schema/data are compatible.

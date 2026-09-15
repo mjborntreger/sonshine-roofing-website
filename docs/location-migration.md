@@ -1,22 +1,37 @@
-# Location migration tooling and candidate
+# Location migration tooling and applied results
 
-Status: prepared and dry-run verified; no production schema, records, files,
-workflow, or deployment changes applied by this tooling.
+Status: authorized Directus schema/data migration applied and read back on
+2026-09-15. Five pages and 85 neighborhoods remain drafts. Workflow publication
+and application deployment remain held.
 
 Shared contract: v3 in [location-contract.md](location-contract.md). Migration
 artifact version remains `location-migration-v1`. Starting application revision:
 `0271ec70f46a2b31c4eb012da28459f6a9144184`. The coordinator records the frozen
-integrated application revision separately.
+integrated application revision separately. Execution and guarded file-timestamp
+recovery used `43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`.
 
-## Prepared candidate
+## Applied plan and reconciliation
 
-The current private candidate is
-`/private/tmp/sonshine-location-migration-20260915/plan-candidate-v4.json`.
-Its canonical plan hash is
-`4aa9693445fdb8e2d22ec00657ec40eba5961e9ebd6a5e04549eb5f1bf1ef424`.
-It contains 219 proposed mutations, with source occurrences accounted separately.
-It has `schemaReady=false` and the apply executor rejects it. After approved
-schema changes, a fresh target inventory and new reviewed plan are required.
+The approved durable recovery root is
+`/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.
+The executed `location-plan-ready-01.json` has canonical hash
+`a86b32efe0f8066a0c3feb3ba51d6b7883918a4e401fc723b44407bd62fde710`.
+All 219 operations are accounted for: the completed run applied 218 operations
+and matched the file created by the first interrupted attempt. It restored source
+timestamps on 89 newly created files. `location-apply-02/complete.json` and
+`location-apply-summary-02.json` record these results; narrow receipts retain the
+individual readbacks. No reviews or projects were written by the location import.
+The same original-plan live repeat then matched all 219 operations with zero
+writes (`location-repeat-summary-01.json`); ordinary matches did not invoke
+timestamp restoration.
+
+The fresh post-apply plan, `location-plan-after-01.json`, has hash
+`8b4ba11f266c8762c037da95cb211ae5eced22295e8d293be181ad80ac4831d1`:
+zero proposed operations and zero conflicts. It accounts for five page matches,
+86 neighborhood matches/two held, 90 media matches/two held/one excluded,
+215 relationship matches/76 held/one excluded, one taxonomy match and 72 held
+reviews. The following table preserves the executed plan's source dispositions;
+its folded relationship updates are not additional API operations.
 
 | Source group | Total | Create | Update | Match | Held | Excluded |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -28,6 +43,10 @@ schema changes, a fresh target inventory and new reviewed plan are required.
 | Relationships | 292 | 39 | 90 | 86 | 76 | 1 |
 | Project enrichment | 53 | 0 | 0 | 0 | 53 | 0 |
 
+The 53 enrichment holds are this planner's separate-pipeline accounting. All 53
+were applied and verified by the enrichment pipeline; its SonShine-only required
+constraint is installed. They are not outstanding project mappings.
+
 No conflicts were overwritten. Relationship counts include 88 primary-area
 occurrences, 93 media references, 72 review-area proposals, ten sponsor pairs,
 17 approved direct-neighbor pairs, and twelve existing coverage-list entries.
@@ -35,13 +54,13 @@ The 90 media relation updates are folded into their page/neighborhood operations
 they are not another 90 API writes. No navigation records currently contain a
 direct location URL needing migration.
 
-Parrish is present in the existing coverage list but absent from the thirteen
-canonical service areas. Its prepared record is published taxonomy with
+Parrish was present in the existing coverage list but absent from the thirteen
+canonical service areas. Its new record is published taxonomy with
 `page_status=taxonomy_only`, no page content, and no fabricated WordPress ID. The
-database must generate `sonshine-roofing:parrish` as its scope key. Its coverage
+database-generated `sonshine-roofing:parrish` scope key was verified. Its coverage
 junction follows that record; it creates no additional public route.
 
-The five existing area records receive concise local draft introductions. Existing
+The five existing area records received concise local draft introductions. Existing
 IDs, taxonomy publication, slugs, scope keys, and taxonomy provenance remain owned
 by their existing records. The planner initializes a landing page only when its
 page fields are empty. Later editorial content and page publication are preserved.
@@ -100,7 +119,24 @@ use `coverage_map`; photos must never be placed in that field. All reviewed sour
 bytes remain intact. One exact duplicate byte stream shares a canonical Directus
 file; its two observed aerial descriptions are compatible. Two photos remain
 held with their geographic conflicts, and the duplicate-owner photo is excluded.
-The result is 89 proposed new immutable files for 90 eligible used references.
+The result is 89 new immutable files for 90 eligible used references.
+
+### Source timestamp preservation
+
+Directus rewrote file timestamps during upload, and its date-updated special also
+rewrote `modified_on` during an API patch. The first attempt stopped at that
+readback failure. The reviewed helper `scripts/location-migration/file-timestamps.mjs`
+then restored only source timestamps through conditional SQL. It requires the
+original matching absent-before creation receipt, canonical byte-derived file ID,
+unchanged planned metadata and both current timestamps. The private caller also
+verified bytes and the freshly created file projection before invoking it.
+
+The helper durably saves a before-image, requires exactly one conditional update,
+reads back through Directus and saves after evidence. Recovery of already-correct
+timestamps requires another API read and a durable match receipt. This recovered
+the interrupted first file and preserved dates for the other new uploads.
+Ordinary migration matches never trigger timestamp repair; existing editorial
+files are not repair targets. Original bytes and recovery records remain intact.
 
 ## Review ownership
 
@@ -125,30 +161,28 @@ is outside migration ownership and is prepared by the review-sync workflow owner
 
 ## Commands and private artifacts
 
-Use Node 22. Commands below are local preparation examples. Load the established
+Use Node 22. Commands below prepare a fresh inventory and plan. Load the established
 environment into the process; never paste or print credentials.
 
 ```sh
-node scripts/migrate-wordpress-locations.mjs --mode inventory \
-  --schema-state pending \
-  --source /private/tmp/sonshine-location-migration-20260915/new-source.json \
-  --targets /private/tmp/sonshine-location-migration-20260915/new-targets.json
+export LOCATION_MIGRATION_PRIVATE_ROOT=/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15
 
-node scripts/location-migration/media.mjs \
-  --source /private/tmp/sonshine-location-migration-20260915/new-source.json \
-  --directory /private/tmp/sonshine-location-migration-20260915/new-media \
-  --manifest /private/tmp/sonshine-location-migration-20260915/new-media.json
+node scripts/migrate-wordpress-locations.mjs --mode inventory \
+  --schema-state ready \
+  --approvals "$LOCATION_MIGRATION_PRIVATE_ROOT/approvals-durable-v1.json" \
+  --source "$LOCATION_MIGRATION_PRIVATE_ROOT/new-source.json" \
+  --targets "$LOCATION_MIGRATION_PRIVATE_ROOT/new-targets.json"
 
 node scripts/migrate-wordpress-locations.mjs --mode plan \
-  --source /private/tmp/sonshine-location-migration-20260915/new-source.json \
-  --targets /private/tmp/sonshine-location-migration-20260915/new-targets.json \
-  --approvals /private/tmp/sonshine-location-migration-20260915/reviewed-decisions.json \
-  --plan /private/tmp/sonshine-location-migration-20260915/new-plan.json
+  --source "$LOCATION_MIGRATION_PRIVATE_ROOT/new-source.json" \
+  --targets "$LOCATION_MIGRATION_PRIVATE_ROOT/new-targets.json" \
+  --approvals "$LOCATION_MIGRATION_PRIVATE_ROOT/approvals-durable-v1.json" \
+  --plan "$LOCATION_MIGRATION_PRIVATE_ROOT/new-plan.json"
 
 node scripts/verify-location-migration.mjs
 ```
 
-After the additive model is actually applied, use `--schema-state ready` and pass
+With the additive model installed, use `--schema-state ready` and pass
 `--approvals` to inventory so it reads only this migration's deterministic file
 IDs and verifies existing destination bytes. Missing fields or required reads
 fail; upstream errors are never converted into empty content. WordPress uses
@@ -158,25 +192,26 @@ repeated identities. Source totals are reconciled, not hard-coded import limits.
 Artifacts are mode-0600 regular files below the mode-0700 private root. Output
 creation is exclusive and refuses to overwrite earlier evidence or follow
 symlinks. Keep all source exports, decisions, mappings, receipts, and media outside
-Git. This temporary directory still needs an approved durable recovery copy before
-production work. Set `LOCATION_MIGRATION_PRIVATE_ROOT` to the approved canonical
-absolute durable directory after moving and verifying the private artifacts;
-location, enrichment and review preparation share this root. The default remains
-the temporary directory. Roots and files require 0700/0600 modes; repository roots,
-Git descendants and root symlinks are rejected. Current artifacts include:
+Git. Durable copies and all 93 media hashes were verified before execution.
+`approvals-durable-v1.json` and `media-durable-v1.json` rebase only their 93 local
+paths; `rebasing-receipt-v1.json` records unchanged original and mapping hashes.
+Location, enrichment and review preparation share this root. The default remains
+the historical temporary directory, so set the environment explicitly. Roots and
+files require 0700/0600 modes; repository roots, Git descendants and root symlinks
+are rejected. Preserved historical preparation artifacts include:
 
 | Artifact | Purpose / canonical content hash |
 | --- | --- |
-| source-final-v2.json | Completed live source inventory; `5a3f23fa10a7ccf39bc652e64654b78973f956f0761b5a8acff9d911d1d212d1` |
-| targets-final-v2.json | Current pre-schema targets; `0b25c14d382581bfae96a9fb3eb2ed59ef6e83fad35ff82caa63349f1a6a1e1b` |
+| source-final-v2.json | Historical source inventory; refreshed source nodes were unchanged; `5a3f23fa10a7ccf39bc652e64654b78973f956f0761b5a8acff9d911d1d212d1` |
+| targets-final-v2.json | Historical pre-schema targets; `0b25c14d382581bfae96a9fb3eb2ed59ef6e83fad35ff82caa63349f1a6a1e1b` |
 | approvals-reviewed-v3.json | Updated media/name verification and approved neighbors; `f2d1d0b573ef7a59a3699e7390b15a417ba369e196f00b9bc1821ee95dd9d3da` |
 | geography-supplement-v2.json | Primary-source and full-size evidence for five disputed occurrences; `1be5c639a6ea87f72a9ce7f4560fb7d938964d52eb979454921c423a528d7af6` |
 | media-v1.json | Source attachment metadata, byte hashes, and local file mapping; `ceb8df61a0279d3d1b3d6f6221d8072fde9f84fd3cdab70f484f2a71d6b0edde` |
 | media-v1/ | Original image bytes and numbered contact sheets |
-| plan-candidate-v4.json | Current dry-run candidate and every source disposition; hash above |
+| plan-candidate-v4.json | Historical unready plan; `4aa9693445fdb8e2d22ec00657ec40eba5961e9ebd6a5e04549eb5f1bf1ef424`; never applied or readiness-edited |
 | prepared-recovery-v4.json | Proposed narrow before-images; explicitly prepared, not execution receipts |
 | prepared-mapping-v4.json | Proposed source/target and immutable-file mappings; explicitly not applied |
-| project-enrichment-plan-v1.json | Separate 53-project private backfill plan; see enrichment guide |
+| project-enrichment-plan-v1.json | Historical unready backfill plan; the fresh applied plan is documented in the enrichment guide |
 
 ## Apply and recovery contract
 
@@ -219,10 +254,13 @@ its receipts. For recovery:
 No automated destructive rollback is included. The receipts make the exact narrow
 restore reviewable. All 53 owner-supplied project/job mappings and ZIPs have been
 verified through authenticated reads, with existing primary areas preserved and
-neighborhoods left null. Their separate private enrichment plan must be applied
-and read back before the SonShine-only required-field constraint. The location
-import accounts for these 53 projects as held for that separate operation;
-it does not write project references. No unattended AccuLynx operations are included.
+neighborhoods left null. Their separate backfill applied all 53 updates, passed
+independent live readback and a 53-match/no-write repeat, then installed the
+SonShine-only required-field constraint. The location planner still labels these
+53 entries held and emits its generic enrichment blocker because it does not
+consume the separate pipeline's completion evidence. That label is superseded by
+the verified [enrichment results](location-enrichment.md), not an unresolved
+mapping requirement. No unattended AccuLynx operations are included.
 
 ## Verification
 
@@ -233,8 +271,15 @@ pagination, editorial conflicts, exact plan authorization, before-image ordering
 tenant rejection, dates, explicit review targets missing from refreshed inventory
 or conflicting with canonical provenance, verified display-name correction with
 stable source identity, and unprepared-schema rejection. Scoped ESLint passes.
-The live inventory and private dry-run executed successfully. Production apply and
-readback have not executed. Independent A1 review replayed the actual 215-operation
-plan in memory with 215 second-run no-ops and zero replan operations/conflicts;
-the review-target correction preserves its canonical hash. See the candidate
-verification record for findings and confirmation status.
+Actual schema, migration and per-operation readbacks completed, followed by the
+zero-operation/zero-conflict fresh plan and 219-match/no-write original-plan
+repeat above. The guarded timestamp helper passes
+41 synthetic checks, including local PostgreSQL execution, concurrency refusal,
+quoted metadata, interrupted recovery and durable match evidence. Historical
+independent reviews also replayed earlier candidate plans in memory; those tests
+remain distinct from the applied evidence. See the candidate verification record
+for current whole-application checks and review dispositions.
+
+The pages and neighborhoods are draft content. Held review ratings/source links,
+two neighborhood/photo conflicts, actual-page editorial/visual acceptance,
+compatible review workflow cutover and deployment remain release gates.

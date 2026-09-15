@@ -3,7 +3,28 @@
 Schema artifact: `location-model-v4`; contract `location-v3`; starting application `0271ec7`.
 Integrity SQL: `location-invariants-v3`, including whitespace-only job/ZIP handling
 and case-invariant UUID job identity.
-Prepared only. No schema, SQL, policy or project-enrichment changes were applied.
+Applied and verified on 2026-09-15 under the owner's Directus authorization.
+Workflow publication and application deployment remain held.
+
+## Recorded application
+
+- Permission tightening changed one project reader grant before private fields
+  were created. The additive schema applied 49 actions; final `--verify-only`
+  reported zero remaining actions.
+- Reader extensions applied eleven changes: seven updates and four creates.
+  Administrative inspection established the intended policy ownership before use.
+- Transactional invariant SQL and read-only verification passed. All 53 project
+  enrichments were independently read back before the separately authorized
+  SonShine-only job-ID/ZIP requirement was applied and validated.
+- Actual website-reader and anonymous direct, nested, aliased and wildcard probes
+  passed before and after backfill. These checks establish the current reader/public
+  boundary; they do not claim the revised review workflow is published.
+
+Private receipts are under
+`/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`, including the
+schema, tighten/extend and before/after-backfill privacy result files listed in
+[model evidence](location-model-evidence.md). The procedure below remains the
+required order for any subsequent authorized run.
 
 ## Permission-first sequence
 
@@ -86,8 +107,10 @@ all SonShine review states to preserve deliberate unpublication; never reuse the
 published-only website policy for that workflow. Admin/migration access is
 separate and all private project references remain server-side.
 
-The current policy ownership topology has not been admin-verified. These artifacts
-do not claim that editor/sync/public/reader production permissions are corrected.
+The reader/public policy ownership and effective denial boundary were verified
+for the applied changes. Editorial and synchronization access must continue to
+obey the ownership contract; this run does not claim revised workflow publication
+or its active synchronization-policy readback.
 
 ## Database integrity
 
@@ -108,9 +131,9 @@ silently convert its FAQ into a global FAQ. Navigation resolves through its menu
 client and rejects foreign-client targets and mismatched parent menus. The SQL
 preflight rejects preexisting conflicts without rewriting editorial timestamps.
 
-After complete verified enrichment, apply
-`scripts/location-model/require-sonshine-enrichment.sql` as a separate approved
-step. It first rejects missing/invalid SonShine values, then creates a validated
+After complete verified enrichment, the separately approved
+`scripts/location-model/require-sonshine-enrichment.sql` was applied. It first
+rejects missing/invalid SonShine values, then creates a validated
 CHECK scoped to the actual SonShine client ID. It captures the ID inside the
 database without recording it in Git. This protects the rule even if the client
 slug later changes; unrelated clients keep optional fields. Neighborhood remains
@@ -132,6 +155,10 @@ must keep the private-field restriction. The schema and privacy boundary should
 normally remain installed while the coordinator restores compatible application,
 workflow and narrow content before-images together.
 
+The active SonShine requirement rejects the original null job/ZIP before-values.
+Any authorized full enrichment rollback must coordinate removal of that scoped
+constraint before restoring those values, while keeping private-field denial.
+
 ## Local verification
 
 - `node scripts/verify-location-model.mjs`: synthetic API apply gate, dry run,
@@ -146,6 +173,6 @@ workflow and narrow content before-images together.
   constraints/indexes/triggers and returns whether the separate enrichment
   requirement is installed. False is a release blocker.
 
-Local engine verification is useful evidence, but production constraints, actual
-permissions, direct/nested denial behavior, enrichment completeness and deployed
-outputs still require authorized live readback.
+Local engine verification remains separate from the completed production
+constraint, privacy and enrichment readback. Deployed output and actual-page
+acceptance remain part of the held application release.

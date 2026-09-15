@@ -1,14 +1,36 @@
 # Location source evidence
 
-Status: local migration candidate prepared; production migration, enrichment, and release pending.
+Status: authorized Directus migration and enrichment applied and verified; pages
+and neighborhoods remain drafts. Workflow publication and deployment remain held.
 Verified: 2026-09-15. Contract: [location contract v3](location-contract.md).
 Application starting revision: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 
-Current candidate totals, media inspection, commands, and recovery preparation are
-in [location-migration.md](location-migration.md). The counts and hashes below
-retain the initial Stage 1 inventory; Stage 4 artifacts are listed in that guide.
+Current applied totals, media inspection, commands and recovery evidence are in
+[location-migration.md](location-migration.md). Execution revision:
+`43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`. The initial inventory below remains
+historical evidence; the fresh pre-apply source nodes were unchanged.
 
-## Current inventory
+## Applied reconciliation
+
+The applied plan hash is
+`a86b32efe0f8066a0c3feb3ba51d6b7883918a4e401fc723b44407bd62fde710`.
+Its 219 operations completed as 218 applied and one previously uploaded file
+matched. All 89 newly created files received guarded source-timestamp restoration
+with private before/readback/after evidence. Five page drafts, 85 neighborhood
+drafts, ten sponsor junctions, seventeen directed nearby pairs and twelve coverage
+junctions are installed. Parrish is a new taxonomy-only area. No review was imported.
+The same original-plan live repeat matched all 219 operations with zero writes.
+
+The fresh post-apply plan hash is
+`8b4ba11f266c8762c037da95cb211ae5eced22295e8d293be181ad80ac4831d1`.
+It proposes zero operations and reports zero conflicts: five page matches,
+86 neighborhood matches/two held, 90 media matches/two held/one excluded,
+215 relationship matches/76 held/one excluded, one taxonomy match and 72 held
+reviews. Separate enrichment applied and verified all 53 projects and installed
+the SonShine-only required-field constraint. The location planner's generic
+53-entry enrichment hold is superseded by that separate completion evidence.
+
+## Historical discovery inventory
 
 The public WordPress GraphQL location connection was exhausted using three
 cursor-paginated requests of two pages each. The five requested routes are the
@@ -25,18 +47,21 @@ complete published location set. A subsequent read fetched retained owner replie
 
 All 88 neighborhood rows have names and ZIP lists. There are 86 distinct
 normalized names. Longboat Key appears in Sarasota and Bradenton; its canonical
-owner is Sarasota under the settled owner decision. Plantation appears in North
-Port and Venice and requires verification before merging or assigning it. Other
-geographic claims need review, particularly combined labels such as University
-Park / West of Trail, Bay Isles, The Lake Club, and The Concession. Existing ZIP
-lists do not establish neighborhood membership.
+owner is Sarasota under the settled owner decision. Plantation initially required
+verification; subsequent source/photo review distinguished Venice's Plantation
+from North Port's Lakeside Plantation. Bay Isles, The Lake Club, The Concession
+and DeSoto Acres were also resolved as recorded in the current migration guide.
+University Park / West of Trail and Arroyo / Crestline / Village Park remain held.
+Existing ZIP lists do not establish neighborhood membership.
 
 The 93 media references have 93 distinct WordPress attachment IDs and URLs. Two
 had empty source alt text. Stage 4 downloaded and decoded all 93 images, verified
 their byte hashes and GMT timestamps, reviewed all five overview maps at full
 size, and reviewed neighborhood photos in contact sheets. No customer-home pins
-were found in the overview maps. Four conflicting neighborhood images remain
-held; the current guide records the exact limits and final dispositions.
+were found in the overview maps. Four neighborhood occurrences were initially
+held; later review also found the DeSoto source-label conflict. Three of those five
+were resolved. The current guide records the two remaining held photos and the
+duplicate-owner exclusion.
 
 Directus was read using the configured website credential and explicit minimal
 fields, with page sizes of 25 and stable ID ordering. Readback totals:
@@ -76,12 +101,12 @@ record was republished.
 
 ## Approved direct nearby lists
 
-The owner approved these five lists during Stage 4. No relationship is written.
-Each proposed target already exists as a published SonShine service area, which
+The owner approved these five lists during Stage 4; all seventeen directed pairs
+are now applied. Each target exists as a published SonShine service area, which
 confirms CMS service coverage. The lists are an editorial inference from regional
 geography, not an automatic distance rule or claim of municipal adjacency.
 
-| Page | Proposed directly eligible areas |
+| Page | Approved directly eligible areas |
 | --- | --- |
 | Sarasota | Bradenton; Lakewood Ranch; Siesta Key; Osprey |
 | Bradenton | Palmetto; Lakewood Ranch; Sarasota |
@@ -95,12 +120,13 @@ Geographic references checked on 2026-09-15:
 and [Visit Sarasota County relocation guide](https://www.visitsarasota.com/sarasota-relocation-guide).
 The private reviewed decisions record all seventeen approved directed pairs.
 
-## Migration preparation contract
+## Migration identity and ownership contract
 
 - Match page owners by existing client and canonical slug, preserving IDs,
   taxonomy `external_id`, and `scope_key`. Store the location-post ID separately.
-- Use source attachment IDs for media identities. Hash downloaded bytes, preserve
-  verified source dates, and retain a private source-to-Directus mapping. Never
+- Keep source attachment IDs as provenance; derive immutable canonical file IDs
+  from verified byte hashes so duplicate bytes share a file. Preserve verified
+  source dates and retain a private source-to-Directus mapping. Never
   replace bytes of a file referenced by an existing deployment.
 - WordPress repeater rows lack independent IDs. Derive neighborhood identity from
   source post ID and normalized real name, and review duplicate/name-change cases.
@@ -118,29 +144,38 @@ The private reviewed decisions record all seventeen approved directed pairs.
   compatibility fields and WordPress originals through release verification.
 - Apply readback must verify values, counts, and relationship membership; private
   recovery maps must record only the affected fields, with later-edit checks before
-  rollback. This document is inventory evidence, not an applied migration manifest.
+  rollback. Applied manifests and individual receipts remain private.
 
 ## Enrichment and release limits
 
-The owner subsequently supplied authorized authenticated AccuLynx read access.
-The coordinator assigned a separate read-only enrichment discovery and private
-mapping-template task. The owner confirmed project/job mappings are not yet
-available and will fill them manually. All 53 projects remain pending verified
-mappings; ZIP and neighborhood assignments cannot be inferred from public project
-copy. The subsequent SonShine-only required-field constraint remains blocked until
-successful enrichment is documented. This migration specialist queried no job or
-customer records.
+The owner supplied all 53 mappings; authenticated AccuLynx reads verified their
+identities, ZIPs and existing primary areas. The separately authorized enrichment
+applied all 53 updates, passed independent live readback and a 53-match/no-write
+repeat, then installed the validated SonShine-only required-field constraint.
+Neighborhoods remain null; no neighborhood was inferred from ZIP or public copy.
+See [enrichment evidence](location-enrichment-evidence.md).
 
-No production schema, record, file, workflow, or deployment writes occurred.
-Permission tightening must precede adding the private job field because the
-coordinator identified wildcard project access on the website-reader policy.
+Permission tightening preceded the private field. The applied model and actual
+website/anonymous privacy checks are recorded in [model evidence](location-model-evidence.md).
+Remaining gates include the held source reviews, two geography/photo conflicts,
+actual-page visual/editorial acceptance, compatible review workflow cutover and
+application deployment. No workflow publication or deployment is claimed.
 
 ## Private evidence
 
-Mode-0700 directory: `/private/tmp/sonshine-location-migration-20260915`.
-Raw JSON files are mode 0600. This is temporary evidence storage; a durable approved
-recovery location is required before production migration. No raw review payloads,
-customer/job identifiers, credentials, or source exports are committed.
+Approved mode-0700 recovery directory:
+`/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.
+JSON and media files are mode 0600. All 93 copied media hashes were verified;
+rebasing changed only paths in new derived artifacts and preserved the original
+mapping template. The earlier `/private/tmp/sonshine-location-migration-20260915`
+directory is historical staging. No raw review payloads, customer/job identifiers,
+credentials or source exports are committed.
+
+Current execution evidence includes `location-apply-02/complete.json`,
+`location-apply-summary-02.json`, `location-plan-after-01.json`,
+`location-plan-summary-after-01.json`, `location-repeat-summary-01.json` and their
+narrow per-operation receipts.
+The following hashes identify the retained initial discovery exports:
 
 | Private file | SHA-256 |
 | --- | --- |
@@ -150,7 +185,8 @@ customer/job identifiers, credentials, or source exports are committed.
 | directus-sponsor_features.json | `3bad46f96495b3a72a5057d83d6b58dff43d5e4ceb4e2e2015c48ae5ffd96a36` |
 | directus-roofing_service_areas.json | `a77114d2b4f2acb6445326276ce981ab0386b8534ddd9751becf76e56e3c5373` |
 
-The private directory also contains a sanitized aggregate inventory and review
-match-candidate dispositions. Media bytes and migration before-images have not yet
-been created. The initial Python HTTPS attempt failed local CA validation; Node's
+The initial private directory also contained a sanitized aggregate inventory and
+review match-candidate dispositions. Media bytes and actual migration before/after
+images were created in subsequent authorized stages and retained in durable
+storage. The initial Python HTTPS attempt failed local CA validation; Node's
 verified TLS requests succeeded. Certificate verification was never disabled.

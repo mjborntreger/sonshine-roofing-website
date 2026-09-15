@@ -1,37 +1,53 @@
 # One-time SonShine project enrichment
 
-Status: prepared; no project updates or required-field SQL applied.
+Status: 53 project updates and the SonShine-only required-field constraint applied and verified on 2026-09-15.
 Private artifact contract: `location-enrichment-v1`; shared contract: `location-v3`.
+Execution revision: `05d1f6ba6f4662a70cbcecdcf2c174a9b4fcf117`.
 This is a manually initiated backfill. It adds no AccuLynx synchronization or schedule.
+Workflow publication and application deployment remain held; this status covers enrichment only.
 
-## Verified input and proposed changes
+## Completed backfill
 
 The owner supplied 53 manual project/job matches. Authenticated job lookups
 verified every identity and postal ZIP. Existing primary areas are corroborated
-and retained; every neighborhood remains unverified/null. See the narrow
+and retained; every neighborhood remains unverified/null. No additional owner
+mapping input is needed for these 53 projects. See the narrow
 [discovery evidence](location-enrichment-evidence.md).
 
-The private `project-enrichment-plan-v1.json` contains 53 updates with no missing,
-duplicate, held or conflicting mappings. Its canonical hash is
-`bd575388e8a5088e768ad484aa7a0c4deae4394673af6ee12e00cec2f8e3db42`.
-It is complete for reconciliation, but `readyForApply=false`: the new schema and
-actual privacy permission checks have not been applied or verified. Null new-field
-before-values are explicitly future placeholders. Refresh the actual administrator
-inventory and replan after schema installation; never toggle these flags on this plan.
+The applied `project-enrichment-plan-ready-01.json` has canonical hash
+`7b74818c99e51db4da303bfb5a07428e335dce67904dcdc9a7627cdebc2912b2`.
+It uses the fresh administrator inventory captured after schema and privacy checks.
+All 53 updates exactly match the previously prepared changes, including expected
+modification timestamps. Independent live readback verified every desired field,
+tenant and canonical project identity. There were no missing, duplicate, held or
+conflicting mappings, no primary-area changes and no neighborhood assignments.
+
+The coordinator's repeat of the same plan matched all 53 projects and wrote nothing.
+After this readback, the separately authorized required-field SQL was applied.
+The validated constraint requires job ID and ZIP only for SonShine. Global field
+nullability remains optional; the existing primary service area remains required.
+Website-reader and anonymous access checks deny private references, including
+nested and aliased requests, and exclude job ID and ZIP from wildcard responses.
+
+The historical `project-enrichment-plan-v1.json`, hash
+`bd575388e8a5088e768ad484aa7a0c4deae4394673af6ee12e00cec2f8e3db42`,
+remains unapplied evidence of preparation before schema installation. Its readiness
+flags were not changed; a fresh inventory and plan replaced it for execution.
 
 ## Offline planning
 
-Use Node 22. Inputs and outputs must be private files outside Git. The default root
-is `/private/tmp/sonshine-location-migration-20260915`; it is temporary. Before
-production work, move and verify artifacts in approved durable storage and set
-`LOCATION_MIGRATION_PRIVATE_ROOT` to that canonical absolute directory. Roots require
-0700 and files 0600; root symlinks and every Git ancestor are rejected.
+Use Node 22. Inputs, outputs and receipts are stored outside Git in the approved
+durable root `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.
+Set `LOCATION_MIGRATION_PRIVATE_ROOT` to that canonical absolute directory.
+Roots require 0700 and files 0600; root symlinks and every Git ancestor are rejected.
+The earlier temporary directory is historical staging, not the recovery authority.
 
 ```sh
-fnm exec --using 22 node scripts/location-enrichment/cli.mjs \
-  --inventory /private/tmp/sonshine-location-migration-20260915/project-enrichment-inventory-v1.json \
-  --mappings /private/tmp/sonshine-location-migration-20260915/project-enrichment-verified-mappings-v2.json \
-  --out /private/tmp/sonshine-location-migration-20260915/project-enrichment-plan-next.json
+LOCATION_MIGRATION_PRIVATE_ROOT='/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15' \
+  fnm exec --using 22 node scripts/location-enrichment/cli.mjs \
+  --inventory '<fresh-private-inventory>' \
+  --mappings '<verified-private-mappings>' \
+  --out '<new-private-plan>'
 ```
 
 Planning makes no API requests. UUID letter casing is normalized consistently with
@@ -42,7 +58,7 @@ Existing differing references always conflict. Existing geography changes requir
 separate documented verification; omitted neighborhoods preserve existing values.
 An area change cannot retain an incompatible neighborhood. Partial plans cannot apply.
 
-## Authorized apply and readback
+## Procedure for an authorized run
 
 After the coordinator verifies schema and actual public/website privacy permissions:
 
@@ -68,7 +84,15 @@ After the coordinator verifies schema and actual public/website privacy permissi
 Recovery restores only the four recorded fields after comparing current values and
 modification state to the saved after-image. Later edits require reconciliation.
 Keep the privacy permissions during rollback; never expose references by restoring
-a wildcard grant. No destructive rollback automation is included.
+a wildcard grant. The now-active SonShine requirement rejects the original null
+job/ZIP before-values, so any authorized full backfill rollback must explicitly
+coordinate removal of that scoped constraint before restoring those fields.
+No destructive rollback automation is included.
+
+The durable root contains the applied plan, exact authorization, 53 narrow before
+and 53 after receipts under `project-enrichment-apply-01`, and 53 no-op match
+receipts under `project-enrichment-repeat-01`. Both runs have complete receipts.
+See the [evidence record](location-enrichment-evidence.md) for SQL and privacy receipts.
 
 ## Verification
 
@@ -77,5 +101,6 @@ and duplicate identities, tenant and neighborhood conflicts, verified correction
 later editorial changes, interrupted-run recovery, same-plan and fresh-plan reruns,
 private error suppression, malformed JSON, public projections, UUID case variants
 and configurable private storage that also rejects nested Git destinations.
-Synthetic checks and authenticated discovery do not establish an applied backfill,
-actual public denial, production constraints or deployed page acceptance.
+Live verification additionally covers all 53 applied records, complete recovery
+receipts, the zero-write repeat, the actual scoped database constraint and public
+permission behavior. Deployment and location-page acceptance remain separate gates.

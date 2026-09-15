@@ -1,10 +1,11 @@
 # Location migration release and recovery
 
-Status: local implementation candidate; production migration and release blocked.
+Status: authorized Directus preparation and migration applied and verified.
+Workflow publication and website deployment remain held for final approval.
 Contract: [location-v3](location-contract.md). The final candidate record and
 independent review dispositions are in [verification](location-verification.md).
 
-## Live baseline refreshed on 2026-09-15
+## Historical pre-migration baseline on 2026-09-15
 
 - Local main and `origin/main`: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 - Coolify reports the application healthy and its latest finished deployment at
@@ -19,29 +20,48 @@ independent review dispositions are in [verification](location-verification.md).
   records. Current and active graphs matched during the refresh. Prepared workflow
   operations are local and are not saved or published in n8n.
 
-## Authorization and inputs still needed
+## Applied phase and remaining release gates
 
-The implementation task prepares code, local schema/workflow/migration artifacts,
-read-only evidence and synthetic verification. Exact production schema/policy/data
-apply, n8n publication/unpublication, deploy/merge and push are not performed.
-Before an external action, approve its concrete reviewed artifact and effect.
+The owner approved Directus preparation/migration, durable private recovery and
+SonShine-only required fields after verified backfill, and paused affected CMS
+editing during execution. These actions are complete at execution revision
+`43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`:
 
-Release also needs these inputs and successful checks:
+- Resolved actual policy ownership; tightened the existing project grant before
+  adding private fields. Applied 49 additive schema actions, transactional
+  invariants and 11 reader-permission extensions. Schema rerun proposes zero actions.
+- Applied the 219-operation plan: five draft page owners, 85 draft neighborhoods,
+  89 new files, one taxonomy-only area and 39 junctions. All records have readback
+  evidence; all file bytes and source timestamps were independently verified.
+  Same-plan repeat matched 219 with no writes; a fresh plan has no operations/conflicts.
+- Applied and verified all 53 owner-mapped project job/ZIP enrichments, preserving
+  primary areas and null neighborhoods. Then applied the SonShine-only required
+  constraint. Actual website/anonymous direct, nested and aliased privacy checks pass.
+- Retained narrow before/after receipts and the prior application image in
+  `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15` (0700/0600).
+  The prior image archive was verified readable; recovery has not been executed.
 
-- Administrative resolution of all effective public/website policy grants and a
-  safe SonShine-specific policy for tenant-scoped extensions.
-- All 53 owner-supplied project/job mappings and ZIP candidates are verified through
-  authenticated AccuLynx reads. Existing primary areas are corroborated and preserved;
-  all neighborhoods remain unverified/null. Enrichment apply/readback and the
-  subsequent SonShine-only job/ZIP requirement are unapplied. This blocks full acceptance.
-- Verified source ratings for held reviews, two corrected source links, unresolved
-  neighborhood geography, and reviewed media. The owner approved all five direct
-  nearby-area lists recorded in the v3 contract on 2026-09-15.
-- A durable approved private recovery directory. Current source/recovery evidence
-  is temporary, outside Git at `/private/tmp/sonshine-location-migration-20260915`.
-  Preserve modes (directory 0700/files 0600), hashes and narrow before-images.
-- A full credentialed candidate build, five actual migrated-page visual/editorial
-  reviews, actual permission probes and constraint readback after schema/data apply.
+The current application remains `0271ec7`; the original active workflow and all
+32 shared review records are unchanged. Feed membership is unseeded. **Do not deploy
+membership-gated consumers before the seed step below.** No remote Git push, merge,
+workflow save/publication or website deployment was performed by this phase.
+
+Remaining gates are the five pages' shared SEO/editorial publication preparation,
+verified source ratings and two corrected source links for 72 held reviews, the two
+held geographic entries, and final workflow/deployment authorization. Held records
+stay excluded unless verified; no additional project/job mapping is needed. A
+credentialed candidate build passes with all five pages still drafts; that confirms
+foundation compatibility, not published five-page acceptance. Actual private draft
+previews and their limits are recorded in [verification](location-verification.md).
+
+## Completed preparation stages
+
+Steps 1–5 below are complete for the approved phase. The original application image
+is `sha256:37463c5bfb2ea184893788de6b0c3e0e03060c12bf2558a41283eed86f745b07`;
+its private archive is `prior-application-0271ec7.docker.tar.gz`. Refresh candidate,
+source, target modification state and workflow versions before the remaining release.
+The owner may resume editing after phase completion; any later edits must become
+reviewed conflicts instead of being overwritten.
 
 ## Concrete maintenance-window sequence
 
@@ -80,6 +100,10 @@ or while old sitewide consumers can read the expanded published collection.
    verify the expected source/candidate hashes, unchanged credential references,
    queries, successful-empty handling, preservation and capped membership tests.
    Prepare the five reviewed pages for publication, with noindex false after review.
+   Review and publish the eligible imported neighborhood records before building;
+   their independent draft status otherwise excludes all 85 from neighborhood
+   sections. Keep the two held source occurrences excluded. Resolve or omit
+   uncertain optional image associations before publishing their owner records.
 8. Build and deploy the compatible application **before expanding historical review
    publication**. This application requires all location foundations and five ready
    page owners. Check build failures, route/FAQ/navigation/sitemap publication,
@@ -110,6 +134,10 @@ See [model permissions](location-model-permissions.md),
    after-values with the narrow before-image. Restore only unchanged migration-owned
    fields. Later editorial edits become manual conflicts; never overwrite them.
    Avoid deleting newly imported records/files that now have other references.
+   A rollback to the original null project job/ZIP values must first remove only
+   the SonShine required-field constraint under explicit rollback authorization;
+   its active CHECK correctly rejects those old null values. Preserve the unique
+   job identity and privacy protections.
 4. Retain additive schema and explicit project privacy permissions. Never restore
    wildcard project grants while the private job field exists. Restoring the old
    workflow alone is unsafe: it can archive retained historical reviews and
@@ -120,7 +148,10 @@ See [model permissions](location-model-permissions.md),
    recovery conflicts and which system versions remain active. Keep original
    WordPress media hosting; host retirement is outside this release.
 
-No production before-images or prior image export are claimed captured by local
-preparation. Temporary workflow recovery graphs and source exports exist; the
-actual release must capture current narrow before/after state and retained deployable
-artifacts in durable storage before relying on rollback.
+Production narrow before-images, exact after-readbacks, schema/policy snapshots,
+workflow recovery graphs and the retained prior application image are now in the
+approved durable root. `location-apply-02`, `location-repeat-01`,
+`project-enrichment-apply-01` and `project-enrichment-repeat-01` contain the executed
+and no-op receipts. See [handoff](location-handoff.md) for artifact hashes and
+[enrichment recovery](location-enrichment.md) for the scoped-constraint dependency.
+A recovery run still requires fresh later-edit comparisons and explicit authorization.
