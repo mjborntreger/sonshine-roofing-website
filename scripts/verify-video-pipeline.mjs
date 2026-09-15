@@ -16,7 +16,7 @@ const file = { id: 'roof-image', description: 'A synthetic roof.', type: 'image/
 const project = (id, slug) => ({
   id, slug, scope_key: `${config.clientSlug}:${slug}`, client, status: 'published', title: 'Project wording',
   description: 'A metal roof replacement.', published_at: '2018-01-01T00:00:00Z',
-  featured_image: file, gallery: [], material_type: term('metal'), service_area: term('sarasota'),
+  featured_image: file, gallery: [], neighborhood: null, material_type: term('metal'), service_area: term('sarasota'),
   product_links: [], noindex: false, external_id: 'wordpress:sonshine-roofing:synthetic',
   youtube_url: 'https://www.youtube.com/watch?v=abcdefghijk',
 });
@@ -200,7 +200,7 @@ try {
 // This script runs after generation, so stale format assumptions would fail builds.
 const routeManifest = await readFile(new URL('./validate-directus-routes.mjs', import.meta.url), 'utf8');
 const routePolicyStart = routeManifest.indexOf('  if (projectSnapshot.version');
-const routePolicyEnd = routeManifest.indexOf('\n  const [offers', routePolicyStart);
+const routePolicyEnd = routeManifest.indexOf('\n  const locationSnapshot', routePolicyStart);
 assert.ok(routePolicyStart >= 0 && routePolicyEnd > routePolicyStart);
 const routePolicy = new Function('projectSnapshot', 'clientSlug', 'addOwner', routeManifest.slice(routePolicyStart, routePolicyEnd));
 const routeOwners = [];

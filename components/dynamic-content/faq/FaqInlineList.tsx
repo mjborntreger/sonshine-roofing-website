@@ -33,8 +33,8 @@ export default async function FaqInlineList({
 }: Props) {
   let records = initialItems;
 
-  if (!records || records.length === 0) {
-    records = await listFaqs({ pagePath, limit }).catch(() => []);
+  if (!records) {
+    records = await listFaqs({ pagePath, limit });
   }
 
   if (!records || records.length === 0) return null;

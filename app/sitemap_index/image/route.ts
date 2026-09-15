@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { unstable_cache } from 'next/cache';
-import { wpFetch, mapImages, type WpImageNode } from "@/lib/content/wp";
+import { listLocationSitemapEntries, deployedLocations } from '@/lib/content/locations';
 import { listBlogImageSitemapEntries } from '@/lib/content/blog';
 import { listProjectSitemapEntries } from '@/lib/content/projects';
 import { listPersonSitemapEntries } from '@/lib/content/persons';
@@ -15,109 +15,17 @@ const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
 
-type Maybe<T> = T | null | undefined;
-
-type ImageNodeWrapper = { node?: Maybe<WpImageNode> };
-
-type LocationImageNode = {
-  uri?: string | null;
-  modifiedGmt?: string | null;
-  locationAttributes?: Maybe<{
-    map?: Maybe<ImageNodeWrapper>;
-    neighborhoodsServed?: Maybe<
-      Array<
-        Maybe<{
-          neighborhood?: string | null;
-          neighborhoodImage?: Maybe<ImageNodeWrapper>;
-        }>
-      >
-    >;
-  }>;
-};
-
-type LocationImageResult = {
-  locations?: {
-    pageInfo?: { hasNextPage?: boolean; endCursor?: string | null } | null;
-    nodes?: Maybe<LocationImageNode>[] | null;
-  } | null;
-};
-
-const mapWrapperImages = (wrapper?: Maybe<ImageNodeWrapper>) => {
-  const node = wrapper?.node;
-  return node ? mapImages([node]) : [];
-};
-
 const getBlogImageNodes = unstable_cache(
   async () => listBlogImageSitemapEntries(),
   ['sitemap-image-blog:directus'],
   { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:blog'] },
 );
 
-const getLocationImageNodes = unstable_cache(
-  async () => {
-    const query = /* GraphQL */ `
-      query ImageSitemapLocations($first: Int!, $after: String) {
-        locations(
-          first: $first
-          after: $after
-          where: { status: PUBLISH, orderby: { field: MODIFIED, order: DESC } }
-        ) {
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-          nodes {
-            uri
-            modifiedGmt
-            locationAttributes {
-              map {
-                node {
-                  sourceUrl
-                  altText
-                }
-              }
-              neighborhoodsServed {
-                neighborhood
-                neighborhoodImage {
-                  node {
-                    sourceUrl
-                    altText
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    `;
-
-    const nodes: LocationImageNode[] = [];
-    let after: string | null = null;
-
-    do {
-      const variables: { first: number; after?: string | null } = after
-        ? { first: 200, after }
-        : { first: 200 };
-      const data = await wpFetch<LocationImageResult>(query, variables);
-      const page = data?.locations;
-      const pageNodes = page?.nodes ?? [];
-      for (const node of pageNodes) {
-        if (node) nodes.push(node);
-      }
-      after = page?.pageInfo?.hasNextPage ? (page?.pageInfo?.endCursor ?? null) : null;
-    } while (after);
-
-    return nodes;
-  },
-  ['sitemap-image-locations'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:locations'] },
-);
-
 const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
   const [blogNodes, projectNodes, locationNodes, personNodes] = await Promise.all([
     getBlogImageNodes(),
     listProjectSitemapEntries(),
-    getLocationImageNodes(),
+    listLocationSitemapEntries(),
     listPersonSitemapEntries(),
   ]);
 
@@ -148,38 +56,8 @@ const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
   }
 
   for (const node of locationNodes) {
-    const rawPath = normalizeEntryPath(node.uri ?? '');
-    const path = rawPath.startsWith('/location/')
-      ? rawPath.replace('/location/', '/locations/')
-      : rawPath;
-    if (path === '/') continue;
-
-    const mapImage = mapWrapperImages(node.locationAttributes?.map);
-    const neighborhoodImages =
-      node.locationAttributes?.neighborhoodsServed?.reduce(
-        (acc, item) => {
-          if (!item) return acc;
-          const images = mapWrapperImages(item.neighborhoodImage);
-          if (!images.length) return acc;
-          const fallback = item.neighborhood?.trim();
-          images.forEach((img) => {
-            acc.push({
-              ...img,
-              altText: img.altText || fallback || img.altText,
-            });
-          });
-          return acc;
-        },
-        [] as ReturnType<typeof mapWrapperImages>,
-      ) ?? [];
-
-    const images = [...mapImage, ...neighborhoodImages];
-    if (!images.length) continue;
-    entries.push({
-      loc: path,
-      lastmod: formatLastmod(node.modifiedGmt),
-      images,
-    });
+    const images = [...(node.mapImage ? [node.mapImage] : []), ...deployedLocations().neighborhoods.filter(item => item.serviceAreaId === node.id).flatMap(item => [item.image, item.mapImage].filter(image => image !== null))];
+    if (images.length) entries.push({ loc: `/locations/${node.slug}`, lastmod: formatLastmod(node.modified), images });
   }
 
   for (const person of personNodes) {

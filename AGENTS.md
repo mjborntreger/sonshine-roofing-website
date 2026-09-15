@@ -14,7 +14,7 @@ and serves it on port 3000.
   special offers, legal copy, people, sponsor features, reviews and
   review-carousel settings, roofing glossary terms, projects, videos/categories,
   and their media.
-- WordPress/WPGraphQL remains authoritative for location landing pages.
+- The location migration candidate moves route ownership to `roofing_service_areas`. Read `docs/location-release.md` before applying schema/data changes, publishing the review workflow, or deploying; production remains WordPress-owned until coordinated release verification.
 - Local Next.js code owns route composition, components, body copy not yet
   migrated, code-only legacy redirect and 410 responses in `proxy.ts`, and the
   normalized operational schedule in `lib/contact-hours.ts`.
@@ -23,7 +23,7 @@ and serves it on port 3000.
   areas.
 - Directus content described as build-only does not become public until a new
   site build is deployed. Projects and videos share the private generated
-  snapshot described in `CONTENT.md`; preserve that boundary in runtime APIs,
+  snapshot described in `CONTENT.md`; location/FAQ/navigation content uses its matching location snapshot. Preserve that boundary in runtime APIs,
   players, and mixed-source pages. Video publication is independent of its
   optional project's publication; follow the context visibility rules there.
 - Homepage/About YouTube placements remain code-owned. Exclude the entire

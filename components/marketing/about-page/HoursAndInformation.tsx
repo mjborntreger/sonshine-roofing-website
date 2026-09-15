@@ -1,3 +1,4 @@
+import { listCoverageAreas } from '@/lib/content/locations';
 import SmartLink from '@/components/utils/SmartLink';
 import { Accordion } from '@/components/ui/Accordion';
 import { OFFICE_HOURS_LONG, PHONE_HOURS_LABEL } from '@/lib/contact-hours';
@@ -84,36 +85,7 @@ export async function HoursAndInformation() {
           proseBody={false}
           tone="soft"
         >
-          <ul className={pStyles}>
-            <li>
-              <SmartLink className={linkStyles} href="/locations/sarasota">
-                Sarasota, FL
-              </SmartLink>
-            </li>
-            <li>
-              <SmartLink className={linkStyles} href="/locations/venice">
-                Venice, FL
-              </SmartLink>
-            </li>
-            <li>
-              <SmartLink className={linkStyles} href="/locations/north-port">
-                North Port, FL
-              </SmartLink>
-            </li>
-            <li>
-              <SmartLink className={linkStyles} href="/locations/lakewood-ranch">
-                Lakewood Ranch, FL
-              </SmartLink>
-            </li>
-            <li>Bradenton, FL</li>
-            <li>Palmetto, FL</li>
-            <li>Parrish, FL</li>
-            <li>Nokomis, FL</li>
-            <li>Port Charlotte, FL</li>
-            <li>Punta Gorda, FL</li>
-            <li>Englewood, FL</li>
-            <li>Myakka City, FL</li>
-          </ul>
+          <SettingsLinks items={listCoverageAreas().map(area => ({ label: area.name, href: area.href }))} />
         </Accordion>
 
         <Accordion

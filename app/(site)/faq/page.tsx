@@ -11,7 +11,7 @@ import { breadcrumbSchema, faqSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 
-export const revalidate = 86400; // daily ISR
+export const revalidate = false; // daily ISR
 const PAGE_PATH = '/faq';
 
 export async function generateMetadata(): Promise<Metadata> {

@@ -199,6 +199,10 @@ if (clientSlug === "sonshine-roofing") {
     addOwner("roofing_projects", project.slug, project.uri, project.scopeKey);
   }
 
+  const locationSnapshot = JSON.parse(readFileSync(resolve(rootDir, ".generated/locations.json"), "utf8"));
+  if (locationSnapshot.version !== 1 || locationSnapshot.clientSlug !== clientSlug || !Array.isArray(locationSnapshot.pages)) throw new Error('[route-manifest] Location snapshot is invalid.');
+  for (const page of locationSnapshot.pages) addOwner('roofing_service_areas', page.id, `/locations/${page.slug}`, page.scopeKey);
+
   const [offers, persons, glossaryTerms] = await Promise.all([
     readCollection("special_offers", ["id", "slug", "scope_key"]),
     readCollection("persons", ["id", "slug", "scope_key"]),
