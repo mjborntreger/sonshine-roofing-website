@@ -1,5 +1,5 @@
 // Contract v3. Definitions contain no source records or private identifiers.
-export const MODEL_VERSION = 'location-model-v3';
+export const MODEL_VERSION = 'location-model-v4';
 const field = (name, type, options = {}) => ({ field: name, type,
   schema: type === 'alias' ? null : { is_nullable: true, ...options.schema },
   meta: { interface: 'input', ...options.meta } });
@@ -36,7 +36,7 @@ export const locationSchema = {
     media('image', 'Optional neighborhood photo with a verified file description. A photo is not a coverage map and must not imply undocumented completed work.'),
     media('coverage_map'), hidden('wordpress_id'), hidden('source_updated_at', 'timestamp'), sort(), ...system()],
   roofing_projects: [
-    field('job_id', 'string', { meta: { hidden: true, note: 'Private AccuLynx reference. Denied to public and website-reader policies. Optional until documented SonShine enrichment succeeds.' } }),
+    field('job_id', 'string', { meta: { hidden: true, note: 'Private AccuLynx reference. UUID case is canonicalized; one job per project within the client. Denied to public and website-reader policies. Optional until documented SonShine enrichment succeeds.' } }),
     field('zip', 'string', { meta: { note: 'Verified job ZIP. Optional until documented SonShine enrichment succeeds. Never infer a neighborhood from ZIP alone.' } }),
     relation('neighborhood'),
   ],

@@ -10,12 +10,14 @@ Full release acceptance remains incomplete.
   `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 - First frozen candidate (A1): `cff3fcc91eafb49adf2a04737861a20bf718e8de`.
 - Confirmed candidate (A2): `429bdf2e70f32a66c5b92a650d82c3a358922b86`.
-  All eight A1 findings were independently confirmed fixed. Subsequent enrichment
-  tooling and geographic corrections require a separate A3 review record.
+  All eight A1 findings were independently confirmed fixed.
+- Enrichment/geography candidate (A3): `f916d0260257bf60e6f0daf67fae5672e62306f6`.
+  Its three additional findings and the A4 correction record appear below.
 - Shared contract: `location-v3`; location snapshot format 1 with project snapshot
   format 2 and a required matching SHA-256 digest.
-- Additive schema: `location-model-v3`; integrity SQL `location-invariants-v2`.
-  A1 used model v2 / SQL v1; A2 adds whitespace normalization and permission fixes.
+- Additive schema: `location-model-v4`; integrity SQL `location-invariants-v3`.
+  A1 used model v2 / SQL v1; A2/A3 used model v3 / SQL v2. A4 also enforces
+  case-invariant UUID job identity in the planner and actual database.
 - Revised workflow graph SHA-256:
   `ce3321a4fa5e6c9061b754b5a21b166f70663910fe2ac780224c3087a9025cf8`.
 - Original workflow graph SHA-256:
@@ -80,7 +82,7 @@ unpublication; departure from the feed no longer archives an older local review.
   changed node configurations; rollover, deliberate unpublication, successful
   empty selection and exact membership/order verification.
 - Schema: synthetic additive rerun/drift/permission/recovery checks. PostgreSQL
-  behavior tested in a private temporary PGlite database, including 30 invalid
+  behavior tested in a private temporary PGlite database, including 32 invalid
   relationship/privacy-integrity writes and the independent photo/map relation.
   Privileged verification scripts were inspected before execution. No live SQL ran.
 - Component rendering: 10 synthetic SSR cases, including omitted null-neighborhood
@@ -89,7 +91,7 @@ unpublication; departure from the feed no longer archives an older local review.
   one settings record, four services, and nine client-scoped described badges.
 - Migration: 17 synthetic accounting/idempotency/ownership/executor cases. Actual
   live inventory and dry-run reproduction succeeded; no apply executed.
-- One-time enrichment: 63 synthetic planning, tenant, conflict, idempotency,
+- One-time enrichment: 70 synthetic planning, tenant, conflict, idempotency,
   recovery and private-root checks passed. Actual discovery verified all 53
   owner-mapped job identities and ZIPs; the offline plan proposes 53 updates.
 - Full Node 22 typecheck, repository lint and the applicable 19 verification
@@ -179,3 +181,27 @@ eligible FAQs, incomplete navigation targets, and malformed shared fetch results
 becoming empty arrays. All five were fixed with affected focused checks; final
 independent A1 review covered those fixes and their integrated behavior. Actual
 schema permissions, enriched records, migrated pages and release remain unverified.
+
+### A3 review and A4 corrections
+
+All three reviews ran against clean A3, shared contract location-v3, model v3 /
+SQL v2, current location plan v4 and enrichment plan v1. No implementation changed
+until every report finished. Findings:
+
+| Finding / severity | Correction and affected checks |
+| --- | --- |
+| Case variants of a UUID bypassed job uniqueness / P2 | Canonicalize UUIDs in source/target comparisons and SQL writes, add case-invariant unique index and canonical-value constraint. Planner and actual PGlite tests reject duplicate inserts/updates while preserving client scoping. |
+| A Git checkout nested beneath the private root could receive private artifacts / P2 | Check Git ancestry of every resolved destination parent for JSON reads/writes and media-byte reads. Added nested-checkout cases. |
+| Malformed JSON could leak an input excerpt through review CLI errors / P2 | Common reader now suppresses parsing details before any caller receives the error. Added malformed synthetic private-input regression. |
+
+All three corrections pass focused checks; independent A4 confirmation is recorded
+in the final handoff. Prepared content/enrichment plan hashes remain unchanged.
+
+A3 independent migration replay verified all 219 operations, 219 before/after
+receipts and 89 media hashes, then 219 no-ops and zero replan operations. Enrichment
+review simulated 53 updates, interrupted after write 27 before its after-receipt,
+resumed with 27 matches and 26 updates, then made zero writes on the next run.
+Another reviewer inspected all five disputed photos at full size and confirmed
+three corrected communities and two held entries, preserving original provenance.
+The original workflow graph, revised graph and actual seed artifacts were unchanged.
+These are offline tests, not production write or recovery evidence.

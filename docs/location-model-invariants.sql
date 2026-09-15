@@ -1,4 +1,4 @@
--- PREPARED, NOT APPLIED. Integrity artifact location-invariants-v2 (model location-model-v3). PostgreSQL only.
+-- PREPARED, NOT APPLIED. Integrity artifact location-invariants-v3 (model location-model-v4). PostgreSQL only.
 -- Permission-first gate must pass before schema creates roofing_projects.job_id.
 -- Run after setup-location-schema, with ON_ERROR_STOP=1, under exact authorization.
 -- Existing conflicting rows cause the transaction to abort; never repair them here.
@@ -14,6 +14,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS location_neighborhoods_client_slug ON public.r
 CREATE UNIQUE INDEX IF NOT EXISTS location_neighborhoods_wordpress ON public.roofing_neighborhoods(client,wordpress_id) WHERE wordpress_id IS NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS location_pages_wordpress ON public.roofing_service_areas(client,wordpress_location_id) WHERE wordpress_location_id IS NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS location_projects_client_job ON public.roofing_projects(client,job_id) WHERE job_id IS NOT NULL;
+-- UUID letter casing cannot create a second identity for the same AccuLynx job.
+CREATE UNIQUE INDEX IF NOT EXISTS location_projects_client_job_uuid ON public.roofing_projects(client,lower(job_id))
+  WHERE job_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$';
 CREATE UNIQUE INDEX IF NOT EXISTS location_sponsor_area_pair ON public.sponsor_service_areas(sponsor,service_area);
 CREATE UNIQUE INDEX IF NOT EXISTS location_nearby_area_pair ON public.roofing_service_area_neighbors(service_area,nearby_area);
 CREATE UNIQUE INDEX IF NOT EXISTS location_coverage_area_pair ON public.service_area_section_areas(section,service_area);
@@ -43,6 +46,7 @@ BEGIN
     ('roofing_service_areas','location_page_publication','CHECK (page_status IN (''taxonomy_only'',''draft'',''published'') AND (page_status <> ''published'' OR (status = ''published'' AND nullif(btrim(page_title),'''') IS NOT NULL AND nullif(btrim(introduction),'''') IS NOT NULL AND published_at IS NOT NULL)))'),
     ('roofing_neighborhoods','location_neighborhood_content','CHECK (client IS NOT NULL AND service_area IS NOT NULL AND nullif(btrim(name),'''') IS NOT NULL AND slug ~ ''^[a-z0-9]+(-[a-z0-9]+)*$'' AND status IN (''draft'',''published'',''archived''))'),
     ('roofing_projects','location_project_reference_normalized','CHECK ((job_id IS NULL OR (job_id !~ ''^[[:space:]]|[[:space:]]$'' AND job_id<>'''')) AND (zip IS NULL OR zip ~ ''^[0-9]{5}(-[0-9]{4})?$''))'),
+    ('roofing_projects','location_project_uuid_canonical','CHECK (job_id IS NULL OR job_id !~* ''^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'' OR job_id=lower(job_id))'),
     ('reviews','location_review_feed_shape','CHECK ((NOT latest_feed_member AND latest_feed_order IS NULL) OR (latest_feed_member AND latest_feed_order BETWEEN 1 AND 20 AND latest_feed_order IS NOT NULL AND external_id IS NOT NULL AND source=''Google'' AND rating=5))'),
     ('reviews','location_review_provenance_array','CHECK (jsonb_typeof(wordpress_provenance::jsonb)=''array'')'),
     ('faqs','location_faq_scope_exclusive','CHECK (num_nonnulls(website_page,service,service_area)<=1)'),
@@ -60,6 +64,9 @@ CREATE OR REPLACE FUNCTION public.location_normalize_project_reference()
 RETURNS trigger LANGUAGE plpgsql AS $function$
 BEGIN
   NEW.job_id := nullif(regexp_replace(NEW.job_id,'^[[:space:]]+|[[:space:]]+$','','g'),'');
+  IF NEW.job_id ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' THEN
+    NEW.job_id := lower(NEW.job_id);
+  END IF;
   NEW.zip := nullif(regexp_replace(NEW.zip,'^[[:space:]]+|[[:space:]]+$','','g'),'');
   RETURN NEW;
 END;

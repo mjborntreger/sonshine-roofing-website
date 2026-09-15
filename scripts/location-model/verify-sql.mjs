@@ -63,6 +63,12 @@ async function rejects(sql, codes = ['23503','23505','23514','23502','23001']) {
   await assert.rejects(db.exec(sql), error => { assert.ok(codes.includes(error.code), `Unexpected SQL failure code ${error.code}.`); rejected++; return true; });
 }
 await rejects(`INSERT INTO roofing_projects(id,client,service_area,job_id) VALUES (${q(key(32))},${q(client)},${q(area)},'synthetic-job-one')`, ['23505']);
+const syntheticJobUuid = 'abcdef12-3456-4789-abcd-ef1234567890';
+await db.exec(`INSERT INTO roofing_projects(id,client,service_area,job_id,zip) VALUES (${q(key(33))},${q(client)},${q(area)},${q(syntheticJobUuid.toUpperCase())},'34200')`);
+assert.equal((await db.query(`SELECT job_id FROM roofing_projects WHERE id=${q(key(33))}`)).rows[0].job_id, syntheticJobUuid);
+await rejects(`INSERT INTO roofing_projects(id,client,service_area,job_id,zip) VALUES (${q(key(34))},${q(client)},${q(area)},${q(syntheticJobUuid)},'34200')`, ['23505']);
+await rejects(`UPDATE roofing_projects SET job_id=${q(syntheticJobUuid.toUpperCase())} WHERE id=${q(project)}`, ['23505']);
+await db.exec(`UPDATE roofing_projects SET job_id=${q(syntheticJobUuid.toUpperCase())} WHERE id=${q(otherProject)}`);
 await rejects(`UPDATE roofing_projects SET service_area=${q(otherArea)} WHERE id=${q(project)}`);
 await rejects(`UPDATE roofing_projects SET service_area=${q(nearby)} WHERE id=${q(project)}`);
 await rejects(`UPDATE roofing_projects SET service_area=NULL WHERE id=${q(project)}`);

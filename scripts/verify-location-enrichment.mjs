@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile, mkdtemp, mkdir, symlink, rm } from 'node:fs/promises';
+import { readFile, writeFile, mkdtemp, mkdir, symlink, rm } from 'node:fs/promises';
 import { VERSION, FIELDS, planEnrichment, verifyPlan, publicSummary, normalizeReference, normalizeZip, applyEnrichmentPlan } from './location-enrichment/core.mjs';
 import { enrichmentApi, endpointFingerprint } from './location-enrichment/cli.mjs';
 import { mapDirectusProject } from '../lib/content/directus-projects.mjs';
@@ -36,6 +36,13 @@ check(!JSON.stringify(plan).includes('Keep editorial title'), 'Private artifact 
 check(!JSON.stringify(publicSummary(plan)).includes('synthetic-private-job') && !JSON.stringify(publicSummary(plan)).includes('34200') && !JSON.stringify(publicSummary(plan)).includes('project-one'), 'Public summary excludes private references and row identities');
 assert.equal(normalizeReference(' \t\n '), null); assert.equal(normalizeReference(' synthetic-job '), 'synthetic-job');
 assert.equal(normalizeZip(' 012345678 '), '01234-5678'); assert.equal(normalizeZip(1234), undefined); assert.equal(normalizeZip('34 200'), undefined); checks++;
+const uuid = 'abcdef12-3456-4789-abcd-ef1234567890';
+check(normalizeReference(uuid.toUpperCase()) === uuid, 'UUID references use canonical lowercase');
+const duplicateUuid = mappings(); duplicateUuid[0].job_id = uuid; duplicateUuid[1].job_id = uuid.toUpperCase();
+check(make(inventory(), duplicateUuid).counts.conflicts === 2 && !make(inventory(), duplicateUuid).readyForApply, 'UUID case variants cannot map one job to two projects');
+const existingUuid = inventory(); existingUuid.projects[1].job_id = uuid.toUpperCase();
+const assignedUuid = mappings(); assignedUuid[0].job_id = uuid;
+check(make(existingUuid, assignedUuid).outcomes[0].reasons.includes('job_owned_by_other_project'), 'Existing UUID ownership is also case invariant');
 
 for (const [change, expected] of [
   [data => { data.schemaReady = false; for (const row of data.projects) { delete row.job_id; delete row.zip; delete row.neighborhood; } }, 'schema_not_ready'],
@@ -157,6 +164,14 @@ try {
   check((await io.readPrivate(`${safe}/synthetic.json`)).fixture === 'synthetic-private-value', 'Configured private root supports artifact write/read');
   await assert.rejects(io.writePrivate(`${safe}/synthetic.json`, {})); checks++;
   await assert.rejects(io.checkedPath(`${temp}/outside.json`, false)); checks++;
+  const nested = `${safe}/nested-repository`;
+  await mkdir(nested, { mode: 0o700 }); await mkdir(`${nested}/.git`);
+  await writeFile(`${nested}/synthetic.json`, '{}', { mode: 0o600 });
+  await assert.rejects(io.writePrivate(`${nested}/new.json`, {}), /outside every Git/u); checks++;
+  await assert.rejects(io.readPrivate(`${nested}/synthetic.json`), /outside every Git/u); checks++;
+  await assert.rejects(io.readPrivateBytes(`${nested}/synthetic.json`), /outside every Git/u); checks++;
+  await writeFile(`${safe}/malformed.json`, 'synthetic-private-malformed-value', { mode: 0o600 });
+  await assert.rejects(io.readPrivate(`${safe}/malformed.json`), error => error.message.includes('contents suppressed') && !error.message.includes('synthetic-private-malformed-value')); checks++;
   for (const root of [repo, `${repo}/child`]) {
     const unsafe = await privateIo(root);
     await assert.rejects(unsafe.checkedPath(`${root}/synthetic.json`, false), /outside every Git/u); checks++;

@@ -34,7 +34,8 @@ fnm exec --using 22 node scripts/location-enrichment/cli.mjs \
   --out /private/tmp/sonshine-location-migration-20260915/project-enrichment-plan-next.json
 ```
 
-Planning makes no API requests. Each row requires a verified owner match, exact
+Planning makes no API requests. UUID letter casing is normalized consistently with
+database job uniqueness. Each row requires a verified owner match, exact
 authenticated job identity, ZIP and primary area, controlled evidence labels and
 verification time. Job references are normalized and unique across the entire client.
 Existing differing references always conflict. Existing geography changes require
@@ -71,9 +72,10 @@ a wildcard grant. No destructive rollback automation is included.
 
 ## Verification
 
-`npm run verify:location-enrichment` passes 63 synthetic checks, including missing
+`npm run verify:location-enrichment` passes 70 synthetic checks, including missing
 and duplicate identities, tenant and neighborhood conflicts, verified corrections,
 later editorial changes, interrupted-run recovery, same-plan and fresh-plan reruns,
-private error suppression, public projections and configurable private storage.
+private error suppression, malformed JSON, public projections, UUID case variants
+and configurable private storage that also rejects nested Git destinations.
 Synthetic checks and authenticated discovery do not establish an applied backfill,
 actual public denial, production constraints or deployed page acceptance.

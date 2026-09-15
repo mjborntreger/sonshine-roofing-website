@@ -1,7 +1,8 @@
 # Location model permissions and application gates
 
-Schema artifact: `location-model-v3`; contract `location-v3`; starting application `0271ec7`.
-Integrity SQL: `location-invariants-v2`, including whitespace-only job/ZIP handling.
+Schema artifact: `location-model-v4`; contract `location-v3`; starting application `0271ec7`.
+Integrity SQL: `location-invariants-v3`, including whitespace-only job/ZIP handling
+and case-invariant UUID job identity.
 Prepared only. No schema, SQL, policy or project-enrichment changes were applied.
 
 ## Permission-first sequence
@@ -93,7 +94,10 @@ do not claim that editor/sync/public/reader production permissions are corrected
 Composite foreign keys enforce client/area/neighborhood consistency in both
 write directions. Primary project service_area remains SQL NOT NULL. A populated
 job_id is trimmed and unique within its client; whitespace-only values, including
-tabs/newlines, become NULL. ZIP is
+tabs/newlines, become NULL. UUID references normalize to lowercase; an additional
+unique index prevents case variants from representing the same job twice. Existing
+noncanonical/conflicting rows block invariant installation rather than being
+silently rewritten. ZIP is
 trimmed and checked only when populated. Junction pairs are unique, nearby links
 are directed and cannot self-link, and row locks plus reassignment guards protect
 junction tenant identities. Existing associated canonical records use RESTRICT;
@@ -135,7 +139,7 @@ workflow and narrow content before-images together.
   before/after recovery and concurrent-edit refusal.
 - `LOCATION_PGLITE_PATH=<temporary-install>/node_modules/@electric-sql/pglite/dist/index.js
   node scripts/location-model/verify-sql.mjs`: a fresh in-memory PostgreSQL engine
-  executes the actual SQL twice and verifies 30 rejected mutations, normalization,
+  executes the actual SQL twice and verifies 32 rejected mutations, normalization,
   local association retention, FAQ deletion/scope, junctions, navigation,
   review rollover and the eventual scoped requirement. No real CMS is connected.
 - `docs/verify-location-model.sql`: explicitly READ ONLY. It validates required

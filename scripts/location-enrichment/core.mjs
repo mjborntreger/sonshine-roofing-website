@@ -16,7 +16,9 @@ export function normalizeReference(value) {
   if (value == null) return null;
   if (typeof value !== 'string') return undefined;
   const result = value.trim();
-  return result === '' ? null : result.length <= 255 && !hasControl(result) ? result : undefined;
+  if (result === '') return null;
+  if (result.length > 255 || hasControl(result)) return undefined;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu.test(result) ? result.toLowerCase() : result;
 }
 export function normalizeZip(value) {
   if (value == null) return null;

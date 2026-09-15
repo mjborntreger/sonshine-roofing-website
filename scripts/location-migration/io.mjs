@@ -8,7 +8,10 @@ async function checkPrivateRoot() {
   assert.ok(path.isAbsolute(PRIVATE_ROOT), 'Private artifact root must be absolute');
   assert.equal(await realpath(PRIVATE_ROOT), PRIVATE_ROOT, 'Use the canonical private artifact root, not a symlink');
   assert.equal((await lstat(PRIVATE_ROOT)).mode & 0o077, 0, 'Private artifact root must have mode 0700');
-  for (let ancestor = PRIVATE_ROOT; ; ancestor = path.dirname(ancestor)) {
+  await checkOutsideGit(PRIVATE_ROOT);
+}
+async function checkOutsideGit(directory) {
+  for (let ancestor = directory; ; ancestor = path.dirname(ancestor)) {
     try { await lstat(path.join(ancestor, '.git')); assert.fail('Private artifacts must remain outside every Git worktree'); }
     catch (error) { if (error.code !== 'ENOENT') throw error; }
     if (path.dirname(ancestor) === ancestor) break;
@@ -19,6 +22,7 @@ export async function checkedPath(filename, existing = true) {
   assert.ok(path.isAbsolute(filename) && filename.startsWith(`${PRIVATE_ROOT}/`), 'Use the approved private recovery directory');
   const directory = await realpath(path.dirname(filename));
   assert.ok(directory === PRIVATE_ROOT || directory.startsWith(`${PRIVATE_ROOT}/`), 'Private path escapes approved storage');
+  await checkOutsideGit(directory);
   assert.equal((await lstat(directory)).mode & 0o077, 0, 'Private directory must have mode 0700');
   if (existing) {
     const stat = await lstat(filename);
@@ -30,7 +34,11 @@ export async function checkedPath(filename, existing = true) {
 export async function readPrivate(filename) {
   await checkedPath(filename);
   const handle = await open(filename, constants.O_RDONLY | constants.O_NOFOLLOW);
-  try { return JSON.parse(await handle.readFile('utf8')); } finally { await handle.close(); }
+  try {
+    const raw = await handle.readFile('utf8');
+    try { return JSON.parse(raw); }
+    catch { throw new Error('Private artifact is not valid JSON; contents suppressed.'); }
+  } finally { await handle.close(); }
 }
 export async function writePrivate(filename, value) {
   assert.ok(path.isAbsolute(PRIVATE_ROOT), 'Private artifact root must be absolute');
