@@ -13,6 +13,9 @@ Full release acceptance remains incomplete.
   All eight A1 findings were independently confirmed fixed.
 - Enrichment/geography candidate (A3): `f916d0260257bf60e6f0daf67fae5672e62306f6`.
   Its three additional findings and the A4 correction record appear below.
+- Final reviewed application candidate (A4):
+  `7afefbd5606bcf5284690fd5ba97bfacce67dece`. All eleven integrated review findings
+  are independently confirmed resolved. See [final handoff](location-handoff.md).
 - Shared contract: `location-v3`; location snapshot format 1 with project snapshot
   format 2 and a required matching SHA-256 digest.
 - Additive schema: `location-model-v4`; integrity SQL `location-invariants-v3`.
@@ -97,6 +100,7 @@ unpublication; departure from the feed no longer archives an older local review.
 - Full Node 22 typecheck, repository lint and the applicable 19 verification
   scripts pass. The revised endpoint guard covers 29 paths and 18 tags, including
   actual GET/POST handler calls that reject mixed requests before any cache write.
+- A4 archive controls: 10 checks passed. Video playback/publication: 15 checks passed.
 
 The independent review findings and fixes are recorded below. Synthetic
 fixtures do not substitute for actual public permission probes, credentialed
@@ -130,7 +134,7 @@ Private preview index: `/private/tmp/sonshine-location-migration-20260915/visual
   plus the prior deployable application artifact before production changes.
 - Resolve effective Directus administrative policy topology; authorize and apply
   reviewed schema/permissions/data, run actual probes and a credentialed build,
-  review subsequent enrichment integration, and follow the coordinated workflow/app
+  follow the coordinated workflow/app
   cutover and rollback steps in [release](location-release.md).
 - Verify the five deployed routes, 404 cases, sitemap/noindex/navigation/FAQ
   boundaries, public outputs and workflow readback against recorded artifacts.
@@ -194,8 +198,9 @@ until every report finished. Findings:
 | A Git checkout nested beneath the private root could receive private artifacts / P2 | Check Git ancestry of every resolved destination parent for JSON reads/writes and media-byte reads. Added nested-checkout cases. |
 | Malformed JSON could leak an input excerpt through review CLI errors / P2 | Common reader now suppresses parsing details before any caller receives the error. Added malformed synthetic private-input regression. |
 
-All three corrections pass focused checks; independent A4 confirmation is recorded
-in the final handoff. Prepared content/enrichment plan hashes remain unchanged.
+All three corrections pass focused checks and independent A4 confirmation at
+`7afefbd5606bcf5284690fd5ba97bfacce67dece`. No new material findings were reported.
+Prepared content/enrichment plan hashes remain unchanged.
 
 A3 independent migration replay verified all 219 operations, 219 before/after
 receipts and 89 media hashes, then 219 no-ops and zero replan operations. Enrichment
@@ -205,3 +210,11 @@ Another reviewer inspected all five disputed photos at full size and confirmed
 three corrected communities and two held entries, preserving original provenance.
 The original workflow graph, revised graph and actual seed artifacts were unchanged.
 These are offline tests, not production write or recovery evidence.
+
+A4 reviewers independently reproduced case-invariant mapping and existing-job
+ownership checks, nested Git-directory/worktree-file rejection, and sanitized
+malformed-input errors through the actual review CLIs. PostgreSQL checks also
+verified the canonical constraint and folded unique index independently, and the
+read-only verifier rejected a missing constraint. The standard SQL suite rejects
+32 invalid mutations; the extended reviewer run added two independent rejections.
+All final reviewers reported unchanged worktrees and no production actions.
