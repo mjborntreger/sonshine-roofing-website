@@ -129,6 +129,20 @@ await test('approved direct neighbors create one pair; no approval gives held en
   assert.equal(b.operations.find(x => x.key === key).data.approved, true);
   assert.equal(Object.values(DRAFT_NEIGHBORS).flat().length, 17);
 });
+await test('verified neighborhood name corrections retain source identity and rerun without duplicates', () => {
+  const f = fixture(), northPort = f.source.nodes.find(page => page.slug === 'north-port');
+  const hood = { neighborhood: 'Plantation' };
+  northPort.locationAttributes.neighborhoodsServed = [hood];
+  const key = neighborhoodKey(northPort, hood);
+  const approvals = { neighborhoods: { [key]: { serviceAreaSlug: 'north-port', geographyVerified: true, evidence: 'Synthetic community sign and official district', nameVerified: true, name: 'Lakeside Plantation' } } };
+  const first = planMigration({ ...f, approvals }), op = first.operations.find(item => item.key === key);
+  assert.equal(op.data.name, 'Lakeside Plantation'); assert.equal(op.data.slug, 'lakeside-plantation');
+  assert.equal(op.data.wordpress_id, key); assert.equal(op.data.service_area, 'area-north-port');
+  const second = planMigration({ ...f, approvals, targets: applyFakePlan(first, f.targets) });
+  assert.equal(second.operations.length, 0);
+  const unverified = structuredClone(approvals); unverified.neighborhoods[key].geographyVerified = false;
+  assert.equal(planMigration({ ...f, approvals: unverified }).summary.neighborhoods.held, 1);
+});
 await test('existing Parrish coverage creates taxonomy only and preserves it on rerun', () => {
   const f = fixture(); f.targets.coverageSources = [{ section: 'synthetic-section', index: 3, slug: 'parrish' }];
   const plan = planMigration(f), op = plan.operations.find(row => row.taxonomyOnly);

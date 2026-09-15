@@ -14,7 +14,7 @@ export const DRAFT_NEIGHBORS = {
 };
 // These source rows contain an observed duplicate or conflicting location label.
 // Ordinary, unambiguous WordPress coverage assignments need no new approval.
-export const GEOGRAPHY_CONFLICTS = new Set(['plantation', 'university park / west of trail area', 'arroyo / crestline / village park', 'bay isles', 'the lake club', 'the concession']);
+export const GEOGRAPHY_CONFLICTS = new Set(['plantation', 'university park / west of trail area', 'arroyo / crestline / village park', 'desoto lakes', 'bay isles', 'the lake club', 'the concession']);
 const sorted = value => Array.isArray(value) ? value.map(sorted) : value && typeof value === 'object'
   ? Object.fromEntries(Object.keys(value).sort().map(key => [key, sorted(value[key])])) : value;
 export const hash = value => createHash('sha256').update(typeof value === 'string' ? value : JSON.stringify(sorted(value))).digest('hex');
@@ -189,16 +189,18 @@ export function planMigration({ source, targets, approvals = {}, previous = {}, 
     const attrs = page.locationAttributes;
     const images = [{ node: attrs.map?.node, ownerKey: key, field: 'overview_map', ownerId: area.id, collection: 'roofing_service_areas' }];
     for (const [index, hood] of (attrs.neighborhoodsServed || []).entries()) {
-      const rawKey = neighborhoodKey(page, hood), name = plain(hood.neighborhood);
-      const longboat = normalized(name) === 'longboat key';
+      const rawKey = neighborhoodKey(page, hood), sourceName = plain(hood.neighborhood);
+      const longboat = normalized(sourceName) === 'longboat key';
       const canonicalPage = longboat ? pages.find(p => p.slug === 'sarasota') : page;
       const canonicalKey = longboat ? neighborhoodKey(canonicalPage, hood) : rawKey;
       const approval = approvals.neighborhoods?.[rawKey];
-      const hasConflict = GEOGRAPHY_CONFLICTS.has(normalized(name));
+      // Correct a verified display name without changing the stable source identity.
+      const name = approval?.nameVerified && approval.geographyVerified && approval.evidence ? plain(approval.name) : sourceName;
+      const hasConflict = GEOGRAPHY_CONFLICTS.has(normalized(sourceName));
       const ownerSlug = longboat ? 'sarasota' : approval?.serviceAreaSlug || (!hasConflict ? page.slug : null);
       const owner = areas.get(ownerSlug);
       let result;
-      if (!name) result = add('neighborhoods', rawKey, 'held', 'Real neighborhood name is required');
+      if (!sourceName || !name) result = add('neighborhoods', rawKey, 'held', 'Real neighborhood name is required');
       else if (!longboat && (!owner || (hasConflict && (!approval?.geographyVerified || !approval?.evidence)))) result = add('neighborhoods', rawKey, 'held', 'Conflicting source geography requires verification');
       else {
         const existing = rows('roofing_neighborhoods').filter(row => row.wordpress_id === canonicalKey || (row.slug === slugify(name) && idOf(row.client) === targets.clientId));
@@ -322,7 +324,7 @@ export function planMigration({ source, targets, approvals = {}, previous = {}, 
     assert.ok(slug !== nearby && areas.has(slug) && areas.has(nearby), 'Invalid nearby relationship');
     junction('roofing_service_area_neighbors', key, { service_area: areas.get(slug).id, nearby_area: areas.get(nearby).id }, { approved: true, sort });
   }
-  for (const project of rows('roofing_projects')) add('enrichment', `project:${project.id}`, 'held', 'Verified initial enrichment mapping has not yet been supplied to this planner');
+  for (const project of rows('roofing_projects')) add('enrichment', `project:${project.id}`, 'held', 'Project enrichment is tracked in a separate private artifact and is not applied by the location import');
   for (const record of targets.coverageSources || []) {
     const area = areas.get(record.slug), key = `coverage:${record.section}:${record.index}`;
     if (!area) add('relationships', key, 'held', 'Coverage name/link has no verified canonical match');

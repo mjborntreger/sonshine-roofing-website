@@ -43,6 +43,7 @@
     "verify:location-model": "node scripts/verify-location-model.mjs",
     "verify:location-review-sync": "node scripts/verify-location-review-sync.mjs",
     "verify:location-migration": "node scripts/verify-location-migration.mjs",
+    "verify:location-enrichment": "node scripts/verify-location-enrichment.mjs",
     "migrate:locations:dry-run": "node scripts/migrate-wordpress-locations.mjs --dry-run",
     "verify:location-site-shell": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-location-site-shell.mjs"
   },

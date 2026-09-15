@@ -134,7 +134,9 @@ No production schema/data apply, workflow publication, deployment, merge, or pus
 is inferred from access. Prepare a concrete candidate and request any remaining
 exact external-action approval at the release gate. The owner authorized
 authenticated AccuLynx reads using the workspace-root environment on 2026-09-15;
-enrichment still requires verified matches and separately authorized CMS apply.
+all 53 owner-supplied matches and postal ZIPs have now been verified. The one-time
+private `location-enrichment-v1` artifact prepares only job/ZIP/geography updates;
+CMS apply/readback and the subsequent scoped required-field constraint remain pending.
 
 ## File ownership
 

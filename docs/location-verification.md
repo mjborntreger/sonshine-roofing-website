@@ -9,8 +9,9 @@ Full release acceptance remains incomplete.
 - Starting application and refreshed deployed revision:
   `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 - First frozen candidate (A1): `cff3fcc91eafb49adf2a04737861a20bf718e8de`.
-  Eight independent findings were fixed locally; the confirmation revision (A2)
-  and final dispositions are recorded in the final handoff.
+- Confirmed candidate (A2): `429bdf2e70f32a66c5b92a650d82c3a358922b86`.
+  All eight A1 findings were independently confirmed fixed. Subsequent enrichment
+  tooling and geographic corrections require a separate A3 review record.
 - Shared contract: `location-v3`; location snapshot format 1 with project snapshot
   format 2 and a required matching SHA-256 digest.
 - Additive schema: `location-model-v3`; integrity SQL `location-invariants-v2`.
@@ -27,10 +28,14 @@ Full release acceptance remains incomplete.
   preparation produces zero updates. Recheck fresh state before apply.
 - Workflow patch artifact: private `review-workflow-patch-v4.json`, contract-v3
   metadata; prior v1/v2/v3 patches are superseded.
-- Migration: `location-migration-v1`, contract v3, private `plan-candidate-v3.json`;
-  canonical hash `54a660973869ca8fd45367ba5582d7ba1cc027ff92376893f160f161fdd120bb`.
-  The plan has 215 proposed mutations and is not executable before fresh applied
+- Migration: `location-migration-v1`, contract v3, private `plan-candidate-v4.json`;
+  canonical hash `4aa9693445fdb8e2d22ec00657ec40eba5961e9ebd6a5e04549eb5f1bf1ef424`.
+  The plan has 219 proposed mutations and is not executable before fresh applied
   schema/permission readback. See the full [source accounting](location-migration.md).
+- Enrichment: private `location-enrichment-v1`, `project-enrichment-plan-v1.json`;
+  canonical hash `bd575388e8a5088e768ad484aa7a0c4deae4394673af6ee12e00cec2f8e3db42`.
+  All 53 updates are prepared; schema/privacy gates prevent apply. No required
+  constraint has run. See [enrichment evidence](location-enrichment-evidence.md).
 
 ## Implemented behavior
 
@@ -82,8 +87,11 @@ unpublication; departure from the feed no longer archives an older local review.
   wrappers and separate photo/map rendering. Selection: 18 focused fixtures.
 - Shared shell: 35 fixtures, plus a successful credentialed read-only check of
   one settings record, four services, and nine client-scoped described badges.
-- Migration: 16 synthetic accounting/idempotency/ownership/executor cases. Actual
+- Migration: 17 synthetic accounting/idempotency/ownership/executor cases. Actual
   live inventory and dry-run reproduction succeeded; no apply executed.
+- One-time enrichment: 63 synthetic planning, tenant, conflict, idempotency,
+  recovery and private-root checks passed. Actual discovery verified all 53
+  owner-mapped job identities and ZIPs; the offline plan proposes 53 updates.
 - Full Node 22 typecheck, repository lint and the applicable 19 verification
   scripts pass. The revised endpoint guard covers 29 paths and 18 tags, including
   actual GET/POST handler calls that reject mixed requests before any cache write.
@@ -108,9 +116,10 @@ Private preview index: `/private/tmp/sonshine-location-migration-20260915/visual
 
 ## Outstanding acceptance dependencies
 
-- Owner's manually verified project-to-AccuLynx mapping; authenticated API access
-  works. All 53 projects require enrichment accounting and approved apply before
-  the SonShine-only job/ZIP required constraint can be enforced.
+- All 53 manual project-to-job mappings and authenticated job lookups are verified,
+  with 53 valid ZIPs and preserved primary areas. Neighborhoods remain unverified.
+  Approved backfill and successful readback are still required before enforcing
+  the SonShine-only job/ZIP required constraint.
 - Verify held review ratings and problematic source links; preserve unknown dates.
   No ratings are inferred from WordPress star graphics.
 - Resolve remaining geographic conflicts and complete actual media/editorial review.
@@ -119,7 +128,7 @@ Private preview index: `/private/tmp/sonshine-location-migration-20260915/visual
   plus the prior deployable application artifact before production changes.
 - Resolve effective Directus administrative policy topology; authorize and apply
   reviewed schema/permissions/data, run actual probes and a credentialed build,
-  confirm independent review fixes, and follow the coordinated workflow/app
+  review subsequent enrichment integration, and follow the coordinated workflow/app
   cutover and rollback steps in [release](location-release.md).
 - Verify the five deployed routes, 404 cases, sitemap/noindex/navigation/FAQ
   boundaries, public outputs and workflow readback against recorded artifacts.
@@ -132,9 +141,12 @@ lint, focused commit and synchronization process.
 
 Three independent reviewers examined clean A1 at
 `cff3fcc91eafb49adf2a04737861a20bf718e8de`, shared contract `location-v3`, model v2,
-SQL v1, and the workflow/migration hashes above. No implementation changed during
-their review. The coordinator owns every correction below; the same reviewers
-will confirm their affected findings against frozen A2 before final handoff.
+SQL v1, the unchanged workflow hash above, and migration plan v3 hash
+`54a660973869ca8fd45367ba5582d7ba1cc027ff92376893f160f161fdd120bb`.
+No implementation changed during
+their review. The coordinator owns every correction below. The same reviewers
+confirmed all eight findings fixed at frozen A2, with no new material findings
+within the affected scope. Their conclusions do not authorize production release.
 
 | Review / severity | Finding | Correction and focused evidence |
 | --- | --- | --- |
@@ -152,6 +164,14 @@ in memory, verified 87 media byte hashes and 215 before/after receipts, then obs
 215 no-ops on a second execution and zero operations/conflicts on replanning.
 The corrected planner reproduces the same canonical plan hash. These checks do
 not constitute a live migration or recovery rehearsal.
+
+A2 correctness confirmation additionally passed an independent 64-case navigation
+matrix, ten neighborhood-state cases, and an in-process tenant-environment
+restoration check. Privacy confirmation passed model, pipeline and actual PGlite
+SQL checks (30 rejected invalid writes). Migration confirmation passed 16 tests
+and reproduced the same 215-operation artifact. Worktrees remained unchanged
+during all three confirmations. The subsequently added seventeenth migration
+fixture covers the verified display-name correction while retaining source identity.
 
 Preliminary independent model-specialist audit found five issues before freeze:
 internal revalidation bypass, shared-layout snapshot leakage, silently missing

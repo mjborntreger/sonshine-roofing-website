@@ -30,10 +30,10 @@ Release also needs these inputs and successful checks:
 
 - Administrative resolution of all effective public/website policy grants and a
   safe SonShine-specific policy for tenant-scoped extensions.
-- The owner's manual project/job mapping. AccuLynx API authentication was verified
-  using the authorized workspace-root environment; all 53 initial
-  project enrichments are unresolved pending mapping. The subsequent SonShine-only job/ZIP
-  requirement is unapplied. This blocks full release acceptance.
+- All 53 owner-supplied project/job mappings and ZIP candidates are verified through
+  authenticated AccuLynx reads. Existing primary areas are corroborated and preserved;
+  all neighborhoods remain unverified/null. Enrichment apply/readback and the
+  subsequent SonShine-only job/ZIP requirement are unapplied. This blocks full acceptance.
 - Verified source ratings for held reviews, two corrected source links, unresolved
   neighborhood geography, and reviewed media. The owner approved all five direct
   nearby-area lists recorded in the v3 contract on 2026-09-15.
