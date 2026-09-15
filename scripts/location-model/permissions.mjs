@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
-import { readFile, writeFile, mkdir, stat } from 'node:fs/promises';
-import { resolve, isAbsolute } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { readFile, writeFile, mkdir, stat, realpath } from 'node:fs/promises';
+import { resolve, isAbsolute, dirname, basename, join } from 'node:path';
+import { pathToFileURL, fileURLToPath } from 'node:url';
 import { publicLocationFields } from './schema.mjs';
 
 export const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
@@ -43,13 +43,46 @@ export function planPermissions(rows, { policyIds, clientId, availableFields, ph
     assert.ok(allowed.includes('id'), `No public projection for ${collection}.`);
     if (!grants.length && phase === 'tighten') continue; // Do not grant previously absent access during tightening.
     for (const prior of grants.length ? grants : [null]) {
+      const priorFields = fieldsOf(prior?.fields);
+      if (phase === 'tighten') assert.ok(priorFields.length, 'Existing field scope is unavailable; resolve it before tightening.');
+      const fields = phase === 'tighten' && !priorFields.includes('*') ? priorFields.filter(name => allowed.includes(name)) : allowed;
+      assert.ok(fields.length, 'No existing public fields remain; review removal of this grant rather than broadening access.');
       const data = { collection, action: 'read', policy,
-        fields: allowed, permissions: phase === 'tighten' ? (prior?.permissions ?? null) : scoped(prior?.permissions, rowScope(collection, clientId)) };
+        fields, permissions: phase === 'tighten' ? (prior?.permissions ?? null) : scoped(prior?.permissions, rowScope(collection, clientId)) };
       if (prior && JSON.stringify(fieldsOf(prior.fields)) === JSON.stringify(data.fields) && JSON.stringify(prior.permissions) === JSON.stringify(data.permissions)) continue;
       changes.push({ id: prior?.id ?? null, before: prior, beforeDigest: digest(prior), data });
     }
   }
   return changes;
+}
+/** Resolve symlinks before writing private before-images, including new paths. */
+export async function prepareRecoveryDirectory(directory, repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))) {
+  assert.ok(directory && isAbsolute(directory), 'An absolute recovery directory outside Git is required.');
+  const root = await realpath(repositoryRoot);
+  let ancestor = resolve(directory);
+  const missing = [];
+  for (;;) {
+    try { ancestor = await realpath(ancestor); break; }
+    catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      missing.unshift(basename(ancestor));
+      const parent = dirname(ancestor);
+      assert.notEqual(parent, ancestor, 'Recovery parent cannot be resolved.');
+      ancestor = parent;
+    }
+  }
+  const target = resolve(ancestor, ...missing);
+  assert.ok(target !== root && !target.startsWith(root + '/'), 'Recovery directory must remain outside Git.');
+  for (let parent = ancestor; ; parent = dirname(parent)) {
+    try { await stat(join(parent, '.git')); assert.fail('Recovery directory must remain outside Git.'); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+    if (dirname(parent) === parent) break;
+  }
+  await mkdir(target, { recursive: true, mode: 0o700 });
+  const actual = await realpath(target);
+  assert.equal(actual, target, 'Recovery path changed while preparing it.');
+  assert.equal((await stat(actual)).mode & 0o077, 0, 'Recovery directory must be private (0700).');
+  return actual;
 }
 export async function applyPermissionPlan(request, changes, saveRecovery) {
   assert.equal(typeof saveRecovery, 'function', 'Private recovery writer required.');
@@ -127,10 +160,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     for (const name of phase === 'tighten' ? ['roofing_projects'] : Object.keys(publicLocationFields)) availableFields[name] = (await request(`fields/${name}`)).map(row => row.field);
     const changes = planPermissions(rows, { ...config, availableFields, phase });
     if (args.includes('--apply')) {
-      const directory = arg('--recovery-dir');
-      assert.ok(directory && isAbsolute(directory) && !resolve(directory).startsWith(resolve('.') + '/'), 'An absolute recovery directory outside Git is required.');
-      await mkdir(directory, { recursive: true, mode: 0o700 });
-      assert.equal((await stat(directory)).mode & 0o077, 0, 'Recovery directory must be private (0700).');
+      const directory = await prepareRecoveryDirectory(arg('--recovery-dir'));
       const runDirectory = resolve(directory, `permissions-${phase}-${Date.now()}-${randomUUID()}`);
       await mkdir(runDirectory, { mode: 0o700 });
       const save = async (index, change) => writeFile(resolve(runDirectory, `${index}.${change.after ? 'after' : 'before'}.json`), JSON.stringify(change), { mode: 0o600, flag: 'wx' });

@@ -1,7 +1,7 @@
 # Location project enrichment evidence
 
 Status: authenticated discovery complete; owner mapping and enrichment remain pending.
-Contract: `location-v2`.
+Contract: `location-v3`.
 Application base: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 Last verified: 2026-09-15.
 Verification source: authenticated AccuLynx read, live Directus schema and scoped

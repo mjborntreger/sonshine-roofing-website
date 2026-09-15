@@ -225,9 +225,11 @@ export function planMigration({ source, targets, approvals = {}, previous = {}, 
     for (const review of attrs.featuredReviews || []) {
       const key = reviewKey(page, review), approval = approvals.reviews?.[key];
       const candidates = rows('reviews').filter(row => (row.wordpress_provenance || []).some(p => p.key === key));
-      const matched = approval?.targetId ? rows('reviews').filter(row => row.id === approval.targetId) : candidates;
+      const explicitTarget = approval?.targetId != null;
+      const matched = explicitTarget ? rows('reviews').filter(row => row.id === approval.targetId) : candidates;
       let result, scoped = false;
-      if (matched.length > 1) result = add('reviews', key, 'conflict', 'More than one canonical review match');
+      if (explicitTarget && (matched.length !== 1 || candidates.some(row => row.id !== matched[0].id))) result = add('reviews', key, 'conflict', 'Explicit review target is missing or disagrees with canonical provenance');
+      else if (matched.length > 1) result = add('reviews', key, 'conflict', 'More than one canonical review match');
       else if (!approval?.sourceVerified || !approval?.evidence || !Number.isInteger(approval.rating) || approval.rating < 1 || approval.rating > 5 || !safeUrl(review.reviewUrl) || reviewDate(review.reviewDate) === undefined) result = add('reviews', key, 'held', 'Verified rating/source/link/date facts required; absent date remains null');
       else {
         const provenance = { key, location_post_id: String(page.databaseId), source_url: review.reviewUrl, source_review_date: review.reviewDate || null };

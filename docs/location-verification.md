@@ -8,10 +8,13 @@ Full release acceptance remains incomplete.
 
 - Starting application and refreshed deployed revision:
   `0271ec70f46a2b31c4eb012da28459f6a9144184`.
-- Candidate: recorded below after implementation freeze and independent review.
+- First frozen candidate (A1): `cff3fcc91eafb49adf2a04737861a20bf718e8de`.
+  Eight independent findings were fixed locally; the confirmation revision (A2)
+  and final dispositions are recorded in the final handoff.
 - Shared contract: `location-v3`; location snapshot format 1 with project snapshot
   format 2 and a required matching SHA-256 digest.
-- Additive schema: `location-model-v2`; integrity SQL remains version 1.
+- Additive schema: `location-model-v3`; integrity SQL `location-invariants-v2`.
+  A1 used model v2 / SQL v1; A2 adds whitespace normalization and permission fixes.
 - Revised workflow graph SHA-256:
   `ce3321a4fa5e6c9061b754b5a21b166f70663910fe2ac780224c3087a9025cf8`.
 - Original workflow graph SHA-256:
@@ -59,9 +62,11 @@ unpublication; departure from the feed no longer archives an older local review.
 
 - Node 22 baseline credentialed build at the starting revision passed: 456 pages,
   53 projects, 79 videos, 333 gallery images, 438 CMS route owners.
-- Candidate credentialed prebuild was attempted and failed closed because the new
-  project neighborhood schema/expansion is not present in live Directus. This is
-  expected before additive schema apply, and is **not** a successful candidate build.
+- Candidate credentialed prebuild exposed a fixture client-environment leak at A1.
+  After correction, all prebuild fixture gates passed with the real client environment.
+  The build then failed closed because the new project neighborhood schema/expansion
+  is not present in live Directus. This is expected before additive schema apply,
+  and is **not** a successful candidate build. The corrected build runner propagated exit 1.
   No fallback or stale generated project/location snapshot was retained.
 - Focused fixtures cover project/video independent publication, geographic
   selection edge cases, integer review identities, exclusive FAQ scopes,
@@ -70,20 +75,20 @@ unpublication; departure from the feed no longer archives an older local review.
   changed node configurations; rollover, deliberate unpublication, successful
   empty selection and exact membership/order verification.
 - Schema: synthetic additive rerun/drift/permission/recovery checks. PostgreSQL
-  behavior tested in a private temporary PGlite database, including 28 invalid
+  behavior tested in a private temporary PGlite database, including 30 invalid
   relationship/privacy-integrity writes and the independent photo/map relation.
   Privileged verification scripts were inspected before execution. No live SQL ran.
 - Component rendering: 10 synthetic SSR cases, including omitted null-neighborhood
   wrappers and separate photo/map rendering. Selection: 18 focused fixtures.
 - Shared shell: 35 fixtures, plus a successful credentialed read-only check of
   one settings record, four services, and nine client-scoped described badges.
-- Migration: 15 synthetic accounting/idempotency/ownership/executor cases. Actual
+- Migration: 16 synthetic accounting/idempotency/ownership/executor cases. Actual
   live inventory and dry-run reproduction succeeded; no apply executed.
 - Full Node 22 typecheck, repository lint and the applicable 19 verification
   scripts pass. The revised endpoint guard covers 29 paths and 18 tags, including
   actual GET/POST handler calls that reject mixed requests before any cache write.
 
-The independent review dispositions are appended after freeze. Synthetic
+The independent review findings and fixes are recorded below. Synthetic
 fixtures do not substitute for actual public permission probes, credentialed
 candidate build, migrated content review, or deployed readback.
 
@@ -114,7 +119,7 @@ Private preview index: `/private/tmp/sonshine-location-migration-20260915/visual
   plus the prior deployable application artifact before production changes.
 - Resolve effective Directus administrative policy topology; authorize and apply
   reviewed schema/permissions/data, run actual probes and a credentialed build,
-  complete independent review findings, and follow the coordinated workflow/app
+  confirm independent review fixes, and follow the coordinated workflow/app
   cutover and rollback steps in [release](location-release.md).
 - Verify the five deployed routes, 404 cases, sitemap/noindex/navigation/FAQ
   boundaries, public outputs and workflow readback against recorded artifacts.
@@ -125,12 +130,32 @@ lint, focused commit and synchronization process.
 
 ## Independent review record
 
-Pending integrated candidate freeze. Reviewers will cover correctness/publication,
-privacy/data integrity, and migration/release. Each review must name the candidate
-revision and artifact versions, with findings and unresolved live-state limits.
+Three independent reviewers examined clean A1 at
+`cff3fcc91eafb49adf2a04737861a20bf718e8de`, shared contract `location-v3`, model v2,
+SQL v1, and the workflow/migration hashes above. No implementation changed during
+their review. The coordinator owns every correction below; the same reviewers
+will confirm their affected findings against frozen A2 before final handoff.
+
+| Review / severity | Finding | Correction and focused evidence |
+| --- | --- | --- |
+| Correctness / P1 | Fixture client inherited the credentialed build environment. | Scope and restore the fixture client; retain the cross-client rejection case. Credentialed prebuild fixtures now pass. |
+| Correctness / P2 | Query, fragment and same-site absolute navigation URLs bypassed location publication checks. | Normalize the URL, resolve its canonical published owner, then preserve a valid suffix. Added draft/taxonomy/unknown and published URL variants. |
+| Correctness / P2 | An expanded neighborhood with missing or invalid status silently disappeared. | Validate the status enum; only known draft/archived records normalize to absent. Added malformed and intentionally unpublished cases. |
+| Privacy / P1 | Service-area reader projection omitted requested source_updated_at. | Add the public timestamp and check all requested root fields against prepared projections. |
+| Privacy / P2 | Permission tightening could broaden an existing narrow field grant. | Preserve the intersection for narrow grants; reject unavailable/empty scopes. Added restrictive-grant cases. |
+| Privacy / P2 | Tabs/newlines bypassed blank job-reference normalization and required checks. | Normalize edge whitespace to null and reject invalid required values in actual SQL; 30 rejected-mutation PGlite checks pass. |
+| Privacy / P2 | Recovery paths accepted the repository root or symlinks into Git. | Resolve existing ancestors/symlinks, reject any Git ancestor and require a private directory. Added root, descendant, symlink and valid external-path cases. |
+| Migration / P2 | A missing explicit review target could become a create; a conflicting target could override canonical provenance. | Require exactly one explicit target consistent with every provenance match; both cases now produce conflicts and no review writes. |
+
+The migration/release reviewer independently replayed all 215 prepared operations
+in memory, verified 87 media byte hashes and 215 before/after receipts, then observed
+215 no-ops on a second execution and zero operations/conflicts on replanning.
+The corrected planner reproduces the same canonical plan hash. These checks do
+not constitute a live migration or recovery rehearsal.
 
 Preliminary independent model-specialist audit found five issues before freeze:
 internal revalidation bypass, shared-layout snapshot leakage, silently missing
 eligible FAQs, incomplete navigation targets, and malformed shared fetch results
 becoming empty arrays. All five were fixed with affected focused checks; final
-independent review will assess those fixes against the frozen candidate.
+independent A1 review covered those fixes and their integrated behavior. Actual
+schema permissions, enriched records, migrated pages and release remain unverified.

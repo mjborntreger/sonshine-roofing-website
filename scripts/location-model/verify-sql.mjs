@@ -99,12 +99,16 @@ await db.exec(`UPDATE reviews SET latest_feed_member=false,latest_feed_order=NUL
 assert.equal((await db.query('SELECT status FROM reviews WHERE id=1')).rows[0].status,'published');
 await db.exec(`UPDATE roofing_projects SET job_id='  ',zip='  ' WHERE id=${q(project)}`);
 assert.deepEqual((await db.query(`SELECT job_id,zip FROM roofing_projects WHERE id=${q(project)}`)).rows[0],{job_id:null,zip:null});
+await db.exec(`UPDATE roofing_projects SET job_id=${q('\t\n\r ')},zip=${q('\t\n')} WHERE id=${q(project)}`);
+assert.deepEqual((await db.query(`SELECT job_id,zip FROM roofing_projects WHERE id=${q(project)}`)).rows[0],{job_id:null,zip:null});
 const backfillSQL = await readFile(new URL('./require-sonshine-enrichment.sql', import.meta.url),'utf8');
 await assert.rejects(db.exec(backfillSQL), /enrichment is incomplete/u); await db.exec('ROLLBACK');
 await db.exec(`UPDATE roofing_projects SET job_id='synthetic-job-one',zip='34200' WHERE id=${q(project)}`);
 await db.exec(backfillSQL); await db.exec(backfillSQL);
 await rejects(`UPDATE roofing_projects SET job_id=NULL WHERE id=${q(project)}`);
 await rejects(`UPDATE roofing_projects SET zip=NULL WHERE id=${q(project)}`);
+await rejects(`UPDATE roofing_projects SET job_id=${q('\t\n')} WHERE id=${q(project)}`);
+await rejects(`UPDATE roofing_projects SET zip=${q('\t\n')} WHERE id=${q(project)}`);
 await db.exec(`UPDATE roofing_projects SET job_id=NULL,zip=NULL WHERE id=${q(otherProject)}`);
 // The required rule captures tenant identity; changing a slug cannot evade it.
 await db.exec(`UPDATE clients SET slug='renamed-synthetic' WHERE id=${q(client)}`);

@@ -1,4 +1,4 @@
--- PREPARED, NOT APPLIED. Contract location-model-v1. PostgreSQL only.
+-- PREPARED, NOT APPLIED. Integrity artifact location-invariants-v2 (model location-model-v3). PostgreSQL only.
 -- Permission-first gate must pass before schema creates roofing_projects.job_id.
 -- Run after setup-location-schema, with ON_ERROR_STOP=1, under exact authorization.
 -- Existing conflicting rows cause the transaction to abort; never repair them here.
@@ -42,7 +42,7 @@ BEGIN
     ('navigation_items','location_navigation_parent_fk','FOREIGN KEY (parent) REFERENCES public.navigation_items(id) ON DELETE RESTRICT ON UPDATE RESTRICT'),
     ('roofing_service_areas','location_page_publication','CHECK (page_status IN (''taxonomy_only'',''draft'',''published'') AND (page_status <> ''published'' OR (status = ''published'' AND nullif(btrim(page_title),'''') IS NOT NULL AND nullif(btrim(introduction),'''') IS NOT NULL AND published_at IS NOT NULL)))'),
     ('roofing_neighborhoods','location_neighborhood_content','CHECK (client IS NOT NULL AND service_area IS NOT NULL AND nullif(btrim(name),'''') IS NOT NULL AND slug ~ ''^[a-z0-9]+(-[a-z0-9]+)*$'' AND status IN (''draft'',''published'',''archived''))'),
-    ('roofing_projects','location_project_reference_normalized','CHECK ((job_id IS NULL OR (job_id=btrim(job_id) AND job_id<>'''')) AND (zip IS NULL OR zip ~ ''^[0-9]{5}(-[0-9]{4})?$''))'),
+    ('roofing_projects','location_project_reference_normalized','CHECK ((job_id IS NULL OR (job_id !~ ''^[[:space:]]|[[:space:]]$'' AND job_id<>'''')) AND (zip IS NULL OR zip ~ ''^[0-9]{5}(-[0-9]{4})?$''))'),
     ('reviews','location_review_feed_shape','CHECK ((NOT latest_feed_member AND latest_feed_order IS NULL) OR (latest_feed_member AND latest_feed_order BETWEEN 1 AND 20 AND latest_feed_order IS NOT NULL AND external_id IS NOT NULL AND source=''Google'' AND rating=5))'),
     ('reviews','location_review_provenance_array','CHECK (jsonb_typeof(wordpress_provenance::jsonb)=''array'')'),
     ('faqs','location_faq_scope_exclusive','CHECK (num_nonnulls(website_page,service,service_area)<=1)'),
@@ -59,8 +59,8 @@ $migration$;
 CREATE OR REPLACE FUNCTION public.location_normalize_project_reference()
 RETURNS trigger LANGUAGE plpgsql AS $function$
 BEGIN
-  NEW.job_id := nullif(btrim(NEW.job_id),'');
-  NEW.zip := nullif(btrim(NEW.zip),'');
+  NEW.job_id := nullif(regexp_replace(NEW.job_id,'^[[:space:]]+|[[:space:]]+$','','g'),'');
+  NEW.zip := nullif(regexp_replace(NEW.zip,'^[[:space:]]+|[[:space:]]+$','','g'),'');
   RETURN NEW;
 END;
 $function$;

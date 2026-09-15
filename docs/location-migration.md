@@ -203,10 +203,14 @@ remain incomplete. This tooling performs no unattended AccuLynx operations.
 
 ## Verification
 
-Fifteen Node 22 synthetic checks pass, covering source accounting, reruns,
+Sixteen Node 22 synthetic checks pass, covering source accounting, reruns,
 publication preservation, source-review nulls and ownership, verified initial
 geography, duplicate neighborhoods/sponsors/media, Parrish taxonomy-only behavior,
 pagination, editorial conflicts, exact plan authorization, before-image ordering,
-tenant rejection, dates, and unprepared-schema rejection. Scoped ESLint passes.
+tenant rejection, dates, explicit review targets missing from refreshed inventory
+or conflicting with canonical provenance, and unprepared-schema rejection. Scoped ESLint passes.
 The live inventory and private dry-run executed successfully. Production apply and
-readback have not executed; independent integrated review remains coordinator-owned.
+readback have not executed. Independent A1 review replayed the actual 215-operation
+plan in memory with 215 second-run no-ops and zero replan operations/conflicts;
+the review-target correction preserves its canonical hash. See the candidate
+verification record for findings and confirmation status.

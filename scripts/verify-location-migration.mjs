@@ -98,6 +98,20 @@ await test('verified empty review facts and initial editorial geography may be f
   prior.owner_reply = 'Newer authoritative reply';
   assert.equal(planMigration({ ...f, approvals }).summary.reviews.conflict, 1);
 });
+await test('explicit review targets cannot disappear or override existing canonical provenance', () => {
+  const f = fixture(), page = f.source.nodes[0];
+  const review = { reviewAuthor: 'Synthetic Reviewer', review: 'Synthetic text', reviewUrl: 'https://example.test/review/explicit', reviewDate: null };
+  page.locationAttributes.featuredReviews.push(review);
+  const key = reviewKey(page, review);
+  const approvals = { reviews: { [key]: { rating: 5, sourceVerified: true, matchVerified: true, targetId: 77, evidence: 'Synthetic verified match' } } };
+  let plan = planMigration({ ...f, approvals });
+  assert.equal(plan.summary.reviews.conflict, 1);
+  assert.equal(plan.operations.filter(op => op.collection === 'reviews').length, 0);
+  f.targets.collections.reviews.push({ id: 76, client: f.targets.clientId, rating: 5, wordpress_provenance: [{ key }] }, { id: 77, client: f.targets.clientId, rating: 5, wordpress_provenance: [] });
+  plan = planMigration({ ...f, approvals });
+  assert.equal(plan.summary.reviews.conflict, 1);
+  assert.equal(plan.operations.filter(op => op.collection === 'reviews').length, 0);
+});
 await test('Longboat duplicate maps to Sarasota and ambiguous geography stays held', () => {
   const f = fixture(), sarasota = f.source.nodes[0], bradenton = f.source.nodes[1];
   sarasota.locationAttributes.neighborhoodsServed = [{ neighborhood: 'Longboat Key' }];

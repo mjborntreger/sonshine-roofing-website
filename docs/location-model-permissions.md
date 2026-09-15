@@ -1,7 +1,7 @@
 # Location model permissions and application gates
 
-Schema artifact: `location-model-v2`; contract v2; starting application `0271ec7`.
-The existing v1 integrity SQL remains unchanged by the additive photo field.
+Schema artifact: `location-model-v3`; contract `location-v3`; starting application `0271ec7`.
+Integrity SQL: `location-invariants-v2`, including whitespace-only job/ZIP handling.
 Prepared only. No schema, SQL, policy or project-enrichment changes were applied.
 
 ## Permission-first sequence
@@ -16,7 +16,9 @@ Prepared only. No schema, SQL, policy or project-enrichment changes were applied
    `policyIds` (all reviewed effective read policies) and `clientId`.
    Tightening replaces project wildcard fields with the existing public allowlist,
    excluding job_id and ZIP, and preserves the prior row filters. It does not add
-   a missing grant or introduce new columns. Policies shared by other websites
+   a missing grant or introduce new columns. Existing narrow grants keep only
+   their already allowed public fields; unavailable or empty scopes require review.
+   Policies shared by other websites
    must retain their row scopes and compatible existing public fields.
 3. After exact approval, repeat with `--apply --recovery-dir <private-directory>`.
    The tool requires `LOCATION_DIRECTUS_ADMIN_TOKEN`, `LOCATION_WEBSITE_TOKEN`
@@ -24,6 +26,8 @@ Prepared only. No schema, SQL, policy or project-enrichment changes were applied
    Each update rereads its before-state, refuses intervening changes, saves a
    private before-image, applies, rereads, then saves a separate after-image.
    A unique mode-0700 directory prevents subsequent runs overwriting recovery.
+   Recovery paths are resolved through symlinks and must remain outside every Git
+   worktree, including the repository root itself.
 4. Verify effective project field access for the actual website reader. Public
    permissions must explicitly deny private fields or deny project access.
    `scripts/setup-location-schema.mjs --apply` repeats this prerequisite before
@@ -88,7 +92,8 @@ do not claim that editor/sync/public/reader production permissions are corrected
 
 Composite foreign keys enforce client/area/neighborhood consistency in both
 write directions. Primary project service_area remains SQL NOT NULL. A populated
-job_id is trimmed and unique within its client; blank values become NULL. ZIP is
+job_id is trimmed and unique within its client; whitespace-only values, including
+tabs/newlines, become NULL. ZIP is
 trimmed and checked only when populated. Junction pairs are unique, nearby links
 are directed and cannot self-link, and row locks plus reassignment guards protect
 junction tenant identities. Existing associated canonical records use RESTRICT;
@@ -130,7 +135,7 @@ workflow and narrow content before-images together.
   before/after recovery and concurrent-edit refusal.
 - `LOCATION_PGLITE_PATH=<temporary-install>/node_modules/@electric-sql/pglite/dist/index.js
   node scripts/location-model/verify-sql.mjs`: a fresh in-memory PostgreSQL engine
-  executes the actual SQL twice and verifies 28 rejected mutations, normalization,
+  executes the actual SQL twice and verifies 30 rejected mutations, normalization,
   local association retention, FAQ deletion/scope, junctions, navigation,
   review rollover and the eventual scoped requirement. No real CMS is connected.
 - `docs/verify-location-model.sql`: explicitly READ ONLY. It validates required

@@ -1,5 +1,5 @@
-// Contract v2. Definitions contain no source records or private identifiers.
-export const MODEL_VERSION = 'location-model-v2';
+// Contract v3. Definitions contain no source records or private identifiers.
+export const MODEL_VERSION = 'location-model-v3';
 const field = (name, type, options = {}) => ({ field: name, type,
   schema: type === 'alias' ? null : { is_nullable: true, ...options.schema },
   meta: { interface: 'input', ...options.meta } });
@@ -77,7 +77,7 @@ export const publicProjectFields = [
 ];
 export const publicLocationFields = {
   roofing_projects: publicProjectFields,
-  roofing_service_areas: ['id', 'sort', 'client', 'status', 'name', 'slug', 'scope_key', 'page_status', 'page_title', 'introduction', 'overview', 'overview_map', 'published_at', 'date_updated', 'noindex', 'meta_title', 'meta_description', 'primary_focus_keyword', 'focus_keywords', 'og_title', 'og_description', 'og_image_override'],
+  roofing_service_areas: ['id', 'sort', 'client', 'status', 'name', 'slug', 'scope_key', 'page_status', 'page_title', 'introduction', 'overview', 'overview_map', 'published_at', 'date_updated', 'source_updated_at', 'noindex', 'meta_title', 'meta_description', 'primary_focus_keyword', 'focus_keywords', 'og_title', 'og_description', 'og_image_override'],
   roofing_neighborhoods: ['id', 'client', 'status', 'name', 'slug', 'service_area', 'description', 'landmarks', 'image', 'coverage_map', 'sort', 'date_updated'],
   reviews: ['id', 'client', 'author_name', 'rating', 'review_text', 'owner_reply', 'review_date', 'source', 'sort_order', 'url', 'status', 'external_id', 'source_created_at', 'source_updated_at', 'service_area', 'latest_feed_member', 'latest_feed_order'],
   sponsor_features: ['id', 'sort', 'client', 'status', 'title', 'slug', 'logo', 'description', 'website_url', 'facebook_url', 'instagram_url', 'service_area_slugs', 'service_areas', 'published_at', 'date_updated'],

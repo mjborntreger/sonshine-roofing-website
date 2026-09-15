@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
+import { mkdtemp, mkdir, symlink, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { setupLocationSchema } from './setup-location-schema.mjs';
 import { locationSchema, locationRelations, publicProjectFields, publicLocationFields } from './location-model/schema.mjs';
-import { planPermissions, applyPermissionPlan, assertReaderProjection, rowScope } from './location-model/permissions.mjs';
+import { planPermissions, applyPermissionPlan, assertReaderProjection, rowScope, prepareRecoveryDirectory } from './location-model/permissions.mjs';
 
 // Synthetic API state, separate from the live CMS and its clients.
 const tables = new Map(Object.keys(locationSchema).filter(name => !['roofing_neighborhoods', 'sponsor_service_areas', 'roofing_service_area_neighbors', 'service_area_section_areas'].includes(name)).map(name => [name, []]));
@@ -63,6 +66,9 @@ assert.equal(tighten.length, 1);
 assert.ok(!tighten[0].data.fields.includes('*'));
 assert.ok(!JSON.stringify(tighten[0].data.fields).includes('job_id'));
 assert.equal(planPermissions([{ ...initial[0], ...tighten[0].data }], config).length, 0, 'Permission rerun must be empty.');
+assert.equal(planPermissions([{ ...initial[0], fields: ['id', 'title'] }], config).length, 0, 'Tightening must preserve an existing narrow field grant.');
+assert.deepEqual(planPermissions([{ ...initial[0], fields: ['id', 'title', 'job_id'] }], config)[0].data.fields, ['id', 'title']);
+assert.throws(() => planPermissions([{ ...initial[0], fields: [] }], config), /scope is unavailable/u);
 const strictInitial = [{ ...initial[0], permissions: { title: { _starts_with: 'Allowed' } } }];
 assert.deepEqual(planPermissions(strictInitial, config)[0].data.permissions, strictInitial[0].permissions, 'Tightening preserves prior row scope.');
 assert.deepEqual(planPermissions(strictInitial, { ...config, phase: 'extend' })[0].data.permissions._and[0], strictInitial[0].permissions, 'Extension keeps narrower prior rules.');
@@ -90,4 +96,17 @@ await assert.rejects(applyPermissionPlan(async (route, method = 'GET') => {
 }, tighten, async () => {}), /changed since planning/u);
 assert.equal(conflictWrites, 0, 'Preserve intervening policy edits.');
 assert.ok(planPermissions(initial, { ...config, phase: 'extend' }).length > 1);
+const privateRoot = await mkdtemp(join(tmpdir(), 'location-recovery-paths-'));
+try {
+  const repository = join(privateRoot, 'repository');
+  await mkdir(join(repository, '.git'), { recursive: true, mode: 0o700 });
+  await mkdir(join(repository, 'private'), { mode: 0o700 });
+  await symlink(join(repository, 'private'), join(privateRoot, 'alias'));
+  await assert.rejects(prepareRecoveryDirectory(repository, repository), /outside Git/u);
+  await assert.rejects(prepareRecoveryDirectory(join(repository, 'private'), repository), /outside Git/u);
+  await assert.rejects(prepareRecoveryDirectory(join(privateRoot, 'alias', 'new'), repository), /outside Git/u);
+  await assert.rejects(prepareRecoveryDirectory(join(repository, 'private'), privateRoot + '/alias'), /outside Git/u);
+  const safe = await prepareRecoveryDirectory(join(privateRoot, 'recovery'), repository);
+  assert.ok(safe.endsWith('/recovery'));
+} finally { await rm(privateRoot, { recursive: true, force: true }); }
 console.log('PASS: location schema dry-run/apply gate/rerun/drift, reader allowlist, tenant scopes, permission recovery and editorial conflict checks (synthetic).');

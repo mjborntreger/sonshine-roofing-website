@@ -7,6 +7,7 @@ import { readLocationSnapshot } from '../lib/content/location-data.ts';
 import { mapDirectusProject } from '../lib/content/directus-projects.mjs';
 import { normalizeSiteSettings, normalizeServiceSummaries } from '../lib/content/directus-site-shell.ts';
 import { makeSiteShellFixture } from './fixtures/location-site-shell.mjs';
+import { publicLocationFields } from './location-model/schema.mjs';
 
 const config = { url: 'https://cms.example.test', clientSlug: 'fixture' };
 const client = { slug: config.clientSlug };
@@ -58,6 +59,15 @@ nav.navigation[0].service.slug = 'roof-repair';
 assert.equal(normalizeLocationSnapshot(nav, config, projects).navigation[0].href, '/roof-repair');
 nav.navigation[0].service.status = undefined;
 assert.throws(() => normalizeLocationSnapshot(nav, config, projects), /publication state/u);
+const navigationTo = href => ({ id: 'link', status: 'published', label: 'Area', link_type: 'external_url', url: href, menu: { ...scope, key: 'header' } });
+const siteUrl = new URL(siteShell.settings.siteUrl);
+const aliasUrl = new URL(siteUrl); aliasUrl.hostname = `www.${siteUrl.hostname.replace(/^www\./u, '')}`;
+for (const slug of ['bradenton', 'osprey', 'unknown']) for (const href of [`/locations/${slug}`, `/locations/${slug}?source=nav`, `/locations/${slug}#coverage`, new URL(`/locations/${slug}`, siteUrl).href, new URL(`/locations/${slug}`, aliasUrl).href]) {
+  const data = source(); data.navigation = [navigationTo(href)];
+  assert.equal(normalizeLocationSnapshot(data, config, projects).navigation[0].href, undefined, 'Unpublished location URLs cannot bypass canonical publication');
+}
+const publishedNav = source(); publishedNav.navigation = [navigationTo(new URL('/locations/sarasota?source=nav#coverage', aliasUrl).href)];
+assert.equal(normalizeLocationSnapshot(publishedNav, config, projects).navigation[0].href, '/locations/sarasota?source=nav#coverage');
 const featured = source(); featured.featuredOffers = [{ ...scope, id: 'offer', featured: true, slug: 'synthetic-offer', title: 'Synthetic offer', description: 'Example only.', featured_image: null, expiration_date: null }];
 assert.equal(normalizeLocationSnapshot(featured, config, projects).featuredOffer.title, 'Synthetic offer');
 featured.featuredOffers[0].featured_image = {};
@@ -82,6 +92,10 @@ await fetchDirectusLocationSnapshot(projects, env, fetcher);
 assert.equal(requests.length, 15);
 assert.ok(requests.every(({url}) => !url.searchParams.get('fields').includes('*') && !url.searchParams.get('fields').includes('job_id')));
 assert.ok(requests.every(({options}) => options.cache === 'no-store'));
+for (const { url } of requests) {
+  const grant = publicLocationFields[url.pathname.split('/').pop()];
+  if (grant) for (const field of url.searchParams.get('fields').split(',')) assert.ok(grant.includes(field.split('.')[0]), 'Required query must fit the prepared reader grant');
+}
 const reviewQuery = JSON.parse(requests.find(({url}) => url.pathname.endsWith('/reviews')).url.searchParams.get('filter'));
 assert.equal(reviewQuery.rating._eq, 5);
 assert.ok(!('external_id' in reviewQuery) && !('latest_feed_member' in reviewQuery));
@@ -90,13 +104,22 @@ await assert.rejects(fetchDirectusLocationSnapshot(projects, env, async () => ({
 await assert.rejects(fetchDirectusLocationSnapshot(projects, {}, fetcher), /requires/u);
 
 const directory = await mkdtemp(join(tmpdir(), 'location-pipeline-'));
+const previousClientSlug = process.env.DIRECTUS_CLIENT_SLUG;
 try {
+  process.env.DIRECTUS_CLIENT_SLUG = 'fixture';
   const projectFile = join(directory, 'projects.json'); const locationFile = join(directory, 'locations.json');
   await writeFile(projectFile, JSON.stringify(projects)); await writeFile(locationFile, JSON.stringify(snapshot));
   assert.equal(readLocationSnapshot(locationFile, projectFile).pages.length, 1);
+  process.env.DIRECTUS_CLIENT_SLUG = 'different-fixture';
+  assert.throws(() => readLocationSnapshot(locationFile, projectFile), /another client/u);
+  process.env.DIRECTUS_CLIENT_SLUG = 'fixture';
   await writeFile(projectFile, JSON.stringify({ ...projects, videos: [{ id: 'changed' }] }));
   assert.throws(() => readLocationSnapshot(locationFile, projectFile), /incompatible/u);
-} finally { await rm(directory, { recursive: true, force: true }); }
+} finally {
+  if (previousClientSlug === undefined) delete process.env.DIRECTUS_CLIENT_SLUG;
+  else process.env.DIRECTUS_CLIENT_SLUG = previousClientSlug;
+  await rm(directory, { recursive: true, force: true });
+}
 
 const file = { id: 'image', description: 'Synthetic roof.', type: 'image/webp' };
 const term = { ...scope, id: 'sarasota', name: 'sarasota', slug: 'sarasota' };
@@ -106,6 +129,8 @@ assert.equal(publicProject.neighborhood, null);
 assert.ok(!JSON.stringify(publicProject).includes('synthetic-private-job'));
 assert.ok(!('job_id' in publicProject) && !('zip' in publicProject));
 assert.throws(() => mapDirectusProject({ ...rawProject, neighborhood: { ...scope, id: 'hood', name: 'Hood', slug: 'hood', service_area: 'wrong' } }, config), /primary service area/u);
+for (const status of [undefined, 'invalid']) assert.throws(() => mapDirectusProject({ ...rawProject, neighborhood: { ...scope, id: 'hood', name: 'Hood', slug: 'hood', service_area: term.id, status } }, config), /publication state/u);
+for (const status of ['draft', 'archived']) assert.equal(mapDirectusProject({ ...rawProject, neighborhood: { ...scope, id: 'hood', name: 'Hood', slug: 'hood', service_area: term.id, status } }, config).neighborhood, null);
 
 const route = await readFile(new URL('../app/(site)/locations/[slug]/page.tsx', import.meta.url), 'utf8');
 assert.match(route, /dynamicParams = false/u); assert.match(route, /revalidate = false/u);

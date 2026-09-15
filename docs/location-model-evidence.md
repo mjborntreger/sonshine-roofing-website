@@ -1,6 +1,7 @@
 # Location model evidence
 
-Contract: v2. Starting application: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
+Contract: `location-v3`; model `location-model-v3`; SQL `location-invariants-v2`.
+Starting application: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 Verified 2026-09-15 using the configured Directus MCP (initial prompt, discovery,
 selected schema/fields/relations and bounded identity/status reads) and GET-only
 website-reader REST permission checks. No production writes were performed.
@@ -86,10 +87,11 @@ enter this evidence or fixtures. Prepared schema is not applied schema.
 The prepared model passed `node scripts/verify-location-model.mjs` on Node
 22.23.2. Targeted ESLint passed for all new model JavaScript files. The actual
 invariant and post-backfill SQL passed in a temporary in-memory PostgreSQL engine
-using @electric-sql/pglite 0.5.8: apply/rerun, read-only verification, 28 rejected
+using @electric-sql/pglite 0.5.8: apply/rerun, read-only verification, 30 rejected
 invalid mutations, trimmed/null references, tenant and neighborhood relationships,
 FAQ exclusivity/deletion, junction uniqueness, navigation ownership, review-feed
-rollover and SonShine-only required fields. All fixtures were synthetic.
+rollover and SonShine-only required fields, including whitespace-only references
+before and after the required-field gate. All fixtures were synthetic.
 
 Temporary test dependency: `/private/tmp/sonshine-location-model-test`.
 This directory contains test tooling only, not migration recovery or client data.
