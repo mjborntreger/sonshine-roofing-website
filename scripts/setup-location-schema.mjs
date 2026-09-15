@@ -1,7 +1,17 @@
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
+import { isDeepStrictEqual } from 'node:util';
 import { locationSchema, locationRelations, MODEL_VERSION } from './location-model/schema.mjs';
 import { assertReaderProjection } from './location-model/permissions.mjs';
+
+function jsonDefaultsEqual(actual, desired) {
+  try {
+    const parse = value => typeof value === 'string' ? JSON.parse(value) : value;
+    return isDeepStrictEqual(parse(actual), parse(desired));
+  } catch {
+    return false;
+  }
+}
 
 export async function setupLocationSchema(request, { apply = false, verifyOnly = false, verifyPrivateAccess } = {}) {
   assert.ok(!(apply && verifyOnly), 'Choose apply or verification.');
@@ -27,7 +37,12 @@ export async function setupLocationSchema(request, { apply = false, verifyOnly =
       if (prior) {
         assert.equal(prior.type, desired.type, `Type drift: ${collection}.${desired.field}.`);
         if (desired.schema?.is_nullable === false) assert.equal(prior.schema?.is_nullable, false, `Required field drift: ${collection}.${desired.field}.`);
-        if (desired.schema?.default_value !== undefined) assert.equal(String(prior.schema?.default_value), String(desired.schema.default_value), `Default drift: ${collection}.${desired.field}.`);
+        if (desired.schema?.default_value !== undefined) {
+          const matches = desired.type === 'json'
+            ? jsonDefaultsEqual(prior.schema?.default_value, desired.schema.default_value)
+            : String(prior.schema?.default_value) === String(desired.schema.default_value);
+          assert.ok(matches, `Default drift: ${collection}.${desired.field}.`);
+        }
         continue;
       }
       assert.ok(!verifyOnly, `Missing field ${collection}.${desired.field}.`);

@@ -36,6 +36,26 @@ const appliedCount = writes.length;
 assert.equal((await setupLocationSchema(request, { apply: true, verifyPrivateAccess: async () => {} })).actions.length, 0);
 assert.equal(writes.length, appliedCount, 'Schema rerun duplicated changes.');
 assert.equal(relations.length, locationRelations.length);
+const provenance = tables.get('reviews').find(row => row.field === 'wordpress_provenance');
+const provenanceDefault = provenance.schema.default_value;
+assert.equal(provenanceDefault, '[]', 'The desired schema retains its serialized JSON default.');
+for (const equivalent of [[], ' [ ] ']) {
+  provenance.schema.default_value = equivalent;
+  assert.equal((await setupLocationSchema(request, { verifyOnly: true })).actions.length, 0);
+}
+for (const mismatch of [[{}], {}, null, '[1]', '{}', 'null', undefined, 'malformed synthetic JSON', JSON.stringify('[]')]) {
+  provenance.schema.default_value = mismatch;
+  await assert.rejects(setupLocationSchema(request, { verifyOnly: true }), error => {
+    assert.equal(error.message, 'Default drift: reviews.wordpress_provenance.');
+    return true;
+  });
+}
+provenance.schema.default_value = provenanceDefault;
+const membership = tables.get('reviews').find(row => row.field === 'latest_feed_member');
+membership.schema.default_value = true;
+await assert.rejects(setupLocationSchema(request, { verifyOnly: true }), /Default drift: reviews.latest_feed_member/u);
+membership.schema.default_value = false;
+assert.equal(writes.length, appliedCount, 'JSON default verification must not write.');
 const photo = locationSchema.roofing_neighborhoods.find(row => row.field === 'image');
 assert.equal(photo.schema.is_nullable, true);
 assert.ok(photo.meta.note.includes('photo'));
