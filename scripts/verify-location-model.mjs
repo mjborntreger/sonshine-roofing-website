@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { setupLocationSchema } from './setup-location-schema.mjs';
 import { locationSchema, locationRelations, publicProjectFields, publicLocationFields } from './location-model/schema.mjs';
-import { planPermissions, applyPermissionPlan, assertReaderProjection, rowScope, prepareRecoveryDirectory } from './location-model/permissions.mjs';
+import { planPermissions, applyPermissionPlan, assertReaderProjection, rowScope, prepareRecoveryDirectory, readPermissions } from './location-model/permissions.mjs';
 
 // Synthetic API state, separate from the live CMS and its clients.
 const tables = new Map(Object.keys(locationSchema).filter(name => !['roofing_neighborhoods', 'sponsor_service_areas', 'roofing_service_area_neighbors', 'service_area_section_areas'].includes(name)).map(name => [name, []]));
@@ -60,6 +60,18 @@ assert.ok(!publicProjectFields.some(name => ['job_id', 'zip'].includes(name)));
 
 const availableFields = Object.fromEntries(Object.entries(publicLocationFields).map(([name, fields]) => [name, fields]));
 const initial = [{ id: 'synthetic-permission-1', policy: 'synthetic-reader', collection: 'roofing_projects', action: 'read', fields: ['*'], permissions: null }];
+// Live permission reads ignore page/filter parameters and return more than 100 rows.
+// Read the complete response once, and validate identities before local filtering.
+let permissionReads = 0;
+const virtual = { system: true, policy: null, collection: 'directus_fields', action: 'read' };
+const completePermissions = [...Array.from({ length: 197 }, (_, index) => ({ ...initial[0], id: `synthetic-permission-${index}` })), ...Array.from({ length: 20 }, () => ({ ...virtual }))];
+assert.equal((await readPermissions(async route => { permissionReads++; assert.equal(route, 'permissions'); return completePermissions; })).length, 197);
+assert.equal(permissionReads, 1, 'The complete permission endpoint must not be paginated.');
+for (const invalid of [{ data: [] }, [null], [{}], [{ id: '' }], [{ id: 'same' }, { id: 'same' }], [{ id: 1 }, { id: '1' }],
+  [{ ...virtual, system: false }], [{ ...virtual, policy: 'synthetic-reader' }], [{ ...virtual, policy: undefined }],
+  [{ ...virtual, collection: 'roofing_projects' }], [{ ...virtual, action: 'unknown' }], [{ ...virtual, id: '' }]]) {
+  await assert.rejects(readPermissions(async () => invalid), /permission|Permission/u);
+}
 const config = { clientId: 'synthetic-client', policyIds: ['synthetic-reader'], availableFields, policyScopeVerifiedExclusive: true };
 const tighten = planPermissions(initial, config);
 assert.equal(tighten.length, 1);
@@ -96,6 +108,29 @@ await assert.rejects(applyPermissionPlan(async (route, method = 'GET') => {
 }, tighten, async () => {}), /changed since planning/u);
 assert.equal(conflictWrites, 0, 'Preserve intervening policy edits.');
 assert.ok(planPermissions(initial, { ...config, phase: 'extend' }).length > 1);
+const create = planPermissions(initial, { ...config, phase: 'extend' }).find(row => row.id === null);
+const unrelated = [
+  virtual,
+  { id: 'other-policy', ...create.data, policy: 'synthetic-other-policy' },
+  { id: 'other-collection', ...create.data, collection: 'synthetic_other_collection' },
+  { id: 'other-action', ...create.data, action: 'update' },
+];
+let created = null, createReads = 0, createWrites = 0;
+const createRecovery = [];
+await applyPermissionPlan(async (route, method = 'GET', data) => {
+  if (method === 'POST') { assert.equal(route, 'permissions'); createWrites++; created = { ...data, id: 'synthetic-created-grant' }; return created; }
+  if (route === 'permissions') { createReads++; return unrelated; }
+  assert.equal(route, 'permissions/synthetic-created-grant'); return created;
+}, [create], async (index, value) => createRecovery.push({ index, value }));
+assert.equal(createReads, 1); assert.equal(createWrites, 1); assert.equal(createRecovery.length, 2);
+for (const present of [[...unrelated, { id: 'appeared', ...create.data }], [...unrelated, unrelated[1]]]) {
+  let writes = 0, receipts = 0;
+  await assert.rejects(applyPermissionPlan(async (route, method = 'GET') => {
+    if (method !== 'GET') writes++;
+    assert.equal(route, 'permissions'); return present;
+  }, [create], async () => { receipts++; }), /appeared after planning|Duplicate permission identity/u);
+  assert.equal(writes, 0); assert.equal(receipts, 0);
+}
 const privateRoot = await mkdtemp(join(tmpdir(), 'location-recovery-paths-'));
 try {
   const repository = join(privateRoot, 'repository');

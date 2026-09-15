@@ -7,6 +7,27 @@ import { publicLocationFields } from './schema.mjs';
 
 export const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex');
 const fieldsOf = fields => Array.isArray(fields) ? fields : typeof fields === 'string' ? fields.split(',') : [];
+/** Directus returns the complete set, including uneditable virtual system permissions. */
+export async function readPermissions(request) {
+  const rows = await request('permissions');
+  assert.ok(Array.isArray(rows), 'Invalid complete permission response.');
+  const ids = new Set(), persisted = [];
+  for (const row of rows) {
+    assert.ok(row && typeof row === 'object' && !Array.isArray(row), 'Invalid permission row.');
+    if (row.id == null) {
+      assert.ok(row.system === true && row.policy === null && typeof row.collection === 'string'
+        && row.collection.startsWith('directus_') && ['create', 'read', 'update', 'delete', 'share'].includes(row.action),
+      'Idless permission is not a verified virtual system grant.');
+      continue;
+    }
+    assert.ok(typeof row.id === 'string' && row.id.length > 0 || Number.isSafeInteger(row.id), 'Permission identity missing or invalid.');
+    const key = String(row.id);
+    assert.ok(!ids.has(key), 'Duplicate permission identity; complete response cannot be trusted.');
+    ids.add(key);
+    persisted.push(row);
+  }
+  return persisted;
+}
 export function assertReaderProjection(permissions, { requireProjectAccess = true } = {}) {
   const read = permissions?.roofing_projects?.read;
   if (!read || read.access === 'none') { assert.ok(!requireProjectAccess, 'Website project access missing.'); return; }
@@ -92,7 +113,8 @@ export async function applyPermissionPlan(request, changes, saveRecovery) {
     assert.equal(digest(current), change.beforeDigest, 'Permission changed since planning; stop for review.');
     // Recheck absence for creates so a resumed plan cannot duplicate permissions.
     if (change.id === null) {
-      const matches = await request(`permissions?limit=2&filter=${encodeURIComponent(JSON.stringify({ policy: { _eq: change.data.policy }, collection: { _eq: change.data.collection }, action: { _eq: 'read' } }))}`);
+      const matches = (await readPermissions(request)).filter(row => row.policy === change.data.policy
+        && row.collection === change.data.collection && row.action === change.data.action);
       assert.equal(matches.length, 0, 'Permission appeared after planning; replan.');
     }
     await saveRecovery(index, change);
@@ -154,8 +176,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       assert.ok(response.ok && !payload.errors, `${method} ${route.split('?')[0]} failed: HTTP ${response.status}.`);
       return payload.data;
     };
-    const rows = [];
-    for (let page = 1; ; page++) { const batch = await request(`permissions?limit=100&page=${page}&sort=id`); assert.ok(Array.isArray(batch), 'Invalid permission response.'); rows.push(...batch); if (batch.length < 100) break; }
+    // This system endpoint ignores pagination/filter query arguments in the live API.
+    const rows = await readPermissions(request);
     const availableFields = {};
     for (const name of phase === 'tighten' ? ['roofing_projects'] : Object.keys(publicLocationFields)) availableFields[name] = (await request(`fields/${name}`)).map(row => row.field);
     const changes = planPermissions(rows, { ...config, availableFields, phase });
