@@ -14,7 +14,7 @@ and serves it on port 3000.
   special offers, legal copy, people, sponsor features, reviews and
   review-carousel settings, roofing glossary terms, projects, videos/categories,
   and their media.
-- The location migration candidate moves route ownership to `roofing_service_areas`. Read `docs/location-release.md` before applying schema/data changes, publishing the review workflow, or deploying; production remains WordPress-owned until coordinated release verification.
+- The location migration candidate moves route ownership to `roofing_service_areas`. Read `docs/location-release.md` before applying schema/data changes or deploying; production remains WordPress-owned until release verification. Location reviews are manually maintained; see `docs/location-reviews.md` for static import and deduplication. The existing n8n workflow stays unchanged.
 - Local Next.js code owns route composition, components, body copy not yet
   migrated, code-only legacy redirect and 410 responses in `proxy.ts`, and the
   normalized operational schedule in `lib/contact-hours.ts`.

@@ -39,7 +39,7 @@ export function directusApi({ endpoint = process.env.DIRECTUS_URL, token = proce
     async find(op) {
       const { provenanceKey, ...identity } = op.identity;
       const filter = Object.fromEntries(Object.entries(identity).map(([key, value]) => [key, { _eq: value }]));
-      const fields = [...new Set(['id', ...(op.collection === 'directus_files' ? [] : ['date_updated']), ...Object.keys(op.data), ...(provenanceKey ? ['wordpress_provenance'] : []), ...(op.expectedScopeKey ? ['scope_key'] : [])])];
+      const fields = [...new Set(['id', ...(op.collection === 'directus_files' ? [] : ['date_updated']), ...Object.keys(op.data), ...(op.collection === 'reviews' ? ['external_id'] : []), ...(provenanceKey ? ['wordpress_provenance'] : []), ...(op.expectedScopeKey ? ['scope_key'] : [])])];
       const resource = op.collection === 'directus_files' ? 'files' : `items/${op.collection}`;
       const rows = await readAll((page, limit) => request(resource, { query: { filter, fields: fields.join(','), sort: 'id', page, limit } }));
       return provenanceKey ? rows.filter(row => row.wordpress_provenance?.some(p => p.key === provenanceKey)) : rows;
@@ -67,13 +67,15 @@ export async function executePlan({ plan, expectedHash, api, receipt, approval }
   assert.equal(plan.endpointHash, api.endpointHash, 'Plan belongs to a different Directus target');
   assert.ok(approval.productionApplyAuthorized && approval.exclusiveMigrationWriter && approval.editorialChangesPaused && approval.schemaPermissionsVerified && approval.recoveryLocationApproved,
     'Explicit apply, single-writer/edit window, schema/permission, and recovery authorization required');
-  assert.ok(approval.feedRetentionCutoverReady || !plan.operations.some(op => op.collection === 'reviews'), 'Review retention cutover is not prepared');
   const results = [];
+  const requireStaticReview = row => assert.ok(Object.hasOwn(row, 'external_id') && row.external_id === null,
+    'Static location import requires an explicit null Google identity; managed or incomplete records need disposition');
   for (const [index, original] of plan.operations.entries()) {
     const op = structuredClone(original);
     const found = await api.find(op);
     assert.ok(found.length <= 1, 'Ambiguous canonical identity; execution stopped');
     const current = found[0];
+    if (op.collection === 'reviews' && current) requireStaticReview(current);
     if (current && op.expectedScopeKey) assert.equal(current.scope_key, op.expectedScopeKey, 'Canonical taxonomy scope conflict');
     const fields = Object.keys(op.data).filter(field => field !== 'id' && field !== 'client');
     const relations = new Set(['service_area', 'nearby_area', 'sponsor', 'section', 'overview_map', 'coverage_map', 'image']);
@@ -105,12 +107,14 @@ export async function executePlan({ plan, expectedHash, api, receipt, approval }
     if (op.action === 'update') {
       const again = await api.find(op);
       assert.equal(again.length, 1, 'Target changed before mutation');
+      if (op.collection === 'reviews') requireStaticReview(again[0]);
       assert.equal(again[0].date_updated ?? null, op.expectedDateUpdated, 'Target modified before mutation');
       assert.equal(hash(projection(again[0])), op.beforeHash, 'Target fields changed before mutation');
     }
     const written = op.action === 'create' ? await api.create(op) : await api.update(op);
     const readback = await api.find(op);
     assert.equal(readback.length, 1, 'Canonical readback count failed');
+    if (op.collection === 'reviews') requireStaticReview(readback[0]);
     if (op.expectedScopeKey) assert.equal(readback[0].scope_key, op.expectedScopeKey, 'Database-maintained taxonomy scope readback failed');
     assert.equal(hash(projection(readback[0])), hash(desired), 'Written field readback failed');
     if (op.collection === 'directus_files') assert.equal(await api.fileHash(readback[0].id), op.sha256, 'Uploaded media byte hash differs');

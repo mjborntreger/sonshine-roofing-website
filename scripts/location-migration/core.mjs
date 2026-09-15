@@ -62,6 +62,16 @@ export const sourceKey = (kind, identity) => `wordpress:${CLIENT}:${kind}:${iden
 export const reviewKey = (page, row) => sourceKey('review', `${page.databaseId}:${hash(safeUrl(row.reviewUrl) || { author: normalized(row.reviewAuthor), text: normalized(row.review) }).slice(0, 32)}`);
 export const neighborhoodKey = (page, row) => sourceKey('neighborhood', `${page.databaseId}:${slugify(row.neighborhood)}`);
 
+function importedReviewUrl(review, approval) {
+  const original = safeUrl(review.reviewUrl);
+  const correction = ['correctedUrl', 'urlVerified', 'urlEvidence'].some(field => Object.hasOwn(approval ?? {}, field));
+  if (!correction) return original ? review.reviewUrl : null;
+  // Repair malformed source links only; never silently replace a valid source URL.
+  if (original || approval.urlVerified !== true || typeof approval.urlEvidence !== 'string' || !approval.urlEvidence.trim()
+    || typeof approval.correctedUrl !== 'string') return null;
+  return safeUrl(approval.correctedUrl);
+}
+
 export const FIELDS = {
   roofing_service_areas: ['page_title', 'introduction', 'overview', 'overview_map', 'wordpress_location_id', 'source_updated_at', 'meta_title', 'meta_description', 'og_title', 'og_description'],
   roofing_neighborhoods: ['id', 'client', 'name', 'slug', 'service_area', 'description', 'landmarks', 'image', 'coverage_map', 'wordpress_id', 'source_updated_at', 'sort'],
@@ -226,20 +236,22 @@ export function planMigration({ source, targets, approvals = {}, previous = {}, 
     }
     for (const review of attrs.featuredReviews || []) {
       const key = reviewKey(page, review), approval = approvals.reviews?.[key];
+      const url = importedReviewUrl(review, approval);
       const candidates = rows('reviews').filter(row => (row.wordpress_provenance || []).some(p => p.key === key));
       const explicitTarget = approval?.targetId != null;
       const matched = explicitTarget ? rows('reviews').filter(row => row.id === approval.targetId) : candidates;
       let result, scoped = false;
       if (explicitTarget && (matched.length !== 1 || candidates.some(row => row.id !== matched[0].id))) result = add('reviews', key, 'conflict', 'Explicit review target is missing or disagrees with canonical provenance');
       else if (matched.length > 1) result = add('reviews', key, 'conflict', 'More than one canonical review match');
-      else if (!approval?.sourceVerified || !approval?.evidence || !Number.isInteger(approval.rating) || approval.rating < 1 || approval.rating > 5 || !safeUrl(review.reviewUrl) || reviewDate(review.reviewDate) === undefined) result = add('reviews', key, 'held', 'Verified rating/source/link/date facts required; absent date remains null');
+      else if (matched[0] && (!Object.hasOwn(matched[0], 'external_id') || matched[0].external_id !== null)) result = add('reviews', key, 'conflict', 'Static location import cannot modify a Google-managed or incomplete review identity');
+      else if (!approval?.sourceVerified || !approval?.evidence || !Number.isInteger(approval.rating) || approval.rating < 1 || approval.rating > 5 || !url || reviewDate(review.reviewDate) === undefined) result = add('reviews', key, 'held', 'Verified rating/source/link/date facts required; absent date remains null');
       else {
         const provenance = { key, location_post_id: String(page.databaseId), source_url: review.reviewUrl, source_review_date: review.reviewDate || null };
         const geography = approval.geographyVerified && approval.geographyEvidence && approval.serviceAreaSlug ? areas.get(approval.serviceAreaSlug) : null;
         const geographyConflict = approval.serviceAreaSlug && (!geography || geography.status !== 'published');
         if (matched[0]) {
           const prior = matched[0];
-          const sourceFills = { url: review.reviewUrl, owner_reply: plain(review.ownerReply) || null, review_date: reviewDate(review.reviewDate) };
+          const sourceFills = { url, owner_reply: plain(review.ownerReply) || null, review_date: reviewDate(review.reviewDate) };
           const differing = Object.entries(sourceFills).some(([field, value]) => value != null && prior[field] != null && prior[field] !== '' && prior[field] !== value);
           const assignedElsewhere = geography && idOf(prior.service_area) != null && idOf(prior.service_area) !== geography.id;
           if (prior.rating !== approval.rating || !approval.matchVerified || geographyConflict || differing || assignedElsewhere) result = add('reviews', key, 'conflict', 'Review match, existing source facts, or editorial geography conflicts with import');
@@ -260,7 +272,7 @@ export function planMigration({ source, targets, approvals = {}, previous = {}, 
             client: targets.clientId, status: 'draft', author_name: plain(review.reviewAuthor), rating: approval.rating,
             review_text: plain(review.review), owner_reply: plain(review.ownerReply) || null,
             review_date: reviewDate(review.reviewDate), source: 'Google', sort_order: 0,
-            url: review.reviewUrl, wordpress_provenance: [provenance],
+            url, wordpress_provenance: [provenance],
             ...(geography ? { service_area: geography.id } : {}),
           }, null, { verifiedInitialGeography: Boolean(geography) });
         }

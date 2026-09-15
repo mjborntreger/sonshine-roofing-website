@@ -176,13 +176,12 @@ export async function getGoogleReviews(): Promise<Review[]> {
       filter: {
         client: { slug: { _eq: config.clientSlug } },
         status: { _eq: "published" },
-        latest_feed_member: { _eq: true },
         source: { _eq: "Google" },
         rating: { _eq: 5 },
         external_id: { _nnull: true },
       },
-      sort: ["latest_feed_order", "-source_created_at", "-review_date", "id"],
-      limit: 20,
+      sort: ["sort_order", "-source_created_at", "-review_date"],
+      limit: 100,
     },
   );
 

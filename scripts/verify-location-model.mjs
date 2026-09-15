@@ -51,10 +51,9 @@ for (const mismatch of [[{}], {}, null, '[1]', '{}', 'null', undefined, 'malform
   });
 }
 provenance.schema.default_value = provenanceDefault;
-const membership = tables.get('reviews').find(row => row.field === 'latest_feed_member');
-membership.schema.default_value = true;
-await assert.rejects(setupLocationSchema(request, { verifyOnly: true }), /Default drift: reviews.latest_feed_member/u);
-membership.schema.default_value = false;
+assert.deepEqual(locationSchema.reviews.map(row => row.field), ['service_area', 'wordpress_provenance']);
+assert.ok(!publicLocationFields.reviews.some(field => field.startsWith('latest_feed_')));
+assert.ok(!publicLocationFields.reviews.includes('wordpress_provenance'));
 assert.equal(writes.length, appliedCount, 'JSON default verification must not write.');
 const photo = locationSchema.roofing_neighborhoods.find(row => row.field === 'image');
 assert.equal(photo.schema.is_nullable, true);
@@ -107,6 +106,10 @@ assert.deepEqual(planPermissions(strictInitial, { ...config, phase: 'extend' })[
 assert.throws(() => planPermissions(initial, { ...config, phase: 'extend', policyScopeVerifiedExclusive: false }), /exclusive/u);
 assert.ok(!JSON.stringify(rowScope('service_area_sections', 'synthetic-client')).includes('status'));
 assert.ok(JSON.stringify(rowScope('roofing_service_area_neighbors', 'synthetic-client')).includes('approved'));
+const reviewScope = rowScope('reviews', 'synthetic-client');
+assert.ok(JSON.stringify(reviewScope).includes('synthetic-client'));
+assert.ok(JSON.stringify(reviewScope).includes('published'));
+assert.ok(!JSON.stringify(reviewScope).includes('external_id'), 'Published static reviews do not require a Google resource identity.');
 assertReaderProjection({ roofing_projects: { read: { access: 'partial', fields: publicProjectFields } } });
 assertReaderProjection({}, { requireProjectAccess: false });
 for (const fields of [['*'], ['id', 'job_id'], ['id', 'zip'], ['id', 'project.*']]) assert.throws(() => assertReaderProjection({ roofing_projects: { read: { access: 'partial', fields } } }), /Unsafe/u);

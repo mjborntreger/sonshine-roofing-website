@@ -1,6 +1,6 @@
-# Location migration contract v3
+# Location migration contract — manual review amendment
 
-Status: implementation contract; production changes and release are pending.
+Status: owner scope amendment on 2026-09-15. Directus migration is authorized; website deployment remains held. The application snapshot format remains `location-v3`. The owner explicitly withdrew all n8n workflow work: location reviews are imported once, deduplicated and linked, then maintained by hand.
 Starting application revision: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 Evidence refreshed: 2026-09-15. The user handoff is authoritative for scope.
 
@@ -26,12 +26,15 @@ Evidence refreshed: 2026-09-15. The user handoff is authoritative for scope.
   null, enforce client/job uniqueness, and prevent cross-client or mismatched
   neighborhood/area assignments. After verified complete enrichment, a separate
   constraint makes job ID and ZIP required for SonShine only.
-- Reviews gain optional `service_area`, separate `wordpress_provenance` JSON,
-  `latest_feed_member` boolean default false, and nullable `latest_feed_order`.
-  Google synchronization owns verified identity/source facts and membership/order.
-  Editors own `status` and geography. Updates omit editorial fields, `url`,
-  `owner_reply`, and WordPress provenance. New eligible Google records retain
-  published creation behavior. Departure clears membership/order only.
+- Reviews gain optional `service_area` and separate `wordpress_provenance` JSON.
+  Imported location reviews are manually maintained. Preserve original attribution,
+  actual approved ratings, dates, source URLs and owner replies; missing dates stay
+  null. `external_id` is reserved for verified Google resource identity and remains
+  null on WordPress-only imports. No feed membership fields or n8n changes belong
+  to this migration. Existing Google-managed records and sitewide feed behavior
+  remain under their existing workflow; never duplicate a confirmed existing match.
+  Conflicting or workflow-managed matches require explicit disposition before a
+  manual-location import can alter them.
 - `sponsor_service_areas(sponsor, service_area)` supplies multiple geography
   relations through `sponsor_features.service_areas`; keep `service_area_slugs`.
 - `roofing_service_area_neighbors(service_area, nearby_area, approved, sort)` is
@@ -119,31 +122,37 @@ date may be filled when null; conflicting populated values remain editorial
 conflicts. Explicitly approved initial review geography can fill an empty relation;
 subsequent migration runs preserve editor-owned assignments and publication.
 
-Private source exports, narrow before-images, workflow graphs, and recovery maps
-belong under mode-0700 `/private/tmp/sonshine-location-migration-20260915`, files
-mode 0600; this is temporary storage, not a durable backup. Repository reports
-contain sanitized counts, hashes, and verification outcomes only.
+Private source exports, narrow before-images and recovery maps belong in the
+approved durable root `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`
+(directory 0700, files 0600). Repository reports contain sanitized counts, hashes
+and verification outcomes only. Retain prior preparation artifacts as withdrawn
+historical evidence; do not execute abandoned workflow patches or seed plans.
 
-Prepare additive schema first, seed membership, deploy compatible feed consumers,
-then stop the old archiving workflow before retaining historical reviews. Enable
-the revised workflow only with verified compatible application/schema/data state.
-Rollback requires application, workflow, and narrow record recovery together,
-with later-editor conflict checks. Reverting only the old workflow is unsafe.
+Static review import requires a reviewed dry run, current deduplication evidence,
+verified source facts and owner-approved location associations, and fresh target
+conflict checks. Create drafts, verify every field, then apply the already-approved
+editorial publication in a separate status-only step. Imported null-identity reviews
+must remain outside the unchanged Google workflow and sitewide feed. No workflow
+pause, publication, feed seeding, or website deployment is an import prerequisite.
+Deployment is still required for changed location content to appear publicly.
 
-No production schema/data apply, workflow publication, deployment, merge, or push
-is inferred from access. Prepare a concrete candidate and request any remaining
-exact external-action approval at the release gate. The owner authorized
-authenticated AccuLynx reads using the workspace-root environment on 2026-09-15;
-all 53 owner-supplied matches and postal ZIPs have now been verified. The one-time
-private `location-enrichment-v1` artifact prepares only job/ZIP/geography updates;
-CMS apply/readback and the subsequent scoped required-field constraint remain pending.
+Rollback is confined to affected migration-owned fields/records, with narrow
+before-images and later-editor checks. Preserve the existing workflow. The previous
+application remains compatible with null-identity static reviews. Removing unused
+feed-preparation fields requires proof they remain unused and no dependencies would
+be broken; retain their narrow recovery metadata privately.
+
+All 53 owner-supplied project/job and postal ZIP enrichments were applied and
+verified, followed by the SonShine-only required-field constraint. These private
+references and all existing privacy protections remain independent of review scope.
+No deployment, merge or remote Git push is authorized by CMS import approval.
 
 ## File ownership
 
 Coordinator: contract, application data/snapshot adapters, shared types, consumers,
 publication integration, common utilities, package scripts, authoring docs, release
 evidence. Model specialist: new schema/permission/SQL preparation and model tests.
-Review-sync specialist: new workflow patch/contract/tests/recovery instructions.
+Review specialist: static review source verification, deduplication, URL corrections and removal of abandoned workflow tooling.
 Migration specialist: new migration tooling, inventory, manifest, migration tests.
 Frontend specialist (after reassignment): common location components, selectors,
 focused selector/component tests. Explicit handoff transfers ownership; no two

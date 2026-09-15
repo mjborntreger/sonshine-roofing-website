@@ -41,7 +41,7 @@
     "verify:location-components": "node scripts/verify-location-components.mjs",
     "verify:location-pipeline": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-location-pipeline.mjs",
     "verify:location-model": "node scripts/verify-location-model.mjs",
-    "verify:location-review-sync": "node scripts/verify-location-review-sync.mjs",
+    "verify:location-review-isolation": "node scripts/verify-location-review-isolation.mjs",
     "verify:location-migration": "node scripts/verify-location-migration.mjs",
     "verify:location-file-timestamps": "node scripts/verify-location-file-timestamps.mjs",
     "verify:location-enrichment": "node scripts/verify-location-enrichment.mjs",

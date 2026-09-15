@@ -1,18 +1,15 @@
 # Location migration candidate verification
 
-Status: Directus schema/privacy, draft migration, project enrichment and required
-constraint applied and verified. Workflow publication and website deployment remain
-held. Full release acceptance remains incomplete.
+Current scope: static, manually maintained location reviews. The owner withdrew all
+n8n changes on 2026-09-15. [Current release instructions](location-release.md) and
+[manual review ownership](location-reviews.md) supersede every historical workflow,
+membership seed and cutover instruction below. Abandoned patch/seed artifacts are
+withdrawn and must not be executed. The existing workflow remains unchanged.
 
-The A1–A4 sections below preserve historical preparation evidence. The applied-phase
-record immediately below supersedes their pre-apply status statements.
-
-## Subsequent editorial update
-
-The [editorial follow-up](location-editorial-status.md) records 85 neighborhood
-publications and five approved SEO/date updates, with exact 90-target readback.
-The owner confirmed all 72 review ratings as five stars. Workflow and deployment
-remain held; earlier draft/missing-SEO/rating descriptions below are historical.
+See [current editorial status](location-editorial-status.md) and [handoff](location-handoff.md)
+for applied counts and remaining website-release approval. A1–A4 and the original
+applied-phase evidence below describe their named historical candidates; they do not
+establish verification of subsequent manual-review changes.
 
 ## Applied-phase verification — 2026-09-15
 
@@ -79,7 +76,8 @@ bodies. The private receipt is `candidate-runtime-privacy-43fbd45-01.json`.
 The independent migration/release reviewer found no material execution or recovery
 defect and confirmed all source dispositions and no-op receipts against this exact
 code/plan. The original workflow remains compatible with the unchanged review set;
-feed membership is zero and must be seeded before deploying the new consumers.
+the former membership-dependent consumer was subsequently withdrawn; current
+sitewide behavior is restored to baseline, with manual imports excluded by null identity.
 
 ### Actual draft visual and publication preparation
 

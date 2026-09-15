@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { planMigration, hash, reviewKey, neighborhoodKey, sourceKey, sourceTime, reviewDate, SLUGS, DRAFT_NEIGHBORS } from './location-migration/core.mjs';
-import { readAll, executePlan } from './location-migration/api.mjs';
+import { readAll, executePlan, directusApi } from './location-migration/api.mjs';
 import { inventoryWordPress } from './location-migration/inventory.mjs';
 
 let checks = 0;
@@ -17,11 +17,21 @@ function fixture() {
   } };
   return { source, targets, createdAt: '2026-09-15T00:00:00Z' };
 }
+function correctedReviewFixture() {
+  const f = fixture(), page = f.source.nodes[0];
+  const review = { reviewAuthor: 'Synthetic Reviewer', review: 'Synthetic review text', ownerReply: 'Synthetic retained reply', reviewDate: null, reviewUrl: 'example.test/review/correction' };
+  page.locationAttributes.featuredReviews.push(review);
+  const key = reviewKey(page, review);
+  const approval = { sourceVerified: true, rating: 5, evidence: 'Synthetic verified source', correctedUrl: 'https://example.test/review/correction', urlVerified: true, urlEvidence: 'Synthetic source-link verification',
+    serviceAreaSlug: 'sarasota', geographyVerified: true, geographyEvidence: 'Synthetic verified editorial geography' };
+  f.approvals = { reviews: { [key]: approval } };
+  return { f, page, review, key, approval };
+}
 function applyFakePlan(plan, targets) {
   const result = structuredClone(targets);
   for (const op of plan.operations) {
     result.collections[op.collection] ||= [];
-    if (op.action === 'create') result.collections[op.collection].push({ ...op.data, id: op.data.id || `new-${result.collections[op.collection].length}`, date_updated: '2026-09-15T00:00:00Z' });
+    if (op.action === 'create') result.collections[op.collection].push({ ...(op.collection === 'reviews' ? { external_id: null } : {}), ...op.data, id: op.data.id || `new-${result.collections[op.collection].length}`, date_updated: '2026-09-15T00:00:00Z' });
     else Object.assign(result.collections[op.collection].find(row => row.id === op.targetId), op.data, { date_updated: '2026-09-15T00:00:00Z' });
   }
   return result;
@@ -31,12 +41,17 @@ function fakeApi(targets) {
   const data = structuredClone(targets.collections);
   return { endpointHash: 'synthetic-endpoint', get writes() { return writes; }, data,
     async find(op) { return (data[op.collection] || []).filter(row => Object.entries(op.identity).every(([key, value]) => key === 'provenanceKey' ? row.wordpress_provenance?.some(p => p.key === value) : row[key] === value)); },
-    async create(op) { writes++; data[op.collection] ||= []; const row = { ...op.data, id: op.data.id || `review-${writes}`, date_updated: '2026-09-15T00:00:00Z' }; data[op.collection].push(row); return row; },
+    async create(op) { writes++; data[op.collection] ||= []; const row = { ...(op.collection === 'reviews' ? { external_id: null } : {}), ...op.data, id: op.data.id || `review-${writes}`, date_updated: '2026-09-15T00:00:00Z' }; data[op.collection].push(row); return row; },
     async update(op) { writes++; const row = data[op.collection].find(row => row.id === op.targetId); Object.assign(row, op.data, { date_updated: '2026-09-15T00:00:00Z' }); return row; },
   };
 }
 const authorization = plan => ({ planHash: plan.planHash, endpointHash: 'synthetic-endpoint', productionApplyAuthorized: true,
-  exclusiveMigrationWriter: true, editorialChangesPaused: true, schemaPermissionsVerified: true, recoveryLocationApproved: true, feedRetentionCutoverReady: true });
+  exclusiveMigrationWriter: true, editorialChangesPaused: true, schemaPermissionsVerified: true, recoveryLocationApproved: true });
+function reviewsOnly(plan) {
+  const body = { ...plan }; delete body.planHash;
+  body.operations = body.operations.filter(op => op.collection === 'reviews');
+  return { ...body, planHash: hash(body) };
+}
 
 await test('all source rows have dispositions; source reorder preserves stable neighborhood identities', () => {
   const f = fixture(), a = planMigration(f);
@@ -78,10 +93,148 @@ await test('unverified reviews remain held; missing date stays null and replies/
   assert.equal(op.data.status, 'draft'); assert.equal(op.data.external_id, undefined); assert.equal(op.data.service_area, undefined);
   assert.equal(op.data.wordpress_provenance[0].key, reviewKey(p, review));
 });
+await test('verified malformed review URL repair preserves raw source, provenance, null date and geography', () => {
+  const { f, page, review, key, approval } = correctedReviewFixture(), original = structuredClone(f.source);
+  const plan = planMigration(f), op = plan.operations.find(row => row.collection === 'reviews');
+  assert.equal(op.key, key); assert.equal(op.identity.provenanceKey, key);
+  assert.equal(op.data.url, approval.correctedUrl); assert.equal(op.data.wordpress_provenance[0].source_url, review.reviewUrl);
+  assert.equal(op.data.wordpress_provenance[0].key, key); assert.equal(op.data.wordpress_provenance[0].source_review_date, null);
+  assert.notEqual(reviewKey(page, { ...review, reviewUrl: approval.correctedUrl }), key);
+  assert.equal(op.data.review_date, null); assert.equal(op.data.owner_reply, review.ownerReply); assert.equal(op.data.service_area, 'area-sarasota');
+  assert.equal(op.data.status, 'draft'); assert.equal(op.data.external_id, undefined); assert.equal(op.data.latest_feed_member, undefined);
+  assert.deepEqual(f.source, original);
+  for (const field of ['geographyVerified', 'geographyEvidence', 'serviceAreaSlug']) delete approval[field];
+  review.ownerReply = null; approval.correctedUrl = ' HTTPS://EXAMPLE.TEST/review/correction ';
+  const unassigned = planMigration(f).operations.find(row => row.collection === 'reviews');
+  assert.equal(unassigned.data.service_area, undefined); assert.equal(unassigned.data.owner_reply, null);
+  assert.equal(unassigned.data.url, 'https://example.test/review/correction');
+});
+await test('partial, unverified and unsafe URL overrides remain held without fallback', () => {
+  for (const change of [
+    { urlVerified: undefined }, { urlVerified: false }, { urlVerified: 'true' },
+    { urlEvidence: undefined }, { urlEvidence: '' }, { urlEvidence: '  \n\t' }, { urlEvidence: 1 },
+    { correctedUrl: undefined }, { correctedUrl: null }, { correctedUrl: '' }, { correctedUrl: {} },
+    { correctedUrl: 'javascript:alert(1)' }, { correctedUrl: 'data:text/plain,synthetic' },
+    { correctedUrl: 'ftp://example.test/review' }, { correctedUrl: 'https://user:password@example.test/review' },
+  ]) {
+    const { f, approval } = correctedReviewFixture(); Object.assign(approval, change);
+    const plan = planMigration(f);
+    assert.equal(plan.summary.reviews.held, 1); assert.equal(plan.operations.filter(row => row.collection === 'reviews').length, 0);
+  }
+  for (const missing of ['correctedUrl', 'urlVerified', 'urlEvidence']) {
+    const { f, approval } = correctedReviewFixture(); delete approval[missing];
+    assert.equal(planMigration(f).summary.reviews.held, 1);
+  }
+});
+await test('URL overrides cannot replace an already-valid source URL or fall back to it', () => {
+  for (const verified of [true, false]) {
+    const { f, page, review, approval } = correctedReviewFixture();
+    review.reviewUrl = 'https://example.test/review/original'; approval.urlVerified = verified;
+    f.approvals.reviews = { [reviewKey(page, review)]: approval };
+    const plan = planMigration(f);
+    assert.equal(plan.summary.reviews.held, 1); assert.equal(plan.operations.filter(row => row.collection === 'reviews').length, 0);
+  }
+});
+await test('verified URL repair fills an empty archived target but preserves differing target facts', () => {
+  const { f, review, key, approval } = correctedReviewFixture();
+  const prior = { id: 9, client: f.targets.clientId, rating: 5, status: 'archived', author_name: review.reviewAuthor, review_text: review.review,
+    owner_reply: review.ownerReply, url: null, review_date: null, service_area: null, wordpress_provenance: [], external_id: null, date_updated: '2025-01-01' };
+  f.targets.collections.reviews.push(prior); Object.assign(approval, { targetId: prior.id, matchVerified: true });
+  const op = planMigration(f).operations.find(row => row.collection === 'reviews');
+  assert.equal(op.data.url, approval.correctedUrl); assert.equal(op.data.service_area, 'area-sarasota');
+  assert.equal(op.data.wordpress_provenance[0].key, key); assert.equal(op.data.wordpress_provenance[0].source_url, review.reviewUrl);
+  assert.equal(op.data.status, undefined); assert.equal(op.data.external_id, undefined); assert.equal(op.data.owner_reply, undefined);
+  prior.url = approval.correctedUrl;
+  assert.equal(planMigration(f).operations.find(row => row.collection === 'reviews').data.url, undefined);
+  prior.url = 'https://example.test/review/editorial';
+  const conflict = planMigration(f);
+  assert.equal(conflict.summary.reviews.conflict, 1); assert.equal(conflict.operations.filter(row => row.collection === 'reviews').length, 0);
+  assert.equal(prior.url, 'https://example.test/review/editorial'); assert.equal(prior.status, 'archived');
+});
+await test('corrected review imports rerun without duplicates and retain editorial publication', async () => {
+  const { f, key, approval } = correctedReviewFixture(), plan = planMigration(f), api = fakeApi(f.targets);
+  await executePlan({ plan, expectedHash: plan.planHash, api, receipt: async () => {}, approval: authorization(plan) });
+  const writes = api.writes;
+  const repeat = await executePlan({ plan, expectedHash: plan.planHash, api, receipt: async () => assert.fail('Matching rerun must not write receipts'), approval: authorization(plan) });
+  assert.ok(repeat.every(row => row.disposition === 'match')); assert.equal(api.writes, writes); assert.equal(api.data.reviews.length, 1);
+  assert.equal(api.data.reviews[0].wordpress_provenance[0].key, key);
+  api.data.reviews[0].status = 'published';
+  // The fresh planning decision confirms the record from the completed readback.
+  approval.matchVerified = true;
+  const next = planMigration({ ...f, targets: { ...f.targets, collections: api.data } });
+  assert.equal(next.operations.length, 0); assert.equal(next.summary.reviews.match, 1); assert.equal(api.data.reviews[0].status, 'published');
+});
+await test('manual review planner rejects managed and incomplete matches without duplicating them', () => {
+  for (const externalId of ['synthetic-managed-identity', '', undefined]) for (const explicit of [true, false]) {
+    const { f, key, approval } = correctedReviewFixture();
+    const prior = { id: 91, client: f.targets.clientId, external_id: externalId, rating: 5, wordpress_provenance: explicit ? [] : [{ key }] };
+    if (externalId === undefined) delete prior.external_id;
+    f.targets.collections.reviews.push(prior); approval.matchVerified = true;
+    if (explicit) approval.targetId = prior.id;
+    const plan = planMigration(f);
+    assert.equal(plan.summary.reviews.conflict, 1); assert.equal(plan.operations.filter(op => op.collection === 'reviews').length, 0);
+    assert.equal(prior.external_id, externalId);
+  }
+});
+await test('executor rejects managed or missing identities even for an otherwise matching canonical review', async () => {
+  for (const externalId of ['synthetic-managed-identity', '', undefined]) {
+    const { f } = correctedReviewFixture(), plan = reviewsOnly(planMigration(f)), api = fakeApi(f.targets);
+    api.data.reviews.push({ ...plan.operations[0].data, id: 'synthetic-canonical', external_id: externalId });
+    if (externalId === undefined) delete api.data.reviews[0].external_id;
+    await assert.rejects(executePlan({ plan, expectedHash: plan.planHash, api, receipt: async () => assert.fail('Must reject before receipt'), approval: authorization(plan) }), /explicit null Google identity/u);
+    assert.equal(api.writes, 0);
+  }
+});
+await test('static drafts require no workflow flag and retain null identity through a zero-write repeat', async () => {
+  const { f } = correctedReviewFixture(), plan = reviewsOnly(planMigration(f)), api = fakeApi(f.targets);
+  assert.equal(Object.hasOwn(authorization(plan), 'feedRetentionCutoverReady'), false);
+  await executePlan({ plan, expectedHash: plan.planHash, api, receipt: async () => {}, approval: authorization(plan) });
+  assert.equal(api.writes, 1); assert.equal(api.data.reviews[0].external_id, null); assert.equal(api.data.reviews[0].status, 'draft');
+  const repeated = await executePlan({ plan, expectedHash: plan.planHash, api, receipt: async () => assert.fail('Repeat must not write'), approval: authorization(plan) });
+  assert.equal(repeated[0].disposition, 'match'); assert.equal(api.writes, 1);
+});
+await test('static update recheck rejects changed identity before PATCH and preserves publication', async () => {
+  for (const changed of [false, true]) {
+    const { f, key, approval, review } = correctedReviewFixture();
+    f.targets.collections.reviews.push({ id: 92, client: f.targets.clientId, external_id: null, rating: 5, status: 'published',
+      url: null, owner_reply: review.ownerReply, review_date: null, service_area: null, wordpress_provenance: [{ key }], date_updated: 'synthetic-before' });
+    approval.matchVerified = true;
+    const plan = reviewsOnly(planMigration(f)), api = fakeApi(f.targets), find = api.find;
+    let reads = 0;
+    api.find = async op => { if (++reads === 2 && changed) api.data.reviews[0].external_id = 'synthetic-concurrent-identity'; return find(op); };
+    const execute = () => executePlan({ plan, expectedHash: plan.planHash, api, receipt: async () => {}, approval: authorization(plan) });
+    if (changed) { await assert.rejects(execute(), /explicit null Google identity/u); assert.equal(api.writes, 0); }
+    else { await execute(); assert.equal(api.writes, 1); assert.equal(api.data.reviews[0].url, approval.correctedUrl); }
+    assert.equal(api.data.reviews[0].status, 'published');
+  }
+});
+await test('static review create readback rejects managed or omitted identity', async () => {
+  for (const externalId of ['synthetic-unexpected-default', undefined]) {
+    const { f } = correctedReviewFixture(), plan = reviewsOnly(planMigration(f)), api = fakeApi(f.targets), create = api.create;
+    api.create = async op => { const row = await create(op); if (externalId === undefined) delete row.external_id; else row.external_id = externalId; return row; };
+    const receipts = [];
+    await assert.rejects(executePlan({ plan, expectedHash: plan.planHash, api, receipt: async (_index, phase) => receipts.push(phase), approval: authorization(plan) }), /explicit null Google identity/u);
+    assert.equal(api.writes, 1); assert.deepEqual(receipts, ['before']);
+  }
+});
+await test('API query requests explicit review identity with tenant scope', async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    let called = false;
+    globalThis.fetch = async url => {
+      called = true; assert.ok(url.searchParams.get('fields').split(',').includes('external_id'));
+      assert.deepEqual(JSON.parse(url.searchParams.get('filter')), { client: { _eq: 'synthetic-client' }, id: { _eq: 93 } });
+      return new Response(JSON.stringify({ data: [{ id: 93, external_id: null }] }), { status: 200 });
+    };
+    const api = directusApi({ endpoint: 'https://example.test', token: 'synthetic-test-token', clientSlug: 'sonshine-roofing' });
+    const rows = await api.find({ collection: 'reviews', identity: { client: 'synthetic-client', id: 93 }, data: { url: 'https://example.test/review' } });
+    assert.ok(called); assert.equal(rows[0].external_id, null);
+  } finally { globalThis.fetch = originalFetch; }
+});
 await test('confirmed archived review reuse appends provenance without changing owned fields', () => {
   const f = fixture(), p = f.source.nodes[0], review = { reviewAuthor: 'Synthetic Reviewer', review: 'Text', ownerReply: 'Reply', reviewUrl: 'https://example.test/review/2', reviewDate: '2024-12-01' };
   p.locationAttributes.featuredReviews.push(review);
-  f.targets.collections.reviews.push({ id: 7, client: f.targets.clientId, rating: 5, status: 'archived', author_name: review.reviewAuthor, review_text: review.review, owner_reply: review.ownerReply, url: review.reviewUrl, review_date: review.reviewDate, wordpress_provenance: [], date_updated: '2025-01-01' });
+  f.targets.collections.reviews.push({ id: 7, client: f.targets.clientId, rating: 5, status: 'archived', author_name: review.reviewAuthor, review_text: review.review, owner_reply: review.ownerReply, url: review.reviewUrl, review_date: review.reviewDate, wordpress_provenance: [], external_id: null, date_updated: '2025-01-01' });
   const approvals = { reviews: { [reviewKey(p, review)]: { rating: 5, sourceVerified: true, matchVerified: true, targetId: 7, evidence: 'synthetic source match' } } };
   const plan = planMigration({ ...f, approvals }), op = plan.operations.find(x => x.collection === 'reviews');
   assert.deepEqual(Object.keys(op.data), ['wordpress_provenance']); assert.equal(op.action, 'update');
@@ -89,7 +242,7 @@ await test('confirmed archived review reuse appends provenance without changing 
 await test('verified empty review facts and initial editorial geography may be filled, differing values are preserved', () => {
   const f = fixture(), p = f.source.nodes[0], review = { reviewAuthor: 'Synthetic Reviewer', review: 'Text', ownerReply: 'Verified reply', reviewUrl: 'https://example.test/review/3', reviewDate: '2024-12-01' };
   p.locationAttributes.featuredReviews.push(review);
-  const prior = { id: 8, client: f.targets.clientId, rating: 5, status: 'archived', author_name: review.reviewAuthor, review_text: review.review, owner_reply: null, url: null, review_date: null, service_area: null, wordpress_provenance: [], date_updated: '2025-01-01' };
+  const prior = { id: 8, client: f.targets.clientId, rating: 5, status: 'archived', author_name: review.reviewAuthor, review_text: review.review, owner_reply: null, url: null, review_date: null, service_area: null, wordpress_provenance: [], external_id: null, date_updated: '2025-01-01' };
   f.targets.collections.reviews.push(prior);
   const approvals = { reviews: { [reviewKey(p, review)]: { rating: 5, sourceVerified: true, matchVerified: true, targetId: 8, evidence: 'synthetic source', geographyVerified: true, geographyEvidence: 'synthetic editorial approval', serviceAreaSlug: 'sarasota' } } };
   const plan = planMigration({ ...f, approvals }), op = plan.operations.find(row => row.collection === 'reviews');

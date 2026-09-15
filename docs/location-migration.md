@@ -140,24 +140,19 @@ files are not repair targets. Original bytes and recovery records remain intact.
 
 ## Review ownership
 
-All 72 WordPress reviews remain held because a source five-star rating has not
-been verified. Seventy-one source dates are ISO timestamps; the parser preserves
-their source calendar dates. The one absent date stays null. Every original
-source link, exact date representation, and retained owner reply remains in the
-private source export. Two source links require correction from evidence.
+The owner approved all 72 selected reviews and verified their five-star ratings.
+Location reviews are manually maintained; the existing Google workflow remains
+unchanged. See [manual location reviews](location-reviews.md) for source verification,
+deduplication, URL correction and ongoing authoring. New records have null Google
+identity, separate stable WordPress provenance, and approved service-area relations.
+Existing Google-managed matches require explicit disposition and are never silently
+copied or detached from their verified identity.
 
-The planner supports a private, verified review decision keyed by source
-provenance, with `sourceVerified`, `rating`, and `evidence`. A confirmed existing
-match also needs `targetId` and `matchVerified`. It never infers Google identity
-from a WordPress post or the old star display, and never creates `external_id`.
-
-Existing reviews preserve source facts, publication, and editor assignments.
-Verified null URL, reply, or review-date fields may be filled. Differing populated
-values produce a conflict. Existing review publication is never written. Initial
-service-area assignment requires explicit `serviceAreaSlug`, `geographyVerified`,
-and `geographyEvidence`; it can initialize a null relation but cannot replace an
-editor's existing assignment. New verified imports start as drafts. Feed membership
-is outside migration ownership and is prepared by the review-sync workflow owner.
+The planner accepts private source approvals and confirmed match decisions.
+Verified missing source URL, reply or review date may initialize empty fields;
+conflicting populated facts and assignments are preserved. New reviews start draft,
+and approved publication is a separate status-only operation. An explicitly verified
+URL correction does not change the raw source, source key or original provenance.
 
 ## Commands and private artifacts
 
@@ -218,9 +213,9 @@ are rejected. Preserved historical preparation artifacts include:
 The apply executor requires an exact plan hash and a separate private authorization
 file naming that hash and the hashed Directus target. Authorization must confirm
 the exact production apply, schema/permissions readback, exclusive migration
-writer, paused editorial changes, approved recovery storage, and (for review
-writes) compatible feed-retention cutover. These flags record the coordinator's
-release authorization; generating a plan supplies none of them.
+writer, paused editorial changes and approved recovery storage. Review operations
+require explicit null Google identity in actual readbacks, keeping manual imports
+outside the unchanged Google workflow. Generating a plan grants no authorization.
 
 Directus REST does not provide an atomic compare-and-swap guarantee. The executor
 rechecks timestamps and narrow field hashes immediately before updates, and the
@@ -236,9 +231,8 @@ Every execution uses a new private recovery directory and writes numbered
 `before`/`after` receipts, plus a result file. A failed or interrupted run retains
 its receipts. For recovery:
 
-1. Freeze the affected editorial fields and stop the old archiving workflow using
-   the coordinator's approved cross-system release sequence.
-2. Keep the prior deployed application artifact and reviewed workflow version.
+1. Freeze the affected editorial fields. Keep the existing Google workflow unchanged.
+2. Keep the prior deployed application artifact and narrow private recovery records.
 3. For an update receipt, reread its target and compare the current fields and
    modification timestamp to the recorded after-image. A later edit is a conflict
    for explicit reconciliation, not a restore target.
@@ -248,8 +242,8 @@ its receipts. For recovery:
 5. Keep uploaded immutable files and WordPress originals. Restore owner relations
    rather than overwriting image bytes. Recheck bytes after any asynchronous media
    processing and before publication.
-6. Read back all affected records and verify the application/workflow compatibility
-   matrix. Reverting only the former archiving workflow is unsafe.
+6. Read back all affected records and verify static review isolation and deployed
+   application compatibility. No workflow rollback belongs to this migration.
 
 No automated destructive rollback is included. The receipts make the exact narrow
 restore reviewable. All 53 owner-supplied project/job mappings and ZIPs have been
@@ -280,6 +274,8 @@ independent reviews also replayed earlier candidate plans in memory; those tests
 remain distinct from the applied evidence. See the candidate verification record
 for current whole-application checks and review dispositions.
 
-The pages and neighborhoods are draft content. Held review ratings/source links,
-two neighborhood/photo conflicts, actual-page editorial/visual acceptance,
-compatible review workflow cutover and deployment remain release gates.
+The five pages remain drafts until the approved website release. Neighborhoods
+are published, SEO and review ratings are approved, and geographic/photo dispositions
+are resolved. See the current handoff for static review import completion and the
+remaining website deployment gate. Historical counts above describe their named
+execution artifacts, not current unresolved decisions.

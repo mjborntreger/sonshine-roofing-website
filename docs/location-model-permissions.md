@@ -1,10 +1,14 @@
 # Location model permissions and application gates
 
-Schema artifact: `location-model-v4`; contract `location-v3`; starting application `0271ec7`.
-Integrity SQL: `location-invariants-v3`, including whitespace-only job/ZIP handling
-and case-invariant UUID job identity.
-Applied and verified on 2026-09-15 under the owner's Directus authorization.
-Workflow publication and application deployment remain held.
+Current schema artifact: `location-model-v5`; deployment format `location-v3`;
+starting application `0271ec7`. Integrity SQL: `location-invariants-v4`.
+These local artifacts remove the abandoned review feed-membership requirements.
+The preceding model-v4/invariants-v3 were applied and verified on 2026-09-15;
+removal of their unused live feed fields and CHECK requires separate coordinated
+cleanup and readback. All project privacy, tenant, provenance and enrichment
+constraints remain required. Location reviews now use a static import followed by
+manual editorial maintenance; no workflow changes are part of this release.
+Application deployment remains held.
 
 ## Recorded application
 
@@ -18,13 +22,33 @@ Workflow publication and application deployment remain held.
   SonShine-only job-ID/ZIP requirement was applied and validated.
 - Actual website-reader and anonymous direct, nested, aliased and wildcard probes
   passed before and after backfill. These checks establish the current reader/public
-  boundary; they do not claim the revised review workflow is published.
+  boundary. The existing Google review synchronization remains unchanged.
 
 Private receipts are under
 `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`, including the
 schema, tighten/extend and before/after-backfill privacy result files listed in
 [model evidence](location-model-evidence.md). The procedure below remains the
 required order for any subsequent authorized run.
+
+## Prepared removal of unused review membership
+
+Read-only inspection on 2026-09-15 found both abandoned columns present. All 49
+review records across the shared CMS had `latest_feed_member=false` and
+`latest_feed_order=null`. One explicit permission field list references them;
+three existing wildcard review grants require no field-list mutation. No Directus
+relations depend on either field. This is a global column-usage count, separate
+from the 32-record SonShine reconciliation baseline.
+
+The exact private permission before-state, two field definitions and removal
+proposal are under `manual-review-schema-preparation-01` in the approved recovery
+root above. Its read-only `inspect-dependencies-01.sql` must run before cleanup to
+check PostgreSQL dependencies and capture the named CHECK definition. Unexpected
+dependencies or new nondefault data block removal. The coordinator removes only
+the explicit permission-field references, `location_review_feed_shape`, and the
+two Directus fields; all other records, constraints and policy scopes remain.
+No remote cleanup was executed by this preparation. Preserve the old definitions
+for guarded recovery, and verify v5 schema, v4 invariants and project privacy after
+the authorized cleanup.
 
 ## Permission-first sequence
 
@@ -99,18 +123,21 @@ Nearby junction readers require approved=true and both published taxonomy ends.
 Unassigned sponsors/reviews may remain available to their authorized sitewide
 consumers; location selection never treats them as geographic backfill.
 
-Editorial policies must allow local assignments and editorial status while keeping
-migration provenance and source-owned review facts out of routine editorial
-writes. A dedicated synchronization policy should allow only the review fields
-listed in the review-sync contract, including feed membership/order. It must read
-all SonShine review states to preserve deliberate unpublication; never reuse the
-published-only website policy for that workflow. Admin/migration access is
-separate and all private project references remain server-side.
+Editorial policies must allow local assignments and editorial publication while
+keeping migration provenance out of routine editorial writes. The static import
+preserves verified attribution, dates, rating, source URL and available reply;
+new static records have no fabricated Google `external_id`. Published static
+records can be location matches without that identifier. The sitewide feed keeps
+its existing Google-identity requirement and publication behavior. Reused records
+that already have a verified Google identity retain their existing automation
+ownership; assigning an area does not transfer their publication or retention to
+manual control. Admin/migration access is separate and private project references
+remain server-side.
 
 The reader/public policy ownership and effective denial boundary were verified
-for the applied changes. Editorial and synchronization access must continue to
-obey the ownership contract; this run does not claim revised workflow publication
-or its active synchronization-policy readback.
+for the applied model. The prepared v5 public review projection excludes the
+unused feed fields and private WordPress provenance. Do not grant new workflow
+permissions, seed membership, or change the existing synchronization policy.
 
 ## Database integrity
 
@@ -152,8 +179,9 @@ rolling back the application. Preserve the safe explicit projection and deny job
 and ZIP. Tight reader permissions are compatible with the prior project's explicit
 queries. A rollback of tenant-scope extensions must be individually reviewed and
 must keep the private-field restriction. The schema and privacy boundary should
-normally remain installed while the coordinator restores compatible application,
-workflow and narrow content before-images together.
+normally remain installed while the coordinator restores the application and
+narrow content before-images. The unchanged review workflow has no release or
+rollback step in this migration.
 
 The active SonShine requirement rejects the original null job/ZIP before-values.
 Any authorized full enrichment rollback must coordinate removal of that scoped
@@ -166,9 +194,10 @@ constraint before restoring those values, while keeping private-field denial.
   before/after recovery and concurrent-edit refusal.
 - `LOCATION_PGLITE_PATH=<temporary-install>/node_modules/@electric-sql/pglite/dist/index.js
   node scripts/location-model/verify-sql.mjs`: a fresh in-memory PostgreSQL engine
-  executes the actual SQL twice and verifies 32 rejected mutations, normalization,
+  executes the actual SQL twice and verifies 34 rejected mutations, normalization,
   local association retention, FAQ deletion/scope, junctions, navigation,
-  review rollover and the eventual scoped requirement. No real CMS is connected.
+  static review null identity, manual publication, tenant/provenance integrity and
+  the eventual scoped requirement. No real CMS is connected.
 - `docs/verify-location-model.sql`: explicitly READ ONLY. It validates required
   constraints/indexes/triggers and returns whether the separate enrichment
   requirement is installed. False is a release blocker.

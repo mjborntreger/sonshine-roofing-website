@@ -1,4 +1,4 @@
--- PREPARED, NOT APPLIED. Integrity artifact location-invariants-v3 (model location-model-v4). PostgreSQL only.
+-- PREPARED, NOT APPLIED. Integrity artifact location-invariants-v4 (model location-model-v5). PostgreSQL only.
 -- Permission-first gate must pass before schema creates roofing_projects.job_id.
 -- Run after setup-location-schema, with ON_ERROR_STOP=1, under exact authorization.
 -- Existing conflicting rows cause the transaction to abort; never repair them here.
@@ -47,7 +47,6 @@ BEGIN
     ('roofing_neighborhoods','location_neighborhood_content','CHECK (client IS NOT NULL AND service_area IS NOT NULL AND nullif(btrim(name),'''') IS NOT NULL AND slug ~ ''^[a-z0-9]+(-[a-z0-9]+)*$'' AND status IN (''draft'',''published'',''archived''))'),
     ('roofing_projects','location_project_reference_normalized','CHECK ((job_id IS NULL OR (job_id !~ ''^[[:space:]]|[[:space:]]$'' AND job_id<>'''')) AND (zip IS NULL OR zip ~ ''^[0-9]{5}(-[0-9]{4})?$''))'),
     ('roofing_projects','location_project_uuid_canonical','CHECK (job_id IS NULL OR job_id !~* ''^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'' OR job_id=lower(job_id))'),
-    ('reviews','location_review_feed_shape','CHECK ((NOT latest_feed_member AND latest_feed_order IS NULL) OR (latest_feed_member AND latest_feed_order BETWEEN 1 AND 20 AND latest_feed_order IS NOT NULL AND external_id IS NOT NULL AND source=''Google'' AND rating=5))'),
     ('reviews','location_review_provenance_array','CHECK (jsonb_typeof(wordpress_provenance::jsonb)=''array'')'),
     ('faqs','location_faq_scope_exclusive','CHECK (num_nonnulls(website_page,service,service_area)<=1)'),
     ('navigation_items','location_navigation_area_scope','CHECK ((link_type=''service_area'' AND service_area IS NOT NULL AND page IS NULL AND service IS NULL) OR (link_type<>''service_area'' AND service_area IS NULL))'),

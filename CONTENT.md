@@ -71,11 +71,11 @@
 ## Publishing reviews in Directus
 
 - The site-wide review widget reads published, SonShine-scoped Google reviews
-  whose rating is five, whose verified Google `external_id` is populated, and whose `latest_feed_member` is true. Records also need
+  whose rating is five and whose verified Google `external_id` is populated. Records also need
   an author name and review text to render.
 - Keep exactly one SonShine-scoped `reviews_carousels` record. Its `limit` and
   `gbp_profile_link` configure the widget.
-- Location hubs select editorially published, five-star, geographically assigned reviews from the deployment snapshot. Feed membership and Google identity are not required. Unassigned reviews cannot supply local or nearby results. WordPress provenance remains separate; historical reviews retain publication when they leave the latest feed. See [review ownership and cutover](docs/location-review-sync.md).
+- Location hubs select editorially published, five-star, geographically assigned reviews from the deployment snapshot. Imported location reviews are manually maintained and keep `external_id` null. Unassigned reviews cannot supply local or nearby results. WordPress provenance remains separate. The existing Google workflow and sitewide feed remain unchanged. See [manual location reviews](docs/location-reviews.md).
 
 ## Publishing FAQs in Directus
 
@@ -129,7 +129,7 @@
   navigation remain frozen for a deployment. Required schema/fetch/tenant failures
   stop prebuild. Unknown, draft and taxonomy-only routes return 404.
 - Read [location authoring](docs/location-authoring.md) for editorial checks and
-  [the release guide](docs/location-release.md) for schema, data, workflow,
+  [the release guide](docs/location-release.md) for schema, data,
   permission, deployment and rollback dependencies. The unused
   `location_landing_pages` scaffold and WordPress originals remain untouched.
 

@@ -13,7 +13,7 @@ BEGIN
     'location_review_area_client','location_faq_area_client','location_faq_page_client','location_faq_service_client',
     'location_navigation_menu_fk','location_navigation_page_fk','location_navigation_parent_fk',
     'location_page_publication','location_neighborhood_content','location_project_reference_normalized','location_project_uuid_canonical',
-    'location_review_feed_shape','location_review_provenance_array','location_faq_scope_exclusive',
+    'location_review_provenance_array','location_faq_scope_exclusive',
     'location_navigation_area_scope','location_nearby_not_self'
   ] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_constraint c JOIN pg_namespace n ON n.oid=c.connamespace WHERE n.nspname='public' AND c.conname=name AND c.convalidated) THEN
@@ -33,7 +33,7 @@ BEGIN
     OR EXISTS(SELECT 1 FROM public.service_area_section_areas j JOIN public.service_area_sections s ON s.id=j.section JOIN public.roofing_service_areas a ON a.id=j.service_area WHERE s.client IS DISTINCT FROM a.client) THEN
     RAISE EXCEPTION 'Cross-client junction exists';
   END IF;
-  RAISE NOTICE 'PASS: location-invariants-v3 present; private references were not selected';
+  RAISE NOTICE 'PASS: location-invariants-v4 present; private references were not selected';
 END;
 $verify$;
 -- A false result is an explicit enrichment/release blocker, not an optional check.

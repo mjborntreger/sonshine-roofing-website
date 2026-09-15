@@ -99,10 +99,20 @@ await db.exec(`INSERT INTO navigation_items(id,menu,link_type,service_area) VALU
 await rejects(`UPDATE navigation_menus SET client=${q(other)} WHERE id=${q(menu)}`);
 await rejects(`UPDATE roofing_service_areas SET client=${q(other)} WHERE id=${q(area)}`);
 await rejects(`INSERT INTO reviews(id,client,service_area) VALUES (1,${q(client)},${q(otherArea)})`);
-await rejects(`INSERT INTO reviews(id,client,latest_feed_member,latest_feed_order) VALUES (1,${q(client)},true,1)`);
-await db.exec(`INSERT INTO reviews(id,client,service_area,external_id,latest_feed_member,latest_feed_order) VALUES (1,${q(client)},${q(area)},'synthetic-google-resource',true,1)`);
-await db.exec(`UPDATE reviews SET latest_feed_member=false,latest_feed_order=NULL WHERE id=1`);
-assert.equal((await db.query('SELECT status FROM reviews WHERE id=1')).rows[0].status,'published');
+// Static imported reviews need no fabricated Google resource identity. Editors
+// publish or unpublish them, while the same-client association and provenance
+// shape remain enforced independently of the unchanged sitewide Google feed.
+await db.exec(`INSERT INTO reviews(id,client,service_area,status,external_id,wordpress_provenance) VALUES (1,${q(client)},${q(area)},'draft',NULL,'[{"key":"synthetic-wordpress-review"}]');
+INSERT INTO reviews(id,client,service_area,external_id) VALUES (2,${q(client)},${q(area)},'synthetic-google-resource');
+UPDATE reviews SET status='published' WHERE id=1`);
+assert.deepEqual((await db.query('SELECT status,external_id FROM reviews WHERE id=1')).rows[0],{status:'published',external_id:null});
+assert.equal((await db.query("SELECT count(*)::integer AS count FROM reviews WHERE status='published' AND source='Google' AND rating=5 AND external_id IS NOT NULL")).rows[0].count,1);
+await rejects(`UPDATE reviews SET service_area=${q(otherArea)} WHERE id=1`);
+await rejects(`UPDATE reviews SET client=${q(other)} WHERE id=1`);
+await rejects(`UPDATE reviews SET wordpress_provenance='{}' WHERE id=1`);
+await db.exec("UPDATE reviews SET status='archived' WHERE id=1");
+assert.deepEqual((await db.query('SELECT status,external_id FROM reviews WHERE id=1')).rows[0],{status:'archived',external_id:null});
+assert.equal((await db.query('SELECT status FROM reviews WHERE id=2')).rows[0].status,'published');
 await db.exec(`UPDATE roofing_projects SET job_id='  ',zip='  ' WHERE id=${q(project)}`);
 assert.deepEqual((await db.query(`SELECT job_id,zip FROM roofing_projects WHERE id=${q(project)}`)).rows[0],{job_id:null,zip:null});
 await db.exec(`UPDATE roofing_projects SET job_id=${q('\t\n\r ')},zip=${q('\t\n')} WHERE id=${q(project)}`);
@@ -122,4 +132,4 @@ await rejects(`UPDATE roofing_projects SET job_id=NULL WHERE id=${q(project)}`);
 const verificationSQL = await readFile(new URL('../../docs/verify-location-model.sql', import.meta.url),'utf8');
 await db.exec(verificationSQL);
 await db.close();
-console.log(`PASS: PostgreSQL local SQL apply/rerun/read-only verification, ${rejected} invalid mutations rejected, reference normalization, retained relationships, review rollover, and scoped post-backfill requirement.`);
+console.log(`PASS: PostgreSQL local SQL apply/rerun/read-only verification, ${rejected} invalid mutations rejected, reference normalization, retained relationships, static review publication/identity/tenant isolation, and scoped post-backfill requirement.`);

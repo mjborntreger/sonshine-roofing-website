@@ -1,60 +1,45 @@
-# Location editorial follow-up
+# Location editorial status
 
-Verified 2026-09-15 after owner approval. Application code is unchanged from
-`366a45a6efae3b73188d5bbdabc88c92c21761b3`; this is a CMS content update only.
+Verified 2026-09-15. Directus content changes are authorized; website deployment is
+held. The owner withdrew all n8n changes and requested static, manually maintained
+location reviews. See [manual reviews](location-reviews.md).
 
-## Applied and recorded
+## Applied
 
-- All 85 existing SonShine `roofing_neighborhoods` records are published.
-  Updates changed only `status`; client, primary area, images and other content
-  were preserved. The two held source occurrences have no imported records.
-- The approved five-field SEO/date proposal was applied to all five location
-  owners. Titles, descriptions, primary/focus keywords and original WordPress UTC
-  publication dates match the approved proposal. Page status remains draft,
-  noindex remains false and source modification dates are preserved.
-- The owner approved all 72 reviews and explicitly confirmed that all have actual
-  five-star ratings. Record this as owner-verified evidence, not a rating inferred
-  from the old website. One missing review date remains null; two malformed source
-  URLs still need verified corrections. The review import remains queued behind
-  the coordinated feed/workflow/application cutover; no review records changed.
-- Geographic holds and uncertain photo associations remain unchanged pending the
-  owner's dispositions. No location page, workflow or website deployment occurred.
+- All 87 unique SonShine neighborhoods are published.
+- G1 is **University Park**; G2 is **Arroyo Vista**. Two new records and two files
+  were created with stable source identities and source image timestamps, then
+  published with status-only changes. Existing Sarasota content organization is
+  retained under the owner's decision, not an independent geolocation assertion.
+- P1: retain Newtown/Washington Park's image. P2: the shared Waterford/Sawgrass image
+  is valid for both. All existing image links remain unchanged.
+- Five approved SEO/date sets are applied. Page status remains draft, noindex false,
+  and source modification dates are preserved.
+- All 72 selected reviews and their actual five-star ratings are approved. Two
+  malformed source links were verified by adding HTTPS; one absent date stays null.
+  Review import and final readback are tracked in the handoff.
 
-Plan hash:
-`6f5c09a7d21efe5a8a6c2efc236c1a326bb199fe2936ddafb7ec6a734b71cbd5`.
-Approved SEO proposal hash:
-`f7276557a5841c7d9313ba1829db68ccbc8c9bcd7d17341aef929e00e3202eb1`.
+## Evidence
 
-The exact plan/driver received independent pre-execution review. All 90 writes
-have narrow before/after receipts and exact fresh readback; final verification
-matched all 90 targets. Independent review also verified all 180 before/after
-receipts and fresh CMS readback, including unchanged image associations and draft
-page states, with no issues found. Historical 219-operation rerun evidence predates these
-editorial changes. Do not replay a migration in a way that restores draft statuses
-or overwrites approved SEO. Refresh targets and preserve these owner decisions.
+The 85-neighborhood/five-SEO plan applied 90 exact writes. Independent verification
+checked all 180 before/after receipts and fresh CMS readback.
 
-Private recovery root:
-`/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.
-Artifacts: `editorial-approved-01-plan.json`, `editorial-approved-01-authorization.json`,
-`editorial-approved-01-apply/`, `editorial-approved-01-complete.json` and
-`review-editorial-approval-02.json`. The last supersedes the earlier approval
-record's unresolved-rating state. All private source identities stay outside Git.
+The disposition plan
+`d55cf23d47b5bd1b3e4fbbbc9dd26ef0d898021bb48e80604f0e9bbb7eb0500c`
+applied four creates and two status-only publications. Independent live verification
+confirmed both file byte hashes/timestamps, all new fields, final 87 publications,
+unchanged prior 85 neighborhood rows, unchanged five SEO rows and all P1/P2 links.
+No findings remained. Verification hash:
+`a4d6585b344b37095519ed2be35c94a62e090fe85374ee8351e810bc7aa630d2`.
 
-## Geographic holds
+Private artifacts are under
+`/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`:
+`editorial-approved-01-apply/`, `disposition-preparation-01/`,
+`disposition-apply-01/`, `disposition-publish-01/`,
+`disposition-independent-verification-01.json` and owner approval records.
+Retain original sources and recovery evidence. Fresh replanning preserves current
+publication and approved copy; never replay an old plan to restore draft statuses.
 
-| Key | Source placement | Issue needing disposition |
-| --- | --- | --- |
-| G1 | Sarasota: University Park / West of Trail area | Combined label, intended canonical neighborhood/service area and retained aerial photo are unresolved. Confirm the correct name and area, or omit. |
-| G2 | Sarasota: Arroyo / Crestline / Village Park | Source combines three names; photo visibly says Arroyo Vista. Sarasota linkage is unverified. Confirm/correct the intended communities and photo, or omit. |
-
-## Uncertain photo associations
-
-| Key | Published neighborhood record(s) | Issue needing disposition |
-| --- | --- | --- |
-| P1 | Sarasota: Newtown / Washington Park | Photo shows waterfront homes, a yacht and private docks. Confirm the association, replace the photo, or remove the image link. |
-| P2 | Venice: Waterford and Sawgrass | Both use the same canonical golf-course/neighborhood photo. Confirm it is valid for both, identify the correct owner, or remove/replace the incorrect association(s). |
-
-The earlier optional-image omission proposal was not applied: the owner requested
-these questions before giving dispositions. Preserve all original/imported files.
-The public website continues serving the prior WordPress location pages until an
-approved deployment. See [the coordinated release sequence](location-release.md).
+No geographic/photo decision, rating confirmation or project mapping remains due
+from the owner. The public website continues serving its prior WordPress pages
+until an approved deployment.
