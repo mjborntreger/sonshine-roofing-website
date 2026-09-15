@@ -1,7 +1,9 @@
 # Location source evidence
 
-Status: authorized Directus migration and enrichment applied and verified; pages
-and neighborhoods remain drafts. Workflow publication and deployment remain held.
+Status: authorized migration and enrichment are verified. Current totals include
+87 published neighborhoods and 72 published manual location reviews; five pages
+remain draft. The existing workflow stays unchanged and website deployment is held.
+The initial 43fbd45 reconciliation below is historical; see the [current handoff](location-handoff.md).
 Verified: 2026-09-15. Contract: [location contract v3](location-contract.md).
 Application starting revision: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 
@@ -10,7 +12,7 @@ Current applied totals, media inspection, commands and recovery evidence are in
 `43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`. The initial inventory below remains
 historical evidence; the fresh pre-apply source nodes were unchanged.
 
-## Applied reconciliation
+## Initial applied reconciliation
 
 The applied plan hash is
 `a86b32efe0f8066a0c3feb3ba51d6b7883918a4e401fc723b44407bd62fde710`.
@@ -157,9 +159,10 @@ See [enrichment evidence](location-enrichment-evidence.md).
 
 Permission tightening preceded the private field. The applied model and actual
 website/anonymous privacy checks are recorded in [model evidence](location-model-evidence.md).
-Remaining gates include the held source reviews, two geography/photo conflicts,
-actual-page visual/editorial acceptance, compatible review workflow cutover and
-application deployment. No workflow publication or deployment is claimed.
+The owner subsequently approved all 72 actual five-star reviews and resolved the
+geographic/photo dispositions. Static review import and current reconciliation
+are recorded in [the handoff](location-handoff.md). Workflow work was withdrawn;
+the existing workflow remains unchanged. Website deployment still requires approval.
 
 ## Private evidence
 

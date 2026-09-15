@@ -17,7 +17,8 @@ location reviews. See [manual reviews](location-reviews.md).
   and source modification dates are preserved.
 - All 72 selected reviews and their actual five-star ratings are approved. Two
   malformed source links were verified by adding HTTPS; one absent date stays null.
-  Review import and final readback are tracked in the handoff.
+  All 72 are now imported, published and linked to their approved locations.
+  Fresh replanning yields zero operations; the existing 32 managed reviews stay unchanged.
 
 ## Evidence
 

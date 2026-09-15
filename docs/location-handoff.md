@@ -11,16 +11,17 @@ are approved; website deployment remains held for final approval.
 Application baseline/deployed revision:
 `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 This manual-review amendment starts from local `6957d2d31846ca392c07062d35c82f8a335975d1`.
-The final frozen amendment revision and checks are recorded in verification.
+Frozen implementation revision: `4a4c5f6a7aed9dccd383c6de2c1be4c8fdbf6ba2`.
+Later documentation commits record execution without changing that reviewed code.
 
 | State | Result |
 | --- | --- |
 | Implemented | Common location hubs, deterministic local/nearby selection, deployment snapshots, navigation/FAQ/SEO/sitemaps, model/privacy and repeatable migration/enrichment. Manual review isolation replaces the abandoned workflow work. |
 | Migrated | Five canonical draft page owners, 87 unique neighborhoods, 91 immutable files, one taxonomy-only area and 39 junctions. All 53 project/job/ZIP enrichments and SonShine-only required constraint are applied. |
-| Published in CMS | All 87 neighborhoods. Five SEO/date sets applied; all five location page owners remain draft and indexable when published. Review import status is recorded below. |
+| Published in CMS | All 87 neighborhoods. Five SEO/date sets applied; all five location page owners remain draft and indexable when published. All 72 manual location reviews are also published. |
 | Deployed | Existing WordPress-backed application at `0271ec7`; unchanged by this task. |
-| Verified | Original 219-operation import/rerun, 53 enrichment readbacks/rerun, actual private-field denial, 90 SEO/neighborhood editorial updates, four disposition creates and two publications. |
-| Remaining | Finish static review import/cleanup verification, freeze the website candidate and obtain website-release approval. No workflow approval or project mapping is outstanding. |
+| Verified | All imports/readbacks and zero-write reruns; independent review and permissions; Node 22 lint/typecheck/29 verification scripts; credentialed 451-page build and 15 local runtime checks. |
+| Remaining | Website-release approval, production-configured build and deployed five-page visual/route acceptance. No workflow approval or project mapping is outstanding. |
 
 ## Reconciliation
 
@@ -39,7 +40,12 @@ The final frozen amendment revision and checks are recorded in verification.
   Two scheme-less links were verified with HTTPS prefixes without changing source keys.
 - Fresh pre-import review comparison found no URL, normalized author/text or
   attribution-only candidate among the existing 32 SonShine records, and no duplicate
-  source URL/text pair. Independent review checks the matching evidence before apply.
+  source URL/text pair. Independent review found no plausible existing matches. Two pairs with generic
+  overlapping praise have distinct attribution, source links and dates and remain
+  distinct. All 72 were imported and published, with no Google identities created.
+- Post-import total is104 SonShine reviews:72 manual plus32 unchanged managed;
+  92 published and 12 archived. A fresh verified-target replan returns zero
+  operations and 72 review matches.
 
 The planner's 53 generic enrichment-held entries are superseded by the completed
 separate enrichment pipeline, not unresolved mappings. See [enrichment](location-enrichment.md).
@@ -53,7 +59,13 @@ separate enrichment pipeline, not unresolved mappings. See [enrichment](location
 | 85-neighborhood/five-SEO editorial plan | `6f5c09a7d21efe5a8a6c2efc236c1a326bb199fe2936ddafb7ec6a734b71cbd5` |
 | University Park/Arroyo Vista increment | `d55cf23d47b5bd1b3e4fbbbc9dd26ef0d898021bb48e80604f0e9bbb7eb0500c` |
 | Independent disposition readback | `a4d6585b344b37095519ed2be35c94a62e090fe85374ee8351e810bc7aa630d2` |
-| Prepared static 72-review plan | `aedc1100fb1061fc34e5be806d63cdee137aa9cec9a236f73cbd96af638a031a` |
+| Applied static 72-review plan | `aedc1100fb1061fc34e5be806d63cdee137aa9cec9a236f73cbd96af638a031a` |
+
+The fresh no-operation rerun plan is
+`fa58a1cff9ecb32a83d402908f922c97b2a377deb31fe325c5452b662b790070`.
+The two unused feed fields, their CHECK and one permission-list subset were removed
+with explicit owner approval and independent readback. All privacy protections,
+32 original managed reviews and the active workflow are unchanged.
 
 ## Recovery and release
 

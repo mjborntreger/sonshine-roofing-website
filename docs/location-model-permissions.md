@@ -4,8 +4,8 @@ Current schema artifact: `location-model-v5`; deployment format `location-v3`;
 starting application `0271ec7`. Integrity SQL: `location-invariants-v4`.
 These local artifacts remove the abandoned review feed-membership requirements.
 The preceding model-v4/invariants-v3 were applied and verified on 2026-09-15;
-removal of their unused live feed fields and CHECK requires separate coordinated
-cleanup and readback. All project privacy, tenant, provenance and enrichment
+the owner separately approved removal of their unused live feed fields and CHECK,
+and cleanup/readback completed on 2026-09-15. All project privacy, tenant, provenance and enrichment
 constraints remain required. Location reviews now use a static import followed by
 manual editorial maintenance; no workflow changes are part of this release.
 Application deployment remains held.
@@ -30,7 +30,7 @@ schema, tighten/extend and before/after-backfill privacy result files listed in
 [model evidence](location-model-evidence.md). The procedure below remains the
 required order for any subsequent authorized run.
 
-## Prepared removal of unused review membership
+## Verified removal of unused review membership
 
 Read-only inspection on 2026-09-15 found both abandoned columns present. All 49
 review records across the shared CMS had `latest_feed_member=false` and
@@ -39,16 +39,24 @@ three existing wildcard review grants require no field-list mutation. No Directu
 relations depend on either field. This is a global column-usage count, separate
 from the 32-record SonShine reconciliation baseline.
 
-The exact private permission before-state, two field definitions and removal
-proposal are under `manual-review-schema-preparation-01` in the approved recovery
-root above. Its read-only `inspect-dependencies-01.sql` must run before cleanup to
-check PostgreSQL dependencies and capture the named CHECK definition. Unexpected
-dependencies or new nondefault data block removal. The coordinator removes only
-the explicit permission-field references, `location_review_feed_shape`, and the
-two Directus fields; all other records, constraints and policy scopes remain.
-No remote cleanup was executed by this preparation. Preserve the old definitions
-for guarded recovery, and verify v5 schema, v4 invariants and project privacy after
-the authorized cleanup.
+The owner explicitly approved deletion of these two fields, the named CHECK and
+associated permission entries after automatic approval review required a more
+specific authorization. SQL dependency inspection found only expected defaults and
+the CHECK. The coordinator removed exactly one permission field-list subset, one
+CHECK and two columns through guarded execution, retaining all before-images.
+
+Independent live verification confirms both Directus metadata and physical columns
+are absent; the complete permission scope differs only by the two removed fields.
+Model-v5 returns zero actions, SQL-v4 verification passes, the SonShine enrichment
+requirement remains true, and actual direct/nested/aliased project job/ZIP denial
+still passes. Existing 32 managed reviews and the active n8n workflow are unchanged.
+
+Private preparation and receipts: `manual-review-schema-preparation-01/`,
+`manual-review-schema-cleanup-01/`, and
+`manual-review-schema-independent-verification-01.json` in the approved root.
+Independent receipt SHA-256:
+`d323e53b62c91f158c7283bf1a24688f004a5d93f79bb2b8643444d7e55be391`.
+Preserve saved field definitions for guarded recovery. No workflow change occurred.
 
 ## Permission-first sequence
 

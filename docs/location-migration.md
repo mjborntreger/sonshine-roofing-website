@@ -1,8 +1,10 @@
 # Location migration tooling and applied results
 
-Status: authorized Directus schema/data migration applied and read back on
-2026-09-15. Five pages and 85 neighborhoods remain drafts. Workflow publication
-and application deployment remain held.
+Status: authorized Directus migration is applied and verified on 2026-09-15.
+All 87 neighborhoods and 72 manual location reviews are published; five page owners
+remain draft. Existing n8n remains unchanged; website deployment is held. The
+initial 43fbd45 phase below is historical; [current handoff](location-handoff.md)
+records subsequent editorial changes, static reviews and schema cleanup.
 
 Shared contract: v3 in [location-contract.md](location-contract.md). Migration
 artifact version remains `location-migration-v1`. Starting application revision:
@@ -10,7 +12,7 @@ artifact version remains `location-migration-v1`. Starting application revision:
 integrated application revision separately. Execution and guarded file-timestamp
 recovery used `43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`.
 
-## Applied plan and reconciliation
+## Initial applied plan and reconciliation
 
 The approved durable recovery root is
 `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.

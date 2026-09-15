@@ -1,6 +1,10 @@
 # Location model evidence
 
-Contract: `location-v3`; model `location-model-v4`; SQL `location-invariants-v3`.
+Current contract: manual review amendment, snapshot `location-v3`; model
+`location-model-v5`; SQL `location-invariants-v4`. The initial v4/v3 phase below
+is historical. Subsequent explicitly approved removal of two unused review-feed
+fields, their CHECK and two reader-field entries passed independent live readback;
+all original privacy/integrity protections remain. See [current model results](location-model-permissions.md).
 Starting application: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 Last verified: 2026-09-15. Verification source: initial configured Directus MCP
 discovery, authorized schema/policy execution receipts, read-only SQL verification,
@@ -8,7 +12,7 @@ actual website/anonymous permission probes and independently verified enrichment
 The applied location migration and timestamp recovery revision is
 `43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`.
 
-## Applied model and privacy verification
+## Initial applied model and privacy verification
 
 The coordinator tightened one project reader grant before adding the private
 fields, then applied 49 additive schema actions and the transactional invariant
@@ -22,10 +26,10 @@ without writes. Direct, nested, aliased and wildcard privacy probes passed for t
 website reader and anonymous access before and after backfill. Job IDs and ZIPs
 remain excluded from their public projections.
 
-Location data now includes fourteen canonical service areas, including Parrish
-taxonomy-only, five draft landing pages and 85 draft neighborhoods. The location
-import wrote no reviews. Workflow publication and application deployment remain
-held; these results do not establish deployed page acceptance.
+That initial phase created fourteen canonical service areas, including Parrish
+taxonomy-only, five draft pages and 85 draft neighborhoods, without review writes.
+The current handoff supersedes those counts with 87 published neighborhoods and 72
+manual reviews. Website deployment remains held; n8n work was withdrawn.
 
 Private recovery root:
 `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.

@@ -4,7 +4,7 @@ Status: 53 project updates and the SonShine-only required-field constraint appli
 Private artifact contract: `location-enrichment-v1`; shared contract: `location-v3`.
 Execution revision: `05d1f6ba6f4662a70cbcecdcf2c174a9b4fcf117`.
 This is a manually initiated backfill. It adds no AccuLynx synchronization or schedule.
-Workflow publication and application deployment remain held; this status covers enrichment only.
+Application deployment remains held; the existing n8n workflow stays unchanged. This status covers enrichment only.
 
 ## Completed backfill
 

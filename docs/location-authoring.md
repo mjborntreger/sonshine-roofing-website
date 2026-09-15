@@ -52,9 +52,10 @@ keep their actual area labels. Fewer eligible records produce fewer cards.
 Verify source attribution, exact text, rating, dates, URL, and any retained reply
 before importing a review. Never derive a rating from the old site's star graphic.
 Keep missing dates empty. `external_id` is reserved for verified Google resource
-identity; WordPress provenance is separate. Google updates preserve an editor's
-publication decision and area assignment. Leaving the latest feed clears membership
-without archiving the review. Project testimonials stay independent.
+identity; WordPress provenance is separate. Manually imported location reviews keep
+that identity null and are maintained directly in Directus. The existing Google
+workflow stays unchanged and does not manage these imports. See [manual review
+ownership](location-reviews.md). Project testimonials stay independent.
 
 Each FAQ has zero or one scope: `website_page`, `service`, or `service_area`.
 Zero means global. Local questions must concern actual local coverage or conditions;
@@ -73,5 +74,5 @@ from the snapshot, including when visitors navigate from another page.
 Review desktop/mobile layout, correct local/nearby headings, source links, optional
 omissions, map safety, indexability, canonicals and video behavior on all five
 initial pages. Record the deployed application revision and the rendered
-`data-location-snapshot` digest. Production schema/data/workflow/deployment actions
+`data-location-snapshot` digest. Production schema/data/deployment actions
 follow the coordinated release procedure and exact authorization boundaries.

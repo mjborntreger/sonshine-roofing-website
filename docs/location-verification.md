@@ -11,6 +11,92 @@ for applied counts and remaining website-release approval. A1–A4 and the origi
 applied-phase evidence below describe their named historical candidates; they do not
 establish verification of subsequent manual-review changes.
 
+## Manual review amendment — verified 2026-09-15
+
+Frozen implementation: `4a4c5f6a7aed9dccd383c6de2c1be4c8fdbf6ba2`.
+Model-v5 / SQL-v4; location snapshot format 1 / `location-v3` and project snapshot 2
+remain compatible. Later documentation commits do not change the reviewed code.
+
+### Applied and independently verified
+
+- All 72 approved static reviews were created with null Google identity, original
+  attribution/text, all 72 replies,71 known dates/one null, two verified HTTPS repairs
+  and the approved area assignments, then published with status-only writes.
+- Exact import plan:
+  `aedc1100fb1061fc34e5be806d63cdee137aa9cec9a236f73cbd96af638a031a`.
+  All 144 create/publication before-after pairs match live records. SonShine totals
+  are 104 reviews:92 published,12 archived. The prior 32 managed records are unchanged.
+- Fresh confirmed mappings reproduce a zero-operation plan with 72 review matches:
+  `fa58a1cff9ecb32a83d402908f922c97b2a377deb31fe325c5452b662b790070`.
+  Source reconciliation is 5 pages,88 neighborhood occurrences/87 canonical records,
+  93 media references/91 files plus one byte-reuse and one excluded duplicate,
+  292 relationships/291 matches plus one excluded duplicate presentation.
+  All 53 generic enrichment holds are superseded by the completed private pipeline.
+- Independent source matching found no plausible existing-record duplicate. Two
+  source pairs with generic overlapping praise were retained as distinct because
+  their attribution, links and dates differ. No fuzzy match was silently merged.
+- Removed only two unused feed fields, their named CHECK and two entries from one
+  explicit reader field list after specific owner approval. Global usage was49
+  records with false/null defaults. Independent live readback confirmed physical and
+  Directus metadata absence, preserved complete policy scope, zero schema actions,
+  SQL invariants and the SonShine required enrichment constraint.
+- The active original n8n graph remains
+  `dfe166e47bc8224252cb8a4c51354465ae9c99fdcd3a0e337689e5c367ae9569`.
+  Current and active versions agree. No workflow save, execution, seed or publication
+  occurred. The sitewide reader is byte-identical to baseline 0271ec7.
+
+### Checks and artifact boundary
+
+Node 22 lint, typecheck and all 29 verification scripts pass. Focused new checks
+include 28 migration cases,8 actual-reader/isolation cases, model verification and
+PGlite SQL execution with 34 rejected invalid mutations. Independent reviewers
+validated the migration plan/driver, schema removal, actual data and permissions.
+The permission-readback P2 was fixed and independently closed before cleanup.
+No open implementation or import finding remains.
+
+The credentialed local build passed with 451 pages,53 projects,79 videos and 333
+gallery images. All five location owners remain drafts, so zero location routes
+are generated. Local runtime verified 15 cases, including eight draft/taxonomy/unknown
+404s and the unchanged home/reviews/project/video/FAQ routes. Sitemaps intentionally
+return 404 under this local nonproduction configuration; a prior expectation of 200
+was corrected after checking the configured sitemap gate.
+
+- Location artifact SHA-256:
+  `847ffc582099a51ca1cadf5210224ef2e424cf75cb55fd69c548d9550aa835db`.
+- Project artifact SHA-256:
+  `941ae39d93a20420d6a13e7b35d4b8cc72d240a34f6e2b68f80e8e5e82e82c93`.
+- Independent actual selection: six local reviews each for Sarasota, Bradenton,
+  Venice and North Port; Lakewood Ranch has four local and two approved nearby.
+  All 72 manual reviews are represented;20 existing published managed reviews remain
+  unassigned. Null project neighborhoods remain absent and project/video identity
+  and publication behavior are preserved.
+- Actual private-field probes still deny website/anonymous direct, nested and aliased
+  job and ZIP reads; wildcard checks contain neither field. Public output scan of
+  8,923 files found zero private-job-reference or credential hits. All 53 actual job
+  IDs were checked without logging them; snapshot private-key count is zero.
+- A broader 9,583-file scan also inspected local server caches and found five files
+  containing credentials, with zero job-reference hits: local Turbopack build/dev
+  caches and the generated server-only `.next/standalone/.env` copy. These are not
+  public outputs. `.dockerignore` excludes local `.env` and `.next` inputs. This
+  classification does not claim that local server artifacts are secret-free.
+
+Private evidence in the approved recovery root includes
+`static-review-preparation-01/`, `static-review-apply-01/`,
+`static-review-publish-01/`, `static-review-reconciliation-01/`,
+`static-review-live-independent-verification-01.json`,
+`manual-review-schema-cleanup-01/`,
+`manual-review-schema-independent-verification-01.json`,
+`manual-review-credentialed-build-01.json`, `manual-review-local-runtime-01.json`
+and `manual-review-public-output-scan-02.json`.
+Independent live review receipt hashes are respectively
+`5f6e0743ea267e8881b7e539ee6915f8afdefec2865e5b716455243d716384c5` and
+`d323e53b62c91f158c7283bf1a24688f004a5d93f79bb2b8643444d7e55be391`.
+
+Website deployment remains held. These checks verify CMS import and a local draft
+candidate; they do not establish five published/deployed location pages. Final
+website release, production-configured snapshot/route checks and deployed visual
+acceptance remain governed by the release guide. No workflow approval is outstanding.
+
 ## Applied-phase verification — 2026-09-15
 
 Execution code: `43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`. Application behavior is
@@ -161,18 +247,10 @@ continued availability of the old deployed application, not a new location relea
 - Additive schema: `location-model-v4`; integrity SQL `location-invariants-v3`.
   A1 used model v2 / SQL v1; A2/A3 used model v3 / SQL v2. A4 also enforces
   case-invariant UUID job identity in the planner and actual database.
-- Revised workflow graph SHA-256:
-  `ce3321a4fa5e6c9061b754b5a21b166f70663910fe2ac780224c3087a9025cf8`.
-- Original workflow graph SHA-256:
+- Unchanged existing workflow graph SHA-256:
   `dfe166e47bc8224252cb8a4c51354465ae9c99fdcd3a0e337689e5c367ae9569`.
-- Actual membership seed plan SHA-256:
-  `c6f2a74ee8998060c6d0396e3f42586d97ade177734968cb8f0382581895bda8`.
-  Its source proof is the successful 2026-09-15 06:15:50 UTC workflow execution;
-  selected identities/order and final readback matched exactly. It prepares 20
-  members and 12 nonmembers without changing publication. An in-memory second
-  preparation produces zero updates. Recheck fresh state before apply.
-- Workflow patch artifact: private `review-workflow-patch-v4.json`, contract-v3
-  metadata; prior v1/v2/v3 patches are superseded.
+  The proposed replacement and seed were subsequently withdrawn, never applied.
+  Their private artifacts are retained solely as historical recovery evidence.
 - Migration: `location-migration-v1`, contract v3, private `plan-candidate-v4.json`;
   canonical hash `4aa9693445fdb8e2d22ec00657ec40eba5961e9ebd6a5e04549eb5f1bf1ef424`.
   The plan has 219 proposed mutations and is not executable before fresh applied
@@ -204,9 +282,9 @@ job references; database constraints enforce client consistency and relationship
 Actual effective permission probes and production constraints remain unverified
 until the separately authorized schema/policy apply.
 
-Review synchronization prepares membership/order independently of editorial
-publication. It preserves geography, imported URLs/replies/provenance and deliberate
-unpublication; departure from the feed no longer archives an older local review.
+The subsequent manual-review amendment replaces proposed synchronization changes.
+Imported reviews retain null Google identity and are manually published/assigned;
+the existing Google workflow and sitewide reader keep their original behavior.
 
 ## Verification performed
 
@@ -221,9 +299,8 @@ unpublication; departure from the feed no longer archives an older local review.
 - Focused fixtures cover project/video independent publication, geographic
   selection edge cases, integer review identities, exclusive FAQ scopes,
   sanitization, image descriptions, fetch errors and snapshot compatibility.
-- Review workflow: 31 synthetic Code-node cases; native validation of the prepared
-  changed node configurations; rollover, deliberate unpublication, successful
-  empty selection and exact membership/order verification.
+- The abandoned workflow proposal had 31 synthetic checks. That tooling and its
+  release requirements were removed when the owner withdrew workflow changes.
 - Schema: synthetic additive rerun/drift/permission/recovery checks. PostgreSQL
   behavior tested in a private temporary PGlite database, including 32 invalid
   relationship/privacy-integrity writes and the independent photo/map relation.
@@ -260,24 +337,14 @@ and cannot establish the five migrated pages' editorial, geographic or interacti
 acceptance. Preview generator: `scripts/preview-location-components.mjs`.
 Private preview index: `/private/tmp/sonshine-location-migration-20260915/visual-preview/index.html`.
 
-## Historical pre-apply acceptance dependencies
+## Current acceptance dependencies
 
-- All 53 manual project-to-job mappings and authenticated job lookups are verified,
-  with 53 valid ZIPs and preserved primary areas. Neighborhoods remain unverified.
-  Approved backfill and successful readback are still required before enforcing
-  the SonShine-only job/ZIP required constraint.
-- Verify held review ratings and problematic source links; preserve unknown dates.
-  No ratings are inferred from WordPress star graphics.
-- Resolve remaining geographic conflicts and complete actual media/editorial review.
-  All five direct nearby lists were explicitly approved by the owner.
-- Approve durable private recovery storage and capture current narrow before-images
-  plus the prior deployable application artifact before production changes.
-- Resolve effective Directus administrative policy topology; authorize and apply
-  reviewed schema/permissions/data, run actual probes and a credentialed build,
-  follow the coordinated workflow/app
-  cutover and rollback steps in [release](location-release.md).
-- Verify the five deployed routes, 404 cases, sitemap/noindex/navigation/FAQ
-  boundaries, public outputs and workflow readback against recorded artifacts.
+All earlier schema, enrichment, owner-rating, geography and photo decisions are
+resolved. See [current handoff](location-handoff.md) for static-review execution,
+manual isolation and schema-cleanup readback. Website release still requires a
+frozen credentialed build and final deployment approval. The five deployed routes,
+404s, sitemaps, navigation, FAQs, private-field exclusion and desktop/mobile output
+must be checked against the recorded deployed artifact. No workflow cutover applies.
 
 Shared context ownership records have not been changed because production ownership
 has not changed. After verified release, use the context repository's metadata,

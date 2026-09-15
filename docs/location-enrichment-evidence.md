@@ -10,8 +10,8 @@ private recovery receipts, post-backfill SQL verification and actual website/ano
 permission probes. Discovery application revision:
 `429bdf2e70f32a66c5b92a650d82c3a358922b86`; execution revision:
 `05d1f6ba6f4662a70cbcecdcf2c174a9b4fcf117`.
-This evidence does not mark the location migration deployed or the review workflow
-published; both release actions remain held.
+This evidence does not mark the location migration deployed; website deployment
+remains held. The owner withdrew workflow work, so existing n8n remains unchanged.
 
 ## Authenticated access
 
