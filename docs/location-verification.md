@@ -7,6 +7,13 @@ held. Full release acceptance remains incomplete.
 The A1–A4 sections below preserve historical preparation evidence. The applied-phase
 record immediately below supersedes their pre-apply status statements.
 
+## Subsequent editorial update
+
+The [editorial follow-up](location-editorial-status.md) records 85 neighborhood
+publications and five approved SEO/date updates, with exact 90-target readback.
+The owner confirmed all 72 review ratings as five stars. Workflow and deployment
+remain held; earlier draft/missing-SEO/rating descriptions below are historical.
+
 ## Applied-phase verification — 2026-09-15
 
 Execution code: `43fbd45f24bb4c9bd4d68f3ed19fe457d3f31a0e`. Application behavior is

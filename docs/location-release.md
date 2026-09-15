@@ -5,6 +5,12 @@ Workflow publication and website deployment remain held for final approval.
 Contract: [location-v3](location-contract.md). The final candidate record and
 independent review dispositions are in [verification](location-verification.md).
 
+The [latest editorial follow-up](location-editorial-status.md) supersedes draft
+neighborhood, missing-SEO and unresolved-rating preparation states below: all
+85 neighborhoods are published, five approved SEO/date sets are applied, and the
+owner explicitly verified all 72 review ratings. Page publication, two source-URL
+corrections, geographic/photo dispositions and workflow/deployment remain pending.
+
 ## Historical pre-migration baseline on 2026-09-15
 
 - Local main and `origin/main`: `0271ec70f46a2b31c4eb012da28459f6a9144184`.

@@ -2,10 +2,16 @@
 
 Verified 2026-09-15. **The approved Directus preparation and migration phase is
 complete. Workflow publication and website deployment remain held.** The five
-location hubs and 85 reusable neighborhoods are drafts; the current public site
+location hubs remain drafts; all 85 reusable neighborhoods are now published.
+Approved SEO values are applied. The current public site
 continues to use its existing WordPress location pages.
 
-## State and revisions
+The [editorial follow-up](location-editorial-status.md) records the subsequent
+90 verified CMS updates, owner approval and five-star confirmation for all 72
+reviews, and the exact geographic/photo questions awaiting dispositions. It
+supersedes the earlier draft/SEO/rating preparation states below.
+
+## Original applied-phase state and revisions
 
 | State | Result |
 | --- | --- |
