@@ -31,5 +31,6 @@ export async function getLocationHubContent(slug: string) {
   return { page, projects: selectLocationContent(pool, { ...selection, kind: 'projects' }), reviews: selectLocationContent(data.reviews, { ...selection, kind: 'reviews' }), sponsors: selectLocationContent(data.sponsors, { ...selection, kind: 'sponsors' }),
     neighborhoods: data.neighborhoods.filter(item => item.serviceAreaId === page.id),
     neighborhoodProjects: pool.filter(item => item.serviceAreaIds.includes(page.id)),
-    faqs: data.faqs.filter(faq => faq.serviceArea?.id === page.id || (!faq.serviceArea && !faq.service && !faq.websitePage)) };
+    faqs: [...data.faqs.filter(faq => faq.serviceArea?.id === page.id),
+      ...data.faqs.filter(faq => !faq.serviceArea && !faq.service && !faq.websitePage)] };
 }

@@ -3,7 +3,9 @@
 Owner scope amendment, 2026-09-15: location reviews are a static import followed by
 manual maintenance. The existing n8n workflow remains unchanged. The owner has
 approved Directus preparation/migration, private recovery, all 72 five-star reviews,
-SEO values, and neighborhood publication. Website deployment remains held.
+SEO values, and neighborhood publication. The September 16 execution also covers
+export/CI repairs, overviews, neighborhood copy, project-neighborhood verification
+and local FAQs. Website deployment remains held.
 
 Read the [current handoff](location-handoff.md), [manual review contract](location-reviews.md)
 and [verification record](location-verification.md) before execution.
@@ -17,9 +19,13 @@ and [verification record](location-verification.md) before execution.
   neighborhood remains nullable. No unattended AccuLynx automation is included.
 - Applied the original 219-operation location plan with exact field, byte and
   timestamp readback, followed by a 219-match/no-write repeat.
-- Applied five approved SEO/date sets. All five page owners remain draft, with
-  noindex false. Published 85 neighborhoods, then the approved University Park and
-  Arroyo Vista additions; retained the approved P1/P2 image associations.
+- Applied five approved SEO/date sets. All five page owners are now published,
+  with noindex false and populated overviews. Published the 87 original canonical
+  neighborhoods; retained the approved P1/P2 image associations. Current editorial
+  counts and verification are in [editorial status](location-editorial-status.md).
+- Added 25 published local FAQs and preserved all 45 previous FAQs. Each hub shows
+  five local answers before the eight shared answers. The rendered order and
+  structured data are covered by regression tests.
 - Retained narrow recovery receipts and prior application image in the approved
   private root `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.
 
@@ -27,6 +33,23 @@ The production application remains `0271ec70f46a2b31c4eb012da28459f6a9144184`.
 No website deployment, remote Git push, merge, workflow save or workflow publication
 has been performed by this task. Current import totals and cleanup results belong
 in the handoff; historical plans are not current execution instructions.
+
+## Export and verification contract
+
+`inventoryWordPress()` writes `wordpress-location-source-v2` with
+`contentFormat=rendered-html` and an explicit body-availability value per page.
+Missing or null rendered bodies fail the capture; an available empty string is
+recorded separately. The September 16 capture recovered all five current rendered
+bodies. It does not reconstruct historical RAW content or replace a WordPress
+backup. Retain earlier exports and receipts; never overwrite them with a recapture.
+
+Quality CI runs `npm run verify:locations` (the nine existing location checks plus
+export regression tests) and `npm run verify:dynamic-routes`. Dynamic-route checks
+cover locations, projects, blog posts, people, glossary terms, special offers,
+sitemaps and resource API input. Complete route-owner pagination rejects missing
+counts, truncation, duplicate identities and records outside published client
+scope. Special-offer static paths and sitemap entries use the same complete
+published inventory.
 
 ## Static review import gate
 
@@ -54,10 +77,11 @@ Private abandoned patch/seed files are withdrawn evidence, never release artifac
 2. Verify the five page owners' copy, indexability, maps, neighborhood photos, local
    claims, canonicals, links, FAQs and structured data. All neighborhoods and eligible
    reviews must have their intended publication state before the build.
-3. With website-release approval, publish the five page owners and run the Node 22
-   repository checks and credentialed build. Required upstream/schema/tenant errors
-   must fail the build. Record the exact generated content digests.
-4. Deploy the approved application artifact. Verify the five preserved routes,
+3. Verify the existing publication states and run the Node 22 repository checks,
+   including `verify:locations` and `verify:dynamic-routes`, and the credentialed
+   build. Required upstream/schema/tenant errors must fail the build. Record the
+   exact generated content digests; do not republish or reset the five owners.
+4. With website-release approval, deploy the approved application artifact. Verify the five preserved routes,
    unknown/draft/taxonomy-only 404s, canonical navigation, noindex/sitemap behavior,
    FAQ scope, empty-section omission and project/video independence. Perform desktop
    and mobile visual review against the actual deployed artifact.

@@ -141,6 +141,15 @@ check('section order and regional labels remain accurate and no business rating 
   assert.equal(schema.mainEntity[0].acceptedAnswer.text, 'Verified & safe answer.');
   assert.doesNotMatch(JSON.stringify(schema), /AggregateRating|RoofingContractor|"Review"/);
 });
+check('all thirteen location FAQ answers appear in visible content and JSON-LD in the same order', () => {
+  const props = baseProps();
+  props.faqs = Array.from({ length: 13 }, (_, index) => ({ id: `faq-${index}`, title: `${index < 5 ? 'Local' : 'Shared'} question ${index}?`, contentHtml: `<p>Verified answer ${index}.</p>` }));
+  const doc = render(Hub, props);
+  const schema = JSON.parse(doc.querySelector('script[type="application/ld+json"]').textContent);
+  assert.equal(schema.mainEntity.length, 13);
+  assert.deepEqual(schema.mainEntity.map(item => item.name), props.faqs.map(item => item.title));
+  assert.deepEqual([...doc.querySelectorAll('[aria-label="Roofing questions and answers"] summary')].map(node => node.textContent), props.faqs.map(item => item.title));
+});
 check('CMS HTML remains sanitized and review text is escaped', () => {
   const props = baseProps();
   props.page = { ...page, overviewHtml: '<p>Overview</p><img src="private"><script>unsafeOverview()</script>' };

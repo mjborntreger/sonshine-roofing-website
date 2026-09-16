@@ -219,7 +219,7 @@ export function planMigration({ source, targets, approvals = {}, previous = {}, 
         else if (existing.length > 1 || (existing[0] && existing[0].wordpress_id !== canonicalKey)) result = add('neighborhoods', rawKey, 'conflict', 'Competing neighborhood name/source identity');
         else result = operation('neighborhoods', canonicalKey, 'roofing_neighborhoods', { client: targets.clientId, wordpress_id: canonicalKey }, {
           id: existing[0]?.id || stableId(canonicalKey), client: targets.clientId, status: 'draft', name, slug: slugify(name),
-          service_area: owner.id, description: approval?.descriptionVerified ? plain(approval.description) || null : null,
+          service_area: owner.id, description: approval?.descriptionVerified ? plain(approval.description) || null : existing[0]?.description ?? null,
           wordpress_id: canonicalKey, source_updated_at: sourceTime(canonicalPage.modifiedGmt), sort: index,
         }, existing[0]);
       }

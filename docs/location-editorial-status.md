@@ -1,6 +1,6 @@
 # Location editorial status
 
-Verified 2026-09-15. Directus content changes are authorized; website deployment is
+Updated 2026-09-16 from the current implementation and CMS execution readback. Directus content changes are authorized; website deployment is
 held. The owner withdrew all n8n changes and requested static, manually maintained
 location reviews. See [manual reviews](location-reviews.md).
 
@@ -13,14 +13,26 @@ location reviews. See [manual reviews](location-reviews.md).
   retained under the owner's decision, not an independent geolocation assertion.
 - P1: retain Newtown/Washington Park's image. P2: the shared Waterford/Sawgrass image
   is valid for both. All existing image links remain unchanged.
-- Five approved SEO/date sets are applied. Page status remains draft, noindex false,
-  and source modification dates are preserved.
+- Five approved SEO/date sets remain applied. All five page owners are now
+  published with `noindex=false`; source modification dates are preserved. All five
+  overview fields are populated without changing the other page copy or metadata.
+- Added 25 published local FAQs, five for each location. All 45 previous FAQs are
+  unchanged. Each hub shows its five local FAQs before the eight shared FAQs.
+- Neighborhood description pass one populated all 87 original canonical rows from
+  WordPress. Pass two rewrote 86 descriptions with exact readback. Arroyo Vista's
+  description was cleared pending factual identification; its name, status and
+  photo remain unchanged. The migration planner preserves existing descriptions
+  unless a description revision is explicitly supplied; its existing before-image
+  conflict checks still apply to revisions.
+- Saved 12 verified project assignments to existing neighborhoods. Another 28
+  projects await 25 proposed additions, 11 have documented empty exceptions, and
+  two membership checks remain unresolved. See [all 53 dispositions](location-project-neighborhoods.md).
 - All 72 selected reviews and their actual five-star ratings are approved. Two
   malformed source links were verified by adding HTTPS; one absent date stays null.
   All 72 are now imported, published and linked to their approved locations.
   Fresh replanning yields zero operations; the existing 32 managed reviews stay unchanged.
 
-## Evidence
+## Historical September 15 evidence
 
 The 85-neighborhood/five-SEO plan applied 90 exact writes. Independent verification
 checked all 180 before/after receipts and fresh CMS readback.
@@ -41,6 +53,11 @@ Private artifacts are under
 Retain original sources and recovery evidence. Fresh replanning preserves current
 publication and approved copy; never replay an old plan to restore draft statuses.
 
-No geographic/photo decision, rating confirmation or project mapping remains due
-from the owner. The public website continues serving its prior WordPress pages
-until an approved deployment.
+The original geographic/photo dispositions, ratings and project-to-job mappings
+are complete. September 16 project-neighborhood research accounts for all 53 projects.
+The remaining additions and factual holds are listed in the assignment report. If a property has no recognized neighborhood, leave
+the relation empty and document the exception, as the owner instructed.
+
+The public website continues serving its prior WordPress pages until an approved
+deployment. Current publication and copy supersede historical draft receipts; do
+not replay those receipts as a new desired state.

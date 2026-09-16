@@ -90,8 +90,12 @@
 - Publication uses `status`; scope uses `website_page`, `service`, or `service_area`. FAQs and owner visibility are normalized into the deployment snapshot.
 - Page sections render global FAQs plus FAQs whose related fixed-page path or
   service slug or published location slug matches the current route.
+- Location hubs show every eligible local FAQ first, then all global FAQs. The
+  current editorial set has five local and eight shared answers per hub; there is
+  no combined eight-answer cap. The DOM order and FAQ structured data agree.
 - The `/faq` archive renders General first, then fixed-page/service groups by
-  their editor-facing labels, including published location groups.
+  their editor-facing labels, including published location groups. Its structured
+  data covers the same answers as the displayed list.
 
 ## Publishing redirects in Directus
 
@@ -112,10 +116,16 @@
   route after successful deployment. A published taxonomy remains required.
 - Store local page copy, described coverage maps, WordPress location provenance,
   and the shared SEO fields on `roofing_service_areas`. `noindex` changes indexing,
-  not route availability. Initial pages stay drafts until editorial review.
+  not route availability. New pages stay drafts until editorial review. The five
+  migrated owners are now published in Directus; production ownership stays with
+  WordPress until the coordinated frontend deployment is verified.
 - Use reusable `roofing_neighborhoods` with one primary area and real names.
   Optional descriptions are short plain text. Coverage does not claim a completed
   project. Verified projects may link from a card; neighborhoods have no routes.
+  Migration reruns preserve edited descriptions unless an explicit description
+  revision is supplied and its before-image still matches. Leave a project
+  neighborhood empty with a documented exception when no recognized neighborhood
+  can be verified.
 - Select only directly approved `roofing_service_area_neighbors`. Projects and
   reviews show up to six combined, local first. Sponsors show every local match,
   then nearby matches toward three. Empty sections and absent neighborhoods/maps
@@ -317,8 +327,9 @@
   Expiration disables the claim form and featured-popup eligibility, but does
   not override indexing.
 - Use `featured_image.description` for image alt text and `legal_disclaimer` for disclaimer copy.
-- Special-offer content is build-only. Publish a new site build for Directus
-  changes to reach the public offer route or its sitemap entry.
+- Special-offer content is build-only. Static paths and sitemap entries enumerate
+  the complete published inventory with verified pagination. Publish a new site
+  build for Directus changes to reach the public offer route or its sitemap entry.
 
 ## Publishing legal copy in Directus
 

@@ -69,12 +69,28 @@ await test('second run creates no records or relationships and preserves editori
   assert.equal(second.operations.length, 0);
   assert.equal(second.summary.neighborhoods.match, 5);
 });
-await test('later editorial changes produce conflicts instead of overwrites', () => {
+await test('later editorial descriptions survive migration reruns without description approval', () => {
   const f = fixture(), first = planMigration(f), targets = applyFakePlan(first, f.targets);
   targets.collections.roofing_neighborhoods[0].description = 'An editor supplied verified detail.';
   const next = planMigration({ ...f, targets });
-  assert.equal(next.summary.neighborhoods.conflict, 1);
-  assert.ok(!next.operations.some(op => op.targetId === targets.collections.roofing_neighborhoods[0].id));
+  assert.equal(next.summary.neighborhoods.match, 5);
+  assert.equal(next.operations.length, 0);
+});
+await test('explicit description revisions require matching recorded after-images', () => {
+  const f = fixture(), first = planMigration(f), targets = applyFakePlan(first, f.targets);
+  const neighborhood = targets.collections.roofing_neighborhoods[0];
+  const key = neighborhood.wordpress_id;
+  neighborhood.description = 'Verified first-pass source copy.';
+  const approvals = { neighborhoods: { [key]: { descriptionVerified: true, description: 'Reviewed second-pass copy.' } } };
+  const previous = { [key]: { after: structuredClone(neighborhood) } };
+  const plan = planMigration({ ...f, targets, approvals, previous });
+  const update = plan.operations.find(op => op.targetId === neighborhood.id);
+  assert.equal(update.data.description, 'Reviewed second-pass copy.');
+  const completed = applyFakePlan(plan, targets);
+  assert.equal(planMigration({ ...f, targets: completed, approvals }).operations.length, 0);
+  neighborhood.description = 'A later independent editorial change.';
+  assert.equal(planMigration({ ...f, targets, approvals, previous }).summary.neighborhoods.conflict, 1);
+  assert.equal(planMigration({ ...f, targets, previous }).operations.length, 0);
 });
 await test('renamed repeater rows cannot silently create duplicate canonical neighborhoods', () => {
   const f = fixture(), first = planMigration(f), targets = applyFakePlan(first, f.targets);
@@ -324,7 +340,7 @@ await test('paginated Directus and WordPress inventories exhaust connections and
   assert.equal(rows.length, 3);
   await assert.rejects(readAll(async () => [{ id: 1 }], 1), /Repeated/u);
   let reads = 0;
-  const source = await inventoryWordPress(async ({ after }) => { reads++; return after ? { nodes: [{ databaseId: 2 }], pageInfo: { hasNextPage: false, endCursor: 'b' } } : { nodes: [{ databaseId: 1 }], pageInfo: { hasNextPage: true, endCursor: 'a' } }; }, 1);
+  const source = await inventoryWordPress(async ({ after }) => { reads++; return after ? { nodes: [{ databaseId: 2, renderedContent: '' }], pageInfo: { hasNextPage: false, endCursor: 'b' } } : { nodes: [{ databaseId: 1, renderedContent: '' }], pageInfo: { hasNextPage: true, endCursor: 'a' } }; }, 1);
   assert.equal(source.nodes.length, 2); assert.equal(reads, 2); assert.equal(source.complete, true);
 });
 await test('executor requires exact artifact authorization and stops before later editorial changes', async () => {

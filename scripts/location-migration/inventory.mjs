@@ -3,7 +3,7 @@ import { CLIENT, SLUGS, DRAFT_NEIGHBORS, FIELDS, hash, plain, slugify, stableId 
 import { readAll } from './api.mjs';
 
 export const WORDPRESS_ENDPOINT = 'https://wp.sonshineroofing.com/graphql';
-export const LOCATION_QUERY = `query($after:String,$first:Int!){locations(first:$first,after:$after,where:{status:PUBLISH,orderby:{field:DATE,order:ASC}}){pageInfo{hasNextPage endCursor} nodes{id databaseId slug title date dateGmt modified modifiedGmt content(format:RAW) locationAttributes{locationName nearbyLandmarks{landmark} map{node{databaseId sourceUrl altText date dateGmt modified modifiedGmt mimeType mediaDetails{width height}}} featuredReviews{reviewAuthor review reviewUrl reviewDate ownerReply} neighborhoodsServed{neighborhood neighborhoodDescription zipCodes{zipCode} neighborhoodImage{node{databaseId sourceUrl altText date dateGmt modified modifiedGmt mimeType mediaDetails{width height}}}}} seo{title description canonicalUrl openGraph{title description image{url}}}}}}`;
+export const LOCATION_QUERY = `query($after:String,$first:Int!){locations(first:$first,after:$after,where:{status:PUBLISH,orderby:{field:DATE,order:ASC}}){pageInfo{hasNextPage endCursor} nodes{id databaseId slug title date dateGmt modified modifiedGmt renderedContent:content(format:RENDERED) locationAttributes{locationName nearbyLandmarks{landmark} map{node{databaseId sourceUrl altText date dateGmt modified modifiedGmt mimeType mediaDetails{width height}}} featuredReviews{reviewAuthor review reviewUrl reviewDate ownerReply} neighborhoodsServed{neighborhood neighborhoodDescription zipCodes{zipCode} neighborhoodImage{node{databaseId sourceUrl altText date dateGmt modified modifiedGmt mimeType mediaDetails{width height}}}}} seo{title description canonicalUrl openGraph{title description image{url}}}}}}`;
 export async function inventoryWordPress(fetchPage = async variables => {
   const response = await fetch(WORDPRESS_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: LOCATION_QUERY, variables }) });
   assert.ok(response.ok, `WordPress inventory failed (HTTP ${response.status})`);
@@ -17,7 +17,12 @@ export async function inventoryWordPress(fetchPage = async variables => {
   while (more) {
     const result = await fetchPage({ first, after });
     assert.ok(Array.isArray(result.nodes) && result.pageInfo && typeof result.pageInfo.hasNextPage === 'boolean', 'Incomplete WordPress connection');
-    for (const node of result.nodes) { assert.ok(node.databaseId && !ids.has(node.databaseId), 'Duplicate/missing WordPress source ID'); ids.add(node.databaseId); nodes.push(node); }
+    for (const node of result.nodes) {
+      assert.ok(node.databaseId && !ids.has(node.databaseId), 'Duplicate/missing WordPress source ID');
+      assert.equal(typeof node.renderedContent, 'string', 'WordPress rendered content unavailable; export is incomplete');
+      ids.add(node.databaseId);
+      nodes.push({ ...node, contentAvailability: node.renderedContent.trim() ? 'available' : 'available-empty' });
+    }
     pages++;
     more = result.pageInfo.hasNextPage;
     if (!more) break;
@@ -25,7 +30,7 @@ export async function inventoryWordPress(fetchPage = async variables => {
     assert.ok(after && !cursors.has(after), 'Repeated/missing WordPress cursor'); cursors.add(after);
     assert.ok(pages < 10000, 'WordPress pagination safety limit');
   }
-  return { version: 'wordpress-location-source-v1', capturedAt: new Date().toISOString(), complete: true, pages, nodes };
+  return { version: 'wordpress-location-source-v2', contentFormat: 'rendered-html', capturedAt: new Date().toISOString(), complete: true, pages, nodes };
 }
 export async function inventoryDirectus(api, schemaReady, approvals = {}) {
   const clients = await api.request('items/clients', { query: { fields: 'id,slug', filter: { slug: { _eq: CLIENT } }, limit: 2 } });
