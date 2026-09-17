@@ -5,7 +5,9 @@ manual maintenance. The existing n8n workflow remains unchanged. The owner has
 approved Directus preparation/migration, private recovery, all 72 five-star reviews,
 SEO values, and neighborhood publication. The September 16 execution also covers
 export/CI repairs, overviews, neighborhood copy, project-neighborhood verification
-and local FAQs. Website deployment remains held.
+and local FAQs. The September 17 owner-confirmed project memberships and Arroyo
+Vista removal are applied; see the [decision record](location-decisions-20260917.md).
+Website deployment remains held.
 
 Read the [current handoff](location-handoff.md), [manual review contract](location-reviews.md)
 and [verification record](location-verification.md) before execution.
@@ -20,8 +22,9 @@ and [verification record](location-verification.md) before execution.
 - Applied the original 219-operation location plan with exact field, byte and
   timestamp readback, followed by a 219-match/no-write repeat.
 - Applied five approved SEO/date sets. All five page owners are now published,
-  with noindex false and populated overviews. Published the 87 original canonical
-  neighborhoods; retained the approved P1/P2 image associations. Current editorial
+  with noindex false and populated overviews. Originally published 87 canonical
+  neighborhoods; the September 17 changes leave 88 published and one archived,
+  including two owner-confirmed additions. Retained the approved P1/P2 image associations. Current editorial
   counts and verification are in [editorial status](location-editorial-status.md).
 - Added 25 published local FAQs and preserved all 45 previous FAQs. Each hub shows
   five local answers before the eight shared answers. The rendered order and

@@ -1,16 +1,19 @@
 # Location editorial status
 
-Updated 2026-09-16 from the current implementation and CMS execution readback. Directus content changes are authorized; website deployment is
+Updated 2026-09-17 from the current implementation and CMS execution readback. Directus content changes are authorized; website deployment is
 held. The owner withdrew all n8n changes and requested static, manually maintained
 location reviews. See [manual reviews](location-reviews.md).
 
 ## Applied
 
-- All 87 unique SonShine neighborhoods are published.
-- G1 is **University Park**; G2 is **Arroyo Vista**. Two new records and two files
-  were created with stable source identities and source image timestamps, then
-  published with status-only changes. Existing Sarasota content organization is
-  retained under the owner's decision, not an independent geolocation assertion.
+- There are 89 SonShine neighborhoods: 88 published and Arroyo Vista archived.
+  September 17 added Saddlebag Creek Ranches and Oak Hollow after owner confirmation.
+- G1 is **University Park**; G2 was **Arroyo Vista**. Their original records and
+  files retain stable WordPress identities and source image timestamps. University
+  Park retains its Sarasota organization under the owner's decision. Arroyo Vista
+  is archived at the owner's September 17 request; the connector disables physical
+  deletion. Its retained source record and photo are recovery evidence, and no
+  projects were linked to it.
 - P1: retain Newtown/Washington Park's image. P2: the shared Waterford/Sawgrass image
   is valid for both. All existing image links remain unchanged.
 - Five approved SEO/date sets remain applied. All five page owners are now
@@ -20,13 +23,15 @@ location reviews. See [manual reviews](location-reviews.md).
   unchanged. Each hub shows its five local FAQs before the eight shared FAQs.
 - Neighborhood description pass one populated all 87 original canonical rows from
   WordPress. Pass two rewrote 86 descriptions with exact readback. Arroyo Vista's
-  description was cleared pending factual identification; its name, status and
-  photo remain unchanged. The migration planner preserves existing descriptions
+  description was cleared pending factual identification, then the record was
+  archived on September 17. The two new confirmed neighborhoods have brief copy
+  limited to their confirmed project memberships and existing service areas.
+  The migration planner preserves existing descriptions
   unless a description revision is explicitly supplied; its existing before-image
   conflict checks still apply to revisions.
-- Saved 12 verified project assignments to existing neighborhoods. Another 28
-  projects await 25 proposed additions, 11 have documented empty exceptions, and
-  two membership checks remain unresolved. See [all 53 dispositions](location-project-neighborhoods.md).
+- Saved 14 project assignments: 12 previously verified and two owner-confirmed
+  memberships. Another 28 projects await 25 proposed additions and 11 have
+  documented empty exceptions. See [all 53 dispositions](location-project-neighborhoods.md).
 - All 72 selected reviews and their actual five-star ratings are approved. Two
   malformed source links were verified by adding HTTPS; one absent date stays null.
   All 72 are now imported, published and linked to their approved locations.
@@ -55,7 +60,7 @@ publication and approved copy; never replay an old plan to restore draft statuse
 
 The original geographic/photo dispositions, ratings and project-to-job mappings
 are complete. September 16 project-neighborhood research accounts for all 53 projects.
-The remaining additions and factual holds are listed in the assignment report. If a property has no recognized neighborhood, leave
+The remaining proposed additions are listed in the assignment report. If a property has no recognized neighborhood, leave
 the relation empty and document the exception, as the owner instructed.
 
 The public website continues serving its prior WordPress pages until an approved

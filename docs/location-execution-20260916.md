@@ -2,6 +2,11 @@
 
 The CMS content and local code changes below are applied. Website deployment remains held; the live website still uses the previously deployed WordPress-backed location pages.
 
+This is the historical September 16 execution and review record. The
+[September 17 decision record](location-decisions-20260917.md) supersedes the two
+membership holds and Arroyo Vista disposition below. The September 16 independent
+reviews do not cover those later writes.
+
 ## Completed
 
 | Work | Result |

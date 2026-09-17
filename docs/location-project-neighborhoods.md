@@ -1,19 +1,20 @@
-# Project neighborhood assignments — 2026-09-16
+# Project neighborhood assignments — 2026-09-17
 
-All 53 projects checked using their privately verified exact AccuLynx job address. Twelve assignments to existing published neighborhoods are saved and read back. No new neighborhoods created.
+All 53 projects checked using their privately verified exact AccuLynx job address. Twelve assignments to existing published neighborhoods were saved on September 16. On September 17, the owner confirmed the two remaining membership candidates; Saddlebag Creek Ranches and Oak Hollow were created, published and linked to their respective projects.
 
 ## Status
 
-- 12 assigned to existing neighborhoods.
+- 14 assigned: 12 to previously existing neighborhoods and two to the owner-confirmed additions.
 - 28 projects await 25 proposed neighborhood additions.
 - 11 left empty with documented exceptions.
-- 2 remain unresolved: High Oaks Trail (Saddlebag Creek Ranches) and East Corktree Circle (Oak Hollow).
+- No unresolved membership checks remain. The separate 25 proposed additions below remain unapproved and uncreated.
+- Arroyo Vista is archived at the owner's request. No projects were linked to it, so no project unlink was necessary. See the [September 17 decision record](location-decisions-20260917.md).
 
 ## Matrix
 
 | Public project | Existing area | Status | Neighborhood or exception |
 |---|---|---|---|
-| [high-oaks-trail-myakka-city](https://sonshineroofing.com/project/high-oaks-trail-myakka-city) | Myakka City | unresolved | Saddlebag Creek Ranches |
+| [high-oaks-trail-myakka-city](https://sonshineroofing.com/project/high-oaks-trail-myakka-city) | Myakka City | assigned_owner_confirmed | Saddlebag Creek Ranches |
 | [west-price-blvd-north-port-2](https://sonshineroofing.com/project/west-price-blvd-north-port-2) | North Port | documented_empty | Exact parcel belongs to numbered Port Charlotte Subdivision 10. County association overlay shows only citywide Vision North Port; no specific named neighborhood established. |
 | [41st-court-east-sarasota-fl](https://sonshineroofing.com/project/41st-court-east-sarasota-fl) | Sarasota | propose_new | Cascades at Sarasota |
 | [lake-worth-blvd-port-charlotte](https://sonshineroofing.com/project/lake-worth-blvd-port-charlotte) | Port Charlotte | documented_empty | Exact county property evidence verifies the numbered plat section, but a plat number alone does not establish an independently recognized public-facing neighborhood. Leave empty with this exception; do not invent a neighborhood or infer a nearby community. |
@@ -58,7 +59,7 @@ All 53 projects checked using their privately verified exact AccuLynx job addres
 | [canal-st-punta-gorda](https://sonshineroofing.com/project/canal-st-punta-gorda) | Punta Gorda | propose_new | River Club |
 | [hartley-ave-port-charlotte-1](https://sonshineroofing.com/project/hartley-ave-port-charlotte-1) | Port Charlotte | propose_new | Port Charlotte Section 15 |
 | [treesdale-glen-lakewood-ranch](https://sonshineroofing.com/project/treesdale-glen-lakewood-ranch) | Lakewood Ranch | propose_new | The Country Club at Lakewood Ranch |
-| [east-corktree-circle-port-charlotte-fl](https://sonshineroofing.com/project/east-corktree-circle-port-charlotte-fl) | Port Charlotte | unresolved | Oak Hollow |
+| [east-corktree-circle-port-charlotte-fl](https://sonshineroofing.com/project/east-corktree-circle-port-charlotte-fl) | Port Charlotte | assigned_owner_confirmed | Oak Hollow |
 | [n-race-street-north-port](https://sonshineroofing.com/project/n-race-street-north-port) | North Port | documented_empty | Exact parcel belongs to numbered Port Charlotte Subdivision 10. County association overlay shows only citywide Vision North Port; no specific named neighborhood established. |
 | [kingston-blvd-sarasota](https://sonshineroofing.com/project/kingston-blvd-sarasota) | Sarasota | propose_new | Gulf Gate East |
 | [saralake-dr-sarasota-fl](https://sonshineroofing.com/project/saralake-dr-sarasota-fl) | Sarasota | propose_new | Saralake Estates |
@@ -99,16 +100,16 @@ All proposed records use status `draft`, the existing SonShine client and servic
 | Saralake Estates | saralake-estates | Sarasota | 1 |
 | University Place | university-place | Bradenton | 1 |
 
-## Evidence and unresolved cases
+## Evidence and owner confirmations
 
 - [Sarasota Property Appraiser parcel layer](https://services3.arcgis.com/icrWMv7eBkctFu1f/arcgis/rest/services/ParcelProperty_Scpao/FeatureServer/0), [Manatee Property Appraiser parcel layer](https://gis.manateepao.gov/arcgis/rest/services/Website/WebLayers/MapServer/0), and [Charlotte County subdivision layer](https://agis3.charlottecountyfl.gov/arcgis/rest/services/Essentials/CCGIS_BaseLayers/MapServer/16) supplied exact-property evidence. Private records contain the selected attributes and match receipts; public summary omits addresses, job IDs and property identifiers.
 - Port Charlotte Section 15 has a separate [county civic-area map](https://www.charlottecountyfl.gov/core/fileparse.php/152/urlt/port-charlotte-section-15_02_07_24.pdf), supporting its public identity. Section 92 and Section 74 remain empty because numbered plats alone do not establish a neighborhood.
 - [South Gulf Cove county map](https://www.charlottecountyfl.gov/core/fileparse.php/152/urlt/south-gulf-cove_02_27_23.pdf) connects the verified plat section to the named community.
 - [Sun Communities Saralake Estates](https://www.suncommunities.com/florida/saralake-estates) supplies the official site plan used to verify the exact project address privately.
 - [Stoneybrook Golf & Country Club FAQ](https://www.stoneybrook.net/faqs) distinguishes the proposed community from existing Stoneybrook Estates.
-- High Oaks Trail: the exact property appraiser assessment label, [county Neighborhood Services atlas](https://www.mymanatee.org/gisapps/data/NHSAtlas/atlas_data/pdf/Page_16-E.pdf), and [official Saddlebag Creek community map](https://saddlebagcreek.org/wp-content/uploads/2016/05/sc_site_map.jpg) corroborate the candidate, but exact parcel membership still needs a boundary/declaration check.
-- East Corktree Circle: exact plat verified; Oak Hollow membership remains unresolved because authoritative boundary/declaration evidence was not available. HOA website access failed. This is an evidence/access gap, not proof that no neighborhood exists.
+- High Oaks Trail: the exact property appraiser assessment label, [county Neighborhood Services atlas](https://www.mymanatee.org/gisapps/data/NHSAtlas/atlas_data/pdf/Page_16-E.pdf), and [official Saddlebag Creek community map](https://saddlebagcreek.org/wp-content/uploads/2016/05/sc_site_map.jpg) corroborated the candidate. The owner's September 17 confirmation resolves membership for this assignment; no additional boundary/declaration verification is claimed.
+- East Corktree Circle: the exact plat was verified, but authoritative boundary/declaration evidence was unavailable and HOA website access failed. The owner's September 17 confirmation resolves Oak Hollow membership for this assignment; no additional external verification is claimed.
 
 ## Verification
 
-Fresh guards verified every written target belongs to the same client and service area and is published. Readback found 53 projects, 87 neighborhoods, all 12 intended links, zero pending repeat changes, and no changes to the other 41 projects or selected non-neighborhood fields.
+Fresh September 17 guards verified both new targets belong to the same client and primary service area as their projects and are published. Readback found 53 projects, 89 neighborhoods (88 published and Arroyo Vista archived), all 14 intended links, 39 empty relations and zero pending repeat changes. Compared with the September 17 before-images, the other 51 project rows are unchanged across the checked fields. On the two updated projects, only the neighborhood and system modification timestamp changed. The 86 other original neighborhood rows are unchanged. A global reference check found zero links to Arroyo Vista.

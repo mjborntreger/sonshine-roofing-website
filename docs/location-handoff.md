@@ -8,7 +8,10 @@ and workflow-cutover requirements are withdrawn. The existing review workflow
 remains active and unchanged. Directus migration and the 72 actual five-star reviews
 are approved. On 2026-09-16 the owner also authorized the export/CI repair,
 overviews, two-pass neighborhood descriptions, project neighborhood research and
-local FAQs. Website deployment remains held for final approval.
+local FAQs. On September 17 the owner confirmed the Saddlebag Creek Ranches and
+Oak Hollow project memberships and requested removal of Arroyo Vista. These
+[decisions are applied](location-decisions-20260917.md). Website deployment remains
+held for final approval.
 
 Application baseline/deployed revision:
 `0271ec70f46a2b31c4eb012da28459f6a9144184`.
@@ -21,12 +24,12 @@ private `execution-2026-09-16/verification/completion-manifest.json`.
 | --- | --- |
 | Implemented | Common location hubs, deterministic local/nearby selection, deployment snapshots, navigation/FAQ/SEO/sitemaps, model/privacy and repeatable migration/enrichment. Manual review isolation replaces the abandoned workflow work. |
 | Migrated | Five canonical page owners, 87 original unique neighborhoods, 91 immutable files, one added taxonomy-only area and 39 junctions. All 53 project/job/ZIP enrichments and the SonShine-only required constraint are applied. |
-| Published in CMS | All five location page owners are published with overviews and the existing SEO/date sets. The 87 original neighborhoods and 72 manual location reviews remain published. Added 25 local FAQs; the prior 45 FAQs are unchanged. |
+| Published in CMS | All five location page owners are published with overviews and the existing SEO/date sets. There are 88 published neighborhoods (86 original plus two owner-confirmed additions); Arroyo Vista is archived. The 72 manual location reviews remain published. Added 25 local FAQs; the prior 45 FAQs are unchanged. |
 | Deployed | Existing WordPress-backed application at `0271ec7`; unchanged by this task. |
 | Verified | September 15 import/readback and release-candidate checks remain historical evidence. September 16 export/CI/FAQ changes pass Node 22 lint, typecheck, Tailwind, all nine location verifiers plus export tests, and 14 dynamic-route contract groups. The integrated build generates 456 pages, validates 443 route owners, and serves all five hubs with 13 matching visible/schema FAQs. |
-| Remaining | Resolve the Arroyo Vista factual hold and remaining project-neighborhood dispositions, then final release acceptance. The credentialed candidate build and route checks pass; both independent sequential reviews completed without new actionable findings. Website deployment still requires release approval; no workflow change or project-to-job remapping is required. |
+| Remaining | Decide on the separate 25 proposed neighborhood additions covering 28 projects, then final release acceptance. Eleven project relations remain empty with documented exceptions. The September 16 credentialed candidate build and route checks passed; both independent sequential reviews completed without new actionable findings. Website deployment still requires release approval; no workflow change or project-to-job remapping is required. |
 
-## September 16 content and code update
+## September 16–17 content and code update
 
 - All five overview fields are populated. Page identities, introductions, SEO and
   publication states are preserved.
@@ -35,11 +38,11 @@ private `execution-2026-09-16/verification/completion-manifest.json`.
   desktop. The archive schema covers the same answers as its visible list.
 - Neighborhood description pass one populated all 87 original canonical rows
   from WordPress. Pass two rewrote 86 descriptions with exact readback. Arroyo
-  Vista's description is now empty pending identification of the community; its
-  name, publication and photo remain unchanged.
-- Saved 12 verified project assignments to existing neighborhoods. Another 28
-  projects await 25 proposed additions; 11 have documented empty exceptions and
-  two membership checks remain unresolved. See [all 53 dispositions](location-project-neighborhoods.md).
+  Vista's description was cleared and the record was archived on September 17.
+  Its source identity and photo remain retained; no projects required unlinking.
+- Saved 14 project assignments: 12 previously verified and two owner-confirmed
+  memberships. Another 28 projects await 25 proposed additions; 11 have documented
+  empty exceptions. See [all 53 dispositions](location-project-neighborhoods.md).
   Project-to-job mappings and primary service areas remain unchanged.
 - Anonymous WordPress RAW bodies were null despite available rendered HTML. The
   exporter now captures `wordpress-location-source-v2`, labels rendered HTML and
@@ -53,9 +56,11 @@ private `execution-2026-09-16/verification/completion-manifest.json`.
 ## Reconciliation
 
 - Five source pages retain all five public routes.
-- 88 neighborhood occurrences resolve to 87 canonical records, with one duplicate
+- The original 88 neighborhood occurrences resolve to 87 canonical records, with one duplicate
   Longboat Key presentation folded into Sarasota. University Park and Arroyo Vista
-  preserve their raw WordPress source identities and existing Sarasota organization.
+  preserve their raw WordPress source identities and existing Sarasota organization;
+  Arroyo Vista is now archived. Two owner-confirmed additions bring the current
+  inventory to 89 records, of which 88 are published.
 - 93 media references resolve to 91 new immutable files, one shared-byte reuse and
   one excluded duplicate-owner image. WordPress originals remain intact.
 - P1 Newtown/Washington Park is retained. P2 Waterford/Sawgrass is valid for both.
@@ -99,7 +104,8 @@ with explicit owner approval and independent readback. All privacy protections,
 
 Approved private recovery root:
 `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15` (0700; files 0600).
-The September 16 execution files are in `execution-2026-09-16/`, with verified
+The September 17 decisions have separate before/after receipts in
+`decisions-2026-09-17/`. The September 16 execution files are in `execution-2026-09-16/`, with verified
 SHA-256 copy receipts. It contains immutable source inventories, exact plans, private mappings, narrow
 before/after receipts, file byte/timestamp proofs and independent evidence. Abandoned
 workflow patches and seed plans are withdrawn historical evidence and must not run.
