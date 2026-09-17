@@ -15,7 +15,9 @@ const BUILD_ONLY_PATH_PREFIXES = [
 function normalizePath(value: string): string {
   const path = value.split(/[?#]/, 1)[0] || '/';
   const withLeadingSlash = path.startsWith('/') ? path : `/${path}`;
-  return withLeadingSlash.length > 1 ? withLeadingSlash.replace(/\/+$/, '') : withLeadingSlash;
+  let end = withLeadingSlash.length;
+  while (end > 1 && withLeadingSlash[end - 1] === '/') end -= 1;
+  return withLeadingSlash.slice(0, end);
 }
 
 export function isBuildOnlyRevalidationPath(value: string): boolean {
@@ -24,9 +26,11 @@ export function isBuildOnlyRevalidationPath(value: string): boolean {
   // Next accepts route-file paths as implicit cache tags. A layout invalidation
   // can reach every location and its shared render dependencies.
   if (/[\\()[\]]/u.test(decoded) || [...decoded].some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)
-    || decoded.split('/').some(segment => segment === '.' || segment === '..')
-    || /\/(?:layout|page)\/?(?:[?#].*)?$/u.test(decoded)) return true;
+    || decoded.split('/').some(segment => segment === '.' || segment === '..')) return true;
   const path = normalizePath(decoded);
+  // Strip query/fragment and trailing slashes before checking the route-file
+  // suffix, avoiding backtracking over repeated user-controlled delimiters.
+  if (path.endsWith('/layout') || path.endsWith('/page')) return true;
   return BUILD_ONLY_PATH_PREFIXES.some(
     (prefix) => path === prefix || path.startsWith(`${prefix}/`),
   );

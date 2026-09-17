@@ -7,6 +7,8 @@ import { isBuildOnlyRevalidationPath, isBuildOnlyRevalidationTag } from '../lib/
 
 const cases = [
   ['/layout', true], ['/(site)/layout', true], ['/locations/[slug]/page', true],
+  ['/blog/layout/?preview=1', true], ['/blog/page#section', true],
+  ['page///?preview=1', true], ['/blog/layout-other', false],
   ['/%6cocations/sarasota', true], ['/blog/../locations/sarasota', true], ['/bad%ZZ', true],
   ['/locations/sarasota', true], ['/locations/unknown', true], ['/sitemap_index/location', true], ['/faq', true], ['/locations-other', false],
   ['/special-offers', true],
@@ -38,6 +40,13 @@ for (const [path, expected] of cases) {
 }
 
 console.log(`Verified ${cases.length} build-only revalidation paths.`);
+
+// Repeated route-file and slash delimiters must stay cheap without weakening
+// protection for implicit Next cache tags or ordinary eligible content routes.
+assert.equal(isBuildOnlyRevalidationPath('/page#'.repeat(100_000)), true);
+assert.equal(isBuildOnlyRevalidationPath('/layout?'.repeat(100_000)), true);
+assert.equal(isBuildOnlyRevalidationPath('/'.repeat(100_000) + 'blog'), false);
+assert.equal(isBuildOnlyRevalidationPath('/project' + '/'.repeat(100_000)), true);
 
 const tags = [
   ['_N_T_/layout', true], ['_N_T_/(site)/layout', true], ['_N_T_/locations/sarasota', true],
