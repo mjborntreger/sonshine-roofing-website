@@ -7,7 +7,9 @@ SEO values, and neighborhood publication. The September 16 execution also covers
 export/CI repairs, overviews, neighborhood copy, project-neighborhood verification
 and local FAQs. The September 17 owner-confirmed project memberships and Arroyo
 Vista removal are applied; see the [decision record](location-decisions-20260917.md).
-Website deployment remains held.
+The owner subsequently approved all 25 proposed neighborhood additions and
+authorized execution of the integrated merge/release plan. The additions and 28
+project connections are applied; see [release execution](location-release-20260917.md).
 
 Read the [current handoff](location-handoff.md), [manual review contract](location-reviews.md)
 and [verification record](location-verification.md) before execution.
@@ -23,8 +25,8 @@ and [verification record](location-verification.md) before execution.
   timestamp readback, followed by a 219-match/no-write repeat.
 - Applied five approved SEO/date sets. All five page owners are now published,
   with noindex false and populated overviews. Originally published 87 canonical
-  neighborhoods; the September 17 changes leave 88 published and one archived,
-  including two owner-confirmed additions. Retained the approved P1/P2 image associations. Current editorial
+  neighborhoods; the completed September 17 changes leave 113 published and one archived,
+  including two owner-confirmed additions and 25 approved release additions. Retained the approved P1/P2 image associations. Current editorial
   counts and verification are in [editorial status](location-editorial-status.md).
 - Added 25 published local FAQs and preserved all 45 previous FAQs. Each hub shows
   five local answers before the eight shared answers. The rendered order and
@@ -32,9 +34,9 @@ and [verification record](location-verification.md) before execution.
 - Retained narrow recovery receipts and prior application image in the approved
   private root `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.
 
-The production application remains `0271ec70f46a2b31c4eb012da28459f6a9144184`.
-No website deployment, remote Git push, merge, workflow save or workflow publication
-has been performed by this task. Current import totals and cleanup results belong
+The retained rollback application is `0271ec70f46a2b31c4eb012da28459f6a9144184`.
+The integrated release is authorized; verify its actual deployment separately.
+No workflow save or workflow publication is part of this release. Current import totals and cleanup results belong
 in the handoff; historical plans are not current execution instructions.
 
 ## Export and verification contract
@@ -73,7 +75,7 @@ removed only after a global unused-value check, SQL dependency review and exact
 metadata/permission before-images. A dependency or nondefault value stops cleanup.
 Private abandoned patch/seed files are withdrawn evidence, never release artifacts.
 
-## Website release — final approval required
+## Website release — authorized execution
 
 1. Freeze application revision, model/invariant version, exact migration receipts,
    and normalized location/project snapshot hashes. Recheck later editorial changes.
@@ -84,7 +86,7 @@ Private abandoned patch/seed files are withdrawn evidence, never release artifac
    including `verify:locations` and `verify:dynamic-routes`, and the credentialed
    build. Required upstream/schema/tenant errors must fail the build. Record the
    exact generated content digests; do not republish or reset the five owners.
-4. With website-release approval, deploy the approved application artifact. Verify the five preserved routes,
+4. Under the owner's execution authorization, deploy the validated application artifact. Verify the five preserved routes,
    unknown/draft/taxonomy-only 404s, canonical navigation, noindex/sitemap behavior,
    FAQ scope, empty-section omission and project/video independence. Perform desktop
    and mobile visual review against the actual deployed artifact.

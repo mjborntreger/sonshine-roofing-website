@@ -1,13 +1,14 @@
 # Location editorial status
 
-Updated 2026-09-17 from the current implementation and CMS execution readback. Directus content changes are authorized; website deployment is
-held. The owner withdrew all n8n changes and requested static, manually maintained
+Updated 2026-09-17 from the current implementation and CMS execution readback. The owner authorized the integrated website release after approving the 25 neighborhood additions. Deployment verification is recorded separately from this CMS readback. The owner withdrew all n8n changes and requested static, manually maintained
 location reviews. See [manual reviews](location-reviews.md).
 
 ## Applied
 
-- There are 89 SonShine neighborhoods: 88 published and Arroyo Vista archived.
-  September 17 added Saddlebag Creek Ranches and Oak Hollow after owner confirmation.
+- There are 114 SonShine neighborhoods: 113 published and Arroyo Vista archived.
+  September 17 added Saddlebag Creek Ranches and Oak Hollow, then all 25 approved
+  additions from the project research. The latter use names and project links with
+  optional copy/media left empty. See [release execution](location-release-20260917.md).
 - G1 is **University Park**; G2 was **Arroyo Vista**. Their original records and
   files retain stable WordPress identities and source image timestamps. University
   Park retains its Sarasota organization under the owner's decision. Arroyo Vista
@@ -29,9 +30,8 @@ location reviews. See [manual reviews](location-reviews.md).
   The migration planner preserves existing descriptions
   unless a description revision is explicitly supplied; its existing before-image
   conflict checks still apply to revisions.
-- Saved 14 project assignments: 12 previously verified and two owner-confirmed
-  memberships. Another 28 projects await 25 proposed additions and 11 have
-  documented empty exceptions. See [all 53 dispositions](location-project-neighborhoods.md).
+- Saved 42 project assignments: the prior 14 plus 28 verified connections to the
+  25 approved additions. Eleven projects retain documented empty exceptions. See [all 53 dispositions](location-project-neighborhoods.md).
 - All 72 selected reviews and their actual five-star ratings are approved. Two
   malformed source links were verified by adding HTTPS; one absent date stays null.
   All 72 are now imported, published and linked to their approved locations.
@@ -60,9 +60,9 @@ publication and approved copy; never replay an old plan to restore draft statuse
 
 The original geographic/photo dispositions, ratings and project-to-job mappings
 are complete. September 16 project-neighborhood research accounts for all 53 projects.
-The remaining proposed additions are listed in the assignment report. If a property has no recognized neighborhood, leave
+All 25 approved additions are applied and listed in the assignment report. If a property has no recognized neighborhood, leave
 the relation empty and document the exception, as the owner instructed.
 
-The public website continues serving its prior WordPress pages until an approved
-deployment. Current publication and copy supersede historical draft receipts; do
+Public content ownership changes through the authorized integrated deployment and
+its release verification. Current publication and copy supersede historical draft receipts; do
 not replay those receipts as a new desired state.
