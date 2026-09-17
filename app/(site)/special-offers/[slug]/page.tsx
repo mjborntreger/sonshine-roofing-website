@@ -32,7 +32,7 @@ export const revalidate = false;
 const HERO_SUBTITLE_MAX_LENGTH = 180;
 
 export async function generateStaticParams() {
-  const slugs = await listSpecialOfferSlugs(200);
+  const slugs = await listSpecialOfferSlugs();
   return slugs.map((slug) => ({ slug }));
 }
 

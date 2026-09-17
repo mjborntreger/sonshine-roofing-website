@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 const DIRECTUS_FETCHERS = [
   'lib/content/blog.ts',
   'lib/content/directus-projects.mjs',
+  'lib/content/directus-locations.mjs',
   'lib/content/directus-videos.mjs',
   'lib/content/directus-build-settings.mjs',
   'lib/content/directus-faqs.ts',
@@ -11,6 +12,7 @@ const DIRECTUS_FETCHERS = [
   'lib/content/directus-redirects.mjs',
   'lib/content/directus-reviews.ts',
   'lib/content/directus-site.ts',
+  'lib/content/directus-site-shell.ts',
   'lib/content/directus-special-offers.ts',
   'lib/content/glossary.ts',
   'lib/content/persons.ts',

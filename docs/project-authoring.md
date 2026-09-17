@@ -1,6 +1,6 @@
 # SonShine Roofing project upload procedure
 
-Version 3 — September 11, 2026. This procedure applies to the frontend that uses project descriptions for narrative copy and independently authored Directus video records. Publication rules and retained migration fields are documented in `CONTENT.md`.
+Version 4 — September 15, 2026. This procedure applies to the frontend that uses project descriptions for narrative copy and independently authored Directus video records. Publication rules and retained migration fields are documented in `CONTENT.md`.
 
 Every post should let a homeowner understand what work SonShine completed, where it happened, which roof system was installed, and what was distinctive about the job. Write every field from one verified set of facts.
 
@@ -10,6 +10,7 @@ Have the project team verify the following from its authorized job records. Accu
 
 | Information | Requirement |
 | --- | --- |
+| Private job reference | Verified AccuLynx job ID and postal ZIP. One job corresponds to one project within SonShine; check for an existing project first. Keep job IDs and customer lookup payloads out of public copy and review reports. |
 | Public location | City/service area and an approved street or neighborhood label. Omit the house number from the normal title and description. |
 | Job type | Replacement, new construction, repair, or another accurately described scope. |
 | Property type | Residential or commercial, where relevant to understanding the job. |
@@ -33,9 +34,14 @@ Do not guess the product, color, homeowner motivation, storm damage, installatio
 | `slug` | A unique, readable, lowercase URL identifier. Check for an existing project before creating another. Preserve a published slug when editing content. |
 | `published_at` | The intended editorial publication timestamp. Do not substitute upload/import time or imply that it is the job completion date. Do not rely on a future timestamp alone to schedule publication. |
 | `material_type` | Select the main installed material from the existing published list. Describe a secondary material separately. |
-| `service_area` | Select the actual project location from the existing published list. |
+| `service_area` | Required. Select the actual project location from the existing published list. |
+| `job_id` | Required for SonShine, including drafts, after the verified backfill on 2026-09-15. Use the verified AccuLynx job ID; never use a placeholder. This private field is excluded from website/public access. |
+| `zip` | Required verified postal ZIP for SonShine. It remains private and cannot establish neighborhood membership by itself. |
+| `neighborhood` | Optional canonical neighborhood within the selected service area. Assign only with independent verification; leave null when uncertain. |
 | `roof_color` | Select the verified official color where applicable. Leave it empty when genuinely unknown or inapplicable; explain a verified unpainted finish in the copy. Do not invent a color to satisfy the form. |
 | `description` | Plain text, usually about 75–125 words. Use less if the job has fewer verified facts; do not pad it. |
+
+If the authoring form does not expose the private job reference, use the approved administrative content-write path to supply the verified value when creating the draft. Do not put it in another field or weaken the required-field constraint.
 
 Keep the project narrative in `description`. The separate project body field is retired from the frontend and import path. Project search uses the title and description, so state the verified material, product, and location naturally in that copy.
 
@@ -118,6 +124,7 @@ Do not edit migration-managed identifiers or scope fields. Legacy projects may r
 
 Have a reviewer compare the draft with the verified job facts. The same editor may perform a separate final pass when another reviewer is unavailable.
 
+- [ ] Verified unique private job ID and ZIP; required primary service area is correct, and any neighborhood assignment is independently verified.
 - [ ] Correct project identity, city, job type, product/profile, and color throughout the title, description, filters, product labels, and search/social text.
 - [ ] No copied details from another job, invented claims, or unapproved specific addresses/customer details.
 - [ ] Main roof product represented; links are relevant, clean, and not duplicated.

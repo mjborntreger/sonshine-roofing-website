@@ -54,6 +54,10 @@ jobs:
         run: npm run verify:video-pipeline
       - name: Verify video migration
         run: npm run verify:video-migration
+      - name: Verify location migration and page contracts
+        run: npm run verify:locations
+      - name: Verify all dynamic route contracts
+        run: npm run verify:dynamic-routes
       - name: Verify Directus fetch policy
         run: npm run verify:directus-fetch-policy
       - name: Verify FAQ HTML

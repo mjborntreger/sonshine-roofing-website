@@ -32,8 +32,8 @@ export function readProjectSnapshot(filename: string): ProjectSnapshot {
 }
 
 export function projectSummary(project: ProjectSummary): ProjectSummary {
-  const { slug, uri, title, year, date, heroImage, projectDescription, reviewSnippet, reviewAuthorName, materialTypes, roofColors, serviceAreas } = project;
-  return { slug, uri, title, year, date, heroImage, projectDescription, reviewSnippet, reviewAuthorName, materialTypes, roofColors, serviceAreas };
+  const { id, neighborhood, slug, uri, title, year, date, heroImage, projectDescription, reviewSnippet, reviewAuthorName, materialTypes, roofColors, serviceAreas } = project;
+  return { id, neighborhood, slug, uri, title, year, date, heroImage, projectDescription, reviewSnippet, reviewAuthorName, materialTypes, roofColors, serviceAreas };
 }
 
 export function queryProjectSnapshot(snapshot: ProjectSnapshot, {

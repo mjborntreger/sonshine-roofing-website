@@ -15,7 +15,8 @@ import {
   BadgeCheck,
   type LucideIcon,
 } from 'lucide-react';
-import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES, NAV_LOCATIONS } from '@/lib/routes';
+import { NAV_COMPANY, NAV_SERVICES, NAV_RESOURCES, ROUTES } from '@/lib/routes';
+import type { ServiceArea } from '@/lib/content/location-types';
 import type { NavItem } from '@/lib/routes';
 import type { ServiceSummary, SiteSettings } from '@/lib/content/directus-site';
 import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_PREFIXED } from '@/lib/contact-hours';
@@ -50,6 +51,7 @@ type FooterProps = {
   settings?: SiteSettings | null;
   services?: ServiceSummary[];
   navigation?: NavItem[];
+  serviceAreas?: ServiceArea[];
 };
 
 type FooterLink = { label: string; href: string };
@@ -58,7 +60,7 @@ function findNavigationItem(navigation: NavItem[], label: string): NavItem | und
   return navigation.find((item) => item.label === label);
 }
 
-export default function Footer({ settings, services = [], navigation = [] }: FooterProps) {
+export default function Footer({ settings, services = [], navigation = [], serviceAreas = [] }: FooterProps) {
   const brandName = settings?.brandName ?? 'SonShine Roofing';
   const brandSlogan = settings?.brandSlogan ?? 'Since 1987, we’ve got you covered.';
   const resolvedLogoSrc = settings?.logoInverted.url ?? logoSrc;
@@ -229,19 +231,11 @@ export default function Footer({ settings, services = [], navigation = [] }: Foo
             <div>
               <h3 className={h3Styles}>Service Areas</h3>
               <ul className="mt-4 space-y-3 text-sm">
-                {NAV_LOCATIONS.map((r) => (
-                  <li key={r.href}>
-                    <SmartLink href={r.href} className={linkStyles}>
-                      {r.label}
-                    </SmartLink>
+                {serviceAreas.map((area) => (
+                  <li key={area.id} className={linkStyles}>
+                    {area.href ? <SmartLink href={area.href} className={linkStyles}>{area.name}</SmartLink> : area.name}
                   </li>
                 ))}
-                {/* Hardcoded Locations (no href yet) */}
-                <li className={linkStyles}>Palmetto, FL</li>
-                <li className={linkStyles}>Parrish, FL</li>
-                <li className={linkStyles}>Myakka City, FL</li>
-                <li className={linkStyles}>Port Charlotte, FL</li>
-                <li className={linkStyles}>Punta Gorda, FL</li>
               </ul>
             </div>
 

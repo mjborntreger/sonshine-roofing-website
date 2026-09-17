@@ -1,0 +1,118 @@
+# Project neighborhood assignments — 2026-09-17
+
+All 53 projects checked using their privately verified exact AccuLynx job address. Twelve assignments to existing published neighborhoods were saved on September 16. On September 17, the owner confirmed the two remaining membership candidates; Saddlebag Creek Ranches and Oak Hollow were created, published and linked to their respective projects.
+
+The owner approved all 25 proposed additions and authorized the integrated release. All 25 are now published and their 28 project connections are verified. See [release execution](location-release-20260917.md).
+
+## Status
+
+- 42 assigned: the prior 14 assignments plus 28 connections to the 25 newly published neighborhoods.
+- 11 left empty with documented exceptions.
+- No unresolved membership checks or neighborhood-addition decisions remain.
+- Arroyo Vista is archived at the owner's request. No projects were linked to it, so no project unlink was necessary. See the [September 17 decision record](location-decisions-20260917.md).
+
+## Matrix
+
+| Public project | Existing area | Status | Neighborhood or exception |
+|---|---|---|---|
+| [high-oaks-trail-myakka-city](https://sonshineroofing.com/project/high-oaks-trail-myakka-city) | Myakka City | assigned_owner_confirmed | Saddlebag Creek Ranches |
+| [west-price-blvd-north-port-2](https://sonshineroofing.com/project/west-price-blvd-north-port-2) | North Port | documented_empty | Exact parcel belongs to numbered Port Charlotte Subdivision 10. County association overlay shows only citywide Vision North Port; no specific named neighborhood established. |
+| [41st-court-east-sarasota-fl](https://sonshineroofing.com/project/41st-court-east-sarasota-fl) | Sarasota | assigned_release_addition | Cascades at Sarasota |
+| [lake-worth-blvd-port-charlotte](https://sonshineroofing.com/project/lake-worth-blvd-port-charlotte) | Port Charlotte | documented_empty | Exact county property evidence verifies the numbered plat section, but a plat number alone does not establish an independently recognized public-facing neighborhood. Leave empty with this exception; do not invent a neighborhood or infer a nearby community. |
+| [scherer-way-osprey-fl](https://sonshineroofing.com/project/scherer-way-osprey-fl) | Osprey | assigned_release_addition | Rivendell |
+| [lakescene-dr-venice](https://sonshineroofing.com/project/lakescene-dr-venice) | Venice | assigned_release_addition | The Lakes of Jacaranda |
+| [brewster-rd-north-port-fl](https://sonshineroofing.com/project/brewster-rd-north-port-fl) | North Port | documented_empty | Exact parcel belongs to numbered Port Charlotte Subdivision 49. County association overlay shows only the citywide Vision North Port; no specific named neighborhood established. |
+| [commonwealth-lane-siesta-key](https://sonshineroofing.com/project/commonwealth-lane-siesta-key) | Siesta Key | assigned_release_addition | Siesta's Bayside |
+| [palm-view-rd-sarasota](https://sonshineroofing.com/project/palm-view-rd-sarasota) | Sarasota | assigned_release_addition | Oak Ford Golf Club |
+| [91st-street-east-palmetto](https://sonshineroofing.com/project/91st-street-east-palmetto) | Palmetto | assigned_release_addition | Regency Oaks Preserve |
+| [wagon-wheel-cir-sarasota-fl](https://sonshineroofing.com/project/wagon-wheel-cir-sarasota-fl) | Sarasota | assigned_release_addition | Chaparral |
+| [74th-street-east-bradenton-fl](https://sonshineroofing.com/project/74th-street-east-bradenton-fl) | Bradenton | assigned_release_addition | River Place |
+| [west-price-blvd-north-port-1](https://sonshineroofing.com/project/west-price-blvd-north-port-1) | North Port | documented_empty | Exact parcel belongs to numbered Port Charlotte Subdivision 10. County association overlay shows only citywide Vision North Port; no specific named neighborhood established. |
+| [catalina-isles-circle-venice-fl](https://sonshineroofing.com/project/catalina-isles-circle-venice-fl) | Venice | assigned_release_addition | The Isles of Chestnut Creek |
+| [woodingham-dr-venice-fl-2](https://sonshineroofing.com/project/woodingham-dr-venice-fl-2) | Venice | assigned_existing | Chestnut Creek Estates |
+| [western-pine-circle-sarasota-fl](https://sonshineroofing.com/project/western-pine-circle-sarasota-fl) | Sarasota | assigned_release_addition | Villages at Pinetree |
+| [links-court-sarasota-fl](https://sonshineroofing.com/project/links-court-sarasota-fl) | Sarasota | assigned_existing | Palm Aire |
+| [coco-plum-way-sarasota-fl](https://sonshineroofing.com/project/coco-plum-way-sarasota-fl) | Sarasota | assigned_release_addition | Bent Tree Village |
+| [spinnaker-blvd-englewood-fl](https://sonshineroofing.com/project/spinnaker-blvd-englewood-fl) | Englewood | documented_empty | Exact county property evidence verifies the numbered plat section, but a plat number alone does not establish an independently recognized public-facing neighborhood. Leave empty with this exception; do not invent a neighborhood or infer a nearby community. |
+| [grey-oaks-ave-2](https://sonshineroofing.com/project/grey-oaks-ave-2) | Sarasota | assigned_release_addition | Stoneybrook Golf & Country Club |
+| [egret-court-north-port-fl](https://sonshineroofing.com/project/egret-court-north-port-fl) | North Port | assigned_existing | Heron Creek |
+| [fiesole-st-venice-fl](https://sonshineroofing.com/project/fiesole-st-venice-fl) | Venice | assigned_existing | The Island, Venice |
+| [osprey-circle-north-port-fl](https://sonshineroofing.com/project/osprey-circle-north-port-fl) | North Port | assigned_existing | Heron Creek |
+| [bearded-oaks-cir-sarasota-fl](https://sonshineroofing.com/project/bearded-oaks-cir-sarasota-fl) | Sarasota | assigned_release_addition | Bearded Oaks |
+| [woodingham-dr-venice-fl-3](https://sonshineroofing.com/project/woodingham-dr-venice-fl-3) | Venice | assigned_existing | Chestnut Creek Estates |
+| [woodingham-dr-venice-fl-1](https://sonshineroofing.com/project/woodingham-dr-venice-fl-1) | Venice | assigned_existing | Chestnut Creek Estates |
+| [alsask-circle-port-charlotte-fl](https://sonshineroofing.com/project/alsask-circle-port-charlotte-fl) | Port Charlotte | assigned_release_addition | South Gulf Cove |
+| [innisbrook-court-venice-fl](https://sonshineroofing.com/project/innisbrook-court-venice-fl) | Venice | assigned_existing | Jacaranda West |
+| [dancing-river-dr-venice-fl](https://sonshineroofing.com/project/dancing-river-dr-venice-fl) | Venice | assigned_release_addition | Stoneybrook at Venice |
+| [benevento-dr-sarasota-fl](https://sonshineroofing.com/project/benevento-dr-sarasota-fl) | Sarasota | assigned_existing | Palmer Ranch |
+| [vinson-ave-sarasota-fl](https://sonshineroofing.com/project/vinson-ave-sarasota-fl) | Sarasota | assigned_existing | Sarasota Springs |
+| [253rd-street-east-myakka](https://sonshineroofing.com/project/253rd-street-east-myakka) | Myakka City | assigned_release_addition | Pomello Park |
+| [hartley-ave-port-charlotte-2](https://sonshineroofing.com/project/hartley-ave-port-charlotte-2) | Port Charlotte | assigned_release_addition | Port Charlotte Section 15 |
+| [grey-oaks-ave-sarasota](https://sonshineroofing.com/project/grey-oaks-ave-sarasota) | Sarasota | assigned_release_addition | Stoneybrook Golf & Country Club |
+| [myrtle-dr-nokomis](https://sonshineroofing.com/project/myrtle-dr-nokomis) | Nokomis | documented_empty | Exact parcel has a metes-and-bounds legal description, no recorded subdivision match, and only the broad Nokomis Area Civic Association overlay. Leave empty; no specific recognized neighborhood established. |
+| [ridgewood-drive-north-port](https://sonshineroofing.com/project/ridgewood-drive-north-port) | North Port | documented_empty | Exact parcel belongs to numbered Port Charlotte Subdivision 01. County association overlay shows only citywide Vision North Port; no specific named neighborhood established. |
+| [old-stone-rd-sarasota](https://sonshineroofing.com/project/old-stone-rd-sarasota) | Sarasota | assigned_release_addition | Oakleaf |
+| [americana-ave-north-port](https://sonshineroofing.com/project/americana-ave-north-port) | North Port | documented_empty | Exact parcel belongs to numbered Port Charlotte Subdivision 14. County association overlay shows only the citywide Vision North Port; no specific named neighborhood established. Leave empty rather than use a broad district or nearby community. |
+| [oakford-rd-sarasota](https://sonshineroofing.com/project/oakford-rd-sarasota) | Sarasota | documented_empty | Exact rural parcel has a metes-and-bounds legal description, no recorded subdivision match, and only Miakka Community Club regional coverage. It is not established as part of nearby Oak Ford Golf Club. |
+| [jasmine-way-north-port](https://sonshineroofing.com/project/jasmine-way-north-port) | North Port | assigned_release_addition | Charleston Park |
+| [stoeber-ave-sarasota](https://sonshineroofing.com/project/stoeber-ave-sarasota) | Sarasota | assigned_release_addition | Pleasant Acres |
+| [hemlock-lane-sarasota](https://sonshineroofing.com/project/hemlock-lane-sarasota) | Sarasota | assigned_release_addition | Bent Tree Village |
+| [canal-st-punta-gorda](https://sonshineroofing.com/project/canal-st-punta-gorda) | Punta Gorda | assigned_release_addition | River Club |
+| [hartley-ave-port-charlotte-1](https://sonshineroofing.com/project/hartley-ave-port-charlotte-1) | Port Charlotte | assigned_release_addition | Port Charlotte Section 15 |
+| [treesdale-glen-lakewood-ranch](https://sonshineroofing.com/project/treesdale-glen-lakewood-ranch) | Lakewood Ranch | assigned_release_addition | The Country Club at Lakewood Ranch |
+| [east-corktree-circle-port-charlotte-fl](https://sonshineroofing.com/project/east-corktree-circle-port-charlotte-fl) | Port Charlotte | assigned_owner_confirmed | Oak Hollow |
+| [n-race-street-north-port](https://sonshineroofing.com/project/n-race-street-north-port) | North Port | documented_empty | Exact parcel belongs to numbered Port Charlotte Subdivision 10. County association overlay shows only citywide Vision North Port; no specific named neighborhood established. |
+| [kingston-blvd-sarasota](https://sonshineroofing.com/project/kingston-blvd-sarasota) | Sarasota | assigned_release_addition | Gulf Gate East |
+| [saralake-dr-sarasota-fl](https://sonshineroofing.com/project/saralake-dr-sarasota-fl) | Sarasota | assigned_release_addition | Saralake Estates |
+| [south-tamiami-trail-port-charlotte-fl-harbor-professional-center](https://sonshineroofing.com/project/south-tamiami-trail-port-charlotte-fl-harbor-professional-center) | Port Charlotte | documented_empty | The official address search finds three buildings on the commercial site, all in Harbor Professional Center. This verifies the complex, not a neighborhood. Leave empty rather than create a building/complex as a residential neighborhood. |
+| [nice-way-sarasota-fl](https://sonshineroofing.com/project/nice-way-sarasota-fl) | Sarasota | assigned_existing | Palmer Ranch |
+| [spring-marsh-dr-bradenton](https://sonshineroofing.com/project/spring-marsh-dr-bradenton) | Bradenton | assigned_release_addition | University Place |
+| [white-jasmine-way-north-port-fl](https://sonshineroofing.com/project/white-jasmine-way-north-port-fl) | North Port | assigned_existing | Heron Creek |
+
+## September 17 additions (applied)
+
+All 25 records were created as drafts, read back, then published and connected to the 28 projects below. Existing SonShine client and service-area relationships are preserved. Optional descriptions, landmarks, images and maps remain null; WordPress provenance is omitted. Directus supplied its default `sort=0`.
+
+| Name | Slug | Service area | Projects |
+|---|---|---|---|
+| Cascades at Sarasota | cascades-at-sarasota | Sarasota | 1 |
+| Rivendell | rivendell | Osprey | 1 |
+| The Lakes of Jacaranda | the-lakes-of-jacaranda | Venice | 1 |
+| Siesta's Bayside | siestas-bayside | Siesta Key | 1 |
+| Oak Ford Golf Club | oak-ford-golf-club | Sarasota | 1 |
+| Regency Oaks Preserve | regency-oaks-preserve | Palmetto | 1 |
+| Chaparral | chaparral | Sarasota | 1 |
+| River Place | river-place | Bradenton | 1 |
+| The Isles of Chestnut Creek | the-isles-of-chestnut-creek | Venice | 1 |
+| Villages at Pinetree | villages-at-pinetree | Sarasota | 1 |
+| Bent Tree Village | bent-tree-village | Sarasota | 2 |
+| Stoneybrook Golf & Country Club | stoneybrook-golf-and-country-club | Sarasota | 2 |
+| Bearded Oaks | bearded-oaks | Sarasota | 1 |
+| South Gulf Cove | south-gulf-cove | Port Charlotte | 1 |
+| Stoneybrook at Venice | stoneybrook-at-venice | Venice | 1 |
+| Pomello Park | pomello-park | Myakka City | 1 |
+| Port Charlotte Section 15 | port-charlotte-section-15 | Port Charlotte | 2 |
+| Oakleaf | oakleaf | Sarasota | 1 |
+| Charleston Park | charleston-park | North Port | 1 |
+| Pleasant Acres | pleasant-acres | Sarasota | 1 |
+| River Club | river-club | Punta Gorda | 1 |
+| The Country Club at Lakewood Ranch | the-country-club-at-lakewood-ranch | Lakewood Ranch | 1 |
+| Gulf Gate East | gulf-gate-east | Sarasota | 1 |
+| Saralake Estates | saralake-estates | Sarasota | 1 |
+| University Place | university-place | Bradenton | 1 |
+
+## Evidence and owner confirmations
+
+- [Sarasota Property Appraiser parcel layer](https://services3.arcgis.com/icrWMv7eBkctFu1f/arcgis/rest/services/ParcelProperty_Scpao/FeatureServer/0), [Manatee Property Appraiser parcel layer](https://gis.manateepao.gov/arcgis/rest/services/Website/WebLayers/MapServer/0), and [Charlotte County subdivision layer](https://agis3.charlottecountyfl.gov/arcgis/rest/services/Essentials/CCGIS_BaseLayers/MapServer/16) supplied exact-property evidence. Private records contain the selected attributes and match receipts; public summary omits addresses, job IDs and property identifiers.
+- Port Charlotte Section 15 has a separate [county civic-area map](https://www.charlottecountyfl.gov/core/fileparse.php/152/urlt/port-charlotte-section-15_02_07_24.pdf), supporting its public identity. Section 92 and Section 74 remain empty because numbered plats alone do not establish a neighborhood.
+- [South Gulf Cove county map](https://www.charlottecountyfl.gov/core/fileparse.php/152/urlt/south-gulf-cove_02_27_23.pdf) connects the verified plat section to the named community.
+- [Sun Communities Saralake Estates](https://www.suncommunities.com/florida/saralake-estates) supplies the official site plan used to verify the exact project address privately.
+- [Stoneybrook Golf & Country Club FAQ](https://www.stoneybrook.net/faqs) distinguishes the proposed community from existing Stoneybrook Estates.
+- High Oaks Trail: the exact property appraiser assessment label, [county Neighborhood Services atlas](https://www.mymanatee.org/gisapps/data/NHSAtlas/atlas_data/pdf/Page_16-E.pdf), and [official Saddlebag Creek community map](https://saddlebagcreek.org/wp-content/uploads/2016/05/sc_site_map.jpg) corroborated the candidate. The owner's September 17 confirmation resolves membership for this assignment; no additional boundary/declaration verification is claimed.
+- East Corktree Circle: the exact plat was verified, but authoritative boundary/declaration evidence was unavailable and HOA website access failed. The owner's September 17 confirmation resolves Oak Hollow membership for this assignment; no additional external verification is claimed.
+
+## Earlier September 17 verification
+
+The following records the two owner-confirmed memberships before the subsequent 25 additions. Current totals and readback evidence are in [release execution](location-release-20260917.md).
+
+Fresh September 17 guards verified both new targets belong to the same client and primary service area as their projects and are published. Readback found 53 projects, 89 neighborhoods (88 published and Arroyo Vista archived), all 14 intended links, 39 empty relations and zero pending repeat changes. Compared with the September 17 before-images, the other 51 project rows are unchanged across the checked fields. On the two updated projects, only the neighborhood and system modification timestamp changed. The 86 other original neighborhood rows are unchanged. A global reference check found zero links to Arroyo Vista.

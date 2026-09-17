@@ -63,3 +63,21 @@
   `/project` `website_pages` record. Gallery order and the full image set are retained.
 - Project article and sitemap dates use the source-preserved `date_updated` on
   import and later Directus editorial update dates after a new deployment.
+
+## Location publication
+
+`roofing_service_areas` owns `/locations/{slug}` in the migration candidate.
+Published taxonomy plus `page_status=published` enables a route only after a
+successful deployment. `noindex` pages remain routable and leave location/image
+sitemaps. Metadata, related content and sitemap images use the same deployed
+snapshot. Draft, taxonomy-only and unknown slugs return 404; revalidation cannot
+create a page. Initial pages need editorial review before indexing/publication.
+
+Location pages use the actual global business identity and address. They do not
+invent local branches or calculate business rating/count from selected reviews.
+No Review/AggregateRating markup is emitted by the location layout, and stale
+hardcoded global rating totals are removed. Google's
+[review-snippet guidance](https://developers.google.com/search/docs/appearance/structured-data/review-snippet)
+excludes self-serving local-business reviews from that rich result (checked
+2026-09-15). FAQ structured data uses sanitized visible answers and correct global
+or single-owner scope from the deployment snapshot.

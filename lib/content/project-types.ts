@@ -16,6 +16,8 @@ export type ProjectTestimonial = {
 };
 
 export type ProjectSummary = {
+  id?: string;
+  neighborhood?: { id: string; name: string; slug: string } | null;
   slug: string;
   uri: string;
   title: string;
@@ -36,6 +38,9 @@ export type ProjectSummary = {
 };
 
 export type ProjectFull = ProjectSummary & {
+  id: string;
+  serviceAreaId: string;
+  neighborhood: { id: string; name: string; slug: string } | null;
   scopeKey: string;
   noindex: boolean;
   focusKeywords: string[];

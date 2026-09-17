@@ -12,14 +12,14 @@ assert.equal(projectServiceLabel('A roofing project with a new skylight.'), 'Roo
 assert.equal(projectServiceLabel(null), 'Roofing Project');
 
 const config = { url: 'https://cms.example.test', clientSlug: 'fixture-client' };
-const term = (slug, name = slug) => ({ slug, name, status: 'published', client: { slug: config.clientSlug } });
+const term = (slug, name = slug) => ({ id: slug, slug, name, status: 'published', client: { slug: config.clientSlug } });
 const file = (id) => ({ id, type: 'image/webp', description: `A described roof ${id}`, width: 2000, height: 1500 });
 const source = {
   id: 'one', scope_key: 'fixture-client:blue-roof', external_id: 'wordpress:sonshine-roofing:fixture',
   client: { slug: config.clientSlug }, status: 'published', title: 'Blue roof & sunny day', slug: 'blue-roof',
   description: 'A metal roof in Sarasota.', published_at: '2020-01-01T12:00:00Z', date_updated: '2021-02-01T12:00:00Z', source_updated_at: '2021-02-01T12:00:00Z',
   featured_image: file('hero'), gallery: Array.from({ length: 24 }, (_, i) => ({ sort: 24 - i, directus_files_id: file(`image-${24 - i}`) })),
-  material_type: term('metal'), service_area: term('sarasota'), roof_color: null,
+  material_type: term('metal'), service_area: term('sarasota'), roof_color: null, neighborhood: null,
   product_links: [{ label: 'Standing seam', href: 'https://example.test/product' }],
   youtube_url: 'https://www.youtube.com/watch?v=abcdefghijk', noindex: false,
   meta_description: null, focus_keywords: [],

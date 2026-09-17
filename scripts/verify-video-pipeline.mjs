@@ -7,6 +7,7 @@ import { readVideoSnapshot, queryVideoSnapshot, findVideoInSnapshot } from '../l
 import { readProjectSnapshot } from '../lib/content/project-data.ts';
 import { writeContentSnapshot } from '../lib/content/write-content-snapshot.mjs';
 import { extractYouTubeId } from '../lib/content/video-utils.mjs';
+import { validateRouteOwners } from './validate-directus-routes.mjs';
 
 const config = { url: 'https://cms.example.test', clientSlug: 'fixture-client' };
 const env = { DIRECTUS_URL: config.url, DIRECTUS_CLIENT_SLUG: config.clientSlug, DIRECTUS_TOKEN: 'synthetic-token' };
@@ -16,7 +17,7 @@ const file = { id: 'roof-image', description: 'A synthetic roof.', type: 'image/
 const project = (id, slug) => ({
   id, slug, scope_key: `${config.clientSlug}:${slug}`, client, status: 'published', title: 'Project wording',
   description: 'A metal roof replacement.', published_at: '2018-01-01T00:00:00Z',
-  featured_image: file, gallery: [], material_type: term('metal'), service_area: term('sarasota'),
+  featured_image: file, gallery: [], neighborhood: null, material_type: term('metal'), service_area: term('sarasota'),
   product_links: [], noindex: false, external_id: 'wordpress:sonshine-roofing:synthetic',
   youtube_url: 'https://www.youtube.com/watch?v=abcdefghijk',
 });
@@ -196,19 +197,28 @@ try {
   await rm(directory, { recursive: true, force: true });
 }
 
-// Exercise the route-manifest consumer's actual guard and owner projection.
-// This script runs after generation, so stale format assumptions would fail builds.
-const routeManifest = await readFile(new URL('./validate-directus-routes.mjs', import.meta.url), 'utf8');
-const routePolicyStart = routeManifest.indexOf('  if (projectSnapshot.version');
-const routePolicyEnd = routeManifest.indexOf('\n  const [offers', routePolicyStart);
-assert.ok(routePolicyStart >= 0 && routePolicyEnd > routePolicyStart);
-const routePolicy = new Function('projectSnapshot', 'clientSlug', 'addOwner', routeManifest.slice(routePolicyStart, routePolicyEnd));
-const routeOwners = [];
-routePolicy(snapshot, config.clientSlug, (...owner) => routeOwners.push(owner));
-assert.equal(routeOwners.length, 2);
-assert.doesNotThrow(() => routePolicy(noProjects, config.clientSlug, () => assert.fail('Unpublished projects cannot own routes')));
-assert.doesNotThrow(() => routePolicy(noVideos, config.clientSlug, () => {}));
+// Exercise the real route-manifest consumer with synthetic published snapshots.
+// Keep the pipeline's generic-client fixtures, translating only the route owner's
+// site-specific client/scope fields at this boundary. Never slice executable source.
+const routeClient = 'sonshine-roofing';
+const routeSnapshot = value => ({
+  ...value,
+  clientSlug: value.clientSlug === config.clientSlug ? routeClient : value.clientSlug,
+  projects: Array.isArray(value.projects) ? value.projects.map(project => ({
+    ...project, scopeKey: project.scopeKey.replace(`${config.clientSlug}:`, `${routeClient}:`),
+  })) : value.projects,
+});
+const routePolicy = projectSnapshot => validateRouteOwners({
+  clientSlug: routeClient,
+  readCollection: async () => [],
+  snapshots: { projects: routeSnapshot(projectSnapshot), locations: { version: 1, clientSlug: routeClient, pages: [] } },
+});
+assert.deepEqual(await routePolicy(snapshot), snapshot.projects.map(project => ({
+  collection: 'roofing_projects', id: project.slug, path: `/project/${project.slug}`,
+})));
+assert.deepEqual(await routePolicy(noProjects), [], 'Unpublished projects cannot own routes');
+assert.equal((await routePolicy(noVideos)).length, 2, 'Unpublished videos cannot remove published project routes');
 for (const invalid of [{ ...snapshot, version: 1 }, { ...snapshot, projects: null }, { ...snapshot, videos: null }, { ...snapshot, categories: null }, { ...snapshot, clientSlug: 'another-client' }]) {
-  assert.throws(() => routePolicy(invalid, config.clientSlug, () => {}), /invalid/u);
+  await assert.rejects(routePolicy(invalid), /invalid/u);
 }
 console.log('Verified unified Directus video/project snapshots, complete pagination, independent publication, private relation boundaries, overlapping filters, aliases, chronology, safe YouTube references, and atomic deployment-only refresh.');

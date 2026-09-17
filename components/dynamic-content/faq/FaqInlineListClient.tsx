@@ -111,27 +111,15 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
         </button>
       </div>
 
-      <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="flex flex-col gap-4">
-          {safeItems.filter((_, idx) => idx % 2 === 0).map((faq, idx) => (
-            <FaqItem
-              key={faq.id}
-              ref={assignRef(idx * 2)}
-              title={faq.title}
-              contentHtml={faq.contentHtml}
-            />
-          ))}
-        </div>
-        <div className="flex flex-col gap-4">
-          {safeItems.filter((_, idx) => idx % 2 === 1).map((faq, idx) => (
-            <FaqItem
-              key={faq.id}
-              ref={assignRef(idx * 2 + 1)}
-              title={faq.title}
-              contentHtml={faq.contentHtml}
-            />
-          ))}
-        </div>
+      <div className="mt-12 grid grid-cols-1 items-start gap-4 md:grid-cols-2">
+        {safeItems.map((faq, idx) => (
+          <FaqItem
+            key={faq.id}
+            ref={assignRef(idx)}
+            title={faq.title}
+            contentHtml={faq.contentHtml}
+          />
+        ))}
       </div>
     </div>
   );

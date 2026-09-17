@@ -6,6 +6,11 @@ import ts from 'typescript';
 import { isBuildOnlyRevalidationPath, isBuildOnlyRevalidationTag } from '../lib/content/build-only-revalidation.ts';
 
 const cases = [
+  ['/layout', true], ['/(site)/layout', true], ['/locations/[slug]/page', true],
+  ['/blog/layout/?preview=1', true], ['/blog/page#section', true],
+  ['page///?preview=1', true], ['/blog/layout-other', false],
+  ['/%6cocations/sarasota', true], ['/blog/../locations/sarasota', true], ['/bad%ZZ', true],
+  ['/locations/sarasota', true], ['/locations/unknown', true], ['/sitemap_index/location', true], ['/faq', true], ['/locations-other', false],
   ['/special-offers', true],
   ['/project', true],
   ['/video-library', true],
@@ -36,7 +41,16 @@ for (const [path, expected] of cases) {
 
 console.log(`Verified ${cases.length} build-only revalidation paths.`);
 
+// Repeated route-file and slash delimiters must stay cheap without weakening
+// protection for implicit Next cache tags or ordinary eligible content routes.
+assert.equal(isBuildOnlyRevalidationPath('/page#'.repeat(100_000)), true);
+assert.equal(isBuildOnlyRevalidationPath('/layout?'.repeat(100_000)), true);
+assert.equal(isBuildOnlyRevalidationPath('/'.repeat(100_000) + 'blog'), false);
+assert.equal(isBuildOnlyRevalidationPath('/project' + '/'.repeat(100_000)), true);
+
 const tags = [
+  ['_N_T_/layout', true], ['_N_T_/(site)/layout', true], ['_N_T_/locations/sarasota', true],
+  ['locations', true], ['location:sarasota', true], ['sitemap:image:locations', true], ['directus:reviews:sonshine-roofing', false], ['faqs', true],
   ['video', true], ['video:example', true], ['videos', true],
   ['video-library', true], ['directus:videos', true],
   ['sitemap:videos:entries', true], ['sitemap-video-entries', true],
@@ -77,6 +91,17 @@ try {
   const rejectedGet = await route.exports.GET(new Request('https://revalidate.test/api/revalidate?path=/video-library&tag=post:123', { headers }));
   assert.equal(rejectedGet.status, 400);
   assert.deepEqual(writes, [], 'mixed GET rejects before any cache write');
+  for (const payload of [{ path: '/layout' }, { path: '/(site)/layout' }, { tag: '_N_T_/locations/sarasota' }]) {
+    const post = await route.exports.POST(new Request('https://revalidate.test/api/revalidate', {
+      method: 'POST', headers, body: JSON.stringify({ ...payload, paths: ['/blog'] }),
+    }));
+    const getUrl = new URL('https://revalidate.test/api/revalidate');
+    Object.entries(payload).forEach(([key, value]) => getUrl.searchParams.set(key, value));
+    getUrl.searchParams.append('path', '/blog');
+    const get = await route.exports.GET(new Request(getUrl, { headers }));
+    assert.equal(post.status, 400); assert.equal(get.status, 400);
+    assert.deepEqual(writes, [], 'internal layout/route tags cannot invalidate a deployed location');
+  }
   const allowed = await route.exports.GET(new Request('https://revalidate.test/api/revalidate?path=/blog&tag=post:123', { headers }));
   assert.equal(allowed.status, 200);
   assert.deepEqual(writes, [{ path: '/blog' }, { tag: 'post:123' }]);

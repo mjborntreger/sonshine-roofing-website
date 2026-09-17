@@ -11,7 +11,7 @@ import { breadcrumbSchema, faqSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 
-export const revalidate = 86400; // daily ISR
+export const revalidate = false; // daily ISR
 const PAGE_PATH = '/faq';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,10 +33,10 @@ export default async function FAQArchivePage() {
   const faqs = await listAllFaqs(500);
   const groups = groupFaqsForArchive(faqs);
 
-  // JSON-LD: build FAQPage + Breadcrumbs (first 50 items)
+  // JSON-LD uses the same complete collection displayed below.
   const origin = SITE_ORIGIN;
   const faqLd = faqSchema(
-    faqs.slice(0, 50).map((faq) => ({
+    faqs.map((faq) => ({
       question: faq.title,
       answerHtml: faq.contentHtml,
       url: `${PAGE_PATH}#faq-${faq.id}`,
