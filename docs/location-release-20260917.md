@@ -10,9 +10,14 @@ the actual deployment succeeds.
 The integration combines `feat/directus-location-hubs` at
 `da4b93cc6b826822d05586c0b8c549e88c8ee3a9` and the dependency update from PR #28 at
 `9b0ba5bd3e478e3a351aacf45a7a70ecda5638ab`, preserving both histories. Runtime
-validation used integration commit `e951bc903391777405542b112b49b59b0607d674`,
-tree `292ad3197b1bc1a393530f30f165ce9c87ae58ff`, followed only by documentation
-completion updates. The prior production/rollback source is `0271ec7`.
+validation initially used integration commit `e951bc903391777405542b112b49b59b0607d674`,
+tree `292ad3197b1bc1a393530f30f165ce9c87ae58ff`. GitHub then exposed two issues:
+a potentially polynomial route-file regular expression and a macOS-only test
+temporary path. Commits `96450ce` and `8d879b1` replace the regex with linear
+normalization/suffix checks and use a canonical platform temporary directory.
+The corrected runtime at `8d879b1fedd1aca8225fb3fd66ca88a8d23f5fce` passed a fresh
+credentialed build with identical snapshots. The prior production/rollback source
+is `0271ec7`.
 
 All 25 approved neighborhoods were created as drafts, read back, then published
 with status-only writes. The exact 28 researched project relations were guarded
@@ -62,6 +67,10 @@ public project disposition without private job/address data.
   issues in publication/tenant isolation, FAQ selection/schema, snapshots,
   geography, sanitizers, private-field projection, dependency compatibility and
   preserved lead/truck-sale/homepage/About boundaries.
+- The reviewer also checked the final three-file CI repair without findings.
+  The revalidation suite now covers repeated 100,000-delimiter inputs, route-file
+  suffixes and atomic endpoint rejection. The corrected enrichment verifier
+  passes all 70 synthetic guards while preserving symlink-root rejection.
 
 Normalized snapshot SHA-256 digests:
 
