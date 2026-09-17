@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile, writeFile, mkdtemp, mkdir, symlink, rm } from 'node:fs/promises';
+import { readFile, writeFile, mkdtemp, mkdir, symlink, rm, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { VERSION, FIELDS, planEnrichment, verifyPlan, publicSummary, normalizeReference, normalizeZip, applyEnrichmentPlan } from './location-enrichment/core.mjs';
@@ -150,7 +150,7 @@ for (const path of ['../lib/content/directus-projects.mjs', '../lib/content/dire
   check(!(await readFile(new URL(path, import.meta.url), 'utf8')).includes('location-enrichment/'), 'Website snapshot code never imports private tooling');
 }
 // The approved recovery root can be durable storage, but can never be a Git path.
-const temp = await mkdtemp(join(tmpdir(), 'location-private-io-test-'));
+const temp = await realpath(await mkdtemp(join(tmpdir(), 'location-private-io-test-')));
 const priorRoot = process.env.LOCATION_MIGRATION_PRIVATE_ROOT;
 let sequence = 0;
 async function privateIo(root) {
