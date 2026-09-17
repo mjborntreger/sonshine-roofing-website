@@ -2,7 +2,7 @@
 
 ## Where content lives
 
-- Location migration candidate: `roofing_service_areas` owns location landing pages after the coordinated release in [the release guide](docs/location-release.md). Production remains WordPress-owned until that release is verified.
+- Directus `roofing_service_areas` owns location landing pages. The five hubs were deployed and verified on September 17; see [release evidence](docs/location-release-20260917.md).
 - The WordPress host also serves hard-coded `/wp-content/uploads` assets used by
   local routes and components. This media dependency is separate from
   WPGraphQL content ownership; audit or migrate those URLs before retiring the
@@ -117,8 +117,8 @@
 - Store local page copy, described coverage maps, WordPress location provenance,
   and the shared SEO fields on `roofing_service_areas`. `noindex` changes indexing,
   not route availability. New pages stay drafts until editorial review. The five
-  migrated owners are now published in Directus; production ownership stays with
-  WordPress until the coordinated frontend deployment is verified.
+  migrated owners are published in Directus and deployed. Later CMS edits become
+  public only through a successful frontend build and deployment.
 - Use reusable `roofing_neighborhoods` with one primary area and real names.
   Optional descriptions are short plain text. Coverage does not claim a completed
   project. Verified projects may link from a card; neighborhoods have no routes.

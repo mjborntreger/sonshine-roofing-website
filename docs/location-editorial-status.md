@@ -1,6 +1,6 @@
 # Location editorial status
 
-Updated 2026-09-17 from the current implementation and CMS execution readback. The owner authorized the integrated website release after approving the 25 neighborhood additions. Deployment verification is recorded separately from this CMS readback. The owner withdrew all n8n changes and requested static, manually maintained
+Updated 2026-09-17 from the current implementation and CMS execution readback. The owner authorized the integrated website release after approving the 25 neighborhood additions. Release `4967397` is deployed and verified; see [public release evidence](location-release-20260917.md#production-verification). The owner withdrew all n8n changes and requested static, manually maintained
 location reviews. See [manual reviews](location-reviews.md).
 
 ## Applied
@@ -63,6 +63,6 @@ are complete. September 16 project-neighborhood research accounts for all 53 pro
 All 25 approved additions are applied and listed in the assignment report. If a property has no recognized neighborhood, leave
 the relation empty and document the exception, as the owner instructed.
 
-Public content ownership changes through the authorized integrated deployment and
-its release verification. Current publication and copy supersede historical draft receipts; do
+Directus now owns the five deployed location hubs; later edits require a new
+frontend build and deployment. Current publication and copy supersede historical draft receipts; do
 not replay those receipts as a new desired state.

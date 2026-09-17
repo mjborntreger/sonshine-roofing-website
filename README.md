@@ -11,7 +11,9 @@ the frontend adapters for Directus and WordPress.
   page and service SEO, blog posts, FAQs, people, roofing glossary terms,
   sponsor features, projects, videos/categories, reviews and review-carousel settings, special
   offers, legal copy, navigation, and published CMS redirects.
-- WordPress/WPGraphQL remains authoritative for location landing pages.
+- Directus owns the five location hubs through the deployment snapshot; see
+  [release evidence](docs/location-release-20260917.md). Remaining hard-coded
+  WordPress media still depends on the WordPress host.
 - Homepage/About YouTube placements remain hard-coded. The entire truck-sale
   page and its videos are excluded from Directus-backed content.
 - Next.js configuration and `proxy.ts` retain code-owned platform redirects and

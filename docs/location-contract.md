@@ -1,8 +1,8 @@
 # Location migration contract — manual review amendment
 
-Status: owner scope amendment on 2026-09-15. Directus migration is authorized; website deployment remains held. The application snapshot format remains `location-v3`. The owner explicitly withdrew all n8n workflow work: location reviews are imported once, deduplicated and linked, then maintained by hand.
+Status: the owner-approved migration and integrated website release were deployed and verified on 2026-09-17; see [release evidence](location-release-20260917.md). The application snapshot format remains `location-v3`. The owner explicitly withdrew all n8n workflow work: location reviews are imported once, deduplicated and linked, then maintained by hand.
 Starting application revision: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
-Evidence refreshed: 2026-09-15. The user handoff is authoritative for scope.
+Evidence refreshed: 2026-09-17. The user handoff is authoritative for scope.
 
 ## Model and ownership
 
