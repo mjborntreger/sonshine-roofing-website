@@ -4,21 +4,19 @@ import Header from '@/components/global-nav/header/Header';
 import Footer from '@/components/global-nav/footer/Footer';
 import AnalyticsScripts from '@/lib/telemetry/analytics';
 import LeadAttributionCapture from '@/components/lead-capture/LeadAttributionCapture';
-import SpecialOfferPopup, {
-  type SpecialOfferPopupOffer,
-} from '@/components/lead-capture/special-offer/SpecialOfferPopup';
-import { getFeaturedSpecialOffer } from '@/lib/content/directus-special-offers';
-import { formatSpecialOfferExpiration } from '@/lib/lead-capture/specialOfferDates';
+import SpecialOfferPopup from '@/components/lead-capture/special-offer/SpecialOfferPopup';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { OFFICE_OPENING_HOURS_SPEC, PHONE_OPENING_HOURS_SPEC } from '@/lib/contact-hours';
 import {
-  getSiteBundle,
   getSiteSettings,
+  getServices,
+  getHeaderNavigation,
   getWebsitePage,
   type SiteSettings,
 } from '@/lib/content/directus-site';
 import { SiteSettingsProvider } from '@/lib/content/site-settings-context';
 import { JsonLd } from '@/lib/seo/json-ld';
+import { deployedLocations, listCoverageAreas } from '@/lib/content/locations';
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
@@ -97,8 +95,6 @@ export const viewport: Viewport = {
 
 const BASE_URL = SITE_ORIGIN;
 const LOGO_URL_512 = 'https://sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png'; // 512×512
-const AGG_RATING_VALUE = 4.8;
-const AGG_RATING_COUNT = 211;
 
 function getGlobalSchema(settings: SiteSettings | null) {
   const baseUrl = settings?.siteUrl ?? BASE_URL;
@@ -174,29 +170,8 @@ function getGlobalSchema(settings: SiteSettings | null) {
       { '@type': 'AdministrativeArea', name: 'Sarasota County, FL' },
       { '@type': 'AdministrativeArea', name: 'Manatee County, FL' },
       { '@type': 'AdministrativeArea', name: 'Charlotte County, FL' },
-      { '@type': 'Place', name: 'Sarasota' },
-      { '@type': 'Place', name: 'Bradenton' },
-      { '@type': 'Place', name: 'Venice' },
-      { '@type': 'Place', name: 'North Port' },
-      { '@type': 'Place', name: 'Port Charlotte' },
-      { '@type': 'Place', name: 'Punta Gorda' },
-      { '@type': 'Place', name: 'Palmetto' },
-      { '@type': 'Place', name: 'Myakka City' },
-      { '@type': 'Place', name: 'Osprey' },
-      { '@type': 'Place', name: 'Siesta Key' },
-      { '@type': 'Place', name: 'Englewood' },
-      { '@type': 'Place', name: 'Ellenton' },
-      { '@type': 'Place', name: 'Lakewood Ranch' },
-      { '@type': 'Place', name: 'Parrish' },
-      { '@type': 'Place', name: 'Nokomis' },
+      ...listCoverageAreas().map(area => ({ '@type': 'Place', name: area.name })),
     ],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: AGG_RATING_VALUE,
-      bestRating: '5',
-      worstRating: '4',
-      ratingCount: AGG_RATING_COUNT,
-    },
     makesOffer: configuredServices.map((service, index) => ({
       '@type': 'Offer',
       itemOffered: { '@id': `${baseUrl}/#service-${index + 1}` },
@@ -234,38 +209,11 @@ function getGlobalSchema(settings: SiteSettings | null) {
   } as const;
 }
 
-async function getFeaturedOfferPopup(): Promise<SpecialOfferPopupOffer | null> {
-  try {
-    const offer = await getFeaturedSpecialOffer();
-    if (!offer) return null;
-
-    return {
-      slug: offer.slug,
-      title: offer.title,
-      href: `/special-offers/${offer.slug}`,
-      description: offer.description,
-      discount: offer.discount,
-      expirationLabel: formatSpecialOfferExpiration(offer.expirationDate),
-      legalDisclaimer: offer.legalDisclaimer,
-      featuredImage: offer.featuredImage
-        ? {
-            url: offer.featuredImage.url,
-            altText: offer.featuredImage.altText,
-            width: offer.featuredImage.width,
-            height: offer.featuredImage.height,
-          }
-        : null,
-    };
-  } catch (error) {
-    console.error('[directus] Unable to load featured special offer.', error);
-    return null;
-  }
-}
-
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const siteBundle = await getSiteBundle();
-  const featuredOfferPopup = await getFeaturedOfferPopup();
-  const { settings, services, navigation } = siteBundle;
+  const settings = await getSiteSettings();
+  const services = await getServices();
+  const navigation = await getHeaderNavigation();
+  const featuredOfferPopup = deployedLocations().featuredOffer;
   const publicSettings = {
     brandName: settings?.brandName ?? 'SonShine Roofing',
     phone: settings?.phone ?? '(941) 866-4320',
@@ -319,7 +267,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
           collapsedLogoAlt={settings?.logoInverted.description}
         />
         <main className="flex-1">{children}</main>
-        <Footer settings={settings} services={services} navigation={navigation} />
+        <Footer settings={settings} services={services} navigation={navigation} serviceAreas={listCoverageAreas()} />
         <JsonLd data={getGlobalSchema(settings)} />
       </div>
     </SiteSettingsProvider>

@@ -114,6 +114,10 @@ function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/, "");
 }
 
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function readString(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const trimmed = value.trim();
@@ -228,12 +232,14 @@ type FetchSpecialOffersOptions = {
   filter?: UnknownRecord;
   sort?: string[];
   limit?: number;
+  allPages?: boolean;
 };
 
 async function fetchSpecialOfferItems({
   filter = {},
   sort,
   limit = 100,
+  allPages = false,
 }: FetchSpecialOffersOptions = {}): Promise<SpecialOffer[]> {
   const config = getDirectusConfig();
   if (!config) return [];
@@ -255,31 +261,44 @@ async function fetchSpecialOfferItems({
     url.searchParams.set("sort", sort.join(","));
   }
 
-  const res = await fetch(url, {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${config.token}`,
-    },
-    cache: "force-cache",
-  });
-
-  if (!res.ok) {
-    throw new Error(`Directus special_offers HTTP ${res.status} ${res.statusText}`);
+  const rows: DirectusSpecialOfferItem[] = [];
+  const slugs = new Set<string>();
+  let expected: number | undefined;
+  for (let page = 1; page <= 10000; page++) {
+    if (allPages) {
+      url.searchParams.set("page", String(page));
+      url.searchParams.set("meta", "filter_count");
+    }
+    const res = await fetch(url, {
+      headers: { Accept: "application/json", Authorization: `Bearer ${config.token}` },
+      cache: "force-cache",
+    });
+    if (!res.ok) throw new Error(`Directus special_offers HTTP ${res.status}`);
+    const json = (await res.json()) as DirectusListResponse<DirectusSpecialOfferItem> & { meta?: { filter_count?: number } };
+    if (json.errors?.length || !Array.isArray(json.data)) throw new Error("Directus special_offers returned an invalid collection response");
+    for (const item of json.data) {
+      const slug = readString(item.slug);
+      if (!slug || slugs.has(slug)) throw new Error("Directus special_offers returned a missing or duplicate slug");
+      if (item.status !== "published" || !isRecord(item.client) || item.client.slug !== config.clientSlug) throw new Error("Directus special_offers escaped published client scope");
+      slugs.add(slug);
+      rows.push(item);
+    }
+    if (!allPages) break;
+    const count = json.meta?.filter_count;
+    if (typeof count !== "number" || !Number.isSafeInteger(count) || count < 0) throw new Error("Directus special_offers missing verified inventory count");
+    expected ??= count;
+    if (count !== expected) throw new Error("Directus special_offers inventory changed during pagination");
+    if (rows.length === expected) break;
+    if (!json.data.length || rows.length > expected || json.data.length < limit) throw new Error("Directus special_offers inventory truncated");
+    if (page === 10000) throw new Error("Directus special_offers pagination safety limit");
   }
-
-  const json = (await res.json()) as DirectusListResponse<DirectusSpecialOfferItem>;
-  if (json.errors?.length) {
-    throw new Error(json.errors.map((error) => error.message).filter(Boolean).join("; ") || "Directus responded with an error");
-  }
-
-  return (json.data ?? [])
-    .map((item) => mapSpecialOffer(item, config))
-    .filter((offer): offer is SpecialOffer => Boolean(offer));
+  return rows.map((item) => mapSpecialOffer(item, config)).filter((offer): offer is SpecialOffer => Boolean(offer));
 }
 
-export async function listSpecialOfferSlugs(limit = 100): Promise<string[]> {
+export async function listSpecialOfferSlugs(limit?: number): Promise<string[]> {
   const offers = await fetchSpecialOfferItems({
-    limit,
+    limit: limit ?? 100,
+    allPages: limit === undefined,
     sort: ["slug"],
   });
 
@@ -313,7 +332,7 @@ export async function getFeaturedSpecialOffer(): Promise<SpecialOffer | null> {
 export async function listSpecialOfferSitemapEntries(): Promise<
   Array<{ uri: string; modified: string | null }>
 > {
-  const offers = await fetchSpecialOfferItems({ sort: ['slug'], limit: 500 });
+  const offers = await fetchSpecialOfferItems({ sort: ['slug'], limit: 100, allPages: true });
   return offers
     .filter(isSpecialOfferIndexable)
     .map((offer) => ({

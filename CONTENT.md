@@ -2,7 +2,7 @@
 
 ## Where content lives
 
-- WordPress (via WPGraphQL): location landing pages.
+- Location migration candidate: `roofing_service_areas` owns location landing pages after the coordinated release in [the release guide](docs/location-release.md). Production remains WordPress-owned until that release is verified.
 - The WordPress host also serves hard-coded `/wp-content/uploads` assets used by
   local routes and components. This media dependency is separate from
   WPGraphQL content ownership; audit or migrate those URLs before retiring the
@@ -19,7 +19,7 @@
   - `site_settings`: shared brand, contact, address, social, image, hero media, footer badges, company facts, robots, CSP, analytics switch, schema values, and optional raw `llms.txt` content.
   - `website_pages`: normalized SEO records for fixed routes only; canonicals are route-derived.
   - `services`: primary service route owners, including their SEO metadata.
-  - `faqs`: published WYSIWYG-authored semantic HTML answers. Fixed routes use `website_page`, service routes use `service`, and a record is global only when both are null.
+  - `faqs`: published WYSIWYG-authored semantic HTML answers. Fixed routes use `website_page`, service routes use `service`, and local routes use `service_area`, and a record is global only when all three scopes are null.
   - `navigation_items`: header navigation and matching footer link groups.
   - `redirects`: published legacy redirect rules loaded at build time.
   - `special_offers`: special-offer pages and popup content.
@@ -71,28 +71,31 @@
 ## Publishing reviews in Directus
 
 - The site-wide review widget reads published, SonShine-scoped Google reviews
-  whose rating is five and whose `external_id` is populated. Records also need
+  whose rating is five and whose verified Google `external_id` is populated. Records also need
   an author name and review text to render.
 - Keep exactly one SonShine-scoped `reviews_carousels` record. Its `limit` and
   `gbp_profile_link` configure the widget.
-- These collections do not replace the `featuredReviews` embedded in
-  WordPress-owned location landing pages.
+- Location hubs select editorially published, five-star, geographically assigned reviews from the deployment snapshot. Imported location reviews are manually maintained and keep `external_id` null. Unassigned reviews cannot supply local or nearby results. WordPress provenance remains separate. The existing Google workflow and sitewide feed remain unchanged. See [manual location reviews](docs/location-reviews.md).
 
 ## Publishing FAQs in Directus
 
 - Keep each FAQ assigned to one client and one scope: `website_page` for a fixed
-  route or `service` for a service route.
-- Leave both scope relations empty only for genuinely global FAQs.
+  route, `service` for a service route, or `service_area` for a location page.
+- Leave all three scope relations empty only for genuinely global FAQs. At most one scope may be populated; all owners must belong to the same client.
 - Use only paragraphs, links, bold/italic emphasis, ordered or unordered lists, list items, and line breaks in `answer` (`p`, `a`, `strong`, `em`, `ul`, `ol`, `li`, and `br`).
 - Link attributes are limited to `href`, `rel`, `target`, and `title`. Destinations must begin with exactly one `/`, begin with `#`, or use `http`, `https`, `mailto`, or `tel`. Do not use protocol-relative or unsafe-protocol URLs.
 - Do not add images, headings, tables, classes, IDs, inline styles, scripts, event handlers, or arbitrary editor/source markup.
 - The editor toolbar guides authors, but the restricted frontend sanitizer is the authoritative security boundary. `_blank` links receive `rel="noopener noreferrer"`.
 - FAQ JSON-LD uses parser-derived, entity-decoded plain text from `faqHtmlToPlainText()`; never remove tags with a regex.
-- Publication uses only `status`; scope uses `website_page` or `service`.
+- Publication uses `status`; scope uses `website_page`, `service`, or `service_area`. FAQs and owner visibility are normalized into the deployment snapshot.
 - Page sections render global FAQs plus FAQs whose related fixed-page path or
-  service slug matches the current route.
+  service slug or published location slug matches the current route.
+- Location hubs show every eligible local FAQ first, then all global FAQs. The
+  current editorial set has five local and eight shared answers per hub; there is
+  no combined eight-answer cap. The DOM order and FAQ structured data agree.
 - The `/faq` archive renders General first, then fixed-page/service groups by
-  their editor-facing labels.
+  their editor-facing labels, including published location groups. Its structured
+  data covers the same answers as the displayed list.
 
 ## Publishing redirects in Directus
 
@@ -105,12 +108,40 @@
   Directus.
 - Deleted deprecated landing-page routes intentionally return 404; do not add redirects for them.
 
-## Publishing in WordPress
+## Publishing location hubs
 
-- Publish the remaining WordPress location content before release.
-- Fill excerpts where available (used as SEO fallbacks).
-- Provide featured images for richer OG cards.
-- Location landing pages remain a deliberate WordPress/code exception until they move to a dedicated Directus `location_landing_pages` collection.
+- Preserve canonical service-area IDs, slugs, taxonomy `external_id`, and `scope_key`.
+  `page_status` is independent of taxonomy `status`: `taxonomy_only` keeps content
+  associations without a page, `draft` prepares copy, and `published` enables a
+  route after successful deployment. A published taxonomy remains required.
+- Store local page copy, described coverage maps, WordPress location provenance,
+  and the shared SEO fields on `roofing_service_areas`. `noindex` changes indexing,
+  not route availability. New pages stay drafts until editorial review. The five
+  migrated owners are now published in Directus; production ownership stays with
+  WordPress until the coordinated frontend deployment is verified.
+- Use reusable `roofing_neighborhoods` with one primary area and real names.
+  Optional descriptions are short plain text. Coverage does not claim a completed
+  project. Verified projects may link from a card; neighborhoods have no routes.
+  Migration reruns preserve edited descriptions unless an explicit description
+  revision is supplied and its before-image still matches. Leave a project
+  neighborhood empty with a documented exception when no recognized neighborhood
+  can be verified.
+- Select only directly approved `roofing_service_area_neighbors`. Projects and
+  reviews show up to six combined, local first. Sponsors show every local match,
+  then nearby matches toward three. Empty sections and absent neighborhoods/maps
+  disappear. Unassigned records are not geographic backfill.
+- Canonical coverage relations replace copied names/URLs. Navigation may use
+  `link_type=service_area` with a service-area relation; published pages get links,
+  taxonomy-only areas can remain plain coverage text. Keep CMS sort order.
+- The `.generated/locations.json` v1 artifact references the matching project/video
+  snapshot digest under contract `location-v3`. It also freezes public site settings,
+  service summaries and the shared offer popup across client navigation. Routes, location/image sitemap entries, FAQs, geography and
+  navigation remain frozen for a deployment. Required schema/fetch/tenant failures
+  stop prebuild. Unknown, draft and taxonomy-only routes return 404.
+- Read [location authoring](docs/location-authoring.md) for editorial checks and
+  [the release guide](docs/location-release.md) for schema, data,
+  permission, deployment and rollback dependencies. The unused
+  `location_landing_pages` scaffold and WordPress originals remain untouched.
 
 ## Publishing blog posts in Directus
 
@@ -132,6 +163,7 @@
   stable slug, `status`, `published_at`, plain-text `description`, and a described
   `featured_image`. Published WordPress projects were the migration scope;
   unpublished WordPress records remain excluded.
+- Internal `job_id` is the private AccuLynx reference; populated values are unique within the client. The verified 53-project backfill and SonShine-only job ID/ZIP requirement were applied on 2026-09-15. Unrelated clients keep optional fields. Actual public/website permissions exclude job ID and ZIP; neither is fetched or packaged by the website. Neighborhood stays optional and its label disappears when absent. See [enrichment evidence](docs/location-enrichment-evidence.md).
 - Select one published material and one published service area from the reusable
   managed lists. Roof color is optional and single-select. Preserve existing
   names/slugs because archive URLs use `mt`, `rc`, and `sa` query parameters.
@@ -256,10 +288,10 @@
 - Each record requires `slug`, `title`, restricted `description` HTML, and a
   logo with a non-empty Directus file description. Optional website, Facebook,
   and Instagram fields must use absolute HTTP(S) URLs.
-- `service_area_slugs` is an optional JSON string list. The location adapter
-  returns up to eight matching records when at least four exist. Otherwise it
-  appends the configured leading entries from the full sorted pool—six in the
-  current homepage and location routes—and removes duplicate slugs.
+- `service_areas` relates sponsors to canonical areas through `sponsor_service_areas`.
+  Location selection uses these relations and direct approved neighbors; legacy
+  `service_area_slugs` is retained for compatibility through verification. The
+  homepage keeps its existing ordered partnership selection.
 - `description` allows paragraphs, links, bold/italic emphasis, ordered or
   unordered lists, list items, and line breaks. The frontend sanitizer removes
   images, unsafe links, classes, styles, scripts, and unsupported markup.
@@ -295,8 +327,9 @@
   Expiration disables the claim form and featured-popup eligibility, but does
   not override indexing.
 - Use `featured_image.description` for image alt text and `legal_disclaimer` for disclaimer copy.
-- Special-offer content is build-only. Publish a new site build for Directus
-  changes to reach the public offer route or its sitemap entry.
+- Special-offer content is build-only. Static paths and sitemap entries enumerate
+  the complete published inventory with verified pagination. Publish a new site
+  build for Directus changes to reach the public offer route or its sitemap entry.
 
 ## Publishing legal copy in Directus
 
