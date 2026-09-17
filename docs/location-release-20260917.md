@@ -2,8 +2,7 @@
 
 The owner approved the 25 researched neighborhood additions before launch and
 instructed execution of the finalized merge/release plan. This record separates
-completed candidate checks from production verification, which is added after
-the actual deployment succeeds.
+candidate checks from the completed production verification below.
 
 ## Candidate and CMS prerequisites
 
@@ -86,7 +85,7 @@ The repository's synthetic input/body/consent contracts passed. No real lead was
 submitted. The reviewer performed source review; build/browser/CMS evidence above
 was collected separately.
 
-## Recovery and remaining release gates
+## Recovery and production verification
 
 Narrow before-images, exact plans and readback receipts are retained with private
 permissions under the established recovery root's `release-2026-09-17` directory.
@@ -95,7 +94,35 @@ The after/readback receipt SHA-256 is
 The retained prior application image passed gzip integrity verification; see
 [recovery instructions](location-release.md#rollback). Recovery has not been run.
 
-Before merging, require final-head Quality and reviewed CodeQL results, recheck
-source ancestry and content drift, and use a merge commit. Then verify the exact
-released SHA in Coolify, main-push checks and public desktop/mobile behavior.
-Update production ownership and shared context only after that verification.
+### Production verification
+
+[PR #29](https://github.com/mjborntreger/sonshine-roofing-website/pull/29)
+merged at 21:16:59 UTC on September 17 as
+`4967397d6b80463b102b3bc36c5cf0438de781c7`. Both original source tips are ancestors
+of main; GitHub automatically marked PR #28 merged. Final-head Quality and both
+CodeQL languages passed, with the aggregate CodeQL result successful. Main-push
+Quality and CodeQL also passed. Coolify's enabled main webhook produced deployment
+`kzswb6saiqcpn8futr0gfrv6`, finished at 21:21:07 UTC. The exact release container
+reports healthy.
+
+Public acceptance passed all 56 routes. Desktop and mobile browser checks
+confirmed new cards, maps/images, 13 hub FAQ answers, navigation, 53-project
+filter/reset behavior and video playback with a canonical share URL. No real lead
+submission was made. The deployed snapshots contain 53 projects, 79 videos, 42
+neighborhood assignments, 11 empty exceptions, 113 published neighborhoods, five
+pages and 70 FAQs. Their internal digest relationship matches and neither contains
+private job/ZIP fields.
+
+Production normalized SHA-256 digests:
+
+```text
+projects: d12f353fe9005301c4bb2339938c64afd442f2bc486338cfe158c46c3c4ad56d
+locations: 2fa4263ddbba5343b59dfe9b98643ad85531a174dd121e45178ea97ea502a3ea
+```
+
+Compared field by field with the local build, production differs only in 79
+YouTube upload dates populated by its configured API key and the resulting
+project digest referenced by locations. All other fields match. Directus is now
+the public location source. WordPress media dependencies and recovery originals
+remain; host retirement is outside this release. Source branches/worktrees and
+private recovery material are retained.

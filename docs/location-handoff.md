@@ -27,9 +27,9 @@ private `execution-2026-09-16/verification/completion-manifest.json`.
 | Implemented | Common location hubs, deterministic local/nearby selection, deployment snapshots, navigation/FAQ/SEO/sitemaps, model/privacy and repeatable migration/enrichment. Manual review isolation replaces the abandoned workflow work. |
 | Migrated | Five canonical page owners, 87 original unique neighborhoods, 91 immutable files, one added taxonomy-only area and 39 junctions. All 53 project/job/ZIP enrichments and the SonShine-only required constraint are applied. |
 | Published in CMS | All five location page owners are published with overviews and the existing SEO/date sets. There are 113 published neighborhoods, including the 25 approved release additions; Arroyo Vista remains archived. The 72 manual location reviews remain published. Added 25 local FAQs; the prior 45 FAQs are unchanged. |
-| Deployment | Release execution is authorized. `0271ec7` is the retained rollback baseline; release verification is tracked in the dated execution record and shared context. |
+| Deployment | PR #29 released `4967397` on September 17; Coolify reports healthy and public acceptance passed. Directus now owns the five hubs. `0271ec7` remains the retained rollback baseline. See the dated execution record. |
 | Verified | September 15 import/readback and release-candidate checks remain historical evidence. September 16 export/CI/FAQ changes pass Node 22 lint, typecheck, Tailwind, all nine location verifiers plus export tests, and 14 dynamic-route contract groups. The integrated build generates 456 pages, validates 443 route owners, and serves all five hubs with 13 matching visible/schema FAQs. |
-| Release gates | All 25 additions and 28 project connections are applied. Eleven project relations retain documented empty exceptions. Validate the combined source, final CMS snapshots and public deployment; no workflow change or project-to-job remapping is required. |
+| Completion | All 25 additions and 28 project connections are applied. Eleven project relations retain documented empty exceptions. Final-head and main-push Quality/CodeQL, rebuilt snapshots, independent review and public desktop/mobile acceptance passed. Source branches and private recovery remain retained. |
 
 ## September 16–17 content and code update
 

@@ -35,7 +35,8 @@ and [verification record](location-verification.md) before execution.
   private root `/Users/home/Documents/SonShine-Migration-Recovery/2026-09-15`.
 
 The retained rollback application is `0271ec70f46a2b31c4eb012da28459f6a9144184`.
-The integrated release is authorized; verify its actual deployment separately.
+The integrated release was deployed and verified at `4967397` on September 17;
+see [public release evidence](location-release-20260917.md#production-verification).
 No workflow save or workflow publication is part of this release. Current import totals and cleanup results belong
 in the handoff; historical plans are not current execution instructions.
 
@@ -93,7 +94,8 @@ Private abandoned patch/seed files are withdrawn evidence, never release artifac
 5. Verify that CMS edits do not change deployed location output until another build.
    Verify the unchanged sitewide review feed and manually maintained local reviews.
 6. Update verified shared-context ownership through its lint/diff/commit/sync process.
-   Public ownership remains WordPress until deployment verification succeeds.
+   The September 17 release established Directus production ownership. Treat this
+   checklist as the gate for subsequent releases, not a request to replay migration.
 
 ## Rollback
 
