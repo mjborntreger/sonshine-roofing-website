@@ -4,28 +4,35 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import LocationSectionHeading from '@/components/location/LocationSectionHeading';
 import type { LocationNeighborhood, LocationProject } from '@/lib/content/location-types';
 import type { ProjectImage } from '@/lib/content/project-types';
+import { sanitizeFaqHtml } from '@/lib/content/directus-faq-html';
 
 type Props = {
   areaId: string;
   locationName: string;
+  overviewHtml?: string | null;
   mapImage: ProjectImage | null;
   neighborhoods: LocationNeighborhood[];
   /** Published local project matches from the same deployment. */
   projects: LocationProject[];
 };
 
-export default function ServiceAreaSection({ areaId, locationName, mapImage, neighborhoods, projects }: Props) {
+export default function ServiceAreaSection({ areaId, locationName, overviewHtml, mapImage, neighborhoods, projects }: Props) {
   const coverage = neighborhoods.filter((item) => item.serviceAreaId === areaId && item.name.trim());
-  if (!mapImage && !coverage.length) return null;
+  if (!overviewHtml && !mapImage && !coverage.length) return null;
 
   return (
     <section aria-labelledby="location-coverage" className="space-y-8">
-      <LocationSectionHeading id="location-coverage" heading={`Roofing coverage in ${locationName}`}
+      <LocationSectionHeading id="location-coverage" heading={`Where We Work in ${locationName}`}
         highlightText={locationName}
         description="Explore the neighborhoods we serve, with links to our published projects where available." />
 
+      {overviewHtml ? (
+        <div className="mx-auto max-w-3xl space-y-4 text-lg leading-relaxed text-slate-700"
+          dangerouslySetInnerHTML={{ __html: sanitizeFaqHtml(overviewHtml) }} />
+      ) : null}
+
       {mapImage ? (
-        <figure className="max-w-4xl space-y-3">
+        <figure className="mx-auto max-w-4xl space-y-3">
           <Image src={mapImage.url} alt={mapImage.altText}
             width={mapImage.width || 1080} height={mapImage.height || 907}
             sizes="(max-width: 1024px) 100vw, 896px"

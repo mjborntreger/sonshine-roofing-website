@@ -183,16 +183,16 @@ check('section order and regional labels remain accurate and no business rating 
   props.faqs = [{ id: 'faq-one', title: 'Fixture question?', contentHtml: '<p>Verified &amp; safe answer.</p>' }];
   const doc = render(Hub, props);
   assert.deepEqual([...doc.querySelectorAll('[data-location-hub] h2')].map((node) => node.textContent), [
-    'Recent roofing projects in Fixture City', 'Roofing projects in nearby areas', 'What Our Customers Say',
-    'Roofing Services in Fixture City', 'Roofing coverage in Fixture City', 'Partnerships in Fixture City', 'Partnerships in nearby areas', 'Roofing questions and answers',
+    'Roofing Services in Fixture City', 'What Our Customers Say', 'Recent Roofing Projects in Fixture City',
+    'Partnerships in Fixture City', 'Partnerships in Nearby Areas', 'Where We Work in Fixture City', 'Roofing Questions and Answers',
   ]);
-  assert.match(doc.querySelector('[aria-label="Roofing projects in nearby areas"]').textContent, /Nearby Town/);
+  assert.match(doc.querySelector('[aria-label="Roofing Projects in Nearby Areas"]').textContent, /Nearby Town/);
   const reviewSection = doc.querySelector('[aria-labelledby="location-reviews"]');
   assert.equal(doc.querySelectorAll('[aria-labelledby="location-reviews"]').length, 1);
   assert.match(reviewSection.textContent, /Fixture City/);
   assert.match(reviewSection.textContent, /Nearby Town/);
   assert.doesNotMatch(reviewSection.textContent, /Reviews from|nearby areas|Nearby review/);
-  assert.match(doc.querySelector('[aria-label="Partnerships in nearby areas"]').textContent, /Nearby Town/);
+  assert.match(doc.querySelector('[aria-label="Partnerships in Nearby Areas"]').textContent, /Nearby Town/);
   assert.equal(doc.querySelectorAll('time').length, 0);
   const schema = JSON.parse(doc.querySelector('script[type="application/ld+json"]').textContent);
   assert.equal(schema['@type'], 'FAQPage');
@@ -207,7 +207,7 @@ check('all thirteen location FAQ answers appear in visible content and JSON-LD i
   const schema = JSON.parse(doc.querySelector('script[type="application/ld+json"]').textContent);
   assert.equal(schema.mainEntity.length, 13);
   assert.deepEqual(schema.mainEntity.map(item => item.name), props.faqs.map(item => item.title));
-  assert.deepEqual([...doc.querySelectorAll('[aria-label="Roofing questions and answers"] summary')].map(node => node.textContent), props.faqs.map(item => item.title));
+  assert.deepEqual([...doc.querySelectorAll('[aria-label="Roofing Questions and Answers"] summary')].map(node => node.textContent), props.faqs.map(item => item.title));
 });
 check('CMS HTML remains sanitized and review text is escaped', () => {
   const props = baseProps();

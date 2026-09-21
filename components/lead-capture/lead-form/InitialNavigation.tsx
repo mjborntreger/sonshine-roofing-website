@@ -21,8 +21,8 @@ export default function InitialNavigation({
   heading = 'How Can We Help?', headingId, highlightText, embedded = false, trustPills,
 }: Props = {}) {
   return (
-    <section aria-labelledby={headingId} className={`w-full bg-gradient-to-b from-[#eefbff] via-[#dff6ff] to-[#cef3ff] py-12${embedded ? ' rounded-3xl' : ''}`}>
-      <div className="mx-auto max-w-[1280px] px-4">
+    <section aria-labelledby={headingId} className={embedded ? 'w-full' : 'w-full bg-gradient-to-b from-[#eefbff] via-[#dff6ff] to-[#cef3ff] py-12'}>
+      <div className={embedded ? 'mx-auto max-w-[1280px]' : 'mx-auto max-w-[1280px] px-4'}>
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[--brand-blue]">
             Explore Services
