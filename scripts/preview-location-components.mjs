@@ -9,7 +9,8 @@ import ts from 'typescript';
 
 // Local visual preparation only. No CMS reads, real customer records, or app routes.
 const root = fileURLToPath(new URL('../', import.meta.url));
-const output = '/private/tmp/sonshine-location-migration-20260915/visual-preview';
+const output = resolve(process.env.LOCATION_PREVIEW_OUTPUT || '/private/tmp/sonshine-location-migration-20260915/visual-preview');
+const baselineRoot = resolve(process.env.LOCATION_PREVIEW_BASELINE_ROOT || root);
 const require = createRequire(import.meta.url);
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
@@ -73,14 +74,14 @@ mkdirSync(join(output, 'assets'), { recursive: true, mode: 0o700 });
 chmodSync(output, 0o700);
 chmodSync(join(output, 'assets'), 0o700);
 
-const cssFiles = readdirSync(join(root, '.next/static/chunks')).filter((name) => name.endsWith('.css')).sort();
+const cssFiles = readdirSync(join(baselineRoot, '.next/static/chunks')).filter((name) => name.endsWith('.css')).sort();
 assert.ok(cssFiles.length, 'An existing baseline build must provide the real site CSS.');
 for (const name of cssFiles) {
-  const css = readFileSync(join(root, '.next/static/chunks', name), 'utf8').replaceAll('../media/', './');
+  const css = readFileSync(join(baselineRoot, '.next/static/chunks', name), 'utf8').replaceAll('../media/', './');
   save(`assets/${name}`, css);
 }
-for (const name of readdirSync(join(root, '.next/static/media')).filter((name) => name.endsWith('.woff2'))) {
-  copyFileSync(join(root, '.next/static/media', name), join(output, 'assets', name));
+for (const name of readdirSync(join(baselineRoot, '.next/static/media')).filter((name) => name.endsWith('.woff2'))) {
+  copyFileSync(join(baselineRoot, '.next/static/media', name), join(output, 'assets', name));
   chmodSync(join(output, 'assets', name), 0o600);
 }
 // Preserve the actual baseline font CSS and generate current utilities without
@@ -149,11 +150,11 @@ function projectRecord(area, index) {
   };
 }
 const projectPool = areas.flatMap((area) => Array.from({ length: area.localCount }, (_, index) => projectRecord(area, index)));
-const reviewPool = areas.flatMap((area, areaIndex) => Array.from({ length: areaIndex === 4 ? 0 : 3 }, (_, index) => ({
+const reviewPool = areas.flatMap((area, areaIndex) => Array.from({ length: [15, 13, 4, 21, 19][areaIndex] }, (_, index) => ({
   id: `${area.slug}-review-${index}`, clientSlug, status: 'published', serviceAreaIds: [area.slug], rating: 5,
-  authorName: `Fixture Reviewer ${String.fromCharCode(65 + areaIndex * 3 + index)}`, areaName: area.name,
+  authorName: `Fixture Reviewer ${area.name} ${index + 1}`, areaName: area.name,
   text: index === 1 ? 'Synthetic review copy with a little more detail. The crew explained the work and kept the process clear. This example exists only to inspect the review-card layout.' : 'Synthetic review for layout inspection. This is not a real customer testimonial.',
-  date: index === 2 ? null : `2026-07-${String(20 - index).padStart(2, '0')}T12:00:00Z`, url: null,
+  date: index === 2 ? null : `2026-07-${String(28 - index).padStart(2, '0')}T12:00:00Z`, url: 'https://example.com/review',
 })));
 const sponsorPool = areas.flatMap((area, areaIndex) => Array.from({ length: areaIndex === 0 ? 4 : areaIndex === 4 ? 0 : 1 }, (_, index) => ({
   id: `${area.slug}-partner-${index}`, clientSlug, status: 'published', serviceAreaIds: [area.slug], sort: index, areaNames: [area.name],
@@ -172,8 +173,8 @@ function makeFixture(area, empty = false) {
   const neighbors = [areas[(areaIndex + 1) % areas.length].slug, areas[(areaIndex + 2) % areas.length].slug];
   const selection = { areaId: area.slug, nearbyAreaIds: neighbors, clientSlug };
   return {
-    page: { id: area.slug, name: area.name, slug: area.slug, clientSlug, title: `Roofing services in ${area.name}`,
-      introduction: `This synthetic ${area.name} introduction demonstrates concise local copy. The page brings together projects, reviews, services, and neighborhood coverage from a deployment snapshot.`,
+    page: { id: area.slug, name: area.name, slug: area.slug, clientSlug, title: `The BEST Roofing Company in ${area.name} for Over 39 Years`,
+      introduction: `Explore roofing services, coverage, and published projects in ${area.name}.`,
       overviewHtml: empty ? null : '<p>Every project, review, neighborhood, partner, and map below is an illustrative fixture for layout review. No local claim or relationship on this preview has been approved for publication.</p>',
       mapImage: empty || areaIndex === 2 ? null : { url: './assets/coverage.svg', altText: 'Synthetic service coverage diagram with no customer-home pins', width: 1080, height: 700 } },
     projects: empty ? { local: [projectRecord(area, 1)], nearby: [] } : selectLocationContent(projectPool, { ...selection, kind: 'projects' }),
@@ -207,6 +208,7 @@ for (const area of [...areas, { ...areas[0], empty: true }]) {
   currentSlug = area.slug;
   const slug = area.empty ? 'empty-null-neighborhood' : area.slug;
   const fixture = makeFixture(area, area.empty);
+  save(`${slug}.fixture.json`, `${JSON.stringify({ fixture, settings })}\n`);
   const body = renderToStaticMarkup(React.createElement(SiteSettingsProvider, { value: settings }, React.createElement(Hub, fixture)));
   assert.ok(!body.includes('data-msg='), 'Suspense must not hide a component render failure.');
   const banner = `<aside class="fixture-banner"><strong>FIXTURE ONLY — ${area.empty ? 'Empty sections and null neighborhood' : area.name}.</strong> Synthetic copy, projects, reviews, neighborhoods, partners and media. No actual migrated content has been accepted. Static preview; forms and players are inactive.<a href="./index.html">Preview index</a></aside>`;

@@ -39,6 +39,7 @@
     "migrate:videos:apply": "node scripts/migrate-wordpress-videos.mjs --apply",
     "verify:location-selection": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-location-selection.mjs",
     "verify:location-components": "node scripts/verify-location-components.mjs",
+    "verify:review-carousel": "node scripts/verify-review-carousel.mjs",
     "verify:location-pipeline": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-location-pipeline.mjs",
     "verify:location-model": "node scripts/verify-location-model.mjs",
     "verify:location-review-isolation": "node scripts/verify-location-review-isolation.mjs",

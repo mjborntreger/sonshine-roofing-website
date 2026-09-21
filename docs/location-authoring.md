@@ -1,7 +1,7 @@
 # Authoring location hubs
 
-This describes the implemented candidate. Production cutover is pending; consult
-[release status and recovery](location-release.md) before publishing.
+The five location hubs were released on September 17, 2026. Consult
+[release status and recovery](location-release.md) before publishing later changes.
 
 ## Prepare the canonical area
 
@@ -32,6 +32,13 @@ indexable only after editorial review and a successful deployment.
   old file and source bytes for rollback.
 - Store verified neighborhood photos in `image`; `coverage_map` is reserved for
   actual maps. Both are optional and need accurate image descriptions.
+- For a photo requiring credit, store `metadata.attribution` on its Directus file.
+  Required fields are `title`, `creator`, `source_url`, `license`, and `license_url`;
+  `creator_url` and `changes` are optional. Use absolute HTTP(S) links without
+  credentials. The neighborhood card displays the credit below the uncropped
+  image. Record actual image transformations in `changes` when required.
+  The build must receive file metadata as an object or explicit null; only these
+  public credit fields enter the snapshot, never arbitrary metadata or EXIF.
 - Projects retain a required primary service area. Neighborhood is nullable and
   shown only when verified; a missing value produces no label or placeholder.
   The private AccuLynx job reference and ZIP never enter website snapshots.
@@ -41,10 +48,12 @@ indexable only after editorial review and a successful deployment.
   recursively. An area can supply content with no landing page, provided its
   taxonomy and content are published and client-scoped.
 
-Projects and reviews show at most six combined: local first, newest dates first,
-missing dates last. Reviews require verified rating five and editorial publication;
-Google feed membership/identity are irrelevant to local eligibility. Sponsors
-show every local match, then nearby matches toward three total. Regional cards
+Projects show at most six combined: local first, newest dates first, missing dates
+last. Reviews show all eligible local records, adding directly approved nearby
+records only when needed to reach six. They share one carousel with no separate
+nearby heading or badge. Reviews require verified rating five and editorial
+publication; Google feed membership/identity are irrelevant to local eligibility.
+Sponsors show every local match, then nearby matches toward three total. Cards
 keep their actual area labels. Fewer eligible records produce fewer cards.
 
 ## Reviews and FAQs

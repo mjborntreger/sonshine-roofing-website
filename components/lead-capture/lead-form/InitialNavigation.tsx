@@ -1,5 +1,7 @@
 import { ArrowRight } from 'lucide-react';
+import type { ReactNode } from 'react';
 import SmartLink from '@/components/utils/SmartLink';
+import { renderHighlight } from '@/components/utils/renderHighlight';
 import { LEAD_NAVIGATION_CARDS } from '@/components/lead-capture/lead-form/config';
 import {
   PROJECT_OPTION_CARD_BASE_CLASS,
@@ -7,20 +9,31 @@ import {
   ProjectOptionCardContent,
 } from '@/components/lead-capture/lead-form/ProjectOptionCard';
 
-export default function InitialNavigation() {
+type Props = {
+  heading?: string;
+  headingId?: string;
+  highlightText?: string | readonly string[];
+  embedded?: boolean;
+  trustPills?: ReactNode;
+};
+
+export default function InitialNavigation({
+  heading = 'How Can We Help?', headingId, highlightText, embedded = false, trustPills,
+}: Props = {}) {
   return (
-    <section className="w-full bg-gradient-to-b from-[#eefbff] via-[#dff6ff] to-[#cef3ff] py-12">
+    <section aria-labelledby={headingId} className={`w-full bg-gradient-to-b from-[#eefbff] via-[#dff6ff] to-[#cef3ff] py-12${embedded ? ' rounded-3xl' : ''}`}>
       <div className="mx-auto max-w-[1280px] px-4">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[--brand-blue]">
             Explore Services
           </p>
-          <h2 className="mt-4 text-3xl font-semibold text-slate-900 md:text-5xl">
-            How Can We Help?
+          <h2 id={headingId} className="mt-4 text-3xl font-semibold text-slate-900 md:text-5xl">
+            {renderHighlight(heading, highlightText)}
           </h2>
           <p className="mt-3 text-sm text-slate-600 md:text-base">
             Prefer to learn more first? Start with the page that fits your situation.
           </p>
+          {trustPills}
         </div>
 
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -1,89 +1,82 @@
 'use client';
 
-import { useCallback, useEffect, useState, type ComponentType } from 'react';
-import type { Review } from './types';
+import { useCallback, useEffect, useRef, useState, type ComponentType } from 'react';
+import type { CarouselReview, ReviewsSliderProps } from './types';
 
-type Props = {
-  reviews: Review[];
-  gbpUrl: string;
-  fallbackId?: string;
-};
+type Props = { reviews: CarouselReview[]; fallbackId: string };
 
-type SliderComponent = ComponentType<Pick<Props, 'reviews' | 'gbpUrl'>>;
-
-export default function ReviewsSliderLazy({
-  reviews,
-  gbpUrl,
-  fallbackId,
-}: Props) {
-  const [Slider, setSlider] = useState<SliderComponent | null>(null);
+export default function ReviewsSliderLazy({ reviews, fallbackId }: Props) {
+  const [Slider, setSlider] = useState<ComponentType<ReviewsSliderProps> | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const initialized = useRef(false);
 
-  const hideFallback = useCallback(() => {
-    if (!fallbackId) return;
-    const fallbackEl = document.getElementById(fallbackId);
-    if (fallbackEl) {
-      fallbackEl.classList.add('hidden');
-      fallbackEl.setAttribute('data-hidden-by', 'reviews-slider');
+  const revealFallback = useCallback(() => {
+    const fallback = document.getElementById(fallbackId);
+    if (fallback) {
+      fallback.hidden = false;
+      fallback.classList.remove('hidden');
+      fallback.removeAttribute('data-hidden-by');
     }
   }, [fallbackId]);
 
+  const handleReady = useCallback(() => {
+    initialized.current = true;
+    const fallback = document.getElementById(fallbackId);
+    if (fallback) {
+      // Keep the reader's current focus intact if they are using a fallback source link.
+      if (fallback.contains(document.activeElement)) return;
+      fallback.hidden = true;
+      fallback.classList.add('hidden');
+      fallback.setAttribute('data-hidden-by', 'reviews-slider');
+    }
+    setReady(true);
+  }, [fallbackId]);
+
+  const handleError = useCallback(() => {
+    initialized.current = false;
+    revealFallback();
+    setReady(false);
+    setFailed(true);
+  }, [revealFallback]);
+
+  useEffect(() => {
+    const fallback = document.getElementById(fallbackId);
+    const onFocusOut = () => {
+      if (initialized.current && !failed) requestAnimationFrame(handleReady);
+    };
+    fallback?.addEventListener('focusout', onFocusOut);
+    return () => {
+      fallback?.removeEventListener('focusout', onFocusOut);
+      revealFallback();
+    };
+  }, [fallbackId, Slider, failed, handleReady, revealFallback]);
+
   useEffect(() => {
     if (shouldLoad) return;
-    if (typeof window === 'undefined') return;
-
-    let triggered = false;
-
-    const cleanup = () => {
-      window.removeEventListener('scroll', handleEvent);
-      window.removeEventListener('wheel', handleEvent);
-      window.removeEventListener('touchmove', handleEvent);
-      window.removeEventListener('keydown', handleEvent);
-    };
-
-    const triggerLoad = () => {
-      if (triggered) return;
-      triggered = true;
-      hideFallback();
-      setShouldLoad(true);
-      cleanup();
-    };
-
-    const handleEvent = () => triggerLoad();
-
-    if (window.scrollY > 0) {
-      triggerLoad();
-      return cleanup;
-    }
-
-    window.addEventListener('scroll', handleEvent, { passive: true });
-    window.addEventListener('wheel', handleEvent, { passive: true });
-    window.addEventListener('touchmove', handleEvent, { passive: true });
-    window.addEventListener('keydown', handleEvent);
-
-    return cleanup;
-  }, [shouldLoad, hideFallback]);
+    const triggerLoad = () => setShouldLoad(true);
+    const events = ['scroll', 'wheel', 'touchmove', 'keydown'] as const;
+    events.forEach(event => window.addEventListener(event, triggerLoad, { passive: true }));
+    if (window.scrollY > 0) triggerLoad();
+    return () => events.forEach(event => window.removeEventListener(event, triggerLoad));
+  }, [shouldLoad]);
 
   useEffect(() => {
-    if (!shouldLoad || Slider) return;
+    if (!shouldLoad || Slider || failed) return;
     let cancelled = false;
-
     import('./ReviewsSlider').then(mod => {
       if (!cancelled) setSlider(() => mod.default);
+    }).catch(() => {
+      if (!cancelled) handleError();
     });
+    return () => { cancelled = true; };
+  }, [shouldLoad, Slider, failed, handleError]);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [shouldLoad, Slider]);
-
-  useEffect(() => {
-    if (!Slider) return;
-    const frame = requestAnimationFrame(hideFallback);
-    return () => cancelAnimationFrame(frame);
-  }, [Slider, hideFallback]);
-
-  return Slider ? (
-    <Slider reviews={reviews} gbpUrl={gbpUrl} />
-  ) : null;
+  if (!Slider || failed) return null;
+  return (
+    <div aria-hidden={!ready || undefined} style={ready ? undefined : { position: 'absolute', width: '100%', visibility: 'hidden' }}>
+      <Slider key={reviews.map(review => review.id).join('|')} reviews={reviews} onReady={handleReady} onError={handleError} />
+    </div>
+  );
 }

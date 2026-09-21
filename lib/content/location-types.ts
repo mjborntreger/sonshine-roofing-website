@@ -52,6 +52,16 @@ export type LocationSponsor = GeographicRecord & {
   areaNames: string[];
   feature: SponsorFeature;
 };
+export type ImageAttribution = {
+  title: string;
+  creator: string;
+  creatorUrl: string | null;
+  sourceUrl: string;
+  license: string;
+  licenseUrl: string;
+  changes: string | null;
+};
+export type NeighborhoodImage = ProjectImage & { attribution?: ImageAttribution | null };
 export type LocationNeighborhood = {
   id: string;
   name: string;
@@ -59,7 +69,7 @@ export type LocationNeighborhood = {
   serviceAreaId: string;
   description: string | null;
   landmarks: string | null;
-  image: ProjectImage | null;
+  image: NeighborhoodImage | null;
   mapImage: ProjectImage | null;
   sort: number;
 };

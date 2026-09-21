@@ -16,11 +16,15 @@ import { useSiteSettings } from '@/lib/content/site-settings-context';
 type HeroProps = {
   scriptFontClassName: string;
   title?: string;
+  highlightText?: string | readonly string[];
+  description?: string;
 };
 
 export default function Hero({
   scriptFontClassName,
   title = 'The BEST Roofing Company in Sarasota, Manatee, and Charlotte Counties for over 39 years',
+  highlightText = ['BEST', 'over 39 years'],
+  description,
 }: HeroProps) {
   const { heroImage, heroVideo, licenseNumber, licenseUrl } = useSiteSettings();
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -29,7 +33,7 @@ export default function Hero({
   const [isNearViewport, setIsNearViewport] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const restoredSuccess = useMemo<LeadSuccessRestore | null>(() => restoreLeadSuccessState(), []);
-  const renderedTitle = renderHighlight(title, ['BEST', 'over 39 years'], 'text-[--brand-cyan]');
+  const renderedTitle = renderHighlight(title, highlightText, 'text-[--brand-cyan]');
   const shouldMountVideo = allowsMotion && isNearViewport && Boolean(heroVideo?.url);
 
   useEffect(() => {
@@ -140,6 +144,9 @@ export default function Hero({
             <h1 className="my-8 text-3xl sm:text-4xl leading-[3rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">
               {renderedTitle}
             </h1>
+            {description ? (
+              <p className="text-lg leading-relaxed text-blue-50 md:text-xl">{description}</p>
+            ) : null}
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
               <SmartLink

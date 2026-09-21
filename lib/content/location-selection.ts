@@ -62,5 +62,8 @@ export function selectLocationContent<T extends GeographicRecord>(
   if (kind === 'sponsors') {
     return { local, nearby: nearby.slice(0, Math.max(0, 3 - local.length)) };
   }
+  if (kind === 'reviews') {
+    return { local, nearby: nearby.slice(0, Math.max(0, 6 - local.length)) };
+  }
   return { local: local.slice(0, 6), nearby: nearby.slice(0, Math.max(0, 6 - local.length)) };
 }
