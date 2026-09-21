@@ -1,4 +1,4 @@
-import Image from "next/image";
+import StaticImage from "@/components/media/StaticImage";
 
 import { Accordion } from "@/components/ui/Accordion";
 import { cn } from "@/lib/utils";
@@ -93,9 +93,9 @@ export default function ProgramCard({
           <div className="flex items-center gap-2">
             {/* Optional logo placeholder — add real URL if available */}
             {logoUrl ? (
-              <Image
+              <StaticImage
                 src={logoUrl}
-                alt={title}
+                alt="" decorative
                 width={96}
                 height={32}
                 className="h-8 w-auto opacity-70"

@@ -35,7 +35,7 @@ if (directusUrl) {
 const nextConfig = {
   typedRoutes: true,
   output: 'standalone',
-  outputFileTracingIncludes: { '/*': ['./.generated/projects.json'] },
+  outputFileTracingIncludes: { '/*': ['./.generated/projects.json', './.generated/static-media.json'] },
   // Keep WordPress and Directus traffic bounded while static pages are generated.
   experimental: {
     cpus: 2,

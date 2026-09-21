@@ -20,7 +20,7 @@ import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, webPageSchema } from '@/lib/seo/schema';
 import { getServicePageConfig } from '@/lib/seo/service-pages';
 import { SITE_ORIGIN } from '@/lib/seo/site';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import Hero from '@/components/ui/Hero';
 import SmartLink from '@/components/utils/SmartLink';
 import SidebarCta from '@/components/cta/SidebarCta';
@@ -81,7 +81,7 @@ export default async function Page() {
         eyelash="Who we are"
         subtitle="Family-owned roofing company based in Sarasota, Florida, serving Sarasota, Manatee, and Charlotte County residents with 39+ years of experience."
         justifyStart
-        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Roofing-Team-Wide-Angle.webp"
+        imageSrc="static:sonshine-roofing-team-and-work-trucks"
         badges={[
           { icon: ShieldCheck, label: 'Licensed & Insured' },
           { icon: MapPin, label: 'Local & Family-owned' },
@@ -167,9 +167,8 @@ export default async function Page() {
                 warranties and our own 25-year Leak Free Guarantee.
               </p>
               <div className="flex items-center justify-self-center">
-                <Image
-                  src="https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Roofing-Team-Wide-Angle.webp"
-                  alt="Wide Angle Shot of The SonShine Roofing Team"
+                <StaticImage
+                  src="static:sonshine-roofing-team-and-work-trucks"
                   title="SonShine Roofing Team"
                   width={800}
                   height={225}

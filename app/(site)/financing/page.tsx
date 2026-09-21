@@ -4,7 +4,7 @@ import ProgramCard from '@/components/marketing/financing/ProgramCard';
 import MonthlyEstimator from '@/components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
 import { Suspense } from "react";
-import Image from "next/image";
+import StaticImage from "@/components/media/StaticImage";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import { listFaqs } from "@/lib/content/directus-faqs";
 import { getWebsitePageMetadata } from "@/lib/content/directus-site";
@@ -120,7 +120,7 @@ export default async function FinancingPage() {
           { icon: Percent, label: "Equity-based Options" },
           { icon: DollarSign, label: "Credit-based Options" },
         ]}
-        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Browse-Financing-Options.webp"
+        imageSrc="static:financing-options-couple-wide"
       >
         <div className="flex justify-center gap-6 flex-wrap mx-auto max-w-3xl">
           <div>
@@ -163,7 +163,7 @@ export default async function FinancingPage() {
               theme="orange"
               title="YGrene PACE Financing (Equity‑based)"
               subtitle="House‑secured. Payments typically included in your property‑tax bill."
-              logoUrl="https://wp.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
+              logoUrl="static:ygrene-logo"
               chips={["No credit check", "Tax‑bill payments", "Equity‑based", "Fast approval"]}
               keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
               sampleMonthly={`${sampleMonthly849} on ${currency(defaultAmount)} (15yr @ 8.49%)`}
@@ -188,7 +188,7 @@ export default async function FinancingPage() {
               theme="cyan"
               title="Service Finance (Credit‑based)"
               subtitle="Signature loan with flexible terms. No lien on your property."
-              logoUrl="https://wp.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
+              logoUrl="static:service-finance-logo"
               chips={["Signature loan", "Fixed term", "Fast approval"]}
               keyFigures={["0% for 12 months", "From 7.9% fixed", per10kService]}
               sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
@@ -300,10 +300,10 @@ export default async function FinancingPage() {
                   id="ygrene-docs"
                   className="text-xl font-semibold text-slate-900">YGrene PACE Financing (Equity‑based)
                 </h3>
-                <Image
-                  src="https://wp.sonshineroofing.com/wp-content/uploads/ygrene-financing-logo.webp"
+                <StaticImage
+                  src="static:ygrene-logo"
                   title="Ygrene Financing Logo"
-                  alt="Ygrene Financing Logo"
+                  alt="" decorative
                   className="h-6 w-auto opacity-70"
                   width={160}
                   height={48}
@@ -343,10 +343,10 @@ export default async function FinancingPage() {
                 >
                   Service Finance (Credit‑based)
                 </h3>
-                <Image
-                  src="https://wp.sonshineroofing.com/wp-content/uploads/service-finance-logo.png"
+                <StaticImage
+                  src="static:service-finance-logo"
                   title="Service Finance Logo"
-                  alt="Service Finance Logo"
+                  alt="" decorative
                   className="h-8 w-auto opacity-70"
                   width={180}
                   height={64}

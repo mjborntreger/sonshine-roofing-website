@@ -6,6 +6,7 @@ const DIRECTUS_FETCHERS = [
   'lib/content/directus-projects.mjs',
   'lib/content/directus-locations.mjs',
   'lib/content/directus-videos.mjs',
+  'lib/content/directus-static-media.mjs',
   'lib/content/directus-build-settings.mjs',
   'lib/content/directus-faqs.ts',
   'lib/content/directus-legal-copy.ts',

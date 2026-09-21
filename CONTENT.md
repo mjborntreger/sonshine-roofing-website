@@ -3,10 +3,10 @@
 ## Where content lives
 
 - Directus `roofing_service_areas` owns location landing pages. The five hubs were deployed and verified on September 17; see [release evidence](docs/location-release-20260917.md).
-- The WordPress host also serves hard-coded `/wp-content/uploads` assets used by
-  local routes and components. This media dependency is separate from
-  WPGraphQL content ownership; audit or migrate those URLs before retiring the
-  host.
+- Static image selections use Directus File Library originals in
+  `/clients/sonshine_roofing/static`; metadata is deployment-frozen as described
+  below. Retain legacy WordPress sources until a separately authorized cleanup
+  after proven production cutover.
 - Directus, filtered by related `client.slug = DIRECTUS_CLIENT_SLUG`:
   - `blog_posts` and flat, client-scoped `blog_topics`: the exclusive blog
     source for archives, filters, post pages, recommendations, metadata, and
@@ -34,9 +34,34 @@
   - `roofing_glossary_terms`: the exclusive source for the glossary archive,
     term routes, route-owned SEO, contextual term linking, and glossary sitemap.
 - Next.js app pages: route layouts, components, and page body copy not yet moved to Directus.
-- Homepage and About YouTube placements remain hard-coded. The entire
-  `/truck-for-sale` page, including both videos, is excluded from Directus-backed
-  content and CMS migration work. Its code remains the authoring source.
+- Home and About select published Directus videos from the shared build
+  snapshot. Both belong to the public video library. The personal
+  `/truck-for-sale` page keeps its body and two YouTube videos completely
+  code-owned and stays `noindex, nofollow`; its images use Directus originals.
+  Truck videos have no CMS records, library membership or snapshot selectors.
+
+## Static images
+
+- `lib/content/static-image-files.mjs` holds stable file selections. The build
+  fetches only those files from the SonShine static folder, validates image MIME,
+  description, intrinsic dimensions and original-pixel focal coordinates, and
+  writes private `.generated/static-media.json`. Missing or invalid data fails
+  the build. File metadata edits become visible through a new build/deployment.
+- `staticImage` and `staticImageUrl` are server-only selectors. `DirectusImage`
+  renders their public fields synchronously with Next Image delivery. Shared
+  client header/lead forms receive only their selected public metadata through
+  `StaticMediaProvider`; the standalone truck gallery receives its own records.
+  Credentials, complete CMS exports and private snapshots stay server-side.
+- Description is the informative-image default. Decorative illustrations use
+  empty alt; logo links use a contextual link name. Cropped images opt into
+  focal positioning: explicit usage/style position, then file focal converted
+  from original pixels, then center. Decorative Hero backgrounds use the same
+  precedence with top-center as their final fallback. Full logos and lightboxes
+  retain the complete image. Existing CMS images keep their current presentation.
+- Preserve originals and distinct crops/resolutions. Replace a published image
+  by uploading a new file and changing its selection, so old deployments retain
+  their referenced media. Migration evidence, approvals, originals and recovery
+  ledgers are private and do not belong in this repository.
 
 ## Publishing shared site content in Directus
 
@@ -248,6 +273,16 @@
 - `published_at` controls newest-first website chronology. True YouTube upload
   dates are separate metadata; absence of a verified upload date never causes
   the website timestamp to be presented as YouTube's upload date.
+- Home/About select their required published entries through `getPageVideo`.
+  Directus owns their names and descriptions. About's September 21, 2026
+  `published_at` records its new library admission, not its historical first use
+  on the About page. YouTube upload dates use the existing batched build lookup;
+  missing optional metadata never starts a runtime metadata fetch.
+- These supporting placements emit an initial player iframe and matching
+  `VideoObject` with an embed URL, omitting `contentUrl` because YouTube watch
+  pages are not video-byte URLs. Playback preserves muted viewport autoplay,
+  looping and reduced-motion click activation. Their player starts paused until
+  activation. Dedicated watch-page eligibility is not implied.
 - Projects and videos share the private `.generated/projects.json` artifact.
   Save CMS changes, complete a successful build, and deploy it to publish.
   The library, player lookup, resources API, project players, and video sitemap

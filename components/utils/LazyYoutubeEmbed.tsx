@@ -6,6 +6,8 @@ import clsx from "clsx";
 
 type LazyYoutubeEmbedProps = {
   videoId: string;
+  /** Emit a real player in initial HTML for indexable supporting placements. */
+  discoverable?: boolean;
   title: string;
   className?: string;
   posterUrl?: string;
@@ -49,6 +51,7 @@ export default function LazyYoutubeEmbed({
   posterUrl,
   host = "youtube-nocookie",
   query,
+  discoverable = false,
 }: LazyYoutubeEmbedProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isActive, setIsActive] = useState(false);
@@ -64,7 +67,7 @@ export default function LazyYoutubeEmbed({
   }, []);
 
   useEffect(() => {
-    if (isActive || prefersReduceMotion) return;
+    if (isActive || prefersReduceMotion || (discoverable && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
     const node = containerRef.current;
     if (!node) return;
 
@@ -80,7 +83,7 @@ export default function LazyYoutubeEmbed({
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [isActive, prefersReduceMotion]);
+  }, [isActive, prefersReduceMotion, discoverable]);
 
   const activate = () => {
     setIsActive(true);
@@ -98,16 +101,19 @@ export default function LazyYoutubeEmbed({
         className
       )}
     >
-      {isActive ? (
+      {isActive || discoverable ? (
         <iframe
           className="absolute inset-0 h-full w-full"
-          src={src}
+          src={isActive ? src : `${baseUrl}${videoId}?${buildQuery(videoId, { ...query, autoplay: 0 })}`}
           title={title}
+          tabIndex={isActive ? undefined : -1}
+          aria-hidden={!isActive || undefined}
           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           loading="lazy"
         />
-      ) : (
+      ) : null}
+      {!isActive ? (
         <>
           <Image
             src={poster}
@@ -142,7 +148,7 @@ export default function LazyYoutubeEmbed({
             </div>
           )}
         </>
-      )}
+      ) : null}
     </div>
   );
 }

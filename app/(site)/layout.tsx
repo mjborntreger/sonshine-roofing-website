@@ -1,3 +1,7 @@
+import { StaticMediaProvider } from '@/components/media/StaticMediaProvider';
+import { SITE_CLIENT_IMAGE_KEYS } from '@/lib/content/static-image-client-keys';
+import { selectStaticImages } from '@/lib/content/static-media';
+import { staticImageUrl } from '@/lib/content/static-media';
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
 import Header from '@/components/global-nav/header/Header';
@@ -46,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
               alt: ogImage.description,
             }
           : {
-              url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+              url: staticImageUrl('sonshine-roofing-social-card'),
               width: 1200,
               height: 630,
               alt: 'SonShine Roofing, Sarasota, FL',
@@ -94,7 +98,7 @@ export const viewport: Viewport = {
 };
 
 const BASE_URL = SITE_ORIGIN;
-const LOGO_URL_512 = 'https://sonshineroofing.com/wp-content/uploads/cropped-GBP-logo.png'; // 512×512
+const LOGO_URL_512 = staticImageUrl('sonshine-roofing-square-logo'); // 512×512
 
 function getGlobalSchema(settings: SiteSettings | null) {
   const baseUrl = settings?.siteUrl ?? BASE_URL;
@@ -243,6 +247,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <SiteSettingsProvider value={publicSettings}>
+      <StaticMediaProvider images={selectStaticImages(SITE_CLIENT_IMAGE_KEYS)}>
       <div
         id="page-top"
         className="
@@ -270,6 +275,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         <Footer settings={settings} services={services} navigation={navigation} serviceAreas={listCoverageAreas()} />
         <JsonLd data={getGlobalSchema(settings)} />
       </div>
+    </StaticMediaProvider>
     </SiteSettingsProvider>
   );
 }
