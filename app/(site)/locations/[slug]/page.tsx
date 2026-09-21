@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { getLocationBySlug, getLocationHubContent, listLocationSlugs, locationSnapshotId } from '@/lib/content/locations';
-import { getServices, getSiteSettings } from '@/lib/content/directus-site';
+import { getSiteSettings } from '@/lib/content/directus-site';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import LocationHub from '@/components/location/LocationHub';
 
@@ -26,6 +26,5 @@ export default async function LocationPage({ params }: Props) {
   const { slug } = await params;
   const content = await getLocationHubContent(slug);
   if (!content) notFound();
-  const services = await getServices();
-  return <div data-location-snapshot={locationSnapshotId()}><LocationHub {...content} services={services} /></div>;
+  return <div data-location-snapshot={locationSnapshotId()}><LocationHub {...content} /></div>;
 }

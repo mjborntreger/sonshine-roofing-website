@@ -126,10 +126,13 @@
   revision is supplied and its before-image still matches. Leave a project
   neighborhood empty with a documented exception when no recognized neighborhood
   can be verified.
-- Select only directly approved `roofing_service_area_neighbors`. Projects and
-  reviews show up to six combined, local first. Sponsors show every local match,
-  then nearby matches toward three. Empty sections and absent neighborhoods/maps
-  disappear. Unassigned records are not geographic backfill.
+- Select only directly approved `roofing_service_area_neighbors`. Projects show
+  up to six combined, local first. Reviews show every eligible local review and,
+  when there are fewer than six, enough approved nearby reviews to reach six if
+  available. Render the selected reviews in one carousel without separate nearby
+  headings or badges. Sponsors show every local match, then nearby matches toward
+  three. Empty sections and absent neighborhoods/maps disappear. Unassigned
+  records are not geographic backfill.
 - Canonical coverage relations replace copied names/URLs. Navigation may use
   `link_type=service_area` with a service-area relation; published pages get links,
   taxonomy-only areas can remain plain coverage text. Keep CMS sort order.

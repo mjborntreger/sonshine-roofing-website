@@ -1,362 +1,242 @@
 'use client';
 
 import AutoScroll from 'embla-carousel-auto-scroll';
-import EmblaCarousel, { type EmblaOptionsType } from 'embla-carousel';
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import EmblaCarousel, { type EmblaCarouselType } from 'embla-carousel';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { ArrowLeft, ArrowRight, ArrowUpRight, Pause, Play, Quote, X } from 'lucide-react';
 import SmartLink from '../utils/SmartLink';
-import { ArrowUpRight, Quote } from 'lucide-react';
-import Image from 'next/image';
-import type { Review } from './types';
+import ReviewAttribution from './ReviewAttribution';
+import type { ReviewsSliderProps } from './types';
 
-const ordinalize = (day: number): string => {
-  const j = day % 10;
-  const k = day % 100;
-  if (j === 1 && k !== 11) return `${day}st`;
-  if (j === 2 && k !== 12) return `${day}nd`;
-  if (j === 3 && k !== 13) return `${day}rd`;
-  return `${day}th`;
-};
+const CONTROL_CLASS = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-blue-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue disabled:cursor-default disabled:opacity-40';
 
-const formatReviewDate = (time?: number | null, fallback?: string | null | undefined): string | null => {
-  if (typeof time === 'number' && Number.isFinite(time) && time > 0) {
-    const date = new Date(time * 1000);
-    if (!Number.isNaN(date.getTime())) {
-      const month = date.toLocaleString('en-US', { month: 'long' });
-      const day = ordinalize(date.getDate());
-      const year = date.getFullYear();
-      return `${month} ${day}, ${year}`;
-    }
-  }
-  return fallback?.trim() || null;
-};
-
-export default function ReviewsSlider({
-  reviews,
-  gbpUrl,
-}: {
-  reviews: Review[];
-  gbpUrl: string;
-}) {
-  // Continuous auto-scroll (linear), infinite loop, pause on hover
-  const autoScrollOptions = useMemo(
-    () => ({ speed: 1, startDelay: 0, stopOnInteraction: false, stopOnMouseEnter: false }),
-    []
-  );
-
-  const emblaOptions = useMemo<EmblaOptionsType>(
-    () => ({ align: 'start', loop: true, containScroll: 'keepSnaps', dragFree: true }),
-    []
-  );
-
+export default function ReviewsSlider({ reviews, onReady, onError }: ReviewsSliderProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
-  const autoScrollPluginRef = useRef<ReturnType<typeof AutoScroll> | null>(null);
-
-  useEffect(() => {
-    if (!viewportRef.current) return;
-
-    const autoScrollPlugin = AutoScroll(autoScrollOptions);
-    autoScrollPluginRef.current = autoScrollPlugin;
-    const emblaInstance = EmblaCarousel(
-      viewportRef.current,
-      emblaOptions,
-      [autoScrollPlugin]
-    );
-
-    return () => {
-      autoScrollPluginRef.current = null;
-      emblaInstance.destroy();
-    };
-  }, [autoScrollOptions, emblaOptions]);
-
-  // Modal state
+  const emblaRef = useRef<EmblaCarouselType | null>(null);
+  const autoScrollRef = useRef<ReturnType<typeof AutoScroll> | null>(null);
+  const [canScroll, setCanScroll] = useState(false);
+  const [canGoBack, setCanGoBack] = useState(false);
+  const [canGoForward, setCanGoForward] = useState(false);
+  const [carouselVersion, setCarouselVersion] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(true);
+  const [paused, setPaused] = useState(false);
+  const [hovered, setHovered] = useState(false);
+  const [focusPaused, setFocusPaused] = useState(false);
   const [modalIndex, setModalIndex] = useState<number | null>(null);
+  const modalRef = useRef<HTMLDivElement | null>(null);
   const closeBtnRef = useRef<HTMLButtonElement | null>(null);
-  const scrollYRef = useRef(0);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
+  const modalTitleId = useId();
+  const modalOpen = modalIndex !== null;
 
-  const fadeOverlayStyle = useMemo(() => {
-    type FadeStyle = CSSProperties & {
-      "--reviews-fade-color": string;
-      "--reviews-fade-width": string;
-    };
-    return {
-      "--reviews-fade-color": "var(--reviews-fade-color, #00e3fe)",
-      "--reviews-fade-width": "24px",
-    } as FadeStyle;
-  }, []);
-
-  const openModal = useCallback((i: number) => {
-    setModalIndex(i);
-    autoScrollPluginRef.current?.stop();
-  }, []);
-
-  const closeModal = useCallback(() => {
-    setModalIndex(null);
-    autoScrollPluginRef.current?.play();
-  }, []);
-
-  // Body scroll lock + focus + ESC + modal left/right nav
   useEffect(() => {
-    if (modalIndex === null) return;
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
 
-    const htmlEl = document.documentElement;
-    scrollYRef.current = window.scrollY || document.documentElement.scrollTop || 0;
-
-    const prev = {
-      position: document.body.style.position,
-      top: document.body.style.top,
-      left: document.body.style.left,
-      right: document.body.style.right,
-      width: document.body.style.width,
-      overflow: document.body.style.overflow,
-      paddingRight: document.body.style.paddingRight,
-    };
-
-    const prevHtml = {
-      scrollBehavior: htmlEl.style.scrollBehavior,
-      scrollLock: htmlEl.dataset.scrollLock,
-      scrollLockOffset: htmlEl.style.getPropertyValue('--scroll-lock-offset'),
-    };
-
-    const scrollbar = window.innerWidth - htmlEl.clientWidth;
-
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollYRef.current}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.width = '100%';
-    document.body.style.overflow = 'hidden';
-    if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`;
-
-    htmlEl.dataset.scrollLock = 'true';
-    htmlEl.style.setProperty('--scroll-lock-offset', `${scrollbar}px`);
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') closeModal();
-      if (e.key === 'ArrowRight') {
-        e.preventDefault();
-        setModalIndex((idx) => {
-          const cur = idx ?? 0;
-          return (cur + 1) % reviews.length;
-        });
-      }
-      if (e.key === 'ArrowLeft') {
-        e.preventDefault();
-        setModalIndex((idx) => {
-          const cur = idx ?? 0;
-          return (cur - 1 + reviews.length) % reviews.length;
-        });
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    const t = setTimeout(() => closeBtnRef.current?.focus(), 0);
-
+  useEffect(() => {
+    if (!viewportRef.current || !reviews.length) return;
+    let carousel: EmblaCarouselType | undefined;
+    try {
+      const autoScroll = AutoScroll({
+        speed: 1, startDelay: 0, playOnInit: false,
+        stopOnInteraction: true, stopOnMouseEnter: false, stopOnFocusIn: false,
+      });
+      autoScrollRef.current = autoScroll;
+      carousel = EmblaCarousel(viewportRef.current, {
+        align: 'start', loop: reviews.length > 1, containScroll: 'keepSnaps', dragFree: true,
+        breakpoints: { '(prefers-reduced-motion: reduce)': { duration: 0 } },
+      }, [autoScroll]);
+      emblaRef.current = carousel;
+      const update = () => {
+        const previous = carousel?.canScrollPrev() ?? false;
+        const next = carousel?.canScrollNext() ?? false;
+        setCanGoBack(previous);
+        setCanGoForward(next);
+        setCanScroll(previous || next);
+      };
+      update();
+      carousel.on('select', update);
+      carousel.on('reInit', () => {
+        update();
+        // Embla resets plugin playback after resizing; reapply the current pause preference.
+        setCarouselVersion(version => version + 1);
+      });
+      // Dragging is deliberate interaction; keep scrolling stopped until Resume is chosen.
+      carousel.on('pointerDown', () => setPaused(true));
+      onReady?.();
+    } catch {
+      onError?.();
+    }
     return () => {
-      window.removeEventListener('keydown', onKey);
-      clearTimeout(t);
-      // Temporarily disable smooth scroll so restore doesn't animate
-      const htmlEl = document.documentElement;
-      htmlEl.style.scrollBehavior = 'auto';
-      document.body.style.position = prev.position;
-      document.body.style.top = prev.top;
-      document.body.style.left = prev.left;
-      document.body.style.right = prev.right;
-      document.body.style.width = prev.width;
-      document.body.style.overflow = prev.overflow;
-      document.body.style.paddingRight = prev.paddingRight;
-      window.scrollTo(0, scrollYRef.current);
-      if (prevHtml.scrollLock) {
-        htmlEl.dataset.scrollLock = prevHtml.scrollLock;
-      } else {
-        delete htmlEl.dataset.scrollLock;
-      }
-      if (prevHtml.scrollLockOffset) {
-        htmlEl.style.setProperty('--scroll-lock-offset', prevHtml.scrollLockOffset);
-      } else {
-        htmlEl.style.removeProperty('--scroll-lock-offset');
-      }
-      htmlEl.style.scrollBehavior = prevHtml.scrollBehavior;
+      autoScrollRef.current = null;
+      emblaRef.current = null;
+      carousel?.destroy();
     };
-  }, [closeModal, modalIndex, reviews.length]);
+  }, [reviews, onReady, onError]);
 
+  useEffect(() => {
+    const shouldPlay = canScroll && !reducedMotion && !paused && !hovered && !focusPaused && !modalOpen;
+    if (shouldPlay) autoScrollRef.current?.play();
+    else autoScrollRef.current?.stop();
+  }, [reviews, carouselVersion, canScroll, reducedMotion, paused, hovered, focusPaused, modalOpen]);
+
+  const closeModal = useCallback(() => setModalIndex(null), []);
+  const openModal = (index: number, trigger: HTMLButtonElement) => {
+    returnFocusRef.current = trigger;
+    autoScrollRef.current?.stop();
+    setModalIndex(index);
+  };
+  const moveReview = useCallback((direction: number) => {
+    setModalIndex(index => index === null ? null : (index + direction + reviews.length) % reviews.length);
+  }, [reviews.length]);
+
+  useEffect(() => {
+    if (!modalOpen) return;
+    const body = document.body;
+    const html = document.documentElement;
+    const scrollY = window.scrollY || html.scrollTop || 0;
+    const previous = {
+      position: body.style.position, top: body.style.top, left: body.style.left,
+      right: body.style.right, width: body.style.width, overflow: body.style.overflow,
+      paddingRight: body.style.paddingRight, scrollBehavior: html.style.scrollBehavior,
+      scrollLock: html.dataset.scrollLock, scrollLockOffset: html.style.getPropertyValue('--scroll-lock-offset'),
+    };
+    const scrollbar = window.innerWidth - html.clientWidth;
+    Object.assign(body.style, { position: 'fixed', top: `-${scrollY}px`, left: '0', right: '0', width: '100%', overflow: 'hidden' });
+    if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+    html.dataset.scrollLock = 'true';
+    html.style.setProperty('--scroll-lock-offset', `${scrollbar}px`);
+
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { event.preventDefault(); closeModal(); }
+      if (reviews.length > 1 && (event.key === 'ArrowRight' || event.key === 'ArrowLeft')) {
+        event.preventDefault();
+        moveReview(event.key === 'ArrowRight' ? 1 : -1);
+      }
+      if (event.key === 'Tab' && modalRef.current) {
+        const nodes = modalRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex="0"]');
+        const first = nodes[0];
+        const last = nodes[nodes.length - 1];
+        if (!first || !last) return;
+        if (event.shiftKey && (document.activeElement === first || !modalRef.current.contains(document.activeElement))) {
+          event.preventDefault(); last.focus();
+        } else if (!event.shiftKey && (document.activeElement === last || !modalRef.current.contains(document.activeElement))) {
+          event.preventDefault(); first.focus();
+        }
+      }
+    };
+    const containFocus = (event: FocusEvent) => {
+      if (event.target instanceof Node && !modalRef.current?.contains(event.target)) closeBtnRef.current?.focus();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('focusin', containFocus);
+    closeBtnRef.current?.focus({ preventScroll: true });
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('focusin', containFocus);
+      html.style.scrollBehavior = 'auto';
+      Object.assign(body.style, {
+        position: previous.position, top: previous.top, left: previous.left, right: previous.right,
+        width: previous.width, overflow: previous.overflow, paddingRight: previous.paddingRight,
+      });
+      if (previous.scrollLock === undefined) delete html.dataset.scrollLock;
+      else html.dataset.scrollLock = previous.scrollLock;
+      if (previous.scrollLockOffset) html.style.setProperty('--scroll-lock-offset', previous.scrollLockOffset);
+      else html.style.removeProperty('--scroll-lock-offset');
+      window.scrollTo(0, scrollY);
+      html.style.scrollBehavior = previous.scrollBehavior;
+      if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus({ preventScroll: true });
+    };
+  }, [modalOpen, reviews.length, closeModal, moveReview]);
+
+  const selected = modalIndex === null ? null : reviews[modalIndex];
+  if (!reviews.length) return null;
   return (
-    <div className="relative w-full embla isolate">
-      {/**
-       * Edge Fades (full-bleed to viewport)
-       *
-       * - Adjust `--reviews-fade-color` to match your section background.
-       *   Default: brand cyan-like shade. If your section uses a gradient,
-       *   pick the color that sits directly behind the slider edges so the
-       *   fade blends seamlessly.
-       * - Adjust `--reviews-fade-width` to control fade width.
-       *   Example values: `48px`, `72px`, `10vw`.
-       *
-       * These overlays extend to the viewport width (w-screen) so the fade
-       * reaches the true page edges even when the slider is inside a
-       * constrained container.
-       */}
-      <div
-        aria-hidden
-        className="absolute top-0 z-10 w-screen h-full -translate-x-1/2 pointer-events-none left-1/2"
-        style={fadeOverlayStyle}
-      >
-        {/* Left overlay: solid bg color at the extreme edge -> transparent toward content */}
-        <div
-          className="absolute inset-y-0 left-0"
-          style={{
-            width: 'var(--reviews-fade-width)',
-            background: 'linear-gradient(to right, var(--reviews-fade-color), rgba(0,0,0,0))',
-          }}
-        />
-        {/* Right overlay */}
-        <div
-          className="absolute inset-y-0 right-0"
-          style={{
-            width: 'var(--reviews-fade-width)',
-            background: 'linear-gradient(to left, var(--reviews-fade-color), rgba(0,0,0,0))',
-          }}
-        />
-      </div>
-      {/* Viewport with gutters + mask fade; spacing uses padding model */}
-      <div
-        className="px-5 py-3 overflow-x-hidden overflow-y-visible embla__viewport"
-        ref={viewportRef}
-        style={{
-          // Content mask (optional): softly fade the slider contents themselves at the edges
-          // so the overlay above has no visible hard seam.
-          // Adjust the same variable for consistent widths.
-          WebkitMaskImage:
-            'linear-gradient(to right, transparent, black var(--reviews-fade-width, 56px), black calc(100% - var(--reviews-fade-width, 28px)), transparent)',
-          maskImage:
-            'linear-gradient(to right, transparent, black var(--reviews-fade-width, 56px), black calc(100% - var(--reviews-fade-width, 28px)), transparent)',
-        }}
-      >
-        <div className="embla__container ml-[-1rem] items-start flex flex-nowrap will-change-transform">
-          {reviews.map((r, i) => {
-            const text = r.text?.length > 250 ? r.text.slice(0, 250) + '…' : r.text || '';
-            const formattedDate = formatReviewDate(r.time, r.relative_time_description);
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => openModal(i)}
-                aria-label={`Open full review by ${r.author_name}`}
-                className="embla__slide block relative pl-4 shrink-0 min-w-0 flex-[0_0_80%] md:flex-[0_0_33%] lg:flex-[0_0_25%] appearance-none py-4 m-0 text-left cursor-pointer"
-              >
-                <article className="h-full rounded-3xl border border-blue-300 bg-cyan-50 p-5 shadow-md transition-transform duration-300 ease-in-out hover:translate-y-[-2px] hover:scale-[1.006] hover:shadow-xl hover:border-[#fb9216] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e3fe]">
-                  <header className="mb-2">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1 min-w-0">
-                        <h3 className="flex items-start gap-2 m-0 text-xl font-bold text-slate-700">
-                          <Image
-                            src="https://wp.sonshineroofing.com/wp-content/uploads/google.webp"
-                            alt="Google logo"
-                            width={40}
-                            height={40}
-                            className="flex-none w-5 h-5"
-                          />
-                          <span>{r.author_name}</span>
-                        </h3>
-                        <div className="my-2 flex items-center gap-1 text-[#fb9216]">
-                          {Array.from({ length: 5 }).map((_, j) => (
-                            <svg key={j} viewBox="0 0 24 24" className="w-6 h-6 fill-current" aria-hidden>
-                              <path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.336 24 12 20.125 4.664 24 6 15.6 0 9.753l8.332-1.735z" />
-                            </svg>
-                          ))}
-                        </div>
-                        {formattedDate && (
-                          <div className="mt-1 text-xs text-slate-500">{formattedDate}</div>
-                        )}
-                      </div>
-                      <Quote className="flex-none w-10 h-10 mt-1 text-[--brand-cyan]" aria-hidden />
-                    </div>
-                  </header>
-                  <p className="text-base md:text-lg text-slate-700">{text}</p>
-                </article>
+    <div className="relative isolate w-full" role="region" aria-roledescription="carousel" aria-label="Customer reviews"
+      onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setFocusPaused(true)} onBlurCapture={event => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocusPaused(false);
+      }}>
+      <div ref={viewportRef} className="overflow-hidden px-5 py-3" data-review-viewport
+        style={canScroll ? {
+          WebkitMaskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+          maskImage: 'linear-gradient(to right, transparent, black 16px, black calc(100% - 16px), transparent)',
+        } : undefined}>
+        <div className="-ml-4 flex flex-nowrap items-start" aria-live="off">
+          {reviews.map((review, index) => (
+            <div key={review.id} className="min-w-0 shrink-0 basis-[80%] pl-4 md:basis-1/3 lg:basis-1/4"
+              role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${reviews.length}`}>
+              <button type="button" onClick={event => openModal(index, event.currentTarget)}
+                aria-label={`Open full review by ${review.authorName}`} aria-haspopup="dialog"
+                className="my-4 block w-full appearance-none rounded-3xl border border-blue-300 bg-cyan-50 p-5 text-left shadow-md transition motion-safe:duration-300 hover:border-[#fb9216] hover:shadow-xl motion-safe:hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue">
+                <span className="flex items-start justify-between gap-3">
+                  <ReviewAttribution review={review} inButton starVariant="icon" />
+                  <Quote className="mt-1 h-10 w-10 flex-none text-[--brand-cyan]" aria-hidden="true" />
+                </span>
+                <span className="mt-4 block text-base text-slate-700 md:text-lg">{review.text.length > 250 ? `${review.text.slice(0, 250)}…` : review.text}</span>
               </button>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
-
-      {/* Modal via portal to avoid transformed ancestor / z-index issues */}
-      {mounted && modalIndex !== null && createPortal(
-        (() => {
-          const r = reviews[modalIndex]!;
-          const href = r.author_url || gbpUrl;
-          const formattedDate = formatReviewDate(r.time, r.relative_time_description);
-          return (
-            <div
-              className="fixed inset-0 z-[2147483647] grid place-items-center bg-black/45 py-16 md:p-16"
-              onClick={closeModal}
-            >
-              <div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="review-title"
-                className="relative w-full max-w-[720px] mx-4 md:mx-0 overflow-hidden rounded-3xl border border-blue-300 bg-white shadow-2xl"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  ref={closeBtnRef}
-                  type="button"
-                  aria-label="Close review"
-                  className="absolute flex items-center transition-colors rounded-full hover:bg-white justify-center w-8 h-8 right-3 top-3"
-                  onClick={closeModal}
-                >
-                  <svg viewBox="0 0 24 24" className="text-red-600 w-6 h-6" aria-hidden>
-                    <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                </button>
-                <header className="px-5 pt-4 bg-blue-50 pb-2 border border-b-blue-200">
-                  <SmartLink
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer nofollow"
-                    data-icon-affordance="up-right"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-start items-center gap-2">
-                          <h4 id="review-title" className="flex items-center gap-2 m-0 text-2xl font-bold text-slate-700">
-                            <Image
-                              src="https://wp.sonshineroofing.com/wp-content/uploads/google.webp"
-                              alt="Google logo"
-                              width={40}
-                              height={40}
-                              className="flex-none w-5 h-5"
-                            />
-                            <span>{r.author_name}</span>
-                          </h4>
-                          <p className="text-sm font-semibold text-slate-500">
-                            View on Google
-                            <ArrowUpRight className="inline w-4 h-4 ml-2 icon-affordance" />
-                          </p>
-                        </div>
-                        <div className="my-3 flex gap-1 text-[#fb9216]">
-                          {Array.from({ length: 5 }).map((_, j) => (
-                            <svg key={j} viewBox="0 0 24 24" className="fill-current h-7 w-7" aria-hidden>
-                              <path d="M12 .587l3.668 7.431L24 9.753l-6 5.847L19.336 24 12 20.125 4.664 24 6 15.6 0 9.753l8.332-1.735z" />
-                            </svg>
-                          ))}
-                        </div>
-                        {formattedDate && (
-                          <div className="mt-1 text-xs md:text-sm text-slate-500">{formattedDate}</div>
-                        )}
-                      </div>
-                    </div>
-                  </SmartLink>
-                </header>
-                <div className="max-h-[80vh] overflow-auto px-5 py-4 bg-amber-50/50 space-y-4">
-                  <p className="m-0 whitespace-pre-wrap text-base md:text-lg text-slate-700">{r.text || ''}</p>
-                </div>
-              </div>
+      {canScroll ? (
+        <div className="mb-4 flex flex-wrap justify-center gap-2" aria-label="Review carousel controls">
+          <button type="button" className={CONTROL_CLASS} aria-label="Previous reviews" disabled={!canGoBack}
+            onClick={() => { setPaused(true); emblaRef.current?.scrollPrev(reducedMotion); }}>
+            <ArrowLeft className="h-4 w-4" aria-hidden="true" /><span className="sr-only">Previous reviews</span>
+          </button>
+          {!reducedMotion ? (
+            <button type="button" className={CONTROL_CLASS} onClick={() => {
+              // Honor an explicit Resume without moving keyboard focus. The next focus event pauses again.
+              if (paused) setFocusPaused(false);
+              setPaused(value => !value);
+            }}
+              aria-label={paused ? 'Resume automatic scrolling' : 'Pause automatic scrolling'}>
+              {paused ? <Play className="h-4 w-4" aria-hidden="true" /> : <Pause className="h-4 w-4" aria-hidden="true" />}
+              {paused ? 'Resume' : 'Pause'}
+            </button>
+          ) : null}
+          <button type="button" className={CONTROL_CLASS} aria-label="Next reviews" disabled={!canGoForward}
+            onClick={() => { setPaused(true); emblaRef.current?.scrollNext(reducedMotion); }}>
+            <ArrowRight className="h-4 w-4" aria-hidden="true" /><span className="sr-only">Next reviews</span>
+          </button>
+        </div>
+      ) : null}
+      {selected && createPortal(
+        <div className="fixed inset-0 z-[2147483647] grid place-items-center bg-black/45 px-4 py-8 md:p-16"
+          onClick={event => { if (event.target === event.currentTarget) closeModal(); }}>
+          <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby={modalTitleId}
+            className="relative mx-auto flex max-h-[85dvh] w-full max-w-[720px] flex-col overflow-hidden rounded-3xl border border-blue-300 bg-white shadow-2xl">
+            <button ref={closeBtnRef} type="button" aria-label="Close review" onClick={closeModal}
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-red-600 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue">
+              <X className="h-6 w-6" aria-hidden="true" />
+            </button>
+            <div className="border-b border-blue-200 bg-blue-50 px-5 pb-4 pr-16 pt-5">
+              <ReviewAttribution review={selected} titleId={modalTitleId} starVariant="icon" starClassName="h-7 w-7" />
+              {selected.sourceUrl ? (
+                <SmartLink href={selected.sourceUrl} target="_blank" rel="noopener noreferrer nofollow"
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand-blue underline underline-offset-4">
+                  {selected.sourceLabel}<ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                </SmartLink>
+              ) : null}
             </div>
-          );
-        })(),
-        document.body
+            <div className="overflow-auto bg-amber-50/50 px-5 py-4">
+              <blockquote className="m-0 whitespace-pre-wrap text-base text-slate-700 md:text-lg">{selected.text}</blockquote>
+            </div>
+            {reviews.length > 1 ? (
+              <div className="flex items-center justify-between gap-3 border-t border-blue-100 px-5 py-3">
+                <button type="button" className={CONTROL_CLASS} aria-label="Previous review" onClick={() => moveReview(-1)}><ArrowLeft className="h-4 w-4" aria-hidden="true" />Previous</button>
+                <span className="text-sm text-slate-500" aria-live="polite">{modalIndex! + 1} of {reviews.length}</span>
+                <button type="button" className={CONTROL_CLASS} aria-label="Next review" onClick={() => moveReview(1)}>Next<ArrowRight className="h-4 w-4" aria-hidden="true" /></button>
+              </div>
+            ) : null}
+          </div>
+        </div>, document.body,
       )}
     </div>
   );

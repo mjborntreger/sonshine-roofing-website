@@ -81,14 +81,16 @@ projects remain independent and expose no project geography.
 
 Use canonical IDs and one shared, pure selector. Return local and nearby groups.
 Projects: local then directly approved nearby, maximum six combined. Reviews:
-editorially published, actual rating five, assigned area, maximum six combined;
-neither Google ID nor feed membership is required. Dates descend, missing dates
+editorially published, actual rating five, assigned area, all local records plus
+directly approved nearby records only when needed to reach six. Render reviews
+in one carousel without separate nearby headings or badges; neither Google ID
+nor feed membership is required. Dates descend within each group, missing dates
 last, stable ID breaks ties. Sponsors: every local match, then nearby toward
 three combined; CMS sort then ID, canonical-ID deduplication. Unassigned reviews
 and sponsors never provide regional backfill. Retain actual area labels.
 
 Common order: shared hero/local introduction; projects and existing video
-functionality; local/nearby reviews; existing service links; neighborhoods/map;
+functionality; one combined review carousel; shared homepage service cards; neighborhoods/map;
 partnerships; global/local FAQs. Omit empty sections and absent optional fields.
 Null project neighborhood means no label, wrapper, or placeholder. Neighborhood
 cards can link to matching published projects but have no routes or archive filter.

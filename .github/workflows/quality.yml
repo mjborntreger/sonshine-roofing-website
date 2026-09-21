@@ -56,6 +56,8 @@ jobs:
         run: npm run verify:video-migration
       - name: Verify location migration and page contracts
         run: npm run verify:locations
+      - name: Verify shared review carousel
+        run: npm run verify:review-carousel
       - name: Verify all dynamic route contracts
         run: npm run verify:dynamic-routes
       - name: Verify Directus fetch policy

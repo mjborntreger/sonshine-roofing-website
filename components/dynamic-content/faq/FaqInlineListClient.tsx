@@ -3,6 +3,7 @@
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, ArrowRight, ArrowUp, HelpCircle } from "lucide-react";
 import { Accordion } from "@/components/ui/Accordion";
+import { renderHighlight } from "@/components/utils/renderHighlight";
 import SmartLink from "../../utils/SmartLink";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
@@ -17,11 +18,14 @@ export type FaqInlineListClientItem = Item;
 
 type Props = {
   heading: string;
+  highlightText?: string | readonly string[];
+  description?: string;
+  className?: string;
   seeMoreHref: string;
   items: Item[];
 };
 
-export default function FaqInlineListClient({ heading, seeMoreHref, items }: Props) {
+export default function FaqInlineListClient({ heading, highlightText, description, className, seeMoreHref, items }: Props) {
   const detailRefs = useRef<Array<HTMLDetailsElement | null>>([]);
   const [allOpen, setAllOpen] = useState(false);
 
@@ -69,7 +73,7 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
   if (!safeItems.length) return null;
 
   return (
-    <div className="mb-8 mt-24 px-2" data-toc-exclude>
+    <div className={className ?? "mb-8 mt-24 px-2"} data-toc-exclude>
       <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start justify-start gap-4">
           <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-800 md:text-4xl">
@@ -77,7 +81,7 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
               className="mr-1 hidden sm:inline h-7 w-7 text-[--brand-blue] md:h-9 md:w-9"
               aria-hidden="true"
             />
-            {heading}
+            <span>{renderHighlight(heading, highlightText)}</span>
           </h2>
           <div className="text-right">
             <SmartLink
@@ -110,6 +114,8 @@ export default function FaqInlineListClient({ heading, seeMoreHref, items }: Pro
           )}
         </button>
       </div>
+
+      {description ? <p className="mt-4 max-w-3xl text-lg text-slate-600">{description}</p> : null}
 
       <div className="mt-12 grid grid-cols-1 items-start gap-4 md:grid-cols-2">
         {safeItems.map((faq, idx) => (

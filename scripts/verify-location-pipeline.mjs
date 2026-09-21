@@ -46,9 +46,39 @@ const regional = source(); regional.neighbors = [{ id: 'pair', service_area: 'sa
 assert.equal(normalizeLocationSnapshot(regional, config, projects).neighbors.length, 1, 'taxonomy-only neighbors are valid');
 const review = source(); review.reviews = [{ ...scope, id: 42, service_area: 'sarasota', rating: 5, author_name: 'Synthetic reviewer', review_text: 'Synthetic review.', source_created_at: null, review_date: null, url: null }];
 assert.equal(normalizeLocationSnapshot(review, config, projects).reviews[0].id, '42', 'Directus integer review IDs become canonical string IDs');
-const neighborhood = source(); neighborhood.neighborhoods = [{ ...scope, id: 'hood', name: 'Synthetic neighborhood', slug: 'synthetic-neighborhood', service_area: 'sarasota', image: { id: 'photo', description: 'Synthetic neighborhood entrance.', type: 'image/webp' }, coverage_map: null }];
+const neighborhood = source(); neighborhood.neighborhoods = [{ ...scope, id: 'hood', name: 'Synthetic neighborhood', slug: 'synthetic-neighborhood', service_area: 'sarasota', image: { id: 'photo', description: 'Synthetic neighborhood entrance.', type: 'image/webp', metadata: null }, coverage_map: null }];
 assert.equal(normalizeLocationSnapshot(neighborhood, config, projects).neighborhoods[0].image.altText, 'Synthetic neighborhood entrance.');
 assert.equal(normalizeLocationSnapshot(neighborhood, config, projects).neighborhoods[0].mapImage, null, 'Neighborhood photos do not become coverage maps');
+assert.equal(normalizeLocationSnapshot(neighborhood, config, projects).neighborhoods[0].image.attribution, null);
+const attributedNeighborhood = structuredClone(neighborhood);
+const credit = { title: 'Synthetic entrance photo', creator: 'Fixture photographer', source_url: 'https://example.com/photo',
+  creator_url: 'https://example.com/creator', license: 'Fixture license', license_url: 'https://example.com/license', changes: 'Resized and converted to WebP; no crop.' };
+attributedNeighborhood.neighborhoods[0].image.metadata = { attribution: { ...credit, unpublished_note: 'synthetic internal note' },
+  exif: { GPSLatitude: 'synthetic excluded coordinate' }, unrelated: 'synthetic excluded metadata' };
+const attributedPhoto = normalizeLocationSnapshot(attributedNeighborhood, config, projects).neighborhoods[0].image;
+assert.deepEqual(attributedPhoto.attribution, { title: credit.title, creator: credit.creator, creatorUrl: credit.creator_url,
+  sourceUrl: credit.source_url, license: credit.license, licenseUrl: credit.license_url, changes: credit.changes });
+assert.doesNotMatch(JSON.stringify(attributedPhoto), /unpublished_note|GPSLatitude|unrelated|synthetic excluded|synthetic internal/);
+for (const change of [
+  photo => { delete photo.metadata; },
+  photo => { photo.metadata = 'invalid'; },
+  photo => { photo.metadata.attribution = []; },
+  photo => { photo.metadata.attribution.creator = ''; },
+  photo => { photo.metadata.attribution.source_url = 'javascript:alert(1)'; },
+  photo => { photo.metadata.attribution.creator_url = 'data:text/html,unsafe'; },
+  photo => { photo.metadata.attribution.license_url = 'https://synthetic-user:synthetic-pass@example.com/license'; },
+  photo => { delete photo.metadata.attribution.license_url; },
+]) {
+  const invalid = structuredClone(attributedNeighborhood);
+  change(invalid.neighborhoods[0].image);
+  assert.throws(() => normalizeLocationSnapshot(invalid, config, projects), /photo|Photo/u);
+}
+const optionalCredit = structuredClone(attributedNeighborhood);
+delete optionalCredit.neighborhoods[0].image.metadata.attribution.creator_url;
+delete optionalCredit.neighborhoods[0].image.metadata.attribution.changes;
+const optionalAttribution = normalizeLocationSnapshot(optionalCredit, config, projects).neighborhoods[0].image.attribution;
+assert.equal(optionalAttribution.creatorUrl, null);
+assert.equal(optionalAttribution.changes, null);
 const missingFaq = source(); missingFaq.faqScopes.push({ id: 'local-missing', website_page: null, service: null, service_area: 'sarasota' });
 assert.throws(() => normalizeLocationSnapshot(missingFaq, config, projects), /Eligible FAQ/u);
 const unpublishedFaq = source(); unpublishedFaq.faqScopes.push({ id: 'draft-owner', website_page: null, service: null, service_area: 'bradenton' }); unpublishedFaq.faqUnavailable.push({ id: 'draft-owner' });
@@ -92,6 +122,7 @@ await fetchDirectusLocationSnapshot(projects, env, fetcher);
 assert.equal(requests.length, 15);
 assert.ok(requests.every(({url}) => !url.searchParams.get('fields').includes('*') && !url.searchParams.get('fields').includes('job_id')));
 assert.ok(requests.every(({options}) => options.cache === 'no-store'));
+assert.ok(requests.find(({ url }) => url.pathname.endsWith('/roofing_neighborhoods')).url.searchParams.get('fields').split(',').includes('image.metadata'));
 for (const { url } of requests) {
   const grant = publicLocationFields[url.pathname.split('/').pop()];
   if (grant) for (const field of url.searchParams.get('fields').split(',')) assert.ok(grant.includes(field.split('.')[0]), 'Required query must fit the prepared reader grant');

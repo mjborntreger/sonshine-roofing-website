@@ -60,9 +60,24 @@ check('review rollover preserves the approved older local review', () => {
   const after = { ...before, latestFeedMember: false, latestFeedOrder: null };
   assert.deepEqual(ids(selectLocationContent([before], { ...options, kind: 'reviews' })), ids(selectLocationContent([after], { ...options, kind: 'reviews' })));
 });
-check('reviews cap at six by review date', () => {
-  const pool = Array.from({ length: 8 }, (_, i) => record(`review-${i}`, { rating: 5, date: `2026-02-0${i + 1}` }));
-  assert.deepEqual(ids(selectLocationContent(pool, { ...options, kind: 'reviews' })).local, ['review-7', 'review-6', 'review-5', 'review-4', 'review-3', 'review-2']);
+check('reviews retain every local review by date and omit nearby when six or more are local', () => {
+  const pool = [nearby('new-neighbor', { rating: 5, date: '2027-01-01' }), ...Array.from({ length: 8 }, (_, i) => record(`review-${i}`, { rating: 5, date: `2026-02-0${i + 1}` }))];
+  assert.deepEqual(ids(selectLocationContent(pool, { ...options, kind: 'reviews' })), {
+    local: ['review-7', 'review-6', 'review-5', 'review-4', 'review-3', 'review-2', 'review-1', 'review-0'], nearby: [],
+  });
+});
+check('a thin review pool keeps all locals first and fills only to six with unique approved nearby reviews', () => {
+  const localReviews = Array.from({ length: 4 }, (_, i) => record(`local-${i}`, { rating: 5 }));
+  const pool = [...localReviews, nearby('b', { rating: 5 }), nearby('a', { rating: 5 }), nearby('a', { rating: 5 }),
+    nearby('local-0', { rating: 5 }), nearby('c', { rating: 5 }), nearby('unassigned', { rating: 5, serviceAreaIds: [] }),
+    nearby('unapproved', { rating: 5, serviceAreaIds: ['unapproved'] })];
+  assert.deepEqual(ids(selectLocationContent(pool, { ...options, kind: 'reviews' })), {
+    local: ['local-0', 'local-1', 'local-2', 'local-3'], nearby: ['a', 'b'],
+  });
+});
+check('a review shortage stays short without unrelated or unassigned backfill', () => {
+  const pool = [record('one', { rating: 5 }), nearby('two', { rating: 5 }), record('unassigned', { rating: 5, serviceAreaIds: [] })];
+  assert.deepEqual(ids(selectLocationContent(pool, { ...options, kind: 'reviews' })), { local: ['one'], nearby: ['two'] });
 });
 check('sponsors retain all local records in CMS order, even above three', () => {
   const pool = [nearby('nearby', { sort: -1 }), ...Array.from({ length: 5 }, (_, i) => record(`sponsor-${i}`, { sort: 4 - i }))];

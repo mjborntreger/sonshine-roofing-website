@@ -13,7 +13,7 @@ const { renderToStaticMarkup } = require('react-dom/server');
 const modules = new Map();
 
 // Compile the actual location, card, video facade, FAQ and sanitizer code. Only
-// Next's image/link/font boundary and the unchanged settings/lead-form hero are replaced.
+// Next's image/link/font boundary and unchanged settings/lead-form behavior are replaced.
 function loadSource(filename) {
   if (modules.has(filename)) return modules.get(filename).exports;
   const loaded = { exports: {} };
@@ -32,9 +32,10 @@ function loadSource(filename) {
       return React.createElement('a', attributes);
     };
     if (id === '@/lib/ui/allura-font') return { allura: { variable: 'fixture-font' } };
-    if (id === '@/components/marketing/landing-page/LandingHero') return function FixtureHero({ title }) {
-      return React.createElement('header', null, React.createElement('h1', null, title));
-    };
+    if (id === '@/components/lead-capture/lead-form/LeadForm') return function FixtureLeadForm() { return null; };
+    if (id === '@/components/lead-capture/lead-form/Fallback') return { LeadFormFallback: () => null };
+    if (id === '@/lib/lead-capture/contact-lead') return { parseLeadSuccessCookie: () => null };
+    if (id === '@/lib/content/site-settings-context') return { useSiteSettings: () => ({ heroImage: null, heroVideo: null, licenseNumber: '', licenseUrl: '' }) };
     if (id === 'server-only' || id.includes('directus-site') || id.includes('directus-faqs')) throw new Error(`Unexpected server data import: ${id}`);
     if (id.startsWith('@/') || id.startsWith('.')) {
       const base = id.startsWith('@/') ? resolve(root, id.slice(2)) : resolve(dirname(filename), id);
@@ -49,9 +50,11 @@ function loadSource(filename) {
 }
 const Hub = loadSource(resolve(root, 'components/location/LocationHub.tsx')).default;
 const Coverage = loadSource(resolve(root, 'components/location/ServiceAreaSection.tsx')).default;
+const Hero = loadSource(resolve(root, 'components/marketing/landing-page/LandingHero.tsx')).default;
+const ServiceNavigation = loadSource(resolve(root, 'components/lead-capture/lead-form/InitialNavigation.tsx')).default;
 const page = { id: 'area-local', name: 'Fixture City', slug: 'fixture-city', clientSlug: 'fixture-client', title: 'Roofing in Fixture City', introduction: 'Roofing services for Fixture City.', overviewHtml: null, mapImage: null };
 const emptyGroups = () => ({ local: [], nearby: [] });
-const baseProps = () => ({ page, projects: emptyGroups(), reviews: emptyGroups(), sponsors: emptyGroups(), neighborhoods: [], faqs: [], services: [] });
+const baseProps = () => ({ page, projects: emptyGroups(), reviews: emptyGroups(), sponsors: emptyGroups(), neighborhoods: [], faqs: [] });
 const project = (id, overrides = {}) => ({ id, status: 'published', clientSlug: 'fixture-client', serviceAreaIds: ['area-local'], project: {
   id, title: `Project ${id}`, slug: id, uri: `/project/${id}`, heroImage: null, projectDescription: 'A verified project.', materialTypes: [], roofColors: [],
   serviceAreas: [{ name: 'Fixture City', slug: 'fixture-city' }], neighborhood: null, video: null, ...overrides,
@@ -63,12 +66,38 @@ function check(name, callback) {
   try { callback(); checks++; } catch (error) { error.message = `${name}: ${error.message}`; throw error; }
 }
 
-check('empty optional sections leave no headings, maps, reviews or placeholders', () => {
+check('empty optional sections leave only shared service navigation and no placeholders', () => {
   const doc = render(Hub, baseProps());
   assert.equal(doc.querySelector('h1').textContent, page.title);
-  assert.equal(doc.querySelectorAll('[data-location-hub] section').length, 0);
-  assert.equal(doc.querySelectorAll('[data-location-hub] h2, [data-location-hub] img, [data-location-hub] details, [data-location-hub] [data-project-neighborhood]').length, 0);
+  assert.equal(doc.querySelectorAll('[data-location-hub] section').length, 1);
+  assert.deepEqual([...doc.querySelectorAll('[data-location-hub] h2')].map(node => node.textContent), ['Roofing Services in Fixture City']);
+  assert.equal(doc.querySelectorAll('[data-location-hub] details, [data-location-hub] [data-project-neighborhood], [aria-labelledby="location-reviews"]').length, 0);
   assert.doesNotMatch(doc.body.textContent, /No .+ yet|not provided|Neighborhood \d|39 years/);
+});
+check('location hero keeps its CMS title, highlights exact approved case, and shows its introduction once', () => {
+  const props = baseProps();
+  props.page = { ...page, title: 'The BEST Roofing Company in Fixture City for Over 39 Years' };
+  const doc = render(Hub, props);
+  const heading = doc.querySelector('h1');
+  assert.equal(heading.textContent, props.page.title);
+  assert.deepEqual([...heading.querySelectorAll('span')].map(node => node.textContent), ['BEST', 'Over 39 Years']);
+  assert.ok([...heading.querySelectorAll('span')].every(node => node.className === 'text-[--brand-cyan]'));
+  assert.equal(heading.nextElementSibling.textContent, page.introduction);
+  assert.equal([...doc.querySelectorAll('p')].filter(node => node.textContent === page.introduction).length, 1);
+});
+check('homepage hero defaults and all six shared service cards remain unchanged', () => {
+  const homeHero = render(Hero, { scriptFontClassName: 'fixture-font' });
+  assert.equal(homeHero.querySelector('h1').textContent, 'The BEST Roofing Company in Sarasota, Manatee, and Charlotte Counties for over 39 years');
+  assert.deepEqual([...homeHero.querySelectorAll('h1 span')].map(node => node.textContent), ['BEST', 'over 39 years']);
+  assert.equal(homeHero.querySelector('h1').nextElementSibling.tagName, 'DIV');
+  const homeServices = render(ServiceNavigation, {});
+  const locationServices = render(Hub, baseProps()).querySelector('[aria-labelledby="location-services"]');
+  assert.equal(homeServices.querySelector('h2').textContent, 'How Can We Help?');
+  assert.equal(homeServices.querySelectorAll('a').length, 6);
+  assert.deepEqual([...locationServices.querySelectorAll('a')].map(node => node.outerHTML), [...homeServices.querySelectorAll('a')].map(node => node.outerHTML));
+  assert.equal(locationServices.querySelector('h2 span').textContent, page.name);
+  assert.match(locationServices.textContent, /Licensed and Insured/);
+  assert.doesNotMatch(locationServices.textContent, /4\.[89]|25-year|A\+ Rated|Master Elite/);
 });
 check('a null neighborhood removes its entire label and wrapper', () => {
   const props = baseProps(); props.projects.local = [project('no-neighborhood')];
@@ -94,6 +123,7 @@ check('coverage records need a real name and omit every absent detail', () => {
   const doc = render(Coverage, { areaId: page.id, locationName: page.name, mapImage: null, neighborhoods: [neighborhood(), neighborhood({ id: 'blank', name: ' ' }), neighborhood({ id: 'other-area', name: 'Other place', serviceAreaId: 'other' })], projects: [] });
   assert.deepEqual([...doc.querySelectorAll('h3')].map((node) => node.textContent), ['Fixture Neighborhood']);
   assert.equal(doc.querySelectorAll('img, details, ul, figcaption').length, 0);
+  assert.equal(doc.querySelectorAll('h4').length, 0);
   assert.doesNotMatch(doc.body.textContent, /ZIP|landmarks|No map|No description|Other place|Neighborhood 2/);
 });
 check('coverage links only verified published project matches, including projects outside recent six', () => {
@@ -103,6 +133,11 @@ check('coverage links only verified published project matches, including project
   const doc = render(Hub, props);
   const links = [...doc.querySelectorAll('[aria-labelledby="location-coverage"] a')].map((node) => node.getAttribute('href'));
   assert.deepEqual(links, ['/project/older-match']);
+  const projectHeading = doc.querySelector('[aria-labelledby="location-coverage"] h4');
+  assert.equal(projectHeading.textContent, 'Featured Projects:');
+  assert.equal(projectHeading.nextElementSibling.tagName, 'UL');
+  assert.ok(projectHeading.nextElementSibling.classList.contains('list-disc'));
+  assert.equal(projectHeading.nextElementSibling.querySelectorAll('li').length, 1);
   assert.equal(doc.querySelectorAll('a[href^="/neighborhood"]').length, 0);
 });
 check('coverage maps preserve verified descriptions and never add customer pins', () => {
@@ -116,30 +151,54 @@ check('neighborhood photos render separately from optional coverage maps', () =>
   assert.equal(doc.querySelector('img').alt, 'Synthetic neighborhood entrance sign');
   assert.equal(doc.querySelectorAll('figcaption').length, 0);
 });
+check('attributed neighborhood photos display escaped credit, source and license beneath the correct image', () => {
+  const attribution = { title: 'Synthetic <em>photo</em>', creator: 'Fixture photographer', creatorUrl: 'https://example.com/creator',
+    sourceUrl: 'https://example.com/source', license: 'Fixture license', licenseUrl: 'https://example.com/license', changes: 'Resized and converted to WebP; no crop.' };
+  const photo = { url: 'https://example.com/photo.webp', altText: 'Synthetic entrance photo', attribution };
+  const doc = render(Coverage, { areaId: page.id, locationName: page.name, mapImage: null,
+    neighborhoods: [neighborhood({ image: photo })], projects: [] });
+  const caption = doc.querySelector('figcaption');
+  assert.equal(caption.previousElementSibling.alt, photo.altText);
+  assert.match(caption.textContent, /Synthetic <em>photo<\/em> by Fixture photographer/);
+  assert.match(caption.textContent, /Fixture license\. Resized and converted to WebP; no crop\./);
+  assert.equal(caption.querySelector('em'), null);
+  assert.deepEqual([...caption.querySelectorAll('a')].map(node => node.href), [attribution.sourceUrl, attribution.creatorUrl, attribution.licenseUrl]);
+  assert.ok([...caption.querySelectorAll('a')].every(node => node.rel.includes('noopener') && node.rel.includes('noreferrer')));
+  assert.ok(caption.querySelector('a[href="https://example.com/license"]').rel.includes('license'));
+  const withoutOptional = render(Coverage, { areaId: page.id, locationName: page.name, mapImage: null,
+    neighborhoods: [neighborhood({ image: { ...photo, attribution: { ...attribution, creatorUrl: null, changes: null } } })], projects: [] });
+  assert.equal(withoutOptional.querySelectorAll('figcaption a').length, 2);
+  assert.match(withoutOptional.querySelector('figcaption').textContent, /by Fixture photographer/);
+  assert.doesNotMatch(withoutOptional.querySelector('figcaption').textContent, /Resized|undefined|null/);
+});
 check('section order and regional labels remain accurate and no business rating markup is emitted', () => {
   const props = baseProps();
   props.projects.local = [project('local')];
   props.projects.nearby = [{ ...project('regional', { serviceAreas: [{ name: 'Nearby Town', slug: 'nearby-town' }] }), serviceAreaIds: ['area-nearby'] }];
   const review = (id, areaName) => ({ id, authorName: 'Fixture Reviewer', text: 'Synthetic review.', rating: 5, areaName, date: null, url: null });
   props.reviews = { local: [review('local-review', page.name)], nearby: [review('nearby-review', 'Nearby Town')] };
-  props.services = [{ slug: 'roof-repair', href: '/roof-repair', navLabel: 'Roof repair', intro: 'Repair service.' }];
   props.neighborhoods = [neighborhood()];
   props.sponsors.local = [{ id: 'sponsor-local', areaNames: [page.name], feature: { title: 'Fixture local partner', links: null, contentHtml: null, featuredImage: null } }];
   props.sponsors.nearby = [{ id: 'sponsor-nearby', areaNames: ['Nearby Town'], feature: { title: 'Fixture nearby partner', links: null, contentHtml: null, featuredImage: null } }];
   props.faqs = [{ id: 'faq-one', title: 'Fixture question?', contentHtml: '<p>Verified &amp; safe answer.</p>' }];
   const doc = render(Hub, props);
   assert.deepEqual([...doc.querySelectorAll('[data-location-hub] h2')].map((node) => node.textContent), [
-    'Recent roofing projects in Fixture City', 'Roofing projects in nearby areas', 'Reviews from Fixture City', 'Reviews from nearby areas',
-    'Roofing services', 'Roofing coverage in Fixture City', 'Partnerships in Fixture City', 'Partnerships in nearby areas', 'Roofing questions and answers',
+    'Recent roofing projects in Fixture City', 'Roofing projects in nearby areas', 'What Our Customers Say',
+    'Roofing Services in Fixture City', 'Roofing coverage in Fixture City', 'Partnerships in Fixture City', 'Partnerships in nearby areas', 'Roofing questions and answers',
   ]);
   assert.match(doc.querySelector('[aria-label="Roofing projects in nearby areas"]').textContent, /Nearby Town/);
-  assert.match(doc.querySelector('[aria-label="Reviews from nearby areas"]').textContent, /Nearby Town/);
+  const reviewSection = doc.querySelector('[aria-labelledby="location-reviews"]');
+  assert.equal(doc.querySelectorAll('[aria-labelledby="location-reviews"]').length, 1);
+  assert.match(reviewSection.textContent, /Fixture City/);
+  assert.match(reviewSection.textContent, /Nearby Town/);
+  assert.doesNotMatch(reviewSection.textContent, /Reviews from|nearby areas|Nearby review/);
   assert.match(doc.querySelector('[aria-label="Partnerships in nearby areas"]').textContent, /Nearby Town/);
   assert.equal(doc.querySelectorAll('time').length, 0);
   const schema = JSON.parse(doc.querySelector('script[type="application/ld+json"]').textContent);
   assert.equal(schema['@type'], 'FAQPage');
   assert.equal(schema.mainEntity[0].acceptedAnswer.text, 'Verified & safe answer.');
   assert.doesNotMatch(JSON.stringify(schema), /AggregateRating|RoofingContractor|"Review"/);
+  for (const heading of doc.querySelectorAll('[data-location-hub] h2')) assert.ok(heading.querySelector('span'), `${heading.textContent} includes a highlight`);
 });
 check('all thirteen location FAQ answers appear in visible content and JSON-LD in the same order', () => {
   const props = baseProps();
@@ -157,7 +216,8 @@ check('CMS HTML remains sanitized and review text is escaped', () => {
   props.reviews.local = [{ id: 'review', authorName: 'Fixture', areaName: page.name, rating: 5, text: '<img src=x onerror=unsafeReview()>', url: null, date: 'invalid' }];
   props.sponsors.local = [{ id: 'sponsor', areaNames: [page.name], feature: { title: 'Fixture partner', links: null, featuredImage: null, contentHtml: '<p>Partner</p><script>unsafeSponsor()</script>' } }];
   const doc = render(Hub, props);
-  assert.equal(doc.querySelectorAll('[data-location-hub] img, a[href^="javascript:"], script:not([type="application/ld+json"])').length, 0);
+  assert.equal([...doc.querySelectorAll('[data-location-hub] img')].filter(node => !node.closest('[aria-labelledby="location-services"]')).length, 0);
+  assert.equal(doc.querySelectorAll('a[href^="javascript:"], script:not([type="application/ld+json"])').length, 0);
   assert.doesNotMatch(doc.querySelector('[data-location-hub]').innerHTML, /unsafeOverview|unsafeFaq|unsafeSponsor/);
   assert.match(doc.querySelector('blockquote').textContent, /<img src=x onerror=unsafeReview\(\)>/);
 });

@@ -1,19 +1,22 @@
 import Image from 'next/image';
-import { Star } from 'lucide-react';
+import { CalendarDays, HandCoins, ShieldCheck } from 'lucide-react';
 import LandingHero from '@/components/marketing/landing-page/LandingHero';
+import InitialNavigation from '@/components/lead-capture/lead-form/InitialNavigation';
 import ProjectArchiveCard from '@/components/dynamic-content/project/ProjectArchiveCard';
 import ProjectVideo from '@/components/dynamic-content/project/ProjectVideo';
 import FaqInlineListClient from '@/components/dynamic-content/faq/FaqInlineListClient';
 import ServiceAreaSection from '@/components/location/ServiceAreaSection';
-import { SECTION_HEADING } from '@/components/location/sectionStyles';
+import LocationSectionHeading from '@/components/location/LocationSectionHeading';
+import { FEATURE_LIST_CLASS, FEATURE_PILL_CLASS } from '@/components/location/sectionStyles';
+import LocationReviewsCarousel from '@/components/reviews-widget/LocationReviewsCarousel';
 import SmartLink from '@/components/utils/SmartLink';
+import { cn } from '@/lib/utils';
 import { allura } from '@/lib/ui/allura-font';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { faqSchema } from '@/lib/seo/schema';
 import { sanitizeFaqHtml } from '@/lib/content/directus-faq-html';
 import { sanitizeSponsorHtml } from '@/lib/content/directus-sponsor-html';
 import type { DirectusFaq } from '@/lib/content/directus-faqs';
-import type { ServiceSummary } from '@/lib/content/directus-site';
 import type {
   LocationGroups,
   LocationNeighborhood,
@@ -32,14 +35,19 @@ export type LocationHubProps = {
   /** All local published projects, including those outside the six recent cards. */
   neighborhoodProjects?: LocationProject[];
   faqs: DirectusFaq[];
-  services: ServiceSummary[];
 };
 
-function ProjectGroup({ heading, projects }: { heading: string; projects: LocationProject[] }) {
+type SectionCopy = {
+  heading: string;
+  highlightText: string;
+  description: string;
+};
+
+function ProjectGroup({ heading, highlightText, description, projects }: SectionCopy & { projects: LocationProject[] }) {
   if (!projects.length) return null;
   return (
     <section className="space-y-8" aria-label={heading}>
-      <h2 className={SECTION_HEADING}>{heading}</h2>
+      <LocationSectionHeading heading={heading} highlightText={highlightText} description={description} />
       <div className="grid items-start gap-8 md:grid-cols-2 lg:grid-cols-3">
         {projects.map(({ id, project }) => (
           <article key={id} className="space-y-4">
@@ -62,50 +70,11 @@ function ProjectGroup({ heading, projects }: { heading: string; projects: Locati
   );
 }
 
-function ReviewGroup({ heading, reviews }: { heading: string; reviews: LocationReview[] }) {
-  if (!reviews.length) return null;
-  return (
-    <section className="space-y-8" aria-label={heading}>
-      <h2 className={SECTION_HEADING}>{heading}</h2>
-      <div className="grid items-start gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {reviews.map((review) => {
-          const date = review.date ? new Date(review.date) : null;
-          const validDate = date && Number.isFinite(date.getTime()) ? date : null;
-          return (
-            <figure key={review.id} className="space-y-5 rounded-3xl border border-blue-200 bg-blue-50 p-6">
-              <div aria-label={`${review.rating} out of 5 stars`} className="flex gap-1 text-amber-500">
-                {Array.from({ length: review.rating }, (_, index) => (
-                  <Star key={index} aria-hidden="true" className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <blockquote className="whitespace-pre-line leading-relaxed text-slate-700">{review.text}</blockquote>
-              <figcaption className="space-y-1 text-sm text-slate-600">
-                <p className="font-semibold text-slate-800">{review.authorName}</p>
-                <p>{review.areaName}</p>
-                {validDate ? (
-                  <p><time dateTime={validDate.toISOString()}>{new Intl.DateTimeFormat('en-US', {
-                    month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC',
-                  }).format(validDate)}</time></p>
-                ) : null}
-                {review.url ? (
-                  <SmartLink href={review.url} className="inline-block text-brand-blue underline underline-offset-4">
-                    Read original review
-                  </SmartLink>
-                ) : null}
-              </figcaption>
-            </figure>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function SponsorGroup({ heading, sponsors }: { heading: string; sponsors: LocationSponsor[] }) {
+function SponsorGroup({ heading, highlightText, description, sponsors }: SectionCopy & { sponsors: LocationSponsor[] }) {
   if (!sponsors.length) return null;
   return (
     <section className="space-y-8" aria-label={heading}>
-      <h2 className={SECTION_HEADING}>{heading}</h2>
+      <LocationSectionHeading heading={heading} highlightText={highlightText} description={description} />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {sponsors.map(({ id, feature, areaNames }) => (
           <article key={id} className="space-y-4 rounded-3xl border border-blue-200 bg-white p-6">
@@ -134,46 +103,59 @@ function SponsorGroup({ heading, sponsors }: { heading: string; sponsors: Locati
 
 /** All records arrive from the deployment snapshot. This component never fetches CMS content. */
 export default function LocationHub({
-  page, projects, reviews, sponsors, neighborhoods, neighborhoodProjects, faqs, services,
+  page, projects, reviews, sponsors, neighborhoods, neighborhoodProjects, faqs,
 }: LocationHubProps) {
   const faqItems = faqs.map(({ id, title, contentHtml }) => ({ id, title, contentHtml: sanitizeFaqHtml(contentHtml) }));
+  const customerReviews = [...reviews.local, ...reviews.nearby];
   return (
     <>
-      <LandingHero scriptFontClassName={allura.variable} title={page.title} />
+      <LandingHero scriptFontClassName={allura.variable} title={page.title}
+        highlightText={['BEST', 'Over 39 Years']} description={page.introduction} />
       <div data-location-hub className="mx-auto max-w-[1280px] space-y-20 px-4 py-14 md:space-y-24 md:py-20">
-        <div className="max-w-3xl space-y-6 text-lg leading-relaxed text-slate-700">
-          <p>{page.introduction}</p>
-          {page.overviewHtml ? <div className="space-y-4" dangerouslySetInnerHTML={{ __html: sanitizeFaqHtml(page.overviewHtml) }} /> : null}
-        </div>
+        {page.overviewHtml ? (
+          <div className="mx-auto max-w-3xl space-y-4 text-lg leading-relaxed text-slate-700"
+            dangerouslySetInnerHTML={{ __html: sanitizeFaqHtml(page.overviewHtml) }} />
+        ) : null}
 
-        <ProjectGroup heading={`Recent roofing projects in ${page.name}`} projects={projects.local} />
-        <ProjectGroup heading="Roofing projects in nearby areas" projects={projects.nearby} />
-        <ReviewGroup heading={`Reviews from ${page.name}`} reviews={reviews.local} />
-        <ReviewGroup heading="Reviews from nearby areas" reviews={reviews.nearby} />
-
-        {services.length ? (
-          <section aria-labelledby="location-services" className="space-y-8">
-            <h2 id="location-services" className={SECTION_HEADING}>Roofing services</h2>
-            <div className="grid gap-4 md:grid-cols-2">
-              {services.map((service) => (
-                <SmartLink key={service.slug} href={service.href}
-                  className="block space-y-3 rounded-3xl border border-blue-200 p-6 transition hover:bg-blue-50">
-                  <h3 className="text-2xl text-brand-blue">{service.navLabel}</h3>
-                  {service.intro ? <p className="text-slate-600">{service.intro}</p> : null}
-                </SmartLink>
-              ))}
-            </div>
+        <ProjectGroup heading={`Recent roofing projects in ${page.name}`} highlightText={page.name}
+          description={`Take a closer look at our roofing work in ${page.name}.`} projects={projects.local} />
+        <ProjectGroup heading="Roofing projects in nearby areas" highlightText="nearby areas"
+          description="Explore roofing projects in nearby communities." projects={projects.nearby} />
+        {customerReviews.length ? (
+          <section aria-labelledby="location-reviews" className="space-y-8">
+            <LocationSectionHeading id="location-reviews" heading="What Our Customers Say" highlightText="Our Customers"
+              description="Read what our customers have shared about their experience with SonShine Roofing." />
+            <LocationReviewsCarousel reviews={customerReviews} />
           </section>
         ) : null}
 
+        <InitialNavigation heading={`Roofing Services in ${page.name}`} headingId="location-services"
+          highlightText={page.name} embedded trustPills={(
+            <div className={cn(FEATURE_LIST_CLASS, 'mt-6 pb-0')}>
+              <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+                <CalendarDays className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />39+ Years of Expertise
+              </span>
+              <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+                <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />Licensed and Insured
+              </span>
+              <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
+                <HandCoins className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />Flexible Financing
+              </span>
+            </div>
+          )} />
+
         <ServiceAreaSection areaId={page.id} locationName={page.name} mapImage={page.mapImage}
           neighborhoods={neighborhoods} projects={neighborhoodProjects ?? projects.local} />
-        <SponsorGroup heading={`Partnerships in ${page.name}`} sponsors={sponsors.local} />
-        <SponsorGroup heading="Partnerships in nearby areas" sponsors={sponsors.nearby} />
+        <SponsorGroup heading={`Partnerships in ${page.name}`} highlightText={page.name}
+          description={`Meet the organizations we support in ${page.name}.`} sponsors={sponsors.local} />
+        <SponsorGroup heading="Partnerships in nearby areas" highlightText="nearby areas"
+          description="Meet the organizations we support in nearby communities." sponsors={sponsors.nearby} />
 
         {faqItems.length ? (
           <section aria-label="Roofing questions and answers">
-            <FaqInlineListClient heading="Roofing questions and answers" seeMoreHref="/faq" items={faqItems} />
+            <FaqInlineListClient heading="Roofing questions and answers" highlightText="questions and answers"
+              description={`Find answers about roofing in ${page.name} and working with SonShine Roofing.`}
+              className="px-2" seeMoreHref="/faq" items={faqItems} />
             <JsonLd data={faqSchema(faqItems.map((faq) => ({
               question: faq.title,
               answerHtml: faq.contentHtml,
