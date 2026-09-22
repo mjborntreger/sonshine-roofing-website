@@ -137,7 +137,7 @@ const full = await fetchDirectusProjectSnapshot(env, async (url, options) => {
 assert.equal(full.projects.length, 101, 'top-level pagination must include every published project');
 assert.deepEqual(JSON.parse(requests.find((url) => url.pathname.endsWith('/roofing_projects')).searchParams.get('deep')), { gallery: { _limit: -1, _sort: ['sort'] } });
 
-for (const filename of ['lib/content/wp.ts', 'app/api/wp-debug/route.ts', 'app/sitemap_index/project/route.ts', 'app/sitemap_index/image/route.ts', 'app/sitemap_index/video/route.ts']) {
+for (const filename of ['lib/content/blog.ts', 'lib/content/projects.ts', 'app/sitemap_index/project/route.ts', 'app/sitemap_index/image/route.ts', 'app/sitemap_index/video/route.ts']) {
   const code = await readFile(new URL(`../${filename}`, import.meta.url), 'utf8');
   assert.doesNotMatch(code, /\bprojects\s*\(\s*(?:first|\n)|\bproject\s*\(\s*id:|WP_PROJECT_BASE/u, `${filename} retains a WordPress project query`);
 }

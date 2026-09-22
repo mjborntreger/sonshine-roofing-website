@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, MouseEvent, ReactNode } from "react";
 import type { PageResult, ResourceKind, ResourceQuery } from "@/lib/ui/pagination";
-import type { PostCard } from "@/lib/content/wp";
+import type { PostCard } from "@/lib/content/content-types";
 import type { VideoItem } from "@/lib/content/video-types";
 import type { ProjectSummary } from "@/lib/content/project-types";
 import { fetchPage, getCachedPages, setCachedPages } from "@/lib/content/resource-fetch";

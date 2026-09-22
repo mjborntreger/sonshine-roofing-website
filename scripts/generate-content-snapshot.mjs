@@ -27,7 +27,7 @@ const fetcher = async (url, options) => {
 };
 const locations = await fetchDirectusLocationSnapshot(projects, process.env, fetcher, shared);
 const media = await fetchStaticMediaSnapshot();
-editorial.redirects = await fetchDirectusRedirects();
+Object.assign(editorial, await fetchDirectusRedirects());
 editorial.routeOwners = await validateRouteOwners({
   clientSlug: editorial.clientSlug,
   readCollection: async (collection) => {

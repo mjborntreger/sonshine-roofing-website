@@ -9,7 +9,7 @@ import type {
   LegalCopy,
   ReviewsCarouselSettings,
 } from './editorial-types';
-import type { TermLite } from './wp';
+import type { TermLite } from './content-types';
 import type { WebsitePage } from './directus-site';
 import type { Review } from '@/components/reviews-widget/types';
 

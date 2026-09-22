@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { argsFor, readPrivate, writePrivate } from '../location-migration/io.mjs';
+import { argsFor, readPrivate, writePrivate } from '../lib/private-artifacts.mjs';
 import { prepareRecoveryDirectory } from '../location-model/permissions.mjs';
 import { VERSION, CLIENT, FIELDS, requireSafe, planEnrichment, publicSummary, validateApproval, applyEnrichmentPlan } from './core.mjs';
 

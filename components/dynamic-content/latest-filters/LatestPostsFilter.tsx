@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import LatestPostsFilterClient from "./LatestPostsFilter.client";
 import BlogArchiveCard from "@/components/dynamic-content/blog/BlogArchiveCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { PostCard } from "@/lib/content/wp";
+import type { PostCard } from "@/lib/content/content-types";
 import {
   POST_TAB_CONFIG,
   type CategoryKey,

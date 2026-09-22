@@ -1,18 +1,18 @@
-import type { WpImage } from '@/lib/content/wp';
+import type { ContentImage } from '@/lib/content/content-types';
 
 export type PersonSeo = {
   meta_title: string;
   meta_description: string;
   og_title: string;
   og_description: string;
-  og_image: WpImage | null;
+  og_image: ContentImage | null;
 };
 
 export type PersonSeoSource = {
   title: string;
   positionTitle: string | null;
   contentPlain: string;
-  featuredImage: WpImage | null;
+  featuredImage: ContentImage | null;
 };
 
 function truncateSeoText(value: string, limit = 160): string {

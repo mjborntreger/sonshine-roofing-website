@@ -3,8 +3,8 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import SmartLink from "@/components/utils/SmartLink";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import type { PostCard } from "@/lib/content/wp";
-import { stripHtml } from "@/lib/content/wp";
+import type { PostCard } from "@/lib/content/content-types";
+import { stripHtml } from "@/lib/content/html-text";
 import {
   BLOG_PREVIEW_CARD_MIN_HEIGHT_CLASS,
   lineClampStyle,

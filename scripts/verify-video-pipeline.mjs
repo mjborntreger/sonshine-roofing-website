@@ -28,7 +28,7 @@ const sourceVideos = Array.from({ length: 251 }, (_, index) => ({
   title: `Independent clip ${index}`, description: index === 0 ? 'An installation explainer.' : 'Roofing context.',
   youtube_url: `https://youtu.be/v${String(index).padStart(10, '0')}`, youtube_id: `v${String(index).padStart(10, '0')}`,
   published_at: new Date(Date.UTC(2020, 0, index + 1)).toISOString(), source_updated_at: '2021-01-01T00:00:00Z',
-  legacy_ids: [`legacy-${index}`, ...(index === 0 ? ['project-original-project', 'original-project'] : [])],
+  legacy_ids: [`legacy-${index}`, ...(index === 0 ? ['project-original-project', 'original-project', '12345', 'dmlkZW9MaWJyYXJ5OjEyMzQ1', 'roof-😀'] : [])],
   project: index === 0 ? 'visible-project-id' : index === 1 ? 'hidden-project-id' : null,
 }));
 const sourceAssignments = sourceVideos.filter((_, index) => index !== 2).map((video, index) => ({ id: `assignment-${index}`, video: video.id, category: 'explain' }));
@@ -81,6 +81,9 @@ assert.equal(linked.date, sourceVideos[0].published_at);
 assert.equal(linked.modified, sourceVideos[0].source_updated_at);
 assert.equal(linked.uploadDate, null, 'website publication cannot be relabeled as YouTube upload');
 assert.equal(findVideoInSnapshot(snapshot, 'project-original-project').id, linked.id);
+for (const alias of ['12345', 'dmlkZW9MaWJyYXJ5OjEyMzQ1', 'roof-😀']) {
+  assert.equal(findVideoInSnapshot(snapshot, alias).id, linked.id, 'Imported numeric, GraphQL, and Unicode selections must survive retirement of the importer');
+}
 assert.equal(findVideoInSnapshot(snapshot, 'original-project').id, linked.id);
 assert.equal(findVideoInSnapshot(snapshot, 'legacy-250').slug, 'clip-250');
 const hidden = findVideoInSnapshot(snapshot, 'clip-1');

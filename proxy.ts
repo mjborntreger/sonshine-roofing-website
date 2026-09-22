@@ -1,4 +1,10 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { deploymentBundle } from './lib/content/deployment-snapshot.mjs';
+import {
+  isLegacyMediaPath,
+  resolveLegacyMediaRedirect,
+  type LegacyMediaRedirect,
+} from './lib/content/legacy-media-redirects.mjs';
 
 const energyEfficientLegacyPath =
   '/🌞-energy-efficient-roofing-options-for-florida-homes-save-money-and-beat-the-heat-☀💸🏠';
@@ -50,6 +56,13 @@ function matchesGoneRoute(pathname: string): boolean {
 }
 
 export function proxy(req: NextRequest) {
+  if (isLegacyMediaPath(req.nextUrl.pathname)) {
+    const snapshot = deploymentBundle().snapshots['editorial.json'] as {
+      legacyMediaRedirects: LegacyMediaRedirect[];
+    };
+    const rule = resolveLegacyMediaRedirect(req.url, snapshot.legacyMediaRedirects);
+    if (rule) return NextResponse.redirect(rule.destination, rule.statusCode);
+  }
   const pathname = normalizedLegacyPath(req.nextUrl.pathname);
 
   if (pathname === energyEfficientLegacyPath) {

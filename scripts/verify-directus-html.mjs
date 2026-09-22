@@ -34,4 +34,15 @@ assert.equal(
 
 assert.equal(sanitizeDirectusHtml('<script>alert(1)</script><p>Keep</p>'), '<p>Keep</p>');
 
+assert.equal(
+  sanitizeDirectusHtml('<script>alert(1)</script><p onclick="alert(2)">Keep <strong>this</strong>.</p><a href="javascript:alert(3)">Bad link</a><iframe src="https://example.com/embed/test"></iframe>'),
+  '<p>Keep <strong>this</strong>.</p><a>Bad link</a>',
+);
+const article = sanitizeDirectusHtml(
+  '<h2>Roofing project</h2><figure><img src="https://cms.example.test/assets/roof" alt="Finished roof"></figure><p>Read <a href="https://example.com/details" target="_blank">details</a>.</p>',
+);
+assert.match(article, /<h2>Roofing project<\/h2>/);
+assert.match(article, /src="https:\/\/cms\.example\.test\/assets\/roof"/);
+assert.match(article, /rel="noopener noreferrer"/);
+
 process.stdout.write('Directus article HTML fixtures passed.\n');

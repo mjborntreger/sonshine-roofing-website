@@ -1,4 +1,5 @@
 import { deploymentBundle } from './lib/content/deployment-snapshot.mjs';
+import { nonMediaLegacyRedirects } from './lib/content/legacy-media-redirects.mjs';
 import { getDirectusBuildSettings } from './lib/content/directus-build-settings.mjs';
 
 const directusBuildSettings = await getDirectusBuildSettings();
@@ -6,8 +7,6 @@ const csp = directusBuildSettings?.contentSecurityPolicy ?? '';
 
 const imageRemotePatterns = [
   { protocol: 'https', hostname: 'sonshineroofing.com' },
-  { protocol: 'https', hostname: 'wp.sonshineroofing.com' },
-  { protocol: 'https', hostname: '**.wp.com' },
   { protocol: 'https', hostname: 'coc.codes' },
   { protocol: 'https', hostname: 'res.cloudinary.com' },
   { protocol: 'https', hostname: 'seal-westflorida.bbb.org' },
@@ -118,14 +117,8 @@ const nextConfig = {
       // Content-specific redirects are managed in Directus and loaded at build time.
       ...directusRedirects,
 
-      // De-paginate everywhere: /something/page/2 -> /something/
-      { source: '/:prefix*/page/:n(\\d+)', destination: '/:prefix*', permanent: true },
-
-      // Strip .html endings globally
-      { source: '/:path*.html', destination: '/:path*', permanent: true },
-
-      // WordPress sitemap aliases need regex matching that the shared redirects schema does not expose.
-      { source: '/:prefix*/:seg(wp\\-sitemap.*)', destination: '/sitemap_index', permanent: true },
+      // Absolute /wp-content redirects use the sealed snapshot in Proxy.
+      ...nonMediaLegacyRedirects,
     ];
   },
 };

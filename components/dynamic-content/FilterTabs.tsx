@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import type { ReactNode } from "react";
-import type { TermLite } from "@/lib/content/wp";
+import type { TermLite } from "@/lib/content/content-types";
 import { Layers, MapPin, Palette } from "lucide-react";
 
 type TabKey = string;
