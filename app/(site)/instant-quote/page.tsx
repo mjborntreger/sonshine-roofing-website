@@ -13,7 +13,7 @@ import { SITE_ORIGIN } from "@/lib/seo/site";
 import { listRecentPostsPool } from "@/lib/content/blog";
 import { listFaqs } from "@/lib/content/directus-faqs";
 
-export const revalidate = 900;
+export const revalidate = false;
 
 const PAGE_PATH = "/instant-quote";
 const PAGE_TITLE = "60-sec Roof Quote | SonShine Roofing";
@@ -97,3 +97,5 @@ export default async function InstantQuotePage() {
     </>
   );
 }
+
+export const dynamic = 'force-static';

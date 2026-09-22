@@ -301,3 +301,7 @@ export default async function HomeownerReferralProgramPage() {
     </>
   );
 }
+
+export const revalidate = false;
+
+export const dynamic = 'force-static';

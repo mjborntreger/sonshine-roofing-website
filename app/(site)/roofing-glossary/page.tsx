@@ -9,7 +9,7 @@ import { breadcrumbSchema, definedTermSchema } from '@/lib/seo/schema';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 
-export const revalidate = 86400; // daily ISR
+export const revalidate = false;
 const PAGE_PATH = '/roofing-glossary';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GlossaryArchivePage() {
-  const terms = await listGlossaryIndex(500);
+  const terms = await listGlossaryIndex();
 
   // Group by first letter (A-Z, then # for non-letters)
   const groups = new Map<string, { title: string; slug: string }[]>();
@@ -134,3 +134,5 @@ export default async function GlossaryArchivePage() {
     </Section>
   );
 }
+
+export const dynamic = 'force-static';

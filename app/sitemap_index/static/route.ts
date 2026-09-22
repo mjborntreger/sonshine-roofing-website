@@ -1,30 +1,25 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { NextResponse } from 'next/server';
-import { resolveSiteOrigin, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
+import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 // The manifest is generated at build time to: public/__sitemaps/static-routes.json
-// We fetch it from the current origin so this works on prod and staging without hardcoding.
+// It belongs to the same sealed content bundle as every other sitemap.
 
 type StaticManifest = { generatedAt?: string; routes: { loc: string; lastmod?: string }[] };
 
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
 
-// Important: render dynamically so we always read the latest manifest
-export const dynamic = 'force-dynamic';
-// (No revalidate; handled by reading the JSON at request time)
+// Render once using the deployment manifest.
+export const dynamic = 'force-static';
 
-export async function GET(req: Request) {
+
+export async function GET() {
   if (!SITEMAPS_ENABLED) return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
 
-  const origin = resolveSiteOrigin(req.headers);
-  let manifest: StaticManifest = { routes: [] };
-
-  try {
-    const res = await fetch(`${origin}/__sitemaps/static-routes.json`, { cache: 'no-store' });
-    if (res.ok) manifest = (await res.json()) as StaticManifest;
-  } catch {
-    // fall through with empty manifest
-  }
+  const origin = SITE_ORIGIN;
+  const manifest = JSON.parse(readFileSync(join(process.cwd(), 'public/__sitemaps/static-routes.json'), 'utf8')) as StaticManifest;
 
   const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,
@@ -49,3 +44,5 @@ export async function GET(req: Request) {
     },
   });
 }
+
+export const revalidate = false;

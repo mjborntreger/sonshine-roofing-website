@@ -10,7 +10,7 @@ import { breadcrumbSchema, personSchema, webPageSchema } from '@/lib/seo/schema'
 import { SITE_ORIGIN } from '@/lib/seo/site';
 import { getSiteSettings } from '@/lib/content/directus-site';
 
-export const revalidate = 86400;
+export const revalidate = false;
 
 // Dynamic metadata per person
 export async function generateMetadata({
@@ -63,13 +63,13 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const navItems = await listPersonNav(50);
+  const navItems = await listPersonNav();
   return navItems.map(({ slug }) => ({ slug }));
 }
 
 export default async function PersonPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const [person, navItems] = await Promise.all([listPersonsBySlug(slug), listPersonNav(50)]);
+  const [person, navItems] = await Promise.all([listPersonsBySlug(slug), listPersonNav()]);
   if (!person) return notFound();
 
   const idx = navItems.findIndex((item) => item.slug === slug);
@@ -188,3 +188,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
     </Section>
   );
 }
+
+export const dynamic = 'force-static';
+
+export const dynamicParams = false;

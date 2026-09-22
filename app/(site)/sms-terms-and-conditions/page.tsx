@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export const revalidate = 86400;
+export const revalidate = false;
 
 export default async function SmsTermsAndConditionsPage() {
   const legalCopy = await getLegalCopy();
@@ -32,3 +32,5 @@ export default async function SmsTermsAndConditionsPage() {
     </Section>
   );
 }
+
+export const dynamic = 'force-static';

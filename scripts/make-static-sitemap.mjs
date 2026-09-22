@@ -28,30 +28,6 @@ function loadEnvFile(filename) {
 loadEnvFile('.env');
 loadEnvFile('.env.local');
 
-async function readDirectusCollection(collection, fields) {
-  const baseUrl = (process.env.DIRECTUS_URL ?? '').trim().replace(/\/+$/u, '');
-  const token = (process.env.DIRECTUS_TOKEN ?? process.env.DIRECTUS_STATIC_TOKEN ?? '').trim();
-  const clientSlug = (process.env.DIRECTUS_CLIENT_SLUG ?? '').trim();
-  if (!baseUrl || !token || !clientSlug) {
-    throw new Error('[static-sitemap] Directus configuration is required.');
-  }
-  const url = new URL(`/items/${collection}`, baseUrl);
-  url.searchParams.set('fields', fields.join(','));
-  url.searchParams.set(
-    'filter',
-    JSON.stringify({ client: { slug: { _eq: clientSlug } }, status: { _eq: 'published' } }),
-  );
-  url.searchParams.set('limit', '500');
-  const response = await fetch(url, {
-    headers: { Accept: 'application/json', Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) {
-    throw new Error(`[static-sitemap] Directus ${collection} request failed with HTTP ${response.status}.`);
-  }
-  const payload = await response.json();
-  return Array.isArray(payload.data) ? payload.data : [];
-}
-
 const files = await fg(['app/**/page.@(tsx|jsx|mdx)'], {
   dot: false,
   onlyFiles: true,
@@ -119,10 +95,8 @@ const items = files
   })
   .sort((a, b) => a.loc.localeCompare(b.loc));
 
-const [websitePages, services] = await Promise.all([
-  readDirectusCollection('website_pages', ['path', 'noindex']),
-  readDirectusCollection('services', ['slug', 'noindex']),
-]);
+const { websitePages } = JSON.parse(readFileSync(join(ROOT, '.generated/editorial.json'), 'utf8'));
+const { siteShell: { services } } = JSON.parse(readFileSync(join(ROOT, '.generated/locations.json'), 'utf8'));
 const fixedNoindexPaths = new Set(
   websitePages.filter((page) => page.noindex === true).map((page) => page.path),
 );

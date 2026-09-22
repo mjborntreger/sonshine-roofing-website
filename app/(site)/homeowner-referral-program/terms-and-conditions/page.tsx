@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export const revalidate = 86400;
+export const revalidate = false;
 
 export default async function ReferralProgramTermsPage() {
   const settings = await getSiteSettings();
@@ -175,3 +175,5 @@ export default async function ReferralProgramTermsPage() {
     </Section>
   );
 }
+
+export const dynamic = 'force-static';

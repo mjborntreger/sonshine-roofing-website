@@ -1,4 +1,4 @@
-import { getDirectusRedirects } from './lib/content/directus-redirects.mjs';
+import { deploymentBundle } from './lib/content/deployment-snapshot.mjs';
 import { getDirectusBuildSettings } from './lib/content/directus-build-settings.mjs';
 
 const directusBuildSettings = await getDirectusBuildSettings();
@@ -15,7 +15,7 @@ const imageRemotePatterns = [
   { protocol: 'https', hostname: 'www.google.com' },
 ];
 
-const directusUrl = process.env.DIRECTUS_URL?.trim();
+const directusUrl = deploymentBundle().snapshots['editorial.json'].assetOrigin;
 if (directusUrl) {
   try {
     const url = new URL(directusUrl);
@@ -27,7 +27,7 @@ if (directusUrl) {
       });
     }
   } catch {
-    // Ignore invalid local configuration; the content fetcher will surface missing/invalid env separately.
+    // The build capture validates the source URL before sealing the bundle.
   }
 }
 
@@ -35,8 +35,8 @@ if (directusUrl) {
 const nextConfig = {
   typedRoutes: true,
   output: 'standalone',
-  outputFileTracingIncludes: { '/*': ['./.generated/projects.json', './.generated/static-media.json'] },
-  // Keep WordPress and Directus traffic bounded while static pages are generated.
+  outputFileTracingIncludes: { '/*': ['./.generated/*.json', './public/__sitemaps/static-routes.json', './public/llms.txt'] },
+  // Bound resource use while rendering the captured content into static pages.
   experimental: {
     cpus: 2,
     staticGenerationMaxConcurrency: 1,
@@ -104,7 +104,7 @@ const nextConfig = {
   trailingSlash: false,
 
   async redirects() {
-    const directusRedirects = await getDirectusRedirects();
+    const directusRedirects = deploymentBundle().snapshots['editorial.json'].redirects;
 
     return [
       // === Canonical host — www → apex (run first to avoid extra hops) ===

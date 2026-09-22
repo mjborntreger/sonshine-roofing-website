@@ -1,5 +1,43 @@
 # Content Workflow
 
+## Deployment-only publishing contract
+
+All Directus-owned website content is captured during prebuild and becomes public
+only when that successful build is deployed. This includes edits, new records,
+unpublishing, slug changes, metadata, shared content, reviews, redirects, robots,
+`llms.txt`, archives, resource API responses, and every sitemap. A CMS save alone
+never changes an existing deployment. Urgent removals also require a deployment.
+
+`scripts/prebuild.mjs` coordinates complete, client-scoped reads and existing
+normalizers/sanitizers. It writes private `projects.json`, `locations.json`,
+`static-media.json`, and `editorial.json` under `.generated/`. Shared sponsors,
+reviews, and offers are captured once for their consumers. Site settings supply
+both rendering and build configuration. Route ownership is checked against the
+captured records; runtime lookup, navigation, pagination and sitemaps use that
+same inventory. Published `noindex` records remain routable.
+
+`.generated/content-manifest.json` seals the snapshot files, static sitemap
+manifest and optional `llms.txt` with hashes. Required fetch, pagination, scope,
+normalization and integrity failures stop the candidate build. There is no stale
+snapshot, empty-inventory or live-CMS recovery path. Server startup validates the
+whole bundle. Keep these artifacts private, ignored by Git, and packaged together
+with the standalone application; do not change them inside a running deployment.
+
+Content pages and sitemaps have no ISR. Every CMS detail route disables dynamic
+fallback, so a slug absent from its deployment returns 404. Runtime resource APIs
+remain interactive but read local snapshots. Both authenticated revalidation
+methods return HTTP 410 with a deployment-required message and perform no cache
+writes; unauthenticated requests return 401.
+
+Offer expiration, consent state, opening-hours displays and other existing
+clock/client behavior continue to operate on captured values. External media
+bytes and YouTube playback are not packaged with the content. Replace published
+Directus media by uploading a new file and changing its reference; preserve old
+files so older deployments and rollback retain their media.
+
+See [deployment verification](DEPLOY.md#cache-and-invalidation) for the build,
+runtime and two-release acceptance gates.
+
 ## Where content lives
 
 - Directus `roofing_service_areas` owns location landing pages. The five hubs were deployed and verified on September 17; see [release evidence](docs/location-release-20260917.md).

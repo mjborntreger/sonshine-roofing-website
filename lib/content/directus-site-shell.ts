@@ -195,11 +195,7 @@ export function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/, '');
 }
 
-export function normalizeWebsitePath(value: string): string {
-  const withoutQuery = value.split(/[?#]/, 1)[0] || '/';
-  const withLeadingSlash = withoutQuery.startsWith('/') ? withoutQuery : `/${withoutQuery}`;
-  return withLeadingSlash.length > 1 ? withLeadingSlash.replace(/\/+$/, '') : '/';
-}
+export { normalizeWebsitePath } from './site-path.ts';
 
 function getAssetUrl(config: DirectusConfig, id: string): string {
   return `${config.url}/assets/${encodeURIComponent(id)}`;
@@ -483,6 +479,7 @@ export const SITE_SETTINGS_FIELDS = [
     ] as const;
 
 export const SERVICE_SUMMARY_FIELDS = [
+      'scope_key',
       'id',
       'client.slug',
       'status',

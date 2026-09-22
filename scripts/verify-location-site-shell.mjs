@@ -138,14 +138,15 @@ function loadRuntime(snapshot) {
     if (id === 'server-only') return {};
     if (id === 'react') return { cache: callback => callback };
     if (id === './locations') return { deployedLocations: () => snapshot };
-    if (id === './directus-site-shell') return shellModule;
+    if (id === './site-path') return shellModule;
+    if (id === './editorial') return { deployedEditorial: () => ({ websitePages: [{ path: '/other', noindex: true, pageType: 'fixed', metaTitle: 'Frozen other page' }] }) };
     if (id === '@/lib/seo/meta') return { buildBasicMetadata: value => ({ ...value }) };
     return require(id);
   };
   new Function('require', 'module', 'exports', source)(runtimeRequire, loadedModule, loadedModule.exports);
   return loadedModule.exports;
 }
-await check('other-page metadata refresh cannot change deployed hero, footer, services or navigation', async () => {
+await check('all shared content and page metadata remain frozen without runtime reads', async () => {
   const { snapshot: siteShell } = await build();
   const runtime = loadRuntime({ siteShell, navigation: [{ label: 'Frozen navigation', href: '/frozen' }] });
   const originalFetch = globalThis.fetch;
@@ -156,36 +157,19 @@ await check('other-page metadata refresh cannot change deployed hero, footer, se
     const collection = new URL(input).pathname.split('/').at(-1);
     assert.equal(collection, 'website_pages', 'Runtime must never fetch settings or services.');
     liveRequests++;
-    return { ok: true, json: async () => ({ data: [{ path: '/other', noindex: true, page_type: 'fixed', meta_title: 'Updated other page', meta_description: null }] }) };
+    return { ok: true, json: async () => ({ data: [{ path: '/other', noindex: true, page_type: 'fixed', meta_title: 'Frozen other page', meta_description: null }] }) };
   };
   try {
     assert.equal((await runtime.getSiteSettings()).heroImage.url, siteShell.settings.heroImage.url);
     const bundle = await runtime.getSiteBundle();
-    assert.equal(bundle.pages[0].metaTitle, 'Updated other page');
+    assert.equal(bundle.pages[0].metaTitle, 'Frozen other page');
     assert.deepEqual(bundle.settings, siteShell.settings);
     assert.deepEqual(bundle.services, siteShell.services);
     assert.equal(bundle.navigation[0].label, 'Frozen navigation');
-    assert.equal(liveRequests, 1);
+    assert.equal(liveRequests, 0);
     assert.deepEqual(await runtime.getSiteSettings(), siteShell.settings);
     assert.deepEqual(await runtime.getServices(), siteShell.services);
-    assert.equal(liveRequests, 1);
-  } finally {
-    globalThis.fetch = originalFetch;
-    for (const key of Object.keys(env)) {
-      if (prior[key] === undefined) delete process.env[key]; else process.env[key] = prior[key];
-    }
-  }
-});
-await check('remaining website-page reader rejects missing/null/non-array data', async () => {
-  const runtime = loadRuntime({ siteShell: {}, navigation: [] });
-  const originalFetch = globalThis.fetch;
-  const prior = { ...process.env };
-  Object.assign(process.env, env);
-  try {
-    for (const payload of [{}, { data: null }, { data: {} }]) {
-      globalThis.fetch = async () => ({ ok: true, json: async () => payload });
-      await assert.rejects(() => runtime.getWebsitePages(), /invalid collection response/);
-    }
+    assert.equal(liveRequests, 0);
   } finally {
     globalThis.fetch = originalFetch;
     for (const key of Object.keys(env)) {

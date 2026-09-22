@@ -43,7 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 type Params = { slug: string };
-export const revalidate = 600;
+export const revalidate = false;
 
 export default async function Page({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
@@ -109,3 +109,5 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     </>
   );
 }
+
+export const dynamic = 'force-static';

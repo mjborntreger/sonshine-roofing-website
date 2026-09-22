@@ -4,7 +4,7 @@ import { formatLastmod, normalizeEntryPath } from '../utils';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 export const dynamic = 'force-static';
-export const revalidate = 3600; // safety net; tag-based revalidation will be faster
+export const revalidate = false;
 
 const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();

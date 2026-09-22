@@ -10,7 +10,7 @@ import { breadcrumbSchema, collectionPageSchema } from "@/lib/seo/schema";
 import { SITE_ORIGIN } from "@/lib/seo/site";
 import Hero from "@/components/ui/Hero";
 
-export const revalidate = 900;
+export const revalidate = false;
 
 const PAGE_PATH = "/blog";
 const PAGE_TITLE = "Roofing Blog for Sarasota, Manatee & Charlotte Counties | SonShine Roofing";

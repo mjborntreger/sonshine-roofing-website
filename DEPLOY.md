@@ -46,9 +46,9 @@
   - `NEXT_PUBLIC_GTM_ID`
   - `NEXT_PUBLIC_META_PIXEL_ID`
   - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
-- Mark these server variables as build-time and runtime variables. Directus
-  content and redirects are read during builds, and the same values remain
-  available if a route renders at runtime:
+- These server variables are required at build time only. The standalone
+  application reads the sealed deployment bundle and does not need Directus
+  credentials or API access at runtime:
   - `DIRECTUS_URL`
   - `DIRECTUS_CLIENT_SLUG`
   - `DIRECTUS_TOKEN`
@@ -58,7 +58,7 @@
   - `N8N_WEBHOOK_URL`
   - `N8N_WEBHOOK_SECRET`
   - `TURNSTILE_SECRET_KEY`
-  - `REVALIDATE_SECRET`
+  - `REVALIDATE_SECRET` (optional; authenticates the retired endpoint's 410 response)
   - `ALLOWED_ORIGIN=https://sonshineroofing.com,https://www.sonshineroofing.com`
 - Optional build-time variables:
   - `YOUTUBE_API_KEY` for YouTube metadata during static generation.
@@ -85,7 +85,7 @@
 
 - [SEO.md](SEO.md) is the canonical robots and sitemap behavior reference.
 - Generated at build by `scripts/make-static-sitemap.mjs` → `public/__sitemaps/static-routes.json`.
-- Endpoint reads the manifest at request time: `/sitemap_index/static`.
+- `/sitemap_index/static` is prerendered from that local, sealed manifest.
 - If empty:
   - Confirm prebuild ran (visible in build logs "Wrote N static routes").
   - Confirm `proxy.ts` passes `^/__sitemaps/` and `^/sitemap_index` through
@@ -107,21 +107,40 @@
 
 ## Cache and invalidation
 
-- Remaining WordPress GraphQL data uses Next fetch revalidation where configured.
-- Directus route fetchers use ordinary `force-cache` reads without ISR options
-  or cache tags. The project prebuild fetcher uses fresh uncached reads to write
-  `.generated/projects.json`, which Docker packages privately with the standalone
-  application. Project runtime consumers read only that deployment artifact.
-- Publish Directus content changes through a new build. Project and special-offer
-  routes and their dedicated sitemaps reject runtime path revalidation. Mixed
-  video/image sitemaps and legacy location pages may still revalidate their other
-  content, while their project data stays fixed to the deployment snapshot.
-- Build settings and redirects use `no-store` while generating build outputs
-  and configuration. Directus review and review-carousel reads use untagged
-  `force-cache`; the revalidation endpoint has no review-specific tag.
-- Static sitemap: regenerated on build; read dynamically per request.
-- Published Directus redirects are fetched and validated by `next.config.mjs` at build time. Redirect changes require a new build.
-- Static generation is limited to two workers with one page per worker at a time to avoid bursting WordPress or Directus.
+- Every Directus-owned surface uses the deployment bundle described in
+  [CONTENT.md](CONTENT.md#deployment-only-publishing-contract). Build-only loaders
+  use uncached, fully paginated reads; runtime adapters do not fetch CMS records.
+- Content pages and sitemap handlers use `revalidate = false`; CMS detail routes
+  use `dynamicParams = false`. The blog resource API searches the packaged posts.
+  The static sitemap reads its packaged manifest locally during prerendering.
+- Both `/api/revalidate` methods reject authenticated calls with 410 and an
+  instruction to build/deploy. Missing or incorrect credentials receive 401.
+  There are no runtime path, tag, or layout invalidations.
+- `npm run build` captures, validates and seals the content bundle, builds Next,
+  and checks the generated prerender manifest. Docker copies all private
+  `.generated` artifacts and public build artifacts into the standalone image.
+  Node startup validates the bundle hashes before serving requests.
+- Run `npm run verify:deployment-builds` for two synthetic production builds with
+  shared build caches. The tests verify changed/new/removed content across releases,
+  cold restarts, no runtime network reads, complete page inventories and fail-closed
+  bundle validation. CI runs this without CMS credentials.
+- For release acceptance, use Node 22, run all applicable `verify:*` checks, then
+  `NEXT_PUBLIC_ENV=production npm run build` and
+  `npm run verify:deployment-runtime`. The latter requires production sitemaps to
+  be enabled in the build and runs an isolated copy of the standalone artifact.
+- After an authorized main push, verify the successful Coolify deployment and
+  running image commit. Check its bundle and prerender manifests, public routes,
+  metadata, blog resource results, sitemaps and unknown-slug 404s. Compare content
+  hashes with the reviewed candidate, accounting explicitly for commit-based
+  static-sitemap timestamps and any intervening CMS edits.
+- Failed builds leave the current deployment intact. Roll back by restoring the
+  prior complete application image with its matching bundle; rebuilding an old
+  Git commit against today's CMS is not a content rollback.
+- Existing remote-media delivery and clock-based behavior remain documented
+  exceptions. Keep old media files and upload new replacements under new IDs.
+- Retired webhook callers may receive 410. Do not change production n8n workflows
+  as part of this frontend contract; separately authorized integration changes
+  can adopt deployment-based publishing.
 
 ## Project releases and rollback
 
@@ -186,7 +205,7 @@
   - `www.sonshineroofing.com` redirects to `sonshineroofing.com` once both domains point at Coolify.
   - Legacy redirects and configured 410 routes still behave correctly.
   - A deprecated static landing-page URL returns 404 without redirecting.
-  - `/api/revalidate` rejects missing secrets and accepts a valid `REVALIDATE_SECRET`.
+  - `/api/revalidate` returns 401 for missing/incorrect secrets and 410 for a valid `REVALIDATE_SECRET`, without invalidating content.
   - An explicitly authorized synthetic lead submission verifies Turnstile and
     reaches n8n.
 - After promotion:

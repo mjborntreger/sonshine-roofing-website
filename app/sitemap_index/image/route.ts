@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { unstable_cache } from 'next/cache';
 import { listLocationSitemapEntries, deployedLocations } from '@/lib/content/locations';
 import { listBlogImageSitemapEntries } from '@/lib/content/blog';
 import { listProjectSitemapEntries } from '@/lib/content/projects';
@@ -9,21 +8,17 @@ import { serializeImageEntry, type ImageSitemapEntry } from './serialization';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 export const dynamic = 'force-static';
-export const revalidate = 3600;
+export const revalidate = false;
 
 const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
 
-const getBlogImageNodes = unstable_cache(
-  async () => listBlogImageSitemapEntries(),
-  ['sitemap-image-blog:directus'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:image', 'sitemap:image:blog'] },
-);
+
 
 const buildImageEntries = async (): Promise<ImageSitemapEntry[]> => {
   const [blogNodes, projectNodes, locationNodes, personNodes] = await Promise.all([
-    getBlogImageNodes(),
+    listBlogImageSitemapEntries(),
     listProjectSitemapEntries(),
     listLocationSitemapEntries(),
     listPersonSitemapEntries(),

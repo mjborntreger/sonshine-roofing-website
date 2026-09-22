@@ -1,29 +1,24 @@
 
 import { NextResponse } from 'next/server';
-import { unstable_cache } from 'next/cache';
 import { listGlossarySitemapEntries } from '@/lib/content/glossary';
 import { formatLastmod, normalizeEntryPath } from '../utils';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
 export const dynamic = 'force-static';
-export const revalidate = 3600; // safety net; tag-based revalidation will be faster
+export const revalidate = false;
 
 const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();
 const PREVIEW_HEADERS = sitemapPreviewHeaders();
 
-const getGlossaryUrls = unstable_cache(
-  async () => listGlossarySitemapEntries(),
-  ['sitemap-glossary:directus'],
-  { revalidate: 3600, tags: ['sitemap', 'sitemap:glossary'] },
-);
+
 
 export async function GET() {
   if (!SITEMAPS_ENABLED) {
     return NextResponse.json({ ok: true, note: 'sitemap disabled' }, { status: 404 });
   }
 
-  const items = await getGlossaryUrls();
+  const items = await listGlossarySitemapEntries();
 
   const head = [
     `<?xml version="1.0" encoding="UTF-8"?>`,

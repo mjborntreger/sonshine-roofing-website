@@ -27,5 +27,5 @@ for (const filename of DIRECTUS_FETCHERS) {
 }
 
 process.stdout.write(
-  `Verified ${DIRECTUS_FETCHERS.length} Directus fetchers use no ISR options.\n`,
+  `Verified ${DIRECTUS_FETCHERS.length} Directus adapter files contain no Next fetch revalidation options (adapter-only check).\n`,
 );

@@ -62,9 +62,9 @@ const locations = {
 const specs = [
   { route: 'locations/[slug]', map: 'location', prefix: '/locations/', module: '@/lib/content/locations', api: locations, revalidate: false, fixed: true },
   { route: 'project/[slug]', map: 'project', prefix: '/project/', module: '@/lib/content/projects', api: { listProjectSlugs: list, getProjectBySlug: async slug => row(slug), listRecentProjectsPool: async () => [], listProjectSitemapEntries: sitemap('/project/') }, revalidate: false, fixed: true },
-  { route: '[slug]', map: 'blog', prefix: '/', module: '@/lib/content/blog', api: { listPostSlugs: list, getPostBySlug: async slug => row(slug), listRecentPostsPool: async () => [], listRecentPostNav: async () => [], listBlogSitemapEntries: sitemap('/') }, revalidate: 900 },
-  { route: 'person/[slug]', map: 'person', prefix: '/person/', module: '@/lib/content/persons', api: { listPersonNav: nav, listPersonsBySlug: async slug => row(slug), listPersonSitemapEntries: sitemap('/person/') }, revalidate: 86400 },
-  { route: 'roofing-glossary/[slug]', map: 'roofing-glossary', prefix: '/roofing-glossary/', module: '@/lib/content/glossary', api: { listGlossaryIndex: nav, getGlossaryTerm: async slug => row(slug), listGlossarySitemapEntries: sitemap('/roofing-glossary/') }, revalidate: 86400 },
+  { route: '[slug]', map: 'blog', prefix: '/', module: '@/lib/content/blog', api: { listPostSlugs: list, getPostBySlug: async slug => row(slug), listRecentPostsPool: async () => [], listRecentPostNav: async () => [], listBlogSitemapEntries: sitemap('/') }, revalidate: false, fixed: true },
+  { route: 'person/[slug]', map: 'person', prefix: '/person/', module: '@/lib/content/persons', api: { listPersonNav: nav, listPersonsBySlug: async slug => row(slug), listPersonSitemapEntries: sitemap('/person/') }, revalidate: false, fixed: true },
+  { route: 'roofing-glossary/[slug]', map: 'roofing-glossary', prefix: '/roofing-glossary/', module: '@/lib/content/glossary', api: { listGlossaryIndex: nav, getGlossaryTerm: async slug => row(slug), listGlossarySitemapEntries: sitemap('/roofing-glossary/') }, revalidate: false, fixed: true },
   { route: 'special-offers/[slug]', map: 'special-offer', prefix: '/special-offers/', module: '@/lib/content/directus-special-offers', api: { listSpecialOfferSlugs: (...args) => { assert.equal(args.length, 0, 'Build-only offers must enumerate all slugs'); return list(); }, getSpecialOfferBySlug: async slug => row(slug), listSpecialOfferSitemapEntries: sitemap('/special-offers/') }, revalidate: false, fixed: true },
 ];
 await check('every parameterized public page has a route contract', () => {
@@ -76,8 +76,8 @@ for (const spec of specs) await check(`${spec.route} params, metadata, missing r
   const page = load(`app/(site)/${spec.route}/page.tsx`);
   assert.deepEqual(await page.generateStaticParams(), slugs.map(slug => ({ slug })));
   assert.equal(page.revalidate, spec.revalidate);
-  if (spec.fixed) assert.equal(page.dynamicParams, false);
-  else assert.notEqual(page.dynamicParams, false, 'ISR routes retain on-demand paths');
+  assert.equal(page.dynamicParams, false);
+  assert.equal(page.dynamic, 'force-static');
   const metadata = await page.generateMetadata(params('published'));
   assert.equal(metadata.path, `${spec.prefix}published`);
   assert.notEqual(metadata.robots?.index, false);
@@ -164,72 +164,34 @@ await check('FAQ archive schema describes all 70 displayed answers and preserves
   assert.equal(doc.querySelectorAll('.faq-answer').length, 70);
   assert.deepEqual(schema.mainEntity.map(item => item.name), faqs.map(item => item.title));
 });
-await check('special-offer build params and sitemap exhaust the same inventory beyond 200 and 500', async () => {
-  const saved = { ...process.env }, originalFetch = globalThis.fetch;
-  Object.assign(process.env, { DIRECTUS_URL: 'https://cms.example.test', DIRECTUS_CLIENT_SLUG: 'fixture', DIRECTUS_TOKEN: 'synthetic' });
-  const rows = Array.from({ length: 503 }, (_, i) => ({ client: { slug: 'fixture' }, status: 'published', slug: `offer-${i}`, title: `Offer ${i}`, noindex: i === 502, primary_focus_keyword: 'fixture', focus_keywords: ['fixture'], expiration_date: '2020-01-01' }));
-  let alter;
-  globalThis.fetch = async url => {
-    assert.equal(url.searchParams.get('sort'), 'slug');
-    assert.deepEqual(JSON.parse(url.searchParams.get('filter')), { client: { slug: { _eq: 'fixture' } }, status: { _eq: 'published' } });
-    const page = Number(url.searchParams.get('page')), limit = Number(url.searchParams.get('limit'));
-    const payload = { data: rows.slice((page - 1) * limit, page * limit), meta: { filter_count: rows.length } };
-    return { ok: true, json: async () => alter ? alter(payload, page) : payload };
-  };
+await check('snapshot readers enumerate the complete inventory without network access', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => { throw new Error('Runtime CMS access is forbidden'); };
+  const items = Array.from({ length: 503 }, (_, i) => ({ ...row('published'), slug: `item-${i}`, noindex: i === 502 }));
+  const editorial = { posts: items, topics: [], glossary: items, persons: [{ ...row('published'), slug: 'michael', showOnTeam: true }], offers: items, websitePages: [], sponsors: [], reviews: [], legalCopy: {} };
+  const load = loader({ './editorial': { deployedEditorial: () => editorial } });
   try {
-    const api = loader()('lib/content/directus-special-offers.ts');
-    const route = loader({ '@/lib/content/directus-special-offers': api })('app/(site)/special-offers/[slug]/page.tsx');
-    const paths = (await route.generateStaticParams()).map(item => `/special-offers/${item.slug}`);
-    const entries = await api.listSpecialOfferSitemapEntries();
-    assert.equal(paths.length, 503); assert.equal(entries.length, 502);
-    assert.ok(entries.every(item => paths.includes(item.uri)));
-    assert.ok(entries.some(item => item.uri === '/special-offers/offer-501'), 'Expired indexable offers remain indexable');
-    for (const [mutation, expected] of [
-      [(payload, page) => page === 2 ? { ...payload, data: [] } : payload, /truncated/],
-      [(payload, page) => page === 2 ? { ...payload, data: [rows[0]] } : payload, /duplicate/],
-      [payload => ({ ...payload, data: [{ ...rows[0], status: 'draft' }] }), /scope/],
-      [payload => ({ ...payload, data: [{ ...rows[0], client: { slug: 'other' } }] }), /scope/],
-      [payload => ({ ...payload, meta: {} }), /count/],
-    ]) { alter = mutation; await assert.rejects(api.listSpecialOfferSlugs(), expected); }
-  } finally {
-    globalThis.fetch = originalFetch;
-    for (const key of ['DIRECTUS_URL', 'DIRECTUS_CLIENT_SLUG', 'DIRECTUS_TOKEN']) {
-      if (saved[key] === undefined) delete process.env[key]; else process.env[key] = saved[key];
-    }
-  }
-});
-await check('live-backed ISR route adapters request only published records for their client', async () => {
-  const saved = { ...process.env }, originalFetch = globalThis.fetch;
-  Object.assign(process.env, { DIRECTUS_URL: 'https://cms.example.test', DIRECTUS_CLIENT_SLUG: 'fixture', DIRECTUS_TOKEN: 'synthetic' });
-  const calls = [];
-  globalThis.fetch = async url => {
-    const filter = JSON.parse(url.searchParams.get('filter'));
-    assert.equal(filter.client.slug._eq, 'fixture');
-    assert.equal(filter.status._eq, 'published');
-    calls.push({ path: url.pathname, filter });
-    return { ok: true, json: async () => ({ data: [] }) };
-  };
-  try {
-    const load = loader();
-    for (const [file, listName, getName, sitemapName, slug] of [
-      ['blog', 'listPostSlugs', 'getPostBySlug', 'listBlogSitemapEntries', 'fixture-post'],
-      ['persons', 'listPersonNav', 'listPersonsBySlug', 'listPersonSitemapEntries', 'michael'],
-      ['glossary', 'listGlossaryIndex', 'getGlossaryTerm', 'listGlossarySitemapEntries', 'fixture-term'],
+    for (const [file, list, get, sitemap, prefix] of [
+      ['blog', 'listPostSlugs', 'getPostBySlug', 'listBlogSitemapEntries', '/'],
+      ['glossary', 'listGlossaryIndex', 'getGlossaryTerm', 'listGlossarySitemapEntries', '/roofing-glossary/'],
+      ['directus-special-offers', 'listSpecialOfferSlugs', 'getSpecialOfferBySlug', 'listSpecialOfferSitemapEntries', '/special-offers/'],
     ]) {
       const api = load(`lib/content/${file}.ts`);
-      assert.deepEqual(await api[listName](), []);
-      assert.equal(await api[getName](slug), null);
-      assert.deepEqual(await api[sitemapName](), []);
+      assert.equal((await api[list]()).length, 503);
+      assert.equal((await api[get]('item-501')).slug, 'item-501');
+      assert.equal(await api[get]('new-after-build'), null);
+      const entries = await api[sitemap]();
+      assert.equal(entries.length, 502);
+      assert.ok(entries.some(entry => entry.uri === `${prefix}item-501`));
     }
-    assert.equal(calls.length, 9);
-    const before = calls.length;
-    assert.equal(await load('lib/content/persons.ts').listPersonsBySlug('excluded-person'), null);
-    assert.equal(calls.length, before, 'Excluded person slugs never query CMS');
-  } finally {
-    globalThis.fetch = originalFetch;
-    for (const key of ['DIRECTUS_URL', 'DIRECTUS_CLIENT_SLUG', 'DIRECTUS_TOKEN']) {
-      if (saved[key] === undefined) delete process.env[key]; else process.env[key] = saved[key];
-    }
-  }
+    const people = load('lib/content/persons.ts');
+    assert.equal((await people.listPersonNav()).length, 1);
+    assert.equal((await people.listPersonsBySlug('michael')).slug, 'michael');
+    assert.equal(await people.listPersonsBySlug('excluded-person'), null);
+    const posts = load('lib/content/blog.ts');
+    const first = await posts.listPostsPaged({ first: 50 });
+    const second = await posts.listPostsPaged({ first: 50, after: first.pageInfo.endCursor });
+    assert.equal(first.total, 503); assert.equal(second.items[0].slug, 'item-50');
+  } finally { globalThis.fetch = originalFetch; }
 });
-process.stdout.write(`${checks} dynamic route contract groups passed.\n`);
+process.stdout.write(`${checks} deployment route contract groups passed.\n`);

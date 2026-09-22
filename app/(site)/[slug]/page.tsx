@@ -23,7 +23,7 @@ import ResourcesQuickLinks from '@/components/global-nav/static-pages/ResourcesQ
 import BlogPostInlineImageLightbox from '@/components/dynamic-content/blog/BlogPostInlineImageLightbox';
 import { getSiteSettings } from '@/lib/content/directus-site';
 
-export const revalidate = 900;
+export const revalidate = false;
 
 // -------- Helpers (local) --------
 function stripHtml(html: string) {
@@ -160,7 +160,7 @@ function decorateExternalAnchors(html: string, baseHost: string) {
 
 // -------- Static params --------
 export async function generateStaticParams() {
-  const slugs = await listPostSlugs(200).catch(() => []);
+  const slugs = await listPostSlugs();
   return slugs.map((slug: string) => ({ slug }));
 }
 
@@ -225,7 +225,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const postPromise = getPostBySlug(slug);
   const poolPromise = listRecentPostsPool(36);
   const generalFaqsPromise = listFaqs({ limit: 8 }).catch(() => []);
-  const navPromise = listRecentPostNav(200).catch(
+  const navPromise = listRecentPostNav().catch(
     () => [] as Awaited<ReturnType<typeof listRecentPostNav>>,
   );
   const [post, pool, generalFaqs, all] = await Promise.all([
@@ -407,3 +407,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     </Section>
   );
 }
+
+export const dynamic = 'force-static';
+
+export const dynamicParams = false;

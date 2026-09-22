@@ -70,7 +70,7 @@ function autoLinkGlossary(
   return tokens.join('');
 }
 
-export const revalidate = 86400;
+export const revalidate = false;
 
 export async function generateMetadata({
   params,
@@ -104,7 +104,7 @@ export async function generateMetadata({
 }
 
 export async function generateStaticParams() {
-  const index = await listGlossaryIndex(500);
+  const index = await listGlossaryIndex();
   return index.map((term) => ({ slug: term.slug }));
 }
 
@@ -114,7 +114,7 @@ export default async function GlossaryTermPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [index, term] = await Promise.all([listGlossaryIndex(500), getGlossaryTerm(slug)]);
+  const [index, term] = await Promise.all([listGlossaryIndex(), getGlossaryTerm(slug)]);
   if (!term) notFound();
 
   const position = index.findIndex((item) => item.slug === slug);
@@ -196,3 +196,7 @@ export default async function GlossaryTermPage({
     </Section>
   );
 }
+
+export const dynamic = 'force-static';
+
+export const dynamicParams = false;

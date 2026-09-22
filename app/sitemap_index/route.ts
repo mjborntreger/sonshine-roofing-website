@@ -2,8 +2,8 @@
 import { NextResponse } from 'next/server';
 import { SITE_ORIGIN, sitemapEnabled, sitemapPreviewHeaders } from '@/lib/seo/site';
 
-export const dynamic = 'force-static'; // can be cached by ISR
-export const revalidate = 3600; // safety net (1h) – revalidateTag will bust sooner
+export const dynamic = 'force-static';
+export const revalidate = false;
 
 const BASE = SITE_ORIGIN;
 const SITEMAPS_ENABLED = sitemapEnabled();

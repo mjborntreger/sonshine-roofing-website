@@ -1,4 +1,5 @@
 import 'server-only';
+import { deployedEditorial } from './editorial';
 
 import type { Metadata } from 'next';
 import { cache } from 'react';
@@ -6,27 +7,9 @@ import { deployedLocations } from './locations';
 import type { NavItem } from '@/lib/routes';
 import { buildBasicMetadata, type BasicMetadataInput, type OgImageInput } from '@/lib/seo/meta';
 import {
-  readString, requiredString, readBoolean, readFocusKeywords, normalizeWebsitePath,
-  trimTrailingSlash, mapAsset, type DirectusConfig, type DirectusFileValue,
-} from './directus-site-shell';
-export { normalizeWebsitePath } from './directus-site-shell';
-
-type UnknownRecord = Record<string, unknown>;
-type DirectusListResponse<T> = { data?: T[]; errors?: Array<{ message?: string }> };
-
-type DirectusWebsitePageItem = {
-  path?: unknown;
-  meta_title?: unknown;
-  meta_description?: unknown;
-  og_image_override?: DirectusFileValue;
-  noindex?: unknown;
-  og_title?: unknown;
-  og_description?: unknown;
-  nav_label?: unknown;
-  page_type?: unknown;
-  primary_focus_keyword?: unknown;
-  focus_keywords?: unknown;
-};
+  normalizeWebsitePath,
+} from './site-path';
+export { normalizeWebsitePath } from './site-path';
 
 export type DirectusAsset = {
   id: string;
@@ -143,147 +126,11 @@ export type SiteBundle = {
   navigation: NavItem[];
 };
 
-let warnedForMissingConfig = false;
-
-function getDirectusConfig(): DirectusConfig | null {
-  const url = readString(process.env.DIRECTUS_URL);
-  const clientSlug = readString(process.env.DIRECTUS_CLIENT_SLUG);
-  const token = readString(process.env.DIRECTUS_TOKEN);
-
-  if (!url || !clientSlug || !token) {
-    const message =
-      '[directus-site] Missing DIRECTUS_URL, DIRECTUS_CLIENT_SLUG, or DIRECTUS_TOKEN.';
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error(message);
-    }
-    if (!warnedForMissingConfig) {
-      console.warn(message);
-      warnedForMissingConfig = true;
-    }
-    return null;
-  }
-
-  return { url: trimTrailingSlash(url), clientSlug, token };
-}
-
-async function fetchCollection<T>(
-  config: DirectusConfig,
-  collection: string,
-  fields: readonly string[],
-  filter: UnknownRecord,
-  options: { sort?: readonly string[]; limit?: number } = {},
-): Promise<T[]> {
-  const url = new URL(`items/${collection}`, `${config.url}/`);
-  url.searchParams.set('fields', fields.join(','));
-  url.searchParams.set('filter', JSON.stringify(filter));
-  url.searchParams.set('limit', String(options.limit ?? 100));
-  if (options.sort?.length) url.searchParams.set('sort', options.sort.join(','));
-
-  const response = await fetch(url, {
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${config.token}`,
-    },
-    cache: 'force-cache',
-  });
-
-  if (!response.ok) {
-    throw new Error(
-      `[directus-site] Directus ${collection} HTTP ${response.status} ${response.statusText}`,
-    );
-  }
-
-  const json = (await response.json()) as DirectusListResponse<T>;
-  if (json.errors?.length) {
-    throw new Error(
-      json.errors
-        .map((error) => error.message)
-        .filter(Boolean)
-        .join('; ') || `[directus-site] Directus ${collection} request failed.`,
-    );
-  }
-
-  if (!Array.isArray(json.data)) {
-    throw new Error(`[directus-site] Directus ${collection} returned an invalid collection response.`);
-  }
-  return json.data;
-}
-
 export const getSiteSettings = cache(async (): Promise<SiteSettings | null> => {
   return deployedLocations().siteShell.settings;
 });
 
-export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => {
-  const config = getDirectusConfig();
-  if (!config) return [];
-
-  const items = await fetchCollection<DirectusWebsitePageItem>(
-    config,
-    'website_pages',
-    [
-      'path',
-      'meta_title',
-      'meta_description',
-      'og_image_override.id',
-      'og_image_override.description',
-      'og_image_override.width',
-      'og_image_override.height',
-      'og_image_override.type',
-      'noindex',
-      'og_title',
-      'og_description',
-      'nav_label',
-      'page_type',
-      'primary_focus_keyword',
-      'focus_keywords',
-    ],
-    {
-      client: { slug: { _eq: config.clientSlug } },
-      status: { _eq: 'published' },
-    },
-    { sort: ['path'], limit: 500 },
-  );
-
-  const seen = new Set<string>();
-  return items.map((item) => {
-    const path = normalizeWebsitePath(requiredString(item.path, 'website_pages', 'path'));
-    if (seen.has(path)) {
-      throw new Error(`[directus-site] Duplicate website_pages path "${path}".`);
-    }
-    seen.add(path);
-    const noindex = readBoolean(item.noindex, false);
-    const focusKeywordMetadata = noindex
-      ? { primaryFocusKeyword: null, focusKeywords: [] }
-      : readFocusKeywords(
-          item.primary_focus_keyword,
-          item.focus_keywords,
-          'website_pages',
-          path,
-        );
-
-    return {
-      path,
-      metaTitle: noindex
-        ? readString(item.meta_title)
-        : requiredString(item.meta_title, 'website_pages', 'meta_title'),
-      metaDescription: noindex
-        ? readString(item.meta_description)
-        : requiredString(item.meta_description, 'website_pages', 'meta_description'),
-      ogImageOverride: mapAsset(
-        item.og_image_override ?? null,
-        config,
-        'website_pages',
-        'og_image_override',
-      ),
-      noindex,
-      ogTitle: readString(item.og_title),
-      ogDescription: readString(item.og_description),
-      navLabel: readString(item.nav_label),
-      pageType: requiredString(item.page_type, 'website_pages', 'page_type'),
-      ...focusKeywordMetadata,
-    };
-  });
-});
+export const getWebsitePages = cache(async (): Promise<WebsitePage[]> => deployedEditorial().websitePages);
 
 export async function getWebsitePage(path: string): Promise<WebsitePage | null> {
   const normalized = normalizeWebsitePath(path);

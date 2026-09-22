@@ -1,4 +1,4 @@
-import { rm, writeFile } from 'node:fs/promises';
+import { rm, writeFile, readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { loadEnvFile } from 'node:process';
 
@@ -10,8 +10,7 @@ try {
 
 process.env.NODE_ENV = 'production';
 
-const { getDirectusBuildSettings } = await import('../lib/content/directus-build-settings.mjs');
-const settings = await getDirectusBuildSettings();
+const { buildSettings: settings } = JSON.parse(await readFile(new URL('../.generated/editorial.json', import.meta.url), 'utf8'));
 const outputUrl = new URL('../public/llms.txt', import.meta.url);
 
 if (!settings?.llmsTxt.trim()) {

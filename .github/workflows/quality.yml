@@ -82,3 +82,7 @@ jobs:
         run: npm run verify:special-offer-indexing
       - name: Verify build-only revalidation
         run: npm run verify:build-only-revalidation
+      - name: Verify editorial capture and deployment source contract
+        run: npm run verify:editorial-pipeline && npm run verify:deployment-contract
+      - name: Verify synthetic production deployments without runtime CMS access
+        run: npm run verify:deployment-builds

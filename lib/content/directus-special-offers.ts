@@ -1,224 +1,9 @@
-import { isProdEnv } from "@/lib/seo/site";
-import { isSpecialOfferIndexable } from "@/lib/seo/special-offer-indexing";
-import { isSpecialOfferExpired, parseSpecialOfferDate } from "@/lib/lead-capture/specialOfferDates";
-
-const DIRECTUS_COLLECTION = "special_offers";
-
-type UnknownRecord = Record<string, unknown>;
-
-type DirectusFileValue =
-  | string
-  | {
-      id?: unknown;
-      description?: unknown;
-      width?: unknown;
-      height?: unknown;
-    }
-  | null;
-
-type DirectusSpecialOfferItem = {
-  client?: unknown;
-  title?: unknown;
-  slug?: unknown;
-  featured_image?: DirectusFileValue;
-  offer_code?: unknown;
-  discount?: unknown;
-  description?: unknown;
-  expiration_date?: unknown;
-  legal_disclaimer?: unknown;
-  status?: unknown;
-  featured?: unknown;
-  noindex?: unknown;
-  meta_title?: unknown;
-  meta_description?: unknown;
-  primary_focus_keyword?: unknown;
-  focus_keywords?: unknown;
-  og_title?: unknown;
-  og_description?: unknown;
-  og_image_override?: DirectusFileValue;
-  date_updated?: unknown;
-};
-
-type DirectusListResponse<T> = {
-  data?: T[];
-  errors?: Array<{ message?: string }>;
-};
-
-type DirectusConfig = {
-  url: string;
-  clientSlug: string;
-  token: string;
-};
-
-export type SpecialOfferImage = {
-  id: string;
-  url: string;
-  altText: string | null;
-  width: number | null;
-  height: number | null;
-};
-
-export type SpecialOffer = {
-  slug: string;
-  title: string;
-  description: string;
-  featuredImage: SpecialOfferImage | null;
-  offerCode: string | null;
-  discount: string | null;
-  expirationDate: string | null;
-  legalDisclaimer: string | null;
-  featured: boolean;
-  noindex: boolean;
-  metaTitle: string | null;
-  metaDescription: string | null;
-  primaryFocusKeyword: string | null;
-  focusKeywords: string[];
-  ogTitle: string | null;
-  ogDescription: string | null;
-  ogImageOverride: SpecialOfferImage | null;
-  dateUpdated: string | null;
-};
-
-const SPECIAL_OFFER_FIELDS = [
-  "client.slug",
-  "title",
-  "slug",
-  "featured_image.id",
-  "featured_image.description",
-  "featured_image.width",
-  "featured_image.height",
-  "offer_code",
-  "discount",
-  "description",
-  "expiration_date",
-  "legal_disclaimer",
-  "status",
-  "featured",
-  "noindex",
-  "meta_title",
-  "meta_description",
-  "primary_focus_keyword",
-  "focus_keywords",
-  "og_title",
-  "og_description",
-  "og_image_override.id",
-  "og_image_override.description",
-  "og_image_override.width",
-  "og_image_override.height",
-  "date_updated",
-] as const;
-
-let warnedForMissingConfig = false;
-
-function trimTrailingSlash(value: string): string {
-  return value.replace(/\/+$/, "");
-}
-
-function isRecord(value: unknown): value is UnknownRecord {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function readString(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed.length ? trimmed : null;
-}
-
-function readBoolean(value: unknown): boolean {
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value === 1;
-  if (typeof value === "string") {
-    const normalized = value.trim().toLowerCase();
-    return normalized === "true" || normalized === "1" || normalized === "yes";
-  }
-  return false;
-}
-
-function readNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
-
-function getDirectusConfig(): DirectusConfig | null {
-  const url = readString(process.env.DIRECTUS_URL);
-  const clientSlug = readString(process.env.DIRECTUS_CLIENT_SLUG);
-  const token = readString(process.env.DIRECTUS_TOKEN);
-
-  if (!url || !clientSlug || !token) {
-    if (!warnedForMissingConfig && isProdEnv()) {
-      console.error("[directus] Missing DIRECTUS_URL, DIRECTUS_CLIENT_SLUG, or DIRECTUS_TOKEN.");
-      warnedForMissingConfig = true;
-    }
-    return null;
-  }
-
-  return {
-    url: trimTrailingSlash(url),
-    clientSlug,
-    token,
-  };
-}
-
-function getAssetUrl(config: DirectusConfig, fileId: string): string {
-  return `${config.url}/assets/${encodeURIComponent(fileId)}`;
-}
-
-function mapFeaturedImage(value: DirectusFileValue, config: DirectusConfig): SpecialOfferImage | null {
-  if (typeof value === "string") {
-    const id = readString(value);
-    return id ? { id, url: getAssetUrl(config, id), altText: null, width: null, height: null } : null;
-  }
-
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-
-  const record = value as UnknownRecord;
-  const id = readString(record.id);
-  if (!id) return null;
-
-  return {
-    id,
-    url: getAssetUrl(config, id),
-    altText: readString(record.description),
-    width: readNumber(record.width),
-    height: readNumber(record.height),
-  };
-}
-
-function mapSpecialOffer(item: DirectusSpecialOfferItem, config: DirectusConfig): SpecialOffer | null {
-  const slug = readString(item.slug);
-  const title = readString(item.title);
-  if (!slug || !title) return null;
-
-  const noindex = readBoolean(item.noindex);
-  const primaryFocusKeyword = readString(item.primary_focus_keyword);
-  const focusKeywords = Array.isArray(item.focus_keywords)
-    ? item.focus_keywords.map((value) => readString(value)).filter((value): value is string => Boolean(value))
-    : [];
-  if (!noindex && (!primaryFocusKeyword || !focusKeywords.includes(primaryFocusKeyword))) {
-    throw new Error(`Directus special_offers focus keywords are incomplete for ${slug}.`);
-  }
-
-  return {
-    slug,
-    title,
-    description: readString(item.description) ?? "",
-    featuredImage: mapFeaturedImage(item.featured_image ?? null, config),
-    offerCode: readString(item.offer_code),
-    discount: readString(item.discount),
-    expirationDate: readString(item.expiration_date),
-    legalDisclaimer: readString(item.legal_disclaimer),
-    featured: readBoolean(item.featured),
-    noindex,
-    metaTitle: readString(item.meta_title),
-    metaDescription: readString(item.meta_description),
-    primaryFocusKeyword,
-    focusKeywords,
-    ogTitle: readString(item.og_title),
-    ogDescription: readString(item.og_description),
-    ogImageOverride: mapFeaturedImage(item.og_image_override ?? null, config),
-    dateUpdated: readString(item.date_updated),
-  };
-}
-
+import 'server-only';
+import { deployedEditorial } from './editorial';
+import { isSpecialOfferIndexable } from '@/lib/seo/special-offer-indexing';
+import { isSpecialOfferExpired, parseSpecialOfferDate } from '@/lib/lead-capture/specialOfferDates';
+import type { SpecialOffer } from './editorial-types';
+export type { SpecialOffer, SpecialOfferImage } from './editorial-types';
 function compareFeaturedOffers(a: SpecialOffer, b: SpecialOffer): number {
   const aDate = a.expirationDate ? parseSpecialOfferDate(a.expirationDate) : null;
   const bDate = b.expirationDate ? parseSpecialOfferDate(b.expirationDate) : null;
@@ -228,115 +13,25 @@ function compareFeaturedOffers(a: SpecialOffer, b: SpecialOffer): number {
   return a.slug.localeCompare(b.slug);
 }
 
-type FetchSpecialOffersOptions = {
-  filter?: UnknownRecord;
-  sort?: string[];
-  limit?: number;
-  allPages?: boolean;
-};
-
-async function fetchSpecialOfferItems({
-  filter = {},
-  sort,
-  limit = 100,
-  allPages = false,
-}: FetchSpecialOffersOptions = {}): Promise<SpecialOffer[]> {
-  const config = getDirectusConfig();
-  if (!config) return [];
-
-  const url = new URL(`items/${DIRECTUS_COLLECTION}`, `${config.url}/`);
-  url.searchParams.set("fields", SPECIAL_OFFER_FIELDS.join(","));
-  url.searchParams.set(
-    "filter",
-    JSON.stringify({
-      client: { slug: { _eq: config.clientSlug } },
-      status: {
-        _eq: "published",
-      },
-      ...filter,
-    }),
-  );
-  url.searchParams.set("limit", String(limit));
-  if (sort?.length) {
-    url.searchParams.set("sort", sort.join(","));
-  }
-
-  const rows: DirectusSpecialOfferItem[] = [];
-  const slugs = new Set<string>();
-  let expected: number | undefined;
-  for (let page = 1; page <= 10000; page++) {
-    if (allPages) {
-      url.searchParams.set("page", String(page));
-      url.searchParams.set("meta", "filter_count");
-    }
-    const res = await fetch(url, {
-      headers: { Accept: "application/json", Authorization: `Bearer ${config.token}` },
-      cache: "force-cache",
-    });
-    if (!res.ok) throw new Error(`Directus special_offers HTTP ${res.status}`);
-    const json = (await res.json()) as DirectusListResponse<DirectusSpecialOfferItem> & { meta?: { filter_count?: number } };
-    if (json.errors?.length || !Array.isArray(json.data)) throw new Error("Directus special_offers returned an invalid collection response");
-    for (const item of json.data) {
-      const slug = readString(item.slug);
-      if (!slug || slugs.has(slug)) throw new Error("Directus special_offers returned a missing or duplicate slug");
-      if (item.status !== "published" || !isRecord(item.client) || item.client.slug !== config.clientSlug) throw new Error("Directus special_offers escaped published client scope");
-      slugs.add(slug);
-      rows.push(item);
-    }
-    if (!allPages) break;
-    const count = json.meta?.filter_count;
-    if (typeof count !== "number" || !Number.isSafeInteger(count) || count < 0) throw new Error("Directus special_offers missing verified inventory count");
-    expected ??= count;
-    if (count !== expected) throw new Error("Directus special_offers inventory changed during pagination");
-    if (rows.length === expected) break;
-    if (!json.data.length || rows.length > expected || json.data.length < limit) throw new Error("Directus special_offers inventory truncated");
-    if (page === 10000) throw new Error("Directus special_offers pagination safety limit");
-  }
-  return rows.map((item) => mapSpecialOffer(item, config)).filter((offer): offer is SpecialOffer => Boolean(offer));
-}
-
 export async function listSpecialOfferSlugs(limit?: number): Promise<string[]> {
-  const offers = await fetchSpecialOfferItems({
-    limit: limit ?? 100,
-    allPages: limit === undefined,
-    sort: ["slug"],
-  });
-
-  return offers.map((offer) => offer.slug);
+  return deployedEditorial()
+    .offers.slice(0, limit)
+    .map((offer) => offer.slug);
 }
-
 export async function getSpecialOfferBySlug(slug: string): Promise<SpecialOffer | null> {
-  const trimmedSlug = readString(slug);
-  if (!trimmedSlug) return null;
-
-  const offers = await fetchSpecialOfferItems({
-    filter: { slug: { _eq: trimmedSlug } },
-    limit: 1,
-  });
-
-  return offers[0] ?? null;
+  return deployedEditorial().offers.find((offer) => offer.slug === slug.trim()) ?? null;
 }
-
 export async function getFeaturedSpecialOffer(): Promise<SpecialOffer | null> {
-  const offers = await fetchSpecialOfferItems({
-    filter: { featured: { _eq: true } },
-    sort: ["expiration_date", "slug"],
-    limit: 25,
-  });
-
-  return offers
-    .filter((offer) => !isSpecialOfferExpired(offer.expirationDate))
-    .sort(compareFeaturedOffers)[0] ?? null;
+  return (
+    deployedEditorial()
+      .offers.filter((offer) => offer.featured && !isSpecialOfferExpired(offer.expirationDate))
+      .sort(compareFeaturedOffers)[0] ?? null
+  );
 }
-
 export async function listSpecialOfferSitemapEntries(): Promise<
   Array<{ uri: string; modified: string | null }>
 > {
-  const offers = await fetchSpecialOfferItems({ sort: ['slug'], limit: 100, allPages: true });
-  return offers
-    .filter(isSpecialOfferIndexable)
-    .map((offer) => ({
-      uri: `/special-offers/${offer.slug}`,
-      modified: offer.dateUpdated,
-    }));
+  return deployedEditorial()
+    .offers.filter(isSpecialOfferIndexable)
+    .map((offer) => ({ uri: '/special-offers/' + offer.slug, modified: offer.dateUpdated }));
 }

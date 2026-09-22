@@ -19,3 +19,7 @@ export default function ThankYouPage() {
     </Suspense>
   );
 }
+
+export const revalidate = false;
+
+export const dynamic = 'force-static';

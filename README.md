@@ -14,8 +14,9 @@ the frontend adapters for Directus and WordPress.
 - Directus owns the five location hubs through the deployment snapshot; see
   [release evidence](docs/location-release-20260917.md). Remaining hard-coded
   WordPress media still depends on the WordPress host.
-- Homepage/About YouTube placements remain hard-coded. The entire truck-sale
-  page and its videos are excluded from Directus-backed content.
+- Home/About placement stays in code; video metadata and static images come
+  from deployment snapshots. Truck body copy and both videos stay code-owned;
+  truck images use the static-media snapshot.
 - Next.js configuration and `proxy.ts` retain code-owned platform redirects and
   normalized legacy redirect/410 behavior.
 - `POST /api/lead` validates public form submissions, verifies Turnstile, and
@@ -53,13 +54,21 @@ cache/revalidation contract. Use `npm run build` for full confidence when the
 credentialed CMS environment is available; `npm run build:codex` supplies the
 sandbox fetch proxy when that contract is needed.
 
-Build presteps generate `public/llms.txt`,
-`public/__sitemaps/static-routes.json`, and the private `.generated/projects.json`
-combined project/video snapshot. These are ignored build artifacts, not authoring
-sources. The snapshot travels with each deployment and powers every project and
-video consumer, including runtime resource requests. CMS changes require a new
-build and deployment; these consumers have no ISR or runtime CMS fallback.
-Failed, partial, or invalid reads stop prebuild and invalidate the candidate artifact.
+All Directus content uses one sealed deployment bundle: project/video, location,
+static-media and editorial snapshots, plus sitemap and `llms.txt` artifacts.
+Prebuild captures and validates the complete inventories. Runtime pages, metadata,
+archives and APIs read only those packaged files. Required failures stop the
+candidate build; runtime has no CMS fallback. New slugs, edits and unpublishing
+require a successful build and deployment. See [CONTENT.md](CONTENT.md).
+
+Run `verify:editorial-pipeline` and `verify:deployment-contract` for source and
+capture checks. `verify:deployment-builds` builds two isolated synthetic releases,
+reuses build caches, and tests the standalone servers with outbound requests
+blocked and Directus credentials absent. It needs Node 22 and installed dependencies,
+not CMS access. `npm run build` also verifies the generated prerender manifest.
+After a credentialed production-mode build, run `verify:deployment-runtime` to
+exercise its packaged routes, APIs, RSC responses, revalidation rejection and cold
+restart. These checks are distinct from the narrower adapter fetch-policy check.
 
 ## Archive controls
 

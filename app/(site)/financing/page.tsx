@@ -400,3 +400,7 @@ export default async function FinancingPage() {
     </>
   );
 }
+
+export const revalidate = false;
+
+export const dynamic = 'force-static';
