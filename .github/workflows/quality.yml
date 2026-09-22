@@ -52,6 +52,8 @@ jobs:
         run: npm run verify:project-pipeline
       - name: Verify video pipeline
         run: npm run verify:video-pipeline
+      - name: Verify static media metadata and rendering
+        run: npm run verify:static-media
       - name: Verify video migration
         run: npm run verify:video-migration
       - name: Verify location migration and page contracts

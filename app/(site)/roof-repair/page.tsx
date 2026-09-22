@@ -1,5 +1,6 @@
+import { staticImageUrl } from '@/lib/content/static-media';
 import Section from '@/components/layout/Section';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import SmartLink from '@/components/utils/SmartLink';
 import { listRecentPostsPool } from '@/lib/content/blog';
 import { listFaqs } from '@/lib/content/directus-faqs';
@@ -81,7 +82,7 @@ export default async function Page() {
     origin,
     primaryImage:
       config?.image?.url ??
-      'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      staticImageUrl('sonshine-roofing-social-card'),
     isPartOf: { '@type': 'WebSite', name: 'SonShine Roofing', url: origin },
   });
 
@@ -106,7 +107,7 @@ export default async function Page() {
           { icon: HardHat, label: 'Expert Opinion' },
           { icon: Ban, label: 'No BS' },
         ]}
-        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Light-Repairs-Inspection-and-Maintenance.webp"
+        imageSrc="static:skylight-shingle-repair"
       >
         <div className="flex flex-wrap gap-3">
           <SmartLink
@@ -205,9 +206,8 @@ export default async function Page() {
               </p>
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/curling-Shingles-on-roof.jpg"
-                    alt="Curling Shingles Roof Repair"
+                  <StaticImage crop
+                    src="static:curling-asphalt-roof-shingles"
                     fill
                     className="object-cover mb-2"
                     sizes="(max-width: 768px) 100vw, 800px"
@@ -245,9 +245,8 @@ export default async function Page() {
               </p>
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
-                    alt="Water Damage Roof Repair"
+                  <StaticImage crop
+                    src="static:clearing-leaves-from-roof-gutter"
                     fill
                     className="object-cover mb-2"
                     sizes="(max-width: 768px) 100vw, 800px"
@@ -284,9 +283,8 @@ export default async function Page() {
               </p>
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/roof-insect-damage-repair.jpg"
-                    alt="Insect Damage Roof Repair"
+                  <StaticImage crop
+                    src="static:bugs-on-roof-tiles"
                     fill
                     className="object-cover mb-2"
                     sizes="(max-width: 768px) 100vw, 800px"
@@ -320,9 +318,8 @@ export default async function Page() {
               </p>
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/damaged-vent-flashing-scaled.jpg"
-                    alt="Worn out or damaged flashing roof repair"
+                  <StaticImage crop
+                    src="static:damaged-roof-vent-flashing"
                     fill
                     className="object-cover mb-2"
                     sizes="(max-width: 768px) 100vw, 800px"
@@ -362,9 +359,8 @@ export default async function Page() {
               </p>
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/rotten-fascia-scaled.jpg"
-                    alt="Rotting fascia roof repair"
+                  <StaticImage crop
+                    src="static:attic-roof-framing-dark-staining"
                     fill
                     className="object-cover mb-2"
                     sizes="(max-width: 768px) 100vw, 800px"

@@ -1,5 +1,5 @@
 import Section from '@/components/layout/Section';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import SmartLink from '@/components/utils/SmartLink';
 import { listRecentPostsPool } from '@/lib/content/blog';
 import { listFaqs } from '@/lib/content/directus-faqs';
@@ -97,7 +97,7 @@ export default async function Page() {
           { icon: HardHat, label: 'Expert Opinion' },
           { icon: Zap, label: 'Hurricane Preparation' },
         ]}
-        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Roof-Inspection-Hero-Image.webp"
+        imageSrc="static:workers-on-tile-roof"
       >
         <div className="bg-slate-600 h-[1px] my-8" />
         <div className="flex-col gap-y-6 max-w-5xl text-center mx-auto">
@@ -176,7 +176,7 @@ export default async function Page() {
               </p>
               <figure className="not-prose mt-4">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                  <Image
+                  <StaticImage
                     src={nathanImage.url}
                     alt={nathanImage.altText}
                     fill

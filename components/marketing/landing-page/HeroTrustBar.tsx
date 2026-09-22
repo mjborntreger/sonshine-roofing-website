@@ -1,5 +1,5 @@
 // IMPORTS
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import { ArrowUpRight, BadgeCheck } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import { renderHighlight } from '@/components/utils/renderHighlight';
@@ -17,14 +17,14 @@ const NEXTDOOR_PROFILE_URL =
   'https://nextdoor.com/page/sonshine-roofing-sarasota-fl?utm_campaign=1763612646168&share_action_id=ec8cdd35-bc00-464d-a93a-da23de117ddc';
 
 // LOGO SRC
-const GOOGLE_LOGO_SRC = 'https://wp.sonshineroofing.com/wp-content/uploads/google.webp';
+const GOOGLE_LOGO_SRC = 'static:google-logo';
 const YELP_LOGO_SRC =
-  'https://wp.sonshineroofing.com/wp-content/uploads/Yelp-Logo-Icon-for-Reviews.webp';
-const ANGI_LOGO_SRC = 'https://wp.sonshineroofing.com/wp-content/uploads/Angi-Logo-Icon.webp';
+  'static:yelp-logo-icon';
+const ANGI_LOGO_SRC = 'static:angi-logo-icon';
 const FACEBOOK_LOGO_SRC =
-  'https://wp.sonshineroofing.com/wp-content/uploads/facebook-logo-for-reviews.webp';
+  'static:facebook-logo';
 const NEXTDOOR_LOGO_SRC =
-  'https://wp.sonshineroofing.com/wp-content/uploads/Nextdoor-Logo-Icon.webp';
+  'static:nextdoor-house-icon';
 
 type HeroTrustBarProps = {
   heading?: string;
@@ -166,7 +166,7 @@ const BADGES = [
     label: 'GAF Master Elite Cerified',
     subtitle: 'Industry-leading warranties and premium roofing materials you can rely on.',
     href: 'https://www.gaf.com/en-us/roofing-contractors/residential/sonshine-roofing-inc-1104247',
-    src: 'https://wp.sonshineroofing.com/wp-content/uploads/GAF-Master-Elite-Contractor-Seal.webp',
+    src: 'static:gaf-master-elite-contractor-seal',
     alt: 'GAF Master Elite Contractor Seal',
   },
   {
@@ -175,7 +175,7 @@ const BADGES = [
     subtitle:
       'Prepare for hurricane season and save thousands in insurance costs and wind mitigation services.',
     href: 'https://mysafeflhome.com',
-    src: 'https://wp.sonshineroofing.com/wp-content/uploads/MSFLH-Logo.png',
+    src: 'static:my-safe-fl-home-logo',
     alt: 'My Safe FL Home Certified Roofing Contractor in Florida',
   },
   {
@@ -183,7 +183,7 @@ const BADGES = [
     label: 'A+ Rating with the BBB',
     subtitle: 'Stability and a longstanding reputation in the community.',
     href: 'https://www.bbb.org/us/fl/sarasota/profile/roofing-contractors/sonshine-roofing-inc-0653-6096353/#sealclick',
-    src: 'https://wp.sonshineroofing.com/wp-content/uploads/BBB-A-plus-Rated-Accredited-Business-Seal.webp',
+    src: 'static:bbb-a-plus-accredited-business-seal',
     alt: 'A+ Rated Roofing Contractor with the Better Business Bureau',
   },
   {
@@ -250,9 +250,9 @@ export default async function HeroTrustBar({
                       {review.statDescriptor}
                     </p>
                     <div className={TITLE_AND_LOGO}>
-                      <Image
+                      <StaticImage
                         src={review.logo.src}
-                        alt={review.logo.alt}
+                        alt="" decorative
                         width={48}
                         height={48}
                         className={LOGO_STYLES}
@@ -290,9 +290,9 @@ export default async function HeroTrustBar({
                   <p className={BADGE_SUBTITLE_STYLES}>{badge.subtitle}</p>
                   {badge.src ? (
                     <div className={BADGE_IMAGE_WRAPPER}>
-                      <Image
+                      <StaticImage
                         src={badge.src}
-                        alt={badge.alt}
+                        alt={badge.src.startsWith('static:') ? undefined : badge.alt}
                         width={220}
                         height={80}
                         sizes={BADGE_IMAGE_SIZES}

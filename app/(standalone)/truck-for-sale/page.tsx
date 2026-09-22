@@ -1,11 +1,11 @@
 import Section from '@/components/layout/Section';
 import Hero from '@/components/ui/Hero';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import { ArrowUpRight, ChartSpline, Map, Truck, Zap } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import { VideoWithSchema } from '@/components/utils/VideoWithSchema';
 import ProjectGallery from '@/components/dynamic-content/project/ProjectGallery';
-import type { WpImage } from '@/lib/content/wp';
+import { staticImage } from '@/lib/content/static-media';
 
 const PRICE = '$52,500';
 const TRUCK_TITLE = '2020 GMC Sierra 1500 Denali';
@@ -77,26 +77,29 @@ const buildSheet = [
   },
 ];
 
-const truckGalleryImages: WpImage[] = [
-  'https://wp.sonshineroofing.com/wp-content/uploads/DenaliSideView-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalirear-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalirightside-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalifrontview-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denaliinteriorfront-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denaliinteriorrear-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalimpgproof-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denaliliftgate-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalisupercharger-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denaliunderthehood2-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denaliunderthehood3-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denaliinfotainment2-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalidriveshaft-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalibelow2-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalibelow-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalidocs2-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/denalidocs-ezgif.com-optiwebp.webp',
-  'https://wp.sonshineroofing.com/wp-content/uploads/Denali-Dynoresults-ezgif.com-optiwebp.webp',
-].map((url) => ({ url, altText: TRUCK_TITLE }));
+const truckGalleryImages = [
+  'static:black-pickup-truck-side-view',
+  'static:black-gmc-sierra-denali-rear-view',
+  'static:black-denali-pickup-side-profile',
+  'static:black-gmc-pickup-front-view',
+  'static:pickup-truck-front-seat-interior',
+  'static:pickup-truck-rear-seat-interior',
+  'static:pickup-truck-trip-and-fuel-economy-display',
+  'static:pickup-truck-open-tailgate-and-bed',
+  'static:procharger-supercharger-label',
+  'static:aeromotive-pressure-regulator-and-gauge',
+  'static:alkycontrol-engine-bay-reservoir',
+  'static:pickup-truck-surround-view-camera-display',
+  'static:gulfcoast-driveshaft-label',
+  'static:pickup-truck-drivetrain-underbody',
+  'static:pickup-truck-underbody-side',
+  'static:pickup-truck-drag-racing-time-slips',
+  'static:gmc-sierra-denali-window-sticker',
+  'static:dynamometer-results-monitor',
+].map((key) => {
+  const media = staticImage(key);
+  return { url: media.url, altText: media.description, width: media.width, height: media.height, staticMedia: media };
+});
 
 export default async function Page() {
   return (
@@ -106,7 +109,7 @@ export default async function Page() {
           title="Performance Truck for Sale"
           subtitle="Real-world 800-wheel-horsepower GMC Sierra Denali that can be driven every day—comfort, 4WD traction, and a professionally built ProCharged 6.2L."
           eyelash="The 'Frankenstein Truck'"
-          imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/denalileftfront-ezgif.com-optiwebp-1.webp"
+          imageSrc="static:black-gmc-denali-front-quarter-view"
           justifyStart
           badges={[
             { icon: Map, label: '53,334 chassis miles' },
@@ -190,9 +193,8 @@ export default async function Page() {
                 </p>
                 <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 my-8">
                   <div className="relative aspect-[16/9] w-full">
-                    <Image
-                      src="https://wp.sonshineroofing.com/wp-content/uploads/denaliunderhood-ezgif.com-optiwebp.webp"
-                      alt={TRUCK_TITLE}
+                    <StaticImage crop
+                      src="static:pickup-truck-engine-bay-supercharger"
                       fill
                       className="object-cover"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 960px"

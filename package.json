@@ -50,7 +50,8 @@
     "verify:location-site-shell": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-location-site-shell.mjs",
     "verify:location-export": "node scripts/verify-location-export.mjs",
     "verify:dynamic-routes": "node scripts/verify-dynamic-routes.mjs",
-    "verify:locations": "npm run verify:location-selection && npm run verify:location-components && npm run verify:location-pipeline && npm run verify:location-model && npm run verify:location-review-isolation && npm run verify:location-migration && npm run verify:location-file-timestamps && npm run verify:location-enrichment && npm run verify:location-site-shell && npm run verify:location-export"
+    "verify:locations": "npm run verify:location-selection && npm run verify:location-components && npm run verify:location-pipeline && npm run verify:location-model && npm run verify:location-review-isolation && npm run verify:location-migration && npm run verify:location-file-timestamps && npm run verify:location-enrichment && npm run verify:location-site-shell && npm run verify:location-export",
+    "verify:static-media": "node scripts/verify-static-media.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.3.3",

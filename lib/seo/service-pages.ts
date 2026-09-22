@@ -1,3 +1,4 @@
+import { staticImageUrl } from '@/lib/content/static-media';
 import type { OgImageInput } from './meta';
 
 export type ServicePageConfig = {
@@ -13,7 +14,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
     description:
       'FREE ESTIMATES | Fast, lasting roof repair for leaks, flashing, fascia and storm damage | Serving Sarasota & surrounding areas since 1987.',
     image: {
-      url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,
       height: 630,
     },
@@ -27,7 +28,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
     description:
       'FREE ESTIMATES | Since 1987, SonShine Roofing has installed long‑lasting shingle, tile, flat and metal roofs with strong workmanship warranties & industry-leading financing.',
     image: {
-      url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,
       height: 630,
     },
@@ -41,7 +42,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
     description:
       'Get approved today! | 0% APR for 12 mo. | Credit-based & Equity-based | Easy, convenient financing options for your next roof',
     image: {
-      url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,
       height: 630,
     },
@@ -55,7 +56,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
     description:
       'Prevent leaks, catch issues early, and extend roof life with scheduled inspections and upkeep. Serving Southwest Florida since 1987.',
     image: {
-      url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,
       height: 630,
     },
@@ -69,7 +70,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
     description:
       'Licensed residential roof inspections to catch hidden leaks and extend roof life. Serving Sarasota and surrounding areas since 1987.',
     image: {
-      url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,
       height: 630,
     },
@@ -83,7 +84,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
     description:
       'Family-owned roofing contractor in Sarasota serving Sarasota, Manatee, and Charlotte Counties since 1987. Meet the team, our values, and what sets us apart.',
     image: {
-      url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,
       height: 630,
     },
@@ -97,7 +98,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
     description:
       'Learn who can refer SonShine Roofing, what projects qualify, and how to earn $250 per qualified full roof replacement referral.',
     image: {
-      url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,
       height: 630,
     },
@@ -111,7 +112,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
     description:
       'Call or send a message — our team responds quickly during business hours. Serving Sarasota, Manatee & Charlotte Counties since 1987.',
     image: {
-      url: 'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png',
+      url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,
       height: 630,
     },

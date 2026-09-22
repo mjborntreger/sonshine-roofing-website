@@ -127,7 +127,7 @@ export default async function HomeownerReferralProgramPage() {
           { icon: ArrowLeftRight, label: 'Paid via check in the mail' },
         ]}
         justifyStart
-        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/referral-program-hero-image.webp"
+        imageSrc="static:smiling-man-holding-cash"
       >
         <div className="flex flex-wrap gap-3">
           <SmartLink

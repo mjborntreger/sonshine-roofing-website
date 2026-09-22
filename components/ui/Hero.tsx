@@ -1,3 +1,5 @@
+import { staticImage } from '@/lib/content/static-media';
+import { imageBackground } from '@/lib/content/public-image';
 import type { ComponentType, ReactNode, SVGProps } from "react";
 import { cn } from "@/lib/utils";
 
@@ -8,13 +10,14 @@ type HeroProps = {
   subtitle?: string;
   eyelash?: string;
   imageSrc?: string;
+  imagePosition?: string;
   justifyStart?: boolean
   badges?: HeroBadge[];
   className?: string;
   children?: ReactNode;
 };
 
-const FALLBACK_IMAGE = "https://wp.sonshineroofing.com/wp-content/uploads/Fallback-Hero.webp";
+const FALLBACK_IMAGE = "static:red-tile-roof-aerial-wide";
 
 /**
  * Base hero for service/resource/blog/project pages.
@@ -26,6 +29,7 @@ export default function Hero({
   eyelash,
   subtitle,
   imageSrc = FALLBACK_IMAGE,
+  imagePosition,
   justifyStart = false,
   badges,
   className,
@@ -50,7 +54,7 @@ export default function Hero({
       >
         <div
           className="absolute inset-0 -z-20 bg-cover bg-top"
-          style={{ backgroundImage: `url(${imageSrc})` }}
+          style={imageSrc.startsWith('static:') ? imageBackground(staticImage(imageSrc), imagePosition) : { backgroundImage: `url(${imageSrc})` }}
           aria-hidden="true"
         />
         <div

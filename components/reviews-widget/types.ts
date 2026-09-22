@@ -1,3 +1,5 @@
+import type { PublicImage } from '@/lib/content/public-image';
+
 export type Review = {
   author_name: string;
   author_url?: string | null;
@@ -18,7 +20,7 @@ export type CarouselReview = {
   areaName?: string;
   sourceUrl: string | null;
   sourceLabel: string;
-  sourceLogo?: { src: string; alt: string };
+  sourceLogo?: PublicImage;
 };
 
 export type ReviewsSliderProps = {

@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticMediaProvider';
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -33,9 +33,9 @@ export default function LeadFormStepShell({
             <p className="mt-3 text-sm text-slate-600 md:text-base">{description}</p>
           </div>
           <div className="relative mb-4 aspect-[21/9] h-[27px] w-[79px] sm:h-[54px] sm:w-[158px] shrink-0">
-            <Image
-              src="https://wp.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp"
-              alt="sonshine logo, no swoosh"
+            <StaticImage
+              src="static:sonshine-roofing-wordmark"
+              alt="SonShine Roofing"
               width={158}
               height={54}
               className="absolute right-0 top-[20px]"

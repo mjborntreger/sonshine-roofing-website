@@ -1,7 +1,7 @@
 'use client';
 
 import SmartLink from '@/components/utils/SmartLink';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticMediaProvider';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelectedLayoutSegments } from 'next/navigation';
 import { NavMenu } from './NavMenu';
@@ -135,10 +135,10 @@ export default function Header({
   const backdropBlur = backgroundOpacity > 0 ? `blur(${6 + backgroundOpacity * 6}px)` : 'blur(0px)';
   const expandedLogo =
     expandedLogoSrc ??
-    'https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Blue.webp';
+    'static:sonshine-roofing-blue-orange-logo';
   const collapsedLogo =
     collapsedLogoSrc ??
-    'https://wp.sonshineroofing.com/wp-content/uploads/SonShine-Website-Logo-Orange.webp';
+    'static:sonshine-roofing-white-orange-logo';
   const logoSrc = !collapsed && isLanding ? collapsedLogo : expandedLogo;
   const logoAlt =
     !collapsed && isLanding
@@ -174,15 +174,16 @@ export default function Header({
       >
         <SmartLink
           href={logoHref}
+          aria-label={logoSrc.startsWith('static:') ? `${brandName} home` : undefined}
           className={cn(
             'flex items-center gap-2 transition-transform duration-200 ease-out',
             collapsed ? 'scale-[0.8]' : 'scale-100',
           )}
         >
-          <Image
+          <StaticImage
             src={logoSrc}
-            alt={logoAlt}
-            aria-label={`${brandName} logo`}
+            alt={logoAlt} decorative={logoSrc.startsWith('static:')}
+            aria-label={logoSrc.startsWith('static:') ? undefined : `${brandName} logo`}
             width={106}
             height={40}
             loading="eager"

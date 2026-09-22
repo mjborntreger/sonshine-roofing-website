@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
+import Image, { type ImageProps } from "next/image";
+import { DirectusImage } from "@/components/media/DirectusImage";
+import type { PublicImage } from "@/lib/content/public-image";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
 import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
@@ -10,8 +12,10 @@ import Skeleton from "@/components/ui/Skeleton";
 import type { ProjectImage } from "@/lib/content/project-types";
 import { PROJECT_GALLERY_DEFAULT_HEIGHT, PROJECT_GALLERY_DEFAULT_WIDTH } from "./galleryConfig";
 
+type GalleryImage = ProjectImage & { staticMedia?: PublicImage };
+
 type ProjectGalleryProps = {
-  images: ProjectImage[];
+  images: GalleryImage[];
   projectTitle: string;
 };
 
@@ -271,7 +275,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
 }
 
 type GalleryImageProps = {
-  image: ProjectImage;
+  image: GalleryImage;
   projectTitle: string;
   onOpen: () => void;
 };
@@ -298,10 +302,11 @@ function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
       aria-label={`Open photo: ${alt}`}
     >
       {!loaded ? <Skeleton className="pointer-events-none absolute inset-0 h-full w-full" /> : null}
-      <Image
+      <GalleryPhoto
         ref={imageRef}
-        src={image.url}
-        alt={alt}
+        image={image}
+        projectTitle={projectTitle}
+        crop
         fill
         sizes="(min-width: 1024px) 50vw, 100vw"
         className={`${imageClassBase} ${loaded ? "opacity-100" : "opacity-0"}`}
@@ -320,7 +325,7 @@ function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
   );
 }
 
-function LightboxImage({ image, projectTitle }: { image: ProjectImage; projectTitle: string }) {
+function LightboxImage({ image, projectTitle }: { image: GalleryImage; projectTitle: string }) {
   const width = image.width ?? PROJECT_GALLERY_DEFAULT_WIDTH;
   const height = image.height ?? PROJECT_GALLERY_DEFAULT_HEIGHT;
   const aspectStyle: React.CSSProperties = {
@@ -331,9 +336,9 @@ function LightboxImage({ image, projectTitle }: { image: ProjectImage; projectTi
 
   return (
     <div className="relative w-full max-w-5xl" style={aspectStyle}>
-      <Image
-        src={image.url}
-        alt={image.altText || projectTitle}
+      <GalleryPhoto
+        image={image}
+        projectTitle={projectTitle}
         fill
         sizes="100vw"
         priority={false}
@@ -341,6 +346,11 @@ function LightboxImage({ image, projectTitle }: { image: ProjectImage; projectTi
       />
     </div>
   );
+}
+
+function GalleryPhoto({ image, projectTitle, crop, ...props }: Omit<ImageProps, 'src' | 'alt'> & { image: GalleryImage; projectTitle: string; crop?: boolean; ref?: React.Ref<HTMLImageElement> }) {
+  if (image.staticMedia) return <DirectusImage {...props} media={image.staticMedia} crop={crop} />;
+  return <Image {...props} src={image.url} alt={image.altText || projectTitle} />;
 }
 
 type NavButtonProps = {

@@ -1,3 +1,4 @@
+import { staticImage } from '@/lib/content/static-media';
 import SmartLink from '@/components/utils/SmartLink';
 import { ArrowUpRight } from 'lucide-react';
 import type { Review } from './types';
@@ -63,10 +64,7 @@ export default async function ReviewsCarousel({
         ...reviewDate(review.time, review.relative_time_description),
         sourceUrl: safeReviewUrl(review.author_url) ?? resolvedGbpUrl,
         sourceLabel: 'View on Google',
-        sourceLogo: {
-          src: 'https://wp.sonshineroofing.com/wp-content/uploads/google.webp',
-          alt: 'Google logo',
-        },
+        sourceLogo: staticImage('google-logo'),
       }))} />
       <div className="mx-auto mb-4 flex max-w-6xl flex-wrap justify-center gap-y-4 text-center">
         {showDisclaimer ? (

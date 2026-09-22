@@ -1,4 +1,4 @@
-import Image from "next/image";
+import StaticImage from "@/components/media/StaticImage";
 import { BestOfTheBestVideo } from "@/components/marketing/landing-page/BestOfTheBestVideo";
 import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 
@@ -8,23 +8,23 @@ const imageClasses = "transition-transform duration-200 ease-out group-hover:tra
 const awards = [
   {
     year: "2021",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/2021-Best-of-the-Best-award-icon.bak-175x175.webp",
+    src: "static:best-of-the-best-award-2021",
   },
   {
     year: "2022",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/2022-Best-of-the-Best-award-icon.bak-175x175.webp",
+    src: "static:best-of-the-best-award-2022",
   },
   {
     year: "2023",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/2023-best-of-the-best-award.bak-175x175.webp",
+    src: "static:best-of-the-best-award-2023",
   },
   {
     year: "2024",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/backup/2024-Best-of-the-Best-badge-icon-1-175x175.webp",
+    src: "static:best-of-the-best-award-2024",
   },
   {
     year: "2025",
-    src: "https://wp.sonshineroofing.com/wp-content/uploads/BOTB25_Award_1080px-175x175.webp",
+    src: "static:best-of-the-best-award-2025",
   },
 ] as const;
 
@@ -72,15 +72,13 @@ export default async function bestOfTheBest({
 
           return (
             <li key={award.year} className="relative group">
-              <Image
+              <StaticImage
                 src={award.src}
-                aria-label={label}
                 title={label}
                 height={imageHeight}
                 width={imageWidth}
                 loading="lazy"
                 decoding="async"
-                alt={label}
                 className={imageClasses}
               />
             </li>

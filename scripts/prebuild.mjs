@@ -24,6 +24,7 @@ function runScript(filename) {
 }
 
 await runScript('./generate-project-snapshot.mjs');
+await runScript('./generate-static-media-snapshot.mjs');
 await runScript('./validate-directus-routes.mjs');
 await runScript('./make-static-sitemap.mjs');
 await runScript('./generate-llms-txt.mjs');
