@@ -2,8 +2,8 @@
 
 This repository is the production-facing SonShine Roofing Next.js application.
 It owns public routes, lead capture, attribution and consent behavior, SEO,
-structured data, sitemaps, analytics integration, and a hybrid Directus and
-WordPress content layer. Coolify builds the standalone Docker image on Node 22
+structured data, sitemaps, analytics integration, and Directus content captured
+in deployment snapshots. Coolify builds the standalone Docker image on Node 22
 and serves it on port 3000.
 
 ## Sources of Truth
@@ -39,11 +39,13 @@ and serves it on port 3000.
 - `app/sitemap_index`: sitemap index and content-specific children.
 - `components/lead-capture` and `lib/lead-capture`: forms, attribution,
   consent, validation, identifiers, and payload types.
-- `lib/content`: Directus/WordPress adapters and HTML sanitizers.
+- `lib/content`: Directus adapters, deployment snapshots, shared types and HTML sanitizers.
 - `lib/seo` and `lib/telemetry`: metadata/schema and analytics behavior.
 - `scripts`: generated artifacts, content verification, and migrations.
 - `next.config.mjs`, `proxy.ts`, and `Dockerfile`: platform redirects, legacy
   responses, headers, standalone output, build behavior, and Coolify runtime.
+- Read `DEPLOY.md` before changing Docker build arguments, Coolify environment
+  configuration, or deployment checks; it records the current key inventory.
 
 ## Validation
 
@@ -53,7 +55,7 @@ Use Node 22 and install with `npm ci`.
   `npm run verify:tailwind-utilities`; `npm test` is currently an alias for
   lint.
 - Sanitizer/SEO work: run the applicable
-  `verify:directus-html`, `verify:wordpress-html`, `verify:faq-html`,
+  `verify:directus-html`, `verify:html-text`, `verify:faq-html`,
   `verify:person-html`, `verify:sponsor-html`, `verify:glossary-html`, `verify:person-seo`,
   `verify:special-offer-indexing`, `verify:build-only-revalidation`,
   `verify:glossary-policy`, `verify:project-pipeline`,
@@ -66,10 +68,8 @@ Use Node 22 and install with `npm ci`.
 
 Build presteps generate or remove sitemap and `llms.txt` artifacts and can
 dirty a worktree. Inspect generated changes and never include them
-accidentally. The `migrate:persons:*` commands and retained blog migration
-verifiers require historical JSON inputs that are not tracked in a clean
-checkout; they are not routine validation commands. Do not run
-`migrate:persons:apply`; it writes to Directus.
+accidentally. Retired WordPress import commands and their migration-only verifiers were
+removed; use the active `verify:*` commands in `package.json`.
 
 ## Content, Security, and Privacy
 
@@ -82,9 +82,8 @@ checkout; they are not routine validation commands. Do not run
   only and never log or copy real payloads into fixtures, PRs, or notifications.
 - Preserve Turnstile, honeypot, allowed-origin, SMS-consent, lead-ID, and n8n
   authentication behavior when touching lead flow.
-- Keep Directus, WordPress, n8n, Turnstile, revalidation, Maps, and other
-  secrets server-only. Prefer header-based revalidation authorization.
-- Preserve CSP/security headers, staging-only diagnostic gates, analytics
+- Keep Directus, n8n, Turnstile, and other private credentials server-only.
+- Preserve CSP/security headers, analytics
   enablement gates, and safe external URL validation.
 
 ## Git and pull-request workflow
@@ -101,7 +100,7 @@ checkout; they are not routine validation commands. Do not run
 
 ## Deployment Boundary
 
-Directus, WordPress, n8n, Coolify, analytics, revalidation, and production lead
+Directus, Cloudflare, n8n, Coolify, analytics, revalidation, and production lead
 flows are external control planes. Do not mutate, deploy, redeploy, publish,
 revalidate production, submit real leads, or run migration apply commands
 without explicit authorization for that exact action.
