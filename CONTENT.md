@@ -296,8 +296,9 @@
   Sharing from the player copies the stable library selection URL. Eligible
   project cards retain their project link; the modal keeps its existing layout.
 - See [the migration tooling guide](docs/video-migration.md) for source exports,
-  schema invariants, recovery, and verification. The homepage/About placements
-  and the excluded truck-sale page retain the code-owned boundary above.
+  schema invariants, recovery, and verification. Home/About placement stays in
+  code while video metadata comes from the deployment snapshot. Truck body copy
+  and both videos stay code-owned; its images use the static-media snapshot.
 
 ## Publishing SonShine people in Directus
 
