@@ -117,7 +117,7 @@ const nextConfig = {
       // Content-specific redirects are managed in Directus and loaded at build time.
       ...directusRedirects,
 
-      // /wp-content rules run from the sealed deployment snapshot in Proxy.
+      // Absolute /wp-content redirects use the sealed snapshot in Proxy.
       ...nonMediaLegacyRedirects,
     ];
   },

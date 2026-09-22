@@ -123,9 +123,23 @@ export async function verifyRuntime(root = process.cwd(), { revision } = {}) {
       assert.equal(response.status, 410);
     }
     assert.equal((await fetch(base + '/api/revalidate')).status, 401);
+    // Relative media redirects stay in native Next routing. In particular,
+    // Proxy's standalone adapter rejects relative Location headers at runtime.
+    for (const rule of editorial.redirects.filter((row) => row.source.startsWith('/wp-content/'))) {
+      for (const method of ['GET', 'HEAD']) {
+        const response = await fetch(base + rule.source + '?ver=1&x=one&x=two', {
+          method,
+          redirect: 'manual',
+        });
+        assert.equal(response.status, rule.statusCode, `${method} ${rule.source}`);
+        const expected = new URL(rule.destination, base);
+        expected.search = '?ver=1&x=one&x=two';
+        assert.equal(new URL(response.headers.get('location'), base).href, expected.href);
+      }
+    }
     for (const rule of editorial.legacyMediaRedirects) {
       const path = rule.wildcard
-        ? rule.sourcePath.replace('*', 'uploads/runtime-check.html')
+        ? rule.sourcePath.replaceAll('*', 'uploads/runtime-check.html')
         : rule.sourcePath;
       for (const method of ['GET', 'HEAD']) {
         const url = base + path + '?key=unknown&download=true&width=40&v=1';
@@ -137,6 +151,17 @@ export async function verifyRuntime(root = process.cwd(), { revision } = {}) {
       }
     }
     if (revision) {
+      for (const method of ['GET', 'HEAD']) {
+        const relative = await fetch(base + '/wp-content/uploads/fixture-relative.jpg?ver=1', {
+          method,
+          redirect: 'manual',
+        });
+        assert.equal(relative.status, 308);
+        assert.equal(
+          new URL(relative.headers.get('location'), base).href,
+          base + (revision === 'B' ? '/blog' : '/') + '?ver=1',
+        );
+      }
       const html = await (await fetch(base + '/' + editorial.posts[0].slug)).text();
       assert.ok(html.includes(`Deployment ${revision}`));
       assert.equal((await fetch(base + '/new-after-build')).status, revision === 'B' ? 200 : 404);

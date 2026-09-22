@@ -68,8 +68,9 @@ async function capture(records) {
   );
 }
 const before = await capture([...rows, ordinary]);
-assert.equal(before.legacyMediaRedirects.length, 15);
+assert.equal(before.legacyMediaRedirects.length, 14);
 assert.deepEqual(before.redirects, [
+  { source: uploads + 'Lifted-Cox.jpg', destination: '/', statusCode: 308 },
   { source: '/ordinary-alias', destination: '/blog', statusCode: 308 },
 ]);
 
@@ -82,8 +83,8 @@ const originalRules = rows
   .slice()
   .sort((a, b) => Number(a.source_path.endsWith('/*')) - Number(b.source_path.endsWith('/*')))
   .map((row) => ({
-    source: row.source_path.replace('/*', '/:directusPath(.+)'),
-    destination: row.destination_url.replace('*', ':directusPath'),
+    source: row.source_path.replaceAll('/*', '/:directusPath(.+)'),
+    destination: row.destination_url.replaceAll('*', ':directusPath'),
     statusCode: row.status_code,
   }));
 const canonical = {
@@ -215,6 +216,8 @@ for (const overrides of [
   },
   { preserve_query: false, destination_url: updates[0].destination_url + '?key=unsafe' },
   { source_path: '/wp-content/:arbitrary' },
+  { source_path: '/wp-content/*', destination_url: '/' },
+  { preserve_query: false, destination_url: '/' },
 ])
   await assert.rejects(capture([{ ...rows[0], ...overrides }]));
 await assert.rejects(capture([rows[0], { ...rows[0], id: 'duplicate' }]), /Duplicate/);
@@ -223,6 +226,10 @@ await assert.rejects(
     rows[0],
     { ...rows[0], id: 'case-duplicate', source_path: rows[0].source_path.toUpperCase() },
   ]),
+  /Duplicate/,
+);
+await assert.rejects(
+  capture([rows[0], { ...rows[0], id: 'native-duplicate', destination_url: '/' }]),
   /Duplicate/,
 );
 console.log(

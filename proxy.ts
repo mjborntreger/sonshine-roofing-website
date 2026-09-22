@@ -61,14 +61,7 @@ export function proxy(req: NextRequest) {
       legacyMediaRedirects: LegacyMediaRedirect[];
     };
     const rule = resolveLegacyMediaRedirect(req.url, snapshot.legacyMediaRedirects);
-    if (rule) {
-      return rule.destination.startsWith('/')
-        ? new NextResponse(null, {
-            status: rule.statusCode,
-            headers: { Location: rule.destination },
-          })
-        : NextResponse.redirect(rule.destination, rule.statusCode);
-    }
+    if (rule) return NextResponse.redirect(rule.destination, rule.statusCode);
   }
   const pathname = normalizedLegacyPath(req.nextUrl.pathname);
 

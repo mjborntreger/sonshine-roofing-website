@@ -155,7 +155,13 @@ const media = {
   ),
 };
 Object.assign(editorial, {
-  redirects: [],
+  redirects: [
+    {
+      source: '/wp-content/uploads/fixture-relative.jpg',
+      destination: revision === 'B' ? '/blog' : '/',
+      statusCode: 308,
+    },
+  ],
   legacyMediaRedirects: [
     {
       sourcePath: '/wp-content/uploads/fixture-direct.jpg',
