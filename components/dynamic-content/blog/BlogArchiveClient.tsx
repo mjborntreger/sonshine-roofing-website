@@ -6,9 +6,9 @@ import InfiniteList from '../InfiniteList';
 import ResourceArchiveClient, {
   type FilterGroupConfig,
 } from '@/components/dynamic-content/ResourceArchiveClient';
-import type { TermLite, FacetGroup } from '@/lib/content/wp';
+import type { TermLite, FacetGroup } from '@/lib/content/content-types';
 import type { PageResult } from '@/lib/ui/pagination';
-import type { PostCard } from '@/lib/content/wp';
+import type { PostCard } from '@/lib/content/content-types';
 
 type Props = {
   initialResult: PageResult<PostCard> & { facets?: FacetGroup[] };

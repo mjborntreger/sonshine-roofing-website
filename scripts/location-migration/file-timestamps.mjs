@@ -1,4 +1,4 @@
-import { stableId } from './core.mjs';
+import { stableId } from '../lib/stable-id.mjs';
 
 const VERSION = 'location-file-timestamps-v1';
 const TIME_FIELDS = ['uploaded_on', 'modified_on'];

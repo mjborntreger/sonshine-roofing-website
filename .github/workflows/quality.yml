@@ -42,8 +42,8 @@ jobs:
         run: npm run verify:video-playback
       - name: Verify Directus HTML
         run: npm run verify:directus-html
-      - name: Verify WordPress HTML
-        run: npm run verify:wordpress-html
+      - name: Verify CMS text extraction
+        run: npm run verify:html-text
       - name: Verify public input handling
         run: npm run verify:security-input-handling
       - name: Verify public JSON body limits
@@ -54,9 +54,7 @@ jobs:
         run: npm run verify:video-pipeline
       - name: Verify static media metadata and rendering
         run: npm run verify:static-media
-      - name: Verify video migration
-        run: npm run verify:video-migration
-      - name: Verify location migration and page contracts
+      - name: Verify location tooling and page contracts
         run: npm run verify:locations
       - name: Verify shared review carousel
         run: npm run verify:review-carousel

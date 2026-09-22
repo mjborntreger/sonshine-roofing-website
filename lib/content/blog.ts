@@ -7,16 +7,16 @@ import type {
 } from './editorial-types';
 export type { BlogSitemapEntry, BlogImageSitemapEntry } from './editorial-types';
 import type { PageResult } from '@/lib/ui/pagination';
-import {
-  stripHtml,
-  type FacetGroup,
-  type Post,
-  type PostCard,
-  type PostLite,
-  type PostsFiltersInput,
-  type TermLite,
-  type WpImage,
-} from './wp';
+import { stripHtml } from './html-text';
+import type {
+  FacetGroup,
+  Post,
+  PostCard,
+  PostLite,
+  PostsFiltersInput,
+  TermLite,
+  ContentImage,
+} from './content-types';
 type UnknownRecord = Record<string, unknown>;
 
 const asRecord = (value: unknown): UnknownRecord | null =>
@@ -43,7 +43,7 @@ function toPostCard(post: NormalizedBlogPost): PostCard {
   };
 }
 
-function toWpImage(image: Post['featuredImage'] | null | undefined): WpImage | null {
+function toContentImage(image: Post['featuredImage'] | null | undefined): ContentImage | null {
   return image?.url ? { url: image.url, altText: readString(image.altText) ?? '' } : null;
 }
 
@@ -52,7 +52,7 @@ function toPostLite(post: NormalizedBlogPost): PostLite {
     slug: post.slug,
     title: post.title,
     date: post.date || null,
-    featuredImage: toWpImage(post.featuredImage),
+    featuredImage: toContentImage(post.featuredImage),
     categories: post.categoryTerms ?? [],
     excerpt: post.excerpt ?? null,
     contentPlain: stripHtml(post.contentHtml) || null,
@@ -219,7 +219,7 @@ export async function listBlogImageSitemapEntries(): Promise<BlogImageSitemapEnt
     .map((post) => ({
       uri: `/${post.slug}`,
       modified: post.modified ?? post.date ?? null,
-      featuredImage: toWpImage(post.featuredImage),
+      featuredImage: toContentImage(post.featuredImage),
     }));
 }
 

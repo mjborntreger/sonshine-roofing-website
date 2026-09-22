@@ -155,7 +155,7 @@ const priorRoot = process.env.LOCATION_MIGRATION_PRIVATE_ROOT;
 let sequence = 0;
 async function privateIo(root) {
   process.env.LOCATION_MIGRATION_PRIVATE_ROOT = root;
-  return import(`./location-migration/io.mjs?private-root-test=${sequence++}`);
+  return import(`./lib/private-artifacts.mjs?private-root-test=${sequence++}`);
 }
 try {
   const safe = `${temp}/durable-root`, repo = `${temp}/repository`;

@@ -1,5 +1,5 @@
 import { sanitizeDirectusHtml } from '../directus-html.ts';
-import type { WpImage, TermLite } from '../wp';
+import type { ContentImage, TermLite } from '../content-types';
 import type { NormalizedBlogPost } from '../editorial-types';
 export const SONSHINE_MICHAEL_PERSON_ID = 'f028dafd-c2fb-4d59-a561-2be5e46ea318';
 
@@ -101,7 +101,7 @@ export function directusAssetUrl(config: DirectusConfig, id: string): string {
   return `${config.url}/assets/${encodeURIComponent(id)}`;
 }
 
-export function mapDirectusImage(value: unknown, config: DirectusConfig): WpImage | null {
+export function mapDirectusImage(value: unknown, config: DirectusConfig): ContentImage | null {
   const record = asRecord(value);
   const id = readString(record?.id) ?? readString(value);
   if (!id) return null;

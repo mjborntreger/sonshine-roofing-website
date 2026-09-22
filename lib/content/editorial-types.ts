@@ -1,4 +1,4 @@
-import type { Post, WpImage } from './wp';
+import type { Post, ContentImage } from './content-types';
 import type { PersonSeo } from './person-seo';
 export type NormalizedBlogPost = Post & {
   featured?: boolean;
@@ -10,7 +10,7 @@ export type BlogSitemapEntry = {
 };
 
 export type BlogImageSitemapEntry = BlogSitemapEntry & {
-  featuredImage: WpImage | null;
+  featuredImage: ContentImage | null;
 };
 export type PersonImage = {
   url: string;
@@ -86,7 +86,7 @@ export type SponsorFeature = {
   title: string | null;
   contentHtml: string | null;
   links: SponsorLinks | null;
-  featuredImage: WpImage | null;
+  featuredImage: ContentImage | null;
 };
 
 export type DirectusSponsorFeature = SponsorFeature & {

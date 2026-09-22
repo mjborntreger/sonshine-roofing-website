@@ -3,7 +3,7 @@ import { readBoundedJsonBody } from "@/lib/http/read-json-body";
 import type { ResourceQuery } from "@/lib/ui/pagination";
 import { listProjectsPaged } from "@/lib/content/projects";
 import { type ProjectsArchiveFilters, type ProjectSearchResult } from "@/lib/content/project-types";
-import { type PostsFiltersInput } from "@/lib/content/wp";
+import { type PostsFiltersInput } from "@/lib/content/content-types";
 import { type VideoFiltersInput, listVideoItemsPaged } from "@/lib/content/videos";
 import { listPostsPaged } from "@/lib/content/blog";
 

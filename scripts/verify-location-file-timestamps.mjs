@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { pathToFileURL } from 'node:url';
-import { stableId } from './location-migration/core.mjs';
+import { stableId } from './lib/stable-id.mjs';
 import { prepareFileTimestampRestore, restoreFileTimestamps } from './location-migration/file-timestamps.mjs';
 
 let checks = 0;
+assert.equal(stableId(`media-bytes:${'a'.repeat(64)}`), '4c22cd2e-1a05-596d-a5ae-71d3ead8f8df', 'Existing file IDs must retain their original deterministic namespace');
 function fixture() {
   const sha256 = 'a'.repeat(64), id = stableId(`media-bytes:${sha256}`);
   const data = { id, title: "Synthetic O'Brien \\ roof", description: "Quoted '); DROP TABLE directus_files; -- synthetic text", filename_download: 'synthetic.webp',

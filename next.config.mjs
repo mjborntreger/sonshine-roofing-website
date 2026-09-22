@@ -6,8 +6,6 @@ const csp = directusBuildSettings?.contentSecurityPolicy ?? '';
 
 const imageRemotePatterns = [
   { protocol: 'https', hostname: 'sonshineroofing.com' },
-  { protocol: 'https', hostname: 'wp.sonshineroofing.com' },
-  { protocol: 'https', hostname: '**.wp.com' },
   { protocol: 'https', hostname: 'coc.codes' },
   { protocol: 'https', hostname: 'res.cloudinary.com' },
   { protocol: 'https', hostname: 'seal-westflorida.bbb.org' },

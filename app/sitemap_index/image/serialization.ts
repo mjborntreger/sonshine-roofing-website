@@ -1,4 +1,4 @@
-import type { WpImage } from '@/lib/content/wp';
+import type { ContentImage } from '@/lib/content/content-types';
 import { xmlEscape, trimTo } from '../utils';
 
 export const IMAGE_ALT_MAX = 200;
@@ -7,7 +7,7 @@ export const MAX_IMAGES_PER_ENTRY = 100;
 export type ImageSitemapEntry = {
   loc: string;
   lastmod?: string | null;
-  images: WpImage[];
+  images: ContentImage[];
 };
 
 export const sanitizeAltText = (value?: string | null) => {
@@ -18,11 +18,11 @@ export const sanitizeAltText = (value?: string | null) => {
 };
 
 export const dedupeImages = (
-  images: ReadonlyArray<WpImage | null | undefined>,
+  images: ReadonlyArray<ContentImage | null | undefined>,
   limit = MAX_IMAGES_PER_ENTRY
-): WpImage[] => {
+): ContentImage[] => {
   const seen = new Set<string>();
-  const result: WpImage[] = [];
+  const result: ContentImage[] = [];
   for (const img of images) {
     if (!img) continue;
     const url = img.url.trim();
