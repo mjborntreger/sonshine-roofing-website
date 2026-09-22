@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticMediaProvider';
 import type { LeadNavigationCard, ProjectOption } from '@/components/lead-capture/lead-form/config';
 
 export const PROJECT_OPTION_CARD_BASE_CLASS =
@@ -12,13 +12,13 @@ type ProjectOptionCardContentProps = {
 };
 
 export function ProjectOptionCardContent({ option }: ProjectOptionCardContentProps) {
-  const { label, description, imageSrc, imageAlt, eyebrow } = option;
+  const { label, description, imageSrc, eyebrow } = option;
   return (
     <div className="flex flex-col gap-3">
       <div className="relative aspect-[7/3] w-full overflow-hidden rounded-lg sm:rounded-xl bg-slate-100">
-        <Image
+        <StaticImage
           src={imageSrc}
-          alt={imageAlt}
+          alt="" decorative crop
           fill
           sizes="(min-width: 1024px) 320px, 100vw"
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"

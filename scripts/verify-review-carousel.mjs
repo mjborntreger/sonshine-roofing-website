@@ -78,6 +78,9 @@ function loadSource(filename) {
     };
     if (id === 'embla-carousel') return embla;
     if (id === 'embla-carousel-auto-scroll') return autoScroll;
+    if (id === '@/lib/content/static-media') return {
+      staticImage: () => ({ url: 'https://images.test/google-logo', description: 'Google logo', type: 'image/webp', width: 40, height: 40, focalPoint: null }),
+    };
     if (id === '@/lib/content/directus-reviews') return {
       DEFAULT_GOOGLE_BUSINESS_PROFILE_URL: 'https://google.test/profile',
       getGoogleReviews: async () => { cmsCalls.push('reviews'); return googleReviews; },

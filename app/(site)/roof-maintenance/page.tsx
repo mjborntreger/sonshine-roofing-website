@@ -1,5 +1,5 @@
 import Section from '@/components/layout/Section';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import { listRecentPostsPool } from '@/lib/content/blog';
 import { listFaqs } from '@/lib/content/directus-faqs';
 import FaqInlineList from '@/components/dynamic-content/faq/FaqInlineList';
@@ -111,9 +111,8 @@ export default async function Page() {
 
             <figure className="not-prose">
               <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                <Image
-                  src="https://wp.sonshineroofing.com/wp-content/uploads/taking-care-of-your-roof-maintenance-saves-moneybak.webp"
-                  alt="taking care of your roof maintenance saves you money"
+                <StaticImage crop
+                  src="static:roof-maintenance-saves-money-graphic"
                   fill
                   className="object-cover mb-2"
                   sizes="(max-width: 768px) 100vw, 800px"

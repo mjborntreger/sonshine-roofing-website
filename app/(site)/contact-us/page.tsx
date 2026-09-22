@@ -3,7 +3,7 @@ import Section from '@/components/layout/Section';
 import SimpleLeadForm from '@/components/lead-capture/lead-form/SimpleLeadForm';
 import SmartLink from '@/components/utils/SmartLink';
 import { Smartphone, ShieldCheck, BadgeCheck, Star, HandCoins } from 'lucide-react';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import type { Metadata } from 'next';
 import LiteMap from '@/components/utils/LiteMap';
 import OpenOrClosed from '@/components/utils/OpenOrClosed';
@@ -79,7 +79,7 @@ export default async function Page() {
       <Hero
         title="Contact Us"
         eyelash="Whatever you need, we've got you covered"
-        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/Plan-a-Roof-Replacement.webp"
+        imageSrc="static:gray-roof-home-aerial"
         subtitle="Whether you want to schedule an appointment with one our expert Roofing Specialists or if you just have a few questions, we’re here to help! Give us a call or complete the form below to contact our office."
         badges={[
           { icon: ShieldCheck, label: 'Licensed & Insured' },
@@ -105,7 +105,7 @@ export default async function Page() {
                       recurringClosures={['12-24', '12-25', '12-26', '07-04', '01-01']}
                     />
                   </div>
-                  <Image
+                  <StaticImage
                     src={taraImage.url}
                     alt={taraImage.altText}
                     width={75}
@@ -167,7 +167,7 @@ export default async function Page() {
                       recurringClosures={['12-24', '12-25', '12-26', '07-04']}
                     />
                   </div>
-                  <Image
+                  <StaticImage
                     src={taraImage.url}
                     alt={taraImage.altText}
                     width={75}

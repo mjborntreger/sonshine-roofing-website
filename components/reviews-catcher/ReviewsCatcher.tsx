@@ -1,4 +1,4 @@
-import Image from "next/image";
+import StaticImage from "@/components/media/StaticImage";
 import SmartLink from "../utils/SmartLink";
 import { ArrowUpRight, Star } from "lucide-react";
 import React from "react";
@@ -45,9 +45,9 @@ export default function ReviewsCatcher() {
             target="_blank"
             className="inline-flex items-center gap-2"
           >
-            <Image
-              alt="Google logo"
-              src="https://wp.sonshineroofing.com/wp-content/uploads/google.webp"
+            <StaticImage
+              alt="" decorative
+              src="static:google-logo"
               width={20}
               height={20}
               className="object-contain w-5 h-5"

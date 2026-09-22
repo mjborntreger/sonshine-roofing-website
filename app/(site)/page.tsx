@@ -1,3 +1,4 @@
+import { staticImageUrl } from '@/lib/content/static-media';
 import Hero from '@/components/marketing/landing-page/LandingHero';
 import HeroTrustBar from '@/components/marketing/landing-page/HeroTrustBar';
 import ReviewsCarousel from '@/components/reviews-widget/ReviewsCarousel';
@@ -29,7 +30,7 @@ const narrowLayout =
 const SEO_TITLE_HOME = 'SonShine Roofing | Best Roofing Company in Sarasota';
 const SEO_CANONICAL_HOME = '/';
 const SEO_OG_IMAGE_DEFAULT =
-  'https://wp.sonshineroofing.com/wp-content/uploads/Open-Graph-Default.png';
+  staticImageUrl('sonshine-roofing-social-card');
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();

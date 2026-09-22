@@ -29,3 +29,15 @@ export async function listVideoCategories() {
 export async function getVideoBySelection(selection: string) {
   return findVideoInSnapshot(deployedVideos(), selection);
 }
+
+const PAGE_VIDEO_SELECTIONS = {
+  home: 'sonshine-roofing-best-of-the-best-2023',
+  about: 'sonshine-roofing-introduction',
+} as const;
+
+/** Page placements use the same normalized deployment snapshot as the library. */
+export async function getPageVideo(placement: keyof typeof PAGE_VIDEO_SELECTIONS) {
+  const video = await getVideoBySelection(PAGE_VIDEO_SELECTIONS[placement]);
+  if (!video) throw new Error(`Required published page video is missing: ${placement}`);
+  return video;
+}

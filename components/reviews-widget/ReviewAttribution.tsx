@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { DirectusImage } from '@/components/media/DirectusImage';
 import ReviewStarRow from './ReviewStarRow';
 import type { CarouselReview } from './types';
 
@@ -13,7 +13,7 @@ export default function ReviewAttribution({ review, titleId, inButton = false, s
     <Wrapper className="block space-y-2">
       <Heading id={titleId} className="m-0 flex items-start gap-2 text-xl font-bold text-slate-700">
         {review.sourceLogo ? (
-          <Image src={review.sourceLogo.src} alt={review.sourceLogo.alt} width={40} height={40} className="h-5 w-5 flex-none" />
+          <DirectusImage media={review.sourceLogo} width={40} height={40} className="h-5 w-5 flex-none" />
         ) : null}
         <span>{review.authorName}</span>
       </Heading>

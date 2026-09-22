@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticMediaProvider';
 import { FormEvent, useMemo, useState } from 'react';
 import { ArrowRight, Check, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -136,25 +136,25 @@ const ROOF_TYPE_OPTIONS: RoofTypeOption[] = [
   {
     value: 'shingle',
     label: 'Shingle',
-    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Shingle-Roof.webp',
+    imageSrc: 'static:dark-shingle-roof-home',
     imageAlt: 'Close-up of a shingle roof',
   },
   {
     value: 'metal',
     label: 'Metal',
-    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Metal-Roof.webp',
+    imageSrc: 'static:standing-seam-metal-roof-home',
     imageAlt: 'Modern home with metal roofing panels',
   },
   {
     value: 'tile',
     label: 'Tile',
-    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Tile-Roof.webp',
+    imageSrc: 'static:red-tile-roof-home',
     imageAlt: 'Clay tile roof on a Florida home',
   },
   {
     value: 'flat',
     label: 'Flat',
-    imageSrc: 'https://wp.sonshineroofing.com/wp-content/uploads/Flat-Roof.webp',
+    imageSrc: 'static:light-colored-flat-roof',
     imageAlt: 'Flat commercial roof with HVAC equipment',
   },
 ];
@@ -615,7 +615,7 @@ export default function SimpleLeadForm({
                 </h3>
                 <p className={SECTION_EYELASH}>Helps us prep for your project</p>
                 <div className="mt-3 grid gap-3 grid-cols-2 sm:grid-cols-4">
-                  {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc, imageAlt }) => {
+                  {ROOF_TYPE_OPTIONS.map(({ value, label, imageSrc }) => {
                     const selected = form.roofType === value;
                     return (
                       <button
@@ -631,9 +631,9 @@ export default function SimpleLeadForm({
                         aria-pressed={selected}
                       >
                         <div className="relative w-full overflow-hidden rounded-xl bg-slate-100 aspect-[5/2]">
-                          <Image
+                          <StaticImage
                             src={imageSrc}
-                            alt={imageAlt}
+                            alt="" decorative crop
                             fill
                             sizes="(min-width: 768px) 320px, 100vw"
                             className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"

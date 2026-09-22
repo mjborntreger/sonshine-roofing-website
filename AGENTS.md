@@ -26,8 +26,10 @@ and serves it on port 3000.
   snapshot described in `CONTENT.md`; location/FAQ/navigation content uses its matching location snapshot. Preserve that boundary in runtime APIs,
   players, and mixed-source pages. Video publication is independent of its
   optional project's publication; follow the context visibility rules there.
-- Homepage/About YouTube placements remain code-owned. Exclude the entire
-  truck-sale page and its videos from Directus-backed content and CMS migrations.
+- Static images, including truck images, use the private build snapshot and
+  Directus File Library metadata described in `CONTENT.md`. Home/About video
+  metadata uses the shared project/video snapshot. Truck-sale body copy and both
+  personal truck videos remain code-owned; preserve its `noindex, nofollow` policy.
 
 ## Important Paths
 

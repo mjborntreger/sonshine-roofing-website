@@ -60,7 +60,15 @@ const project = (id, overrides = {}) => ({ id, status: 'published', clientSlug: 
   serviceAreas: [{ name: 'Fixture City', slug: 'fixture-city' }], neighborhood: null, video: null, ...overrides,
 } });
 const neighborhood = (overrides = {}) => ({ id: 'neighborhood-one', name: 'Fixture Neighborhood', slug: 'fixture-neighborhood', serviceAreaId: 'area-local', description: null, landmarks: null, image: null, mapImage: null, sort: 0, ...overrides });
-const render = (Component, props) => new JSDOM(renderToStaticMarkup(React.createElement(Component, props))).window.document;
+const { StaticMediaProvider } = loadSource(resolve(root, 'components/media/StaticMediaProvider.tsx'));
+const { SITE_CLIENT_IMAGE_KEYS } = loadSource(resolve(root, 'lib/content/static-image-client-keys.ts'));
+const staticImages = Object.fromEntries(SITE_CLIENT_IMAGE_KEYS.map(key => [key, {
+  url: `https://images.test/${key}`, description: 'Synthetic described image', type: 'image/webp',
+  width: 400, height: 200, focalPoint: { x: 200, y: 100 },
+}]));
+const render = (Component, props) => new JSDOM(renderToStaticMarkup(
+  React.createElement(StaticMediaProvider, { images: staticImages }, React.createElement(Component, props)),
+)).window.document;
 let checks = 0;
 function check(name, callback) {
   try { callback(); checks++; } catch (error) { error.message = `${name}: ${error.message}`; throw error; }

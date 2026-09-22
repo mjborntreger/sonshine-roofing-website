@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import dynamic from 'next/dynamic';
 import SmartLink from '@/components/utils/SmartLink';
 import {
@@ -36,7 +36,7 @@ const hoursLabelStyles = 'text-xs md:text-sm font-semibold text-white';
 const legalLinkStyles =
   'transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
 
-const logoSrc = 'https://wp.sonshineroofing.com/wp-content/uploads/sonshine-logo-text.webp';
+const logoSrc = 'static:sonshine-roofing-wordmark';
 
 const FooterBadges = dynamic(() => import('@/components/global-nav/footer/FooterBadges'), {
   loading: () => (
@@ -155,13 +155,13 @@ export default function Footer({ settings, services = [], navigation = [], servi
             <div>
               <SmartLink
                 href={ROUTES.home}
-                aria-label={`${brandName} logo`}
+                aria-label={resolvedLogoSrc.startsWith('static:') ? `${brandName} home` : `${brandName} logo`}
                 title={`${brandName} logo`}
               >
-                <Image
+                <StaticImage
                   src={resolvedLogoSrc}
-                  alt={resolvedLogoAlt}
-                  aria-label={`${brandName} logo`}
+                  alt={resolvedLogoAlt} decorative={resolvedLogoSrc.startsWith('static:')}
+                  aria-label={resolvedLogoSrc.startsWith('static:') ? undefined : `${brandName} logo`}
                   width={180}
                   height={75}
                   loading="lazy"

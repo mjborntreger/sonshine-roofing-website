@@ -1,6 +1,6 @@
 import Section from '@/components/layout/Section';
 import ServicesAside from '@/components/global-nav/static-pages/ServicesAside';
-import Image from 'next/image';
+import StaticImage from '@/components/media/StaticImage';
 import SmartLink from '@/components/utils/SmartLink';
 import { listRecentPostsPool } from '@/lib/content/blog';
 import { listFaqs } from '@/lib/content/directus-faqs';
@@ -129,7 +129,7 @@ export default async function Page() {
           { icon: HandCoins, label: 'Flexible Financing' },
         ]}
         justifyStart
-        imageSrc="https://wp.sonshineroofing.com/wp-content/uploads/2-Treedale-Glen-Lakewood-Ranch-FL-Roof-Replacement.webp"
+        imageSrc="static:red-tile-roof-white-home"
       >
         <div className="flex flex-wrap gap-3">
           <SmartLink
@@ -200,7 +200,7 @@ export default async function Page() {
 
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-                  <Image
+                  <StaticImage
                     src={nathanImage.url}
                     alt={nathanImage.altText}
                     fill
@@ -251,9 +251,8 @@ export default async function Page() {
 
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-                  <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/difference-between-tile-vs-metal-vs-shingle-roofs.jpg"
-                    alt="Roof replacement choices"
+                  <StaticImage crop
+                    src="static:tile-shingle-metal-roof-comparison"
                     fill
                     className="object-cover mb-2"
                     sizes="(max-width: 768px) 100vw, 800px"
@@ -361,9 +360,8 @@ export default async function Page() {
 
               <figure className={figureStyles}>
                 <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-                  <Image
-                    src="https://wp.sonshineroofing.com/wp-content/uploads/roofer-roof-maintenance.jpg"
-                    alt="The importance of roof maintenance"
+                  <StaticImage crop
+                    src="static:clearing-leaves-from-roof-gutter"
                     fill
                     className="object-cover mb-2"
                     sizes="(max-width: 768px) 100vw, 800px"
