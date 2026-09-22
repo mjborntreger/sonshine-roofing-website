@@ -1,4 +1,5 @@
 import { deploymentBundle } from './lib/content/deployment-snapshot.mjs';
+import { nonMediaLegacyRedirects } from './lib/content/legacy-media-redirects.mjs';
 import { getDirectusBuildSettings } from './lib/content/directus-build-settings.mjs';
 
 const directusBuildSettings = await getDirectusBuildSettings();
@@ -116,14 +117,8 @@ const nextConfig = {
       // Content-specific redirects are managed in Directus and loaded at build time.
       ...directusRedirects,
 
-      // De-paginate everywhere: /something/page/2 -> /something/
-      { source: '/:prefix*/page/:n(\\d+)', destination: '/:prefix*', permanent: true },
-
-      // Strip .html endings globally
-      { source: '/:path*.html', destination: '/:path*', permanent: true },
-
-      // WordPress sitemap aliases need regex matching that the shared redirects schema does not expose.
-      { source: '/:prefix*/:seg(wp\\-sitemap.*)', destination: '/sitemap_index', permanent: true },
+      // /wp-content rules run from the sealed deployment snapshot in Proxy.
+      ...nonMediaLegacyRedirects,
     ];
   },
 };

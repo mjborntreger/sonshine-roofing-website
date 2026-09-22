@@ -62,6 +62,8 @@ jobs:
         run: npm run verify:dynamic-routes
       - name: Verify Directus fetch policy
         run: npm run verify:directus-fetch-policy
+      - name: Verify legacy media redirect behavior
+        run: npm run verify:legacy-media-redirects
       - name: Verify FAQ HTML
         run: npm run verify:faq-html
       - name: Verify person HTML

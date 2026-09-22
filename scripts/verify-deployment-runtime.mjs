@@ -7,6 +7,7 @@ import { basename, join, resolve } from 'node:path';
 import { createServer } from 'node:net';
 import { pathToFileURL } from 'node:url';
 import { verifyPrerenderContract } from './verify-deployment-contract.mjs';
+import { resolveLegacyMediaRedirect } from '../lib/content/legacy-media-redirects.mjs';
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function verifyRuntime(root = process.cwd(), { revision } = {}) {
@@ -122,11 +123,55 @@ export async function verifyRuntime(root = process.cwd(), { revision } = {}) {
       assert.equal(response.status, 410);
     }
     assert.equal((await fetch(base + '/api/revalidate')).status, 401);
+    for (const rule of editorial.legacyMediaRedirects) {
+      const path = rule.wildcard
+        ? rule.sourcePath.replace('*', 'uploads/runtime-check.html')
+        : rule.sourcePath;
+      for (const method of ['GET', 'HEAD']) {
+        const url = base + path + '?key=unknown&download=true&width=40&v=1';
+        const expected = resolveLegacyMediaRedirect(url, editorial.legacyMediaRedirects);
+        const response = await fetch(url, { method, redirect: 'manual' });
+        assert.equal(response.status, expected.statusCode, `${method} ${path}`);
+        assert.equal(response.headers.get('location'), expected.destination, path);
+        if (!rule.preserveQuery) assert.equal(new URL(expected.destination).search, '');
+      }
+    }
     if (revision) {
       const html = await (await fetch(base + '/' + editorial.posts[0].slug)).text();
       assert.ok(html.includes(`Deployment ${revision}`));
       assert.equal((await fetch(base + '/new-after-build')).status, revision === 'B' ? 200 : 404);
       assert.equal((await fetch(base + '/fixture-post-1')).status, revision === 'B' ? 404 : 200);
+      const media = await fetch(base + '/wp-content/uploads/fixture-direct.jpg?key=unknown', {
+        redirect: 'manual',
+      });
+      assert.equal(media.status, 308);
+      assert.ok(
+        media.headers
+          .get('location')
+          .endsWith(
+            `/assets/${revision === 'B' ? '22222222' : '11111111'}-1111-1111-1111-111111111111`,
+          ),
+      );
+      const uppercase = await fetch(base + '/WP-CONTENT/uploads/FIXTURE-DIRECT.JPG?download=true', {
+        redirect: 'manual',
+      });
+      assert.equal(uppercase.headers.get('location'), media.headers.get('location'));
+      for (const path of [
+        '/wp-content/uploads/unknown.html',
+        '/wp-content/uploads/page/2',
+        '/wp-content/wp-sitemap.xml',
+        '/wp-content/uploads/Foo%20Bar.jpg',
+        '/wp-content/uploads/foo%2Fbar.jpg',
+        '/wp-content/uploads/foo%252Fbar.jpg',
+      ]) {
+        const response = await fetch(base + path + '?x=one&x=two', { redirect: 'manual' });
+        assert.equal(response.status, 308, path);
+        assert.equal(
+          response.headers.get('location'),
+          'https://legacy.example.test' + path + '?x=one&x=two',
+          path,
+        );
+      }
     }
     assert.equal(existsSync(audit), false, 'Runtime tried to access the network');
   }

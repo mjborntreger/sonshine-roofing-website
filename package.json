@@ -5,7 +5,7 @@
   "scripts": {
     "predev": "npm run prebuild:codex",
     "dev": "next dev",
-    "prebuild": "npm run verify:special-offer-indexing && npm run verify:build-only-revalidation && npm run verify:project-pipeline && npm run verify:video-pipeline && npm run verify:location-pipeline && npm run verify:location-selection && npm run verify:editorial-pipeline && npm run verify:deployment-contract && node scripts/prebuild.mjs",
+    "prebuild": "npm run verify:legacy-media-redirects && npm run verify:special-offer-indexing && npm run verify:build-only-revalidation && npm run verify:project-pipeline && npm run verify:video-pipeline && npm run verify:location-pipeline && npm run verify:location-selection && npm run verify:editorial-pipeline && npm run verify:deployment-contract && node scripts/prebuild.mjs",
     "build": "next build",
     "prebuild:codex": "node scripts/prebuild.mjs",
     "build:codex": "NODE_OPTIONS=\"--require ./scripts/codex-fetch-proxy.cjs $NODE_OPTIONS\" next build --webpack",
@@ -19,6 +19,7 @@
     "verify:person-html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-person-html.mjs",
     "verify:sponsor-html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-sponsor-html.mjs",
     "verify:directus-fetch-policy": "node ./scripts/verify-directus-fetch-policy.mjs",
+    "verify:legacy-media-redirects": "node ./scripts/verify-legacy-media-redirects.mjs",
     "verify:glossary-html": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-glossary-html.mjs",
     "verify:glossary-policy": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-glossary-policy.mjs",
     "verify:person-seo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-person-seo.mjs",

@@ -156,6 +156,29 @@ const media = {
 };
 Object.assign(editorial, {
   redirects: [],
+  legacyMediaRedirects: [
+    {
+      sourcePath: '/wp-content/uploads/fixture-direct.jpg',
+      destination: `${config.url}/assets/${revision === 'B' ? '22222222' : '11111111'}-1111-1111-1111-111111111111`,
+      statusCode: 308,
+      wildcard: false,
+      preserveQuery: false,
+    },
+    {
+      sourcePath: '/wp-content/uploads/fixture-retired.jpg',
+      destination: 'https://legacy.example.test/wp-content/uploads/retired.webp',
+      statusCode: 308,
+      wildcard: false,
+      preserveQuery: true,
+    },
+    {
+      sourcePath: '/wp-content/*',
+      destination: 'https://legacy.example.test/wp-content/*',
+      statusCode: 308,
+      wildcard: true,
+      preserveQuery: true,
+    },
+  ],
   routeOwners: [],
   assetOrigin: config.url,
   buildSettings: {

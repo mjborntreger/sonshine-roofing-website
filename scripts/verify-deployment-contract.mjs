@@ -125,7 +125,7 @@ export function verifySourceContract(root = process.cwd()) {
       if (target) visit(target);
     }
   }
-  for (const file of fg.sync(['app/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}'], { cwd: root }))
+  for (const file of fg.sync(['app/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}', 'proxy.ts'], { cwd: root }))
     visit(resolve(root, file));
   return { pages: publicPages.length, modules: visited.size };
 }
