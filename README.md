@@ -2,7 +2,7 @@
 
 Production-facing Next.js application for SonShine Roofing. It owns the public
 site, lead capture, attribution and consent, SEO, structured data, sitemaps, and
-the frontend adapters for Directus and WordPress.
+the frontend adapters and deployment snapshots for Directus.
 
 ## Architecture
 
@@ -12,8 +12,9 @@ the frontend adapters for Directus and WordPress.
   sponsor features, projects, videos/categories, reviews and review-carousel settings, special
   offers, legal copy, navigation, and published CMS redirects.
 - Directus owns the five location hubs through the deployment snapshot; see
-  [release evidence](docs/location-release-20260917.md). Remaining hard-coded
-  WordPress media still depends on the WordPress host.
+  [release evidence](docs/location-release-20260917.md). Legacy media URLs use
+  Directus assets or the compatibility Worker at `wp.sonshineroofing.com`;
+  the frontend no longer needs a WordPress installation or its environment keys.
 - Home/About placement stays in code; video metadata and static images come
   from deployment snapshots. Truck body copy and both videos stay code-owned;
   truck images use the static-media snapshot.
@@ -119,11 +120,9 @@ original inline-script failure.
 - [SEO.md](SEO.md): robots, sitemap, metadata, and structured-data behavior.
 - [docs/gtm-datalayer.md](docs/gtm-datalayer.md): Google Ads conversion events,
   value mapping, and browser-side deduplication.
-- [sonshine-graphql-reference.md](sonshine-graphql-reference.md): the remaining
-  WordPress/WPGraphQL surface.
 - [SECURITY.md](SECURITY.md): private reporting and safe-testing expectations.
 - [AGENTS.md](AGENTS.md): repository-specific automation and maintenance rules.
 
-Directus, WordPress, n8n, Coolify, revalidation, analytics, and production lead
+Directus, Cloudflare, n8n, Coolify, analytics, and production lead
 flows are external control planes. Do not mutate or deploy them without explicit
 authorization for that action.

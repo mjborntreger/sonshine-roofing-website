@@ -38,40 +38,44 @@
 
 ## Coolify environment variables
 
-- Mark these as build-time and runtime variables because Next bakes `NEXT_PUBLIC_*` values into the client bundle during `next build`:
-  - `NEXT_PUBLIC_ENV=production`
-  - `NEXT_PUBLIC_BASE_URL=https://sonshineroofing.com`
-  - `NEXT_PUBLIC_WP_GRAPHQL_ENDPOINT`
-  - `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
-  - `NEXT_PUBLIC_GTM_ID`
-  - `NEXT_PUBLIC_META_PIXEL_ID`
-  - `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY`
-- These server variables are required at build time only. The standalone
-  application reads the sealed deployment bundle and does not need Directus
-  credentials or API access at runtime:
-  - `DIRECTUS_URL`
-  - `DIRECTUS_CLIENT_SLUG`
-  - `DIRECTUS_TOKEN`
-- Do not set a blog content-source variable. The frontend has no WordPress blog
-  fallback; all blog consumers read Directus.
-- Set these as runtime secrets:
-  - `N8N_WEBHOOK_URL`
-  - `N8N_WEBHOOK_SECRET`
-  - `TURNSTILE_SECRET_KEY`
-  - `REVALIDATE_SECRET` (optional; authenticates the retired endpoint's 410 response)
-  - `ALLOWED_ORIGIN=https://sonshineroofing.com,https://www.sonshineroofing.com`
-- Optional build-time variables:
-  - `YOUTUBE_API_KEY` for YouTube metadata during static generation.
-- Optional public build-time and runtime preview variables:
-  - `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true` exposes sitemap endpoints in a
-    non-production environment with noindex response headers.
-  - `NEXT_PUBLIC_ENABLE_GTM_PREVIEW=true` permits analytics on an allowed
-    non-production host when Directus also enables site analytics.
-- `NEXT_PUBLIC_SITE_URL` is a legacy origin fallback. Prefer
-  `NEXT_PUBLIC_BASE_URL` for new configuration.
-- Do not set `WP_BASIC_AUTH_USER` or `WP_BASIC_AUTH_PASS` unless WPGraphQL becomes
-  protected. The current Dockerfile does not pass these values into the build
-  stage, so protected build-time queries would also require a Dockerfile change.
+Verified against Coolify key names and flags on September 22, 2026: production
+has the 15 keys below. Preview has the same keys plus the GTM preview flag.
+Coolify currently marks every configured key for both build time and runtime;
+the table describes where the application consumes each value.
+
+| Key | Application use |
+| --- | --- |
+| `NEXT_PUBLIC_ENV` | Build-time environment gate; use `production` for production. |
+| `NEXT_PUBLIC_BASE_URL` | Public site origin used during the build. |
+| `NEXT_PUBLIC_SITE_URL` | Retained origin fallback; prefer `NEXT_PUBLIC_BASE_URL`. |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Public form widget configuration, baked into the build. |
+| `NEXT_PUBLIC_GTM_ID` | Public GTM ID, baked into the build. |
+| `NEXT_PUBLIC_META_PIXEL_ID` | Public Meta Pixel ID, baked into the build. |
+| `NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY` | Public map embed configuration, baked into the build. |
+| `DIRECTUS_URL` | Build-time CMS endpoint. |
+| `DIRECTUS_CLIENT_SLUG` | Build-time tenant scope. |
+| `DIRECTUS_TOKEN` | Server-only build credential. |
+| `YOUTUBE_API_KEY` | Optional server-only metadata enrichment during the build; currently configured. |
+| `N8N_WEBHOOK_URL` | Runtime lead-delivery endpoint. |
+| `N8N_WEBHOOK_SECRET` | Runtime lead-delivery credential. |
+| `TURNSTILE_SECRET_KEY` | Runtime form-token verification credential. |
+| `ALLOWED_ORIGIN` | Runtime comma-separated browser-origin allowlist. |
+
+`NEXT_PUBLIC_ENABLE_GTM_PREVIEW` remains configured only for preview builds.
+It permits analytics on an allowed non-production host when Directus also
+enables site analytics. Keep its Docker build argument for those builds.
+
+The standalone application reads its sealed content bundle and needs no
+Directus credential or YouTube metadata request to serve it. Public build
+values require a new build when changed. Runtime lead-delivery configuration
+must remain available to the deployed container.
+
+WordPress connection/authentication, sitemap-preview and revalidation keys are
+retired from the Coolify setup. The Dockerfile no longer passes WordPress or
+sitemap-preview arguments. Sitemaps remain disabled outside production in this
+configuration. The retained `/api/revalidate` compatibility endpoint returns
+401 for GET and POST without a configured secret and never invalidates content.
+Publish CMS changes with a successful build and deployment.
 
 ## Lead delivery (n8n)
 
@@ -90,7 +94,8 @@
   - Confirm prebuild ran (visible in build logs "Wrote N static routes").
   - Confirm `proxy.ts` passes `^/__sitemaps/` and `^/sitemap_index` through
     unchanged; only the listed legacy paths should redirect or return 410.
-  - Confirm `NEXT_PUBLIC_ENABLE_SITEMAPS_PREVIEW=true` on staging if needed.
+  - Check `NEXT_PUBLIC_ENV`: sitemap endpoints intentionally return 404 in
+    the current non-production configuration.
 
 ## Security headers and CSP
 
@@ -201,11 +206,12 @@
 - Before promoting a build:
   - App boots and `/robots.txt` returns 200.
   - `/`, `/contact-us`, `/sitemap_index`, `/sitemap_index/static`, one Directus
-    blog post, and one remaining WP-backed dynamic page render.
+    blog post, and one Directus-backed location hub render.
   - `www.sonshineroofing.com` redirects to `sonshineroofing.com` once both domains point at Coolify.
   - Legacy redirects and configured 410 routes still behave correctly.
   - A deprecated static landing-page URL returns 404 without redirecting.
-  - `/api/revalidate` returns 401 for missing/incorrect secrets and 410 for a valid `REVALIDATE_SECRET`, without invalidating content.
+  - `/api/revalidate` returns 401 for GET and POST with the current secret-free
+    configuration, without invalidating content.
   - An explicitly authorized synthetic lead submission verifies Turnstile and
     reaches n8n.
 - After promotion:
