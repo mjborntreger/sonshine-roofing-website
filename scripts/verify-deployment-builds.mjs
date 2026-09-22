@@ -19,6 +19,9 @@ const env = {
   NEXT_TELEMETRY_DISABLED: '1',
 };
 for (const key of Object.keys(env)) if (/DIRECTUS|YOUTUBE_API_KEY/.test(key)) delete env[key];
+env.YOUTUBE_API_KEY = 'synthetic-build-only';
+env.CONTENT_BUILD_AUDIT = join(root, '.youtube-build-audit');
+env.NODE_OPTIONS = `--require ${join(root, 'scripts/fixtures/youtube-fetch.cjs')}`;
 async function run(args) {
   await new Promise((resolve, reject) => {
     const child = spawn(process.execPath, args, {
@@ -62,6 +65,8 @@ try {
     else assert.notEqual(manifest.digest, firstDigest);
     // Reuse build caches deliberately: cached editorial content must not survive a new capture.
     await run(['node_modules/next/dist/bin/next', 'build', '--webpack']);
+    assert.ok((await readFile(env.CONTENT_BUILD_AUDIT, 'utf8')).length > 0);
+    await rm(env.CONTENT_BUILD_AUDIT);
     await verifyRuntime(root, { revision });
     console.log(`Synthetic deployment ${revision} build and runtime checks passed.`);
   }

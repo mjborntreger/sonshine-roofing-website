@@ -44,7 +44,6 @@ export type YouTubeVideoMeta = {
 };
 
 const YOUTUBE_API_ENDPOINT = "https://www.googleapis.com/youtube/v3/videos";
-const YOUTUBE_API_REVALIDATE_SECONDS = 60 * 60; // 1 hour
 
 let hasWarnedForMissingKey = false;
 
@@ -93,7 +92,9 @@ async function fetchYouTubeMeta(videoId: string): Promise<YouTubeVideoMeta | nul
   try {
     const response = await fetch(url, {
       headers: { Accept: "application/json" },
-      next: { revalidate: YOUTUBE_API_REVALIDATE_SECONDS, tags: [`youtube-video:${trimmedId}`] },
+      // Called while prerendering the code-owned truck videos. A nested ISR
+      // interval would override the route's deployment-only lifetime.
+      cache: 'no-store',
     });
 
     if (!response.ok) {
