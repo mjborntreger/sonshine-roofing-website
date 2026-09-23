@@ -1,0 +1,938 @@
+{
+  "blog_posts": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "user_created",
+      "type": "uuid"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "user_updated",
+      "type": "uuid"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "title",
+      "type": "character varying"
+    },
+    {
+      "field": "meta_title",
+      "type": "character varying"
+    },
+    {
+      "field": "meta_description",
+      "type": "text"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "body",
+      "type": "text"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "featured_image",
+      "type": "uuid"
+    },
+    {
+      "field": "excerpt",
+      "type": "text"
+    },
+    {
+      "field": "author",
+      "type": "uuid"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "primary_focus_keyword",
+      "type": "character varying"
+    },
+    {
+      "field": "focus_keywords",
+      "type": "json"
+    },
+    {
+      "field": "external_id",
+      "type": "character varying"
+    },
+    {
+      "field": "published_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "source_updated_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "featured",
+      "type": "boolean"
+    },
+    {
+      "field": "noindex",
+      "type": "boolean"
+    },
+    {
+      "field": "og_title",
+      "type": "character varying"
+    },
+    {
+      "field": "og_description",
+      "type": "text"
+    },
+    {
+      "field": "og_image_override",
+      "type": "uuid"
+    },
+    {
+      "field": "scope_key",
+      "type": "character varying"
+    }
+  ],
+  "persons": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "user_created",
+      "type": "uuid"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "user_updated",
+      "type": "uuid"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "first_name",
+      "type": "character varying"
+    },
+    {
+      "field": "last_name",
+      "type": "character varying"
+    },
+    {
+      "field": "title",
+      "type": "character varying"
+    },
+    {
+      "field": "profile_image",
+      "type": "uuid"
+    },
+    {
+      "field": "bio",
+      "type": "text"
+    },
+    {
+      "field": "instagram_profile_url",
+      "type": "character varying"
+    },
+    {
+      "field": "linkedin_profile_url",
+      "type": "character varying"
+    },
+    {
+      "field": "website_url",
+      "type": "character varying"
+    },
+    {
+      "field": "github_profile_url",
+      "type": "character varying"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "facebook_url",
+      "type": "character varying"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "display_name",
+      "type": "character varying"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "show_on_team",
+      "type": "boolean"
+    },
+    {
+      "field": "external_id",
+      "type": "character varying"
+    },
+    {
+      "field": "source_updated_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "noindex",
+      "type": "boolean"
+    },
+    {
+      "field": "meta_title",
+      "type": "character varying"
+    },
+    {
+      "field": "meta_description",
+      "type": "text"
+    },
+    {
+      "field": "primary_focus_keyword",
+      "type": "character varying"
+    },
+    {
+      "field": "focus_keywords",
+      "type": "json"
+    },
+    {
+      "field": "og_title",
+      "type": "character varying"
+    },
+    {
+      "field": "og_description",
+      "type": "text"
+    },
+    {
+      "field": "og_image_override",
+      "type": "uuid"
+    },
+    {
+      "field": "scope_key",
+      "type": "character varying"
+    }
+  ],
+  "roofing_projects": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "user_created",
+      "type": "uuid"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "user_updated",
+      "type": "uuid"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "title",
+      "type": "character varying"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "published_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "source_updated_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "description",
+      "type": "text"
+    },
+    {
+      "field": "featured_image",
+      "type": "uuid"
+    },
+    {
+      "field": "body",
+      "type": "text"
+    },
+    {
+      "field": "product_links",
+      "type": "json"
+    },
+    {
+      "field": "youtube_url",
+      "type": "character varying"
+    },
+    {
+      "field": "material_type",
+      "type": "uuid"
+    },
+    {
+      "field": "roof_color",
+      "type": "uuid"
+    },
+    {
+      "field": "service_area",
+      "type": "uuid"
+    },
+    {
+      "field": "client_testimonial_name",
+      "type": "character varying"
+    },
+    {
+      "field": "client_testimonial_date",
+      "type": "date"
+    },
+    {
+      "field": "client_testimonial",
+      "type": "text"
+    },
+    {
+      "field": "review_source",
+      "type": "character varying"
+    },
+    {
+      "field": "review_url",
+      "type": "character varying"
+    },
+    {
+      "field": "external_id",
+      "type": "character varying"
+    },
+    {
+      "field": "scope_key",
+      "type": "character varying"
+    },
+    {
+      "field": "noindex",
+      "type": "boolean"
+    },
+    {
+      "field": "meta_title",
+      "type": "character varying"
+    },
+    {
+      "field": "meta_description",
+      "type": "text"
+    },
+    {
+      "field": "primary_focus_keyword",
+      "type": "character varying"
+    },
+    {
+      "field": "focus_keywords",
+      "type": "json"
+    },
+    {
+      "field": "og_title",
+      "type": "character varying"
+    },
+    {
+      "field": "og_description",
+      "type": "text"
+    },
+    {
+      "field": "og_image_override",
+      "type": "uuid"
+    },
+    {
+      "field": "job_id",
+      "type": "character varying"
+    },
+    {
+      "field": "zip",
+      "type": "character varying"
+    },
+    {
+      "field": "neighborhood",
+      "type": "uuid"
+    }
+  ],
+  "blog_posts_blog_topics": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "blog_post",
+      "type": "uuid"
+    },
+    {
+      "field": "blog_topic",
+      "type": "uuid"
+    }
+  ],
+  "blog_topics": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "user_created",
+      "type": "uuid"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "user_updated",
+      "type": "uuid"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "name",
+      "type": "character varying"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "scope_key",
+      "type": "character varying"
+    },
+    {
+      "field": "description",
+      "type": "text"
+    }
+  ],
+  "roofing_projects_files": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "roofing_project",
+      "type": "uuid"
+    },
+    {
+      "field": "directus_files_id",
+      "type": "uuid"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    }
+  ],
+  "roofing_material_types": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "name",
+      "type": "character varying"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "external_id",
+      "type": "character varying"
+    },
+    {
+      "field": "scope_key",
+      "type": "character varying"
+    },
+    {
+      "field": "user_created",
+      "type": "uuid"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "user_updated",
+      "type": "uuid"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    }
+  ],
+  "roofing_roof_colors": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "name",
+      "type": "character varying"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "external_id",
+      "type": "character varying"
+    },
+    {
+      "field": "scope_key",
+      "type": "character varying"
+    },
+    {
+      "field": "user_created",
+      "type": "uuid"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "user_updated",
+      "type": "uuid"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    }
+  ],
+  "roofing_service_areas": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "name",
+      "type": "character varying"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "external_id",
+      "type": "character varying"
+    },
+    {
+      "field": "scope_key",
+      "type": "character varying"
+    },
+    {
+      "field": "user_created",
+      "type": "uuid"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "user_updated",
+      "type": "uuid"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "page_status",
+      "type": "character varying"
+    },
+    {
+      "field": "page_title",
+      "type": "character varying"
+    },
+    {
+      "field": "introduction",
+      "type": "text"
+    },
+    {
+      "field": "overview",
+      "type": "text"
+    },
+    {
+      "field": "overview_map",
+      "type": "uuid"
+    },
+    {
+      "field": "published_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "wordpress_location_id",
+      "type": "character varying"
+    },
+    {
+      "field": "source_updated_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "noindex",
+      "type": "boolean"
+    },
+    {
+      "field": "meta_title",
+      "type": "character varying"
+    },
+    {
+      "field": "meta_description",
+      "type": "text"
+    },
+    {
+      "field": "primary_focus_keyword",
+      "type": "character varying"
+    },
+    {
+      "field": "focus_keywords",
+      "type": "json"
+    },
+    {
+      "field": "og_title",
+      "type": "character varying"
+    },
+    {
+      "field": "og_description",
+      "type": "text"
+    },
+    {
+      "field": "og_image_override",
+      "type": "uuid"
+    }
+  ],
+  "roofing_neighborhoods": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "name",
+      "type": "character varying"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "service_area",
+      "type": "uuid"
+    },
+    {
+      "field": "description",
+      "type": "text"
+    },
+    {
+      "field": "landmarks",
+      "type": "text"
+    },
+    {
+      "field": "image",
+      "type": "uuid"
+    },
+    {
+      "field": "coverage_map",
+      "type": "uuid"
+    },
+    {
+      "field": "wordpress_id",
+      "type": "character varying"
+    },
+    {
+      "field": "source_updated_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "sort",
+      "type": "integer"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    }
+  ],
+  "videos": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "user_created",
+      "type": "uuid"
+    },
+    {
+      "field": "date_created",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "user_updated",
+      "type": "uuid"
+    },
+    {
+      "field": "date_updated",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "client",
+      "type": "uuid"
+    },
+    {
+      "field": "status",
+      "type": "character varying"
+    },
+    {
+      "field": "title",
+      "type": "character varying"
+    },
+    {
+      "field": "slug",
+      "type": "character varying"
+    },
+    {
+      "field": "description",
+      "type": "text"
+    },
+    {
+      "field": "youtube_url",
+      "type": "character varying"
+    },
+    {
+      "field": "youtube_id",
+      "type": "character varying"
+    },
+    {
+      "field": "published_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "project",
+      "type": "uuid"
+    },
+    {
+      "field": "source_updated_at",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "external_id",
+      "type": "character varying"
+    },
+    {
+      "field": "scope_key",
+      "type": "character varying"
+    },
+    {
+      "field": "legacy_ids",
+      "type": "json"
+    }
+  ],
+  "directus_files": [
+    {
+      "field": "id",
+      "type": "uuid"
+    },
+    {
+      "field": "storage",
+      "type": "character varying"
+    },
+    {
+      "field": "filename_disk",
+      "type": "character varying"
+    },
+    {
+      "field": "filename_download",
+      "type": "character varying"
+    },
+    {
+      "field": "title",
+      "type": "character varying"
+    },
+    {
+      "field": "type",
+      "type": "character varying"
+    },
+    {
+      "field": "folder",
+      "type": "uuid"
+    },
+    {
+      "field": "uploaded_by",
+      "type": "uuid"
+    },
+    {
+      "field": "created_on",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "modified_by",
+      "type": "uuid"
+    },
+    {
+      "field": "modified_on",
+      "type": "timestamp with time zone"
+    },
+    {
+      "field": "charset",
+      "type": "character varying"
+    },
+    {
+      "field": "filesize",
+      "type": "bigint"
+    },
+    {
+      "field": "width",
+      "type": "integer"
+    },
+    {
+      "field": "height",
+      "type": "integer"
+    },
+    {
+      "field": "duration",
+      "type": "integer"
+    },
+    {
+      "field": "embed",
+      "type": "character varying"
+    },
+    {
+      "field": "description",
+      "type": "text"
+    },
+    {
+      "field": "location",
+      "type": "text"
+    },
+    {
+      "field": "tags",
+      "type": "text"
+    },
+    {
+      "field": "metadata",
+      "type": "json"
+    },
+    {
+      "field": "focal_point_x",
+      "type": "integer"
+    },
+    {
+      "field": "focal_point_y",
+      "type": "integer"
+    },
+    {
+      "field": "tus_id",
+      "type": "character varying"
+    },
+    {
+      "field": "tus_data",
+      "type": "json"
+    },
+    {
+      "field": "uploaded_on",
+      "type": "timestamp with time zone"
+    }
+  ]
+}

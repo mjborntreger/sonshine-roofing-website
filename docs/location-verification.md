@@ -1,5 +1,10 @@
 # Location migration candidate verification
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 Current scope: static, manually maintained location reviews. The owner withdrew all
 n8n changes on 2026-09-15. [Current release instructions](location-release.md) and
 [manual review ownership](location-reviews.md) supersede every historical workflow,

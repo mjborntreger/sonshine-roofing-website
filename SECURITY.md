@@ -3,7 +3,7 @@
 ## Supported Code
 
 Security fixes target the current `main` branch. Historical commits,
-WordPress content, Directus content, and third-party services may require
+Directus content, and third-party services may require
 separate maintainer coordination.
 
 ## Report Privately
@@ -22,7 +22,7 @@ and unnecessary personal information. Never send a working secret.
 - Lead capture, referral data, SMS consent, attribution, and n8n forwarding.
 - Turnstile, honeypot, origin validation, revalidation authorization, and
   staging-only diagnostic gates.
-- Directus/WordPress tenant or content exposure and server-side token handling.
+- Directus tenant or content exposure and server-side token handling.
 - Stored or rendered HTML sanitation, outbound URLs, XSS, CSP, and headers.
 - Analytics/QuickQuote conversion-data leakage.
 - Dependency, build-pipeline, Docker, or client-bundle compromise.

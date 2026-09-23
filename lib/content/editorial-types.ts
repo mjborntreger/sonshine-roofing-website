@@ -30,7 +30,7 @@ export type Person = {
   noindex: boolean;
   primaryFocusKeyword: string | null;
   focusKeywords: string[];
-  sourceUpdatedAt: string | null;
+  modifiedAt: string | null;
   seo: PersonSeo;
 };
 

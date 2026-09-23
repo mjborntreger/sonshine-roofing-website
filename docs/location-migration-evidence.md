@@ -1,5 +1,10 @@
 # Location source evidence
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 Status: authorized migration and enrichment are verified. Current totals include
 87 published neighborhoods and 72 published manual location reviews; five pages
 remain draft. The existing workflow stays unchanged and website deployment is held.

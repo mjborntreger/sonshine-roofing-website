@@ -15,9 +15,9 @@ const config = { url: 'https://cms.example.test', clientSlug: 'fixture-client' }
 const term = (slug, name = slug) => ({ id: slug, slug, name, status: 'published', client: { slug: config.clientSlug } });
 const file = (id) => ({ id, type: 'image/webp', description: `A described roof ${id}`, width: 2000, height: 1500 });
 const source = {
-  id: 'one', scope_key: 'fixture-client:blue-roof', external_id: 'wordpress:sonshine-roofing:fixture',
+  id: 'one', scope_key: 'fixture-client:blue-roof',
   client: { slug: config.clientSlug }, status: 'published', title: 'Blue roof & sunny day', slug: 'blue-roof',
-  description: 'A metal roof in Sarasota.', published_at: '2020-01-01T12:00:00Z', date_updated: '2021-02-01T12:00:00Z', source_updated_at: '2021-02-01T12:00:00Z',
+  description: 'A metal roof in Sarasota.', published_at: '2020-01-01T12:00:00Z', modified_at: '2021-02-01T12:00:00Z',
   featured_image: file('hero'), gallery: Array.from({ length: 24 }, (_, i) => ({ sort: 24 - i, directus_files_id: file(`image-${24 - i}`) })),
   material_type: term('metal'), service_area: term('sarasota'), roof_color: null, neighborhood: null,
   product_links: [{ label: 'Standing seam', href: 'https://example.test/product' }],
@@ -29,8 +29,8 @@ assert.equal(project.projectImages.length, 24, 'all gallery images must survive 
 assert.match(project.projectImages[0].url, /image-1$/u);
 assert.equal(project.heroImage.width, 2000);
 assert.equal(new URL(project.heroImage.url).search, '', 'source assets must not request a transformation');
-assert.equal(project.modified, source.source_updated_at, 'import dates must not become editorial dates');
-assert.equal(mapDirectusProject({ ...source, date_updated: '2026-10-01T00:00:00Z' }, config).modified, '2026-10-01T00:00:00Z', 'later editorial updates must supersede source provenance');
+assert.equal(project.modified, source.modified_at, 'canonical editorial date is preserved');
+assert.equal(mapDirectusProject({ ...source, date_updated: '2026-10-01T00:00:00Z' }, config).modified, source.modified_at, 'audit housekeeping must not override editorial dates');
 assert.equal(project.seo.description, null, 'existing route description fallback remains available');
 assert.deepEqual(project.roofColors, []);
 assert.equal('contentHtml' in project, false);
@@ -48,7 +48,7 @@ for (const patch of [
   { service_area: { ...term('sarasota'), client: { slug: 'another-client' } } },
   { gallery: [{ sort: 1, directus_files_id: file('a') }, { sort: 1, directus_files_id: file('b') }] },
   { gallery: null }, { product_links: [{ label: 'Unsafe', href: 'javascript:alert(1)' }] },
-  { external_id: null }, { primary_focus_keyword: 'roof', focus_keywords: ['wrong', 'roof'] },
+  { primary_focus_keyword: 'roof', focus_keywords: ['wrong', 'roof'] },
 ]) assert.throws(() => mapDirectusProject({ ...source, ...patch }, config));
 
 const snapshot = { version: 2, clientSlug: config.clientSlug, videos: [], projects: [

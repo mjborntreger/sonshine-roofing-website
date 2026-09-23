@@ -1,3 +1,4 @@
+import EditorialDates from '@/components/ui/EditorialDates';
 // app/[slug]/page.tsx
 import {
   getPostBySlug,
@@ -241,12 +242,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   const origin = SITE_ORIGIN;
   const shareUrl = `${origin}/${slug}`;
-  const dateStr = new Date(post.date).toLocaleDateString('en-US', {
-    timeZone: 'America/New_York',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
   const readingMinutes = calcReadingMinutes(post.contentHtml);
   const rawAuthorName = post.authorName?.trim();
   const renderedAuthorName = rawAuthorName || 'SonShine Roofing';
@@ -307,10 +302,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </div>
         <div className="h-[2px] my-4 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
 
+        <div className="mb-2 text-sm text-slate-600">
+          <EditorialDates published={post.date} modified={post.modified} />
+        </div>
+
         {/* Meta row */}
         <div className="flex flex-wrap items-center text-sm gap-x-4 gap-y-2 text-slate-600">
-          <span>{dateStr}</span>
-          <span>•</span>
           <span>By {renderedAuthorName}</span>
           <span>•</span>
           <span>{readingMinutes} min read</span>

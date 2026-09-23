@@ -8,6 +8,7 @@ type HeroBadge = { label: string; icon?: ComponentType<SVGProps<SVGSVGElement>> 
 type HeroProps = {
   title: string;
   subtitle?: string;
+  metadata?: ReactNode;
   eyelash?: string;
   imageSrc?: string;
   imagePosition?: string;
@@ -28,6 +29,7 @@ export default function Hero({
   title,
   eyelash,
   subtitle,
+  metadata,
   imageSrc = FALLBACK_IMAGE,
   imagePosition,
   justifyStart = false,
@@ -67,6 +69,7 @@ export default function Hero({
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-white">
               {title}
             </h1>
+            {metadata}
             {eyelash ? (
               <p className="text-sm uppercase font-bold text-blue-200 leading-tight tracking-wide">{eyelash}</p>
             ): null}

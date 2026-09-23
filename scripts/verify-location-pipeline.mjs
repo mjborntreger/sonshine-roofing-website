@@ -14,7 +14,7 @@ const client = { slug: config.clientSlug };
 const scope = { client, status: 'published' };
 const area = (id, page_status = 'published') => ({ ...scope, id, name: id, slug: id, scope_key: `fixture:${id}`, page_status,
   page_title: `Roofing in ${id}`, introduction: `Coverage in ${id}.`, overview: null, overview_map: null,
-  published_at: '2024-01-01T00:00:00Z', date_updated: null, source_updated_at: null, noindex: false,
+  published_at: '2024-01-01T00:00:00Z', date_updated: null, noindex: false,
   meta_title: `Roofing in ${id}`, meta_description: `Local roofing coverage in ${id}.`, focus_keywords: [`${id} roofing`], primary_focus_keyword: `${id} roofing`, og_title: null, og_description: null, og_image_override: null });
 const faq = { ...scope, id: 'faq', question: 'Local question?', answer: '<p>A verified answer.</p>', website_page: null, service: null, service_area: null, sort_order: 1 };
 const shellFixture = makeSiteShellFixture('fixture');

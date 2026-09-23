@@ -18,7 +18,7 @@ const area = slug => ({
   id: slug, client, status: 'published', name: `Synthetic ${slug}`, slug,
   scope_key: `fixture:${slug}`, page_status: 'published', page_title: `Roofing in ${slug}`,
   introduction: 'Synthetic coverage.', overview: null, overview_map: null,
-  published_at: '2024-01-01T00:00:00Z', date_updated: null, source_updated_at: null,
+  published_at: '2024-01-01T00:00:00Z', date_updated: null,
   noindex: false, meta_title: `Roofing in ${slug}`, meta_description: 'Synthetic metadata.',
   primary_focus_keyword: `${slug} roofing`, focus_keywords: [`${slug} roofing`],
   og_title: null, og_description: null, og_image_override: null,

@@ -1,5 +1,10 @@
 # Video migration and recovery
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 The September 2026 migration moves the 26 published WordPress video entries and
 53 project clips into independently authored Directus `videos` records. The
 current library has 79 distinct videos and 27 ordinary category assignments.

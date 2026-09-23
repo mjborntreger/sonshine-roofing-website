@@ -35,9 +35,7 @@ export const DIRECTUS_FIELDS = [
   'og_image_override.description',
   'og_image_override.width',
   'og_image_override.height',
-  'external_id',
-  'source_updated_at',
-  'date_updated',
+  'modified_at',
 ] as const;
 
 export function readString(value: unknown): string | null {
@@ -128,7 +126,7 @@ export function mapDirectusPerson(item: UnknownRecord, config: DirectusConfig): 
     ...(noindex
       ? { primaryFocusKeyword: null, focusKeywords: [] }
       : focusKeywords(item.primary_focus_keyword, item.focus_keywords, slug)),
-    sourceUpdatedAt: readString(item.source_updated_at) ?? readString(item.date_updated),
+    modifiedAt: readString(item.modified_at),
   };
   const fallbackSeo = calculatePersonSeo(personBase);
   const ogImageOverride = directusImage(item.og_image_override, config);

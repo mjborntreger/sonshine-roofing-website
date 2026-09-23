@@ -82,15 +82,6 @@ BEGIN
       END IF;
     END LOOP;
   END IF;
-  IF TG_OP = 'INSERT' AND NEW.external_id IS NOT NULL AND NEW.source_updated_at IS NOT NULL THEN
-    NEW.date_updated := NEW.source_updated_at;
-  ELSIF TG_OP = 'UPDATE' AND OLD.status = 'draft' AND NEW.status = 'published'
-    AND OLD.external_id IS NOT NULL AND OLD.date_updated = OLD.source_updated_at
-    AND (to_jsonb(NEW) - ARRAY['status', 'date_updated', 'user_updated'])
-      = (to_jsonb(OLD) - ARRAY['status', 'date_updated', 'user_updated']) THEN
-    -- Initial publication alone is not an editorial content change.
-    NEW.date_updated := OLD.date_updated;
-  END IF;
   RETURN NEW;
 END;
 $function$;
@@ -174,7 +165,6 @@ $migration$;
 
 CREATE UNIQUE INDEX IF NOT EXISTS videos_client_slug_unique ON public.videos(client, slug);
 CREATE UNIQUE INDEX IF NOT EXISTS videos_client_youtube_unique ON public.videos(client, youtube_id);
-CREATE UNIQUE INDEX IF NOT EXISTS videos_client_external_unique ON public.videos(client, external_id) WHERE external_id IS NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS videos_project_unique ON public.videos(project) WHERE project IS NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS video_categories_client_slug_unique ON public.video_categories(client, slug);
 CREATE UNIQUE INDEX IF NOT EXISTS video_category_assignments_unique ON public.video_category_assignments(video, category);

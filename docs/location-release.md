@@ -1,5 +1,10 @@
 # Location migration release and recovery
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 Owner scope amendment, 2026-09-15: location reviews are a static import followed by
 manual maintenance. The existing n8n workflow remains unchanged. The owner has
 approved Directus preparation/migration, private recovery, all 72 five-star reviews,

@@ -1,5 +1,10 @@
 # SonShine location migration handoff
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 ## Current scope and authorization
 
 The owner confirmed on 2026-09-15 that location reviews are a static import,

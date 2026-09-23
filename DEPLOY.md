@@ -161,28 +161,16 @@ Publish CMS changes with a successful build and deployment.
   reads stop the build and remove any stale project snapshot.
 - Deploy the verified revision through Coolify. Project edits and new slugs stay
   invisible until that release; `/api/revalidate` cannot publish them.
-- Keep the prior deployment and its referenced media until acceptance. Restore
-  the prior deployment to roll back frontend behavior. Keep WordPress projects
-  intact as migration recovery evidence; the current frontend has no fallback.
-- During the original-image migration only, pause Directus Unified Image Upload
-  Admission, drain admitted jobs, import originals and verify file hashes, then
-  restore the trigger on success or failure. Future uploads use the regular
-  processing workflows. Save alt text as file-description metadata independently.
-- The September 2026 import contains 53 published projects, 333 ordered gallery
-  entries, 355 unique project images, six supporting assets, 23 testimonials,
-  and 3 material / 34 color / 13 service-area terms. All 361 files were verified
-  against their source SHA-256 hashes; three visual reviewers covered every
-  project image before descriptions were saved separately.
-- The reusable `scripts/migrate-wordpress-projects.mjs` defaults to a read-only
-  dry run and accepts `--source-dir` outside the repository. Its `--verify-only`
-  mode checks exact source/destination parity. `--apply` is an explicitly
-  authorized migration operation, not part of a normal build. Keep source
-  exports and media manifests private and supply credentials through the
-  environment. After an import, run `scripts/sql/roofing-project-source-dates.sql`
-  through the approved database connection before `--verify-only`; Directus
-  otherwise substitutes import timestamps. Never restore source timestamps after
-  the Directus editorial handoff. The scope triggers are maintained separately
-  in `scripts/sql/roofing-project-scope.sql`.
+- Keep the prior deployment and its referenced media until acceptance. A frontend
+  rollback must match the database schema; old images that request retired columns
+  cannot be rebuilt against the reduced schema. Restore a compatible revision or
+  recover the matching database through the existing VPS backup system.
+- Future uploads use the active Unified Image pipeline. File-description metadata
+  remains independent of binary optimization; preserve rights and attribution.
+- Canonical scope triggers remain in `scripts/sql/roofing-project-scope.sql`.
+  Editorial date rules are in `docs/editorial-date-invariants.sql`. Apply privileged
+  SQL only under explicit schema-change authorization, with the owning schema and
+  tests verified first. One-time import/date-normalization commands are retired.
 
 ## llms.txt
 

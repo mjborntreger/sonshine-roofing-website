@@ -1,5 +1,10 @@
 # Location project enrichment evidence
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 Status: all 53 projects enriched and independently verified; SonShine-only required job-ID/ZIP constraint applied and validated.
 Contract: `location-v3`.
 Application base: `0271ec70f46a2b31c4eb012da28459f6a9144184`.

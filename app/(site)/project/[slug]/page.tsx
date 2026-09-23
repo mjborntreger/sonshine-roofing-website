@@ -1,3 +1,4 @@
+import EditorialDates from '@/components/ui/EditorialDates';
 import Image from "next/image";
 import FaqInlineList from "@/components/dynamic-content/faq/FaqInlineList";
 import { listFaqs } from "@/lib/content/directus-faqs";
@@ -233,6 +234,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     <>
       <Hero
         title={project.title}
+        metadata={project.date ? <EditorialDates published={project.date} modified={project.modified} className="text-sm text-slate-200" /> : null}
         subtitle=""
         imageSrc={heroImageUrl}
         justifyStart

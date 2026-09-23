@@ -65,7 +65,6 @@ const project = mapDirectusProject(
     roof_color: null,
     product_links: [],
     noindex: true,
-    external_id: 'wordpress:sonshine-roofing:synthetic',
   },
   config,
 );
@@ -113,7 +112,7 @@ const area = {
   overview_map: null,
   published_at: '2020-01-01T12:00:00Z',
   date_updated: null,
-  source_updated_at: null,
+
   noindex: true,
   og_image_override: null,
 };
