@@ -22,9 +22,8 @@ export const DIRECTUS_POST_FIELDS = [
   'og_image_override.width',
   'og_image_override.height',
   'published_at',
-  'source_updated_at',
+  'modified_at',
   'date_created',
-  'date_updated',
   'featured',
   'featured_image.id',
   'featured_image.description',
@@ -64,9 +63,8 @@ export type DirectusBlogPost = {
   og_description?: unknown;
   og_image_override?: unknown;
   published_at?: unknown;
-  source_updated_at?: unknown;
+  modified_at?: unknown;
   date_created?: unknown;
-  date_updated?: unknown;
   featured?: unknown;
   featured_image?: unknown;
   author?: unknown;
@@ -208,7 +206,7 @@ export function mapDirectusPost(
   const title = requiredPostString(item.title, 'title', slug);
   const publishedAt = requiredPostString(item.published_at, 'published_at', slug);
   const modifiedAt =
-    readString(item.source_updated_at) ?? readString(item.date_updated) ?? publishedAt;
+    readString(item.modified_at) ?? publishedAt;
   const body = requiredPostString(item.body, 'body', slug);
   const contentHtml = sanitizeDirectusHtml(body, {
     assetBaseUrl: config.url,

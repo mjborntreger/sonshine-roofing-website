@@ -7,17 +7,17 @@ Evidence refreshed: 2026-09-17. The user handoff is authoritative for scope.
 ## Model and ownership
 
 - `roofing_service_areas` owns `/locations/{slug}`. Preserve taxonomy identity,
-  required project association, `status`, `scope_key`, and taxonomy `external_id`.
+  required project association, `status`, `scope_key`, .
   Add independent `page_status` (`taxonomy_only`, `draft`, `published`, default
   `taxonomy_only`), `page_title`, plain-text `introduction`, optional restricted
   HTML `overview`, optional `overview_map`, `published_at`,
-  `wordpress_location_id`, `source_updated_at`, and the standard shared SEO group.
+  the standard shared SEO group.
   Page publication also requires published taxonomy and the correct client.
   Published `noindex` pages remain routable but leave location/image sitemaps.
 - `roofing_neighborhoods`: client, status, name, slug, required `service_area`,
   optional plain-text description/landmarks, optional `image` for a verified
   neighborhood photo and a separate optional `coverage_map` for an actual map,
-  `wordpress_id`, `source_updated_at`, sort. Names are required. Use client/slug
+  sort. Names are required. Use client/slug
   uniqueness and a primary area; resolve conflicting assignments before writes.
 - Preserve existing Parrish coverage with one canonical taxonomy-only area if
   absent. This creates no additional landing page or WordPress taxonomy identity.
@@ -26,12 +26,12 @@ Evidence refreshed: 2026-09-17. The user handoff is authoritative for scope.
   null, enforce client/job uniqueness, and prevent cross-client or mismatched
   neighborhood/area assignments. After verified complete enrichment, a separate
   constraint makes job ID and ZIP required for SonShine only.
-- Reviews gain optional `service_area` and separate `wordpress_provenance` JSON.
+- Reviews gain optional `service_area` .
   Imported location reviews are manually maintained. Preserve original attribution,
   actual approved ratings, dates, source URLs and owner replies; missing dates stay
   null. `external_id` is reserved for verified Google resource identity and remains
   null on WordPress-only imports. No feed membership fields or n8n changes belong
-  to this migration. Existing Google-managed records and sitewide feed behavior
+  to normal authoring. Existing Google-managed records and sitewide feed behavior
   remain under their existing workflow; never duplicate a confirmed existing match.
   Conflicting or workflow-managed matches require explicit disposition before a
   manual-location import can alter them.

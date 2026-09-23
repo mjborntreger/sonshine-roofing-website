@@ -13,14 +13,14 @@ BEGIN
     'location_review_area_client','location_faq_area_client','location_faq_page_client','location_faq_service_client',
     'location_navigation_menu_fk','location_navigation_page_fk','location_navigation_parent_fk',
     'location_page_publication','location_neighborhood_content','location_project_reference_normalized','location_project_uuid_canonical',
-    'location_review_provenance_array','location_faq_scope_exclusive',
+    'location_faq_scope_exclusive',
     'location_navigation_area_scope','location_nearby_not_self'
   ] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_constraint c JOIN pg_namespace n ON n.oid=c.connamespace WHERE n.nspname='public' AND c.conname=name AND c.convalidated) THEN
       RAISE EXCEPTION 'Missing validated location constraint: %',name;
     END IF;
   END LOOP;
-  FOREACH name IN ARRAY ARRAY['location_projects_client_job','location_projects_client_job_uuid','location_neighborhoods_client_slug','location_pages_wordpress','location_neighborhoods_wordpress','location_sponsor_area_pair','location_nearby_area_pair','location_coverage_area_pair'] LOOP
+  FOREACH name IN ARRAY ARRAY['location_projects_client_job','location_projects_client_job_uuid','location_neighborhoods_client_slug','location_sponsor_area_pair','location_nearby_area_pair','location_coverage_area_pair'] LOOP
     IF NOT EXISTS(SELECT 1 FROM pg_indexes WHERE schemaname='public' AND indexname=name AND indexdef LIKE 'CREATE UNIQUE INDEX%') THEN
       RAISE EXCEPTION 'Missing unique location index: %',name;
     END IF;

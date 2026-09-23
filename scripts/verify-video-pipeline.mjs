@@ -18,7 +18,7 @@ const project = (id, slug) => ({
   id, slug, scope_key: `${config.clientSlug}:${slug}`, client, status: 'published', title: 'Project wording',
   description: 'A metal roof replacement.', published_at: '2018-01-01T00:00:00Z',
   featured_image: file, gallery: [], neighborhood: null, material_type: term('metal'), service_area: term('sarasota'),
-  product_links: [], noindex: false, external_id: 'wordpress:sonshine-roofing:synthetic',
+  product_links: [], noindex: false,
   youtube_url: 'https://www.youtube.com/watch?v=abcdefghijk',
 });
 const category = (id, slug, sort) => ({ id, slug, name: slug === 'explainers' ? 'Explainers' : 'In the Field', sort, scope_key: `${config.clientSlug}:${slug}`, client, status: 'published' });
@@ -27,7 +27,7 @@ const sourceVideos = Array.from({ length: 251 }, (_, index) => ({
   id: `video-${index}`, slug: `clip-${index}`, scope_key: `${config.clientSlug}:clip-${index}`, client, status: 'published',
   title: `Independent clip ${index}`, description: index === 0 ? 'An installation explainer.' : 'Roofing context.',
   youtube_url: `https://youtu.be/v${String(index).padStart(10, '0')}`, youtube_id: `v${String(index).padStart(10, '0')}`,
-  published_at: new Date(Date.UTC(2020, 0, index + 1)).toISOString(), source_updated_at: '2021-01-01T00:00:00Z',
+  published_at: new Date(Date.UTC(2020, 0, index + 1)).toISOString(), date_updated: '2021-01-01T00:00:00Z',
   legacy_ids: [`legacy-${index}`, ...(index === 0 ? ['project-original-project', 'original-project', '12345', 'dmlkZW9MaWJyYXJ5OjEyMzQ1', 'roof-😀'] : [])],
   project: index === 0 ? 'visible-project-id' : index === 1 ? 'hidden-project-id' : null,
 }));
@@ -78,7 +78,7 @@ assert.equal(linked.projectUri, '/project/current-project/');
 assert.deepEqual(linked.materialTypes, [{ slug: 'metal', name: 'metal' }]);
 assert.deepEqual(linked.categories.map((item) => item.slug), ['explainers', 'roofing-project', 'in-the-field'], 'card memberships use the same managed category order as filters');
 assert.equal(linked.date, sourceVideos[0].published_at);
-assert.equal(linked.modified, sourceVideos[0].source_updated_at);
+assert.equal(linked.modified, sourceVideos[0].date_updated);
 assert.equal(linked.uploadDate, null, 'website publication cannot be relabeled as YouTube upload');
 assert.equal(findVideoInSnapshot(snapshot, 'project-original-project').id, linked.id);
 for (const alias of ['12345', 'dmlkZW9MaWJyYXJ5OjEyMzQ1', 'roof-😀']) {

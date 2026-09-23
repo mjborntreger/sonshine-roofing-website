@@ -20,7 +20,7 @@ export const videoSchema = {
     hidden('youtube_id'), field('published_at', 'timestamp', { schema: { is_nullable: false }, meta: { interface: 'datetime', required: true, note: 'Website publication date; not the YouTube upload date. Changes go live after deployment.' } }),
     field('project', 'uuid', { meta: { interface: 'select-dropdown-m2o', special: ['m2o'], note: 'Optional. Each project and video may have only one relationship.' } }),
     field('categories', 'alias', { meta: { interface: 'list-m2m', special: ['m2m'], options: { template: '{{category.name}}' } } }),
-    hidden('source_updated_at', 'timestamp'), hidden('external_id'), hidden('scope_key'),
+    hidden('scope_key'),
     field('legacy_ids', 'json', { schema: { default_value: '[]', is_nullable: false }, meta: { interface: 'input-code', special: ['cast-json'], hidden: true, readonly: true } }),
   ],
   video_categories: [id(), client(), status(), text('name'), text('slug'),
@@ -72,7 +72,7 @@ export async function setupVideoSchema(request, { apply = false, verifyOnly = fa
     actions.push(`create relation ${desired.collection}.${desired.field}`);
     if (apply) await request('relations', 'POST', desired);
   }
-  return { mode: apply ? 'apply' : verifyOnly ? 'verify-only' : 'dry-run', actions, next: 'Apply and verify docs/video-model-invariants.sql, then configure scoped role permissions before importing content.' };
+  return { mode: apply ? 'apply' : verifyOnly ? 'verify-only' : 'dry-run', actions, next: 'Apply and verify docs/video-model-invariants.sql, then configure scoped role permissions before authoring content.' };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -1,5 +1,10 @@
 # Location migration tooling and applied results
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 Status: authorized Directus migration is applied and verified on 2026-09-15.
 All 87 neighborhoods and 72 manual location reviews are published; five page owners
 remain draft. Existing n8n remains unchanged; website deployment is held. The

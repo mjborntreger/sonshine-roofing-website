@@ -1,5 +1,10 @@
 # One-time SonShine project enrichment
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 Status: 53 project updates and the SonShine-only required-field constraint applied and verified on 2026-09-15.
 Private artifact contract: `location-enrichment-v1`; shared contract: `location-v3`.
 Execution revision: `05d1f6ba6f4662a70cbcecdcf2c174a9b4fcf117`.

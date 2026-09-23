@@ -1,7 +1,7 @@
 # Authoring location hubs
 
 The five location hubs were released on September 17, 2026. Consult
-[release status and recovery](location-release.md) before publishing later changes.
+[deployment and recovery](../DEPLOY.md) before publishing later changes.
 
 ## Prepare the canonical area
 

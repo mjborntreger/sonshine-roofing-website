@@ -110,8 +110,9 @@ original inline-script failure.
 
 ## Repository guides
 
-- [docs/video-migration.md](docs/video-migration.md): additive video schema,
-  private migration exports, idempotent import, verification, and rollback.
+- [docs/editorial-dates.md](docs/editorial-dates.md): publication and modification rules.
+- [docs/migration-cleanup.md](docs/migration-cleanup.md): retired artifacts and preserved compatibility.
+- [docs/media-provenance.md](docs/media-provenance.md): retained image approvals and rights evidence.
 - [CONTENT.md](CONTENT.md): content ownership, Directus authoring rules, and
   publication behavior.
 - [DEPLOY.md](DEPLOY.md): Coolify configuration, environment variables, cache

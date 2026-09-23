@@ -138,7 +138,7 @@ runtime and two-release acceptance gates.
   an author name and review text to render.
 - Keep exactly one SonShine-scoped `reviews_carousels` record. Its `limit` and
   `gbp_profile_link` configure the widget.
-- Location hubs select editorially published, five-star, geographically assigned reviews from the deployment snapshot. Imported location reviews are manually maintained and keep `external_id` null. Unassigned reviews cannot supply local or nearby results. WordPress provenance remains separate. The existing Google workflow and sitewide feed remain unchanged. See [manual location reviews](docs/location-reviews.md).
+- Location hubs select editorially published, five-star, geographically assigned reviews from the deployment snapshot. Imported location reviews are manually maintained and keep `external_id` null. Unassigned reviews cannot supply local or nearby results. The existing Google workflow and sitewide feed remain unchanged. See [manual location reviews](docs/location-reviews.md).
 
 ## Publishing FAQs in Directus
 
@@ -173,11 +173,11 @@ runtime and two-release acceptance gates.
 
 ## Publishing location hubs
 
-- Preserve canonical service-area IDs, slugs, taxonomy `external_id`, and `scope_key`.
+- Preserve canonical service-area IDs, slugs, and `scope_key`.
   `page_status` is independent of taxonomy `status`: `taxonomy_only` keeps content
   associations without a page, `draft` prepares copy, and `published` enables a
   route after successful deployment. A published taxonomy remains required.
-- Store local page copy, described coverage maps, WordPress location provenance,
+- Store local page copy, described coverage maps,
   and the shared SEO fields on `roofing_service_areas`. `noindex` changes indexing,
   not route availability. New pages stay drafts until editorial review. The five
   migrated owners are published in Directus and deployed. Later CMS edits become
@@ -206,8 +206,8 @@ runtime and two-release acceptance gates.
   stop prebuild. Unknown, draft and taxonomy-only routes return 404.
 - Read [location authoring](docs/location-authoring.md) for editorial checks and
   [the release guide](docs/location-release.md) for schema, data,
-  permission, deployment and rollback dependencies. The unused
-  `location_landing_pages` scaffold and WordPress originals remain untouched.
+  permission, deployment and rollback dependencies. The unrelated
+  `location_landing_pages` scaffold remains outside this model.
 
 ## Publishing blog posts in Directus
 
@@ -215,13 +215,13 @@ runtime and two-release acceptance gates.
   WordPress fallback.
 - Set `status=published` to expose a post and provide one to three published,
   SonShine-scoped `blog_topics` relations.
-- Preserve `published_at`, `source_updated_at`, `meta_title`,
+- Preserve `published_at`, `modified_at`, `meta_title`,
   `meta_description`, and a described Directus featured image.
 - Leave `author` empty for the SonShine Roofing Organization fallback; use only
   the approved SonShine-scoped Michael Borntreger person relation for his posts.
-- `external_id` and `source_updated_at` are automation-owned and read-only in
-  the Directus editor. `published_at`, `featured`, and ordinary editorial fields
-  remain editable.
+- `modified_at` is maintained automatically and read-only in the editor.
+  Preserve `published_at` as the original publication date; historical corrections
+  remain explicit editorial edits. See [editorial dates](docs/editorial-dates.md).
 
 ## Publishing roofing projects in Directus
 
@@ -254,15 +254,11 @@ runtime and two-release acceptance gates.
 - State the job type early in the description. Project badges and service
   structured data use its first explicit "roof installation" or "roof replacement"
   phrase; copy without either phrase receives the neutral "Roofing Project" label.
-- Project SEO uses the shared SEO fields and stored `noindex` policy. The
-  migration preserves existing descriptions and rendered fallbacks. Legacy
-  `wordpress:sonshine-roofing:` records may have empty keyword fields when the
-  source supplied none; new indexable projects require a primary keyword first
-  in `focus_keywords`.
-- `published_at` controls public chronology. `source_updated_at` and `external_id`
-  preserve migration identity; system `date_updated` starts at the source
-  modified time and tracks later Directus edits. Import time is not editorial
-  freshness.
+- Project SEO uses the shared SEO fields and stored `noindex` policy. Both keyword fields are optional in the editor and build. If supplied,
+  keywords must be nonempty text with the primary phrase first in `focus_keywords`.
+- `published_at` retains original publication; `modified_at` records public-facing
+  content edits. Both appear on detail pages. Audit housekeeping and deployments
+  preserve these dates; see [editorial dates](docs/editorial-dates.md).
 - Archive search matches the title plus plain-text description, without case
   sensitivity. Results, totals, pagination, and all filter counts use that same
   matching set, including when material, color, and service-area filters combine.
@@ -326,15 +322,14 @@ runtime and two-release acceptance gates.
   The library, player lookup, resources API, project players, and video sitemap
   have no ISR, runtime CMS refresh, or WordPress fallback. Revalidation cannot
   publish CMS changes. YouTube playback itself remains an external service.
-- Keep `external_id`, `source_updated_at`, `legacy_ids`, `youtube_id`, and
+- Keep `legacy_ids`, `youtube_id`, and
   `scope_key` automation-owned. Existing GraphQL IDs and `project-<slug>` aliases
-  keep shared links working independently of later project changes. Import time
-  and initial publication do not replace the verified source modified date.
+  keep shared links working independently of later project changes. Video sitemap freshness uses `date_updated` with `published_at` as fallback.
 - Archive metadata remains in the `/video-library` `website_pages` record.
   Sharing from the player copies the stable library selection URL. Eligible
   project cards retain their project link; the modal keeps its existing layout.
-- See [the migration tooling guide](docs/video-migration.md) for source exports,
-  schema invariants, recovery, and verification. Home/About placement stays in
+- Canonical video constraints live in `docs/video-model-invariants.sql`;
+  `scripts/setup-video-schema.mjs` maintains the supported schema. Home/About placement stays in
   code while video metadata comes from the deployment snapshot. Truck body copy
   and both videos stay code-owned; its images use the static-media snapshot.
 
@@ -427,7 +422,7 @@ runtime and two-release acceptance gates.
   fallbacks. [SEO.md](SEO.md) is the canonical guide for the tracked local
   fallback asset and its cache-versioned metadata URL.
 
-## Repository migration artifacts
+## Schema tooling
 
 - Files under `docs/*.sql` are privileged Directus database migration and
   verification artifacts, not local setup commands. They may depend on
@@ -435,6 +430,6 @@ runtime and two-release acceptance gates.
 - `docs/directus-route-owner-invariants.sql` is the canonical shared
   client/route scope-key invariant for fixed pages, services, posts, offers,
   people, and glossary terms.
-- The retained person and blog migration scripts require historical JSON inputs
-  that are not tracked in a clean checkout. Do not treat their package commands
-  as routine validation.
+- One-time import, date-normalization and enrichment scripts are retired.
+  Historical migration reports are evidence only. Use current package commands
+  and the canonical model SQL; see [cleanup status](docs/migration-cleanup.md).

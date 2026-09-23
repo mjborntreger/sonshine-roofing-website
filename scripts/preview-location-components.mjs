@@ -9,7 +9,7 @@ import ts from 'typescript';
 
 // Local visual preparation only. No CMS reads, real customer records, or app routes.
 const root = fileURLToPath(new URL('../', import.meta.url));
-const output = resolve(process.env.LOCATION_PREVIEW_OUTPUT || '/private/tmp/sonshine-location-migration-20260915/visual-preview');
+const output = resolve(process.env.LOCATION_PREVIEW_OUTPUT || '/private/tmp/sonshine-location-preview');
 const baselineRoot = resolve(process.env.LOCATION_PREVIEW_BASELINE_ROOT || root);
 const require = createRequire(import.meta.url);
 const React = require('react');

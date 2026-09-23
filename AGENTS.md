@@ -14,7 +14,7 @@ and serves it on port 3000.
   special offers, legal copy, people, sponsor features, reviews and
   review-carousel settings, roofing glossary terms, projects, videos/categories,
   and their media.
-- Directus `roofing_service_areas` owns location routes, verified in the September 17 release. Read `docs/location-release.md` before schema/data changes, deployment or recovery, and `docs/location-reviews.md` for manually maintained location reviews and deduplication. Preserve the existing n8n workflow.
+- Directus `roofing_service_areas` owns location routes, verified in the September 17 release. Read `docs/location-contract.md` before location schema changes and `DEPLOY.md` before deployment or recovery, and `docs/location-reviews.md` for manually maintained location reviews and deduplication. Preserve the existing n8n workflow.
 - Local Next.js code owns route composition, components, body copy not yet
   migrated, code-only legacy redirect and 410 responses in `proxy.ts`, and the
   normalized operational schedule in `lib/contact-hours.ts`.
@@ -41,7 +41,7 @@ and serves it on port 3000.
   consent, validation, identifiers, and payload types.
 - `lib/content`: Directus adapters, deployment snapshots, shared types and HTML sanitizers.
 - `lib/seo` and `lib/telemetry`: metadata/schema and analytics behavior.
-- `scripts`: generated artifacts, content verification, and migrations.
+- `scripts`: generated artifacts, content verification, and current schema tooling.
 - `next.config.mjs`, `proxy.ts`, and `Dockerfile`: platform redirects, legacy
   responses, headers, standalone output, build behavior, and Coolify runtime.
 - Read `DEPLOY.md` before changing Docker build arguments, Coolify environment
@@ -54,6 +54,8 @@ Use Node 22 and install with `npm ci`.
 - Baseline: `npm run lint`, `npm run typecheck`, and
   `npm run verify:tailwind-utilities`; `npm test` is currently an alias for
   lint.
+- Editorial date/schema work: run `npm run verify:editorial-dates` and
+  `node scripts/location-model/verify-sql.mjs`; read `docs/editorial-dates.md`.
 - Sanitizer/SEO work: run the applicable
   `verify:directus-html`, `verify:html-text`, `verify:faq-html`,
   `verify:person-html`, `verify:sponsor-html`, `verify:glossary-html`, `verify:person-seo`,

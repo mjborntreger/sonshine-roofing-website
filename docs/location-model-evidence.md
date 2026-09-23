@@ -1,5 +1,10 @@
 # Location model evidence
 
+> Historical migration evidence. Its import commands, temporary fields and recovery paths
+> describe the original release, not current operating instructions. See
+> [CONTENT.md](../CONTENT.md), [DEPLOY.md](../DEPLOY.md), and
+> [migration cleanup](migration-cleanup.md) for the supported system.
+
 Current contract: manual review amendment, snapshot `location-v3`; model
 `location-model-v5`; SQL `location-invariants-v4`. The initial v4/v3 phase below
 is historical. Subsequent explicitly approved removal of two unused review-feed

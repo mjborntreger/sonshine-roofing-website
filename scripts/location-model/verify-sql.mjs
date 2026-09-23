@@ -1,12 +1,8 @@
-// Optional local PostgreSQL execution, never a production connection.
-// Install @electric-sql/pglite in a temporary directory and set LOCATION_PGLITE_PATH
-// to its dist/index.js. No project dependency or real-data fixture is required.
+// Synthetic PostgreSQL execution; never connects to production.
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
+import { PGlite } from '@electric-sql/pglite';
 import { locationSchema, locationRelations } from './schema.mjs';
-assert.ok(process.env.LOCATION_PGLITE_PATH, 'Set LOCATION_PGLITE_PATH to a temporary local PGlite module.');
-const { PGlite } = await import(pathToFileURL(process.env.LOCATION_PGLITE_PATH).href);
 const db = new PGlite();
 await db.exec(`
 CREATE TABLE clients(id uuid PRIMARY KEY,slug text UNIQUE NOT NULL);
@@ -102,14 +98,13 @@ await rejects(`INSERT INTO reviews(id,client,service_area) VALUES (1,${q(client)
 // Static imported reviews need no fabricated Google resource identity. Editors
 // publish or unpublish them, while the same-client association and provenance
 // shape remain enforced independently of the unchanged sitewide Google feed.
-await db.exec(`INSERT INTO reviews(id,client,service_area,status,external_id,wordpress_provenance) VALUES (1,${q(client)},${q(area)},'draft',NULL,'[{"key":"synthetic-wordpress-review"}]');
+await db.exec(`INSERT INTO reviews(id,client,service_area,status,external_id) VALUES (1,${q(client)},${q(area)},'draft',NULL);
 INSERT INTO reviews(id,client,service_area,external_id) VALUES (2,${q(client)},${q(area)},'synthetic-google-resource');
 UPDATE reviews SET status='published' WHERE id=1`);
 assert.deepEqual((await db.query('SELECT status,external_id FROM reviews WHERE id=1')).rows[0],{status:'published',external_id:null});
 assert.equal((await db.query("SELECT count(*)::integer AS count FROM reviews WHERE status='published' AND source='Google' AND rating=5 AND external_id IS NOT NULL")).rows[0].count,1);
 await rejects(`UPDATE reviews SET service_area=${q(otherArea)} WHERE id=1`);
 await rejects(`UPDATE reviews SET client=${q(other)} WHERE id=1`);
-await rejects(`UPDATE reviews SET wordpress_provenance='{}' WHERE id=1`);
 await db.exec("UPDATE reviews SET status='archived' WHERE id=1");
 assert.deepEqual((await db.query('SELECT status,external_id FROM reviews WHERE id=1')).rows[0],{status:'archived',external_id:null});
 assert.equal((await db.query('SELECT status FROM reviews WHERE id=2')).rows[0].status,'published');

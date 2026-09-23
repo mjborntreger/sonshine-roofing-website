@@ -63,12 +63,13 @@
   stored `noindex` is false. Mixed sitemaps may refresh other content independently.
 - Project canonicals remain `/project/{slug}`. Archive SEO remains in the existing
   `/project` `website_pages` record. Gallery order and the full image set are retained.
-- Project article and sitemap dates use the source-preserved `date_updated` on
-  import and later Directus editorial update dates after a new deployment.
+- Blog/project metadata and sitemap dates use canonical `modified_at`; original
+  publication uses `published_at`. Detail pages display both dates in America/New_York.
+  See [editorial dates](docs/editorial-dates.md).
 
 ## Location publication
 
-`roofing_service_areas` owns `/locations/{slug}` in the migration candidate.
+`roofing_service_areas` owns `/locations/{slug}` in production.
 Published taxonomy plus `page_status=published` enables a route only after a
 successful deployment. `noindex` pages remain routable and leave location/image
 sitemaps. Metadata, related content and sitemap images use the same deployed

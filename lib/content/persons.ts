@@ -31,7 +31,7 @@ export async function listPersonSitemapEntries(): Promise<PersonSitemapEntry[]> 
     .persons.filter((person) => !person.noindex)
     .map((person) => ({
       uri: '/person/' + person.slug,
-      modified: person.sourceUpdatedAt,
+      modified: person.modifiedAt,
       featuredImage: person.featuredImage,
     }));
 }
