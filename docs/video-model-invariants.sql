@@ -1,5 +1,5 @@
--- Apply after scripts/setup-video-schema.mjs, before importing any videos.
--- Additive PostgreSQL invariants; retain roofing_projects.youtube_url for rollback.
+-- Apply after scripts/setup-video-schema.mjs.
+-- Current PostgreSQL invariants; retired project/import fields are not required.
 BEGIN;
 
 CREATE OR REPLACE FUNCTION public.video_youtube_id(input_url text)
