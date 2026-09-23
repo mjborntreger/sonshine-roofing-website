@@ -302,10 +302,12 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         </div>
         <div className="h-[2px] my-4 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
 
+        <div className="mb-2 text-sm text-slate-600">
+          <EditorialDates published={post.date} modified={post.modified} />
+        </div>
+
         {/* Meta row */}
         <div className="flex flex-wrap items-center text-sm gap-x-4 gap-y-2 text-slate-600">
-          <EditorialDates published={post.date} modified={post.modified} />
-          <span>•</span>
           <span>By {renderedAuthorName}</span>
           <span>•</span>
           <span>{readingMinutes} min read</span>
