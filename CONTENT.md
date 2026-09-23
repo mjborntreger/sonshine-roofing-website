@@ -205,8 +205,8 @@ runtime and two-release acceptance gates.
   navigation remain frozen for a deployment. Required schema/fetch/tenant failures
   stop prebuild. Unknown, draft and taxonomy-only routes return 404.
 - Read [location authoring](docs/location-authoring.md) for editorial checks and
-  [the release guide](docs/location-release.md) for schema, data,
-  permission, deployment and rollback dependencies. The unrelated
+  [the model contract](docs/location-contract.md) for schema and permissions,
+  and [DEPLOY.md](DEPLOY.md) for deployment and recovery. The unrelated
   `location_landing_pages` scaffold remains outside this model.
 
 ## Publishing blog posts in Directus

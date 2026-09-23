@@ -1,16 +1,17 @@
-# Location migration contract — manual review amendment
+# Location content model
 
-Status: the owner-approved migration and integrated website release were deployed and verified on 2026-09-17; see [release evidence](location-release-20260917.md). The application snapshot format remains `location-v3`. The owner explicitly withdrew all n8n workflow work: location reviews are imported once, deduplicated and linked, then maintained by hand.
-Starting application revision: `0271ec70f46a2b31c4eb012da28459f6a9144184`.
-Evidence refreshed: 2026-09-17. The user handoff is authoritative for scope.
+Current authoring contract after the September 2026 Directus migration. The
+application snapshot format is `location-v3`; retained setup tooling is model v6.
+Use [location authoring](location-authoring.md) for edits and [DEPLOY.md](../DEPLOY.md)
+for publication/recovery. Historical release decisions remain dated evidence.
 
 ## Model and ownership
 
 - `roofing_service_areas` owns `/locations/{slug}`. Preserve taxonomy identity,
-  required project association, `status`, `scope_key`, .
-  Add independent `page_status` (`taxonomy_only`, `draft`, `published`, default
+  required project association, `status` and `scope_key`.
+  Use independent `page_status` (`taxonomy_only`, `draft`, `published`, default
   `taxonomy_only`), `page_title`, plain-text `introduction`, optional restricted
-  HTML `overview`, optional `overview_map`, `published_at`,
+  HTML `overview`, optional `overview_map`, `published_at`, and
   the standard shared SEO group.
   Page publication also requires published taxonomy and the correct client.
   Published `noindex` pages remain routable but leave location/image sitemaps.
@@ -21,12 +22,12 @@ Evidence refreshed: 2026-09-17. The user handoff is authoritative for scope.
   uniqueness and a primary area; resolve conflicting assignments before writes.
 - Preserve existing Parrish coverage with one canonical taxonomy-only area if
   absent. This creates no additional landing page or WordPress taxonomy identity.
-- Projects gain nullable private `job_id`, nullable `zip`, nullable `neighborhood`.
+- Projects have private `job_id` and `zip`, plus nullable `neighborhood`.
   Existing primary `service_area` remains required. Normalize blank job IDs to
   null, enforce client/job uniqueness, and prevent cross-client or mismatched
   neighborhood/area assignments. After verified complete enrichment, a separate
   constraint makes job ID and ZIP required for SonShine only.
-- Reviews gain optional `service_area` .
+- Reviews have optional `service_area`.
   Imported location reviews are manually maintained. Preserve original attribution,
   actual approved ratings, dates, source URLs and owner replies; missing dates stay
   null. `external_id` is reserved for verified Google resource identity and remains
