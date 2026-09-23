@@ -238,9 +238,8 @@ runtime and two-release acceptance gates.
   Shared featured/gallery assets can reference the same Directus file.
 - Keep product links in their displayed order as `{ label, href }` entries.
   Product and review links require absolute HTTP(S) URLs. Store the project
-  video relationship in the independently authored `videos` record. The old
-  project `youtube_url` remains only for migration rollback and is ignored by
-  the current frontend.
+  video relationship in the independently authored `videos` record. The retired
+  project `youtube_url` field was removed in the September 23 schema cleanup.
 - The testimonial belongs to the project: `client_testimonial`,
   `client_testimonial_name`, `client_testimonial_date`, `review_source`, and
   `review_url`. It is independent of shared review synchronization and has no

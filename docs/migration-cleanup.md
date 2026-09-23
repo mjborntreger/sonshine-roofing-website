@@ -1,9 +1,10 @@
 # WordPress migration cleanup
 
-Approved rollout contract, September 23, 2026. The owner accepted the September 22
+Completed schema rollout, September 23, 2026. The owner accepted the September 22
 VPS backups as the recovery point. No extra local recovery archive is created.
-Completion requires reduced-schema readback and both compatible frontend releases;
-release completion is recorded in shared operational context.
+Both compatible frontends were released before schema removal; both credentialed
+builds passed against the reduced schema. Current release and access status are
+recorded in shared operational context.
 
 Retire dedicated WP IDs/source dates across the imported collections, unused project
 body and legacy project YouTube URL, review WP provenance, two WP-only file metadata
@@ -26,6 +27,19 @@ workflows with their ten history versions on September 23. Final readback: nine
 tables, 22 archived workflows, and unchanged 44 non-archived / 40 active workflows.
 Saved and published retained definitions matched their pre-deletion hashes. The
 private sandbox was excluded from graph inspection and left untouched.
+
+Final Directus readback confirms all 22 approved fields and their import-only
+indexes/check are absent. The video guard retains its ordinary URL/client rules.
+Retained row digests across 16 content/junction collections matched before and
+after removal. Only the approved metadata keys changed on 365 files: 359
+`content_migration` objects and six `migration_source` objects. Other file values,
+metadata, and all 179 editorial records/dates were unchanged in the same transaction.
+The temporary policy, its nine permissions and one assignment were removed;
+the suspended author identity and its 106 blog creation attributions remain.
+
+The six original Mac folders, four completed plans and 17 subsequently approved
+local recovery/scratch folders were deleted after durable evidence consolidation.
+Current repositories, active configuration, media and Worker maps remain.
 
 Historic migration reports are labeled evidence; current operation belongs in
 CONTENT, DEPLOY, location authoring and the canonical model SQL.
