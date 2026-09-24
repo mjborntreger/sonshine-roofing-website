@@ -1,4 +1,5 @@
 import type { SpecialOffer, SpecialOfferImage } from '../editorial-types';
+import { sanitizeOfferHtml, offerHtmlToPlainText } from '../directus-offer-html.ts';
 export type UnknownRecord = Record<string, unknown>;
 
 export type DirectusFileValue =
@@ -14,6 +15,8 @@ export type DirectusFileValue =
 export type DirectusSpecialOfferItem = {
   client?: unknown;
   title?: unknown;
+  eyebrow?: unknown;
+  introduction?: unknown;
   slug?: unknown;
   featured_image?: DirectusFileValue;
   offer_code?: unknown;
@@ -43,6 +46,8 @@ export type DirectusConfig = {
 export const SPECIAL_OFFER_FIELDS = [
   'client.slug',
   'title',
+  'eyebrow',
+  'introduction',
   'slug',
   'featured_image.id',
   'featured_image.description',
@@ -131,6 +136,13 @@ export function mapSpecialOffer(
   const title = readString(item.title);
   if (!slug || !title) return null;
 
+  const eyebrow = readString(item.eyebrow);
+  const introduction = readString(item.introduction);
+  if (!eyebrow || !introduction) {
+    throw new Error(`Published Directus special_offers hero copy is incomplete for ${slug}.`);
+  }
+  const descriptionHtml = sanitizeOfferHtml(readString(item.description) ?? '');
+
   const noindex = readBoolean(item.noindex);
   const primaryFocusKeyword = readString(item.primary_focus_keyword);
   const focusKeywords = Array.isArray(item.focus_keywords)
@@ -145,7 +157,10 @@ export function mapSpecialOffer(
   return {
     slug,
     title,
-    description: readString(item.description) ?? '',
+    eyebrow,
+    introduction,
+    description: offerHtmlToPlainText(descriptionHtml),
+    descriptionHtml,
     featuredImage: mapFeaturedImage(item.featured_image ?? null, config),
     offerCode: readString(item.offer_code),
     discount: readString(item.discount),

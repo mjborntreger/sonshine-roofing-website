@@ -80,6 +80,8 @@ jobs:
         run: npm run verify:glossary-html
       - name: Verify glossary route policy
         run: npm run verify:glossary-policy
+      - name: Verify special-offer content and coupon flow
+        run: npm run verify:special-offer-flow
       - name: Verify special-offer indexing
         run: npm run verify:special-offer-indexing
       - name: Verify build-only revalidation

@@ -1,6 +1,6 @@
 'use client';
 
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import Turnstile from '@/components/lead-capture/Turnstile';
@@ -19,7 +19,8 @@ import {
 import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import { endOfDay, parseSpecialOfferDate } from '@/lib/lead-capture/specialOfferDates';
 import { cn } from '@/lib/utils';
-import SitePhoneLink from '@/components/utils/SitePhoneLink';
+import { pushToDataLayer } from '@/lib/telemetry/gtm';
+import isExpired from '@/lib/lead-capture/isExpired';
 
 type Props = {
   offerCode: string;
@@ -38,7 +39,7 @@ type FormValues = {
   smsMarketingConsent: SmsConsentFieldValue;
 };
 
-type Submission = 'idle' | 'submitting' | 'success' | 'error';
+type Submission = 'idle' | 'submitting' | 'error';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const INPUT_BASE_CLASS =
@@ -106,6 +107,60 @@ export default function SpecialOfferForm({
   const [submission, setSubmission] = useState<Submission>('idle');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
+  const pendingErrorFocus = useRef(false);
+  const viewed = useRef(false);
+  const started = useRef(false);
+
+  const trackStart = () => {
+    if (started.current) return;
+    started.current = true;
+    pushToDataLayer({ event: 'special_offer_form_start', offer_slug: offerSlug });
+  };
+
+  const reportError = (
+    errorType: 'validation' | 'verification' | 'submission' | 'expired',
+    errors: Record<string, string> = {},
+  ) => {
+    pendingErrorFocus.current = true;
+    // Field names are an allowlist; messages and entered values never enter analytics.
+    const errorFields = Object.keys(values).filter((field) => Object.hasOwn(errors, field));
+    pushToDataLayer({
+      event: 'special_offer_form_error',
+      offer_slug: offerSlug,
+      error_type: errorType,
+      error_fields: errorFields,
+    });
+  };
+
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (viewed.current || !entries.some((entry) => entry.isIntersecting && entry.intersectionRatio >= 0.1)) return;
+        viewed.current = true;
+        pushToDataLayer({ event: 'special_offer_form_view', offer_slug: offerSlug });
+        observer.disconnect();
+      },
+      { threshold: 0.1 },
+    );
+    observer.observe(form);
+    return () => observer.disconnect();
+  }, [offerSlug]);
+
+  useEffect(() => {
+    if (!pendingErrorFocus.current || (!Object.keys(fieldErrors).length && !globalError)) return;
+    pendingErrorFocus.current = false;
+    const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
+    const target = invalid?.matches('input')
+      ? invalid
+      : invalid?.querySelector<HTMLInputElement>('input');
+    const focusTarget = target ?? errorRef.current;
+    focusTarget?.focus({ preventScroll: true });
+    focusTarget?.scrollIntoView({ block: 'center', behavior: 'instant' });
+  }, [fieldErrors, globalError]);
 
   const resetErrors = () => {
     setFieldErrors({});
@@ -155,7 +210,6 @@ export default function SpecialOfferForm({
   const cookieName = useMemo(() => `ss_offer_${offerSlug}`, [offerSlug]);
 
   useEffect(() => {
-    if (submission === 'success') return;
     const stored = readOfferCookie(cookieName);
     if (stored && stored.code === offerCode) {
       setGlobalError(null);
@@ -168,8 +222,15 @@ export default function SpecialOfferForm({
     if (submission === 'submitting') return;
 
     resetErrors();
+    trackStart();
+    if (isExpired(offerExpiration)) {
+      reportError('expired');
+      setGlobalError('This offer has expired. Please call our team for current roofing offers.');
+      return;
+    }
     const errors = validate();
     if (Object.keys(errors).length) {
+      reportError('validation', errors);
       setFieldErrors(errors);
       return;
     }
@@ -179,6 +240,7 @@ export default function SpecialOfferForm({
     const honeypot = String(formData.get('company') || '');
 
     if (!cfToken) {
+      reportError('verification');
       setGlobalError('Please complete the verification.');
       return;
     }
@@ -231,6 +293,10 @@ export default function SpecialOfferForm({
     });
 
     if (!result.ok) {
+      reportError(
+        'submission',
+        result.fieldErrors ? mapLeadApiFieldErrors(result.fieldErrors) : {},
+      );
       setSubmission('error');
       setGlobalError(result.error || 'We could not send your request. Please try again.');
       if (result.fieldErrors) {
@@ -247,40 +313,21 @@ export default function SpecialOfferForm({
     redirectToThankYou(payload);
   };
 
-  if (submission === 'success') {
-    return (
-      <div className="not-prose rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm print:border-neutral-700 print:bg-white">
-        <h2 className="text-2xl font-semibold text-emerald-700">You&rsquo;re all set!</h2>
-        <p className="mt-2 text-sm text-slate-600 print:text-black">
-          Thanks! Your offer code is below. We’ve also emailed it to you so you can keep it handy.
-        </p>
-
-        <div className="mt-6 rounded-2xl border-2 border-dashed border-emerald-400 bg-emerald-50 p-6 text-center text-slate-900 print:border-solid print:border-black print:bg-white">
-          <p className="text-sm uppercase tracking-widest text-emerald-600">Your Offer Code</p>
-          <p className="mt-2 text-4xl font-bold tracking-[0.2em] text-emerald-700 print:text-black">
-            {offerCode}
-          </p>
-        </div>
-
-        <p className="mt-6 text-sm text-slate-600 print:text-black">
-          Prefer to call? Just mention <span className="font-semibold">{offerCode}</span> and we’ll
-          apply your discount instantly.{' '}
-          <SitePhoneLink className="text-brand-blue underline print:no-underline">
-            Call
-          </SitePhoneLink>
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="not-prose rounded-3xl border border-blue-100 bg-white p-6 shadow-sm print:hidden sm:p-8">
-      <h2 className="text-2xl font-semibold text-slate-800">Claim This Offer</h2>
+      <h2 className="text-2xl font-semibold text-slate-800">Email Me My Coupon</h2>
       <p className="mt-4 text-sm text-slate-600">
-        Fill out the quick form below and we’ll email your offer code instantly.
+        Enter your details and we’ll email your coupon code and offer details. Our team will also
+        follow up about your roofing project.
       </p>
 
-      <form className="mt-6 space-y-6" onSubmit={handleSubmit} noValidate>
+      <form
+        ref={formRef}
+        className="mt-6 space-y-6"
+        onChangeCapture={trackStart}
+        onSubmit={handleSubmit}
+        noValidate
+      >
         <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -289,6 +336,7 @@ export default function SpecialOfferForm({
             <input
               id="firstName"
               name="firstName"
+              required
               className={cn(INPUT_BASE_CLASS, fieldErrors.firstName && INPUT_ERROR_CLASS)}
               value={values.firstName}
               onChange={handleChange('firstName')}
@@ -308,6 +356,7 @@ export default function SpecialOfferForm({
             <input
               id="lastName"
               name="lastName"
+              required
               className={cn(INPUT_BASE_CLASS, fieldErrors.lastName && INPUT_ERROR_CLASS)}
               value={values.lastName}
               onChange={handleChange('lastName')}
@@ -328,6 +377,7 @@ export default function SpecialOfferForm({
           <input
             id="email"
             name="email"
+            required
             type="email"
             className={cn(INPUT_BASE_CLASS, fieldErrors.email && INPUT_ERROR_CLASS)}
             value={values.email}
@@ -348,6 +398,7 @@ export default function SpecialOfferForm({
           <input
             id="phone"
             name="phone"
+            required
             type="tel"
             inputMode="tel"
             className={cn(INPUT_BASE_CLASS, fieldErrors.phone && INPUT_ERROR_CLASS)}
@@ -355,19 +406,21 @@ export default function SpecialOfferForm({
             onChange={handleChange('phone')}
             autoComplete="tel"
             aria-invalid={Boolean(fieldErrors.phone)}
-            aria-describedby={fieldErrors.phone ? 'phone-error' : undefined}
+            aria-describedby={fieldErrors.phone ? 'phone-help phone-error' : 'phone-help'}
           />
           {fieldErrors.phone && (
             <span id="phone-error" className={FIELD_ERROR_CLASS}>
               {fieldErrors.phone}
             </span>
           )}
-          <p className="mt-1 text-xs text-slate-500">
-            Digits only, US numbers. Example: {formatPhoneExample(values.phone)}
+          <p id="phone-help" className="mt-1 text-xs text-slate-500">
+            US phone number for follow-up. Example: {formatPhoneExample(values.phone)}
           </p>
         </label>
 
         <SmsConsentFields
+          disclosureMode="shared"
+          sectionIntro="Choose Yes or No for each option. You can receive your coupon with either choice."
           smsProjectConsent={values.smsProjectConsent}
           smsMarketingConsent={values.smsMarketingConsent}
           onChange={(field, value) => {
@@ -392,7 +445,12 @@ export default function SpecialOfferForm({
         </div>
 
         {globalError && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+          <div
+            ref={errorRef}
+            role="alert"
+            tabIndex={-1}
+            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+          >
             {globalError}
           </div>
         )}
@@ -405,7 +463,7 @@ export default function SpecialOfferForm({
           data-icon-affordance="right"
           disabled={submission === 'submitting'}
         >
-          {submission === 'submitting' ? 'Sending…' : 'Claim This Offer'}
+          {submission === 'submitting' ? 'Sending…' : 'Email Me My Coupon'}
           {submission !== 'submitting' ? (
             <ArrowRight className="icon-affordance ml-2 h-4 w-4" aria-hidden="true" />
           ) : null}

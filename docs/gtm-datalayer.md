@@ -21,6 +21,31 @@ The event fires for successful thank-you contexts with these form types:
 
 The event does not fire for `special-offer` or `feedback` submissions.
 
+## Special-offer coupon funnel
+
+Offer forms emit the following custom events through the existing GTM queue:
+
+| Event | When | Parameters |
+| --- | --- | --- |
+| `special_offer_form_view` | Once when at least 10% of the form enters the viewport | `offer_slug` |
+| `special_offer_form_start` | Once on the first input change or submission attempt | `offer_slug` |
+| `special_offer_form_error` | A submission fails validation, verification, transport, or the expiration check | `offer_slug`, `error_type`, `error_fields` |
+| `special_offer_claimed` | The lead API accepts a request | Existing `offer_slug`, `offer_code` |
+
+`error_type` is `validation`, `verification`, `submission`, or `expired`.
+`error_fields` contains only allowlisted field names, never values or error
+messages. Views/starts reset when a different offer form mounts. A failed
+request does not emit `special_offer_claimed`; an accepted request is not proof
+of email delivery. The existing Meta `Lead` event remains, and coupon requests
+remain excluded from `ads_lead_submit`.
+
+Use accepted requests divided by form views for completion rate, and accepted
+requests divided by starts for form completion. Segment by `offer_slug` and the
+analytics platform's device/acquisition dimensions. GTM/GA4 event forwarding and
+report configuration belong to the external analytics control plane; dataLayer
+emission alone does not configure a GA4 report. Respect the existing analytics
+enablement gates.
+
 Google click IDs (`gclid`, `gbraid`, `wbraid`) and UTM values are stored and forwarded to n8n when present, but they do not determine whether the ads conversion event fires.
 
 ## QuickQuote path

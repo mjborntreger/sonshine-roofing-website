@@ -10,6 +10,7 @@ type HeroProps = {
   subtitle?: string;
   metadata?: ReactNode;
   eyelash?: string;
+  eyebrow?: string;
   imageSrc?: string;
   imagePosition?: string;
   justifyStart?: boolean
@@ -28,6 +29,7 @@ const FALLBACK_IMAGE = "static:red-tile-roof-aerial-wide";
 export default function Hero({
   title,
   eyelash,
+  eyebrow,
   subtitle,
   metadata,
   imageSrc = FALLBACK_IMAGE,
@@ -66,6 +68,9 @@ export default function Hero({
 
         <div className="container-edge relative z-10 py-12 sm:py-16 md:py-20 lg:py-24">
           <div className={TEXT_CONTAINER}>
+            {eyebrow ? (
+              <p className="text-sm font-bold uppercase leading-tight tracking-wide text-blue-200">{eyebrow}</p>
+            ) : null}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-white">
               {title}
             </h1>

@@ -70,7 +70,9 @@ export function editorialFixture(count = 3, revision = 'A') {
       row(`fixture-offer-${i}`, {
         slug: `fixture-offer-${i}`,
         title: `Deployment ${revision} offer ${i}`,
-        description: 'Synthetic offer',
+        eyebrow: 'Synthetic offer savings',
+        introduction: `Deployment ${revision} offer introduction`,
+        description: '<p>Synthetic offer</p>',
         noindex: i === count - 1,
         featured: false,
         primary_focus_keyword: 'roofing',
