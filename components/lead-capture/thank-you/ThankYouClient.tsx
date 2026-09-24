@@ -24,7 +24,7 @@ function getHeading(context: ThankYouLeadContext | null): string {
     case 'financing-calculator':
       return 'Your financing request is in';
     case 'special-offer':
-      return 'Your offer request is in';
+      return 'Your coupon is on the way';
     default:
       return 'Thank you';
   }
@@ -39,7 +39,7 @@ function getMessage(context: ThankYouLeadContext | null): string {
     case 'financing-calculator':
       return 'We received your financing information. You can return to the calculator while our team reviews your request.';
     case 'special-offer':
-      return 'We received your offer request and will follow up with the details.';
+      return 'Check your inbox for an email from SonShine Roofing with your coupon code and offer details. If you don’t see it, check your spam or promotions folder.';
     default:
       return 'We received your request. Our team will follow up shortly.';
   }
@@ -65,6 +65,10 @@ export default function ThankYouClient() {
         <CheckCircle2 className="h-12 w-12 text-emerald-600" aria-hidden="true" />
         <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-900">{getHeading(context)}</h1>
         <p className="mt-4 text-base leading-7 text-slate-600">{getMessage(context)}</p>
+
+        {context?.formType === 'special-offer' ? (
+          <p className="mt-3 text-base leading-7 text-slate-600">Our team will also follow up about your roofing project.</p>
+        ) : null}
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <SmartLink href="/" className="btn btn-brand-blue btn-md justify-center">

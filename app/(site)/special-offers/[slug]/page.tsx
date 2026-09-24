@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
-import { ArrowDown, BadgePercent, CalendarClock, Smartphone, Tag } from 'lucide-react';
+import { ArrowDown, BadgePercent, CalendarClock, Smartphone } from 'lucide-react';
 
 import Section from '@/components/layout/Section';
 import SpecialOfferForm from '@/components/lead-capture/special-offer/SpecialOfferForm';
-import ServicesAside from '@/components/global-nav/static-pages/ServicesAside';
+import SpecialOfferTrust from '@/components/lead-capture/special-offer/SpecialOfferTrust';
 import Hero from '@/components/ui/Hero';
 import SmartLink from '@/components/utils/SmartLink';
 import {
@@ -29,8 +29,6 @@ export const dynamicParams = false;
 export const fetchCache = 'force-cache';
 export const revalidate = false;
 
-const HERO_SUBTITLE_MAX_LENGTH = 180;
-
 export async function generateStaticParams() {
   const slugs = await listSpecialOfferSlugs();
   return slugs.map((slug) => ({ slug }));
@@ -45,25 +43,6 @@ function buildRobotsMeta(offer: SpecialOfferIndexingState) {
 
 function collapseText(value: string | null | undefined): string {
   return (value ?? '').replace(/\s+/g, ' ').trim();
-}
-
-function splitParagraphs(value: string | null | undefined): string[] {
-  return (value ?? '')
-    .split(/\n{2,}|\r\n{2,}/)
-    .map((paragraph) => paragraph.replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
-}
-
-function buildHeroSubtitle(value: string): string {
-  if (!value) {
-    return 'Claim this special offer from SonShine Roofing.';
-  }
-
-  if (value.length <= HERO_SUBTITLE_MAX_LENGTH) {
-    return value;
-  }
-
-  return `${value.slice(0, HERO_SUBTITLE_MAX_LENGTH - 3).trimEnd()}...`;
 }
 
 export async function generateMetadata({
@@ -120,8 +99,6 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
   const expired = isExpired(offer.expirationDate);
   const expirationLabel = formatSpecialOfferExpiration(offer.expirationDate);
   const description = collapseText(offer.description);
-  const descriptionParagraphs = splitParagraphs(offer.description);
-  const heroSubtitle = buildHeroSubtitle(description);
   const expirationBadge = expirationLabel
     ? `${expired ? 'Expired on' : 'Valid through'} ${expirationLabel}`
     : null;
@@ -159,28 +136,33 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
 
       <Hero
         title={offer.title}
-        eyelash="Limited-Time Roofing Offer"
-        subtitle={heroSubtitle}
+        eyebrow={offer.eyebrow}
+        subtitle={offer.introduction}
+        metadata={
+          offer.discount ? (
+            <p className="max-w-3xl text-2xl font-semibold leading-snug text-white sm:text-3xl">
+              {offer.discount}
+            </p>
+          ) : null
+        }
         justifyStart
         imageSrc={offer.featuredImage?.url || undefined}
-        badges={[
-          { icon: Tag, label: 'Limited-Time Offer' },
-          ...(offer.discount ? [{ icon: BadgePercent, label: offer.discount }] : []),
-          ...(expirationBadge ? [{ icon: CalendarClock, label: expirationBadge }] : []),
-        ]}
+        badges={[...(expirationBadge ? [{ icon: CalendarClock, label: expirationBadge }] : [])]}
       >
         <div className="flex flex-wrap gap-3">
-          <SmartLink
-            href="#claim-offer"
-            className="btn-brand-blue btn-lg rounded-lg px-3 py-2"
-            aria-label="Claim this special offer"
-            data-icon-affordance="down"
-            proseGuard
-          >
-            <BadgePercent className="mr-2 inline h-4 w-4" aria-hidden="true" />
-            Claim This Offer
-            <ArrowDown className="icon-affordance ml-2 inline h-4 w-4" aria-hidden="true" />
-          </SmartLink>
+          {!expired && offer.offerCode ? (
+            <SmartLink
+              href="#claim-offer"
+              className="btn btn-brand-orange btn-lg rounded-lg px-4 py-3"
+              aria-label="Email me my coupon"
+              data-icon-affordance="down"
+              proseGuard
+            >
+              <BadgePercent className="mr-2 inline h-4 w-4" aria-hidden="true" />
+              Email Me My Coupon
+              <ArrowDown className="icon-affordance ml-2 inline h-4 w-4" aria-hidden="true" />
+            </SmartLink>
+          ) : null}
           <SmartLink
             href={settings?.phoneHref ?? '#claim-offer'}
             className="btn-outline phone-affordance btn-lg rounded-lg px-3 py-2 text-white hover:bg-transparent"
@@ -194,68 +176,55 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
       </Hero>
 
       <Section className="pb-20">
-        <div className="grid gap-4 overflow-visible px-2 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
-          <div className="min-w-0 space-y-8">
-            <section id="claim-offer" className="scroll-mt-24">
-              {!expired && offer.offerCode ? (
-                <Suspense
-                  fallback={
-                    <div className="rounded-3xl border border-blue-100 bg-white p-6 text-sm text-slate-600 shadow-sm">
-                      Loading offer form...
-                    </div>
-                  }
-                >
-                  <SpecialOfferForm
-                    offerCode={offer.offerCode}
-                    offerSlug={offer.slug}
-                    offerTitle={offer.title}
-                    offerDiscount={offer.discount ?? null}
-                    offerExpiration={offer.expirationDate ?? null}
-                  />
-                </Suspense>
-              ) : (
-                <div className="not-prose rounded-3xl border border-red-200 bg-white p-6 shadow-sm">
-                  <h2 className="text-xl font-semibold text-red-700">Offer unavailable</h2>
-                  <p className="mt-2 text-sm text-slate-600">
-                    This special offer has expired. Reach out to our team for current promotions.
-                  </p>
-                  <a
-                    href={settings?.phoneHref ?? '#claim-offer'}
-                    className="btn btn-brand-blue btn-md mt-4 inline-flex justify-center"
-                  >
-                    Call {settings?.phone ?? 'our office'}
-                  </a>
-                </div>
-              )}
-            </section>
-
-            {offer.legalDisclaimer !== null ? (
-              <div className="not-prose text-xs italic leading-[1.3rem] text-slate-600 print:text-black">
-                <strong className="font-semibold text-slate-800 print:text-black">
-                  Disclaimer:
-                </strong>{' '}
-                {offer.legalDisclaimer}
+        <div className="mx-auto max-w-3xl space-y-8 px-2">
+          <article className="prose prose-slate max-w-none rounded-3xl border border-blue-100 bg-white p-6 shadow-sm sm:p-8">
+            <h2 className="mt-0">Offer Details</h2>
+            <div dangerouslySetInnerHTML={{ __html: offer.descriptionHtml }} />
+            {offer.legalDisclaimer ? (
+              <div className="not-prose mt-6 border-t border-slate-200 pt-4 text-sm leading-relaxed text-slate-600">
+                <h3 className="mb-2 text-sm font-semibold text-slate-800">Offer terms</h3>
+                <p>{offer.legalDisclaimer}</p>
               </div>
             ) : null}
+          </article>
 
-            <article className="prose prose-slate max-w-none print:prose">
-              <h2 className="mt-0">Offer Details</h2>
-              {descriptionParagraphs.length ? (
-                descriptionParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)
-              ) : (
-                <p>Claim this special offer from SonShine Roofing.</p>
-              )}
+          <SpecialOfferTrust settings={settings} />
 
-              {expired ? (
-                <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-4 text-red-700">
-                  <h2 className="text-xl font-semibold">This offer has expired.</h2>
-                  <p>Please check back soon for future promotions from SonShine Roofing.</p>
-                </div>
-              ) : null}
-            </article>
-          </div>
-
-          <ServicesAside activePath={pagePath} />
+          <section id="claim-offer" className="scroll-mt-24" aria-label="Request your coupon">
+            {!expired && offer.offerCode ? (
+              <Suspense
+                fallback={
+                  <div className="rounded-3xl border border-blue-100 bg-white p-6 text-sm text-slate-600">
+                    Loading coupon form...
+                  </div>
+                }
+              >
+                <SpecialOfferForm
+                  key={offer.slug}
+                  offerCode={offer.offerCode}
+                  offerSlug={offer.slug}
+                  offerTitle={offer.title}
+                  offerDiscount={offer.discount ?? null}
+                  offerExpiration={offer.expirationDate ?? null}
+                />
+              </Suspense>
+            ) : (
+              <div className="rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+                <h2 className="text-xl font-semibold text-slate-900">
+                  {expired ? 'This offer has expired' : 'This offer is unavailable'}
+                </h2>
+                <p className="mt-2 text-slate-600">
+                  Call our team to ask about current roofing offers.
+                </p>
+                <SmartLink
+                  href={settings?.phoneHref ?? '/contact-us'}
+                  className="btn btn-brand-blue btn-md mt-4 inline-flex justify-center"
+                >
+                  Call {settings?.phone ?? 'our office'}
+                </SmartLink>
+              </div>
+            )}
+          </section>
         </div>
       </Section>
     </>

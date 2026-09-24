@@ -388,6 +388,27 @@ runtime and two-release acceptance gates.
 
 ## Publishing special offers in Directus
 
+- `eyebrow` and `introduction` are required for published offers. Drafts may be
+  incomplete. Both are plain text, shared by the offer hero and featured popup;
+  the hero displays the full introduction without truncation. The eyebrow appears
+  above the title. Keep dollar amounts in `discount` to avoid duplicate editing.
+- `description` is WYSIWYG Offer Details, rendered above the coupon form. Use
+  paragraphs, bold/italic emphasis, ordered/unordered lists, and safe links. The
+  offer sanitizer follows the restricted FAQ formatting contract; images,
+  headings, tables, styles, scripts, and unsafe links are removed during capture.
+  SEO fallbacks and Offer JSON-LD use parser-derived plain text, while explicit
+  SEO fields retain precedence. The existing metadata length limits do not limit
+  visible hero copy.
+- Each offer page shows the latest eligible published review from the existing
+  Google feed, selected at build time, with attribution and a source link. The
+  page's license and founding-year reassurance comes from site settings.
+- Coupon forms retain first name, last name, email, phone, and separate project
+  and marketing SMS choices. Either No choice is valid. The website requests an
+  emailed coupon and discloses sales follow-up; the existing lead router owns CRM
+  creation and email delivery. Its acknowledgment precedes those actions.
+- Successful requests use the existing `/thank-you` route with the heading
+  "Your coupon is on the way", inbox/spam guidance, and the follow-up reminder.
+  The website does not claim that the email has already been delivered.
 - Set `status=published` to make an offer routable.
 - Set `featured=true` to make an unexpired offer eligible for the sitewide popup.
 - Popup route suppression is code-owned in

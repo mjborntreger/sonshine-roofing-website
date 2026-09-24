@@ -98,8 +98,15 @@ for (const slug of ['bradenton', 'osprey', 'unknown']) for (const href of [`/loc
 }
 const publishedNav = source(); publishedNav.navigation = [navigationTo(new URL('/locations/sarasota?source=nav#coverage', aliasUrl).href)];
 assert.equal(normalizeLocationSnapshot(publishedNav, config, projects).navigation[0].href, '/locations/sarasota?source=nav#coverage');
-const featured = source(); featured.featuredOffers = [{ ...scope, id: 'offer', featured: true, slug: 'synthetic-offer', title: 'Synthetic offer', description: 'Example only.', featured_image: null, expiration_date: null }];
+const featured = source(); featured.featuredOffers = [{ ...scope, id: 'offer', featured: true, slug: 'synthetic-offer', title: 'Synthetic offer', eyebrow: 'Synthetic savings', introduction: 'Example only.', featured_image: null, expiration_date: null }];
 assert.equal(normalizeLocationSnapshot(featured, config, projects).featuredOffer.title, 'Synthetic offer');
+assert.equal(normalizeLocationSnapshot(featured, config, projects).featuredOffer.eyebrow, 'Synthetic savings');
+assert.equal(normalizeLocationSnapshot(featured, config, projects).featuredOffer.introduction, 'Example only.');
+for (const field of ['eyebrow', 'introduction']) {
+  const incomplete = structuredClone(featured);
+  incomplete.featuredOffers[0][field] = '  ';
+  assert.throws(() => normalizeLocationSnapshot(incomplete, config, projects), /Featured offer/u);
+}
 featured.featuredOffers[0].featured_image = {};
 assert.throws(() => normalizeLocationSnapshot(featured, config, projects), /Featured offer image/u);
 assert.throws(() => normalizeLocationFaq({ ...faq, service_area: area('sarasota'), service: { ...scope, id: 'service', slug: 'roof-repair', nav_label: 'Repair' } }, config), /exclusive/u);

@@ -103,7 +103,10 @@ export type SpecialOfferImage = {
 export type SpecialOffer = {
   slug: string;
   title: string;
+  eyebrow: string;
+  introduction: string;
   description: string;
+  descriptionHtml: string;
   featuredImage: SpecialOfferImage | null;
   offerCode: string | null;
   discount: string | null;

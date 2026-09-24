@@ -9,7 +9,8 @@ export type SpecialOfferPopupOffer = {
   slug: string;
   title: string;
   href: string;
-  description: string;
+  eyebrow: string;
+  introduction: string;
   discount: string | null;
   expirationLabel: string | null;
   legalDisclaimer: string | null;
@@ -139,7 +140,7 @@ export default function SpecialOfferPopup({ offer }: Props) {
   const scrollYRef = useRef(0);
   const titleId = useId();
   const descriptionId = useId();
-  const paragraphs = useMemo(() => splitParagraphs(offer.description), [offer.description]);
+  const paragraphs = useMemo(() => splitParagraphs(offer.introduction), [offer.introduction]);
 
   useEffect(() => {
     if (isBlacklisted || isSuppressed()) return undefined;
@@ -287,7 +288,7 @@ export default function SpecialOfferPopup({ offer }: Props) {
 
           <div className="overflow-y-auto px-5 pb-5 pt-5 sm:px-7 sm:pb-7">
             <div className="space-y-3 pr-10">
-              <p className="text-xs font-semibold uppercase text-[--brand-blue]">Limited-Time Offer</p>
+              <p className="text-xs font-semibold uppercase text-[--brand-blue]">{offer.eyebrow}</p>
               <h2 id={titleId} className="text-2xl font-bold text-slate-950 sm:text-3xl">
                 {offer.title}
               </h2>

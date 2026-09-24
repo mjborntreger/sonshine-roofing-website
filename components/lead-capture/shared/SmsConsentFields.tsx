@@ -102,8 +102,9 @@ function ConsentCard({
       )}
       aria-invalid={Boolean(error)}
       aria-describedby={error ? errorId : undefined}
+      aria-labelledby={`${name}-label`}
     >
-      <div className={cn(DEFAULT_CLASS_NAMES.label, classNames.label)}>{label}</div>
+      <div id={`${name}-label`} className={cn(DEFAULT_CLASS_NAMES.label, classNames.label)}>{label}</div>
       <div className={cn(DEFAULT_CLASS_NAMES.options, classNames.options)}>
         <label
           className={cn(
@@ -116,6 +117,7 @@ function ConsentCard({
             type="radio"
             name={name}
             value="yes"
+            aria-describedby={error ? errorId : undefined}
             checked={value === 'yes'}
             onChange={() => onChange(name, 'yes')}
             className={cn(DEFAULT_CLASS_NAMES.radio, classNames.radio)}
@@ -141,6 +143,7 @@ function ConsentCard({
             type="radio"
             name={name}
             value="no"
+            aria-describedby={error ? errorId : undefined}
             checked={value === 'no'}
             onChange={() => onChange(name, 'no')}
             className={cn(DEFAULT_CLASS_NAMES.radio, classNames.radio)}
