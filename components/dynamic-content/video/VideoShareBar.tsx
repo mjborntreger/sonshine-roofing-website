@@ -53,7 +53,7 @@ export default function VideoShareBar({ collectionUrl }: Props) {
             id="video-share-url"
             readOnly
             value={shareUrl}
-            className="w-full min-w-0 rounded-md border border-blue-300 bg-slate-50 px-3 py-2 text-sm"
+            className="w-full min-w-0 rounded-md border border-blue-300 bg-slate-50 px-3 py-2 text-base"
           />
           <button
             id="video-share-copy"

@@ -352,7 +352,7 @@ const innerPanelUnlocked = `${innerPanelBase} overflow-hidden`;
 const stepCardClass =
   'space-y-4 rounded-2xl border border-blue-200 bg-white/85 p-5 shadow-sm backdrop-blur';
 const inputBaseClass =
-  'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
+  'mt-1 w-full rounded-xl border border-blue-100 bg-white px-3 py-2 text-base text-slate-900 shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20';
 
 type FormValues = {
   firstName: string;
@@ -1061,7 +1061,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 name="amount"
                 inputMode="numeric"
                 autoComplete="off"
-                className="h-10 w-full rounded-lg border border-blue-100 bg-white/95 px-3 text-slate-900 shadow-sm outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+                className="h-10 w-full rounded-lg border border-blue-100 bg-white/95 px-3 text-base text-slate-900 shadow-sm outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
                 value={formValues.amount}
                 onChange={(e) => {
                   const digits = sanitizeAmountInput(e.target.value);
@@ -1604,7 +1604,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 inputMode="numeric"
                 pattern="[0-9]*"
                 autoComplete="off"
-                className="h-10 w-full rounded-lg border border-blue-100 bg-white/95 px-3 text-slate-900 shadow-sm outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
+                className="h-10 w-full rounded-lg border border-blue-100 bg-white/95 px-3 text-base text-slate-900 shadow-sm outline-none focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/20"
                 value={calculatorAmount}
                 onChange={(e) => {
                   const digits = sanitizeAmountInput(e.target.value);

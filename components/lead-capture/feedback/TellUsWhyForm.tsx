@@ -27,7 +27,7 @@ const ratingValueLookup: Record<RatingString, 1 | 2 | 3> = {
   '2': 2,
   '3': 3,
 };
-const INPUT_CLASS = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:ring-2 focus:ring-[--brand-cyan]';
+const INPUT_CLASS = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:ring-2 focus:ring-[--brand-cyan]';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:ring-red-200';
 const FIELD_ERROR_CLASS = 'mt-1 block text-xs text-red-600';
 

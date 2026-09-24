@@ -35,7 +35,7 @@ export default function GlossaryQuickSearch({ terms }: { terms: GlossaryItem[] }
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search terms..."
-            className="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 text-[15px] shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
+            className="w-full rounded-lg border border-blue-300 bg-white px-4 py-2 text-base shadow-sm focus:ring-2 focus:ring-[--brand-cyan] focus:outline-none"
             aria-label="Search glossary terms"
           />
         </div>
