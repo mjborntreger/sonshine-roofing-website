@@ -170,7 +170,7 @@ const mocks = {
   '@/lib/content/projects': {
     getProjectBySlug: async () => project,
     listProjectSlugs: async () => [project.slug],
-    listRecentProjectsPool: async () => [],
+    listRelatedProjects: async () => [],
   },
   '@/lib/content/project-data': { projectServiceLabel: () => 'Roof Replacement' },
   '@/lib/content/directus-faqs': { listFaqs: async () => [] },
