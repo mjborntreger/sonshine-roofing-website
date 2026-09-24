@@ -24,13 +24,14 @@ type Props = {
   post: PostCard;
   style?: CSSProperties;
   className?: string;
+  imageSizes?: string;
 };
 
 const pillClass =
   "inline-flex min-w-0 max-w-full items-center rounded-full font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-[0.75rem] sm:text-xs text-slate-700 sm:px-3 sm:py-1 sm:text-sm";
 const pillLabelClass = "block max-w-full truncate";
 
-export default function BlogArchiveCard({ post, style, className }: Props) {
+export default function BlogArchiveCard({ post, style, className, imageSizes = "(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw" }: Props) {
   const href = buildBlogPostHref(post.slug) ?? ROUTES.blog;
   const date = post.date ? new Date(post.date) : null;
   const dateLabel = date && !Number.isNaN(date.getTime()) ? dateFormatter.format(date) : "";
@@ -67,7 +68,7 @@ export default function BlogArchiveCard({ post, style, className }: Props) {
                 fill
                 src={post.featuredImage.url}
                 alt={post.featuredImage.altText ?? post.title}
-                sizes="(min-width: 1280px) 33vw, (min-width: 768px) 50vw, 100vw"
+                sizes={imageSizes}
                 className="object-cover transition-transform duration-300 hover:scale-[1.06]"
               />
             ) : (

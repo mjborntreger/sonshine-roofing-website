@@ -1,7 +1,7 @@
 import Section from '@/components/layout/Section';
 import StaticImage from '@/components/media/StaticImage';
 import SmartLink from '@/components/utils/SmartLink';
-import { listRecentPostsPool } from '@/lib/content/blog';
+import { listRelatedPosts } from '@/lib/content/blog';
 import { listFaqs } from '@/lib/content/directus-faqs';
 import FaqInlineList from '@/components/dynamic-content/faq/FaqInlineList';
 import YouMayAlsoLike from '@/components/engagement/YouMayAlsoLike';
@@ -55,7 +55,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Page() {
   const [pool, faqs, nathanImage, settings] = await Promise.all([
-    listRecentPostsPool(36),
+    listRelatedPosts({ categorySlugs: ['roof-inspection'] }),
     listFaqs({ serviceSlug: 'roof-inspection', limit: 8 }).catch(() => []),
     getPersonProfileImage('nathan-borntreger'),
     getSiteSettings(),
@@ -266,8 +266,6 @@ export default async function Page() {
         <div data-toc-exclude>
           <YouMayAlsoLike
             posts={pool}
-            category="roof-inspection"
-            excludeSlug={''}
             heading="Learn More About Roof Inspection Services"
           />
         </div>

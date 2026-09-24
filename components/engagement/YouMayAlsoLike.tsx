@@ -1,5 +1,7 @@
 import BlogArchiveCard from "@/components/dynamic-content/blog/BlogArchiveCard";
 import ProjectArchiveCard from "@/components/dynamic-content/project/ProjectArchiveCard";
+import { CONTENT_PREVIEW_LIMIT } from "@/lib/content/preview-selection";
+import { CONTENT_PREVIEW_GRID_CLASS, CONTENT_PREVIEW_IMAGE_SIZES } from "@/components/dynamic-content/card-utils";
 import type { PostCard } from "@/lib/content/content-types";
 import type { ProjectSummary } from "@/lib/content/project-types";
 import { ArrowRight, Sparkles } from "lucide-react";
@@ -7,36 +9,8 @@ import SmartLink from "@/components/utils/SmartLink";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
 
-// Minimal normalized blog post shape returned by the active blog adapter.
-type BlogPoolItem = {
-  slug: string;
-  title: string;
-  featuredImage?: { url: string; altText?: string | null } | null;
-  categories?: { slug: string; name?: string | null }[] | null;
-  date?: string | null; // ISO string optional; used for stable sorting if present
-  excerpt?: string | null;
-  contentPlain?: string | null;
-};
-
-// Minimal project shape (aligned with ProjectSummary expectations)
-type ProjectPoolItem = {
-  slug: string;
-  title: string;
-  uri?: string | null;
-  date?: string | null;
-  heroImage?: { url: string; altText?: string | null } | null;
-  projectDescription?: string | null;
-  reviewSnippet?: string | null;
-  reviewAuthorName?: string | null;
-  materialTypes?: { slug: string; name?: string | null }[] | null;
-  roofColors?: { slug: string; name?: string | null }[] | null;
-  serviceAreas?: { slug: string; name?: string | null }[] | null;
-};
-
 type BaseProps = {
-  /** Exclude a specific slug (e.g., current entry) */
-  excludeSlug?: string;
-  /** Number of cards to show (default 4) */
+  /** Number of cards to show (default 6) */
   limit?: number;
   /** Optional wrapper className */
   className?: string;
@@ -46,17 +20,15 @@ type BaseProps = {
 
 type BlogVariantProps = BaseProps & {
   variant?: "blog";
-  /** Pool of recent blog posts fetched on the server (topics use the legacy categories shape). */
-  posts: BlogPoolItem[];
-  /** Target category slug to prioritize (e.g., 'roof-repair'). */
-  category?: string;
+  /** Already ranked, deduplicated recommendations from the content adapter. */
+  posts: PostCard[];
 };
 
 type ProjectVariantProps = BaseProps & {
   variant: "project";
-  /** Pool of recent projects fetched on the server (should include serviceAreas). */
-  projects: ProjectPoolItem[];
-  /** Slug(s) of service areas to prioritize (case-insensitive). */
+  /** Already ranked, deduplicated recommendations from the content adapter. */
+  projects: ProjectSummary[];
+  /** Service-area context for the default heading. */
   serviceAreaSlug?: string | string[] | null;
   /** Friendly service-area label for default heading copy. */
   serviceAreaName?: string | null;
@@ -73,164 +45,6 @@ const formatServiceArea = (value: string | null | undefined) => {
     .join(" ");
 };
 
-const toPostCard = (item: BlogPoolItem): PostCard => {
-  const categories = (item.categories ?? [])
-    .map((category) => category?.name ?? category?.slug ?? "")
-    .filter(Boolean);
-
-  return {
-    slug: item.slug,
-    title: item.title,
-    date: item.date ?? "",
-    categories,
-    featuredImage: item.featuredImage?.url
-      ? {
-        url: item.featuredImage.url,
-        altText: item.featuredImage.altText ?? null,
-      }
-      : undefined,
-    excerpt: item.excerpt ?? undefined,
-    contentPlain: item.contentPlain ?? undefined,
-  };
-};
-
-function toProjectSummary(item: ProjectPoolItem): ProjectSummary {
-  const parseYear = () => {
-    if (!item.date) return null;
-    const d = new Date(item.date);
-    return Number.isFinite(d.getFullYear()) ? d.getFullYear() : null;
-  };
-
-  const mapTerms = (terms?: { slug: string; name?: string | null }[] | null) =>
-    (terms ?? [])
-      .map((term) => {
-        const slug = term?.slug ?? "";
-        const name = term?.name ?? term?.slug ?? "";
-        if (!slug && !name) return null;
-        return { slug, name };
-      })
-      .filter((term): term is { slug: string; name: string } => term !== null);
-
-  return {
-    slug: item.slug,
-    uri: item.uri ?? "",
-    title: item.title,
-    year: parseYear(),
-    heroImage: item.heroImage?.url
-      ? {
-        url: item.heroImage.url,
-        altText: item.heroImage.altText ?? item.title,
-      }
-      : null,
-    projectDescription: item.projectDescription ?? null,
-    reviewSnippet: item.reviewSnippet ?? null,
-    reviewAuthorName: item.reviewAuthorName ?? null,
-    materialTypes: mapTerms(item.materialTypes),
-    roofColors: mapTerms(item.roofColors),
-    serviceAreas: mapTerms(item.serviceAreas),
-  };
-}
-
-function selectBlogPosts(
-  posts: BlogPoolItem[],
-  { category, excludeSlug, limit }: { category?: string; excludeSlug?: string; limit: number },
-) {
-  if (!Array.isArray(posts) || posts.length === 0) return [];
-
-  const normalized = posts
-    .filter((post) => post && typeof post.slug === "string" && post.slug !== excludeSlug)
-    .slice();
-
-  normalized.sort((a, b) => {
-    const ad = a.date ? Date.parse(a.date) : 0;
-    const bd = b.date ? Date.parse(b.date) : 0;
-    return bd - ad;
-  });
-
-  const pick: BlogPoolItem[] = [];
-  const seen = new Set<string>();
-
-  const push = (post: BlogPoolItem) => {
-    if (!post.slug || seen.has(post.slug)) return;
-    seen.add(post.slug);
-    pick.push(post);
-  };
-
-  if (category) {
-    const target = category.toLowerCase();
-    for (const post of normalized) {
-      const slugs = (post.categories ?? []).map((c) => (c?.slug || "").toLowerCase());
-      if (slugs.includes(target)) push(post);
-      if (pick.length >= limit) break;
-    }
-  }
-
-  if (pick.length < limit) {
-    for (const post of normalized) {
-      if (pick.length >= limit) break;
-      push(post);
-    }
-  }
-
-  return pick.slice(0, limit);
-}
-
-function selectProjects(
-  projects: ProjectPoolItem[],
-  {
-    serviceAreaSlug,
-    excludeSlug,
-    limit,
-  }: { serviceAreaSlug?: string | string[] | null; excludeSlug?: string; limit: number },
-) {
-  if (!Array.isArray(projects) || projects.length === 0) return [];
-
-  const targetSlugs = (() => {
-    if (!serviceAreaSlug) return null;
-    const source = Array.isArray(serviceAreaSlug) ? serviceAreaSlug : [serviceAreaSlug];
-    const normalized = source
-      .map((slug) => (typeof slug === "string" ? slug.trim().toLowerCase() : ""))
-      .filter(Boolean);
-    return normalized.length ? new Set(normalized) : null;
-  })();
-
-  const normalized = projects
-    .filter((project) => project && typeof project.slug === "string" && project.slug !== excludeSlug)
-    .slice();
-
-  normalized.sort((a, b) => {
-    const ad = a.date ? Date.parse(a.date) : 0;
-    const bd = b.date ? Date.parse(b.date) : 0;
-    return bd - ad;
-  });
-
-  const pick: ProjectPoolItem[] = [];
-  const seen = new Set<string>();
-
-  const push = (project: ProjectPoolItem) => {
-    if (!project.slug || seen.has(project.slug)) return;
-    seen.add(project.slug);
-    pick.push(project);
-  };
-
-  if (targetSlugs) {
-    for (const project of normalized) {
-      const slugs = (project.serviceAreas ?? []).map((area) => (area?.slug || "").toLowerCase());
-      if (slugs.some((slug) => targetSlugs.has(slug))) push(project);
-      if (pick.length >= limit) break;
-    }
-  }
-
-  if (pick.length < limit) {
-    for (const project of normalized) {
-      if (pick.length >= limit) break;
-      push(project);
-    }
-  }
-
-  return pick.slice(0, limit);
-}
-
 const buildProjectHeading = (heading: string | undefined, fallbackName?: string | null, slug?: string | string[] | null) => {
   if (heading && heading.trim()) return heading;
   const preferred = fallbackName?.trim();
@@ -242,15 +56,11 @@ const buildProjectHeading = (heading: string | undefined, fallbackName?: string 
 };
 
 export default function YouMayAlsoLike(props: Props) {
-  const { className, excludeSlug } = props;
-  const limit = props.limit ?? 4;
+  const { className } = props;
+  const limit = Math.max(0, props.limit ?? CONTENT_PREVIEW_LIMIT);
   const baseClassName = ["not-prose px-2", className].filter(Boolean).join(" ");
   if (props.variant === "project") {
-    const projectItems = selectProjects(props.projects, {
-      serviceAreaSlug: props.serviceAreaSlug,
-      excludeSlug,
-      limit,
-    });
+    const projectItems = props.projects.slice(0, limit);
 
     if (!projectItems.length) return null;
 
@@ -277,11 +87,12 @@ export default function YouMayAlsoLike(props: Props) {
           </div>
         </div>
 
-        <div className="grid auto-rows-fr grid-cols-1 gap-6 md:grid-cols-4">
+        <div className={CONTENT_PREVIEW_GRID_CLASS}>
           {projectItems.map((item, index) => (
             <ProjectArchiveCard
               key={item.slug}
-              project={toProjectSummary(item)}
+              project={item}
+              imageSizes={CONTENT_PREVIEW_IMAGE_SIZES}
               className="h-full motion-safe:animate-lp-fade-in"
               style={{ animationDelay: `${index * 60}ms` }}
             />
@@ -291,11 +102,7 @@ export default function YouMayAlsoLike(props: Props) {
     );
   }
 
-  const blogItems = selectBlogPosts(props.posts, {
-    category: props.category,
-    excludeSlug,
-    limit,
-  });
+  const blogItems = props.posts.slice(0, limit);
 
   if (!blogItems.length) return null;
 
@@ -322,11 +129,12 @@ export default function YouMayAlsoLike(props: Props) {
         </div>
       </div>
 
-      <div className="grid auto-rows-fr grid-cols-1 gap-6 md:grid-cols-4">
+      <div className={CONTENT_PREVIEW_GRID_CLASS}>
         {blogItems.map((item, index) => (
           <BlogArchiveCard
             key={item.slug}
-            post={toPostCard(item)}
+            post={item}
+            imageSizes={CONTENT_PREVIEW_IMAGE_SIZES}
             className="h-full motion-safe:animate-lp-fade-in"
             style={{ animationDelay: `${index * 60}ms` }}
           />

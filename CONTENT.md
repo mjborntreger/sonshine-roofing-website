@@ -209,6 +209,21 @@ runtime and two-release acceptance gates.
   and [DEPLOY.md](DEPLOY.md) for deployment and recovery. The unrelated
   `location_landing_pages` scaffold remains outside this model.
 
+## Website preview selection
+
+- Homepage category previews select up to six items per configured topic or
+  material from the complete deployment snapshot, before applying the limit.
+- Blog recommendations rank all shared topics, then publication date, and fill
+  remaining slots with recent articles. They exclude the current article and
+  deduplicate by slug.
+- Project previews prefer nonblank project testimonials, then publication date.
+  Related projects prioritize the same service area before regional backfill;
+  location hubs retain local priority and their separate approved-nearby group.
+  Both reviewed and unreviewed projects can fill the six available slots.
+- These preview rules do not change archive chronology or complete neighborhood
+  project listings. Cards use one column below 768px, two from 768px, and three
+  from 1024px; the six-card limit is the same on mobile.
+
 ## Publishing blog posts in Directus
 
 - Directus is the only frontend blog source. There is no environment-controlled

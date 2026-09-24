@@ -3,6 +3,12 @@ import 'server-only';
 import { join } from 'node:path';
 import { readProjectSnapshot, queryProjectSnapshot, projectSummary } from './project-data';
 import type { ProjectFull, ProjectSnapshot, ProjectsArchiveFilters } from './project-types';
+import {
+  CONTENT_PREVIEW_LIMIT,
+  selectProjectCategoryPreviews,
+  selectRelatedProjectPreviews,
+  type RelatedProjectOptions,
+} from './preview-selection';
 
 export type { ProjectFull, ProjectSummary, ProjectTestimonial, ProjectsArchiveFilters, ProjectSearchResult, TermLite } from './project-types';
 
@@ -34,13 +40,12 @@ export async function listRecentProjectsPool(limit = 24) {
   return deployedProjects().projects.slice(0, limit).map(projectSummary);
 }
 
-export async function listRecentProjectsPoolForFilters(perType = 4, allCount = 8) {
-  const all = deployedProjects().projects;
-  const pool = [
-    ...all.slice(0, allCount),
-    ...['shingle', 'metal', 'tile'].flatMap((slug) => all.filter((project) => project.materialTypes.some((term) => term.slug === slug)).slice(0, perType)),
-  ];
-  return [...new Map(pool.map((project) => [project.slug, project])).values()].map(projectSummary);
+export async function listRecentProjectsPoolForFilters(perType = CONTENT_PREVIEW_LIMIT) {
+  return selectProjectCategoryPreviews(deployedProjects().projects, ['shingle', 'metal', 'tile'], perType).map(projectSummary);
+}
+
+export async function listRelatedProjects(options: RelatedProjectOptions = {}) {
+  return selectRelatedProjectPreviews(deployedProjects().projects, options).map(projectSummary);
 }
 
 export async function listRecentProjectsByServiceArea(serviceAreaSlug: string | string[] | null, limit = 4) {

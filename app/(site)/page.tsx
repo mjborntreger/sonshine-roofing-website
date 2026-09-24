@@ -53,8 +53,8 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     minimum: 4,
   }).catch(() => []);
   const [projects, posts, generalFaqs, sponsorFeatures] = await Promise.all([
-    listRecentProjectsPoolForFilters(4, 8),
-    listRecentPostsPoolForFilters(4, 4).catch(() => []),
+    listRecentProjectsPoolForFilters(),
+    listRecentPostsPoolForFilters().catch(() => []),
     listFaqs({ pagePath: '/', limit: 8 }).catch(() => []),
     sponsorFeaturesPromise,
   ]);
@@ -91,8 +91,8 @@ export default async function Page({ params }: { params: Promise<Params> }) {
       </div>
       <div className={leadFormLayout}>
         <div className="max-w-[1280px] pt-16 mx-auto">
-          <LatestProjectsFilter projects={projects} initial={4} />
-          <LatestPostsFilters posts={posts} initial={4} />
+          <LatestProjectsFilter projects={projects} />
+          <LatestPostsFilters posts={posts} />
         </div>
       </div>
 

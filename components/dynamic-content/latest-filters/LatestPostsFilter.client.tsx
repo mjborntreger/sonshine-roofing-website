@@ -12,6 +12,7 @@ import {
 } from "@/components/dynamic-content/latest-filters/latest-tab-config";
 import { renderHighlight } from "@/components/utils/renderHighlight";
 import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
+import { CONTENT_PREVIEW_GRID_CLASS } from "@/components/dynamic-content/card-utils";
 
 const lessFatCta = "btn btn-ghost btn-sm md:btn-md w-auto";
 
@@ -125,7 +126,7 @@ export default function LatestPostsFilter({
         </div>
       )}
 
-      <div key={selected} className="mt-8 grid min-w-0 grid-cols-1 auto-rows-fr gap-6 sm:grid-cols-2 md:grid-cols-4">
+      <div key={selected} className={`mt-8 ${CONTENT_PREVIEW_GRID_CLASS}`}>
         {active && active.slugs.length > 0
           ? active.slugs.map((slug, index) => {
               const card = cardLookup[slug];

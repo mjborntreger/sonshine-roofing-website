@@ -1,4 +1,5 @@
 import type { GeographicRecord, LocationGroups } from './location-types';
+import { hasProjectReview } from './preview-selection.ts';
 
 export type LocationSelectionOptions = {
   areaId: string;
@@ -23,6 +24,12 @@ function recordSort(record: GeographicRecord): number {
     : Number.POSITIVE_INFINITY;
 }
 
+function projectHasReview(record: GeographicRecord): boolean {
+  if (!('project' in record) || !record.project || typeof record.project !== 'object') return false;
+  const reviewSnippet = 'reviewSnippet' in record.project ? record.project.reviewSnippet : null;
+  return hasProjectReview({ reviewSnippet: typeof reviewSnippet === 'string' ? reviewSnippet : null });
+}
+
 /** Select only published, assigned, same-client records; local results always win duplicates. */
 export function selectLocationContent<T extends GeographicRecord>(
   records: readonly T[],
@@ -38,6 +45,10 @@ export function selectLocationContent<T extends GeographicRecord>(
       (kind !== 'reviews' || ('rating' in record && record.rating === 5)),
   );
   const compare = (left: T, right: T): number => {
+    if (kind === 'projects') {
+      const reviewPriority = Number(projectHasReview(right)) - Number(projectHasReview(left));
+      if (reviewPriority) return reviewPriority;
+    }
     const leftValue = kind === 'sponsors' ? recordSort(left) : recordTime(left);
     const rightValue = kind === 'sponsors' ? recordSort(right) : recordTime(right);
     if (leftValue !== rightValue) {

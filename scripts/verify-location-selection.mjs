@@ -32,6 +32,21 @@ check('nearby fills only remaining capacity', () => {
   const pool = [record('local'), ...Array.from({ length: 9 }, (_, i) => nearby(`nearby-${i}`))];
   assert.deepEqual(ids(selectLocationContent(pool, options)), { local: ['local'], nearby: ['nearby-0', 'nearby-1', 'nearby-2', 'nearby-3', 'nearby-4'] });
 });
+check('project reviews rank within geography and never let nearby reviews outrank local projects', () => {
+  const reviewed = { project: { reviewSnippet: 'Synthetic testimonial' }, date: '2020-01-01' };
+  const pool = [nearby('nearby-plain'), record('local-plain'), nearby('nearby-reviewed', reviewed), record('local-reviewed', reviewed)];
+  assert.deepEqual(ids(selectLocationContent(pool, options)), {
+    local: ['local-reviewed', 'local-plain'], nearby: ['nearby-reviewed', 'nearby-plain'],
+  });
+});
+check('older reviewed local projects are selected before the six-card cap', () => {
+  const pool = [...Array.from({ length: 6 }, (_, i) => record(`local-${i}`)),
+    record('reviewed', { date: '2020-01-01', project: { reviewSnippet: 'Synthetic testimonial' } }),
+    record('blank', { date: '2019-01-01', project: { reviewSnippet: '   ' } })];
+  assert.deepEqual(ids(selectLocationContent(pool, options)), {
+    local: ['reviewed', 'local-0', 'local-1', 'local-2', 'local-3', 'local-4'], nearby: [],
+  });
+});
 check('dated records precede missing/invalid dates and ties use canonical ID', () => {
   const pool = [record('z', { date: null }), record('b'), record('a'), record('c', { date: 'invalid' }), record('d', { date: '' })];
   assert.deepEqual(ids(selectLocationContent(pool, options)).local, ['a', 'b', 'c', 'd', 'z']);

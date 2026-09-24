@@ -30,6 +30,7 @@
     "verify:request-body-limits": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-request-body-limits.mjs",
     "verify:project-pipeline": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-project-pipeline.mjs",
     "verify:archive-controls": "node scripts/verify-archive-controls.mjs",
+    "verify:content-previews": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-content-previews.mjs",
     "verify:video-playback": "node scripts/verify-video-playback.mjs",
     "verify:video-pipeline": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types ./scripts/verify-video-pipeline.mjs",
     "verify:location-selection": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-location-selection.mjs",

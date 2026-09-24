@@ -3,6 +3,8 @@ import LatestProjectsFilterClient from "./LatestProjectsFilter.client";
 import ProjectArchiveCard from "@/components/dynamic-content/project/ProjectArchiveCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ProjectSummary } from "@/lib/content/project-types";
+import { CONTENT_PREVIEW_LIMIT } from "@/lib/content/preview-selection";
+import { CONTENT_PREVIEW_IMAGE_SIZES } from "@/components/dynamic-content/card-utils";
 import {
   PROJECT_TAB_CONFIG,
   type MaterialKey,
@@ -36,6 +38,7 @@ function buildCardLookup(projects: ProjectSummary[]): CardLookup {
       <ProjectArchiveCard
         key={project.slug}
         project={project}
+        imageSizes={CONTENT_PREVIEW_IMAGE_SIZES}
       />
     );
     return acc;
@@ -72,7 +75,7 @@ function buildEmptyState(): ReactNode {
   );
 }
 
-export default function LatestProjectsFilter({ projects, initial = 4, showHeader = true }: Props) {
+export default function LatestProjectsFilter({ projects, initial = CONTENT_PREVIEW_LIMIT, showHeader = true }: Props) {
   const groups = groupProjectsByMaterial(projects ?? []);
   const tabs = buildTabs(groups, initial);
   const cardLookup = buildCardLookup(projects ?? []);

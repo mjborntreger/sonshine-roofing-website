@@ -38,6 +38,8 @@ jobs:
         run: npm run verify:tailwind-utilities
       - name: Verify archive controls
         run: npm run verify:archive-controls
+      - name: Verify content preview selection
+        run: npm run verify:content-previews
       - name: Verify video playback
         run: npm run verify:video-playback
       - name: Verify Directus HTML

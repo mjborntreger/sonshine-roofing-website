@@ -3,6 +3,7 @@ import { CalendarDays, HandCoins, ShieldCheck } from 'lucide-react';
 import LandingHero from '@/components/marketing/landing-page/LandingHero';
 import InitialNavigation from '@/components/lead-capture/lead-form/InitialNavigation';
 import ProjectArchiveCard from '@/components/dynamic-content/project/ProjectArchiveCard';
+import { CONTENT_PREVIEW_IMAGE_SIZES } from '@/components/dynamic-content/card-utils';
 import ProjectVideo from '@/components/dynamic-content/project/ProjectVideo';
 import FaqInlineListClient from '@/components/dynamic-content/faq/FaqInlineListClient';
 import ServiceAreaSection from '@/components/location/ServiceAreaSection';
@@ -49,7 +50,7 @@ function ProjectCards({ projects }: { projects: LocationProject[] }) {
     <div className="grid items-start gap-8 md:grid-cols-2 lg:grid-cols-3">
       {projects.map(({ id, project }) => (
         <article key={id} className="space-y-4">
-          <ProjectArchiveCard project={project} />
+          <ProjectArchiveCard project={project} imageSizes={CONTENT_PREVIEW_IMAGE_SIZES} />
           {project.neighborhood?.name.trim() ? (
             <p className="px-2 text-sm text-slate-600" data-project-neighborhood>
               <span className="font-semibold">Neighborhood: </span>{project.neighborhood.name}

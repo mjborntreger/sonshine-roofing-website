@@ -5,7 +5,7 @@ import { listFaqs } from "@/lib/content/directus-faqs";
 import SmartLink from "@/components/utils/SmartLink";
 import Section from "@/components/layout/Section";
 import { notFound } from "next/navigation";
-import { getProjectBySlug, listProjectSlugs, listRecentProjectsPool } from "@/lib/content/projects";
+import { getProjectBySlug, listProjectSlugs, listRelatedProjects } from "@/lib/content/projects";
 import { projectServiceLabel } from "@/lib/content/project-data";
 import ProjectVideo from "@/components/dynamic-content/project/ProjectVideo";
 import YouMayAlsoLike from "@/components/engagement/YouMayAlsoLike";
@@ -90,7 +90,6 @@ const Badge = ({ children }: { children: React.ReactNode }) => (
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const projectPromise = getProjectBySlug(slug);
-  const projectPoolPromise = listRecentProjectsPool(36);
   const faqsPromise = listFaqs({
     pagePath: "/roof-replacement-sarasota-fl",
     limit: 8,
@@ -100,10 +99,13 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
   if (!project) notFound();
 
-  const [projectPool, faqs] = await Promise.all([projectPoolPromise, faqsPromise]);
   const serviceAreaSlugs = (project.serviceAreas ?? [])
     .map((term) => term?.slug)
     .filter((value): value is string => typeof value === "string" && value.length > 0);
+  const [projectPool, faqs] = await Promise.all([
+    listRelatedProjects({ serviceAreaSlugs, excludeSlug: project.slug }),
+    faqsPromise,
+  ]);
   const primaryServiceAreaName =
     project.serviceAreas && project.serviceAreas.length > 0
       ? project.serviceAreas[0]?.name ?? null
@@ -353,7 +355,6 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           projects={projectPool}
           serviceAreaSlug={serviceAreaSlugs}
           serviceAreaName={primaryServiceAreaName}
-          excludeSlug={project.slug}
         />
 
         <FaqInlineList

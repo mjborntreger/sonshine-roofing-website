@@ -18,13 +18,14 @@ type Props = {
   project: ProjectSummary;
   style?: CSSProperties;
   className?: string;
+  imageSizes?: string;
 };
 
 const pillClass =
   "inline-flex min-w-0 max-w-full items-center rounded-xl font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-sm text-slate-600 sm:px-3 sm:py-1 sm:text-sm";
 const pillLabelClass = "block max-w-[14rem] truncate";
 
-export default function ProjectArchiveCard({ project, style, className }: Props) {
+export default function ProjectArchiveCard({ project, style, className, imageSizes = "(min-width: 1024px) 50vw, 100vw" }: Props) {
   const href =
     buildProjectHref(project.slug) ??
     buildProjectHrefFromUri(project.uri) ??
@@ -48,15 +49,15 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
   const hasReview = typeof project.reviewSnippet === "string" && project.reviewSnippet.trim().length > 0;
 
   return (
-    <div className={cn("h-full", className)} style={style}>
+    <div className={cn("h-full min-w-0", className)} style={style}>
       <SmartLink
         href={href}
-        className="block h-full rounded-3xl bg-amber-50/50 group focus-visible:outline-none"
+        className="block h-full min-w-0 rounded-3xl bg-amber-50/50 group focus-visible:outline-none"
         data-icon-affordance="right"
       >
         <Card
           className={cn(
-            "proj-card flex h-full flex-col overflow-hidden transition hover:shadow-lg",
+            "proj-card flex h-full min-w-0 flex-col overflow-hidden transition hover:shadow-lg",
             PROJECT_PREVIEW_CARD_MIN_HEIGHT_CLASS,
           )}
         >
@@ -75,7 +76,7 @@ export default function ProjectArchiveCard({ project, style, className }: Props)
                 fill
                 src={project.heroImage.url}
                 alt={project.heroImage.altText ?? project.title}
-                sizes="(min-width: 1024px) 50vw, 100vw"
+                sizes={imageSizes}
                 className="object-cover transition-transform duration-300 hover:scale-[1.06]"
               />
             ) : (

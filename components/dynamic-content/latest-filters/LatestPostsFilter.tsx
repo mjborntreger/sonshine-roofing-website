@@ -3,6 +3,8 @@ import LatestPostsFilterClient from "./LatestPostsFilter.client";
 import BlogArchiveCard from "@/components/dynamic-content/blog/BlogArchiveCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PostCard } from "@/lib/content/content-types";
+import { CONTENT_PREVIEW_LIMIT } from "@/lib/content/preview-selection";
+import { CONTENT_PREVIEW_IMAGE_SIZES } from "@/components/dynamic-content/card-utils";
 import {
   POST_TAB_CONFIG,
   type CategoryKey,
@@ -37,6 +39,7 @@ function buildCardLookup(posts: PostCard[]): CardLookup {
       <BlogArchiveCard
         key={post.slug}
         post={post}
+        imageSizes={CONTENT_PREVIEW_IMAGE_SIZES}
       />
     );
     return acc;
@@ -70,7 +73,7 @@ function buildEmptyState(): ReactNode {
   );
 }
 
-export default function LatestPostsFilter({ posts, initial = 4, showHeader = true }: Props) {
+export default function LatestPostsFilter({ posts, initial = CONTENT_PREVIEW_LIMIT, showHeader = true }: Props) {
   const groups = groupPostsByCategory(posts ?? []);
   const tabs = buildTabs(groups, initial);
   const cardLookup = buildCardLookup(posts ?? []);

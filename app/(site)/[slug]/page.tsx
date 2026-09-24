@@ -4,7 +4,7 @@ import {
   getPostBySlug,
   listPostSlugs,
   listRecentPostNav,
-  listRecentPostsPool,
+  listRelatedPosts,
 } from '@/lib/content/blog';
 import { listFaqs } from '@/lib/content/directus-faqs';
 import FaqInlineList from '@/components/dynamic-content/faq/FaqInlineList';
@@ -224,21 +224,22 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const { slug } = await params;
   if (slug.startsWith('_')) notFound();
   const postPromise = getPostBySlug(slug);
-  const poolPromise = listRecentPostsPool(36);
   const generalFaqsPromise = listFaqs({ limit: 8 }).catch(() => []);
   const navPromise = listRecentPostNav().catch(
     () => [] as Awaited<ReturnType<typeof listRecentPostNav>>,
   );
-  const [post, pool, generalFaqs, all] = await Promise.all([
+  const [post, generalFaqs, all] = await Promise.all([
     postPromise,
-    poolPromise,
     generalFaqsPromise,
     navPromise,
   ]);
 
   if (!post) notFound();
 
-  const primaryCategorySlug = post.categoryTerms?.find((term) => term.slug)?.slug;
+  const pool = await listRelatedPosts({
+    categorySlugs: post.categoryTerms?.map((term) => term.slug),
+    excludeSlug: post.slug,
+  });
 
   const origin = SITE_ORIGIN;
   const shareUrl = `${origin}/${slug}`;
@@ -392,7 +393,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </nav>
         )}
 
-        <YouMayAlsoLike posts={pool} category={primaryCategorySlug} excludeSlug={post.slug} />
+        <YouMayAlsoLike posts={pool} />
 
         <FaqInlineList
           heading="General FAQs"

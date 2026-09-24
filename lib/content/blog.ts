@@ -8,6 +8,12 @@ import type {
 export type { BlogSitemapEntry, BlogImageSitemapEntry } from './editorial-types';
 import type { PageResult } from '@/lib/ui/pagination';
 import { stripHtml } from './html-text';
+import {
+  CONTENT_PREVIEW_LIMIT,
+  selectPostCategoryPreviews,
+  selectRelatedPostPreviews,
+  type RelatedPostOptions,
+} from './preview-selection';
 import type {
   FacetGroup,
   Post,
@@ -157,33 +163,14 @@ export async function listRecentPosts(limit = 12): Promise<PostCard[]> {
 }
 
 export async function listRecentPostsPoolForFilters(
-  perType = 4,
-  allCount = 4,
-  fetchCap = 60,
+  perType = CONTENT_PREVIEW_LIMIT,
   topicSlugs: string[] = ['roof-repair', 'hurricane-preparation', 'energy-efficient-roofing'],
 ): Promise<PostCard[]> {
-  const batchSize = Math.max(fetchCap, allCount + perType * topicSlugs.length * 2);
-  const recent = await listRecentPosts(batchSize);
-  const pool: PostCard[] = [];
-  const seen = new Set<string>();
-  const append = (posts: PostCard[]) => {
-    for (const post of posts) {
-      if (seen.has(post.slug)) continue;
-      seen.add(post.slug);
-      pool.push(post);
-    }
-  };
+  return selectPostCategoryPreviews(await listDirectusPosts(), topicSlugs, perType).map(toPostCard);
+}
 
-  append(recent.slice(0, allCount));
-  for (const topicSlug of topicSlugs) {
-    append(
-      recent
-        .filter((post) => post.categoryTerms?.some((topic) => topic.slug === topicSlug))
-        .slice(0, perType),
-    );
-  }
-
-  return pool;
+export async function listRelatedPosts(options: RelatedPostOptions = {}): Promise<PostCard[]> {
+  return selectRelatedPostPreviews(await listDirectusPosts(), options).map(toPostCard);
 }
 
 export async function listRecentPostsPool(limit = 36): Promise<PostLite[]> {
