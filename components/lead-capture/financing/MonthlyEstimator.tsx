@@ -23,7 +23,8 @@ import {
 } from 'lucide-react';
 import ProjectTestimonial from '@/components/dynamic-content/project/ProjectTestimonial';
 import Turnstile from '@/components/lead-capture/Turnstile';
-import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
+import LeadFormEnding from '@/components/lead-capture/shared/LeadFormEnding';
+import { useLeadFormErrorFocus } from '@/components/lead-capture/shared/useLeadFormErrorFocus';
 import {
   FINANCING_PRESETS,
   FINANCING_PROGRAMS,
@@ -417,6 +418,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
   const [submission, setSubmission] = useState<SubmissionState>('idle');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const { formRef, focusErrors } = useLeadFormErrorFocus();
   const [unlocked, setUnlocked] = useState(false);
   const [calculatorAmount, setCalculatorAmount] = useState(defaultAmount);
   const [submittedAmount, setSubmittedAmount] = useState<number | null>(null);
@@ -695,6 +697,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     if (step < totalQuizQuestions) {
       if (quizAnswers[step] == null) {
         setGlobalError('Select an option to continue.');
+        focusErrors();
         return;
       }
       setStep(step + 1);
@@ -713,6 +716,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     const stepErrors = validateFormStep(step);
     if (Object.keys(stepErrors).length) {
       setErrors(stepErrors);
+      setGlobalError('Please complete the highlighted fields.');
+      focusErrors();
       return;
     }
 
@@ -797,6 +802,8 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     const finalErrors = validateFormStep(thirdFormStepIndex);
     if (Object.keys(finalErrors).length) {
       setErrors(finalErrors);
+      setGlobalError('Please complete the highlighted fields.');
+      focusErrors();
       setStep(thirdFormStepIndex);
       return;
     }
@@ -814,6 +821,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     const honeypot = String(fd.get('company') || '');
 
     if (!cfToken) {
+      focusErrors();
       setErrors({});
       setGlobalError('Please complete the verification.');
       return;
@@ -876,6 +884,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
 
     setSubmission('submitting');
     setGlobalError(null);
+    setErrors({});
 
     const result = await submitLead(payload, {
       gtmEvent: { event: 'financing_calculator_submit', form: 'monthly_estimator' },
@@ -884,6 +893,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     });
 
     if (!result.ok) {
+      focusErrors();
       setSubmission('error');
       setGlobalError(friendlyError(result.error));
       if (result.fieldErrors) {
@@ -1236,38 +1246,73 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
             Digits only, US numbers. Example: {formatPhoneExample(formValues.phone)}
           </p>
         </div>
-        <SmsConsentFields
-          smsProjectConsent={formValues.smsProjectConsent}
-          smsMarketingConsent={formValues.smsMarketingConsent}
-          onChange={(field, value) => {
-            setFormValues((prev) => ({ ...prev, [field]: value }));
-            if (errors[field]) {
-              setErrors((prev) => {
-                const next = { ...prev };
-                delete next[field];
-                return next;
-              });
-            }
-          }}
-          errors={{
-            smsProjectConsent: errors.smsProjectConsent,
-            smsMarketingConsent: errors.smsMarketingConsent,
-          }}
-        />
-        <p className="mt-3 text-xs italic text-slate-500">
-          Quick verification keeps spam away. It never impacts your credit.
-        </p>
-        <div className="pt-2">
-          <Turnstile className="pt-1" />
-        </div>
       </div>
     );
   };
 
+  const errorFeedback = globalError ? (
+    <div
+      className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm"
+      role="alert"
+      tabIndex={-1}
+    >
+      {globalError}
+    </div>
+  ) : null;
+
+  const stepControls = (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 shadow-sm">
+      <button
+        type="button"
+        onClick={step > 0 ? handleBack : undefined}
+        className={`inline-flex items-center gap-1 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue] ${step === 0 ? 'cursor-not-allowed opacity-60' : ''}`}
+        disabled={step === 0}
+        data-icon-affordance="left"
+      >
+        <Undo2
+          className={`icon-affordance h-4 w-4 ${step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}`}
+          aria-hidden="true"
+        />
+        <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>
+          Back
+        </span>
+      </button>
+
+      <div className="px-1 flex-1 text-center italic text-sm text-slate-500">
+        Since 1987, we&apos;ve got you covered.
+      </div>
+
+      {step < thirdFormStepIndex ? (
+        <button
+          type="button"
+          onClick={handleNext}
+          className="btn btn-brand-blue btn-md inline-flex items-center gap-2"
+          disabled={nextDisabled}
+          data-icon-affordance="right"
+        >
+          Next
+          <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+        </button>
+      ) : (
+        <button
+          type="submit"
+          className="btn btn-brand-orange btn-md inline-flex items-center gap-2"
+          disabled={submission === 'submitting'}
+          data-icon-affordance={submission === 'submitting' ? undefined : 'right'}
+        >
+          {submission === 'submitting' ? 'Sending…' : 'Show my results'}
+          {submission !== 'submitting' && (
+            <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
+          )}
+        </button>
+      )}
+    </div>
+  );
+
   if (!unlocked || !showCalculator) {
     return (
       <div id="estimator" className={gradientShell}>
-        <form onSubmit={handleSubmit} noValidate className={innerPanelLocked}>
+        <form ref={formRef} onSubmit={handleSubmit} noValidate className={innerPanelLocked}>
           <span className="sr-only" aria-live="polite">
             {liveStatus}
           </span>
@@ -1351,61 +1396,44 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                   </AnimatePresence>
                 </LayoutGroup>
 
-                {globalError && (
-                  <div
-                    className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 shadow-sm"
-                    role="alert"
-                  >
-                    {globalError}
-                  </div>
+                {step === thirdFormStepIndex ? (
+                  <LeadFormEnding
+                    verification={
+                      <div>
+                        <p className="text-xs italic text-slate-500">
+                          Quick verification keeps spam away. It never impacts your credit.
+                        </p>
+                        <Turnstile className="pt-3" />
+                      </div>
+                    }
+                    feedback={errorFeedback}
+                    actions={stepControls}
+                    consent={{
+                      smsProjectConsent: formValues.smsProjectConsent,
+                      smsMarketingConsent: formValues.smsMarketingConsent,
+                      onChange: (field, value) => {
+                        setFormValues((prev) => ({ ...prev, [field]: value }));
+                        if (errors[field]) {
+                          setErrors((prev) => {
+                            const next = { ...prev };
+                            delete next[field];
+                            return next;
+                          });
+                        }
+                        if (globalError) setGlobalError(null);
+                      },
+                      errors: {
+                        smsProjectConsent: errors.smsProjectConsent,
+                        smsMarketingConsent: errors.smsMarketingConsent,
+                      },
+                    }}
+                  />
+                ) : (
+                  <>
+                    {errorFeedback}
+                    {stepControls}
+                  </>
                 )}
-
-                <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-100/70 bg-white/80 px-4 py-3 shadow-sm">
-                  <button
-                    type="button"
-                    onClick={step > 0 ? handleBack : undefined}
-                    className={`inline-flex items-center gap-1 text-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue] ${step === 0 ? 'cursor-not-allowed opacity-60' : ''}`}
-                    disabled={step === 0}
-                    data-icon-affordance="left"
-                  >
-                    <Undo2
-                      className={`icon-affordance h-4 w-4 ${step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}`}
-                      aria-hidden="true"
-                    />
-                    <span className={step === 0 ? 'text-slate-400' : 'text-[--brand-blue]'}>
-                      Back
-                    </span>
-                  </button>
-
-                  <div className="px-1 flex-1 text-center italic text-sm text-slate-500">
-                    Since 1987, we&apos;ve got you covered.
-                  </div>
-
-                  {step < thirdFormStepIndex ? (
-                    <button
-                      type="button"
-                      onClick={handleNext}
-                      className="btn btn-brand-blue btn-md inline-flex items-center gap-2"
-                      disabled={nextDisabled}
-                      data-icon-affordance="right"
-                    >
-                      Next
-                      <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
-                    </button>
-                  ) : (
-                    <button
-                      type="submit"
-                      className="btn btn-brand-orange btn-md inline-flex items-center gap-2"
-                      disabled={submission === 'submitting'}
-                      data-icon-affordance={submission === 'submitting' ? undefined : 'right'}
-                    >
-                      {submission === 'submitting' ? 'Sending…' : 'Show my results'}
-                      {submission !== 'submitting' && (
-                        <ArrowRight className="icon-affordance h-4 w-4" aria-hidden="true" />
-                      )}
-                    </button>
-                  )}
-                </div>
 
                 <div className="lg:hidden">
                   <ProjectTestimonial

@@ -4,7 +4,8 @@ import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 're
 import { useSearchParams } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import Turnstile from '@/components/lead-capture/Turnstile';
-import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
+import LeadFormEnding from '@/components/lead-capture/shared/LeadFormEnding';
+import { useLeadFormErrorFocus } from '@/components/lead-capture/shared/useLeadFormErrorFocus';
 import { Button } from '@/components/ui/button';
 import {
   buildN8nLeadPayload,
@@ -107,9 +108,7 @@ export default function SpecialOfferForm({
   const [submission, setSubmission] = useState<Submission>('idle');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const errorRef = useRef<HTMLDivElement>(null);
-  const pendingErrorFocus = useRef(false);
+  const { formRef, focusErrors } = useLeadFormErrorFocus();
   const viewed = useRef(false);
   const started = useRef(false);
 
@@ -123,7 +122,7 @@ export default function SpecialOfferForm({
     errorType: 'validation' | 'verification' | 'submission' | 'expired',
     errors: Record<string, string> = {},
   ) => {
-    pendingErrorFocus.current = true;
+    focusErrors();
     // Field names are an allowlist; messages and entered values never enter analytics.
     const errorFields = Object.keys(values).filter((field) => Object.hasOwn(errors, field));
     pushToDataLayer({
@@ -148,19 +147,7 @@ export default function SpecialOfferForm({
     );
     observer.observe(form);
     return () => observer.disconnect();
-  }, [offerSlug]);
-
-  useEffect(() => {
-    if (!pendingErrorFocus.current || (!Object.keys(fieldErrors).length && !globalError)) return;
-    pendingErrorFocus.current = false;
-    const invalid = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]');
-    const target = invalid?.matches('input')
-      ? invalid
-      : invalid?.querySelector<HTMLInputElement>('input');
-    const focusTarget = target ?? errorRef.current;
-    focusTarget?.focus({ preventScroll: true });
-    focusTarget?.scrollIntoView({ block: 'center', behavior: 'instant' });
-  }, [fieldErrors, globalError]);
+  }, [offerSlug, formRef]);
 
   const resetErrors = () => {
     setFieldErrors({});
@@ -232,6 +219,7 @@ export default function SpecialOfferForm({
     if (Object.keys(errors).length) {
       reportError('validation', errors);
       setFieldErrors(errors);
+      setGlobalError('Please complete the highlighted fields.');
       return;
     }
 
@@ -418,56 +406,56 @@ export default function SpecialOfferForm({
           </p>
         </label>
 
-        <SmsConsentFields
-          disclosureMode="shared"
-          sectionIntro="Choose Yes or No for each option. You can receive your coupon with either choice."
-          smsProjectConsent={values.smsProjectConsent}
-          smsMarketingConsent={values.smsMarketingConsent}
-          onChange={(field, value) => {
-            setValues((prev) => ({ ...prev, [field]: value }));
-            if (fieldErrors[field]) {
-              setFieldErrors((prev) => {
-                const clone = { ...prev };
-                delete clone[field];
-                return clone;
-              });
-            }
-            if (globalError) setGlobalError(null);
-          }}
-          errors={{
-            smsProjectConsent: fieldErrors.smsProjectConsent,
-            smsMarketingConsent: fieldErrors.smsMarketingConsent,
+        <LeadFormEnding
+          verification={<Turnstile className="pt-1" />}
+          feedback={
+            globalError && (
+              <div
+                role="alert"
+                tabIndex={-1}
+                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
+              >
+                {globalError}
+              </div>
+            )
+          }
+          actions={
+            <Button
+              type="submit"
+              variant="brandOrange"
+              size="xl"
+              className="w-full justify-center"
+              data-icon-affordance="right"
+              disabled={submission === 'submitting'}
+            >
+              {submission === 'submitting' ? 'Sending…' : 'Email Me My Coupon'}
+              {submission !== 'submitting' ? (
+                <ArrowRight className="icon-affordance ml-2 h-4 w-4" aria-hidden="true" />
+              ) : null}
+            </Button>
+          }
+          consent={{
+            disclosureMode: 'shared',
+            sectionIntro: 'Choose Yes or No for each option. You can receive your coupon with either choice.',
+            smsProjectConsent: values.smsProjectConsent,
+            smsMarketingConsent: values.smsMarketingConsent,
+            onChange: (field, value) => {
+              setValues((prev) => ({ ...prev, [field]: value }));
+              if (fieldErrors[field]) {
+                setFieldErrors((prev) => {
+                  const clone = { ...prev };
+                  delete clone[field];
+                  return clone;
+                });
+              }
+              if (globalError) setGlobalError(null);
+            },
+            errors: {
+              smsProjectConsent: fieldErrors.smsProjectConsent,
+              smsMarketingConsent: fieldErrors.smsMarketingConsent,
+            },
           }}
         />
-
-        <div className="pt-2">
-          <Turnstile className="pt-1" />
-        </div>
-
-        {globalError && (
-          <div
-            ref={errorRef}
-            role="alert"
-            tabIndex={-1}
-            className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700"
-          >
-            {globalError}
-          </div>
-        )}
-
-        <Button
-          type="submit"
-          variant="brandOrange"
-          size="xl"
-          className="w-full justify-center"
-          data-icon-affordance="right"
-          disabled={submission === 'submitting'}
-        >
-          {submission === 'submitting' ? 'Sending…' : 'Email Me My Coupon'}
-          {submission !== 'submitting' ? (
-            <ArrowRight className="icon-affordance ml-2 h-4 w-4" aria-hidden="true" />
-          ) : null}
-        </Button>
       </form>
     </div>
   );

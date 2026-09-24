@@ -34,7 +34,8 @@ import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import { useSiteSettings } from '@/lib/content/site-settings-context';
 import { renderHighlight } from '@/components/utils/renderHighlight';
-import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
+import LeadFormEnding from '@/components/lead-capture/shared/LeadFormEnding';
+import { useLeadFormErrorFocus } from '@/components/lead-capture/shared/useLeadFormErrorFocus';
 
 // STYLES
 const INPUT_BASE_CLASS =
@@ -159,6 +160,7 @@ export default function EvenSimplerLeadForm({
   const [form, setForm] = useState<FormState>(() => buildInitialState(initialProjectType));
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const { formRef, focusErrors } = useLeadFormErrorFocus();
   const [status, setStatus] = useState<Status>('idle');
   const [successMeta, setSuccessMeta] = useState<SuccessMeta | null>(null);
 
@@ -178,6 +180,7 @@ export default function EvenSimplerLeadForm({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (status === 'submitting') return;
+    setErrors({});
 
     const validation: Record<string, string> = {};
     const identityErrors = validateContactIdentityDraft(
@@ -204,8 +207,9 @@ export default function EvenSimplerLeadForm({
     Object.assign(validation, identityErrors, addressErrors, smsErrors);
 
     if (Object.keys(validation).length) {
+      focusErrors();
       setErrors(validation);
-      setGlobalError('Please double-check your contact details (highlighted fields).');
+      setGlobalError('Please complete the highlighted fields.');
       return;
     }
 
@@ -214,6 +218,7 @@ export default function EvenSimplerLeadForm({
     const honeypot = String(formData.get('company') || '');
 
     if (!cfToken) {
+      focusErrors();
       setErrors((prev) => ({ ...prev, cfToken: 'Verification required.' }));
       setGlobalError('Please complete the verification to continue.');
       return;
@@ -283,6 +288,7 @@ export default function EvenSimplerLeadForm({
     });
 
     if (!result.ok) {
+      focusErrors();
       if (process.env.NODE_ENV !== 'production') {
         console.error('Lead submission failed', result);
       }
@@ -334,7 +340,7 @@ export default function EvenSimplerLeadForm({
   return (
     <>
       <div id="book-an-appointment" className="h-0" aria-hidden="true" />
-      <form className="not-prose" onSubmit={handleSubmit} noValidate>
+      <form ref={formRef} className="not-prose" onSubmit={handleSubmit} noValidate>
         {/* SECRET CIA HONEYPOT */}
         <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
         {/* OK, BACK TO THE SHOW */}
@@ -352,7 +358,7 @@ export default function EvenSimplerLeadForm({
 
           <div className="p-4 sm:p-6">
             {globalError && (
-              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div role="alert" tabIndex={-1} className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {globalError}
               </div>
             )}
@@ -365,6 +371,8 @@ export default function EvenSimplerLeadForm({
                     <input
                       type="text"
                       name="firstName"
+                      aria-invalid={Boolean(errors.firstName)}
+                      aria-describedby={errors.firstName ? 'firstName-error' : undefined}
                       autoComplete="given-name"
                       value={form.firstName}
                       onChange={(event) => setField('firstName', event.target.value)}
@@ -372,7 +380,7 @@ export default function EvenSimplerLeadForm({
                       placeholder="First Name"
                     />
                     {errors.firstName && (
-                      <span className="mt-1 text-xs text-red-600">{errors.firstName}</span>
+                      <span id="firstName-error" className="mt-1 text-xs text-red-600">{errors.firstName}</span>
                     )}
                   </label>
                   <label className="block font-medium text-slate-700">
@@ -380,6 +388,8 @@ export default function EvenSimplerLeadForm({
                     <input
                       type="text"
                       name="lastName"
+                      aria-invalid={Boolean(errors.lastName)}
+                      aria-describedby={errors.lastName ? 'lastName-error' : undefined}
                       autoComplete="family-name"
                       value={form.lastName}
                       onChange={(event) => setField('lastName', event.target.value)}
@@ -387,7 +397,7 @@ export default function EvenSimplerLeadForm({
                       placeholder="Last Name"
                     />
                     {errors.lastName && (
-                      <span className="mt-1 text-xs text-red-600">{errors.lastName}</span>
+                      <span id="lastName-error" className="mt-1 text-xs text-red-600">{errors.lastName}</span>
                     )}
                   </label>
                 </div>
@@ -398,6 +408,8 @@ export default function EvenSimplerLeadForm({
                     <input
                       type="email"
                       name="email"
+                      aria-invalid={Boolean(errors.email)}
+                      aria-describedby={errors.email ? 'email-error' : undefined}
                       autoComplete="email"
                       value={form.email}
                       onChange={(event) => setField('email', event.target.value)}
@@ -405,7 +417,7 @@ export default function EvenSimplerLeadForm({
                       placeholder="example@domain.com"
                     />
                     {errors.email && (
-                      <span className="mt-1 text-xs text-red-600">{errors.email}</span>
+                      <span id="email-error" className="mt-1 text-xs text-red-600">{errors.email}</span>
                     )}
                   </label>
                   <label className="block font-medium text-slate-700">
@@ -413,6 +425,8 @@ export default function EvenSimplerLeadForm({
                     <input
                       type="tel"
                       name="phone"
+                      aria-invalid={Boolean(errors.phone)}
+                      aria-describedby={errors.phone ? 'phone-error' : undefined}
                       autoComplete="tel"
                       value={form.phone}
                       onChange={(event) =>
@@ -423,7 +437,7 @@ export default function EvenSimplerLeadForm({
                       placeholder={`Example: ${formatPhoneExample(form.phone)}`}
                     />
                     {errors.phone && (
-                      <span className="mt-1 text-xs text-red-600">{errors.phone}</span>
+                      <span id="phone-error" className="mt-1 text-xs text-red-600">{errors.phone}</span>
                     )}
                   </label>
                 </section>
@@ -434,6 +448,8 @@ export default function EvenSimplerLeadForm({
                     <input
                       type="text"
                       name="address1"
+                      aria-invalid={Boolean(errors.address1)}
+                      aria-describedby={errors.address1 ? 'address1-error' : undefined}
                       autoComplete="address-line1"
                       value={form.address1}
                       onChange={(event) => setField('address1', event.target.value)}
@@ -441,7 +457,7 @@ export default function EvenSimplerLeadForm({
                       placeholder="123 Sesame St."
                     />
                     {errors.address1 && (
-                      <span className="mt-1 text-xs text-red-600">{errors.address1}</span>
+                      <span id="address1-error" className="mt-1 text-xs text-red-600">{errors.address1}</span>
                     )}
                   </label>
                   <label className="block text-slate-500">
@@ -462,6 +478,8 @@ export default function EvenSimplerLeadForm({
                     <input
                       type="text"
                       name="city"
+                      aria-invalid={Boolean(errors.city)}
+                      aria-describedby={errors.city ? 'city-error' : undefined}
                       autoComplete="address-level2"
                       value={form.city}
                       onChange={(event) => setField('city', event.target.value)}
@@ -469,7 +487,7 @@ export default function EvenSimplerLeadForm({
                       placeholder="City"
                     />
                     {errors.city && (
-                      <span className="mt-1 text-xs text-red-600">{errors.city}</span>
+                      <span id="city-error" className="mt-1 text-xs text-red-600">{errors.city}</span>
                     )}
                   </label>
                   <label className="block font-medium text-slate-700">
@@ -477,6 +495,8 @@ export default function EvenSimplerLeadForm({
                     <input
                       type="text"
                       name="state"
+                      aria-invalid={Boolean(errors.state)}
+                      aria-describedby={errors.state ? 'state-error' : undefined}
                       autoComplete="address-level1"
                       value={form.state}
                       onChange={(event) => setField('state', normalizeState(event.target.value))}
@@ -484,7 +504,7 @@ export default function EvenSimplerLeadForm({
                       maxLength={2}
                     />
                     {errors.state && (
-                      <span className="mt-1 text-xs text-red-600">{errors.state}</span>
+                      <span id="state-error" className="mt-1 text-xs text-red-600">{errors.state}</span>
                     )}
                   </label>
                   <label className="block font-medium text-slate-700">
@@ -492,6 +512,8 @@ export default function EvenSimplerLeadForm({
                     <input
                       type="text"
                       name="zip"
+                      aria-invalid={Boolean(errors.zip)}
+                      aria-describedby={errors.zip ? 'zip-error' : undefined}
                       autoComplete="postal-code"
                       value={form.zip}
                       onChange={(event) => setField('zip', normalizeZip(event.target.value))}
@@ -500,7 +522,7 @@ export default function EvenSimplerLeadForm({
                       maxLength={10}
                       placeholder="ZIP"
                     />
-                    {errors.zip && <span className="mt-1 text-xs text-red-600">{errors.zip}</span>}
+                    {errors.zip && <span id="zip-error" className="mt-1 text-xs text-red-600">{errors.zip}</span>}
                   </label>
                 </section>
               </section>
@@ -600,36 +622,41 @@ export default function EvenSimplerLeadForm({
                 </label>
               </section>
 
-              <SmsConsentFields
-                smsProjectConsent={form.smsProjectConsent}
-                smsMarketingConsent={form.smsMarketingConsent}
-                onChange={(field, value) => setField(field, value)}
-                errors={{
-                  smsProjectConsent: errors.smsProjectConsent,
-                  smsMarketingConsent: errors.smsMarketingConsent,
+              <LeadFormEnding
+                className="space-y-8"
+                verification={
+                  <section>
+                    <Turnstile className="pt-1" action="contact-lead" />
+                    {errors.cfToken && (
+                      <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>
+                    )}
+                  </section>
+                }
+                actions={
+                  <div className="flex w-full">
+                    <Button
+                      className="w-full"
+                      data-icon-affordance="right"
+                      type="submit"
+                      size="xl"
+                      variant="brandOrange"
+                      disabled={status === 'submitting'}
+                    >
+                      {status === 'submitting' ? 'Sending…' : 'Submit Request'}
+                      <ArrowRight className="ml-2 h-4 w-4 inline icon-affordance" />
+                    </Button>
+                  </div>
+                }
+                consent={{
+                  smsProjectConsent: form.smsProjectConsent,
+                  smsMarketingConsent: form.smsMarketingConsent,
+                  onChange: (field, value) => setField(field, value),
+                  errors: {
+                    smsProjectConsent: errors.smsProjectConsent,
+                    smsMarketingConsent: errors.smsMarketingConsent,
+                  },
                 }}
               />
-
-              <section>
-                <Turnstile className="pt-1" action="contact-lead" />
-                {errors.cfToken && (
-                  <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>
-                )}
-              </section>
-
-              <div className="flex w-full">
-                <Button
-                  className="w-full"
-                  data-icon-affordance="right"
-                  type="submit"
-                  size="xl"
-                  variant="brandOrange"
-                  disabled={status === 'submitting'}
-                >
-                  {status === 'submitting' ? 'Sending…' : 'Submit Request'}
-                  <ArrowRight className="ml-2 h-4 w-4 inline icon-affordance" />
-                </Button>
-              </div>
             </div>
           </div>
         </div>
