@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Turnstile from '@/components/lead-capture/Turnstile';
 import SmartLink from '@/components/utils/SmartLink';
-import SmsConsentFields from '@/components/lead-capture/shared/SmsConsentFields';
+import LeadFormEnding from '@/components/lead-capture/shared/LeadFormEnding';
+import { useLeadFormErrorFocus } from '@/components/lead-capture/shared/useLeadFormErrorFocus';
 import {
   buildN8nLeadPayload,
   mapLeadApiFieldErrors,
@@ -44,6 +45,7 @@ export default function TellUsWhyForm() {
 
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
   const [err, setErr] = useState<string | null>(null);
+  const { formRef, focusErrors } = useLeadFormErrorFocus();
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [smsProjectConsent, setSmsProjectConsent] = useState<SmsConsentFieldValue>('');
   const [smsMarketingConsent, setSmsMarketingConsent] = useState<SmsConsentFieldValue>('');
@@ -114,6 +116,7 @@ export default function TellUsWhyForm() {
     }
 
     if (Object.keys(nextErrors).length) {
+      focusErrors();
       setStatus('err');
       setErr('Please complete the highlighted fields.');
       setFieldErrors(nextErrors);
@@ -167,6 +170,7 @@ export default function TellUsWhyForm() {
     });
 
     if (!result.ok) {
+      focusErrors();
       setStatus('err');
       setErr(result.error || 'Something went wrong. Please try again.');
       const serverErrors = mapLeadApiFieldErrors(result.fieldErrors);
@@ -199,7 +203,7 @@ export default function TellUsWhyForm() {
       <h1 className="text-3xl font-semibold">Tell us what went wrong</h1>
       <p className="mt-2 text-slate-700">Your honest feedback helps us fix issues fast and do right by you.</p>
 
-      <form onSubmit={onSubmit} className="mt-6 space-y-5" noValidate>
+      <form ref={formRef} onSubmit={onSubmit} className="mt-6 space-y-5" noValidate>
         {/* Honeypot field (hidden from humans) */}
         <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
@@ -283,31 +287,36 @@ export default function TellUsWhyForm() {
         {/* Hidden rating (from query param) */}
         <input type="hidden" name="rating" value={rating} readOnly />
 
-        <SmsConsentFields
-          smsProjectConsent={smsProjectConsent}
-          smsMarketingConsent={smsMarketingConsent}
-          onChange={(field, value) => {
-            if (field === 'smsProjectConsent') setSmsProjectConsent(value);
-            if (field === 'smsMarketingConsent') setSmsMarketingConsent(value);
-            clearFieldError(field);
-            if (err) setErr(null);
-          }}
-          errors={{
-            smsProjectConsent: fieldErrors.smsProjectConsent,
-            smsMarketingConsent: fieldErrors.smsMarketingConsent,
+        <LeadFormEnding
+          className="space-y-5"
+          verification={
+            <div>
+              <Turnstile className="pt-1" />
+              {fieldErrors.cfToken ? <p className="mt-2 text-sm text-red-600">{fieldErrors.cfToken}</p> : null}
+            </div>
+          }
+          feedback={err ? <p role="alert" tabIndex={-1} className="text-sm text-red-600">{err}</p> : null}
+          actions={
+            <div className="flex items-center gap-3 pt-2">
+              <button type="submit" disabled={status === 'sending'} className="btn btn-brand-orange btn-md">
+                {status === 'sending' ? 'Sending…' : 'Send feedback'}
+              </button>
+            </div>
+          }
+          consent={{
+            smsProjectConsent,
+            smsMarketingConsent,
+            onChange: (field, value) => {
+              if (field === 'smsProjectConsent') setSmsProjectConsent(value);
+              if (field === 'smsMarketingConsent') setSmsMarketingConsent(value);
+              clearFieldError(field);
+            },
+            errors: {
+              smsProjectConsent: fieldErrors.smsProjectConsent,
+              smsMarketingConsent: fieldErrors.smsMarketingConsent,
+            },
           }}
         />
-
-        {/* Turnstile widget injects cfToken hidden input too */}
-        <Turnstile className="pt-1" />
-        {fieldErrors.cfToken ? <p className="text-sm font-medium text-red-600">{fieldErrors.cfToken}</p> : null}
-
-        <div className="flex items-center gap-3 pt-2">
-          <button type="submit" disabled={status === 'sending'} className="btn btn-brand-orange btn-md">
-            {status === 'sending' ? 'Sending…' : 'Send feedback'}
-          </button>
-          {status === 'err' && <p className="text-sm text-red-600">{err}</p>}
-        </div>
       </form>
     </main>
   );

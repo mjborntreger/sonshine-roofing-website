@@ -99,7 +99,7 @@ export default function LocalPartnershipsSection({
                 </ul>
               ) : null}
               {feature.contentHtml ? (
-                  <div className="text-slate-600" dangerouslySetInnerHTML={{ __html: feature.contentHtml }} />
+                <div className="text-slate-600" dangerouslySetInnerHTML={{ __html: feature.contentHtml }} />
               ) : null}
             </article>
           ))}

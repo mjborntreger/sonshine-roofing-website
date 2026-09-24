@@ -24,9 +24,8 @@ import { useUtmParams } from '@/components/lead-capture/useUtmParams';
 import { type LeadSuccessRestore } from '@/components/lead-capture/lead-form/config';
 import { redirectToThankYou } from '@/lib/lead-capture/thank-you';
 import LeadFormStepShell from '@/components/lead-capture/lead-form/LeadFormStepShell';
-import SmsConsentFields, {
-  SmsConsentFooter,
-} from '@/components/lead-capture/shared/SmsConsentFields';
+import LeadFormEnding from '@/components/lead-capture/shared/LeadFormEnding';
+import { useLeadFormErrorFocus } from '@/components/lead-capture/shared/useLeadFormErrorFocus';
 import { renderHighlight } from '@/components/utils/renderHighlight';
 import { cn } from '@/lib/utils';
 import { useSiteSettings } from '@/lib/content/site-settings-context';
@@ -55,7 +54,7 @@ const HERO_SMS_CLASS_NAMES = {
   label: 'text-sm font-semibold leading-6 text-slate-300',
   options: 'mt-4 flex flex-wrap gap-3',
   optionLabel:
-    'inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.04] px-4 py-2.5 text-slate-300',
+    'inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.04] px-4 py-2.5 text-slate-300 focus-within:ring-2 focus-within:ring-[--brand-orange]',
   optionLabelSelected: 'border-slate-200 bg-[--brand-orange] text-slate-200',
   radio: 'sr-only',
   optionText: 'text-sm font-semibold leading-none',
@@ -108,6 +107,8 @@ function LeadFormAlert({ tone, message }: LeadFormAlertProps) {
 
   return (
     <div
+      role="alert"
+      tabIndex={-1}
       className={
         tone === 'hero'
           ? 'mt-5 rounded-xl border border-red-400/40 bg-red-500/15 px-4 py-3 text-sm text-red-100'
@@ -145,13 +146,15 @@ function LeadFormContactFields({ tone, form, errors, onFieldChange }: LeadFormCo
           <input
             type="text"
             name="firstName"
+            aria-invalid={Boolean(errors.firstName)}
+            aria-describedby={errors.firstName ? 'firstName-error' : undefined}
             autoComplete="given-name"
             value={form.firstName}
             onChange={(event) => onFieldChange('firstName', event.target.value)}
             className={cn(inputClassName, errors.firstName && INPUT_ERROR_CLASS)}
             placeholder="First Name"
           />
-          {errors.firstName ? <span className={errorClassName}>{errors.firstName}</span> : null}
+          {errors.firstName ? <span id="firstName-error" className={errorClassName}>{errors.firstName}</span> : null}
         </label>
 
         <label className={labelClassName}>
@@ -159,13 +162,15 @@ function LeadFormContactFields({ tone, form, errors, onFieldChange }: LeadFormCo
           <input
             type="text"
             name="lastName"
+            aria-invalid={Boolean(errors.lastName)}
+            aria-describedby={errors.lastName ? 'lastName-error' : undefined}
             autoComplete="family-name"
             value={form.lastName}
             onChange={(event) => onFieldChange('lastName', event.target.value)}
             className={cn(inputClassName, errors.lastName && INPUT_ERROR_CLASS)}
             placeholder="Last Name"
           />
-          {errors.lastName ? <span className={errorClassName}>{errors.lastName}</span> : null}
+          {errors.lastName ? <span id="lastName-error" className={errorClassName}>{errors.lastName}</span> : null}
         </label>
       </div>
 
@@ -174,13 +179,15 @@ function LeadFormContactFields({ tone, form, errors, onFieldChange }: LeadFormCo
         <input
           type="email"
           name="email"
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? 'email-error' : undefined}
           autoComplete="email"
           value={form.email}
           onChange={(event) => onFieldChange('email', event.target.value)}
           className={cn(inputClassName, errors.email && INPUT_ERROR_CLASS)}
           placeholder="example@domain.com"
         />
-        {errors.email ? <span className={errorClassName}>{errors.email}</span> : null}
+        {errors.email ? <span id="email-error" className={errorClassName}>{errors.email}</span> : null}
       </label>
 
       <label className={phoneLabelClassName}>
@@ -188,6 +195,8 @@ function LeadFormContactFields({ tone, form, errors, onFieldChange }: LeadFormCo
         <input
           type="tel"
           name="phone"
+          aria-invalid={Boolean(errors.phone)}
+          aria-describedby={errors.phone ? 'phone-error' : undefined}
           autoComplete="tel"
           value={form.phone}
           onChange={(event) => onFieldChange('phone', sanitizePhoneInput(event.target.value))}
@@ -195,65 +204,12 @@ function LeadFormContactFields({ tone, form, errors, onFieldChange }: LeadFormCo
           inputMode="tel"
           placeholder={`Example: ${formatPhoneExample(form.phone)}`}
         />
-        {errors.phone ? <span className={errorClassName}>{errors.phone}</span> : null}
+        {errors.phone ? <span id="phone-error" className={errorClassName}>{errors.phone}</span> : null}
       </label>
     </>
   );
 
   return isHero ? <div className="mt-6">{content}</div> : content;
-}
-
-type LeadFormSmsConsentSectionProps = {
-  tone: LeadFormTone;
-  form: FormState;
-  errors: FormErrors;
-  onFieldChange: SetFormField;
-};
-
-function LeadFormSmsConsentSection({
-  tone,
-  form,
-  errors,
-  onFieldChange,
-}: LeadFormSmsConsentSectionProps) {
-  const isHero = tone === 'hero';
-
-  return (
-    <div className="mt-6">
-      <SmsConsentFields
-        {...(isHero
-          ? {
-              className: 'space-y-5',
-              disclosureMode: 'shared' as const,
-              classNames: HERO_SMS_CLASS_NAMES,
-            }
-          : {})}
-        showFooter={false}
-        smsProjectConsent={form.smsProjectConsent}
-        smsMarketingConsent={form.smsMarketingConsent}
-        onChange={(field, value) => onFieldChange(field, value)}
-        errors={{
-          smsProjectConsent: errors.smsProjectConsent,
-          smsMarketingConsent: errors.smsMarketingConsent,
-        }}
-      />
-    </div>
-  );
-}
-
-type LeadFormGeneralDisclosureSectionProps = {
-  tone: LeadFormTone;
-};
-
-function LeadFormGeneralDisclosureSection({ tone }: LeadFormGeneralDisclosureSectionProps) {
-  const isHero = tone === 'hero';
-
-  return (
-    <SmsConsentFooter
-      className={isHero ? 'mt-5' : 'mt-4'}
-      classNames={isHero ? HERO_SMS_CLASS_NAMES : undefined}
-    />
-  );
 }
 
 type LeadFormTurnstileSectionProps = {
@@ -263,7 +219,7 @@ type LeadFormTurnstileSectionProps = {
 
 function LeadFormTurnstileSection({ tone, errors }: LeadFormTurnstileSectionProps) {
   return (
-    <div className="mt-6">
+    <div>
       <Turnstile className="pt-1" action="contact-lead" />
       {errors.cfToken ? (
         <p
@@ -309,7 +265,7 @@ function LeadFormSubmitSection({ tone, status }: LeadFormSubmitSectionProps) {
   }
 
   return (
-    <div className="mt-6 flex justify-end">
+    <div className="flex justify-end">
       <Button
         data-icon-affordance="right"
         type="submit"
@@ -333,6 +289,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
+  const { formRef, focusErrors } = useLeadFormErrorFocus();
   const [status, setStatus] = useState<Status>('idle');
   const [successMeta, setSuccessMeta] = useState(() => restoredSuccess?.meta ?? null);
 
@@ -364,6 +321,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (status === 'submitting') return;
+    setErrors({});
 
     const identityErrors = validateContactIdentityDraft(
       {
@@ -381,6 +339,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
     const validation = { ...identityErrors, ...smsErrors };
 
     if (Object.keys(validation).length) {
+      focusErrors();
       setErrors(validation);
       setGlobalError('Please complete the highlighted fields so we can follow up.');
       return;
@@ -391,6 +350,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
     const honeypot = String(formData.get('company') || '');
 
     if (!cfToken) {
+      focusErrors();
       setErrors((prev) => ({ ...prev, cfToken: 'Verification required.' }));
       setGlobalError('Please complete the verification to continue.');
       return;
@@ -435,6 +395,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
     });
 
     if (!result.ok) {
+      focusErrors();
       if (process.env.NODE_ENV !== 'production') {
         console.error('Lead submission failed', result);
       }
@@ -466,7 +427,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
 
   if (isHeroEmbedded) {
     return (
-      <form onSubmit={handleSubmit} noValidate>
+      <form ref={formRef} onSubmit={handleSubmit} noValidate>
         <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
         <div className={HERO_PANEL_CLASS}>
@@ -495,15 +456,22 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
 
           <LeadFormAlert tone="hero" message={globalError} />
           <LeadFormContactFields tone="hero" form={form} errors={errors} onFieldChange={setField} />
-          <LeadFormSmsConsentSection
-            tone="hero"
-            form={form}
-            errors={errors}
-            onFieldChange={setField}
+          <LeadFormEnding
+            className="mt-6"
+            verification={<LeadFormTurnstileSection tone="hero" errors={errors} />}
+            actions={<LeadFormSubmitSection tone="hero" status={status} />}
+            consent={{
+              classNames: HERO_SMS_CLASS_NAMES,
+              disclosureMode: 'shared',
+              smsProjectConsent: form.smsProjectConsent,
+              smsMarketingConsent: form.smsMarketingConsent,
+              onChange: (field, value) => setField(field, value),
+              errors: {
+                smsProjectConsent: errors.smsProjectConsent,
+                smsMarketingConsent: errors.smsMarketingConsent,
+              },
+            }}
           />
-          <LeadFormTurnstileSection tone="hero" errors={errors} />
-          <LeadFormSubmitSection tone="hero" status={status} />
-          <LeadFormGeneralDisclosureSection tone="hero" />
         </div>
       </form>
     );
@@ -511,7 +479,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
 
   return (
     <div className={formSpacingClassName}>
-      <form onSubmit={handleSubmit} noValidate>
+      <form ref={formRef} onSubmit={handleSubmit} noValidate>
         <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
         <LeadFormStepShell
@@ -540,15 +508,20 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
             errors={errors}
             onFieldChange={setField}
           />
-          <LeadFormSmsConsentSection
-            tone="default"
-            form={form}
-            errors={errors}
-            onFieldChange={setField}
+          <LeadFormEnding
+            className="mt-6"
+            verification={<LeadFormTurnstileSection tone="default" errors={errors} />}
+            actions={<LeadFormSubmitSection tone="default" status={status} />}
+            consent={{
+              smsProjectConsent: form.smsProjectConsent,
+              smsMarketingConsent: form.smsMarketingConsent,
+              onChange: (field, value) => setField(field, value),
+              errors: {
+                smsProjectConsent: errors.smsProjectConsent,
+                smsMarketingConsent: errors.smsMarketingConsent,
+              },
+            }}
           />
-          <LeadFormTurnstileSection tone="default" errors={errors} />
-          <LeadFormSubmitSection tone="default" status={status} />
-          <LeadFormGeneralDisclosureSection tone="default" />
         </LeadFormStepShell>
       </form>
     </div>
