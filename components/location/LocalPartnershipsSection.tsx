@@ -37,7 +37,7 @@ export default function LocalPartnershipsSection({
               key={`${feature.title ?? "sponsor"}-${index}`}
               className="flex flex-col h-full gap-4 p-6 group"
             >
-              <div className="flex items-start gap-4 mt-2">
+              <div className="flex items-center gap-4 mt-2">
                 {feature.featuredImage?.url ? (
                   <div className="flex items-center justify-center w-16 h-16">
                     <div className="relative w-16 h-16">
@@ -100,14 +100,7 @@ export default function LocalPartnershipsSection({
                 </ul>
               ) : null}
               {feature.contentHtml ? (
-                <Accordion
-                  summary="See details"
-                  proseBody={false}
-                  contentClassName="space-y-2 mb-4 bg-sky-50 text-lg text-slate-600 max-h-56 overflow-y-auto"
-                  summaryClassName="bg-sky-50"
-                >
-                  <div dangerouslySetInnerHTML={{ __html: feature.contentHtml }} />
-                </Accordion>
+                  <div className="text-slate-600" dangerouslySetInnerHTML={{ __html: feature.contentHtml }} />
               ) : null}
             </article>
           ))}

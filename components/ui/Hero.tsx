@@ -74,12 +74,21 @@ export default function Hero({
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold text-white">
               {title}
             </h1>
-            {metadata}
+            {metadata ? (
+              <div className={cn("flex", justifyStart ? "justify-start" : "justify-center")}>
+                {metadata}
+              </div>
+            ) : null}
             {eyelash ? (
               <p className="text-sm uppercase font-bold text-blue-200 leading-tight tracking-wide">{eyelash}</p>
             ): null}
             {subtitle ? (
-              <p className="text-base md:text-lg leading-relaxed text-slate-200">
+              <p
+                className={cn(
+                  "text-base md:text-lg leading-relaxed text-slate-200",
+                  justifyStart ? "mx-0 text-left" : "mx-auto text-center",
+                )}
+              >
                 {subtitle}
               </p>
             ) : null}
