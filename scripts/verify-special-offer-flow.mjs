@@ -151,7 +151,7 @@ assert.ok(
 );
 assert.ok(pageHtml.indexOf('Offer Details') < pageHtml.indexOf('id="claim-offer"'));
 assert.ok(page.querySelector('article ul li'));
-assert.ok(page.querySelector('a[href="#claim-offer"]')?.textContent.includes('Email Me My Coupon'));
+assert.ok(page.querySelector('a[href="#claim-offer"]')?.textContent.includes('Redeem Offer'));
 assert.doesNotMatch(pageHtml, /ROOFING SERVICES|Limited-Time Offer/);
 assert.doesNotMatch((await route.generateMetadata(pageInput)).description, /<p>|<strong>/);
 for (const [change, label] of [
@@ -161,7 +161,7 @@ for (const [change, label] of [
   currentOffer = { ...normalized, ...change };
   const html = renderToStaticMarkup(await route.default(pageInput));
   assert.ok(html.includes(label));
-  assert.doesNotMatch(html, /Coupon form fixture|Email Me My Coupon/);
+  assert.doesNotMatch(html, /Coupon form fixture|Redeem Offer/);
 }
 
 // The actual form/payload/validation/analytics run with a synthetic transport only.
