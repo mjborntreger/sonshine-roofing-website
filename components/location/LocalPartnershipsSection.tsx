@@ -3,7 +3,6 @@ import { Facebook, Globe, Instagram } from "lucide-react";
 import type { SponsorFeature } from "@/lib/content/sponsor-features";
 import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/sectionStyles";
 import { renderHighlight } from "@/components/utils/renderHighlight";
-import { Accordion } from "@/components/ui/Accordion";
 import SmartLink from "../utils/SmartLink";
 
 type LocalPartnershipsSectionProps = {
