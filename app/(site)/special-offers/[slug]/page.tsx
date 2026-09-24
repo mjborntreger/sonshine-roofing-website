@@ -140,26 +140,25 @@ export default async function SpecialOfferPage({ params }: { params: Promise<{ s
         subtitle={offer.introduction}
         metadata={
           offer.discount ? (
-            <p className="max-w-3xl text-2xl font-semibold leading-snug text-white sm:text-3xl">
+            <p className="max-w-3xl text-2xl font-semibold leading-snug text-[--brand-cyan] sm:text-3xl">
               {offer.discount}
             </p>
           ) : null
         }
-        justifyStart
         imageSrc={offer.featuredImage?.url || undefined}
         badges={[...(expirationBadge ? [{ icon: CalendarClock, label: expirationBadge }] : [])]}
       >
-        <div className="flex flex-wrap gap-3">
+        <div className="flex justify-center flex-wrap gap-3">
           {!expired && offer.offerCode ? (
             <SmartLink
               href="#claim-offer"
               className="btn btn-brand-orange btn-lg rounded-lg px-4 py-3"
-              aria-label="Email me my coupon"
+              aria-label="Redeem Offer"
               data-icon-affordance="down"
               proseGuard
             >
               <BadgePercent className="mr-2 inline h-4 w-4" aria-hidden="true" />
-              Email Me My Coupon
+              Redeem Offer
               <ArrowDown className="icon-affordance ml-2 inline h-4 w-4" aria-hidden="true" />
             </SmartLink>
           ) : null}
