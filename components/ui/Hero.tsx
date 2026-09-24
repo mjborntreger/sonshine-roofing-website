@@ -62,7 +62,7 @@ export default function Hero({
           aria-hidden="true"
         />
         <div
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/75 to-black/80"
+          className="absolute inset-0 -z-10 bg-gradient-to-b from-black/50 via-black/55 to-black/60"
           aria-hidden="true"
         />
 

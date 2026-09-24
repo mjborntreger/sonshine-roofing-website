@@ -24,6 +24,11 @@ for (const key of [
 Object.defineProperty(globalThis, 'navigator', { configurable: true, value: dom.window.navigator });
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 HTMLElement.prototype.scrollIntoView = function () {};
+// Layout is verified in the browser; JSDOM has no ResizeObserver implementation.
+globalThis.ResizeObserver = class {
+  observe() {}
+  disconnect() {}
+};
 const intersections = [];
 globalThis.IntersectionObserver = class {
   constructor(callback) {

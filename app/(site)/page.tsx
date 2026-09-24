@@ -99,7 +99,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
       {/* General FAQs at bottom of the landing page */}
       <Section>
         <FaqInlineList
-          heading="General FAQs"
+          heading="General Roofing FAQs"
           pagePath="/"
           limit={8}
           initialItems={generalFaqs}

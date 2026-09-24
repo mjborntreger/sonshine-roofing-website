@@ -288,16 +288,16 @@ export default function TellUsWhyForm() {
         <input type="hidden" name="rating" value={rating} readOnly />
 
         <LeadFormEnding
-          className="space-y-5"
+          className="[--lead-form-gap:1.25rem]"
           verification={
             <div>
-              <Turnstile className="pt-1" />
+              <Turnstile />
               {fieldErrors.cfToken ? <p className="mt-2 text-sm text-red-600">{fieldErrors.cfToken}</p> : null}
             </div>
           }
           feedback={err ? <p role="alert" tabIndex={-1} className="text-sm text-red-600">{err}</p> : null}
           actions={
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3">
               <button type="submit" disabled={status === 'sending'} className="btn btn-brand-orange btn-md">
                 {status === 'sending' ? 'Sending…' : 'Send feedback'}
               </button>

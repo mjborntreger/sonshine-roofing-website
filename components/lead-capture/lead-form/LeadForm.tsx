@@ -220,7 +220,7 @@ type LeadFormTurnstileSectionProps = {
 function LeadFormTurnstileSection({ tone, errors }: LeadFormTurnstileSectionProps) {
   return (
     <div>
-      <Turnstile className="pt-1" action="contact-lead" />
+      <Turnstile action="contact-lead" />
       {errors.cfToken ? (
         <p
           className={

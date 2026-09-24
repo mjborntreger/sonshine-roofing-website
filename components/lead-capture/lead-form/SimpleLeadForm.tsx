@@ -696,10 +696,10 @@ export default function SimpleLeadForm({
               </section>
 
               <LeadFormEnding
-                className="space-y-8"
+                className="[--lead-form-gap:2rem]"
                 verification={
                   <section>
-                    <Turnstile className="pt-1" action="contact-lead" />
+                    <Turnstile action="contact-lead" />
                     {errors.cfToken && (
                       <p className="mt-2 text-sm font-medium text-red-600">{errors.cfToken}</p>
                     )}

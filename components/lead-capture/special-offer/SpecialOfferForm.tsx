@@ -407,7 +407,7 @@ export default function SpecialOfferForm({
         </label>
 
         <LeadFormEnding
-          verification={<Turnstile className="pt-1" />}
+          verification={<Turnstile />}
           feedback={
             globalError && (
               <div
