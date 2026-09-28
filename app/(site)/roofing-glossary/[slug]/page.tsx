@@ -3,11 +3,7 @@ import { notFound } from 'next/navigation';
 
 import Section from '@/components/layout/Section';
 import SmartLink from '@/components/utils/SmartLink';
-import {
-  getGlossaryTerm,
-  listGlossaryIndex,
-  type GlossarySummary,
-} from '@/lib/content/glossary';
+import { getGlossaryTerm, listGlossaryIndex, type GlossarySummary } from '@/lib/content/glossary';
 import { getSiteSettings } from '@/lib/content/directus-site';
 import { buildBasicMetadata } from '@/lib/seo/meta';
 import { JsonLd } from '@/lib/seo/json-ld';
@@ -108,11 +104,7 @@ export async function generateStaticParams() {
   return index.map((term) => ({ slug: term.slug }));
 }
 
-export default async function GlossaryTermPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function GlossaryTermPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [index, term] = await Promise.all([listGlossaryIndex(), getGlossaryTerm(slug)]);
   if (!term) notFound();
@@ -120,9 +112,17 @@ export default async function GlossaryTermPage({
   const position = index.findIndex((item) => item.slug === slug);
   const hasPosition = position >= 0;
   const previous =
-    hasPosition && position > 0 ? index[position - 1] : hasPosition ? index[index.length - 1] : null;
+    hasPosition && position > 0
+      ? index[position - 1]
+      : hasPosition
+        ? index[index.length - 1]
+        : null;
   const next =
-    hasPosition && position < index.length - 1 ? index[position + 1] : hasPosition ? index[0] : null;
+    hasPosition && position < index.length - 1
+      ? index[position + 1]
+      : hasPosition
+        ? index[0]
+        : null;
   const termPath = `/roofing-glossary/${term.slug}`;
   const linkedHtml = autoLinkGlossary(term.contentHtml, index, term.slug);
 
@@ -143,35 +143,38 @@ export default async function GlossaryTermPage({
   );
 
   return (
-    <Section>
-      <div className="container-edge py-8">
-        <nav className="mb-4 text-sm text-slate-600">
-          <SmartLink
-            href="/roofing-glossary"
-            className="text-sm font-semibold text-slate-600 underline-offset-2 hover:underline"
-          >
+    <Section className="py-8 md:py-10">
+      <div className="mx-auto max-w-3xl px-2">
+        <nav className="mb-5" aria-label="Glossary">
+          <SmartLink href="/roofing-glossary" className="btn btn-sm btn-ghost">
             ← Back to Glossary
           </SmartLink>
         </nav>
 
-        <article className="prose max-w-none">
-          <h1>{term.title}</h1>
+        <article className="rounded-2xl border border-blue-200 bg-white p-5 shadow-sm md:p-8">
+          <p className="mb-3 text-sm font-semibold text-slate-600">Roofing Glossary</p>
+          <h1 className="break-words text-3xl font-semibold leading-tight tracking-tight md:text-5xl">
+            {term.title}
+          </h1>
           <JsonLd data={definedTermLd} />
           <JsonLd data={breadcrumbsLd} />
-          <div dangerouslySetInnerHTML={{ __html: linkedHtml }} />
+          <div
+            className="prose prose-slate mt-5 max-w-none text-base leading-relaxed prose-p:text-base prose-li:text-base prose-a:text-[--brand-blue]"
+            dangerouslySetInnerHTML={{ __html: linkedHtml }}
+          />
         </article>
 
         {hasPosition && (
-          <nav className="mt-10 flex items-center justify-between gap-4" aria-label="Term navigation">
+          <nav className="mt-6 grid grid-cols-2 gap-3" aria-label="Term navigation">
             {previous ? (
               <SmartLink
                 href={`/roofing-glossary/${previous.slug}`}
                 rel="prev"
-                className="group inline-flex max-w-[48%] items-center gap-2 rounded-md border border-blue-200 bg-white px-3 py-2 text-sm hover:bg-slate-50"
+                className="group inline-flex min-w-0 items-center justify-between gap-2 rounded-xl border border-blue-200 bg-white px-4 py-3 text-sm text-[--brand-blue] hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue]"
                 aria-label={`Previous term: ${previous.title}`}
               >
                 <span aria-hidden>←</span>
-                <span className="truncate">{previous.title}</span>
+                <span className="min-w-0 break-words">{previous.title}</span>
               </SmartLink>
             ) : (
               <span />
@@ -181,10 +184,10 @@ export default async function GlossaryTermPage({
               <SmartLink
                 href={`/roofing-glossary/${next.slug}`}
                 rel="next"
-                className="group inline-flex max-w-[48%] items-center gap-2 rounded-md border border-blue-200 bg-white px-3 py-2 text-sm hover:bg-slate-50"
+                className="group inline-flex min-w-0 items-center justify-between gap-2 rounded-xl border border-blue-200 bg-white px-4 py-3 text-sm text-[--brand-blue] hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue]"
                 aria-label={`Next term: ${next.title}`}
               >
-                <span className="truncate">{next.title}</span>
+                <span className="min-w-0 break-words">{next.title}</span>
                 <span aria-hidden>→</span>
               </SmartLink>
             ) : (

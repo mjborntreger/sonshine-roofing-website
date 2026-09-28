@@ -36,6 +36,8 @@ jobs:
         run: npm run typecheck
       - name: Verify Tailwind utilities
         run: npm run verify:tailwind-utilities
+      - name: Verify resource page interactions
+        run: npm run verify:resource-pages
       - name: Verify archive controls
         run: npm run verify:archive-controls
       - name: Verify content preview selection
