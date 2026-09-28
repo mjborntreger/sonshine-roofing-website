@@ -1,10 +1,15 @@
-import Section from '@/components/layout/Section';
+import ResourcePage from '@/components/resources/ResourcePage';
+import {
+  ResourceSearchPanel,
+  ResourceSearchField,
+  ResourceGroupHeading,
+  resourceClearButtonClass,
+} from '@/components/resources/ResourceUi';
+import SmartLink from '@/components/utils/SmartLink';
 import { groupFaqsForArchive, listAllFaqs } from '@/lib/content/directus-faqs';
 import type { Metadata } from 'next';
 import FaqSearchController from '@/components/dynamic-content/faq/FaqSearchController';
-import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
-import { ArrowDown, ArrowUp, HelpCircle, Search } from 'lucide-react';
-import { Accordion } from '@/components/ui/Accordion';
+import { ArrowDown, ArrowUp, ArrowRight, ChevronDown, X } from 'lucide-react';
 import FaqBulkToggleClient from '@/components/dynamic-content/faq/FaqBulkToggleClient';
 import { JsonLd } from '@/lib/seo/json-ld';
 import { breadcrumbSchema, faqSchema } from '@/lib/seo/schema';
@@ -29,7 +34,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function FAQArchivePage() {
-  const q = '';
   const faqs = await listAllFaqs(500);
   const groups = groupFaqsForArchive(faqs);
 
@@ -52,140 +56,121 @@ export default async function FAQArchivePage() {
   );
 
   return (
-    <Section>
-      <div className="container-edge py-8">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-          {/* LEFT: main content */}
-          <div>
-            <h1 className="text-3xl md:text-5xl font-semibold">Frequently Asked Questions</h1>
-            <p className="mt-4 text-slate-600 md:text-lg">
-              Answers to common roofing questions from our team in Sarasota. If you can’t find what
-              you need, we’re one call away.
-            </p>
-
-            {/* JSON-LD: FAQPage + Breadcrumbs */}
-            <JsonLd data={faqLd} />
-            <JsonLd data={breadcrumbsLd} />
-
-            {/* Search */}
-            <div className="mt-6" role="search">
-              <div className="rounded-2xl border border-blue-300 bg-white/80 p-4 shadow-sm backdrop-blur md:p-6">
-                <div className="inline-flex w-full items-start">
-                  <Search className="h-6 w-6 mr-4 translate-y-2 text-[--brand-blue]" />
-                  <input
-                    id="faq-search"
-                    type="search"
-                    defaultValue={q}
-                    placeholder="Start typing..."
-                    aria-label="Search FAQs"
-                    autoComplete="off"
-                    className="w-full rounded-md border border-blue-400 bg-white px-3 py-2 text-base shadow-sm focus:border-[--brand-blue] focus:outline-none"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Results meta + controls */}
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <span className="text-sm text-slate-700">
-                Showing{' '}
-                <span id="faq-result-count" aria-live="polite">
-                  {faqs.length}
-                </span>{' '}
-                FAQs
-              </span>
-              <div className="ml-auto flex items-center">
-                <button
-                  id="faq-toggle-all"
-                  type="button"
-                  aria-expanded="true"
-                  className="inline-flex items-center gap-2 rounded-full border border-[--brand-blue] bg-white px-4 py-1.5 text-sm font-semibold text-[--brand-blue] transition hover:bg-[--brand-blue]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2"
-                  data-state="expanded"
-                >
-                  <span data-faq-toggle-label>Collapse all</span>
-                  <ArrowDown className="hidden h-4 w-4" data-faq-toggle-icon="down" aria-hidden />
-                  <ArrowUp className="h-4 w-4" data-faq-toggle-icon="up" aria-hidden />
-                </button>
-              </div>
-            </div>
-
-            {/* Client-driven No results panel */}
-            <div
-              id="faq-no-results"
-              className="mt-6 hidden rounded-md border border-blue-200 bg-white p-4"
+    <ResourcePage
+      title="Frequently Asked Questions"
+      introduction="Answers to common roofing questions from our team in Sarasota. If you can’t find what you need, we’re one call away."
+      activePath={PAGE_PATH}
+    >
+      <JsonLd data={faqLd} />
+      <JsonLd data={breadcrumbsLd} />
+      <ResourceSearchPanel>
+        <ResourceSearchField
+          id="faq-search"
+          label="Search FAQs"
+          placeholder="Search questions or topics…"
+          aria-describedby="faq-search-hint"
+          disabled
+          clearButton={
+            <button
+              id="faq-clear-search"
+              type="button"
+              hidden
+              className={resourceClearButtonClass}
+              aria-label="Clear FAQ search"
             >
-              <p className="text-sm text-slate-700">
-                No results for <span id="faq-query" className="font-semibold"></span>.
-              </p>
-              <div id="faq-suggestions" className="mt-2 hidden">
-                <p className="text-sm text-slate-600">Did you mean:</p>
-                <ul id="faq-suggestion-list" className="mt-2 flex flex-wrap gap-2"></ul>
-              </div>
-            </div>
-
-            {/* Groups as accordions */}
-            <div className="mt-8 space-y-6" id="faq-topics">
-              {groups.map((group) => {
-                const { key, title, items: list } = group;
-                if (list.length === 0) return null;
-                return (
-                  <section key={key} id={`topic-${key}`}>
-                    <Accordion
-                      className="faq-topic"
-                      icon={<HelpCircle className="h-5 w-5" aria-hidden="true" />}
-                      summary={
-                        <h2 className="text-xl md:text-2xl" data-topic-name={title}>
-                          {title}
-                        </h2>
-                      }
-                      meta={
-                        <span className="inline-flex items-center gap-2 text-slate-600">
-                          <span className="inline-flex h-6 min-w-[1.5rem] items-center justify-center rounded-full bg-[#cef3ff] px-2 text-xs font-medium text-slate-700 faq-count">
-                            {list.length}
-                          </span>
-                        </span>
-                      }
-                      radius="3xl"
-                      tone="soft"
-                      size="sm"
-                      proseBody={false}
-                      defaultOpen
-                    >
-                      {list.map((f) => (
-                        <Accordion
-                          key={f.id}
-                          id={`faq-${f.id}`}
-                          className="faq-item mb-4"
-                          data-title={(f.title || '').toString()}
-                          data-topic={title}
-                          data-excerpt=""
-                          summary={
-                            <h3 className="text-base md:text-xl font-normal text-slate-700">
-                              {f.title}
-                            </h3>
-                          }
-                          radius="2xl"
-                          tone="soft"
-                          size="sm"
-                          proseBody={false}
-                        >
-                          <div
-                            className="faq-answer text-[1rem] leading-loose text-slate-700"
-                            dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }}
-                          />
-                        </Accordion>
-                      ))}
-                    </Accordion>
-                  </section>
-                );
-              })}
-            </div>
-          </div>
-          {/* RIGHT: floating aside on desktop */}
-          <ResourcesAside activePath={PAGE_PATH} />
+              <X className="h-4 w-4" aria-hidden="true" />
+            </button>
+          }
+        />
+        <p id="faq-search-hint" className="mt-2 text-sm text-slate-500">
+          Enter at least two characters to search.
+        </p>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-600" role="status">
+            Showing <span id="faq-result-count">{faqs.length}</span> FAQs
+          </p>
+          <button
+            id="faq-toggle-all"
+            type="button"
+            disabled
+            aria-expanded="false"
+            aria-controls="faq-topics"
+            className="btn btn-sm btn-outline gap-2 disabled:cursor-default disabled:opacity-50"
+            data-state="collapsed"
+          >
+            <span data-faq-toggle-label>Expand all</span>
+            <ArrowDown className="h-4 w-4" data-faq-toggle-icon="down" aria-hidden="true" />
+            <ArrowUp className="hidden h-4 w-4" data-faq-toggle-icon="up" aria-hidden="true" />
+          </button>
+        </div>
+      </ResourceSearchPanel>
+      <div
+        id="faq-no-results"
+        className="mt-6 hidden rounded-2xl border border-blue-200 bg-white p-5"
+      >
+        <p className="text-slate-700">
+          No results for <span id="faq-query" className="font-semibold" />.
+        </p>
+        <p className="mt-2 text-sm text-slate-600">Try another question or clear your search.</p>
+        <div id="faq-suggestions" className="mt-3 hidden">
+          <p className="text-sm text-slate-600">Did you mean:</p>
+          <ul id="faq-suggestion-list" className="mt-2 flex flex-wrap gap-2" />
         </div>
       </div>
-
+      <div className="mt-6 space-y-6" id="faq-topics">
+        {groups.map(({ key, title, items: list }, groupIndex) =>
+          list.length ? (
+            <section
+              key={key}
+              id={`topic-${key}`}
+              aria-labelledby={`topic-heading-${key}`}
+              className="faq-topic overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm"
+            >
+              <ResourceGroupHeading
+                title={title}
+                count={list.length}
+                id={`topic-heading-${key}`}
+                countClassName="faq-count"
+              />
+              <div className="divide-y divide-blue-100 px-4 md:px-5">
+                {list.map((f, index) => (
+                  <details
+                    key={f.id}
+                    id={`faq-${f.id}`}
+                    open={groupIndex === 0 && index === 0}
+                    className="faq-item group/answer scroll-mt-28"
+                    data-title={f.title}
+                    data-topic={title}
+                    data-excerpt=""
+                  >
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-slate-800 hover:text-[--brand-blue] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[--brand-blue] group-open/answer:text-[--brand-blue] [&::-webkit-details-marker]:hidden">
+                      <h3 className="text-base font-semibold leading-relaxed">{f.title}</h3>
+                      <ChevronDown
+                        className="h-5 w-5 shrink-0 text-[--brand-blue] transition-transform group-open/answer:rotate-180 motion-reduce:transition-none"
+                        aria-hidden="true"
+                      />
+                    </summary>
+                    <div
+                      className="faq-answer prose prose-slate max-w-none pb-5 text-base leading-relaxed prose-p:my-3 prose-p:text-base prose-li:text-base prose-a:text-[--brand-blue]"
+                      dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }}
+                    />
+                  </details>
+                ))}
+              </div>
+            </section>
+          ) : null,
+        )}
+      </div>
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-blue-200 pt-5">
+        <p className="text-sm text-slate-600">Looking for a roofing term?</p>
+        <SmartLink
+          href="/roofing-glossary"
+          aria-label="Explore the glossary"
+          className="btn btn-sm btn-ghost gap-2"
+        >
+          Explore the glossary <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </SmartLink>
+      </div>
       <FaqBulkToggleClient />
       <FaqSearchController
         ids={{
@@ -196,7 +181,7 @@ export default async function FAQArchivePage() {
         urlKeys={{ q: 'q' }}
         minQueryLen={2}
       />
-    </Section>
+    </ResourcePage>
   );
 }
 

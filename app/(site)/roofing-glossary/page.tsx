@@ -1,7 +1,7 @@
-import Section from '@/components/layout/Section';
+import ResourcePage from '@/components/resources/ResourcePage';
+import { ArrowRight } from 'lucide-react';
 import { listGlossaryIndex } from '@/lib/content/glossary';
 import GlossaryQuickSearch from '@/components/dynamic-content/roofing-glossary/GlossaryQuickSearch';
-import ResourcesAside from '@/components/global-nav/static-pages/ResourcesAside';
 import type { Metadata } from 'next';
 import SmartLink from '@/components/utils/SmartLink';
 import { JsonLd } from '@/lib/seo/json-ld';
@@ -28,17 +28,6 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function GlossaryArchivePage() {
   const terms = await listGlossaryIndex();
-
-  // Group by first letter (A-Z, then # for non-letters)
-  const groups = new Map<string, { title: string; slug: string }[]>();
-  for (const t of terms) {
-    const letter = /^[A-Za-z]/.test(t.title) ? t.title[0].toUpperCase() : '#';
-    if (!groups.has(letter)) groups.set(letter, []);
-    groups.get(letter)!.push(t);
-  }
-  const letters = Array.from(groups.keys()).sort((a, b) =>
-    a === '#' ? 1 : b === '#' ? -1 : a.localeCompare(b),
-  );
 
   // JSON-LD: DefinedTermSet + Breadcrumbs
   const origin = SITE_ORIGIN;
@@ -73,65 +62,21 @@ export default async function GlossaryArchivePage() {
   );
 
   return (
-    <Section>
-      <div className="container-edge py-8">
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px] overflow-visible items-start">
-          {/* LEFT: main content */}
-          <div>
-            <h1 className="text-3xl font-semibold">Roofing Glossary</h1>
-            <p className="mt-2 text-slate-600">
-              Clear, plain-English definitions for common (and not-so-common) roofing terms.
-            </p>
-
-            {/* JSON-LD: DefinedTermSet + Breadcrumbs */}
-            <JsonLd data={glossaryLd} />
-            <JsonLd data={breadcrumbsLd} />
-
-            <GlossaryQuickSearch terms={terms} />
-
-            {/* A–Z nav */}
-            <nav className="mt-6 flex flex-wrap gap-2 text-sm" aria-label="Glossary letters">
-              {letters.map((l) => (
-                <SmartLink
-                  key={l}
-                  href={`#glossary-${l === '#' ? 'num' : l}`}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-blue-300 bg-white hover:bg-slate-50"
-                >
-                  {l}
-                </SmartLink>
-              ))}
-            </nav>
-
-            <div className="mt-8 space-y-10">
-              {letters.map((l) => {
-                const list = groups.get(l)!;
-                const anchor = l === '#' ? 'num' : l;
-                return (
-                  <section key={l} id={`glossary-${anchor}`}>
-                    <h2 className="text-xl font-semibold">{l === '#' ? '0–9' : l}</h2>
-                    <ul className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {list.map((t) => (
-                        <li key={t.slug}>
-                          <SmartLink
-                            href={`/roofing-glossary/${t.slug}`}
-                            className="block rounded-xl border border-blue-100 bg-white px-3 py-2 text-slate-800 hover:bg-slate-50"
-                          >
-                            {t.title}
-                          </SmartLink>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* RIGHT: floating aside on desktop */}
-          <ResourcesAside activePath={PAGE_PATH} />
-        </div>
+    <ResourcePage
+      title="Roofing Glossary"
+      introduction="Clear, plain-English definitions for common (and not-so-common) roofing terms."
+      activePath={PAGE_PATH}
+    >
+      <JsonLd data={glossaryLd} />
+      <JsonLd data={breadcrumbsLd} />
+      <GlossaryQuickSearch terms={terms.map(({ title, slug }) => ({ title, slug }))} />
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-blue-200 pt-5">
+        <p className="text-sm text-slate-600">Have a roofing question?</p>
+        <SmartLink href="/faq" aria-label="Read our FAQs" className="btn btn-sm btn-ghost gap-2">
+          Read our FAQs <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </SmartLink>
       </div>
-    </Section>
+    </ResourcePage>
   );
 }
 
