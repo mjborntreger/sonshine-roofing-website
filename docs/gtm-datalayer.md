@@ -48,6 +48,65 @@ enablement gates.
 
 Google click IDs (`gclid`, `gbraid`, `wbraid`) and UTM values are stored and forwarded to n8n when present, but they do not determine whether the ads conversion event fires.
 
+## Google Search landing pages
+
+The landing pages reuse the organic service form and its successful-submission
+flow. No additional conversion event or value formula is introduced.
+
+| Source page / `form_location` | Form type | Project type | Ads lead type | Value |
+| --- | --- | --- | --- | --- |
+| `/landing/roof-replacement` | `contact-lead` | `retail` | `roof_replacement` | 1500 + existing roof adjustments |
+| `/landing/roof-repair` | `contact-lead` | `repair` | `roof_repair` | 300 + existing roof adjustments |
+| `/landing/financing` | `contact-lead` | `retail` | `roof_replacement` | 1500 + existing roof adjustments |
+
+The financing landing form is a replacement estimate inquiry, not the organic
+financing calculator or a credit application. The organic calculator retains
+its fixed 1500 value. `source.page` identifies financing inquiries in the
+existing n8n/Resend staff email, AccuLynx message and lead log.
+
+Keep all event fields, 90-day attribution, click-ID/UTM forwarding, queue/gates
+and lead-ID deduplication. `lead_form_submitted` remains unchanged. An accepted
+request is not yet a qualified appointment. Do not count CTA/phone-link clicks,
+validation failures, or lender button clicks as successful lead submissions.
+
+Before ad activation, inspect the published GTM/Ads configuration for event
+trigger restrictions, value/currency/transaction-ID mapping, duplicate
+conversion imports and primary/secondary goals. External changes require
+their own authorization.
+
+### Read-only launch audit — October 20, 2026
+
+Published GTM version 38 was inspected in the live container. Both the roof
+replacement and roof repair conversion tags listen to `ads_lead_submit`,
+filtered by the corresponding `lead_type`, without a page-path restriction.
+Both use `DLV - conversion_value` for the value and `DLV - lead_id` for the
+transaction ID. Replacement uses literal `USD`; repair uses `DLV - currency`.
+These triggers already accept the three landing-page source paths, including
+financing as `roof_replacement`.
+
+The container has a website-call conversion tag. Its phone-link click trigger
+and thank-you page-view trigger have no attached tags, so neither adds another
+conversion through those triggers. The separate enhanced-conversion
+user-provided-data tag does not represent another conversion action.
+
+The active n8n workflow was separately inspected through MCP: its Resend staff
+notification includes `source.page`, as do its CRM message and lead log. This
+verifies the configured notification path, not delivery to a recipient's inbox.
+
+Google Ads account-level settings remain unverified: the signed-in UI displayed
+an ad-blocker error and did not switch to the intended account. Before ad
+activation, confirm primary/secondary goals, counting settings, value fallback,
+duplicate GA4/offline imports, meaningful-call duration, and qualified-appointment
+reporting in the correct account. No external settings were changed.
+
+Local verification covers accepted and failed mocked submissions, source paths,
+campaign attribution, value calculations, and refresh/direct-visit deduplication.
+Run `NODE_ENV=production node scripts/verify-landing-conversions.mjs` with Node 22
+for the repeatable event/value checks. Browser tests intercepted all lead
+requests; no synthetic lead reached production. Localhost previews cannot use
+the production Turnstile site's hostname authorization, so live anti-spam and
+real delivery still require a separately authorized staging/launch check.
+
 ## QuickQuote path
 
 QuickQuote does not submit through `/api/lead` or redirect through

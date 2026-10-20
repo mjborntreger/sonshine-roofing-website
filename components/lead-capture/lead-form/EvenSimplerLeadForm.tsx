@@ -141,6 +141,7 @@ type Props = {
   title?: string;
   titleHighlight?: string;
   description?: string;
+  submitLabel?: string;
 };
 
 const DEFAULT_TITLE = 'Contact Our Office';
@@ -154,6 +155,7 @@ export default function EvenSimplerLeadForm({
   title,
   titleHighlight,
   description,
+  submitLabel = 'Submit Request',
 }: Props) {
   const { phone } = useSiteSettings();
   const initialProjectType = projectType || 'retail';
@@ -635,14 +637,14 @@ export default function EvenSimplerLeadForm({
                 actions={
                   <div className="flex w-full">
                     <Button
-                      className="w-full"
+                      className={cn('w-full', submitLabel !== 'Submit Request' && 'h-auto min-h-12 whitespace-normal px-4')}
                       data-icon-affordance="right"
                       type="submit"
                       size="xl"
                       variant="brandOrange"
                       disabled={status === 'submitting'}
                     >
-                      {status === 'submitting' ? 'Sending…' : 'Submit Request'}
+                      {status === 'submitting' ? 'Sending…' : submitLabel}
                       <ArrowRight className="ml-2 h-4 w-4 inline icon-affordance" />
                     </Button>
                   </div>

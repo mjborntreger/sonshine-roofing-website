@@ -16,6 +16,8 @@ function getLeadId(searchParams: URLSearchParams | null): string | null {
 }
 
 function getHeading(context: ThankYouLeadContext | null): string {
+  const landing = getLandingConfirmation(context);
+  if (landing) return landing.heading;
   switch (context?.formType) {
     case 'referral':
       return 'Referral received';
@@ -31,6 +33,8 @@ function getHeading(context: ThankYouLeadContext | null): string {
 }
 
 function getMessage(context: ThankYouLeadContext | null): string {
+  const landing = getLandingConfirmation(context);
+  if (landing) return landing.message;
   switch (context?.formType) {
     case 'referral':
       return 'We received your referral and will follow up about the roof replacement project.';
@@ -42,6 +46,21 @@ function getMessage(context: ThankYouLeadContext | null): string {
       return 'Check your inbox for an email from SonShine Roofing with your coupon code and offer details. If you don’t see it, check your spam or promotions folder.';
     default:
       return 'We received your request. Our team will follow up shortly.';
+  }
+}
+
+function getLandingConfirmation(context: ThankYouLeadContext | null) {
+  if (context?.formType !== 'contact-lead') return null;
+  const response = "We'll contact you within 30 minutes during business hours, or the next business day after hours.";
+  switch (context.source.page) {
+    case '/landing/roof-replacement':
+      return { heading: 'Your replacement estimate request is in', message: `We received your request for a free roof replacement estimate. ${response}` };
+    case '/landing/roof-repair':
+      return { heading: 'Your repair estimate request is in', message: `We received your request for a free roof repair estimate. ${response}` };
+    case '/landing/financing':
+      return { heading: 'Your estimate and financing request is in', message: `We received your request for a free roof replacement estimate and information about financing options. ${response} This request is not a credit application or financing approval.` };
+    default:
+      return null;
   }
 }
 

@@ -110,6 +110,8 @@ const serviceNoindexPaths = new Set(
 const EXCLUDE = new Set(['/reviews', '/tell-us-why', '/thank-you', '/truck-for-sale']);
 const filtered = items.filter(
   ({ loc }) =>
+    loc !== '/landing' &&
+    !loc.startsWith('/landing/') &&
     !EXCLUDE.has(loc) && !fixedNoindexPaths.has(loc) && !serviceNoindexPaths.has(loc),
 );
 
