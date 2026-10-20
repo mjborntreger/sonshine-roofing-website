@@ -133,6 +133,12 @@ runtime and two-release acceptance gates.
 
 ## Publishing reviews in Directus
 
+- The owner-approved Google Ads landing pages are a code-owned selection exception:
+  `lib/landing/reviews.ts` contains six verbatim replacement reviews (also used on
+  financing) and six repair reviews, curated from verified published reviews.
+  They render through the same fetch-free carousel view as the organic site,
+  without reading the live feed or carousel settings. Edit these campaign
+  selections in code; do not change organic review ownership or synchronization.
 - The site-wide review widget reads published, SonShine-scoped Google reviews
   whose rating is five and whose verified Google `external_id` is populated. Records also need
   an author name and review text to render.

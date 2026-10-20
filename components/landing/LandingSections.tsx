@@ -1,9 +1,15 @@
 import type { ReactNode } from 'react';
-import { ArrowDown, Check, Phone, Quote } from 'lucide-react';
+import { ArrowDown, ArrowUp, CalendarDays, ClipboardList, Phone, ShieldCheck } from 'lucide-react';
+import Image from 'next/image';
 import StaticImage from '@/components/media/StaticImage';
 import SmartLink from '@/components/utils/SmartLink';
+import { Accordion } from '@/components/ui/Accordion';
+import ReviewsCarouselView from '@/components/reviews-widget/ReviewsCarouselView';
+import { reviewDate, safeReviewUrl } from '@/components/reviews-widget/review-presentation';
 import type { Review } from '@/components/reviews-widget/types';
 import { getSiteSettings } from '@/lib/content/directus-site';
+import { getProjectBySlug } from '@/lib/content/projects';
+import { staticImage } from '@/lib/content/static-media';
 import { cn } from '@/lib/utils';
 
 const container = 'mx-auto w-full max-w-6xl px-4 sm:px-6';
@@ -42,13 +48,59 @@ export async function LandingHero({
 export function LandingTrust() {
   return (
     <div className="border-b border-blue-100 bg-white">
-      <ul aria-label="Why homeowners choose SonShine" className={cn(container, 'grid gap-3 py-5 text-sm font-medium text-slate-700 sm:grid-cols-3')}>
-        {['Serving local homeowners since 1987', 'Licensed & insured', 'Free repair & replacement estimates'].map((text) => (
-          <li key={text} className="flex items-center gap-2">
-            <Check className="size-5 shrink-0 text-[--brand-blue]" aria-hidden="true" />{text}
+      <ul aria-label="Why homeowners choose SonShine" className={cn(container, 'grid grid-cols-1 gap-5 py-6 text-sm font-medium text-slate-700 sm:grid-cols-3 sm:gap-6')}>
+        {[
+          { text: 'Serving local homeowners since 1987', icon: CalendarDays },
+          { text: 'Licensed & insured', icon: ShieldCheck },
+          { text: 'Free repair & replacement estimates', icon: ClipboardList },
+        ].map(({ text, icon: Icon }) => (
+          <li key={text} className="flex min-w-0 flex-col items-center gap-2 text-center">
+            <Icon className="size-6 shrink-0 text-[--brand-blue]" aria-hidden="true" />
+            <span className="max-w-64">{text}</span>
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+export async function LandingFormSection({ children }: { children: ReactNode }) {
+  const projects = await Promise.all([
+    'saralake-dr-sarasota-fl',
+    'coco-plum-way-sarasota-fl',
+    'western-pine-circle-sarasota-fl',
+    'spinnaker-blvd-englewood-fl',
+  ].map(getProjectBySlug));
+  return (
+    <section className="bg-slate-50 py-8 md:py-12" data-landing-form-section>
+      <div className={cn(container, 'grid items-start gap-6 lg:grid-cols-3')}>
+        <div className="min-w-0 lg:col-span-2">{children}</div>
+        <aside aria-label="Completed SonShine roofing projects" className="flex min-w-0 flex-col gap-6">
+          {projects.map((project) => project?.heroImage ? (
+            <figure key={project.slug} className="overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm">
+              <div className="relative aspect-[4/3]">
+                <Image src={project.heroImage.url} alt={project.heroImage.altText || project.title} fill
+                  sizes="(min-width: 1152px) 352px, (min-width: 1024px) 32vw, 100vw"
+                  className="object-cover" loading="lazy" />
+              </div>
+              <figcaption className="px-5 py-4 text-sm font-semibold text-slate-700">{project.title}</figcaption>
+            </figure>
+          ) : null)}
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+export function LandingFaq({ items }: { items: { question: string; answer: ReactNode }[] }) {
+  return (
+    <div className="grid w-full grid-cols-1 gap-4 text-left" data-landing-faq>
+      {items.map(({ question, answer }) => (
+        <Accordion key={question} summary={<h3 className="text-base font-normal text-slate-800 md:text-xl">{question}</h3>}
+          size="md" tone="soft" radius="2xl" proseBody={false}>
+          <div className="faq-answer text-base leading-loose text-slate-700">{answer}</div>
+        </Accordion>
+      ))}
     </div>
   );
 }
@@ -76,7 +128,7 @@ export function LandingCta({ title, description, ctaLabel }: {
         <h2 className="text-3xl leading-tight md:text-4xl lg:text-4xl">{title}</h2>
         <p className="mx-auto mt-4 max-w-2xl text-slate-600">{description}</p>
         <SmartLink href="#book-an-appointment" aria-label={ctaLabel} className="btn btn-brand-blue mt-6 min-h-12 px-6 py-3">
-          {ctaLabel}<ArrowDown className="ml-2 size-4 shrink-0" aria-hidden="true" />
+          {ctaLabel}<ArrowUp className="ml-2 size-4 shrink-0" aria-hidden="true" />
         </SmartLink>
       </div>
     </section>
@@ -89,15 +141,16 @@ export function LandingReviews({ reviews, title = 'From homeowners who chose Son
   if (!reviews.length) return null;
   return (
     <LandingSection eyebrow="Homeowner experiences" title={title} className="bg-slate-50">
-      <div className="grid gap-5 md:grid-cols-3">
-        {reviews.slice(0, 3).map((review) => (
-          <figure key={`${review.author_name}-${review.time ?? review.text}`} className="rounded-2xl border border-slate-200 bg-white p-6">
-            <Quote className="mb-3 size-6 text-[--brand-blue]" aria-hidden="true" />
-            <blockquote className="whitespace-pre-line text-base leading-relaxed text-slate-700">{review.text}</blockquote>
-            <figcaption className="mt-5 text-sm font-semibold text-slate-900">{review.author_name}<span className="block font-normal text-slate-500">Google review</span></figcaption>
-          </figure>
-        ))}
-      </div>
+      <ReviewsCarouselView reviews={reviews.map((review) => ({
+        id: `landing-${review.author_name}-${review.time ?? 'undated'}`,
+        authorName: review.author_name,
+        text: review.text,
+        rating: review.rating ?? 5,
+        ...reviewDate(review.time),
+        sourceUrl: safeReviewUrl(review.author_url) ?? 'https://www.google.com/maps/place/SonShine+Roofing/data=!4m2!3m1!1s0x0:0x5318594fb175e958',
+        sourceLabel: 'View on Google',
+        sourceLogo: staticImage('google-logo'),
+      }))} />
     </LandingSection>
   );
 }

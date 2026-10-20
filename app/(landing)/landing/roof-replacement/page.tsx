@@ -3,41 +3,30 @@ import type { Metadata } from 'next';
 export const revalidate = false;
 export const dynamic = 'force-static';
 import { Suspense } from 'react';
-import { Check, ChevronDown, ClipboardList, HardHat, Layers } from 'lucide-react';
-import Section from '@/components/layout/Section';
 import StaticImage from '@/components/media/StaticImage';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import EvenSimplerLeadForm from '@/components/lead-capture/lead-form/EvenSimplerLeadForm';
 import {
   LandingCta,
+  LandingFaq,
+  LandingFormSection,
   LandingHero,
   LandingReviews,
   LandingSection,
   LandingTrust,
 } from '@/components/landing/LandingSections';
-import type { Review } from '@/components/reviews-widget/types';
-import { getGoogleReviews } from '@/lib/content/directus-reviews';
 import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 import { getProjectBySlug } from '@/lib/content/projects';
 import { staticImage } from '@/lib/content/static-media';
+import { REPLACEMENT_LANDING_REVIEWS } from '@/lib/landing/reviews';
 
 const LANDING_PATH = '/landing/roof-replacement';
 const CTA_LABEL = 'Request My Free Estimate';
-const PREFERRED_REVIEWERS = ['Charlie', 'Bob P.', 'Susan A.'];
-
-function selectReplacementReviews(reviews: Review[]): Review[] {
-  const eligible = reviews.filter((review) => review.rating === 5 && review.text.trim());
-  const preferred = PREFERRED_REVIEWERS.flatMap((name) => {
-    const review = eligible.find((item) => item.author_name === name);
-    return review ? [review] : [];
-  });
-  const relevant = eligible.filter(
-    (review) =>
-      !preferred.includes(review) &&
-      /(?:new roof|roof replacement|replacing (?:our|my|the) roof)/i.test(review.text) &&
-      !/(?:original roofer|another (?:company|roofer)|roof vents?)/i.test(review.text),
-  );
-  return [...preferred, ...relevant].slice(0, 3);
-}
+const PROJECT_GROUPS = [
+  { material: 'Shingle', slugs: ['saralake-dr-sarasota-fl', 'spinnaker-blvd-englewood-fl'] },
+  { material: 'Metal', slugs: ['coco-plum-way-sarasota-fl', 'vinson-ave-sarasota-fl'] },
+  { material: 'Tile', slugs: ['western-pine-circle-sarasota-fl', 'wagon-wheel-cir-sarasota-fl'] },
+];
 
 export async function generateMetadata(): Promise<Metadata> {
   const hero = staticImage('red-tile-roof-white-home');
@@ -58,19 +47,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const steps = [
   {
-    icon: ClipboardList,
     title: 'Start with your roof',
     description:
       'Tell us what has you considering replacement. We arrange an assessment and explain the condition of your roof and the work it needs.',
   },
   {
-    icon: Layers,
     title: 'Choose with a clear estimate',
     description:
       'Compare materials and review the proposed work, cost and warranty details with a Roofing Specialist before deciding how to move forward.',
   },
   {
-    icon: HardHat,
     title: 'Know what happens next',
     description:
       'Once approved, our team handles permits and scheduling, protects the work area, installs your roof and completes the final inspection and cleanup.',
@@ -106,14 +92,12 @@ const faqs = [
 ];
 
 export default async function RoofReplacementLandingPage() {
-  const [reviews, tileProject, shingleProject] = await Promise.all([
-    getGoogleReviews(),
-    getProjectBySlug('western-pine-circle-sarasota-fl'),
-    getProjectBySlug('spinnaker-blvd-englewood-fl'),
-  ]);
-  const projects = [tileProject, shingleProject].filter(
-    (project): project is NonNullable<typeof project> => Boolean(project?.heroImage),
-  );
+  const projectGroups = await Promise.all(PROJECT_GROUPS.map(async ({ material, slugs }) => ({
+    material,
+    projects: (await Promise.all(slugs.map(getProjectBySlug))).filter(
+      (project): project is NonNullable<typeof project> => Boolean(project?.heroImage),
+    ),
+  })));
 
   return (
     <>
@@ -126,68 +110,77 @@ export default async function RoofReplacementLandingPage() {
       />
       <LandingTrust />
 
-      <Section className="bg-slate-50">
-        <div className="mx-auto max-w-5xl">
-          <Suspense fallback={<p className="text-center text-slate-600">Loading your estimate form…</p>}>
-            <EvenSimplerLeadForm
-              projectType="retail"
-              page={LANDING_PATH}
-              title="Get Your Free Roof Replacement Estimate"
-              titleHighlight="Roof Replacement"
-              description="We respond within 30 minutes during business hours. After hours, we'll contact you the next business day."
-              submitLabel={CTA_LABEL}
-            />
-          </Suspense>
-        </div>
-      </Section>
+      <LandingFormSection>
+        <Suspense fallback={<p className="text-center text-slate-600">Loading your estimate form…</p>}>
+          <EvenSimplerLeadForm
+            projectType="retail"
+            page={LANDING_PATH}
+            title="Get Your Free Roof Replacement Estimate"
+            titleHighlight="Roof Replacement"
+            description="We respond within 30 minutes during business hours. After hours, we'll contact you the next business day."
+            submitLabel={CTA_LABEL}
+          />
+        </Suspense>
+      </LandingFormSection>
 
-      {projects.length > 0 && (
+      {projectGroups.some(({ projects }) => projects.length > 0) && (
         <LandingSection eyebrow="Local work, real homes" title="See the difference a new roof makes.">
           <p className="mb-7 max-w-2xl text-lg text-slate-600">
-            These completed SonShine projects show two of the roofing options available for your
-            home. We help you compare the details that matter for your property.
+            Explore completed shingle, metal and tile replacements, with feedback from the
+            homeowners whose roofs you see here.
           </p>
-          <div className="grid gap-6 md:grid-cols-2">
-            {projects.map((project) => (
-              <figure
-                key={project.slug}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white"
-              >
-                <div className="relative aspect-[4/3]">
-                  <StaticImage
-                    src={project.heroImage!.url}
-                    alt={project.heroImage!.altText}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 600px"
-                    loading="lazy"
-                  />
+          <div className="space-y-10">
+            {projectGroups.filter(({ projects }) => projects.length > 0).map(({ material, projects }) => (
+              <div key={material}>
+                <h3 className="mb-5 text-2xl font-semibold text-slate-900">{material} roof replacements</h3>
+                <div className="grid gap-6 md:grid-cols-2">
+                  {projects.map((project) => (
+                    <Card key={project.slug} className="flex h-full min-w-0 flex-col">
+                      <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
+                        <h4 className="text-2xl font-bold leading-tight text-slate-900">{project.title}</h4>
+                      </CardHeader>
+                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-blue-200">
+                        <StaticImage
+                          src={project.heroImage!.url}
+                          alt={project.heroImage!.altText}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 600px"
+                          loading="lazy"
+                        />
+                      </div>
+                      {project.customerTestimonial?.customerReview && (
+                        <CardContent className="flex flex-1 flex-col px-5 py-5 sm:px-6 sm:py-6">
+                          <figure>
+                            <blockquote className="whitespace-pre-line text-base italic leading-7 text-slate-600">
+                              &ldquo;{project.customerTestimonial.customerReview}&rdquo;
+                            </blockquote>
+                            {project.customerTestimonial.customerName && (
+                              <figcaption className="mt-4 text-sm font-semibold text-slate-900">
+                                {project.customerTestimonial.customerName}
+                              </figcaption>
+                            )}
+                          </figure>
+                        </CardContent>
+                      )}
+                    </Card>
+                  ))}
                 </div>
-                <figcaption className="px-5 py-4">
-                  <p className="font-semibold text-slate-900">{project.title}</p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    {project.materialTypes.map((material) => material.name).join(' / ')} roof replacement
-                  </p>
-                </figcaption>
-              </figure>
+              </div>
             ))}
           </div>
         </LandingSection>
       )}
 
       <LandingReviews
-        reviews={selectReplacementReviews(reviews)}
+        reviews={REPLACEMENT_LANDING_REVIEWS}
         title="What homeowners say about their new roofs"
       />
 
       <LandingSection eyebrow="A straightforward process" title="A plan you can follow, from start to finish.">
         <div className="grid gap-6 md:grid-cols-3">
-          {steps.map(({ icon: Icon, title, description }, index) => (
+          {steps.map(({ title, description }) => (
             <div key={title} className="rounded-2xl border border-slate-200 bg-white p-6">
-              <div className="mb-5 flex items-center justify-between">
-                <Icon className="h-8 w-8 text-[--brand-blue]" aria-hidden="true" />
-                <span className="text-sm font-semibold text-slate-400">0{index + 1}</span>
-              </div>
               <h3 className="mb-3 text-xl font-semibold text-slate-900">{title}</h3>
               <p className="text-slate-600">{description}</p>
             </div>
@@ -202,17 +195,14 @@ export default async function RoofReplacementLandingPage() {
               Your new roof is a complete system. We explain the materials and installation details
               together so you know what you are choosing.
             </p>
-            <ul className="space-y-4">
+            <ul className="list-disc space-y-4 pl-5 text-slate-700 marker:text-slate-400">
               {[
                 'Material options that suit your home and budget.',
                 'Underlayment, flashing and ventilation considered together.',
                 'Warranty details for your selected materials and installation.',
                 'Financing options to discuss with your Roofing Specialist.',
               ].map((item) => (
-                <li key={item} className="flex items-start gap-3 text-slate-700">
-                  <Check className="mt-0.5 h-5 w-5 shrink-0 text-[--brand-blue]" aria-hidden="true" />
-                  <span>{item}</span>
-                </li>
+                <li key={item}>{item}</li>
               ))}
             </ul>
           </div>
@@ -230,17 +220,7 @@ export default async function RoofReplacementLandingPage() {
       </LandingSection>
 
       <LandingSection eyebrow="Before you request an estimate" title="A few common questions">
-        <div className="mx-auto max-w-4xl divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white px-5 sm:px-7">
-          {faqs.map(({ question, answer }) => (
-            <details key={question} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold text-slate-900 [&::-webkit-details-marker]:hidden">
-                {question}
-                <ChevronDown className="h-5 w-5 shrink-0 text-[--brand-blue] transition-transform group-open:rotate-180" aria-hidden="true" />
-              </summary>
-              <p className="mt-4 max-w-3xl leading-relaxed text-slate-600">{answer}</p>
-            </details>
-          ))}
-        </div>
+        <LandingFaq items={faqs} />
       </LandingSection>
 
       <LandingCta

@@ -1,43 +1,41 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Droplets, Hammer, House, Wind } from 'lucide-react';
-import Section from '@/components/layout/Section';
 import EvenSimplerLeadForm from '@/components/lead-capture/lead-form/EvenSimplerLeadForm';
 import {
   LandingCta,
+  LandingFaq,
+  LandingFormSection,
   LandingHero,
   LandingReviews,
   LandingSection,
   LandingTrust,
 } from '@/components/landing/LandingSections';
 import StaticImage from '@/components/media/StaticImage';
-import { Accordion } from '@/components/ui/Accordion';
-import { getGoogleReviews } from '@/lib/content/directus-reviews';
 import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 import { staticImageUrl } from '@/lib/content/static-media';
+import { REPAIR_LANDING_REVIEWS } from '@/lib/landing/reviews';
 
 const PAGE_PATH = '/landing/roof-repair';
 const CTA_LABEL = 'Request My Free Repair Estimate';
-const PREFERRED_REVIEW_AUTHORS = ['Stan B.', 'Jim C.', 'Paula N.'];
 
 const REPAIR_CONCERNS = [
   {
-    icon: Droplets,
+    imageKey: 'stained-roof-decking-and-framing',
     title: 'Leaks and water stains',
     description: 'Find out where water is entering and what needs attention.',
   },
   {
-    icon: Wind,
+    imageKey: 'broken-red-roof-tiles',
     title: 'Missing or damaged roofing',
     description: 'Have loose shingles, damaged tiles or wind damage assessed.',
   },
   {
-    icon: Hammer,
+    imageKey: 'damaged-roof-vent-flashing',
     title: 'Flashing and roof penetrations',
     description: 'Check vulnerable areas around vents, skylights and roof joints.',
   },
   {
-    icon: House,
+    imageKey: null,
     title: 'Fascia and roof edges',
     description: 'Understand the cause of deterioration along your roofline.',
   },
@@ -82,22 +80,7 @@ export async function generateMetadata(): Promise<Metadata> {
   });
 }
 
-export default async function RoofRepairLandingPage() {
-  const reviews = await getGoogleReviews();
-  const eligibleReviews = reviews.filter(
-    (review) =>
-      review.rating === 5 &&
-      /\b(?:repair(?:s|ed)?|leak(?:s|ing)?)\b/iu.test(review.text),
-  );
-  const selectedReviews = [
-    ...PREFERRED_REVIEW_AUTHORS.flatMap((author) =>
-      eligibleReviews.filter((review) => review.author_name === author),
-    ),
-    ...eligibleReviews.filter(
-      (review) => !PREFERRED_REVIEW_AUTHORS.includes(review.author_name),
-    ),
-  ].slice(0, 3);
-
+export default function RoofRepairLandingPage() {
   return (
     <>
       <LandingHero
@@ -109,7 +92,7 @@ export default async function RoofRepairLandingPage() {
       />
       <LandingTrust />
 
-      <Section className="bg-white">
+      <LandingFormSection>
         <Suspense fallback={null}>
           <EvenSimplerLeadForm
             projectType="repair"
@@ -120,44 +103,49 @@ export default async function RoofRepairLandingPage() {
             submitLabel={CTA_LABEL}
           />
         </Suspense>
-      </Section>
+      </LandingFormSection>
 
       <LandingSection
         eyebrow="Start with the cause"
         title="Let’s find out what your roof needs."
       >
-        <div className="grid items-center gap-8 lg:grid-cols-2">
-          <div>
-            <p className="max-w-2xl text-lg leading-8 text-slate-700">
-              A water stain or damaged shingle leaves you with questions. Our job is to assess the
-              affected area, explain what we find and recommend the next step. When a repair is
-              appropriate, you can address the problem and keep using the roof you have.
-            </p>
-            <div className="mt-6 grid gap-5 sm:grid-cols-2">
-              {REPAIR_CONCERNS.map(({ icon: Icon, title, description }) => (
-                <div key={title}>
-                  <Icon className="mb-2 h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
-                  <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
-                  <p className="mt-2 text-base leading-7 text-slate-600">{description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
-            <StaticImage
-              crop
-              src="static:damaged-roof-vent-flashing"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 560px"
-              loading="lazy"
-            />
-          </div>
+        <p className="max-w-3xl text-lg leading-8 text-slate-700">
+          A water stain or damaged shingle leaves you with questions. Our job is to assess the
+          affected area, explain what we find and recommend the next step. When a repair is
+          appropriate, you can address the problem and keep using the roof you have.
+        </p>
+        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {REPAIR_CONCERNS.map(({ imageKey, title, description }) => (
+            <article
+              key={title}
+              className="overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-sm"
+            >
+              <div className="relative aspect-[4/3] bg-slate-100">
+                {imageKey ? (
+                  <StaticImage
+                    crop
+                    src={`static:${imageKey}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
+                    loading="lazy"
+                  />
+                ) : (
+                  // Reserved for a fascia/roof-edge photo; existing assets do not show this issue.
+                  <div className="absolute inset-0" aria-hidden="true" />
+                )}
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
+                <p className="mt-2 text-base leading-7 text-slate-600">{description}</p>
+              </div>
+            </article>
+          ))}
         </div>
       </LandingSection>
 
       <LandingReviews
-        reviews={selectedReviews}
+        reviews={REPAIR_LANDING_REVIEWS}
         title="Homeowners who called us for a repair"
       />
 
@@ -181,10 +169,12 @@ export default async function RoofRepairLandingPage() {
             },
           ].map(({ title, description }, index) => (
             <li key={title} className="rounded-3xl border border-blue-100 bg-white p-6">
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 font-semibold text-[--brand-blue]">
-                {index + 1}
-              </span>
-              <h3 className="mt-4 text-xl font-semibold text-slate-900">{title}</h3>
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 font-semibold text-[--brand-blue]">
+                  {index + 1}
+                </span>
+                <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
+              </div>
               <p className="mt-3 text-base leading-7 text-slate-600">{description}</p>
             </li>
           ))}
@@ -192,18 +182,7 @@ export default async function RoofRepairLandingPage() {
       </LandingSection>
 
       <LandingSection title="Before you request your estimate" className="bg-white">
-        <div className="mx-auto grid max-w-4xl gap-3">
-          {REPAIR_QUESTIONS.map(({ question, answer }) => (
-            <Accordion
-              key={question}
-              summary={<h3 className="text-lg font-semibold">{question}</h3>}
-              radius="2xl"
-              proseBody={false}
-            >
-              <p className="text-base leading-7 text-slate-700">{answer}</p>
-            </Accordion>
-          ))}
-        </div>
+        <LandingFaq items={REPAIR_QUESTIONS} />
       </LandingSection>
 
       <LandingCta

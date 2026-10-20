@@ -11,6 +11,7 @@ import { SiteSettingsProvider } from '@/lib/content/site-settings-context';
 import { SITE_CLIENT_IMAGE_KEYS } from '@/lib/content/static-image-client-keys';
 import { selectStaticImages, staticImage } from '@/lib/content/static-media';
 import AnalyticsScripts from '@/lib/telemetry/analytics';
+import LandingFooter from '@/components/landing/LandingFooter';
 import { SITE_ORIGIN } from '@/lib/seo/site';
 
 export const metadata: Metadata = {
@@ -54,20 +55,7 @@ export default async function LandingLayout({ children }: { children: ReactNode 
             </div>
           </header>
           <main id="landing-content">{children}</main>
-          <footer className="border-t border-slate-200 bg-white py-8 text-sm text-slate-600">
-            <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 sm:px-6 md:flex-row md:justify-between">
-              <div>
-                <p className="font-semibold text-slate-900">{brand}</p>
-                {settings?.address ? <p>{settings.address.street}, {settings.address.city}, {settings.address.region} {settings.address.postalCode}</p> : null}
-                {settings?.licenseNumber ? <p>Florida roofing license: {settings.licenseNumber}</p> : null}
-                <p className="mt-2">© {new Date().getFullYear()} {brand}</p>
-              </div>
-              <nav aria-label="Legal" className="flex flex-wrap items-start gap-x-5 gap-y-3">
-                <SmartLink href="/privacy-policy" prefetch={false} className="underline underline-offset-4">Privacy policy</SmartLink>
-                <SmartLink href="/sms-terms-and-conditions" prefetch={false} className="underline underline-offset-4">SMS terms</SmartLink>
-              </nav>
-            </div>
-          </footer>
+          <LandingFooter settings={settings} />
         </div>
       </StaticMediaProvider>
     </SiteSettingsProvider>
