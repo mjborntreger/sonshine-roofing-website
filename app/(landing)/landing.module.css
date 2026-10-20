@@ -1,0 +1,9 @@
+.root {
+  --sticky-offset: 16px;
+}
+
+/* Landing headers scroll away. Keep only the target's 16px margin, without
+   adding the organic site's document-level header padding. */
+:global(html):has(.root) {
+  scroll-padding-top: 0;
+}

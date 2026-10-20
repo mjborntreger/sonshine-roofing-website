@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
 import { Phone } from 'lucide-react';
@@ -13,6 +13,7 @@ import { selectStaticImages, staticImage } from '@/lib/content/static-media';
 import AnalyticsScripts from '@/lib/telemetry/analytics';
 import LandingFooter from '@/components/landing/LandingFooter';
 import { SITE_ORIGIN } from '@/lib/seo/site';
+import styles from './landing.module.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_ORIGIN),
@@ -40,7 +41,7 @@ export default async function LandingLayout({ children }: { children: ReactNode 
   return (
     <SiteSettingsProvider value={publicSettings}>
       <StaticMediaProvider images={selectStaticImages(SITE_CLIENT_IMAGE_KEYS)}>
-        <div id="page-top" className="min-h-svh bg-white text-slate-900" style={{ '--sticky-offset': '16px' } as CSSProperties}>
+        <div id="page-top" className={`${styles.root} min-h-svh bg-white text-slate-900`}>
           <AnalyticsScripts enabled={settings?.enableSiteAnalytics ?? false} />
           <Suspense fallback={null}><LeadAttributionCapture /></Suspense>
           <a href="#landing-content" className="sr-only focus:not-sr-only focus:block focus:p-4">Skip to content</a>
