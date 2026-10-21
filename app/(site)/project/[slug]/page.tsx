@@ -299,20 +299,20 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </div>
 
           {/* Right column: Project Details + Products */}
-          <div className="sticky top-16 prose bg-amber-50/50 shadow-sm rounded-3xl border border-blue-200">
+          <div className="sticky top-16 bg-amber-50/50 shadow-sm rounded-3xl border border-blue-200">
             {project.projectDescription && (
               <>
                 <div className="rounded-t-3xl px-6 border-b border-blue-200 overflow-hidden bg-blue-50">
-                  <h3 className="text-2xl mt-6">
+                  <h3 className="text-2xl mt-6 mb-4">
                     About This Project
                   </h3>
 
                 </div>
                 <div className="px-6">
-                  <h4 className="mt-4 text-xl text-slate-600">
+                  <h4 className="mt-4 mb-2 text-xl text-slate-600">
                     Summary
                   </h4>
-                  <p>{project.projectDescription}</p>
+                  <p className="mb-6">{project.projectDescription}</p>
                 </div>
 
               </>
@@ -321,11 +321,11 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
             {project.productLinks?.length > 0 && (
               <>
                 <div className="rounded-b-3xl px-6 border-t border-blue-200 overflow-hidden bg-blue-50">
-                  <h4 className="mt-4 text-xl text-slate-600">
+                  <h4 className="mt-4 mb-2 text-xl text-slate-600">
                     <List className="text-[--brand-blue] mr-2 inline h-4 w-4" />
                     Products Used
                   </h4>
-                  <ul className="pl-5 list-disc not-prose pb-4 text-sm">
+                  <ul className="pl-5 list-disc mb-6">
                     {project.productLinks.map((p, i) => (
                       <li key={i}>
                         {p.productLink ? (
