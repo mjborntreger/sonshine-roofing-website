@@ -125,7 +125,7 @@ export default function Hero({
       {/* Content */}
       <div className="relative z-30 mx-auto max-w-[1440px] px-4 pb-32 pt-24 md:pt-32 not-prose">
         <div className="grid gap-10 items-start lg:grid-cols-[minmax(0,1fr)_minmax(360px,520px)]">
-          <div className="max-w-3xl text-center lg:pb-8 lg:text-left">
+          <div className="max-w-3xl mx-auto text-center lg:pb-8 lg:text-left">
             <div>
               <p className="font-script text-2xl font-semibold text-[--brand-cyan] sm:text-4xl">
                 Since 1987, we&apos;ve got you covered.
@@ -174,7 +174,7 @@ export default function Hero({
             </div>
           </div>
 
-          <div className="mx-auto w-full max-w-[520px] lg:mx-0 lg:justify-self-end">
+          <div className="mx-auto w-full lg:mx-0 lg:justify-self-end">
             <Suspense fallback={<LeadFormFallback />}>
               <LeadForm restoredSuccess={restoredSuccess} variant="heroEmbedded" />
             </Suspense>
