@@ -17,7 +17,7 @@ export default function LandingFooter({ settings }: { settings: SiteSettings | n
       <footer className="border-t-4 border-[#fb9216] bg-[#071b2b] py-12 text-sm text-slate-100">
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
           <h2 className="sr-only">Footer</h2>
-          <div className="grid gap-10 md:grid-cols-3">
+          <div className="grid gap-10 md:grid-cols-4">
             <div>
               <SmartLink href="/" aria-label={`${brand} home`} prefetch={false}>
                 <StaticImage src={settings?.logoInverted.url ?? 'static:sonshine-roofing-wordmark'}
@@ -35,14 +35,12 @@ export default function LandingFooter({ settings }: { settings: SiteSettings | n
               ) : null}
             </div>
             <div>
-              <h3 className={headingClass}>Contact SonShine</h3>
+              <h3 className={headingClass}>Contact</h3>
               <address className="mt-5 space-y-3 not-italic text-[#cad8e6]">
                 {settings?.address ? <p>{settings.address.street}<br />{settings.address.city}, {settings.address.region} {settings.address.postalCode}</p> : null}
                 <p><SmartLink href={settings?.phoneHref ?? 'tel:+19418664320'} className={linkClass}>{settings?.phone ?? '(941) 866-4320'}</SmartLink></p>
+                <p><SmartLink href='tel:+19418664320' className={linkClass}>{settings?.email ?? 'messages@sonshineroofing.com'}</SmartLink></p>
               </address>
-              <nav aria-label="Footer" className="mt-5">
-                <SmartLink href="/" prefetch={false} className={linkClass}>Home</SmartLink>
-              </nav>
             </div>
             <div>
               <h3 className={headingClass}>Hours of operation</h3>
@@ -51,6 +49,20 @@ export default function LandingFooter({ settings }: { settings: SiteSettings | n
                   const [label, ...parts] = line.split(':');
                   return <p key={line}><span className="font-semibold text-white">{label}:</span><br />{parts.join(':').trim() || line}</p>;
                 })}
+              </div>
+            </div>
+            <div>
+              <h3 className={headingClass}>Quick Links</h3>
+              <div className="mt-5 space-y-3 text-[#cad8e6]">
+                <nav aria-label="Footer" className="mt-5">
+                  <SmartLink href="/" prefetch={false} className={linkClass}>Site Home</SmartLink>
+                </nav>
+                <nav>
+                  <SmartLink href="/project" prefetch={false} className={linkClass}>Project Gallery</SmartLink>
+                </nav>
+                <nav>
+                  <SmartLink href="/financing" prefetch={false} className={linkClass}>Financing</SmartLink>
+                </nav>
               </div>
             </div>
           </div>

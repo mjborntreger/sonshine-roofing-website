@@ -2,6 +2,7 @@ import { staticImage } from '@/lib/content/static-media';
 import { imageBackground } from '@/lib/content/public-image';
 import type { ComponentType, ReactNode, SVGProps } from "react";
 import { cn } from "@/lib/utils";
+import ReviewSummary from '@/components/reviews-widget/ReviewSummary';
 
 type HeroBadge = { label: string; icon?: ComponentType<SVGProps<SVGSVGElement>> };
 
@@ -92,6 +93,8 @@ export default function Hero({
                 {subtitle}
               </p>
             ) : null}
+
+            <ReviewSummary tone="inverse" className={justifyStart ? 'justify-start' : 'justify-center'} />
 
             {badges?.length ? (
               <div className={BADGE_CONTAINER}>

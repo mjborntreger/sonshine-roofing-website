@@ -3,8 +3,11 @@ import { ArrowDown, ArrowUp, CalendarDays, ClipboardList, Phone, ShieldCheck } f
 import Image from 'next/image';
 import StaticImage from '@/components/media/StaticImage';
 import SmartLink from '@/components/utils/SmartLink';
+import { renderHighlight } from '@/components/utils/renderHighlight';
 import { Accordion } from '@/components/ui/Accordion';
 import ReviewsCarouselView from '@/components/reviews-widget/ReviewsCarouselView';
+import ReviewStarRow from '@/components/reviews-widget/ReviewStarRow';
+import ReviewSummary from '@/components/reviews-widget/ReviewSummary';
 import { reviewDate, safeReviewUrl } from '@/components/reviews-widget/review-presentation';
 import type { Review } from '@/components/reviews-widget/types';
 import { getSiteSettings } from '@/lib/content/directus-site';
@@ -13,11 +16,12 @@ import { staticImage } from '@/lib/content/static-media';
 import { cn } from '@/lib/utils';
 
 const container = 'mx-auto w-full max-w-6xl px-4 sm:px-6';
+type HighlightText = string | readonly string[];
 
 export async function LandingHero({
-  eyebrow, title, description, imageKey, ctaLabel,
+  eyebrow, title, highlightText, description, imageKey, ctaLabel,
 }: {
-  eyebrow: string; title: string; description: string; imageKey: string; ctaLabel: string;
+  eyebrow: string; title: string; highlightText?: HighlightText; description: string; imageKey: string; ctaLabel: string;
 }) {
   const settings = await getSiteSettings();
   return (
@@ -25,8 +29,9 @@ export async function LandingHero({
       <div className={cn(container, 'grid items-center gap-6 py-8 md:grid-cols-2 md:gap-10 md:py-10')}>
         <div>
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-[--brand-blue]">{eyebrow}</p>
-          <h1 className="text-4xl leading-tight tracking-tight text-slate-900 md:text-5xl lg:text-5xl">{title}</h1>
+          <h1 className="text-4xl leading-tight tracking-tight text-slate-900 md:text-5xl lg:text-5xl">{renderHighlight(title, highlightText)}</h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg">{description}</p>
+          <ReviewSummary className="mt-4" />
           <div className="mt-6 flex flex-wrap items-center gap-4">
             <SmartLink href="#book-an-appointment" aria-label={ctaLabel} className="btn btn-brand-blue min-h-12 px-5 py-3 text-center">
               {ctaLabel}<ArrowDown className="ml-2 size-4 shrink-0" aria-hidden="true" />
@@ -50,9 +55,9 @@ export function LandingTrust() {
     <div className="border-b border-blue-100 bg-white">
       <ul aria-label="Why homeowners choose SonShine" className={cn(container, 'grid grid-cols-1 gap-5 py-6 text-sm font-medium text-slate-700 sm:grid-cols-3 sm:gap-6')}>
         {[
-          { text: 'Serving local homeowners since 1987', icon: CalendarDays },
-          { text: 'Licensed & insured', icon: ShieldCheck },
-          { text: 'Free repair & replacement estimates', icon: ClipboardList },
+          { text: 'Serving SWFL Since 1987', icon: CalendarDays },
+          { text: 'Licensed & Insured', icon: ShieldCheck },
+          { text: 'Free Repair & Replacement Estimates', icon: ClipboardList },
         ].map(({ text, icon: Icon }) => (
           <li key={text} className="flex min-w-0 flex-col items-center gap-2 text-center">
             <Icon className="size-6 shrink-0 text-[--brand-blue]" aria-hidden="true" />
@@ -70,12 +75,16 @@ export async function LandingFormSection({ children }: { children: ReactNode }) 
     'coco-plum-way-sarasota-fl',
     'western-pine-circle-sarasota-fl',
     'spinnaker-blvd-englewood-fl',
+    'south-tamiami-trail-port-charlotte-fl-harbor-professional-center',
   ].map(getProjectBySlug));
   return (
     <section className="bg-slate-50 py-8 md:py-12" data-landing-form-section>
       <div className={cn(container, 'grid items-start gap-6 lg:grid-cols-3')}>
         <div className="min-w-0 lg:col-span-2">{children}</div>
-        <aside aria-label="Completed SonShine roofing projects" className="flex min-w-0 flex-col gap-6">
+        <aside 
+          aria-label="Completed SonShine roofing projects" 
+          className="hidden lg:flex min-w-0 flex-col gap-6"
+        >
           {projects.map((project) => project?.heroImage ? (
             <figure key={project.slug} className="overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm">
               <div className="relative aspect-[4/3]">
@@ -105,27 +114,28 @@ export function LandingFaq({ items }: { items: { question: string; answer: React
   );
 }
 
-export function LandingSection({ eyebrow, title, children, className, id }: {
-  eyebrow?: string; title: string; children: ReactNode; className?: string; id?: string;
+export function LandingSection({ eyebrow, title, highlightText, subtitle, children, className, id }: {
+  eyebrow?: string; title: string; highlightText?: HighlightText; subtitle?: string; children: ReactNode; className?: string; id?: string;
 }) {
   return (
     <section id={id} className={cn('py-10 md:py-14', className)}>
       <div className={container}>
         {eyebrow ? <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-[--brand-blue]">{eyebrow}</p> : null}
-        <h2 className="mb-6 text-3xl leading-tight tracking-tight md:text-4xl lg:text-4xl">{title}</h2>
+        <h2 className={cn('text-3xl leading-tight tracking-tight md:text-4xl lg:text-4xl', subtitle ? 'mb-3' : 'mb-6')}>{renderHighlight(title, highlightText)}</h2>
+        {subtitle ? <p className="mb-6 max-w-3xl text-base leading-relaxed text-slate-600 md:text-lg">{subtitle}</p> : null}
         {children}
       </div>
     </section>
   );
 }
 
-export function LandingCta({ title, description, ctaLabel }: {
-  title: string; description: string; ctaLabel: string;
+export function LandingCta({ title, highlightText, description, ctaLabel }: {
+  title: string; highlightText?: HighlightText; description: string; ctaLabel: string;
 }) {
   return (
     <section className="border-t border-blue-100 bg-blue-50 py-10 md:py-14">
       <div className={cn(container, 'max-w-3xl text-center')}>
-        <h2 className="text-3xl leading-tight md:text-4xl lg:text-4xl">{title}</h2>
+        <h2 className="text-3xl leading-tight md:text-4xl lg:text-4xl">{renderHighlight(title, highlightText)}</h2>
         <p className="mx-auto mt-4 max-w-2xl text-slate-600">{description}</p>
         <SmartLink href="#book-an-appointment" aria-label={ctaLabel} className="btn btn-brand-blue mt-6 min-h-12 px-6 py-3">
           {ctaLabel}<ArrowUp className="ml-2 size-4 shrink-0" aria-hidden="true" />
@@ -135,12 +145,12 @@ export function LandingCta({ title, description, ctaLabel }: {
   );
 }
 
-export function LandingReviews({ reviews, title = 'From homeowners who chose SonShine' }: {
-  reviews: Review[]; title?: string;
+export function LandingReviews({ reviews, title = 'From homeowners who chose SonShine', highlightText, subtitle }: {
+  reviews: Review[]; title?: string; highlightText?: HighlightText; subtitle?: string;
 }) {
   if (!reviews.length) return null;
   return (
-    <LandingSection eyebrow="Homeowner experiences" title={title} className="bg-slate-50">
+    <LandingSection eyebrow="Homeowner Testimonials" title={title} highlightText={highlightText} subtitle={subtitle} className="bg-slate-50">
       <ReviewsCarouselView reviews={reviews.map((review) => ({
         id: `landing-${review.author_name}-${review.time ?? 'undated'}`,
         authorName: review.author_name,

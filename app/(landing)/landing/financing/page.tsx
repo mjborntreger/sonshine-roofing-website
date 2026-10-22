@@ -24,7 +24,7 @@ const CTA_LABEL = 'Request My Estimate & Financing Options';
 
 export async function generateMetadata(): Promise<Metadata> {
   return getWebsitePageMetadata({
-    title: 'Roof Replacement Financing & Free Estimate | SonShine Roofing',
+    title: 'Roof Financing & Free Estimate | SonShine Roofing',
     description:
       'Request a free roof replacement estimate and discuss Ygrene and Service Finance options with SonShine Roofing. Financing is subject to provider approval.',
     path: LANDING_PATH,
@@ -34,16 +34,16 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const steps = [
   {
-    title: 'Start with your roof',
-    text: 'Send your request. We’ll contact you within 30 minutes during business hours, or the next business day after hours, to arrange your free replacement estimate.',
+    title: 'Assess your roof',
+    text: 'Send your request using the form above or give us a call. We’ll contact you within 30 minutes during business hours, or the next business day after hours, to arrange your free replacement estimate.',
   },
   {
-    title: 'Understand the project and options',
-    text: 'Review the recommended roof, project scope and estimate with our team. We’ll explain how to explore the available financing programs.',
+    title: 'Review your options',
+    text: 'Review the project scope and estimate with our team. We’ll explain how financing works and help you decide how to move forward.',
   },
   {
-    title: 'Choose your next step',
-    text: 'If you decide to apply, complete the provider’s separate application and review its full terms. Approval comes from the provider before you finalize financing.',
+    title: 'Get approved',
+    text: "Complete the provider’s application and review its full terms. We can take care of this for you if needed. Approvals are usually same-day.",
   },
 ];
 
@@ -51,9 +51,10 @@ export default function FinancingLandingPage() {
   return (
     <>
       <LandingHero
-        eyebrow="Roof replacement financing"
-        title="Explore financing for your roof replacement."
-        description="Start with a free roof replacement estimate. Our team will help you understand the project and discuss financing through Ygrene and Service Finance, so you can decide your next step."
+        eyebrow="Roof Replacement Financing"
+        title="Prefer monthly payments for your next roof? Let us help."
+        highlightText="monthly payments"
+        description="Our team will help you understand your options. We'll discuss credit-based and lien-based financing through our preferred partners so you can decide the option that makes the most sense for you."
         imageKey="financing-options-couple-wide"
         ctaLabel={CTA_LABEL}
       />
@@ -70,10 +71,9 @@ export default function FinancingLandingPage() {
           <EvenSimplerLeadForm
             projectType="retail"
             page={LANDING_PATH}
-            title="Free Replacement Estimate & Financing Options"
+            title="Request Your Free Replacement Estimate & Financing Options"
             titleHighlight="Free Replacement Estimate"
-            description="Tell us about your roof and the best way to reach you. This is a request to speak with SonShine, not a credit application. Submitting this form does not check your credit or approve financing."
-            submitLabel={CTA_LABEL}
+            description="Tell us about your roof and the best way to reach you. We'll schedule a free roof assessment and help you understand options for financing."
           />
         </Suspense>
       </LandingFormSection>
@@ -87,8 +87,8 @@ export default function FinancingLandingPage() {
       </LandingSection>
 
       <LandingSection
-        eyebrow="What happens next"
-        title="Get the estimate first. Make an informed decision."
+        eyebrow="How It Works"
+        title="Assessment, Application & Approval."
         className="bg-slate-50"
       >
         <ol className="grid gap-6 md:grid-cols-3">
@@ -106,7 +106,10 @@ export default function FinancingLandingPage() {
         </ol>
       </LandingSection>
 
-      <LandingSection eyebrow="Your roof comes first" title="A roofing team to guide the whole project">
+      <LandingSection 
+        eyebrow="Let's Get to Work" 
+        title="Your roof is our priority."
+      >
         <div className="grid items-center gap-8 md:grid-cols-2">
           <StaticImage
             src="static:red-tile-roof-white-home"
@@ -117,11 +120,8 @@ export default function FinancingLandingPage() {
           <div>
             <p className="text-lg leading-relaxed text-slate-700">
               Financing is one part of replacing a roof. You also need to know what will be installed,
-              how the work will be handled and who will answer your questions.
-            </p>
-            <p className="mt-4 leading-relaxed text-slate-600">
-              SonShine walks you through roof materials, installation, cleanup and the warranty
-              information for your chosen system. Start with a conversation about your home.
+              how the work will be handled, and what your next steps are. SonShine guides you through 
+              the whole process so you can rest easy.
             </p>
           </div>
         </div>
@@ -129,10 +129,15 @@ export default function FinancingLandingPage() {
 
       <LandingReviews
         reviews={REPLACEMENT_LANDING_REVIEWS}
-        title="What homeowners say about their new roofs"
+        title="Read reviews from real SonShine customers."
+        highlightText="real SonShine customers"
+        subtitle="Hear how homeowners describe their roof replacement experience."
       />
 
-      <LandingSection title="Questions about roof financing">
+      <LandingSection 
+        eyebrow="Frequently Asked Questions"
+        title="Need help? We've got you covered."
+      >
         <LandingFaq
           items={[
             {
@@ -173,7 +178,8 @@ export default function FinancingLandingPage() {
       </LandingSection>
 
       <LandingCta
-        title="Know the roof. Understand the options."
+        title="Finance your new roof with confidence."
+        highlightText="with confidence"
         description="Request your free roof replacement estimate and ask our team about financing. We’ll follow up within 30 minutes during business hours, or the next business day after hours."
         ctaLabel={CTA_LABEL}
       />

@@ -19,13 +19,14 @@ import { getWebsitePageMetadata } from '@/lib/content/directus-site';
 import { getProjectBySlug } from '@/lib/content/projects';
 import { staticImage } from '@/lib/content/static-media';
 import { REPLACEMENT_LANDING_REVIEWS } from '@/lib/landing/reviews';
+import ReviewStarRow from '@/components/reviews-widget/ReviewStarRow';
 
 const LANDING_PATH = '/landing/roof-replacement';
 const CTA_LABEL = 'Request My Free Estimate';
 const PROJECT_GROUPS = [
-  { material: 'Shingle', slugs: ['saralake-dr-sarasota-fl', 'spinnaker-blvd-englewood-fl'] },
+  { material: 'Shingle', slugs: ['brewster-rd-north-port-fl', 'spinnaker-blvd-englewood-fl'] },
   { material: 'Metal', slugs: ['coco-plum-way-sarasota-fl', 'vinson-ave-sarasota-fl'] },
-  { material: 'Tile', slugs: ['western-pine-circle-sarasota-fl', 'wagon-wheel-cir-sarasota-fl'] },
+  { material: 'Tile', slugs: ['41st-court-east-sarasota-fl', 'wagon-wheel-cir-sarasota-fl'] },
 ];
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -47,17 +48,17 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const steps = [
   {
-    title: 'Start with your roof',
+    title: 'Step #1: Initial Assessment',
     description:
-      'Tell us what has you considering replacement. We arrange an assessment and explain the condition of your roof and the work it needs.',
+      "Tell us what has you considering replacement. We'll arrange a free assessment, help you understand the condition of your roof, and help you decide if replacement is the right move.",
   },
   {
-    title: 'Choose with a clear estimate',
+    title: 'Step #2: Understand Your Options',
     description:
       'Compare materials and review the proposed work, cost and warranty details with a Roofing Specialist before deciding how to move forward.',
   },
   {
-    title: 'Know what happens next',
+    title: 'Step #3: Project Approval',
     description:
       'Once approved, our team handles permits and scheduling, protects the work area, installs your roof and completes the final inspection and cleanup.',
   },
@@ -72,22 +73,22 @@ const faqs = [
   {
     question: 'What if I am not sure my roof needs replacing?',
     answer:
-      'You can still request an estimate. Tell us about the leaks, damage or other concerns you have. A Roofing Specialist will assess the roof and discuss whether replacement is appropriate.',
+      'You can still request an estimate. Tell us about the leaks, damage or other concerns you have. A Roofing Specialist will assess the roof and discuss whether replacement or repair is appropriate.',
   },
   {
     question: 'Which roofing materials can I choose?',
     answer:
-      'SonShine installs shingle, tile, metal and flat roofing systems. Your roof structure, budget and preferences help determine which options fit your home.',
+      'SonShine installs shingle, tile, metal and flat roofing systems. Your roof structure, budget and preferences help determine which options fit your home. See our project gallery for inspiration',
   },
   {
-    question: 'Can I discuss financing with my estimate?',
+    question: 'Do you offer financing?',
     answer:
-      'Yes. Mention financing in the optional message field or ask your Roofing Specialist when we contact you. Available programs, eligibility and terms are determined by the financing provider.',
+      'Yes. Mention financing in the optional message field or ask your Roofing Specialist when we contact you. Available programs, eligibility and terms are determined by our partners at Service Finance and Ygrene.',
   },
   {
     question: 'When will I hear from you?',
     answer:
-      "We respond within 30 minutes during business hours. After hours, we'll contact you the next business day. Your request starts a conversation; an appointment and installation date are confirmed with our team.",
+      "We respond within 30 minutes during business hours. After hours, we'll contact you the next business day regarding your inquiry and attempt to schedule an intiial appointment with one of our roofing specialists.",
   },
 ];
 
@@ -103,8 +104,9 @@ export default async function RoofReplacementLandingPage() {
     <>
       <LandingHero
         eyebrow="Residential roof replacement"
-        title="A new roof starts with a clear, free estimate."
-        description="Understand your options before you make a big decision. Our local team will help you choose the right roofing system and walk you through the work, from the first assessment to the final cleanup."
+        title="Need to replace your roof? Let us help."
+        highlightText="replace your roof"
+        description="A new roof is a big decision. Our expert team will help you choose the right roofing system and guide you through the entire process from the initial assessment to the final cleanup."
         imageKey="red-tile-roof-white-home"
         ctaLabel={CTA_LABEL}
       />
@@ -124,10 +126,13 @@ export default async function RoofReplacementLandingPage() {
       </LandingFormSection>
 
       {projectGroups.some(({ projects }) => projects.length > 0) && (
-        <LandingSection eyebrow="Local work, real homes" title="See the difference a new roof makes.">
+        <LandingSection 
+          eyebrow="40+ Years of Roofing Excellence" 
+          title="We take pride in our work."
+        >
           <p className="mb-7 max-w-2xl text-lg text-slate-600">
-            Explore completed shingle, metal and tile replacements, with feedback from the
-            homeowners whose roofs you see here.
+            Explore completed shingle, metal and tile replacements with feedback from fellow
+            homeowners.
           </p>
           <div className="space-y-10">
             {projectGroups.filter(({ projects }) => projects.length > 0).map(({ material, projects }) => (
@@ -151,7 +156,8 @@ export default async function RoofReplacementLandingPage() {
                       </div>
                       {project.customerTestimonial?.customerReview && (
                         <CardContent className="flex flex-1 flex-col px-5 py-5 sm:px-6 sm:py-6">
-                          <figure>
+                          <ReviewStarRow />
+                          <figure className="mt-4">
                             <blockquote className="whitespace-pre-line text-base italic leading-7 text-slate-600">
                               &ldquo;{project.customerTestimonial.customerReview}&rdquo;
                             </blockquote>
@@ -174,10 +180,15 @@ export default async function RoofReplacementLandingPage() {
 
       <LandingReviews
         reviews={REPLACEMENT_LANDING_REVIEWS}
-        title="What homeowners say about their new roofs"
+        title="Read reviews from real SonShine customers."
+        highlightText="real SonShine customers"
+        subtitle="Hear how homeowners describe their roof replacement experience."
       />
 
-      <LandingSection eyebrow="A straightforward process" title="A plan you can follow, from start to finish.">
+      <LandingSection 
+        eyebrow="Straightforward & Simple" 
+        title="Let us handle the details."
+      >
         <div className="grid gap-6 md:grid-cols-3">
           {steps.map(({ title, description }) => (
             <div key={title} className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -219,13 +230,17 @@ export default async function RoofReplacementLandingPage() {
         </div>
       </LandingSection>
 
-      <LandingSection eyebrow="Before you request an estimate" title="A few common questions">
+      <LandingSection 
+        eyebrow="Frequently Asked Questions"
+        title="Need help? We've got you covered."
+      >
         <LandingFaq items={faqs} />
       </LandingSection>
 
       <LandingCta
         title="Make your next roofing decision with confidence."
-        description="Start with a free estimate and a conversation about your home. We'll help you understand the options and the next steps."
+        highlightText="with confidence"
+        description="Start with a free estimate and a conversation about your home. We'll help you understand your options and next steps."
         ctaLabel={CTA_LABEL}
       />
     </>

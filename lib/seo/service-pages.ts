@@ -40,7 +40,7 @@ export const SERVICE_PAGE_CONFIG: Record<string, ServicePageConfig> = {
   '/financing': {
     title: 'Roof Financing | SonShine Roofing',
     description:
-      'Get approved today! | 0% APR for 12 mo. | Credit-based & Equity-based | Easy, convenient financing options for your next roof',
+      'Explore Ygrene and Service Finance roof financing options. Estimate payments and compare terms with SonShine Roofing. Financing is subject to approval.',
     image: {
       url: staticImageUrl('sonshine-roofing-social-card'),
       width: 1200,

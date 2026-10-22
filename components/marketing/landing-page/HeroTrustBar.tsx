@@ -3,6 +3,7 @@ import StaticImage from '@/components/media/StaticImage';
 import { ArrowUpRight, BadgeCheck } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import { renderHighlight } from '@/components/utils/renderHighlight';
+import { GOOGLE_REVIEW_SUMMARY } from '@/lib/reviews-summary';
 import {
   DEFAULT_GOOGLE_BUSINESS_PROFILE_URL,
   getReviewsCarouselSettings,
@@ -85,12 +86,12 @@ const REVIEW_LINKS = [
   {
     id: 'google',
     href: DEFAULT_GOOGLE_BUSINESS_PROFILE_URL,
-    ariaLabel: 'View our 4.9-star Google Business Profile reviews (opens in a new tab)',
-    statValue: '244+',
+    ariaLabel: `View our ${GOOGLE_REVIEW_SUMMARY.rating}-star Google Business Profile reviews (opens in a new tab)`,
+    statValue: String(GOOGLE_REVIEW_SUMMARY.reviewCount),
     statDescriptor: 'Reviews',
     logo: { src: GOOGLE_LOGO_SRC, alt: 'Google logo' },
     title: 'Google',
-    rating: '4.9',
+    rating: String(GOOGLE_REVIEW_SUMMARY.rating),
     showStar: true,
     accentClass: TITLE_ACCENT_GOOGLE,
     accentHex: '#2563eb',

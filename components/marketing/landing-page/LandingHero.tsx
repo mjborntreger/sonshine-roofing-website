@@ -12,6 +12,7 @@ import {
   type LeadSuccessRestore,
 } from '@/components/lead-capture/lead-form/config';
 import { useSiteSettings } from '@/lib/content/site-settings-context';
+import ReviewSummary from '@/components/reviews-widget/ReviewSummary';
 
 type HeroProps = {
   scriptFontClassName: string;
@@ -147,6 +148,8 @@ export default function Hero({
             {description ? (
               <p className="text-lg leading-relaxed text-blue-50 md:text-xl">{description}</p>
             ) : null}
+
+            <ReviewSummary tone="inverse" className="mt-6 justify-center lg:justify-start" />
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
               <SmartLink

@@ -22,22 +22,17 @@ const REPAIR_CONCERNS = [
   {
     imageKey: 'stained-roof-decking-and-framing',
     title: 'Leaks and water stains',
-    description: 'Find out where water is entering and what needs attention.',
+    description: 'Find out where water is entering and why.',
   },
   {
     imageKey: 'broken-red-roof-tiles',
     title: 'Missing or damaged roofing',
-    description: 'Have loose shingles, damaged tiles or wind damage assessed.',
+    description: 'Patch the affected area and mitigate further wind-related damage.',
   },
   {
     imageKey: 'damaged-roof-vent-flashing',
     title: 'Flashing and roof penetrations',
-    description: 'Check vulnerable areas around vents, skylights and roof joints.',
-  },
-  {
-    imageKey: null,
-    title: 'Fascia and roof edges',
-    description: 'Understand the cause of deterioration along your roofline.',
+    description: 'Seal and reinforce vulnerable areas around vents, skylights, and roof joints.',
   },
 ];
 
@@ -62,11 +57,6 @@ const REPAIR_QUESTIONS = [
     answer:
       'We will respond within 30 minutes during business hours. Requests received after hours will receive a response the next business day. We will discuss assessment and repair scheduling when we contact you.',
   },
-  {
-    question: 'Can I request an estimate for a property I manage?',
-    answer:
-      'Yes. Homeowners, landlords and authorized property managers can request a repair estimate for a residential property within our service area. Include the property address so we can confirm coverage.',
-  },
 ];
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -84,9 +74,10 @@ export default function RoofRepairLandingPage() {
   return (
     <>
       <LandingHero
-        eyebrow="Residential roof repair · Sarasota, Manatee & Charlotte counties"
-        title="Roof repair starts with a clear answer."
-        description="Get a free roof repair estimate for leaks, damaged roofing or worn flashing. We will assess your roof and explain the repair options so you can decide what comes next."
+        eyebrow="Residential roof repair"
+        title="Start with a clear, free estimate."
+        highlightText="free estimate"
+        description="We will thoroughly assess your roof, explain your options, and help you decide next steps."
         imageKey="skylight-shingle-repair"
         ctaLabel={CTA_LABEL}
       />
@@ -106,13 +97,12 @@ export default function RoofRepairLandingPage() {
       </LandingFormSection>
 
       <LandingSection
-        eyebrow="Start with the cause"
-        title="Let’s find out what your roof needs."
+        eyebrow="Let's Fix The Root Cause"
+        title="Issue with your roof? Let us help."
       >
         <p className="max-w-3xl text-lg leading-8 text-slate-700">
-          A water stain or damaged shingle leaves you with questions. Our job is to assess the
-          affected area, explain what we find and recommend the next step. When a repair is
-          appropriate, you can address the problem and keep using the roof you have.
+          We assess the affected area, explain what we find, and recommend the next step. 
+          When a repair is appropriate, we handle the details so you can rest easy.
         </p>
         <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {REPAIR_CONCERNS.map(({ imageKey, title, description }) => (
@@ -146,7 +136,9 @@ export default function RoofRepairLandingPage() {
 
       <LandingReviews
         reviews={REPAIR_LANDING_REVIEWS}
-        title="Homeowners who called us for a repair"
+        title="Reviews from real SonShine customers."
+        highlightText="real SonShine customers"
+        subtitle="Hear how homeowners describe their roof repair experience."
       />
 
       <LandingSection eyebrow="What happens next" title="From your first call to a repair decision.">
@@ -181,12 +173,16 @@ export default function RoofRepairLandingPage() {
         </ol>
       </LandingSection>
 
-      <LandingSection title="Before you request your estimate" className="bg-white">
+      <LandingSection 
+        eyebrow="Frequently Asked Questions"
+        title="Need help? We've got you covered."
+      >
         <LandingFaq items={REPAIR_QUESTIONS} />
       </LandingSection>
 
       <LandingCta
         title="Get a clear next step for your roof."
+        highlightText="clear next step"
         description="Start with a free repair estimate and a conversation about the problem."
         ctaLabel={CTA_LABEL}
       />

@@ -28,6 +28,7 @@ import { useLeadFormErrorFocus } from '@/components/lead-capture/shared/useLeadF
 import {
   FINANCING_PRESETS,
   FINANCING_PROGRAMS,
+  FINANCING_TERMS,
   monthlyPayment,
 } from '@/components/marketing/financing/financing-programs';
 import { readCookie, writeCookie } from '@/lib/telemetry/client-cookies';
@@ -167,7 +168,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: 'payment-delay',
-    prompt: 'Would you prefer a delay of 12–24 months before your first payment?',
+    prompt: `Would you prefer up to ${FINANCING_TERMS.ygrene.maxFirstPaymentDelayMonths} months before your first payment, depending on the funding date, with interest accruing after funding?`,
     options: [
       { value: 'yes', label: 'Yes' },
       { value: 'no', label: 'No' },
@@ -203,7 +204,7 @@ const quizQuestions: QuizQuestion[] = [
       },
       {
         value: 'tax-based',
-        label: 'Tax-based (repaid via your property tax bill; a lien is placed if unpaid)',
+        label: 'Tax-based (repaid via your property tax bill and secured by a recorded lien)',
       },
       { value: 'either', label: 'I’m okay with either' },
       { value: 'not-sure', label: 'I’m not sure' },
@@ -326,12 +327,12 @@ const MATCH_PROGRAMS: Record<
   serviceFinance: {
     label: 'Service Finance',
     programIds: ['same-as-cash-12', 'term-10yr-999', 'term-15yr-79'],
-    description: 'Traditional loan with fixed payments and no property tax lien.',
+    description: 'Installment financing with lender-set terms. Confirm any security or lien requirements in your agreement.',
   },
   ygrene: {
     label: 'YGrene PACE',
     programIds: ['ygrene-15yr-849'],
-    description: 'PACE financing that leverages property equity with deferred payments.',
+    description: 'PACE financing secured by a property lien and repaid through property taxes. Interest accrues after funding.',
   },
 };
 
@@ -487,7 +488,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     () =>
       FINANCING_PROGRAMS.map((program) => ({
         program,
-        amount: monthlyPayment(calculatorAmount, program.apr, program.termMonths),
+        amount: monthlyPayment(calculatorAmount, program.annualInterestRate, program.termMonths),
       })),
     [calculatorAmount],
   );
@@ -1653,7 +1654,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           <div className="rounded-2xl border border-blue-200 bg-white shadow-md">
             <div className="text-center border-b border-blue-100 p-4 text-2xl font-semibold text-[--brand-blue]">
               <HandCoins className="h-6 w-6 mr-2 inline text-[--brand-blue]" />
-              Est. Monthly Payment
+              Illustrative Monthly Amounts
               <ArrowDown className="h-6 w-6 text-[--brand-blue] inline ml-2" />
             </div>
             <div className="overflow-hidden">
@@ -1732,8 +1733,13 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
           </div>
 
           <p className="text-xs italic text-slate-500">
-            Estimates only. Not a credit offer. Promo terms, deferral windows, and final payments
-            are set by the lender. Estimates do not include loan origination fees.
+            Illustrations only, not a credit offer or approval. Rates shown are interest-rate
+            assumptions, not APRs. These calculations exclude fees and interest accrued before
+            payments begin. The promotional row divides principal over the promotional period;
+            confirm the required payments, payoff deadline and any deferred-interest conditions.
+            Ygrene is repaid on your property-tax schedule; its monthly equivalent is not a quoted
+            tax assessment or escrow payment. Actual availability, rates, APRs, payment schedules
+            and total costs are set in the provider’s financing documents.
           </p>
         </div>
       </section>

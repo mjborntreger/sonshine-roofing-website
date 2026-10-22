@@ -172,7 +172,7 @@ export default function Footer({ settings, services = [], navigation = [], servi
                 {settings?.licenseNumber && settings.licenseUrl ? (
                   <li className="mb-8">
                     <SmartLink
-                      className="font-display text-sm font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-base"
+                      className="text-xs font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
                       href={settings.licenseUrl}
                       aria-label={`Florida Roofing Contractor's License Number ${settings.licenseNumber}`}
                       target="_blank"
@@ -260,12 +260,12 @@ export default function Footer({ settings, services = [], navigation = [], servi
           <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
             <SmartLink
               href="/reviews"
-              className="btn bg-[#fb9216] px-3 py-2 text-sm font-bold !text-[#071b2b] shadow-lg shadow-black/25 transition-colors hover:bg-[#ffb45f] focus-visible:!ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b] md:text-base"
+              className="btn bg-[#fb9216] uppercase px-3 py-2 text-sm font-bold !text-[#071b2b] shadow-lg shadow-black/25 transition-colors hover:bg-[#ffb45f] focus-visible:!ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
               data-icon-affordance="up-right"
             >
-              <Star className="mr-2 h-3 w-3 text-[#071b2b] md:h-4 md:w-4" />
+              <Star className="mr-2 h-4 w-4 text-[#071b2b] md:h-4 md:w-4" />
               Leave a Review
-              <ArrowUpRight className="icon-affordance ml-1 inline h-3 w-3 text-[#071b2b] md:h-4 md:w-4" />
+              <ArrowUpRight className="icon-affordance ml-1 inline h-4 w-4 text-[#071b2b] md:h-4 md:w-4" />
             </SmartLink>
 
             {/* Socials Badges Row */}

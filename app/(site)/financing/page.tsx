@@ -1,6 +1,7 @@
 import SmartLink from "@/components/utils/SmartLink";
-import { ListChecks, ListOrdered, HelpCircle, Smartphone, Timer, Percent, CheckCircle, ArrowLeftRight, ChevronRight, DollarSign, ArrowRight } from "lucide-react";
+import { ListChecks, ListOrdered, HelpCircle, Smartphone, Percent, CheckCircle, ArrowLeftRight, ChevronRight, DollarSign, ArrowRight } from "lucide-react";
 import ProgramCard from '@/components/marketing/financing/ProgramCard';
+import { FINANCING_TERMS, monthlyPayment } from '@/components/marketing/financing/financing-programs';
 import MonthlyEstimator from '@/components/lead-capture/financing/MonthlyEstimator';
 import type { Metadata } from 'next';
 import { Suspense } from "react";
@@ -99,24 +100,25 @@ export default async function FinancingPage() {
     ],
     serviceType: "Roof Financing",
   });
-  // Local helpers for examples
-  const currency = (n: number) => n.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-  const pmt = (principal: number, annualRate: number, months: number) => {
-    const r = annualRate / 12; if (r === 0) return principal / months; return (principal * r) / (1 - Math.pow(1 + r, -months));
-  };
+  // The same amortization calculation drives the estimator and these examples.
+  const currency = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const monthlyCurrency = (n: number) => n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const ratePercent = (rate: number) => (rate * 100).toLocaleString('en-US', { maximumFractionDigits: 2 });
+  const { ygrene, serviceFinance } = FINANCING_TERMS;
   const defaultAmount = 15000;
-  const sampleMonthly79 = currency(Math.round(pmt(defaultAmount, 0.079, 180))) + '/mo';
-  const sampleMonthly849 = currency(Math.round(pmt(defaultAmount, 0.0849, 180))) + "/mo";
-  const per10kService = '$96/mo per $10k';
-  const per10kYgrene = "$124/mo per $10k";
+  const exampleTermMonths = 180;
+  const sampleMonthlyService = monthlyCurrency(monthlyPayment(defaultAmount, serviceFinance.annualInterestRate, exampleTermMonths));
+  const sampleMonthlyYgrene = monthlyCurrency(monthlyPayment(defaultAmount, ygrene.annualInterestRate, exampleTermMonths));
+  const per10kService = monthlyCurrency(monthlyPayment(10000, serviceFinance.annualInterestRate, exampleTermMonths));
+  const per10kYgrene = monthlyCurrency(monthlyPayment(10000, ygrene.annualInterestRate, exampleTermMonths));
 
   return (
     <>
       <Hero
         title="Roof Financing Made Simple"
-        subtitle="Finance your roof with comfortable monthly payment plans customized to fit your needs. Choose from equity‑based (home‑secured) or credit‑based plans — both with same-day approvals and clear terms. When you talk to one of our roofing specialists, we’ll guide you through the entire process every step of the way."
+        subtitle="Explore roof financing options for your needs and budget. Compare property-based PACE financing with credit-based installment programs, each subject to provider approval. Our roofing specialists can explain the next steps after learning about your project."
         badges={[
-          { icon: Timer, label: "Same-day Approval" },
+          { icon: CheckCircle, label: "Free Roof Estimate" },
           { icon: Percent, label: "Equity-based Options" },
           { icon: DollarSign, label: "Credit-based Options" },
         ]}
@@ -124,16 +126,21 @@ export default async function FinancingPage() {
       >
         <div className="flex justify-center gap-6 flex-wrap mx-auto max-w-3xl">
           <div>
-            <p className="italic text-sm text-slate-300">Rates as low as</p>
+            <p className="italic text-sm text-slate-300">Advertised promotional example</p>
             <p className="text-blue-400 mt-2 text-4xl">0%</p>
-            <p className="mt-1 text-slate-200">for 12 months</p>
+            <p className="mt-1 text-slate-200">for {serviceFinance.promotionMonths} months, if available</p>
           </div>
           <div>
-            <p className="italic text-sm text-slate-300">Payments as low as</p>
-            <p className="text-blue-400 mt-2 text-4xl">$96<span className="text-2xl">/mo</span></p>
-            <p className="mt-1 text-slate-200">per $10,000 financed</p>
+            <p className="italic text-sm text-slate-300">Illustrative fixed-rate payment</p>
+            <p className="text-blue-400 mt-2 text-4xl">{per10kService}<span className="text-2xl">/mo</span></p>
+            <p className="mt-1 text-slate-200">per $10,000 at {ratePercent(serviceFinance.annualInterestRate)}% interest for 15 years</p>
           </div>
         </div>
+        <p className="mx-auto mt-5 max-w-3xl text-center text-sm leading-relaxed text-slate-300">
+          These are separate program examples, not financing offers. Availability and approval vary.
+          The payment example excludes fees and interest accrued during any deferral. Confirm the
+          actual APR, total cost and promotional conditions in your financing documents.
+        </p>
       </Hero>
 
       <section className="mx-auto max-w-8xl">
@@ -164,21 +171,17 @@ export default async function FinancingPage() {
               title="YGrene PACE Financing (Equity‑based)"
               subtitle="House‑secured. Payments typically included in your property‑tax bill."
               logoUrl="static:ygrene-logo"
-              chips={["No credit check", "Tax‑bill payments", "Equity‑based", "Fast approval"]}
-              keyFigures={["From 8.49% APR", "18–24 mo deferral", per10kYgrene]}
-              sampleMonthly={`${sampleMonthly849} on ${currency(defaultAmount)} (15yr @ 8.49%)`}
+              chips={["Soft credit inquiry", "Tax‑bill payments", "Equity and income reviewed"]}
+              keyFigures={[`${ygrene.rateLabel} interest-rate illustration`, `Up to ${ygrene.maxFirstPaymentDelayMonths} months before first payment`, `${per10kYgrene}/mo per $10k example`]}
+              sampleMonthly={`${sampleMonthlyYgrene}/mo on ${currency(defaultAmount)} at ${ratePercent(ygrene.annualInterestRate)}% interest for 15 years, before fees and deferral interest`}
               bullets={[
                 "Fixed rate throughout the term",
-                "Simple escrow alignment when payments begin",
-                "Fast approvals with property‑tax history",
-                "Secured by your home",
+                "Repaid through property taxes; mortgage escrow payments may increase",
+                "Interest accrues after funding, including before payments begin",
+                "Secured by a first-priority property lien, ahead of a mortgage",
               ]}
-              eligibility={[
-                "No bankruptcies in the last 3 years",
-                "No late property‑tax payments in the last 3 years",
-                "Sufficient home equity to cover the project",
-              ]}
-              finePrint="Subject to approval and municipal availability. Terms may vary."
+              eligibility={[...ygrene.eligibility]}
+              finePrint={`${ygrene.disclosure} Payment examples use 180 monthly payments and exclude fees and interest accrued before payments begin. PACE repayment is collected with property taxes; this monthly equivalent is not a billing schedule or approval guarantee.`}
               eyelash="Takes you to Ygrene.com"
               cta={{ href: "https://prequalification.ygrene.com/ContractorApply/XYFMHC", label: "Get pre-approved", title: "Ask about YGrene", className: "btn-brand-blue" }}
             />
@@ -187,19 +190,19 @@ export default async function FinancingPage() {
               id="service-finance-program-card"
               theme="cyan"
               title="Service Finance (Credit‑based)"
-              subtitle="Signature loan with flexible terms. No lien on your property."
+              subtitle="Installment financing for a fixed amount and term, subject to a separate application and lender approval."
               logoUrl="static:service-finance-logo"
-              chips={["Signature loan", "Fixed term", "Fast approval"]}
-              keyFigures={["0% for 12 months", "From 7.9% fixed", per10kService]}
-              sampleMonthly={`${sampleMonthly79} on ${currency(defaultAmount)} (15yr @ 7.9%)`}
+              chips={["Installment loan", "Fixed term", "Credit application"]}
+              keyFigures={[`Advertised 0% for ${serviceFinance.promotionMonths} months, if available`, `${serviceFinance.rateLabel} fixed-rate example`, `${per10kService}/mo per $10k example`]}
+              sampleMonthly={`${sampleMonthlyService}/mo on ${currency(defaultAmount)} at ${ratePercent(serviceFinance.annualInterestRate)}% interest for 15 years, before fees and deferral interest`}
               bullets={[
-                "No property lien",
-                "Same‑as‑cash and deferred‑interest promos",
-                "Popular 10‑ and 15‑year fixed terms",
-                "Quick application with credit check",
+                "No-interest, deferred-interest and fixed-term programs may be available through the contractor",
+                "Deferred-interest offers may charge accrued interest if their payoff conditions are not met",
+                "Available rates, terms and any security requirements are defined in the financing documents",
+                "Separate credit application and lender approval required",
               ]}
-              eligibility={["Basic identity + credit", "Estimated project total", "Income/employment basics"]}
-              finePrint="Final terms provided in loan documents. Promos subject to lender programs."
+              eligibility={[...serviceFinance.eligibility]}
+              finePrint={`${serviceFinance.disclosure} The 15-year payment illustration uses 180 monthly payments, excludes fees and deferral interest, and does not guarantee a rate, payment or approval.`}
               cta={{ href: "/contact-us", label: "Contact us for details", title: "Contact us for details", className: "btn-outline" }}
             />
           </div>
@@ -214,15 +217,16 @@ export default async function FinancingPage() {
               </h3>
               <ul className="mt-3 list-disc pl-5 space-y-2 text-slate-700">
                 <li>
-                  <strong>Want no credit check?</strong> YGrene’s equity‑based program focuses on your
-                  home equity and tax payment history.
+                  <strong>Considering property-based financing?</strong> Ygrene reviews home equity,
+                  income and payment history. Its soft credit inquiry does not affect your credit score.
                 </li>
                 <li>
-                  <strong>Prefer a traditional loan?</strong> Service Financing offers same‑as‑cash and
-                  fixed‑term choices.
+                  <strong>Prefer an installment loan?</strong> Ask which Service Finance promotional
+                  and fixed-term programs are currently available, then compare the full costs.
                 </li>
                 <li>
-                  <strong>Need time before payments start?</strong> YGrene offers 18–24 month deferral.
+                  <strong>Need time before payments start?</strong> Ygrene states up to {ygrene.maxFirstPaymentDelayMonths} months,
+                  depending on the funding date. Interest accrues after funding.
                 </li>
               </ul>
             </section>
@@ -324,11 +328,15 @@ export default async function FinancingPage() {
                 </li>
                 <li className={checkList}>
                   <CheckCircle className={checkIconYgrene} aria-hidden="true" />
-                  <span>Property‑tax history (no late payments in last 3 years)</span>
+                  <span>Property-tax history showing taxes paid current for at least the past three years</span>
                 </li>
                 <li className={checkList}>
                   <CheckCircle className={checkIconYgrene} aria-hidden="true" />
-                  <span>Confirmation of sufficient home equity</span>
+                  <span>Confirmation of at least 10% home equity</span>
+                </li>
+                <li className={checkList}>
+                  <CheckCircle className={checkIconYgrene} aria-hidden="true" />
+                  <span>Household income information for the ability-to-repay review</span>
                 </li>
               </ul>
             </section>
@@ -367,7 +375,7 @@ export default async function FinancingPage() {
                 </li>
                 <li className={checkList}>
                   <CheckCircle className={checkIconServiceFinance} aria-hidden="true" />
-                  <span>Income / employment basics (quick verification)</span>
+                  <span>Income / employment information for lender review</span>
                 </li>
                 <li className={checkList}>
                   <CheckCircle className={checkIconServiceFinance} aria-hidden="true" />
@@ -378,10 +386,12 @@ export default async function FinancingPage() {
           </div>
 
           {/* Compliance */}
-          <p className="italic mt-10 text-xs text-slate-500">
-            Rates, terms, and eligibility subject to change and based on lender approval. SonShine
-            Roofing is not a lender. Program availability may vary by municipality. Final terms will be
-            provided in your financing documents.
+          <p className="mt-10 text-sm leading-relaxed text-slate-600">
+            SonShine Roofing is not a lender. Rates, terms, promotional availability and eligibility
+            depend on the provider and may change. Ygrene availability also depends on your property
+            and municipality. Examples exclude fees and interest accrued during deferral and do not
+            guarantee approval. Before signing, review your actual APR, total cost, payment schedule,
+            promotional payoff conditions and any property-security requirements in the financing documents.
           </p>
 
           <FaqInlineList
