@@ -146,7 +146,7 @@ export default async function Page() {
               aria-label="Important"
             >
               <strong className="block font-display uppercase text-slate-800 mb-1">
-                <CircleCheckBig className="h-4 w-4 mr-2 inline text-[--brand-blue]" />
+                <CircleCheckBig className="h-4 w-4 mr-2 inline text-(--brand-blue)" />
                 Fact:
               </strong>
               <p className="m-0 text-slate-700">
@@ -205,7 +205,7 @@ export default async function Page() {
                 moisture, which can lead to rot, holes, and other structural problems.
               </p>
               <figure className={figureStyles}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <div className="relative aspect-4/3 overflow-hidden rounded-lg">
                   <StaticImage crop
                     src="static:curling-asphalt-roof-shingles"
                     fill
@@ -244,7 +244,7 @@ export default async function Page() {
                 underlayment, eventually damaging the wood decking and support structures.
               </p>
               <figure className={figureStyles}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <div className="relative aspect-4/3 overflow-hidden rounded-lg">
                   <StaticImage crop
                     src="static:clearing-leaves-from-roof-gutter"
                     fill
@@ -282,7 +282,7 @@ export default async function Page() {
                 sealed and secure year-round.
               </p>
               <figure className={figureStyles}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <div className="relative aspect-4/3 overflow-hidden rounded-lg">
                   <StaticImage crop
                     src="static:bugs-on-roof-tiles"
                     fill
@@ -317,7 +317,7 @@ export default async function Page() {
                 surface, potentially causing interior leaks, wood rot, and structural damage.
               </p>
               <figure className={figureStyles}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <div className="relative aspect-4/3 overflow-hidden rounded-lg">
                   <StaticImage crop
                     src="static:damaged-roof-vent-flashing"
                     fill
@@ -358,7 +358,7 @@ export default async function Page() {
                 home.
               </p>
               <figure className={figureStyles}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <div className="relative aspect-4/3 overflow-hidden rounded-lg">
                   <StaticImage crop
                     src="static:attic-roof-framing-dark-staining"
                     fill

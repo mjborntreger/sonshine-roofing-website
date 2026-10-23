@@ -28,12 +28,12 @@ export default function LeadFormEnding({ verification, actions, consent, feedbac
   }, []);
 
   return (
-    <div className={cn('[--lead-form-gap:1.5rem] space-y-[--lead-form-gap]', className)}>
+    <div className={cn('[--lead-form-gap:1.5rem] space-y-(--lead-form-gap)', className)}>
       <div>
         {/* Keep verification mounted so an interactive challenge can still appear. */}
         <div ref={verificationRef} className="flow-root">{verification}</div>
         <div
-          className="space-y-[--lead-form-gap]"
+          className="space-y-(--lead-form-gap)"
           style={{ marginTop: hasVisibleVerification ? 'var(--lead-form-gap)' : 0 }}
         >
           {feedback}

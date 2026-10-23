@@ -35,14 +35,14 @@ type HeroTrustBarProps = {
 
 // REVIEW LINK STYLES
 const REVIEW_SMARTLINK_CONTAINER_STYLES =
-  'h-full w-full group inline-flex w-full mx-auto items-start gap-4 rounded-3xl border border-blue-100 bg-white/80 px-4 py-4 text-left shadow-lg transition hover:border-[--brand-cyan] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[--brand-cyan]';
+  'h-full w-full group inline-flex w-full mx-auto items-start gap-4 rounded-3xl border border-blue-100 bg-white/80 px-4 py-4 text-left shadow-lg transition hover:border-(--brand-cyan) hover:shadow-xl focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--brand-cyan)';
 const REVIEW_SMARTLINK_ARROWUPRIGHT_STYLES =
-  'icon-affordance text-[--brand-blue] absolute h-4 w-4 top-0 right-0';
+  'icon-affordance text-(--brand-blue) absolute h-4 w-4 top-0 right-0';
 const REVIEW_LINK_TITLE_BAR = 'mb-2 flex flex-col px-2 justify-start';
 const LOGO_STYLES =
-  'h-8 w-8 rounded-full border border-blue-100 bg-white object-contain p-1 shadow-sm';
+  'h-8 w-8 rounded-full border border-blue-100 bg-white object-contain p-1 shadow-xs';
 const TITLE_BASE = 'mx-2 text-lg font-semibold text-slate-900';
-const TITLE_ACCENT = 'text-[--brand-orange]';
+const TITLE_ACCENT = 'text-(--brand-orange)';
 const TITLE_ACCENT_GOOGLE = 'text-blue-600';
 const TITLE_ACCENT_NEXTDOOR = 'text-emerald-600';
 const TITLE_ACCENT_FACEBOOK = 'text-blue-600';
@@ -56,9 +56,9 @@ const REVIEW_COUNT = 'text-xs text-slate-500 mb-2';
 const BADGE_TITLE_STYLES = 'text-xl text-slate-800';
 const BADGE_SUBTITLE_STYLES = 'text-slate-600 text-base mb-4';
 const BADGE_CARD_STYLES =
-  'flex-col items-center gap-2 rounded-2xl border border border-blue-100 bg-[#fb9216]/5 p-6 text-center shadow-inner transition hover:-translate-y-1 hover:border-[--brand-blue]/40 hover:shadow-lg';
+  'flex-col items-center gap-2 rounded-2xl border border border-blue-100 bg-[#fb9216]/5 p-6 text-center shadow-inner transition hover:-translate-y-1 hover:border-(--brand-blue)/40 hover:shadow-lg';
 const BADGE_IMAGE_WRAPPER = 'relative flex h-32 w-full items-center justify-center';
-const BADGE_IMAGE_CLASS = 'h-full w-auto max-w-[300px] object-contain drop-shadow-sm';
+const BADGE_IMAGE_CLASS = 'h-full w-auto max-w-[300px] object-contain drop-shadow-xs';
 const BADGE_IMAGE_SIZES =
   '(min-width: 1280px) 200px, (min-width: 1024px) 180px, (min-width: 768px) 33vw, 50vw';
 
@@ -247,7 +247,7 @@ export default async function HeroTrustBar({
                   <ArrowUpRight className={REVIEW_SMARTLINK_ARROWUPRIGHT_STYLES} />
                   <div className={REVIEW_LINK_TITLE_BAR}>
                     <p className={REVIEW_COUNT}>
-                      <span className="text-[--brand-blue]">{review.statValue} </span>
+                      <span className="text-(--brand-blue)">{review.statValue} </span>
                       {review.statDescriptor}
                     </p>
                     <div className={TITLE_AND_LOGO}>
@@ -273,7 +273,7 @@ export default async function HeroTrustBar({
 
           <div className="mt-16">
             <h2 className="text-center md:text-4xl text-2xl">
-              Expert <span className="text-[--brand-blue]">Residential Roofing Contractor</span>
+              Expert <span className="text-(--brand-blue)">Residential Roofing Contractor</span>
             </h2>
             <p className="text-center text-slate-600 mt-1 mb-8">
               We never use subcontractors&mdash;period. Our expert in-house roofing crews use the

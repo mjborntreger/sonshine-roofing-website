@@ -24,7 +24,7 @@ import { allura } from '@/lib/ui/allura-font';
 const leadFormLayout = 'mx-auto w-full';
 const reviewsLayout = 'mx-auto w-full bg-[#cef3ff]';
 const narrowLayout =
-  'bg-gradient-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent mx-auto w-full';
+  'bg-linear-to-b from-[#cef3ff] via-[#cef3ff]/80 to-transparent mx-auto w-full';
 
 // ===== STATIC SEO FOR / (Home) — EDIT HERE =====
 const SEO_TITLE_HOME = 'SonShine Roofing | Best Roofing Company in Sarasota';
@@ -84,7 +84,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           {/* Sticky Section */}
           <div className="self-start hidden min-w-0 px-4 lg:block lg:sticky lg:top-16">
             <ServicesQuickLinks activePath="/" />
-            <div className="h-[1px] w-full bg-blue-100 my-4" />
+            <div className="h-px w-full bg-blue-100 my-4" />
             <SidebarCta />
           </div>
         </div>

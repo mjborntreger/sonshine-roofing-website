@@ -24,13 +24,13 @@ export default async function SpecialOfferTrust({ settings }: { settings: SiteSe
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2"
           >
-            <BadgeCheck className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+            <BadgeCheck className="h-5 w-5 text-(--brand-blue)" aria-hidden="true" />
             Florida licensed · {settings.licenseNumber}
           </SmartLink>
         ) : null}
         {foundingYear ? (
           <span className="inline-flex items-center gap-2">
-            <CalendarDays className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />
+            <CalendarDays className="h-5 w-5 text-(--brand-blue)" aria-hidden="true" />
             Serving homeowners since {foundingYear}
           </span>
         ) : null}
@@ -48,7 +48,7 @@ export default async function SpecialOfferTrust({ settings }: { settings: SiteSe
               href={sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-semibold text-[--brand-blue] underline underline-offset-2"
+              className="font-semibold text-(--brand-blue) underline underline-offset-2"
             >
               View on Google
             </SmartLink>

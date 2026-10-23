@@ -105,7 +105,7 @@ export default function VideoModal({ collectionUrl, video, isOpen, onClose }: Pr
       {isOpen && video ? (
         <motion.div
           key={`${videoKey}-wrapper`}
-          className="fixed inset-0 z-[1000]"
+          className="fixed inset-0 z-1000"
           aria-modal="true"
           role="dialog"
           aria-label={video.title}

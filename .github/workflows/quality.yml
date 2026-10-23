@@ -26,16 +26,20 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version-file: '.nvmrc'
           cache: npm
+      - name: Pin npm
+        run: npm install --global npm@12.2.1
       - name: Install dependencies
         run: npm ci
       - name: Lint
         run: npm run lint
       - name: Typecheck
-        run: npm run typecheck
+        run: npm run typecheck && npm run typecheck:compat
+      - name: Verify lint rule coverage
+        run: npm run verify:lint-contract
       - name: Verify Tailwind utilities
-        run: npm run verify:tailwind-utilities
+        run: npm run verify:tailwind-utilities && npm run verify:tailwind-css
       - name: Verify resource page interactions
         run: npm run verify:resource-pages
       - name: Verify archive controls

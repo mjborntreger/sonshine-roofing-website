@@ -240,7 +240,7 @@ export default function TocFromHeadings({
   const visibilityClass = mobile ? 'block md:hidden' : 'hidden lg:block';
   const navClasses = [
     visibilityClass,
-    'rounded-3xl border border-blue-200 bg-white p-4 mb-4 shadow-sm ',
+    'rounded-3xl border border-blue-200 bg-white p-4 mb-4 shadow-xs ',
     className,
   ]
     .filter(Boolean)
@@ -271,8 +271,8 @@ export default function TocFromHeadings({
 
   const renderLink = (item: Item, active: boolean, isChild: boolean) => {
     const linkClasses = [
-      'flex w-full items-start gap-1 transition-colors hover:text-[--brand-blue]',
-      active ? 'text-[--brand-blue] font-medium' : 'text-slate-700',
+      'flex w-full items-start gap-1 transition-colors hover:text-(--brand-blue)',
+      active ? 'text-(--brand-blue) font-medium' : 'text-slate-700',
     ]
       .filter(Boolean)
       .join(' ');
@@ -284,7 +284,7 @@ export default function TocFromHeadings({
         aria-current={active ? 'true' : undefined}
         className={linkClasses}
       >
-        {isChild && <CornerDownRight className="h-4 w-4 inline text-[--brand-orange]" aria-hidden="true" />}
+        {isChild && <CornerDownRight className="h-4 w-4 inline text-(--brand-orange)" aria-hidden="true" />}
         <span className="flex-1 leading-snug">{item.text}</span>
       </a>
     );
@@ -296,9 +296,9 @@ export default function TocFromHeadings({
       className={navClasses}
     >
       <div className="mb-3 text-[1rem] text-center font-display font-bold tracking-wide text-slate-900">
-        <List className="h-4 w-4 inline mr-2 text-[--brand-blue]" aria-hidden="true" />
+        <List className="h-4 w-4 inline mr-2 text-(--brand-blue)" aria-hidden="true" />
         {title}
-        <ArrowDown className="h-4 w-4 inline ml-2 text-[--brand-blue]" aria-hidden="true" />
+        <ArrowDown className="h-4 w-4 inline ml-2 text-(--brand-blue)" aria-hidden="true" />
       </div>
       <ul className={[styles.tocList, styles.tocListRoot, 'space-y-2 text-base'].join(' ')}>
         {structured.map((section) => {

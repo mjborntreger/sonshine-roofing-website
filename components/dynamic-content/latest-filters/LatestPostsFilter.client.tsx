@@ -102,7 +102,7 @@ export default function LatestPostsFilter({
             <p className={SECTION_SUBTITLE}>{description}</p>
           </div>
           <p className="text-slate-500 text-xs leading-none uppercase font-semibold">
-            <ArrowLeftRight className="h-3 w-3 mr-1 text-[--brand-blue] inline" />
+            <ArrowLeftRight className="h-3 w-3 mr-1 text-(--brand-blue) inline" />
             Filter by Category
           </p>  
           {renderFilterTabs()}

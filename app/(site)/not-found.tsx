@@ -49,8 +49,8 @@ export default function NotFound() {
   return (
     <Section>
       <div className="mx-auto flex max-w-3xl flex-col items-center gap-10 text-center">
-        <div className="inline-flex items-center gap-3 rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-[--brand-blue] shadow-sm ring-1 ring-slate-200">
-          <Sparkles className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+        <div className="inline-flex items-center gap-3 rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-(--brand-blue) shadow-xs ring-1 ring-slate-200">
+          <Sparkles className="h-4 w-4 text-(--brand-blue)" aria-hidden="true" />
           Page Not Found
         </div>
 
@@ -68,14 +68,14 @@ export default function NotFound() {
             <SmartLink
               key={href}
               href={href}
-              className="group flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-[--brand-blue]/70 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2"
+              className="group flex flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-5 shadow-xs transition hover:-translate-y-0.5 hover:border-(--brand-blue)/70 hover:shadow-lg focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--brand-blue) focus-visible:ring-offset-2"
               data-icon-affordance="right"
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[--brand-blue]/10 text-[--brand-blue]">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-(--brand-blue)/10 text-(--brand-blue)">
                   <Icon className="h-5 w-5" aria-hidden="true" />
                 </span>
-                <h2 className="not-prose font-display text-[1.5rem] font-bold leading-none group-hover:text-[--brand-blue]">
+                <h2 className="not-prose font-display text-[1.5rem] font-bold leading-none group-hover:text-(--brand-blue)">
                   {label}
                 </h2>
               </div>
@@ -85,12 +85,12 @@ export default function NotFound() {
               <span
                 className={cn(
                   buttonVariants({ variant: "link" }),
-                  "self-start px-0 text-sm font-semibold text-[--brand-blue] hover:no-underline"
+                  "self-start px-0 text-sm font-semibold text-(--brand-blue) hover:no-underline"
                 )}
               >
                 <span className="inline-flex items-center gap-1">
                   Visit {label}
-                  <ArrowRight className="icon-affordance h-3.5 w-3.5 text-[--brand-blue]" aria-hidden="true" />
+                  <ArrowRight className="icon-affordance h-3.5 w-3.5 text-(--brand-blue)" aria-hidden="true" />
                 </span>
               </span>
             </SmartLink>

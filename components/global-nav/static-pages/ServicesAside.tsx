@@ -13,7 +13,7 @@ export default async function ServicesAside({ activePath = "/" }: ServicesAsideP
     return (
         <aside className="sticky top-16 self-start h-fit lg:w-[320px]">
             <ServicesQuickLinks activePath={activePath} services={services} />
-            <div className="h-[1px] w-full bg-blue-100 my-4" />
+            <div className="h-px w-full bg-blue-100 my-4" />
             <SidebarCta />
         </aside>
     )

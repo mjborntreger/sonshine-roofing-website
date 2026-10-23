@@ -127,7 +127,7 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
       <h2 className="text-xl md:text-3xl">Drone Video</h2>
       <p className="flex items-center gap-2 text-sm text-slate-500" aria-live="off">
         <span>Tap to watch</span>
-        <Eye className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+        <Eye className="h-4 w-4 text-(--brand-blue)" aria-hidden="true" />
       </p>
       <button
         type="button"
@@ -161,7 +161,7 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
             {open && (
               <motion.div
                 key="backdrop"
-                className="fixed inset-0 z-[1000]"
+                className="fixed inset-0 z-1000"
                 aria-modal="true"
                 role="dialog"
                 aria-label={title}
@@ -182,7 +182,7 @@ export default function ProjectVideo({ title, videoId, className, posterUrl, pos
                   type="button"
                   aria-label="Close"
                   onClick={(e) => { e.stopPropagation(); setOpen(false); }}
-                  className="fixed z-50 top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] md:top-[max(1.25rem,env(safe-area-inset-top))] md:right-[max(1.25rem,env(safe-area-inset-right))] border border-blue-200 rounded-full hover:bg-white/80 bg-white/40 text-blue-200 hover:text-red-600 p-2.5 shadow-lg backdrop-blur-sm transition focus:outline-none focus-visible:ring-2"
+                  className="fixed z-50 top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] md:top-[max(1.25rem,env(safe-area-inset-top))] md:right-[max(1.25rem,env(safe-area-inset-right))] border border-blue-200 rounded-full hover:bg-white/80 bg-white/40 text-blue-200 hover:text-red-600 p-2.5 shadow-lg backdrop-blur-xs transition focus:outline-hidden focus-visible:ring-2"
                 >
                   <X className="h-5 w-5" aria-hidden="true" />
                 </button>

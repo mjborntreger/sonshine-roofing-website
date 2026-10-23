@@ -38,11 +38,11 @@ export default function GridLoadingState({
     if (imageAspectClass) return imageAspectClass;
     switch (variant) {
       case "project":
-        return "aspect-[4/3]";
+        return "aspect-4/3";
       case "blog":
       case "video":
       default:
-        return "aspect-[16/9]";
+        return "aspect-video";
     }
   }, [imageAspectClass, variant]);
 
@@ -52,9 +52,9 @@ export default function GridLoadingState({
     return (
       <div
         role="status"
-        className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-white/70 backdrop-blur-sm"
+        className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-white/70 backdrop-blur-xs"
       >
-        <span className="inline-flex h-3 w-3 animate-pulse rounded-full bg-[--brand-blue]" aria-hidden />
+        <span className="inline-flex h-3 w-3 animate-pulse rounded-full bg-(--brand-blue)" aria-hidden />
         <span className="text-sm font-medium text-slate-700">{message}</span>
       </div>
     );

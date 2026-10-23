@@ -97,7 +97,7 @@ export default async function Page() {
 
             <div className="flex gap-6 mb-6 lg:hidden">
               {/* “You'll talk to…” human tile */}
-              <div className="not-prose rounded-3xl w-full border border-blue-200 bg-white p-6 shadow-sm max-w-full">
+              <div className="not-prose rounded-3xl w-full border border-blue-200 bg-white p-6 shadow-xs max-w-full">
                 <div className="flex-col gap-6">
                   <div className="mb-4">
                     <OpenOrClosed
@@ -115,7 +115,7 @@ export default async function Page() {
 
                   <div className="mt-4">
                     <h2 className="text-2xl font-semibold text-slate-800">
-                      You&apos;ll likely talk to <span className="text-[--brand-blue]">Tara</span>
+                      You&apos;ll likely talk to <span className="text-(--brand-blue)">Tara</span>
                     </h2>
                     <p className="text-base text-slate-600 mb-2">Fast, friendly & reliable.</p>
                   </div>
@@ -141,7 +141,7 @@ export default async function Page() {
 
             <Suspense
               fallback={
-                <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+                <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white p-6 shadow-xs">
                   <div className="h-6 w-32 animate-pulse rounded-full bg-slate-200" />
                   <div className="mt-4 space-y-3">
                     <div className="h-4 animate-pulse rounded-full bg-slate-200" />
@@ -159,7 +159,7 @@ export default async function Page() {
           <div className="lg:sticky top-16 self-start">
             <div className="hidden lg:flex gap-6 w-full mb-6">
               {/* “You'll talk to…” human tile */}
-              <div className="not-prose rounded-3xl border border-blue-200 bg-white p-6 shadow-sm max-w-full">
+              <div className="not-prose rounded-3xl border border-blue-200 bg-white p-6 shadow-xs max-w-full">
                 <div className="flex-col gap-6">
                   <div className="mb-4">
                     <OpenOrClosed
@@ -177,7 +177,7 @@ export default async function Page() {
 
                   <div className="mt-4">
                     <h2 className="text-2xl font-semibold text-slate-800">
-                      You&apos;ll likely talk to <span className="text-[--brand-blue]">Tara</span>
+                      You&apos;ll likely talk to <span className="text-(--brand-blue)">Tara</span>
                     </h2>
                     <p className="text-base text-slate-600 mb-2">Fast, friendly & reliable.</p>
                   </div>

@@ -122,7 +122,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
             </div>
             <header className="flex flex-col gap-6 p-5">
               {person.featuredImage && (
-                <div className="relative w-full md:w-1/2 lg:w-1/2 aspect-[5/3] overflow-hidden rounded-xl bg-slate-100">
+                <div className="relative w-full md:w-1/2 lg:w-1/2 aspect-5/3 overflow-hidden rounded-xl bg-slate-100">
                   <Image
                     src={person.featuredImage.url}
                     alt={person.featuredImage.altText || person.title}
@@ -151,7 +151,7 @@ export default async function PersonPage({ params }: { params: Promise<{ slug: s
             />
 
             {(prev || next) && (
-              <nav className="mt-8 grid gap-4 rounded-2xl border border-blue-200 bg-white p-4 shadow-sm sm:grid-cols-2">
+              <nav className="mt-8 grid gap-4 rounded-2xl border border-blue-200 bg-white p-4 shadow-xs sm:grid-cols-2">
                 {prev ? (
                   <SmartLink
                     href={`/person/${prev.slug}`}

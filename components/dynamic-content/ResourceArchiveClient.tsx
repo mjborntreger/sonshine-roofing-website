@@ -39,7 +39,7 @@ type Props<Item> = {
 };
 
 const controlClass =
-  'min-h-12 w-full min-w-0 rounded-lg border border-blue-300 bg-white px-3 py-2 text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] disabled:bg-slate-100 disabled:text-slate-500';
+  'min-h-12 w-full min-w-0 rounded-lg border border-blue-300 bg-white px-3 py-2 text-base text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan) disabled:bg-slate-100 disabled:text-slate-500';
 
 export default function ResourceArchiveClient<Item>({
   kind,
@@ -207,7 +207,7 @@ export default function ResourceArchiveClient<Item>({
       >
         <h2 className="text-2xl">
           <Search
-            className="mr-2 inline h-5 w-5 align-text-top text-[--brand-blue]"
+            className="mr-2 inline h-5 w-5 align-text-top text-(--brand-blue)"
             aria-hidden="true"
           />
           Search {labels.itemPlural}
@@ -288,14 +288,14 @@ export default function ResourceArchiveClient<Item>({
             </div>
             <button
               type="submit"
-              className="min-h-12 rounded-lg bg-[--brand-blue] px-5 py-2 font-semibold text-white focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] focus:ring-offset-2"
+              className="min-h-12 rounded-lg bg-(--brand-blue) px-5 py-2 font-semibold text-white focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan) focus:ring-offset-2"
             >
               Search
             </button>
             <button
               type="button"
               onClick={clearFilters}
-              className="min-h-12 rounded-lg border border-blue-300 px-4 py-2 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] focus:ring-offset-2 disabled:opacity-50"
+              className="min-h-12 rounded-lg border border-blue-300 px-4 py-2 font-medium text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan) focus:ring-offset-2 disabled:opacity-50"
             >
               Clear all
             </button>
@@ -330,7 +330,7 @@ export default function ResourceArchiveClient<Item>({
           <button
             type="button"
             onClick={() => setRequestVersion((version) => version + 1)}
-            className="mt-2 min-h-12 rounded-lg border border-red-300 px-4 underline focus:outline-none focus:ring-2 focus:ring-[--brand-cyan]"
+            className="mt-2 min-h-12 rounded-lg border border-red-300 px-4 underline focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan)"
           >
             Retry search
           </button>
@@ -346,7 +346,7 @@ export default function ResourceArchiveClient<Item>({
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-4 min-h-12 rounded-lg border border-blue-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[--brand-cyan]"
+              className="mt-4 min-h-12 rounded-lg border border-blue-300 px-4 py-2 focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan)"
             >
               Clear all
             </button>
@@ -367,7 +367,7 @@ export default function ResourceArchiveClient<Item>({
             });
             searchRef.current?.focus({ preventScroll: true });
           }}
-          className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-[--brand-blue] px-4 py-2 text-sm font-semibold text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] focus:ring-offset-2"
+          className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-(--brand-blue) px-4 py-2 text-sm font-semibold text-white shadow-lg focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan) focus:ring-offset-2"
         >
           To Filters <ArrowUp className="h-4 w-4" aria-hidden="true" />
         </button>

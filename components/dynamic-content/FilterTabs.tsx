@@ -100,7 +100,7 @@ export default function FilterTabs({
           const Icon = tab.icon ?? fallbackIcon;
           const iconClass = selected
             ? "h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white transition-colors flex-wrap mr-1"
-            : "h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 text-[--brand-orange] transition-colors flex-wrap mr-1";
+            : "h-3 w-3 sm:h-5 sm:w-5 md:h-6 md:w-6 text-(--brand-orange) transition-colors flex-wrap mr-1";
           return (
               <button
                 key={tab.key}
@@ -110,9 +110,9 @@ export default function FilterTabs({
                 data-tab={tab.key}
                 onClick={() => onTabChange(tab.key)}
                 aria-label={`${tab.label} tab. ${totalMessage}. ${selectionMessage}.`}
-                className={`relative rounded-lg px-2 sm:px-3 md:px-4 py-1.5 text-sm sm:text-base md:text-lg font-display font-bold transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[--brand-orange] ${selected
-                  ? "border-[--brand-orange] bg-[--brand-orange] text-white shadow-sm"
-                  : "border-[--brand-orange]/40 bg-[--brand-orange]/10 text-slate-500 hover:bg-[--brand-orange]/20"
+                className={`relative rounded-lg px-2 sm:px-3 md:px-4 py-1.5 text-sm sm:text-base md:text-lg font-display font-bold transition focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-(--brand-orange) ${selected
+                  ? "border-(--brand-orange) bg-(--brand-orange) text-white shadow-xs"
+                  : "border-(--brand-orange)/40 bg-(--brand-orange)/10 text-slate-500 hover:bg-(--brand-orange)/20"
                   }`}
               >
                 <span className="flex whitespace-normal text-pretty leading-tight tracking-tight flex-row items-center gap-1">
@@ -122,7 +122,7 @@ export default function FilterTabs({
                 {tab.selectedCount > 0 && (
                   <span
                     aria-hidden="true"
-                    className="absolute -top-1.5 -right-1.5 inline-flex h-2 w-2 items-center justify-center rounded-full bg-[--brand-blue] shadow ring-[3px] ring-white"
+                    className="absolute -top-1.5 -right-1.5 inline-flex h-2 w-2 items-center justify-center rounded-full bg-(--brand-blue) shadow-sm ring-[3px] ring-white"
                   />
                 )}
               </button>

@@ -77,7 +77,7 @@ function readSuppressionPayload(raw: string | null): SuppressionPayload | null {
 function isSuppressed(): boolean {
   if (typeof window === "undefined") return true;
 
-  let payload: SuppressionPayload | null = null;
+  let payload: SuppressionPayload | null;
   try {
     payload = readSuppressionPayload(window.localStorage.getItem(STORAGE_KEY));
   } catch {
@@ -247,7 +247,7 @@ export default function SpecialOfferPopup({ offer }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[1000] bg-slate-950/60 px-2 sm:px-8 backdrop-blur-sm py-8"
+      className="fixed inset-0 z-1000 bg-slate-950/60 px-2 sm:px-8 backdrop-blur-xs py-8"
       role="presentation"
       onPointerDown={(event) => {
         if (event.target === event.currentTarget) dismiss();
@@ -260,21 +260,21 @@ export default function SpecialOfferPopup({ offer }: Props) {
           aria-modal="true"
           aria-labelledby={titleId}
           aria-describedby={descriptionId}
-          className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl outline-none sm:rounded-3xl"
+          className="relative flex max-h-[calc(100svh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl outline-hidden sm:rounded-3xl"
           tabIndex={-1}
         >
           <button
             ref={closeButtonRef}
             type="button"
             aria-label="Close special offer"
-            className="absolute right-3 top-3 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/95 text-slate-800 shadow-lg transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue]"
+            className="absolute right-3 top-3 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/95 text-slate-800 shadow-lg transition hover:bg-white focus:outline-hidden focus-visible:ring-2 focus-visible:ring-(--brand-blue)"
             onClick={dismiss}
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
 
           {offer.featuredImage?.url ? (
-            <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-slate-100">
+            <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-slate-100">
               <Image
                 src={offer.featuredImage.url}
                 alt={offer.featuredImage.altText || offer.title}
@@ -288,7 +288,7 @@ export default function SpecialOfferPopup({ offer }: Props) {
 
           <div className="overflow-y-auto px-5 pb-5 pt-5 sm:px-7 sm:pb-7">
             <div className="space-y-3 pr-10">
-              <p className="text-xs font-semibold uppercase text-[--brand-blue]">{offer.eyebrow}</p>
+              <p className="text-xs font-semibold uppercase text-(--brand-blue)">{offer.eyebrow}</p>
               <h2 id={titleId} className="text-2xl font-bold text-slate-950 sm:text-3xl">
                 {offer.title}
               </h2>

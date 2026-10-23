@@ -6,7 +6,6 @@ import SmartLink from '@/components/utils/SmartLink';
 import { renderHighlight } from '@/components/utils/renderHighlight';
 import { Accordion } from '@/components/ui/Accordion';
 import ReviewsCarouselView from '@/components/reviews-widget/ReviewsCarouselView';
-import ReviewStarRow from '@/components/reviews-widget/ReviewStarRow';
 import ReviewSummary from '@/components/reviews-widget/ReviewSummary';
 import { reviewDate, safeReviewUrl } from '@/components/reviews-widget/review-presentation';
 import type { Review } from '@/components/reviews-widget/types';
@@ -25,10 +24,10 @@ export async function LandingHero({
 }) {
   const settings = await getSiteSettings();
   return (
-    <section className="overflow-hidden border-b border-blue-100 bg-gradient-to-br from-sky-50 via-white to-cyan-50">
+    <section className="overflow-hidden border-b border-blue-100 bg-linear-to-br from-sky-50 via-white to-cyan-50">
       <div className={cn(container, 'grid items-center gap-6 py-8 md:grid-cols-2 md:gap-10 md:py-10')}>
         <div>
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-[--brand-blue]">{eyebrow}</p>
+          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-(--brand-blue)">{eyebrow}</p>
           <h1 className="text-4xl leading-tight tracking-tight text-slate-900 md:text-5xl lg:text-5xl">{renderHighlight(title, highlightText)}</h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600 md:text-lg">{description}</p>
           <ReviewSummary className="mt-4" />
@@ -42,7 +41,7 @@ export async function LandingHero({
           </div>
           <p className="mt-3 text-sm text-slate-500">For homes in Sarasota, Manatee &amp; Charlotte counties.</p>
         </div>
-        <div className="relative aspect-[16/9] overflow-hidden rounded-2xl shadow-sm md:aspect-[4/3]">
+        <div className="relative aspect-video overflow-hidden rounded-2xl shadow-xs md:aspect-4/3">
           <StaticImage src={`static:${imageKey.replace(/^static:/, '')}`} fill crop className="object-cover" sizes="(min-width: 768px) 50vw, 100vw" priority />
         </div>
       </div>
@@ -60,7 +59,7 @@ export function LandingTrust() {
           { text: 'Free Repair & Replacement Estimates', icon: ClipboardList },
         ].map(({ text, icon: Icon }) => (
           <li key={text} className="flex min-w-0 flex-col items-center gap-2 text-center">
-            <Icon className="size-6 shrink-0 text-[--brand-blue]" aria-hidden="true" />
+            <Icon className="size-6 shrink-0 text-(--brand-blue)" aria-hidden="true" />
             <span className="max-w-64">{text}</span>
           </li>
         ))}
@@ -86,8 +85,8 @@ export async function LandingFormSection({ children }: { children: ReactNode }) 
           className="hidden lg:flex min-w-0 flex-col gap-6"
         >
           {projects.map((project) => project?.heroImage ? (
-            <figure key={project.slug} className="overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm">
-              <div className="relative aspect-[4/3]">
+            <figure key={project.slug} className="overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-xs">
+              <div className="relative aspect-4/3">
                 <Image src={project.heroImage.url} alt={project.heroImage.altText || project.title} fill
                   sizes="(min-width: 1152px) 352px, (min-width: 1024px) 32vw, 100vw"
                   className="object-cover" loading="lazy" />
@@ -120,7 +119,7 @@ export function LandingSection({ eyebrow, title, highlightText, subtitle, childr
   return (
     <section id={id} className={cn('py-10 md:py-14', className)}>
       <div className={container}>
-        {eyebrow ? <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-[--brand-blue]">{eyebrow}</p> : null}
+        {eyebrow ? <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-(--brand-blue)">{eyebrow}</p> : null}
         <h2 className={cn('text-3xl leading-tight tracking-tight md:text-4xl lg:text-4xl', subtitle ? 'mb-3' : 'mb-6')}>{renderHighlight(title, highlightText)}</h2>
         {subtitle ? <p className="mb-6 max-w-3xl text-base leading-relaxed text-slate-600 md:text-lg">{subtitle}</p> : null}
         {children}

@@ -129,7 +129,7 @@ export default function LazyYoutubeEmbed({
           <button
             type="button"
             onClick={activate}
-            className="absolute inset-0 flex h-full w-full items-center justify-center focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black/30"
+            className="absolute inset-0 flex h-full w-full items-center justify-center focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-black/30"
           >
             <span className="sr-only">Play {title}</span>
             <span

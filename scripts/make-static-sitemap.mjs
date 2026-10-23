@@ -1,4 +1,4 @@
-import fg from 'fast-glob';
+import { globSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { existsSync, statSync, writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { join, sep } from 'node:path';
@@ -28,10 +28,8 @@ function loadEnvFile(filename) {
 loadEnvFile('.env');
 loadEnvFile('.env.local');
 
-const files = await fg(['app/**/page.@(tsx|jsx|mdx)'], {
-  dot: false,
-  onlyFiles: true,
-  ignore: [
+const files = globSync(['app/**/page.@(tsx|jsx|mdx)'], {
+  exclude: [
     'app/**/api/**',
     'app/**/sitemap_index/**',
     'app/**/robots.ts',

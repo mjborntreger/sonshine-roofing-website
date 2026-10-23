@@ -139,7 +139,7 @@ export default async function Page() {
       <Section>
         <div className="grid min-w-0 gap-8 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
           <div className="min-w-0 space-y-8">
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
               <div className="border-b border-slate-200 px-4 py-3">
                 <h2 className="text-2xl font-semibold text-slate-900">
                   Performance comparison (real-world)
@@ -192,7 +192,7 @@ export default async function Page() {
                   supporting upgrades and select OEM parts are included beyond what is listed here.
                 </p>
                 <div className="relative overflow-hidden rounded-lg border border-slate-200 bg-slate-100 my-8">
-                  <div className="relative aspect-[16/9] w-full">
+                  <div className="relative aspect-video w-full">
                     <StaticImage crop
                       src="static:pickup-truck-engine-bay-supercharger"
                       fill
@@ -203,7 +203,7 @@ export default async function Page() {
                   </div>
                 </div>
 
-                <div className="mb-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div className="mb-4 rounded-xl border border-slate-200 bg-white p-5 shadow-xs">
                   <h3 className="text-lg font-semibold text-slate-900">Summary</h3>
                   <ul className="mt-3 grid gap-2 text-sm text-slate-700 md:grid-cols-2">
                     <li>2020 GMC Sierra 1500 Denali</li>
@@ -223,7 +223,7 @@ export default async function Page() {
                   <VideoWithSchema
                     videoId="aODl4r7ftfc"
                     title={TRUCK_TITLE}
-                    className="aspect-[9/16] rounded-none"
+                    className="aspect-9/16 rounded-none"
                     query={{ autoplay: 0, mute: 0, controls: 1, loop: 0 }}
                   />
                 </div>
@@ -232,7 +232,7 @@ export default async function Page() {
                   {buildSheet.map((section) => (
                     <div
                       key={section.title}
-                      className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                      className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs"
                     >
                       <h3 className="text-lg font-semibold text-slate-900">{section.title}</h3>
                       <ul className="mt-3 space-y-2 text-sm text-slate-700">
@@ -248,7 +248,7 @@ export default async function Page() {
           </div>
 
           <div className="sticky top-8 self-start min-w-0 space-y-6">
-            <div className="rounded-xl border border-slate-200 bg-slate-900 p-6 text-white shadow-sm">
+            <div className="rounded-xl border border-slate-200 bg-slate-900 p-6 text-white shadow-xs">
               <h2 className="text-3xl text-white font-semibold mb-2">Price & terms</h2>
               <p className="text-xl font-semibold mb-2 text-slate-200">Serious interest only.</p>
               <p className="text-slate-200 text-lg">
@@ -279,7 +279,7 @@ export default async function Page() {
           </p>
           <SmartLink
             href="#truck-offer"
-            className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-300"
+            className="inline-flex items-center gap-2 rounded-full bg-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-blue-600 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-blue-300"
           >
             Back to the offer
             <ArrowUpRight className="h-4 w-4" aria-hidden />

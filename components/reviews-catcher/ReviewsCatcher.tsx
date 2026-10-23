@@ -58,7 +58,7 @@ export default function ReviewsCatcher() {
         </Button>
         <div
           aria-hidden="true"
-          className="mx-auto mt-8 h-[3px] w-36 rounded-full bg-gradient-to-r from-[#fb9216] via-[#ffb347] to-[#fb9216] md:mt-8 md:h-1 md:w-96"
+          className="mx-auto mt-8 h-[3px] w-36 rounded-full bg-linear-to-r from-[#fb9216] via-[#ffb347] to-[#fb9216] md:mt-8 md:h-1 md:w-96"
         />
 
         <div className="my-8 md:my-12">
@@ -81,7 +81,7 @@ export default function ReviewsCatcher() {
                     />
                   );
 
-                  const linkClasses = `${styles.starLink} inline-flex flex-col items-center justify-center gap-2 text-slate-300 focus:outline-none md:gap-4`;
+                  const linkClasses = `${styles.starLink} inline-flex flex-col items-center justify-center gap-2 text-slate-300 focus:outline-hidden md:gap-4`;
 
                   const linkContent = (
                     <>

@@ -20,9 +20,9 @@ type LeadFormSuccessProps = {
 const INFO_BADGE_CLASS =
   'inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1';
 const SUCCESS_LINK_CARD_CLASS =
-  'group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-sm transition hover:-translate-y-0.5 hover:border-[--brand-blue] hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]';
+  'group flex h-full flex-col justify-between rounded-2xl border border-slate-200 bg-white px-4 py-4 shadow-xs transition hover:-translate-y-0.5 hover:border-(--brand-blue) hover:shadow-lg focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-(--brand-blue)';
 const SUCCESS_LINK_ICON_WRAPPER_CLASS =
-  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[--brand-blue]/10 text-[--brand-blue]';
+  'flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-(--brand-blue)/10 text-(--brand-blue)';
 
 export default function LeadFormSuccess({
   successMeta,
@@ -49,7 +49,7 @@ export default function LeadFormSuccess({
   const panelClassName = cn(
     'w-full mx-auto rounded-3xl p-8',
     isHeroEmbedded
-      ? 'border border-white/15 bg-slate-950/[0.72] text-white shadow-[0_30px_90px_rgba(0,0,0,0.4)] backdrop-blur-xl'
+      ? 'border border-white/15 bg-slate-950/72 text-white shadow-[0_30px_90px_rgba(0,0,0,0.4)] backdrop-blur-xl'
       : 'border border-emerald-200 bg-white/95 shadow-md',
     maxWidthClassName,
   );
@@ -86,7 +86,7 @@ export default function LeadFormSuccess({
           <p className={paragraphClassName}>
             Your message is already on the way to our project support team. We’ll reach out shortly
             with next steps. If a storm is moving in or water is coming inside, call us right now at{' '}
-            <SitePhoneLink className="font-semibold text-[--brand-blue]" />.
+            <SitePhoneLink className="font-semibold text-(--brand-blue)" />.
           </p>
           {hasSharedDetails && (
             <div className={detailsCardClassName}>
@@ -133,11 +133,11 @@ export default function LeadFormSuccess({
           )}
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs">
             <span className={infoBadgeClassName}>
-              <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Licensed
+              <ShieldCheck className="h-4 w-4 text-(--brand-blue)" aria-hidden="true" /> Licensed
               &amp; insured
             </span>
             <span className={infoBadgeClassName}>
-              <Clock4 className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" /> Typical response
+              <Clock4 className="h-4 w-4 text-(--brand-blue)" aria-hidden="true" /> Typical response
               under 30 minutes
             </span>
             <span className={infoBadgeClassName}>
@@ -166,16 +166,16 @@ export default function LeadFormSuccess({
                       <p className="mt-1 text-xs text-slate-500">{description}</p>
                     </div>
                   </div>
-                  <span className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[--brand-blue]">
+                  <span className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-(--brand-blue)">
                     {external ? 'Open link' : 'Continue'}
                     {external ? (
                       <ExternalLink
-                        className="h-4 w-4 text-[--brand-blue] transition group-hover:translate-x-0.5"
+                        className="h-4 w-4 text-(--brand-blue) transition group-hover:translate-x-0.5"
                         aria-hidden="true"
                       />
                     ) : (
                       <ArrowRight
-                        className="h-4 w-4 text-[--brand-blue] transition group-hover:translate-x-0.5"
+                        className="h-4 w-4 text-(--brand-blue) transition group-hover:translate-x-0.5"
                         aria-hidden="true"
                       />
                     )}

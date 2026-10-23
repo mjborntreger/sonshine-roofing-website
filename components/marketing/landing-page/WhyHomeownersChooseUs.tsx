@@ -21,12 +21,12 @@ import { SECTION_HEADING, SECTION_SUBTITLE } from '@/components/location/section
 const SECTION_CONTAINER = 'px-2';
 const FEATURE_PILL_CLASS = 'inline-flex items-center gap-2 badge badge--accent';
 const FEATURE_LIST_CLASS = 'mt-3 flex flex-wrap justify-center gap-2 text-sm';
-const FEATURE_PILL_ICON_CLASS_BLUE = 'h-4 w-4 text-[--brand-blue]';
+const FEATURE_PILL_ICON_CLASS_BLUE = 'h-4 w-4 text-(--brand-blue)';
 const FEATURE_PILL_ICON_CLASS_ORANGE = 'h-4 w-4 text-amber-500';
 const MOBILE_COLUMN_CLASS = 'md:hidden my-8 space-y-4';
 const GRID_LAYOUT_CLASS = 'mt-8 grid grid-cols-2 gap-5 items-start auto-rows-fr';
 const CARD_SHELL_BASE =
-  'overflow-hidden rounded-3xl bg-white/95 backdrop-blur-sm flex h-full flex-col';
+  'overflow-hidden rounded-3xl bg-white/95 backdrop-blur-xs flex h-full flex-col';
 const ACCORDION_SHELL_BASE = `group ${CARD_SHELL_BASE}`;
 const CARD_SUMMARY_BASE =
   'flex cursor-pointer select-none items-center justify-between gap-3 rounded-t-3xl px-6 py-5 text-left text-lg font-semibold text-slate-900 transition-colors';
@@ -60,23 +60,23 @@ const CARD_THEMES: Record<
 > = {
   blue: {
     frame:
-      'group rounded-3xl p-[1px] bg-gradient-to-r from-[--brand-blue] via-[--brand-blue]/80 to-[--brand-cyan] shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl h-full',
+      'group rounded-3xl p-px bg-linear-to-r from-(--brand-blue) via-(--brand-blue)/80 to-(--brand-cyan) shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl h-full',
     shell: 'ring-1 ring-blue-100/60',
     summary: 'bg-blue-10/80 group-open:bg-blue-10/80 border-b border-blue-100/60',
     body: 'bg-blue-10/10 text-slate-800',
-    icon: 'bg-blue-100 text-[--brand-blue] ring-1 ring-blue-200/70 shadow-sm group-hover:scale-105',
+    icon: 'bg-blue-100 text-(--brand-blue) ring-1 ring-blue-200/70 shadow-xs group-hover:scale-105',
     titleAccent:
-      'after:bg-gradient-to-r after:from-[--brand-blue] after:via-[--brand-cyan] after:to-[--brand-blue] group-hover:after:w-14 group-open:after:w-14',
+      'after:bg-linear-to-r after:from-(--brand-blue) after:via-(--brand-cyan) after:to-(--brand-blue) group-hover:after:w-14 group-open:after:w-14',
   },
   orange: {
     frame:
-      'group rounded-3xl p-[1px] bg-gradient-to-r from-[--brand-orange] via-amber-400 to-amber-300 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl',
+      'group rounded-3xl p-px bg-linear-to-r from-(--brand-orange) via-amber-400 to-amber-300 shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl',
     shell: 'ring-1 ring-orange-200/70',
     summary: 'bg-orange-10/80 group-open:bg-orange-50 border-b border-orange-100/60',
     body: 'bg-orange-10/10 text-slate-800',
-    icon: 'bg-orange-100 text-[--brand-orange] ring-1 ring-orange-200/70 shadow-sm group-hover:scale-105',
+    icon: 'bg-orange-100 text-(--brand-orange) ring-1 ring-orange-200/70 shadow-xs group-hover:scale-105',
     titleAccent:
-      'after:bg-gradient-to-r after:from-[--brand-orange] after:via-amber-400 after:to-[--brand-orange] group-hover:after:w-14 group-open:after:w-14',
+      'after:bg-linear-to-r after:from-(--brand-orange) after:via-amber-400 after:to-(--brand-orange) group-hover:after:w-14 group-open:after:w-14',
   },
 };
 

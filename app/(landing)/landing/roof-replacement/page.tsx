@@ -144,7 +144,7 @@ export default async function RoofReplacementLandingPage() {
                       <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
                         <h4 className="text-2xl font-bold leading-tight text-slate-900">{project.title}</h4>
                       </CardHeader>
-                      <div className="relative aspect-[16/10] w-full overflow-hidden bg-blue-200">
+                      <div className="relative aspect-16/10 w-full overflow-hidden bg-blue-200">
                         <StaticImage
                           src={project.heroImage!.url}
                           alt={project.heroImage!.altText}
@@ -217,7 +217,7 @@ export default async function RoofReplacementLandingPage() {
               ))}
             </ul>
           </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+          <div className="relative aspect-4/3 overflow-hidden rounded-2xl">
             <StaticImage
               src="static:tile-shingle-metal-roof-comparison"
               fill

@@ -3,7 +3,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { createRequire } from 'node:module';
 import ts from 'typescript';
-import fg from 'fast-glob';
+import { globSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { readRouteCollection } from './route-inventory.mjs';
 import { validateRouteOwners } from './validate-directus-routes.mjs';
@@ -68,7 +68,7 @@ const specs = [
   { route: 'special-offers/[slug]', map: 'special-offer', prefix: '/special-offers/', module: '@/lib/content/directus-special-offers', api: { listSpecialOfferSlugs: (...args) => { assert.equal(args.length, 0, 'Build-only offers must enumerate all slugs'); return list(); }, getSpecialOfferBySlug: async slug => row(slug), listSpecialOfferSitemapEntries: sitemap('/special-offers/') }, revalidate: false, fixed: true },
 ];
 await check('every parameterized public page has a route contract', () => {
-  const actual = fg.sync('app/**/page.tsx', { cwd: root }).filter(path => path.includes('['));
+  const actual = globSync('app/**/page.tsx', { cwd: root }).filter(path => path.includes('['));
   assert.deepEqual(actual.sort(), specs.map(spec => `app/(site)/${spec.route}/page.tsx`).sort());
 });
 for (const spec of specs) await check(`${spec.route} params, metadata, missing routes and sitemap`, async () => {

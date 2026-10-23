@@ -50,8 +50,8 @@ export default function QuickQuoteWebFormSkeleton() {
         </div>
       </div>
 
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-[16px] bg-white/70 backdrop-blur-sm">
-        <span className="inline-flex h-3 w-3 animate-pulse rounded-full bg-[--brand-blue]" aria-hidden="true" />
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-[16px] bg-white/70 backdrop-blur-xs">
+        <span className="inline-flex h-3 w-3 animate-pulse rounded-full bg-(--brand-blue)" aria-hidden="true" />
         <span className="text-sm font-medium text-slate-700">Loading roof estimation tool...</span>
         <span className="text-sm font-medium text-slate-500">(This may take a few seconds)</span>
       </div>

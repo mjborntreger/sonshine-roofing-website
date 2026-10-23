@@ -92,7 +92,7 @@ export default function ShareWhatYouThink({
     openPopup(fb);
   }
 
-  const shareBtn = "btn btn-lg inline-flex items-center gap-2 text-white bg-[--brand-blue]";
+  const shareBtn = "btn btn-lg inline-flex items-center gap-2 text-white bg-(--brand-blue)";
   const reviewBtn = "btn btn-ghost btn-md md:btn-lg inline-flex items-center gap-2 text-slate-700";
 
   return (

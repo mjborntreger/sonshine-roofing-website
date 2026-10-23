@@ -21,10 +21,10 @@ export default function InitialNavigation({
   heading = 'How Can We Help?', headingId, highlightText, embedded = false, trustPills,
 }: Props = {}) {
   return (
-    <section aria-labelledby={headingId} className={embedded ? 'w-full' : 'w-full bg-gradient-to-b from-[#eefbff] via-[#dff6ff] to-[#cef3ff] py-12'}>
+    <section aria-labelledby={headingId} className={embedded ? 'w-full' : 'w-full bg-linear-to-b from-[#eefbff] via-[#dff6ff] to-[#cef3ff] py-12'}>
       <div className={embedded ? 'mx-auto max-w-[1280px]' : 'mx-auto max-w-[1280px] px-4'}>
         <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[--brand-blue]">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-(--brand-blue)">
             Explore Services
           </p>
           <h2 id={headingId} className="mt-4 text-3xl font-semibold text-slate-900 md:text-5xl">
@@ -44,7 +44,7 @@ export default function InitialNavigation({
               className={`${PROJECT_OPTION_CARD_BASE_CLASS} ${PROJECT_OPTION_CARD_UNSELECTED_CLASS}`}
             >
               <ProjectOptionCardContent option={card} />
-              <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[--brand-blue]">
+              <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-(--brand-blue)">
                 Learn more
                 <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" aria-hidden="true" />
               </span>

@@ -27,7 +27,7 @@ const ratingValueLookup: Record<RatingString, 1 | 2 | 3> = {
   '2': 2,
   '3': 3,
 };
-const INPUT_CLASS = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:ring-2 focus:ring-[--brand-cyan]';
+const INPUT_CLASS = 'mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:ring-2 focus:ring-(--brand-cyan)';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:ring-red-200';
 const FIELD_ERROR_CLASS = 'mt-1 block text-xs text-red-600';
 
@@ -191,7 +191,7 @@ export default function TellUsWhyForm() {
           We read every note and will reach out if we need more details. Since 1987 we’ve got you covered.
         </p>
         <p className="mt-4 text-slate-700">Redirecting in {countdown}…</p>
-        <SmartLink href="/" className="mt-2 inline-block text-[--brand-blue]">
+        <SmartLink href="/" className="mt-2 inline-block text-(--brand-blue)">
           If you are not redirected automatically, click here.
         </SmartLink>
       </main>

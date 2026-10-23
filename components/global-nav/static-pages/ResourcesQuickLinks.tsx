@@ -41,11 +41,11 @@ const LINKS: QuickLinkItem[] = [
 ];
 
 const PALETTE: QuickLinksPalette = {
-  activeBorderClass: "border-[--brand-blue]",
-  hoverBorderClass: "hover:border-[--brand-blue]",
+  activeBorderClass: "border-(--brand-blue)",
+  hoverBorderClass: "hover:border-(--brand-blue)",
   hoverBackgroundClass: "hover:bg-blue-50",
-  focusRingClass: "focus-visible:ring-[--brand-blue]",
-  titleIconClassName: "text-[--brand-blue]",
+  focusRingClass: "focus-visible:ring-(--brand-blue)",
+  titleIconClassName: "text-(--brand-blue)",
   iconGradientFromClass: "from-[#0045d7]",
   iconGradientToClass: "to-[#00e3fe]",
 };

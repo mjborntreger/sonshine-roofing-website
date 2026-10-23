@@ -129,7 +129,7 @@ Publish CMS changes with a successful build and deployment.
   shared build caches. The tests verify changed/new/removed content across releases,
   cold restarts, no runtime network reads, complete page inventories and fail-closed
   bundle validation. CI runs this without CMS credentials.
-- For release acceptance, use Node 22, run all applicable `verify:*` checks, then
+- For release acceptance, use Node 24.22.1, run all applicable `verify:*` checks, then
   `NEXT_PUBLIC_ENV=production npm run build` and
   `npm run verify:deployment-runtime`. The latter requires production sitemaps to
   be enabled in the build and runs an isolated copy of the standalone artifact.
@@ -149,7 +149,7 @@ Publish CMS changes with a successful build and deployment.
 
 ## Project releases and rollback
 
-- Before a production release, use Node 22 to run `npm ci`, lint, the project and
+- Before a production release, use Node 24.22.1 to run `npm ci`, lint, the project and
   applicable verification scripts, and a credentialed `npm run build`. Preview
   that production build locally and check detail pages, full galleries, filters,
   pagination, videos, testimonials, SEO, and project/image/video sitemaps. Rebuild

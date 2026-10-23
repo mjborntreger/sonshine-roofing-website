@@ -28,13 +28,13 @@ type SocialLink = {
 };
 
 const linkStyles =
-  'text-xs md:text-sm text-[#cad8e6] transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
+  'text-xs md:text-sm text-[#cad8e6] transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
 const h3Styles =
   'text-sm md:text-base font-bold uppercase tracking-wider text-white after:mt-2 after:block after:h-0.5 after:w-8 after:rounded-full after:bg-[#fb9216]';
 const hoursStyles = 'text-xs md:text-sm text-[#cad8e6]';
 const hoursLabelStyles = 'text-xs md:text-sm font-semibold text-white';
 const legalLinkStyles =
-  'transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
+  'transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
 
 const logoSrc = 'static:sonshine-roofing-wordmark';
 
@@ -131,7 +131,7 @@ export default function Footer({ settings, services = [], navigation = [], servi
     <>
       <SmartLink
         href="#page-top"
-        className="mx-auto mb-16 flex w-fit rounded-xl items-center border border-[#24445f] bg-[#071b2b] px-5 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors hover:border-[#fb9216] hover:bg-[#0d2942] hover:text-[#ffb45f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2"
+        className="mx-auto mb-16 flex w-fit rounded-xl items-center border border-[#24445f] bg-[#071b2b] px-5 py-2.5 text-center text-sm font-semibold text-white shadow-xs transition-colors hover:border-[#fb9216] hover:bg-[#0d2942] hover:text-[#ffb45f] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2"
         data-icon-affordance="up"
         aria-label="Return to top of page"
       >
@@ -172,7 +172,7 @@ export default function Footer({ settings, services = [], navigation = [], servi
                 {settings?.licenseNumber && settings.licenseUrl ? (
                   <li className="mb-8">
                     <SmartLink
-                      className="text-xs font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
+                      className="text-xs font-bold uppercase tracking-wider text-[#ffb45f] transition-colors hover:text-white focus-visible:rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
                       href={settings.licenseUrl}
                       aria-label={`Florida Roofing Contractor's License Number ${settings.licenseNumber}`}
                       target="_blank"
@@ -260,7 +260,7 @@ export default function Footer({ settings, services = [], navigation = [], servi
           <div className="flex flex-wrap justify-between gap-8 mt-24 mb-8">
             <SmartLink
               href="/reviews"
-              className="btn bg-[#fb9216] uppercase px-3 py-2 text-sm font-bold !text-[#071b2b] shadow-lg shadow-black/25 transition-colors hover:bg-[#ffb45f] focus-visible:!ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
+              className="btn bg-[#fb9216] uppercase px-3 py-2 text-sm font-bold text-[#071b2b]! shadow-lg shadow-black/25 transition-colors hover:bg-[#ffb45f] focus-visible:ring-[#59ddff]! focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
               data-icon-affordance="up-right"
             >
               <Star className="mr-2 h-4 w-4 text-[#071b2b] md:h-4 md:w-4" />
@@ -281,7 +281,7 @@ export default function Footer({ settings, services = [], navigation = [], servi
                       rel="noopener noreferrer"
                       aria-label={s.label}
                       title={s.label}
-                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#24445f] bg-[#0d2942] text-[#ffb45f] transition-colors hover:border-[#fb9216] hover:bg-[#fb9216] hover:text-[#071b2b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
+                      className="flex h-9 w-9 items-center justify-center rounded-full border border-[#24445f] bg-[#0d2942] text-[#ffb45f] transition-colors hover:border-[#fb9216] hover:bg-[#fb9216] hover:text-[#071b2b] focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]"
                     >
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </a>

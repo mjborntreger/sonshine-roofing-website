@@ -187,7 +187,8 @@ async function historyBack() {
 await test('shared accordion content is readable when its entrance animation cannot run', async () => {
   const Accordion = loadSource(resolve(root, 'components/ui/Accordion.tsx')).Accordion;
   const source = readFileSync(resolve(root, 'app/globals.css'), 'utf8');
-  const rule = source.match(/\.accordion-motion\s*\{[^}]*\}/u)?.[0];
+  const utility = source.match(/@utility accordion-motion\s*\{([\s\S]*?)\n\s*details\[/u)?.[1];
+  const rule = utility ? `.accordion-motion {${utility}}` : null;
   assert.ok(rule, 'shared accordion CSS exists');
   const style = document.createElement('style');
   style.textContent = rule;

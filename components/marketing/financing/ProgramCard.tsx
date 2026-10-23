@@ -54,7 +54,7 @@ export default function ProgramCard({
       : "bg-cyan-50";
   // Motif: YGrene (blue) uses Landmark (tax/house), Service Finance (cyan) uses Percent
   const motif = isBluePrimary ? (
-    <Landmark className="h-4 w-4 text-[--brand-blue]" aria-hidden />
+    <Landmark className="h-4 w-4 text-(--brand-blue)" aria-hidden />
   ) : isOrange ? (
     <Landmark className="h-4 w-4 text-orange-500" aria-hidden />
   ) : (
@@ -63,11 +63,11 @@ export default function ProgramCard({
 
   // Wrapper style per theme (blue/orange/cyan gradients)
   const wrapperClass = isBluePrimary
-    ? "p-[2px] bg-gradient-to-r from-[--brand-blue] to-[--brand-cyan]"
+    ? "p-[2px] bg-linear-to-r from-(--brand-blue) to-(--brand-cyan)"
     : isOrange
-      ? "p-[2px] bg-gradient-to-r from-[--brand-orange] to-amber-400"
+      ? "p-[2px] bg-linear-to-r from-(--brand-orange) to-amber-400"
       : isCyan
-        ? "p-[2px] bg-gradient-to-r from-[--brand-cyan] to-sky-400"
+        ? "p-[2px] bg-linear-to-r from-(--brand-cyan) to-sky-400"
         : "border border-slate-400";
 
   return (
@@ -102,7 +102,7 @@ export default function ProgramCard({
               />
             ) : null}
             {recommended && (
-              <span className="inline-flex items-center rounded-full bg-[--brand-orange] px-2 py-0.5 text-xs font-semibold text-white whitespace-nowrap shrink-0">
+              <span className="inline-flex items-center rounded-full bg-(--brand-orange) px-2 py-0.5 text-xs font-semibold text-white whitespace-nowrap shrink-0">
                 Most popular
               </span>
             )}
@@ -124,7 +124,7 @@ export default function ProgramCard({
                 <CheckCircle2
                   className={cn(
                     "h-4 w-4",
-                    isOrange ? "text-[--brand-orange]" : isCyan ? "text-cyan-600" : "text-[--brand-blue]",
+                    isOrange ? "text-(--brand-orange)" : isCyan ? "text-cyan-600" : "text-(--brand-blue)",
                   )}
                   aria-hidden
                 />
@@ -175,7 +175,7 @@ export default function ProgramCard({
                 <HelpCircle
                   className={cn(
                     "h-4 w-4",
-                    isOrange ? "text-[--brand-orange]" : isCyan ? "text-cyan-600" : "text-[--brand-blue]",
+                    isOrange ? "text-(--brand-orange)" : isCyan ? "text-cyan-600" : "text-(--brand-blue)",
                   )}
                   aria-hidden
                 />
@@ -211,7 +211,7 @@ export default function ProgramCard({
               href={cta.href}
               className={cn(
                 "btn btn-lg inline-flex items-center",
-                isOrange ? "bg-[--brand-orange] hover:bg-[--brand-orange]/90" : undefined,
+                isOrange ? "bg-(--brand-orange) hover:bg-(--brand-orange)/90" : undefined,
                 cta.className,
               )}
               title={cta.title || cta.label}

@@ -18,7 +18,7 @@ import {
 const h2Styles = 'mb-8 text-center text-4xl';
 const pillarsGrid = 'mt-4 grid grid-cols-1 gap-4 items-stretch';
 const pStyles = 'text-lg list-disc pl-5 space-y-1 marker:text-slate-400';
-const linkStyles = 'text-[--brand-blue] icon-affordance';
+const linkStyles = 'text-(--brand-blue) icon-affordance';
 
 function SettingsLinks({ items }: { items: SiteSettingsLink[] }) {
   return (
@@ -53,7 +53,7 @@ export async function HoursAndInformation() {
       <div id="hours-and-information">
         <h2 className={h2Styles}>
           Hours and Information
-          <ArrowDown className="h-8 w-8 inline ml-2 text-[--brand-blue]" />
+          <ArrowDown className="h-8 w-8 inline ml-2 text-(--brand-blue)" />
         </h2>
       </div>
 

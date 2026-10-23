@@ -1,9 +1,8 @@
 import type { Config } from "tailwindcss";
-import tailwindcssAnimate from "tailwindcss-animate";
 import typography from "@tailwindcss/typography";
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -113,7 +112,7 @@ const config: Config = {
       display: ["var(--font-candara)", "var(--font-inter)", "system-ui", "sans-serif"],
     },
   },
-  plugins: [tailwindcssAnimate, typography],
+  plugins: [typography],
 };
 
 export default config;

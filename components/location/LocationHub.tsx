@@ -133,13 +133,13 @@ export default function LocationHub({
           highlightText={page.name} embedded trustPills={(
             <div className={cn(FEATURE_LIST_CLASS, 'mt-6 pb-0')}>
               <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
-                <CalendarDays className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />39+ Years of Expertise
+                <CalendarDays className="h-4 w-4 text-(--brand-blue)" aria-hidden="true" />39+ Years of Expertise
               </span>
               <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
-                <ShieldCheck className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />Licensed and Insured
+                <ShieldCheck className="h-4 w-4 text-(--brand-blue)" aria-hidden="true" />Licensed and Insured
               </span>
               <span className={`${FEATURE_PILL_CLASS} inline-flex items-center gap-2`}>
-                <HandCoins className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />Flexible Financing
+                <HandCoins className="h-4 w-4 text-(--brand-blue)" aria-hidden="true" />Flexible Financing
               </span>
             </div>
           )} />

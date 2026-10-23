@@ -301,7 +301,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
         <div className="">
           <h1 className="mb-0 text-3xl sm:text-4xl md:text-6xl">{post.title}</h1>
         </div>
-        <div className="h-[2px] my-4 w-full rounded-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
+        <div className="h-[2px] my-4 w-full rounded-full bg-linear-to-r from-[#0045d7] to-[#00e3fe]" />
 
         <div className="mb-2 text-sm text-slate-600">
           <EditorialDates published={post.date} modified={post.modified} />
@@ -370,7 +370,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
 
         {/* Prev / Next */}
         {(prev || next) && (
-          <nav className="grid gap-4 p-4 mt-12 bg-white border shadow-sm rounded-2xl border-blue-200 sm:grid-cols-2">
+          <nav className="grid gap-4 p-4 mt-12 bg-white border shadow-xs rounded-2xl border-blue-200 sm:grid-cols-2">
             {prev ? (
               <SmartLink href={`/${prev.slug}`} className="block p-3 rounded-xl hover:bg-slate-50">
                 <div className="text-xs tracking-wide uppercase text-slate-500">Previous</div>

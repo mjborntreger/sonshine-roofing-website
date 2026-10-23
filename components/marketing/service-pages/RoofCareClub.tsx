@@ -173,7 +173,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
           const selected = TERM_PLANS.find((plan) => plan.term === term) ?? TERM_PLANS[0];
           const savings = savingsVsOneYear(TERM_PLANS, term);
           return (
-            <div className="relative flex flex-col overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-sm z-0">
+            <div className="relative flex flex-col overflow-hidden rounded-3xl border border-blue-200 bg-white shadow-xs z-0">
               {/* Header */}
               <div className="not-prose px-6 py-5 bg-[#0045d7] text-white">
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -193,7 +193,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                     </p>
 
                     {/* Duration */}
-                    <div className="inline-flex justify-center overflow-hidden rounded-lg bg-cyan-50 shadow-sm">
+                    <div className="inline-flex justify-center overflow-hidden rounded-lg bg-cyan-50 shadow-xs">
                       {[1, 2, 3].map((t) => (
                         <button
                           key={t}
@@ -203,7 +203,7 @@ export default function RoofCareClub({ origin }: RoofCareClubProps = {}) {
                           className={[
                             'px-4 py-1.5 text-sm md:text-lg transition duration-300',
                             term === t
-                              ? 'bg-[var(--brand-orange)] text-white font-semibold'
+                              ? 'bg-(--brand-orange) text-white font-semibold'
                               : 'hover:bg-[#fb9216]/20 font-semibold text-slate-800',
                           ].join(' ')}
                         >

@@ -70,7 +70,7 @@ export default function YouMayAlsoLike(props: Props) {
       <section className={baseClassName} aria-labelledby="ymal-heading">
         <div className="flex flex-col md:justify-between mt-16 mb-4">
           <h2 id="ymal-heading" className="text-3xl md:text-4xl">
-            <Sparkles className="inline h-7 w-7 md:h-10 md:w-10 text-[--brand-blue] mr-3" />
+            <Sparkles className="inline h-7 w-7 md:h-10 md:w-10 text-(--brand-blue) mr-3" />
             {finalHeading}
           </h2>
           <div className="text-right">
@@ -112,7 +112,7 @@ export default function YouMayAlsoLike(props: Props) {
     <section className={baseClassName} aria-labelledby="ymal-heading">
       <div className="grid mt-36 mb-4">
         <h2 id="ymal-heading" className="text-3xl md:text-4xl">
-          <Sparkles className="inline h-7 w-7 md:h-10 md:w-10 text-[--brand-blue] mr-3" />
+          <Sparkles className="inline h-7 w-7 md:h-10 md:w-10 text-(--brand-blue) mr-3" />
           {finalHeading}
         </h2>
         <div className="text-right">

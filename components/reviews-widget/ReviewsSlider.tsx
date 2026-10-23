@@ -9,7 +9,7 @@ import SmartLink from '../utils/SmartLink';
 import ReviewAttribution from './ReviewAttribution';
 import type { ReviewsSliderProps } from './types';
 
-const CONTROL_CLASS = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-blue-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue disabled:cursor-default disabled:opacity-40';
+const CONTROL_CLASS = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-blue-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue disabled:cursor-default disabled:opacity-40';
 
 export default function ReviewsSlider({ reviews, onReady, onError }: ReviewsSliderProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -173,10 +173,10 @@ export default function ReviewsSlider({ reviews, onReady, onError }: ReviewsSlid
               role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${reviews.length}`}>
               <button type="button" onClick={event => openModal(index, event.currentTarget)}
                 aria-label={`Open full review by ${review.authorName}`} aria-haspopup="dialog"
-                className="my-4 block w-full appearance-none rounded-3xl border border-blue-300 bg-cyan-50 p-5 text-left shadow-md transition motion-safe:duration-300 hover:border-[#fb9216] hover:shadow-xl motion-safe:hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue">
+                className="my-4 block w-full appearance-none rounded-3xl border border-blue-300 bg-cyan-50 p-5 text-left shadow-md transition motion-safe:duration-300 hover:border-[#fb9216] hover:shadow-xl motion-safe:hover:-translate-y-0.5 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue">
                 <span className="flex items-start justify-between gap-3">
                   <ReviewAttribution review={review} inButton starVariant="icon" />
-                  <Quote className="mt-1 h-10 w-10 flex-none text-[--brand-cyan]" aria-hidden="true" />
+                  <Quote className="mt-1 h-10 w-10 flex-none text-(--brand-cyan)" aria-hidden="true" />
                 </span>
                 <span className="mt-4 block text-base text-slate-700 md:text-lg">{review.text.length > 250 ? `${review.text.slice(0, 250)}…` : review.text}</span>
               </button>
@@ -208,12 +208,12 @@ export default function ReviewsSlider({ reviews, onReady, onError }: ReviewsSlid
         </div>
       ) : null}
       {selected && createPortal(
-        <div className="fixed inset-0 z-[2147483647] grid place-items-center bg-black/45 px-4 py-8 md:p-16"
+        <div className="fixed inset-0 z-2147483647 grid place-items-center bg-black/45 px-4 py-8 md:p-16"
           onClick={event => { if (event.target === event.currentTarget) closeModal(); }}>
           <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby={modalTitleId}
             className="relative mx-auto flex max-h-[85dvh] w-full max-w-[720px] flex-col overflow-hidden rounded-3xl border border-blue-300 bg-white shadow-2xl">
             <button ref={closeBtnRef} type="button" aria-label="Close review" onClick={closeModal}
-              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-red-600 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue">
+              className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full text-red-600 hover:bg-white focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-brand-blue">
               <X className="h-6 w-6" aria-hidden="true" />
             </button>
             <div className="border-b border-blue-200 bg-blue-50 px-5 pb-4 pr-16 pt-5">

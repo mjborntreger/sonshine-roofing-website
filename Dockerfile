@@ -1,13 +1,16 @@
-FROM node:22-bookworm-slim AS deps
+FROM node:24.22.1-bookworm-slim AS toolchain
+RUN npm install --global npm@12.2.1
+
+FROM toolchain AS deps
 
 WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 RUN npm ci
 
-FROM node:22-bookworm-slim AS builder
+FROM toolchain AS builder
 
 WORKDIR /app
 
@@ -43,7 +46,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
 
-FROM node:22-bookworm-slim AS runner
+FROM node:24.22.1-bookworm-slim AS runner
 
 WORKDIR /app
 

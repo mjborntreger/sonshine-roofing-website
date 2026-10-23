@@ -19,8 +19,8 @@ const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
 
 const TERMS_PATH = '/homeowner-referral-program/terms-and-conditions';
 
-const CARD_BASE = 'rounded-3xl border bg-white p-6 shadow-sm';
-const PANEL_BASE = 'rounded-3xl border bg-white shadow-sm';
+const CARD_BASE = 'rounded-3xl border bg-white p-6 shadow-xs';
+const PANEL_BASE = 'rounded-3xl border bg-white shadow-xs';
 const CARD_TITLE = 'mt-4 text-lg font-semibold text-slate-900';
 const CARD_TEXT = 'mt-2 text-sm leading-6 text-slate-600';
 const HERO_ACTION = 'btn btn-lg';
@@ -165,13 +165,13 @@ export default async function HomeownerReferralProgramPage() {
             <JsonLd data={breadcrumbsLd} />
 
             <h2 className="mt-4 text-3xl">
-              Refer a Homeowner <span className="text-[--brand-blue]">with Confidence</span>
+              Refer a Homeowner <span className="text-(--brand-blue)">with Confidence</span>
             </h2>
             <p>
               If you know a friend, family member, neighbor, or fellow homeowner who needs a full
               roof replacement in our Southwest Florida service area,{' '}
               <strong>
-                you may be eligible for a <span className="text-[--brand-blue]">$250</span> referral
+                you may be eligible for a <span className="text-(--brand-blue)">$250</span> referral
                 reward.
               </strong>
             </p>
@@ -186,7 +186,7 @@ export default async function HomeownerReferralProgramPage() {
               {PROCESS_STEPS.map(({ step, title, text }) => (
                 <div key={step} className={`${CARD_BASE} border-blue-200`}>
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[--brand-blue] text-sm font-bold text-white">
+                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-(--brand-blue) text-sm font-bold text-white">
                       {step.replace('Step ', '')}
                     </span>
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -202,7 +202,7 @@ export default async function HomeownerReferralProgramPage() {
             <section id="referral-form" className="not-prose my-8 scroll-mt-24">
               <Suspense
                 fallback={
-                  <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white p-6 shadow-sm">
+                  <div className="mx-auto w-full rounded-3xl border border-blue-100 bg-white p-6 shadow-xs">
                     <div className="h-6 w-32 animate-pulse rounded-full bg-slate-200" />
                     <div className="mt-4 space-y-3">
                       <div className="h-4 animate-pulse rounded-full bg-slate-200" />

@@ -42,7 +42,7 @@ export default function RevealContact(props: Props) {
   const label = props.label ?? (props.variant === 'email' ? 'Reveal email' : 'Reveal Phone');
   const btnClasses = props.className ?? 'btn btn-outline btn-sm inline-flex items-center gap-2';
   const linkClasses =
-    props.linkClassName ?? 'inline-flex items-center gap-2 text-[--brand-blue] underline underline-offset-2';
+    props.linkClassName ?? 'inline-flex items-center gap-2 text-(--brand-blue) underline underline-offset-2';
   const wrapperClasses = 'block my-2';
   const isPhoneVariant = props.variant === 'phone';
   const buttonClassName = isPhoneVariant ? `${btnClasses} phone-affordance` : btnClasses;
@@ -100,7 +100,7 @@ export default function RevealContact(props: Props) {
   async function copyToClipboard() {
     if (!value) return;
     // Build the same "display" string we render on screen
-    let toCopy = '';
+    let toCopy: string;
     if (props.variant === 'email') {
       const [primary] = String(value).split('|');
       toCopy = primary;

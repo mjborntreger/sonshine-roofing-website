@@ -6,7 +6,7 @@ the frontend adapters and deployment snapshots for Directus.
 
 ## Architecture
 
-- Next.js 16 runs as a Node 22 standalone image on Coolify.
+- Next.js 16 runs as a Node 24.22.1 standalone image on Coolify.
 - Directus is the primary content platform. It owns shared site content, fixed
   page and service SEO, blog posts, FAQs, people, roofing glossary terms,
   sponsor features, projects, videos/categories, reviews and review-carousel settings, special
@@ -27,7 +27,9 @@ See [CONTENT.md](CONTENT.md) before changing content ownership or CMS behavior.
 
 ## Local development
 
-Use Node 22 and install the locked dependency tree:
+Use Node 24.22.1 and npm 12.2.1 and install the locked dependency tree.
+Dependency scripts must have an exact-version review in `allowScripts`; `.npmrc`
+fails installs with unreviewed scripts. The pinned toolchain is enforced by npm:
 
 ```bash
 npm ci
@@ -44,6 +46,7 @@ Do not put secrets in public variables or commit local environment files.
 ```bash
 npm run lint
 npm run typecheck
+npm run typecheck:compat
 npm run verify:tailwind-utilities
 npm run verify:archive-controls
 npm run verify:video-playback
@@ -65,7 +68,7 @@ require a successful build and deployment. See [CONTENT.md](CONTENT.md).
 Run `verify:editorial-pipeline` and `verify:deployment-contract` for source and
 capture checks. `verify:deployment-builds` builds two isolated synthetic releases,
 reuses build caches, and tests the standalone servers with outbound requests
-blocked and Directus credentials absent. It needs Node 22 and installed dependencies,
+blocked and Directus credentials absent. It needs Node 24.22.1 and installed dependencies,
 not CMS access. `npm run build` also verifies the generated prerender manifest.
 After a credentialed production-mode build, run `verify:deployment-runtime` to
 exercise its packaged routes, APIs, RSC responses, revalidation rejection and cold
@@ -127,3 +130,6 @@ original inline-script failure.
 Directus, Cloudflare, n8n, Coolify, analytics, and production lead
 flows are external control planes. Do not mutate or deploy them without explicit
 authorization for that action.
+
+See [runtime maintenance](docs/runtime-modernization.md) for the compiler bridge,
+CSS/lint compatibility checks and rendering experiment decisions.

@@ -110,7 +110,7 @@ export default async function Page() {
             </p>
 
             <figure className="not-prose">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+              <div className="relative aspect-4/3 overflow-hidden rounded-lg">
                 <StaticImage crop
                   src="static:roof-maintenance-saves-money-graphic"
                   fill

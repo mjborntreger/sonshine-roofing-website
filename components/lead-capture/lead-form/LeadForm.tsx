@@ -40,9 +40,9 @@ const LeadFormSuccess = dynamic(
 );
 
 const INPUT_BASE_CLASS =
-  'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-base shadow-lg focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-orange]/30';
+  'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-base shadow-lg focus:border-(--brand-blue) focus:ring-2 focus:ring-(--brand-orange)/30';
 const HERO_INPUT_BASE_CLASS =
-  'mt-2 w-full rounded-xl border border-white/[0.12] bg-white/80 px-4 py-3 text-base text-slate-900 shadow-none placeholder:text-slate-500 focus:border-[--brand-orange] focus:ring-4 focus:ring-[--brand-orange]/15';
+  'mt-2 w-full rounded-xl border border-white/12 bg-white/80 px-4 py-3 text-base text-slate-900 shadow-none placeholder:text-slate-500 focus:border-(--brand-orange) focus:ring-4 focus:ring-(--brand-orange)/15';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
 const HERO_PANEL_CLASS =
   'mt-8 sm:mt-0 rounded-3xl border border-blue-100/50 bg-[#0045d7]/5 p-5 shadow-none ring-1 ring-white/5 backdrop-blur-xl sm:p-6';
@@ -54,17 +54,17 @@ const HERO_SMS_CLASS_NAMES = {
   label: 'text-sm font-semibold leading-6 text-slate-300',
   options: 'mt-4 flex flex-wrap gap-3',
   optionLabel:
-    'inline-flex items-center gap-2 rounded-full border border-white/[0.12] bg-white/[0.04] px-4 py-2.5 text-slate-300 focus-within:ring-2 focus-within:ring-[--brand-orange]',
-  optionLabelSelected: 'border-slate-200 bg-[--brand-orange] text-slate-200',
+    'inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/4 px-4 py-2.5 text-slate-300 focus-within:ring-2 focus-within:ring-(--brand-orange)',
+  optionLabelSelected: 'border-slate-200 bg-(--brand-orange) text-slate-200',
   radio: 'sr-only',
   optionText: 'text-sm font-semibold leading-none',
   optionTextSelected: 'text-slate-900',
   sharedDisclosure: 'text-xs leading-5 text-slate-400',
   error: 'mt-2 text-sm font-medium text-red-200',
   footer: 'border-none pt-0 text-sm text-blue-100/70',
-  footerText: 'max-w-[34rem] text-xs leading-6',
+  footerText: 'max-w-136 text-xs leading-6',
   footerLinks: 'mt-3 font-semibold text-slate-300',
-  footerLink: 'transition hover:text-[--brand-cyan]',
+  footerLink: 'transition hover:text-(--brand-cyan)',
 } as const;
 
 export type LeadFormLayoutVariant = 'default' | 'heroEmbedded' | 'heroOverlap';
@@ -296,7 +296,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
   const isHeroEmbedded = variant === 'heroEmbedded';
   const formSpacingClassName = variant === 'heroOverlap' ? 'px-4' : 'px-4 py-16';
   const formHeading = 'Get a FREE Estimate';
-  const renderedFormHeading = renderHighlight(formHeading, 'FREE', 'text-[--brand-cyan]');
+  const renderedFormHeading = renderHighlight(formHeading, 'FREE', 'text-(--brand-cyan)');
 
   const setField: SetFormField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -492,7 +492,7 @@ export default function LeadForm({ restoredSuccess, variant = 'default' }: LeadF
                 <p className="font-semibold text-slate-800">Need help right now?</p>
                 <p className="mt-1 text-sm text-slate-600">
                   Call{' '}
-                  <a href={phoneHref} className="font-semibold text-[--brand-blue]">
+                  <a href={phoneHref} className="font-semibold text-(--brand-blue)">
                     {phone}
                   </a>{' '}
                   if a storm is moving in or water is coming inside.

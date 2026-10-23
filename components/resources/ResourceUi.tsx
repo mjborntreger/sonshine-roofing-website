@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 export function ResourceSearchPanel({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-blue-200 bg-white p-4 shadow-sm md:p-5">
+    <div className="rounded-2xl border border-blue-200 bg-white p-4 shadow-xs md:p-5">
       {children}
     </div>
   );
@@ -34,7 +34,7 @@ export function ResourceSearchField({
           autoComplete="off"
           {...input}
           className={cn(
-            'h-12 w-full min-w-0 rounded-lg border border-blue-200 bg-white pl-11 pr-12 text-base text-slate-800 placeholder:text-slate-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] [&::-webkit-search-cancel-button]:appearance-none',
+            'h-12 w-full min-w-0 rounded-lg border border-blue-200 bg-white pl-11 pr-12 text-base text-slate-800 placeholder:text-slate-500 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--brand-blue) [&::-webkit-search-cancel-button]:appearance-none',
             input.className,
           )}
         />
@@ -45,7 +45,7 @@ export function ResourceSearchField({
 }
 
 export const resourceClearButtonClass =
-  '[&[hidden]]:hidden absolute right-1 top-1 inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue]';
+  '[[hidden]]:hidden absolute right-1 top-1 inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 hover:bg-blue-50 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--brand-blue)';
 
 export function ResourceGroupHeading({
   title,

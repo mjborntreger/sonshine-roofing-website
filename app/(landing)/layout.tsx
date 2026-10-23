@@ -50,7 +50,7 @@ export default async function LandingLayout({ children }: { children: ReactNode 
               <SmartLink href="/" aria-label={`${brand} home`} className="shrink-0" prefetch={false}>
                 <DirectusImage media={staticImage('sonshine-roofing-blue-orange-logo')} alt={brand} className="h-auto w-36 sm:w-44" sizes="176px" />
               </SmartLink>
-              <SmartLink href={phoneHref} aria-label={`Call ${brand} at ${phone}`} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[--brand-blue] sm:text-base">
+              <SmartLink href={phoneHref} aria-label={`Call ${brand} at ${phone}`} className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-(--brand-blue) sm:text-base">
                 <Phone className="size-4 shrink-0" aria-hidden="true" /><span>{phone}</span>
               </SmartLink>
             </div>

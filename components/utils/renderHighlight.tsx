@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-const DEFAULT_HIGHLIGHT_CLASS_NAME = "text-[--brand-blue]";
+const DEFAULT_HIGHLIGHT_CLASS_NAME = "text-(--brand-blue)";
 
 export function renderHighlight(
   text: string,
