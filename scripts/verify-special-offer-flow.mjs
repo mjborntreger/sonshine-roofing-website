@@ -310,6 +310,7 @@ const viewLoad = loader({
   '@/lib/lead-capture/thank-you': {
     readThankYouContext: () => context,
     fireAdsLeadSubmitOnce: () => null,
+    buildAdsLeadDataLayerEvent: () => null,
   },
   '@/lib/content/directus-reviews': {
     getGoogleReviews: async () => [
@@ -326,12 +327,16 @@ const viewLoad = loader({
     getReviewsCarouselSettings: async () => ({ gbpProfileLink: 'https://example.test/reviews' }),
   },
 });
-const confirmation = renderToStaticMarkup(
-  React.createElement(viewLoad('components/lead-capture/thank-you/ThankYouClient.tsx').default),
-);
+const Confirmation = viewLoad('components/lead-capture/thank-you/ThankYouClient.tsx').default;
+const serverConfirmation = renderToStaticMarkup(React.createElement(Confirmation));
+assert.match(serverConfirmation, />Thank you<\/h1>/, 'Server output cannot read browser-only lead state');
+const confirmationRoot = createRoot(document.getElementById('root'));
+await act(async () => confirmationRoot.render(React.createElement(Confirmation)));
+const confirmation = document.getElementById('root').innerHTML;
 assert.match(confirmation, /Your coupon is on the way/);
 assert.match(confirmation, /check your spam or promotions folder/);
 assert.doesNotMatch(confirmation, /SYNTHETIC|9415550100|coupon@example/);
+await act(async () => confirmationRoot.unmount());
 const trust = renderToStaticMarkup(
   await viewLoad('components/lead-capture/special-offer/SpecialOfferTrust.tsx').default({
     settings: null,

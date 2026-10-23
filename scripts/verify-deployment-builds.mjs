@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { verifyDeploymentSnapshot, snapshotHash } from '../lib/content/deployment-snapshot.mjs';
 import { verifyRuntime } from './verify-deployment-runtime.mjs';
+import { verifyLeadRuntime } from './verify-lead-runtime.mjs';
 
 // Build and run isolated synthetic releases; never replace a developer's capture.
 const source = process.cwd(),
@@ -74,6 +75,7 @@ try {
     assert.ok((await readFile(env.CONTENT_BUILD_AUDIT, 'utf8')).length > 0);
     await rm(env.CONTENT_BUILD_AUDIT);
     await verifyRuntime(root, { revision });
+    if (revision === 'A') await verifyLeadRuntime(root);
     console.log(`Synthetic deployment ${revision} build, TypeScript 7/6 and runtime checks passed.`);
   }
   const file = join(root, '.generated/editorial.json'),

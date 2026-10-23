@@ -76,16 +76,20 @@ prerender inventory and runtime-network rejection checks remain authoritative.
 An architecture change must establish equivalent output and cache guarantees
 before changing those invariants.
 
-The stable React Compiler was evaluated through its current Hooks diagnostics.
-Existing mount-time hydration, browser-state synchronization, a memoized renderer
-and DOM scroll-lock handling produce additional diagnostics. These new checks
-remain visible as 26 warnings (21 effect updates, three memoization and two DOM
-mutation diagnostics); existing Hooks rules remain strict. `lint:compiler`
-requires zero warnings and is the explicit gate before enabling compilation.
-Neither the stable compiler nor the experimental Rust compiler is enabled.
-The stable compiler package is available for a scoped trial after those findings
-are resolved. No production performance benefit was demonstrated for the Rust,
-disk-cache, lazy-import or worker-thread experiments, so none is enabled.
+The follow-up removes all 26 compiler-readiness warnings across 17 components.
+Hydration-dependent UI uses a stable external-store snapshot; DOM headings and
+the office clock subscribe to external state. Query/route identity resets
+pagination and lightboxes, while the estimator, video history and loading states
+are derived during render or updated by user/network events. Scroll-lock DOM
+operations use browser methods and retain their cleanup. `lint:compiler` now runs
+in CI and requires zero warnings without disabling any existing rule.
+
+A scoped stable-compiler trial compiled the real archive component and passed its
+10 interaction cases in five runs. Whole-process medians were 569 ms disabled and
+822 ms enabled, including compiler/startup overhead. This is not a user-interaction
+latency benchmark and does not establish a production performance benefit. The
+stable and Rust compilers remain disabled. No demonstrated benefit justifies the
+other disk-cache, lazy-import or worker-thread experiments.
 
 ## Verification and remaining release checks
 
@@ -98,7 +102,50 @@ closed inventories, retired revalidation and cold restarts without CMS access.
 The remaining npm audit chain is Next's development-only lint plugin → fast-glob
 → micromatch → braces. No patched braces version is available in the reviewed
 registry. Do not accept audit's suggested downgrade to the Next 14 lint plugin.
-The production-only dependency audit has no reported vulnerabilities.
+The production-only dependency audit has no reported vulnerabilities. The
+`audit:policy` gate accepts only advisory GHSA-vfj7-8cjw-p6xm with the reviewed
+four dependency entries, exact installed paths/versions, incoming edges, trusted
+ESLint configuration and Docker boundary. Runtime exposure, new advisories,
+changed consumers or audit outages fail. Its recorded review expires November 22,
+2026. `verify:audit-policy` includes mutation tests proving those failures. Review
+supported upstream releases and remove the exception once a fix is available;
+never patch/fork braces locally or lower the audit threshold.
+
+The follow-up's production-mode lead verifier uses an isolated receiver and
+Cloudflare's documented pass/fail/spent test keys. CI substitutes only the
+provider response; `TURNSTILE_LIVE_TEST=1 npm run verify:lead-runtime` exercises
+the real test-key endpoint against an already-built standalone artifact. It
+checks origins, honeypots, validation, SMS choices, campaign data, retry identity
+and downstream errors without real submissions. Browser events retain their
+existing conversion deduplication checks, now explicitly included in the CI
+`verify:landing-conversions` step. The API deliberately preserves a lead
+ID across retry; downstream idempotency remains the existing n8n contract.
+
+Analytics now waits until hydration establishes the actual browser hostname.
+This fixes the static-server/localhost host-gate mismatch and prevents provider
+scripts on unapproved hosts. Since there is no script execution without
+hydration, the client component's noscript fallback is no longer a server-rendered
+tracking mechanism. Enabled/disabled/host gates and one-time queue flushing are
+covered by `verify:react-readiness`, alongside clock hydration, restored financing
+state, reduced-motion scores, heading changes and route-scoped lightboxes. The
+project gallery remembers its opening button explicitly, so Safari pointer clicks
+restore focus correctly even when the browser did not focus that button on click.
+
+Build-secret setup and the required per-capture cache ID are documented in
+[DEPLOY.md](../DEPLOY.md#buildkit-secret-migration-required-before-deploying-this-branch).
+The Docker migration must not be deployed until the matching build-system inputs
+are provisioned. No deployment/control-plane changes are part of this PR.
+
+The follow-up also passed 458 public prerendered routes in the committed Linux
+image with networking disabled, a private-value scan of image configuration,
+history and all layers, and verification that the accepted development dependency
+chain is absent from the runtime image. Chromium 155, WebKit 26.6 and Linux
+Firefox 157 covered eight routes at 390, 768 and 1440 pixels. Twenty-four frozen
+Chromium before/after screenshots had no changed pixels; media was replaced with
+deterministic placeholders and tracking requests were blocked for that comparison.
+The mobile menu, estimator, form validation and gallery had separate interaction
+checks. External media delivery and production provider acceptance still need
+release checks.
 
 Deployment remains a separate action. Retain the prior complete image and its
 sealed content bundle for rollback. Localhost cannot complete a production-bound

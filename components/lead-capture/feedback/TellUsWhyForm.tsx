@@ -65,7 +65,6 @@ export default function TellUsWhyForm() {
   useEffect(() => {
     if (status !== 'ok') return;
 
-    setCountdown(3);
     const tick = setInterval(() => setCountdown((prev) => (prev > 0 ? prev - 1 : 0)), 1000);
     const redirectTimer = setTimeout(() => {
       router.push('/');

@@ -1,5 +1,7 @@
 'use client';
 
+import { useHydrated } from '@/lib/ui/use-hydrated';
+
 import SmartLink from '@/components/utils/SmartLink';
 import StaticImage from '@/components/media/StaticMediaProvider';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -74,10 +76,7 @@ export default function Header({
     return () => ro.disconnect();
   }, []);
 
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    setReady(true);
-  }, []);
+  const ready = useHydrated();
 
   useIsomorphicLayoutEffect(() => {
     const getEffectiveScrollY = () => {

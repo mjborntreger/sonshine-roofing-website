@@ -76,11 +76,15 @@ export default function ResourceArchiveClient<Item>({
   }));
   const [requestVersion, setRequestVersion] = useState(0);
   const [forceRequest, setForceRequest] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [outcome, setOutcome] = useState({ requested, version: 0, error: false });
+  const needsRequest = forceRequest || JSON.stringify(requested) !== JSON.stringify(applied.filters);
+  const settled = outcome.requested === requested && outcome.version === requestVersion;
+  const loading = needsRequest && !settled;
+  const error = settled && outcome.error;
   const [legacyNotice, setLegacyNotice] = useState(false);
   const appliedKeyRef = useRef(JSON.stringify(draft));
-  const lastLocationRef = useRef<string | null>(null);
+  const locationKey = archiveLocationKey(new URLSearchParams(paramsString), groups, searchParamKey);
+  const [lastLocation, setLastLocation] = useState<string | null>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -93,7 +97,7 @@ export default function ResourceArchiveClient<Item>({
         groups,
         searchParamKey,
       ).toString();
-      lastLocationRef.current = archiveLocationKey(url.searchParams, groups, searchParamKey);
+
       if (url.href !== window.location.href) {
         // Next's native history integration updates useSearchParams without a route fetch.
         window.history[replace ? 'replaceState' : 'pushState'](
@@ -106,30 +110,28 @@ export default function ResourceArchiveClient<Item>({
     [groups, searchParamKey],
   );
 
-  useEffect(() => {
-    const params = new URLSearchParams(paramsString);
-    const locationKey = archiveLocationKey(params, groups, searchParamKey);
-    if (lastLocationRef.current === locationKey) return;
-    lastLocationRef.current = locationKey;
-    const restored = readArchiveFilters(params, groups, minSearchLength, searchParamKey);
+  if (lastLocation !== locationKey) {
+    setLastLocation(locationKey);
+    const restored = readArchiveFilters(new URLSearchParams(paramsString), groups, minSearchLength, searchParamKey);
     setDraft(restored.filters);
     setRequested(restored.filters);
     setForceRequest(false);
-    setLegacyNotice(restored.adjustedLegacyLink);
-    publishUrl(restored.filters, true);
+    setLegacyNotice(restored.adjustedLegacyLink || (legacyNotice && JSON.stringify(restored.filters) === JSON.stringify(requested)));
+  }
+
+  useEffect(() => {
+    const restored = readArchiveFilters(new URLSearchParams(paramsString), groups, minSearchLength, searchParamKey);
+    if (restored.adjustedLegacyLink) publishUrl(restored.filters, true);
   }, [paramsString, groups, minSearchLength, searchParamKey, publishUrl]);
 
   useEffect(() => {
     const key = JSON.stringify(requested);
-    setError(false);
     if (key === appliedKeyRef.current && !forceRequest) {
-      setLoading(false);
       return;
     }
     const controller = new AbortController();
     let current = true;
     const payload = buildFiltersPayload(archivePayloadInput(requested));
-    setLoading(true);
     fetch(apiPath, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -144,12 +146,10 @@ export default function ResourceArchiveClient<Item>({
         if (!current) return;
         appliedKeyRef.current = key;
         setApplied({ filters: requested, result, payload });
+        setOutcome({ requested, version: requestVersion, error: false });
       })
       .catch(() => {
-        if (current) setError(true);
-      })
-      .finally(() => {
-        if (current) setLoading(false);
+        if (current) setOutcome({ requested, version: requestVersion, error: true });
       });
     return () => {
       current = false;
@@ -164,6 +164,8 @@ export default function ResourceArchiveClient<Item>({
     setForceRequest(true);
     setRequestVersion((version) => version + 1);
     setLegacyNotice(false);
+    const nextParams = writeArchiveFilters(new URLSearchParams(paramsString), normalized, groups, searchParamKey);
+    setLastLocation(archiveLocationKey(nextParams, groups, searchParamKey));
     publishUrl(normalized);
   };
   const clearFilters = () => applyFilters({ search: '', selections: {} });

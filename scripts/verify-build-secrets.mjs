@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { buildEnvironment } from './build-with-secrets.mjs';
+const base = { CONTENT_BUILD_ID: 'fixture-capture-A', DIRECTUS_URL: 'https://cms.example.test' };
+assert.throws(() => buildEnvironment({}, 'DIRECTUS_TOKEN=synthetic'), /CONTENT_BUILD_ID/);
+for (const text of ['', 'DIRECTUS_TOKEN=  ']) assert.throws(() => buildEnvironment(base, text), /DIRECTUS_TOKEN/);
+const first = buildEnvironment(base, 'DIRECTUS_TOKEN=synthetic-a\nYOUTUBE_API_KEY=synthetic-y\nN8N_WEBHOOK_SECRET=must-not-import');
+const second = buildEnvironment({ ...base, CONTENT_BUILD_ID: 'fixture-capture-B' }, 'DIRECTUS_TOKEN=synthetic-b');
+assert.equal(first.DIRECTUS_TOKEN, 'synthetic-a');
+assert.equal(second.DIRECTUS_TOKEN, 'synthetic-b');
+assert.equal(first.N8N_WEBHOOK_SECRET, undefined);
+assert.equal(second.YOUTUBE_API_KEY, undefined);
+assert.notEqual(first.CONTENT_BUILD_ID, second.CONTENT_BUILD_ID);
+const docker = readFileSync(new URL('../Dockerfile', import.meta.url), 'utf8');
+assert.doesNotMatch(docker, /^(ARG|ENV)\s+(DIRECTUS_TOKEN|YOUTUBE_API_KEY)\b/m);
+assert.match(docker, /--mount=type=secret,id=build_env,required=true/);
+assert.match(docker, /CONTENT_BUILD_ID="\$\{CONTENT_BUILD_ID\}" node scripts\/build-with-secrets.mjs/);
+console.log('Build secret boundary, missing/blank inputs, rotation and content capture input checks passed.');

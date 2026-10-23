@@ -199,7 +199,6 @@ export default function SpecialOfferForm({
   useEffect(() => {
     const stored = readOfferCookie(cookieName);
     if (stored && stored.code === offerCode) {
-      setGlobalError(null);
       writeOfferCookie(cookieName, stored.code, offerExpiration);
     }
   }, [submission, cookieName, offerCode, offerExpiration]);

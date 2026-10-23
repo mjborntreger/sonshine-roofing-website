@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useHydrated } from '@/lib/ui/use-hydrated';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, ShieldCheck } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import {
   fireAdsLeadSubmitOnce,
   readThankYouContext,
-  type AdsLeadDataLayerEvent,
+  buildAdsLeadDataLayerEvent,
   type ThankYouLeadContext,
 } from '@/lib/lead-capture/thank-you';
 
@@ -67,15 +68,13 @@ function getLandingConfirmation(context: ThankYouLeadContext | null) {
 export default function ThankYouClient() {
   const searchParams = useSearchParams();
   const leadId = getLeadId(searchParams);
-  const context = useMemo(() => readThankYouContext(leadId), [leadId]);
-  const [debugEvent, setDebugEvent] = useState<AdsLeadDataLayerEvent | null>(null);
+  const hydrated = useHydrated();
+  const context = useMemo(() => hydrated ? readThankYouContext(leadId) : null, [leadId, hydrated]);
+  const debugEvent = context ? buildAdsLeadDataLayerEvent(context) : null;
 
   useEffect(() => {
     if (!context) return;
-    const event = fireAdsLeadSubmitOnce(context);
-    if (process.env.NODE_ENV !== 'production') {
-      setDebugEvent(event);
-    }
+    fireAdsLeadSubmitOnce(context);
   }, [context]);
 
   return (

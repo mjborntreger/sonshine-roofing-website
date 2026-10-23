@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
@@ -62,11 +62,8 @@ export default function VideoPlayback({
     );
   }, [selected, openedVideos, playbackVideos]);
 
-  useEffect(() => {
-    // Retain the last video while the existing modal finishes its exit animation.
-    // Restoring the URL is read-only; only explicit open/close actions write history.
-    if (active) setModalVideo(active);
-  }, [active]);
+  // Retain the previous item for the exit animation, including browser history changes.
+  if (active && active !== modalVideo) setModalVideo(active);
 
   return (
     <>

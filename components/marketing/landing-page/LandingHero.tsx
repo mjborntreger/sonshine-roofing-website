@@ -47,11 +47,17 @@ export default function Hero({
     return () => media.removeEventListener('change', updateMotionPreference);
   }, []);
 
-  useEffect(() => {
+  const [previousMotion, setPreviousMotion] = useState(allowsMotion);
+  if (previousMotion !== allowsMotion) {
+    setPreviousMotion(allowsMotion);
     if (!allowsMotion) {
       setIsNearViewport(false);
-      return;
+      setIsVideoPlaying(false);
     }
+  }
+
+  useEffect(() => {
+    if (!allowsMotion) return;
 
     const target = sectionRef.current;
     if (!target) return;
@@ -71,10 +77,7 @@ export default function Hero({
   }, [allowsMotion]);
 
   useEffect(() => {
-    if (!shouldMountVideo) {
-      setIsVideoPlaying(false);
-      return;
-    }
+    if (!shouldMountVideo) return;
 
     const el = videoRef.current;
     if (!el) return;

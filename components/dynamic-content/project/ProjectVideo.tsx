@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useHydrated } from "@/lib/ui/use-hydrated";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPortal } from "react-dom";
@@ -17,8 +18,7 @@ type Props = {
 export default function ProjectVideo({ title, videoId, className, posterUrl, posterAlt }: Props) {
   const [open, setOpen] = useState(false);
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useHydrated();
 
   const scrollYRef = useRef(0);
 

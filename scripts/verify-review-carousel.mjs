@@ -321,6 +321,25 @@ try {
     assert.equal(document.body.style.overflow, 'clip');
     document.body.style.overflow = '';
   });
+  await check('review modal restores an existing scroll lock and compensation after repeated opens', async () => {
+    document.body.style.position='fixed'; document.body.style.top='-120px'; document.body.style.paddingRight='7px';
+    document.documentElement.dataset.scrollLock='outer'; document.documentElement.style.setProperty('--scroll-lock-offset','7px');
+    await mount(Slider,{reviews:[displayReview('nested')]});
+    const trigger=button('Open full review by Synthetic nested');
+    for(let n=0;n<2;n++) {
+      await click(trigger);
+      assert.equal(document.body.style.position,'fixed');
+      assert.equal(document.documentElement.dataset.scrollLock,'true');
+      await key('Escape');
+      assert.equal(document.body.style.position,'fixed'); assert.equal(document.body.style.top,'-120px');
+      assert.equal(document.body.style.paddingRight,'7px');
+      assert.equal(document.documentElement.dataset.scrollLock,'outer');
+      assert.equal(document.documentElement.style.getPropertyValue('--scroll-lock-offset'),'7px');
+      assert.equal(document.activeElement,trigger);
+    }
+    document.body.style.position=''; document.body.style.top=''; document.body.style.paddingRight='';
+    delete document.documentElement.dataset.scrollLock; document.documentElement.style.removeProperty('--scroll-lock-offset');
+  });
   assert.equal(requests.length, 0, 'No carousel test makes a network request');
   process.stdout.write(`${checks} review carousel fixtures passed.\n`);
 } finally {

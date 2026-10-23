@@ -164,9 +164,11 @@ export default function SpecialOfferPopup({ offer }: Props) {
     };
   }, [isBlacklisted, offer.slug]);
 
-  useEffect(() => {
+  const [previousBlacklist, setPreviousBlacklist] = useState(isBlacklisted);
+  if (previousBlacklist !== isBlacklisted) {
+    setPreviousBlacklist(isBlacklisted);
     if (isBlacklisted) setIsOpen(false);
-  }, [isBlacklisted]);
+  }
 
   useEffect(() => {
     if (!isOpen || isBlacklisted) return undefined;

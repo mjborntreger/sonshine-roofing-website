@@ -56,7 +56,13 @@
     "typecheck:compat": "tsc6 --noEmit --incremental false",
     "verify:lint-contract": "node scripts/verify-lint-contract.mjs",
     "lint:compiler": "eslint . --max-warnings=0",
-    "verify:tailwind-css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-tailwind-css.mjs"
+    "verify:tailwind-css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-tailwind-css.mjs",
+    "verify:build-secrets": "node scripts/verify-build-secrets.mjs",
+    "audit:policy": "node scripts/audit-policy.mjs",
+    "verify:audit-policy": "node --test scripts/audit-policy.test.mjs",
+    "verify:landing-conversions": "node scripts/verify-landing-conversions.mjs",
+    "verify:react-readiness": "node scripts/verify-react-readiness.mjs",
+    "verify:lead-runtime": "node scripts/verify-lead-runtime.mjs"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.4.0",

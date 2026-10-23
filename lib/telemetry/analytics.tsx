@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useHydrated } from '@/lib/ui/use-hydrated';
 import Script from 'next/script';
-import { envFlagTrue, isProdEnv, isSiteHost, SITE_HOST } from '@/lib/seo/site';
+import { envFlagTrue, isProdEnv, isSiteHost } from '@/lib/seo/site';
 import type { GtmWindow } from '@/lib/telemetry/gtm';
 
 const GTM = (process.env.NEXT_PUBLIC_GTM_ID || '').trim();
@@ -39,8 +40,10 @@ export function flushQueuedEvents(win: GtmWindow) {
 
 export default function AnalyticsScripts({ enabled }: { enabled: boolean }) {
   // Enable only in production by default; allow preview on staging if explicitly toggled and host is allowed
-  const HOST_ALLOWED =
-    typeof window !== 'undefined' ? isSiteHost(window.location.hostname) : isSiteHost(SITE_HOST);
+  // Static HTML cannot know its eventual browser hostname. Hydrate the same
+  // empty boundary first, then enable tracking only on the actual allowed host.
+  const hydrated = useHydrated();
+  const HOST_ALLOWED = hydrated && isSiteHost(window.location.hostname);
   const ENABLED =
     enabled && HOST_ALLOWED && (isProdEnv() || envFlagTrue('NEXT_PUBLIC_ENABLE_GTM_PREVIEW'));
   useEffect(() => {

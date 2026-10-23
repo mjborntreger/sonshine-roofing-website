@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useHydrated } from "@/lib/ui/use-hydrated";
 import Image, { type ImageProps } from "next/image";
 import { DirectusImage } from "@/components/media/DirectusImage";
 import type { PublicImage } from "@/lib/content/public-image";
@@ -25,7 +26,7 @@ const imageClassBase =
 const containerBase = "relative overflow-hidden rounded-xl shadow-xl border border-blue-200 bg-slate-100";
 
 export default function ProjectGallery({ images, projectTitle }: ProjectGalleryProps) {
-  const [mounted, setMounted] = React.useState(false);
+  const mounted = useHydrated();
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
   const modalRef = React.useRef<HTMLDivElement | null>(null);
@@ -38,9 +39,6 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
   const isOpen = activeIndex !== null;
   const currentImage = typeof activeIndex === "number" ? images[activeIndex] : null;
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const closeModal = React.useCallback(() => {
     setActiveIndex(null);
@@ -95,7 +93,8 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
     const body = document.body;
 
     if (isOpen) {
-      previouslyFocused.current = document.activeElement as HTMLElement | null;
+      // Safari does not focus buttons on pointer click. Preserve the actual opener.
+      previouslyFocused.current ??= document.activeElement as HTMLElement | null;
       scrollYRef.current = window.scrollY || window.pageYOffset || 0;
       body.style.position = "fixed";
       body.style.top = `-${scrollYRef.current}px`;
@@ -265,7 +264,10 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
             key={`${image.url}-${index}`}
             image={image}
             projectTitle={projectTitle}
-            onOpen={() => setActiveIndex(index)}
+            onOpen={(event) => {
+              previouslyFocused.current = event.currentTarget;
+              setActiveIndex(index);
+            }}
           />
         ))}
       </div>
@@ -277,22 +279,18 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
 type GalleryImageProps = {
   image: GalleryImage;
   projectTitle: string;
-  onOpen: () => void;
+  onOpen: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
-  const [loaded, setLoaded] = React.useState(false);
-  const imageRef = React.useRef<HTMLImageElement | null>(null);
-  const handleLoad = React.useCallback(() => setLoaded(true), []);
+  const [loadedUrl, setLoadedUrl] = React.useState<string | null>(null);
+  const loaded = loadedUrl === image.url;
+  const handleLoad = React.useCallback(() => setLoadedUrl(image.url), [image.url]);
+  const imageRef = React.useCallback((node: HTMLImageElement | null) => {
+    if (node?.complete && node.naturalWidth > 0) setLoadedUrl(image.url);
+  }, [image.url]);
   const alt = image.altText || projectTitle;
 
-  React.useEffect(() => {
-    setLoaded(false);
-    const imgEl = imageRef.current;
-    if (imgEl?.complete) {
-      handleLoad();
-    }
-  }, [image.url, handleLoad]);
 
   return (
     <button

@@ -11,6 +11,36 @@ import type { ReviewsSliderProps } from './types';
 
 const CONTROL_CLASS = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-full border border-blue-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-blue-50 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-blue disabled:cursor-default disabled:opacity-40';
 
+function lockReviewScroll() {
+  const body = document.body;
+  const html = document.documentElement;
+  const scrollY = window.scrollY || html.scrollTop || 0;
+  const previous = {
+    position: body.style.position, top: body.style.top, left: body.style.left,
+    right: body.style.right, width: body.style.width, overflow: body.style.overflow,
+    paddingRight: body.style.paddingRight, scrollBehavior: html.style.scrollBehavior,
+    scrollLock: html.dataset.scrollLock, scrollLockOffset: html.style.getPropertyValue('--scroll-lock-offset'),
+  };
+  const scrollbar = window.innerWidth - html.clientWidth;
+  Object.assign(body.style, { position: 'fixed', top: `-${scrollY}px`, left: '0', right: '0', width: '100%', overflow: 'hidden' });
+  if (scrollbar > 0) body.style.setProperty('padding-right', `${scrollbar}px`);
+  html.setAttribute('data-scroll-lock', 'true');
+  html.style.setProperty('--scroll-lock-offset', `${scrollbar}px`);
+  return () => {
+    html.style.scrollBehavior = 'auto';
+    Object.assign(body.style, {
+      position: previous.position, top: previous.top, left: previous.left, right: previous.right,
+      width: previous.width, overflow: previous.overflow, paddingRight: previous.paddingRight,
+    });
+    if (previous.scrollLock === undefined) delete html.dataset.scrollLock;
+    else html.dataset.scrollLock = previous.scrollLock;
+    if (previous.scrollLockOffset) html.style.setProperty('--scroll-lock-offset', previous.scrollLockOffset);
+    else html.style.removeProperty('--scroll-lock-offset');
+    window.scrollTo(0, scrollY);
+    html.style.scrollBehavior = previous.scrollBehavior;
+  };
+}
+
 export default function ReviewsSlider({ reviews, onReady, onError }: ReviewsSliderProps) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const emblaRef = useRef<EmblaCarouselType | null>(null);
@@ -97,20 +127,7 @@ export default function ReviewsSlider({ reviews, onReady, onError }: ReviewsSlid
 
   useEffect(() => {
     if (!modalOpen) return;
-    const body = document.body;
-    const html = document.documentElement;
-    const scrollY = window.scrollY || html.scrollTop || 0;
-    const previous = {
-      position: body.style.position, top: body.style.top, left: body.style.left,
-      right: body.style.right, width: body.style.width, overflow: body.style.overflow,
-      paddingRight: body.style.paddingRight, scrollBehavior: html.style.scrollBehavior,
-      scrollLock: html.dataset.scrollLock, scrollLockOffset: html.style.getPropertyValue('--scroll-lock-offset'),
-    };
-    const scrollbar = window.innerWidth - html.clientWidth;
-    Object.assign(body.style, { position: 'fixed', top: `-${scrollY}px`, left: '0', right: '0', width: '100%', overflow: 'hidden' });
-    if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
-    html.dataset.scrollLock = 'true';
-    html.style.setProperty('--scroll-lock-offset', `${scrollbar}px`);
+    const restoreScroll = lockReviewScroll();
 
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') { event.preventDefault(); closeModal(); }
@@ -139,17 +156,7 @@ export default function ReviewsSlider({ reviews, onReady, onError }: ReviewsSlid
     return () => {
       document.removeEventListener('keydown', onKey);
       document.removeEventListener('focusin', containFocus);
-      html.style.scrollBehavior = 'auto';
-      Object.assign(body.style, {
-        position: previous.position, top: previous.top, left: previous.left, right: previous.right,
-        width: previous.width, overflow: previous.overflow, paddingRight: previous.paddingRight,
-      });
-      if (previous.scrollLock === undefined) delete html.dataset.scrollLock;
-      else html.dataset.scrollLock = previous.scrollLock;
-      if (previous.scrollLockOffset) html.style.setProperty('--scroll-lock-offset', previous.scrollLockOffset);
-      else html.style.removeProperty('--scroll-lock-offset');
-      window.scrollTo(0, scrollY);
-      html.style.scrollBehavior = previous.scrollBehavior;
+      restoreScroll();
       if (returnFocusRef.current?.isConnected) returnFocusRef.current.focus({ preventScroll: true });
     };
   }, [modalOpen, reviews.length, closeModal, moveReview]);

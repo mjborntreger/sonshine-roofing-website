@@ -1,6 +1,8 @@
 // Financing lead magnet with gated calculator
 'use client';
 
+import { useHydrated } from '@/lib/ui/use-hydrated';
+
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from 'framer-motion';
@@ -449,7 +451,11 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     smsMarketingConsent: '',
   });
 
-  useEffect(() => {
+  const hydrated = useHydrated();
+  const restoreKey = `${hydrated}:${defaultAmount}`;
+  const [restoredKey, setRestoredKey] = useState<string | null>(null);
+  if (hydrated && restoredKey !== restoreKey) {
+    setRestoredKey(restoreKey);
     const contactReady = Boolean(readCookie(CONTACT_READY_COOKIE));
 
     const cookie = parseCookie(readCookie(COOKIE_NAME));
@@ -464,17 +470,14 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
       setSubmittedAmount(roundedAmount);
       setPersistedScores(cookie.scores ?? null);
       setStep((prev) => (prev < summaryStepIndex ? summaryStepIndex : prev));
-      return;
-    }
-
-    if (contactReady) {
+    } else if (contactReady) {
       setUnlocked(true);
       setShowCalculator(true);
       setContactEditMode(false);
       setPersistedScores(null);
       setStep((prev) => (prev < summaryStepIndex ? summaryStepIndex : prev));
     }
-  }, [defaultAmount, summaryStepIndex]);
+  }
 
   const [quizAnswers, setQuizAnswers] = useState<(string | null)[]>(() =>
     Array(totalQuizQuestions).fill(null),
@@ -559,60 +562,33 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
     return () => window.cancelAnimationFrame(raf);
   }, [step]);
 
-  useEffect(() => {
-    if (scoreAnimationFrameRef.current != null) {
-      cancelAnimationFrame(scoreAnimationFrameRef.current);
-      scoreAnimationFrameRef.current = null;
-    }
-
-    if (!displayScores) {
-      setAnimatedScores({ serviceFinance: 0, ygrene: 0 });
-      return;
-    }
-
-    if (!showCalculator) {
-      setAnimatedScores({ serviceFinance: 0, ygrene: 0 });
-      return;
-    }
-
-    const targetScores: Record<FinancingProgramKey, number> = {
-      serviceFinance: displayScores.serviceFinanceScore,
-      ygrene: displayScores.ygreneScore,
-    };
-
-    if (prefersReducedMotion) {
-      setAnimatedScores(targetScores);
-      return;
-    }
-
-    const durationMs = 800;
-    const startTime = performance.now();
-
+  const animationKey = JSON.stringify([displayScores, showCalculator, prefersReducedMotion]);
+  const [previousAnimation, setPreviousAnimation] = useState(animationKey);
+  if (previousAnimation !== animationKey) {
+    setPreviousAnimation(animationKey);
     setAnimatedScores({ serviceFinance: 0, ygrene: 0 });
+  }
+  const visibleScores = !displayScores || !showCalculator
+    ? { serviceFinance: 0, ygrene: 0 }
+    : prefersReducedMotion
+      ? { serviceFinance: displayScores.serviceFinanceScore, ygrene: displayScores.ygreneScore }
+      : animatedScores;
 
+  useEffect(() => {
+    if (!displayScores || !showCalculator || prefersReducedMotion) return;
+    const startTime = performance.now();
     const stepFrame = (now: number) => {
-      const progress = Math.min((now - startTime) / durationMs, 1);
-      const nextScores: Record<FinancingProgramKey, number> = {
-        serviceFinance: targetScores.serviceFinance * progress,
-        ygrene: targetScores.ygrene * progress,
-      };
-      setAnimatedScores(nextScores);
-
-      if (progress < 1) {
-        scoreAnimationFrameRef.current = requestAnimationFrame(stepFrame);
-      } else {
-        scoreAnimationFrameRef.current = null;
-        setAnimatedScores(targetScores);
-      }
+      const progress = Math.min((now - startTime) / 800, 1);
+      setAnimatedScores({
+        serviceFinance: displayScores.serviceFinanceScore * progress,
+        ygrene: displayScores.ygreneScore * progress,
+      });
+      if (progress < 1) scoreAnimationFrameRef.current = requestAnimationFrame(stepFrame);
     };
-
     scoreAnimationFrameRef.current = requestAnimationFrame(stepFrame);
-
     return () => {
-      if (scoreAnimationFrameRef.current != null) {
-        cancelAnimationFrame(scoreAnimationFrameRef.current);
-        scoreAnimationFrameRef.current = null;
-      }
+      if (scoreAnimationFrameRef.current != null) cancelAnimationFrame(scoreAnimationFrameRef.current);
+      scoreAnimationFrameRef.current = null;
     };
   }, [displayScores, showCalculator, prefersReducedMotion]);
 
@@ -1535,7 +1511,7 @@ export default function MonthlyEstimator({ defaultAmount = 15000 }: { defaultAmo
                 const barColor =
                   programKey === 'serviceFinance' ? 'bg-(--brand-blue)' : 'bg-(--brand-orange)';
                 const detailHref = PROGRAM_DETAIL_ANCHORS[programKey];
-                const rawAnimated = animatedScores[programKey] ?? 0;
+                const rawAnimated = visibleScores[programKey] ?? 0;
                 const clampedAnimated = displayScores
                   ? Math.min(Math.max(rawAnimated, 0), baseScore)
                   : 0;
