@@ -77,6 +77,47 @@ configuration. The retained `/api/revalidate` compatibility endpoint returns
 401 for GET and POST without a configured secret and never invalidates content.
 Publish CMS changes with a successful build and deployment.
 
+## BuildKit secret migration (required before deploying this branch)
+
+The committed Dockerfile requires a BuildKit secret named `build_env`, containing
+`DIRECTUS_TOKEN` and optionally `YOUTUBE_API_KEY` in dotenv format. Its loader
+imports only those two keys into the build subprocess. Do not configure private
+credentials as Docker build arguments. Public URLs, tenant scope and
+`NEXT_PUBLIC_*` values remain ordinary build arguments. Runtime webhook and
+Turnstile secrets remain runtime configuration only.
+
+Every publishing run must supply a **new** nonsecret `CONTENT_BUILD_ID`, even
+when rebuilding the same Git commit after a CMS edit. Use a deployment/run ID
+plus attempt, not only a commit SHA. This changes the content-capture layer's
+cache key; BuildKit secret contents alone do not invalidate caches. Alternatively,
+run the builder stage with `--no-cache-filter builder`, still supplying the ID.
+
+Example inputs (values are read from the existing protected build environment):
+
+```sh
+docker buildx build --secret id=build_env,src=/protected/build.env \
+  --build-arg CONTENT_BUILD_ID="$DEPLOYMENT_RUN_ID" \
+  --build-arg DIRECTUS_URL --build-arg DIRECTUS_CLIENT_SLUG \
+  --build-arg NEXT_PUBLIC_ENV=production --build-arg NEXT_PUBLIC_BASE_URL \
+  --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY --build-arg NEXT_PUBLIC_GTM_ID \
+  --build-arg NEXT_PUBLIC_META_PIXEL_ID --build-arg NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY .
+```
+
+**Rollout dependency:** configure the owning Coolify builder to deliver this
+secret mount and a fresh capture ID before merging/deploying the Docker change.
+A build-argument-only integration is insufficient. Validate its generated Docker
+command in a nonproduction build; if the installed Coolify version cannot expose
+BuildKit secrets, use a supported external image-build pipeline before rollout.
+No Coolify configuration is changed by this maintenance PR. Keep the current
+image for rollback; restoring that complete image also restores its content.
+
+The manual `Credentialed Docker validation` workflow uses the same Dockerfile
+and `--secret` contract without pushing an image. It requires the protected
+`SONSHINE_BUILD_ENV` GitHub secret and matching public repository variables;
+those settings must be provisioned separately. Pull-request checks use synthetic
+content and require no credentials. Never run a privileged credentialed build
+for an untrusted pull-request revision.
+
 ## Lead delivery (n8n)
 
 - Set `N8N_WEBHOOK_URL`, `N8N_WEBHOOK_SECRET`, and `TURNSTILE_SECRET_KEY` in
@@ -126,10 +167,12 @@ Publish CMS changes with a successful build and deployment.
   `.generated` artifacts and public build artifacts into the standalone image.
   Node startup validates the bundle hashes before serving requests.
 - Run `npm run verify:deployment-builds` for two synthetic production builds with
-  shared build caches. The tests verify changed/new/removed content across releases,
+  shared build caches. Each build is followed by both TypeScript 7 and compatibility
+  TypeScript 6 checks in the same isolated root, including its generated Next route
+  declarations and validators. The tests verify changed/new/removed content across releases,
   cold restarts, no runtime network reads, complete page inventories and fail-closed
   bundle validation. CI runs this without CMS credentials.
-- For release acceptance, use Node 22, run all applicable `verify:*` checks, then
+- For release acceptance, use Node 24.22.1, run all applicable `verify:*` checks, then
   `NEXT_PUBLIC_ENV=production npm run build` and
   `npm run verify:deployment-runtime`. The latter requires production sitemaps to
   be enabled in the build and runs an isolated copy of the standalone artifact.
@@ -149,7 +192,7 @@ Publish CMS changes with a successful build and deployment.
 
 ## Project releases and rollback
 
-- Before a production release, use Node 22 to run `npm ci`, lint, the project and
+- Before a production release, use Node 24.22.1 to run `npm ci`, lint, the project and
   applicable verification scripts, and a credentialed `npm run build`. Preview
   that production build locally and check detail pages, full galleries, filters,
   pagination, videos, testimonials, SEO, and project/image/video sitemaps. Rebuild

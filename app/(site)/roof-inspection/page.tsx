@@ -99,15 +99,15 @@ export default async function Page() {
         ]}
         imageSrc="static:workers-on-tile-roof"
       >
-        <div className="bg-slate-600 h-[1px] my-8" />
+        <div className="bg-slate-600 h-px my-8" />
         <div className="flex-col gap-y-6 max-w-5xl text-center mx-auto">
           <h2 className="text-4xl sm:text-5xl font-semibold my-4 text-white">
-            Book a <span className="text-[--brand-cyan]">Tip Top Roof Check-up</span> Today
+            Book a <span className="text-(--brand-cyan)">Tip Top Roof Check-up</span> Today
           </h2>
           <div>
             <p className="text-slate-300 mt-2 text-xl sm:text-3xl">
               Just <span className="text-slate-500 line-through">$249</span>
-              <span className="text-[--brand-cyan]"> $209.00</span>
+              <span className="text-(--brand-cyan)"> $209.00</span>
             </p>
           </div>
           <div className="flex flex-row flex-wrap mx-auto mt-8 justify-center gap-4">
@@ -140,7 +140,7 @@ export default async function Page() {
 
             <TipTopRoofCheckup origin={origin} />
 
-            <div className="bg-slate-200 h-[1px] my-8" />
+            <div className="bg-slate-200 h-px my-8" />
 
             <Suspense fallback={null}>
               <EvenSimplerLeadForm
@@ -154,7 +154,7 @@ export default async function Page() {
             <div className="mt-16 not-prose flex flex-row justify-between">
               <h3 className="mb-3 text-xl text-slate-700 md:text-2xl">
                 <HelpCircle
-                  className="text-[--brand-blue] h-5 w-5 inline mr-2"
+                  className="text-(--brand-blue) h-5 w-5 inline mr-2"
                   aria-hidden="true"
                 />
                 Why Do I Need a Roof Inspection?
@@ -175,7 +175,7 @@ export default async function Page() {
                 inspections per year to prevent premature roof failure.
               </p>
               <figure className="not-prose mt-4">
-                <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <div className="relative aspect-4/3 overflow-hidden rounded-lg">
                   <StaticImage
                     src={nathanImage.url}
                     alt={nathanImage.altText}
@@ -188,14 +188,14 @@ export default async function Page() {
                 <figcaption className="mt-2 text-sm text-slate-600">
                   <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #
                   {settings?.licenseNumber ?? 'Licensed Florida contractor'} |{' '}
-                  <SmartLink className="text-[--brand-blue]" href="/person/nathan-borntreger">
+                  <SmartLink className="text-(--brand-blue)" href="/person/nathan-borntreger">
                     See full bio
                   </SmartLink>
                 </figcaption>
               </figure>
               {/* Inline callout (#6) */}
               <div
-                className="shadow-sm my-4 rounded-xl border border-[#fb9216]/5 bg-amber-50/50 p-4"
+                className="shadow-xs my-4 rounded-xl border border-[#fb9216]/5 bg-amber-50/50 p-4"
                 role="note"
                 aria-label="Important"
               >
@@ -218,9 +218,9 @@ export default async function Page() {
                 year.
               </p>
             </div>
-            <div className="bg-slate-200 h-[1px] my-8" />
+            <div className="bg-slate-200 h-px my-8" />
             <div className="text-center text-lg sm:text-2xl font-semibold my-4">
-              Book Your <span className="text-[--brand-blue]">Roof Inspection</span> Today
+              Book Your <span className="text-(--brand-blue)">Roof Inspection</span> Today
             </div>
             <div>
               <SmartLink
@@ -233,12 +233,12 @@ export default async function Page() {
               </SmartLink>
             </div>
             <div
-              className="my-6 rounded-xl border border-[#fb9216]/5 bg-amber-50/50 p-4 shadow-sm"
+              className="my-6 rounded-xl border border-[#fb9216]/5 bg-amber-50/50 p-4 shadow-xs"
               role="note"
               aria-label="Advisory"
             >
               <strong className="uppercase text-[1rem] font-display block text-slate-800 mb-1">
-                <HandCoins className="text-[--brand-blue] h-4 w-4 mr-2 inline" />
+                <HandCoins className="text-(--brand-blue) h-4 w-4 mr-2 inline" />
                 Want it free instead?
               </strong>
               <div className="m-0 text-slate-700">
@@ -257,7 +257,7 @@ export default async function Page() {
                 </SmartLink>
               </div>
             </div>
-            <div className="bg-slate-200 h-[1px] my-8" />
+            <div className="bg-slate-200 h-px my-8" />
           </div>
 
           <ServicesAside activePath={SERVICE_PATH} />

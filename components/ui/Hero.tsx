@@ -63,7 +63,7 @@ export default function Hero({
           aria-hidden="true"
         />
         <div
-          className="absolute inset-0 -z-10 bg-gradient-to-b from-black/50 via-black/55 to-black/60"
+          className="absolute inset-0 -z-10 bg-linear-to-b from-black/50 via-black/55 to-black/60"
           aria-hidden="true"
         />
 
@@ -101,9 +101,9 @@ export default function Hero({
                 {badges.map(({ label, icon: Icon }, index) => (
                   <span
                     key={`${label}-${index}`}
-                    className="inline-flex items-center gap-2 rounded-md border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur"
+                    className="inline-flex items-center gap-2 rounded-md border border-white/25 bg-white/15 px-3 py-1.5 text-sm font-semibold text-white backdrop-blur-sm"
                   >
-                    {Icon ? <Icon className="h-4 w-4 text-[--brand-cyan]" aria-hidden="true" /> : null}
+                    {Icon ? <Icon className="h-4 w-4 text-(--brand-cyan)" aria-hidden="true" /> : null}
                     <span className="leading-tight">{label}</span>
                   </span>
                 ))}
@@ -115,7 +115,7 @@ export default function Hero({
         </div>
       </section>
 
-      <div className="h-1 w-full bg-gradient-to-r from-[--brand-blue] via-blue-500 to-blue-200" />
+      <div className="h-1 w-full bg-linear-to-r from-(--brand-blue) via-blue-500 to-blue-200" />
     </>
   );
 }

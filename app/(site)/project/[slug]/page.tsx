@@ -299,7 +299,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
           </div>
 
           {/* Right column: Project Details + Products */}
-          <div className="sticky top-16 bg-amber-50/50 shadow-sm rounded-3xl border border-blue-200">
+          <div className="sticky top-16 bg-amber-50/50 shadow-xs rounded-3xl border border-blue-200">
             {project.projectDescription && (
               <>
                 <div className="rounded-t-3xl px-6 border-b border-blue-200 overflow-hidden bg-blue-50">
@@ -322,7 +322,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
               <>
                 <div className="rounded-b-3xl px-6 border-t border-blue-200 overflow-hidden bg-blue-50">
                   <h4 className="mt-4 mb-2 text-xl text-slate-600">
-                    <List className="text-[--brand-blue] mr-2 inline h-4 w-4" />
+                    <List className="text-(--brand-blue) mr-2 inline h-4 w-4" />
                     Products Used
                   </h4>
                   <ul className="pl-5 list-disc mb-6">
@@ -333,7 +333,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
                             href={p.productLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-[--brand-blue] transition-colors hover:text-blue-800"
+                            className="text-(--brand-blue) transition-colors hover:text-blue-800"
                             showExternalIcon
                           >
                             {p.productName}

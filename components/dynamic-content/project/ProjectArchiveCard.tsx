@@ -23,7 +23,7 @@ type Props = {
 
 const pillClass =
   "inline-flex min-w-0 max-w-full items-center rounded-xl font-semibold tracking-tight bg-blue-100 px-2.5 py-1 text-sm text-slate-600 sm:px-3 sm:py-1 sm:text-sm";
-const pillLabelClass = "block max-w-[14rem] truncate";
+const pillLabelClass = "block max-w-56 truncate";
 
 export default function ProjectArchiveCard({ project, style, className, imageSizes = "(min-width: 1024px) 50vw, 100vw" }: Props) {
   const href =
@@ -52,7 +52,7 @@ export default function ProjectArchiveCard({ project, style, className, imageSiz
     <div className={cn("h-full min-w-0", className)} style={style}>
       <SmartLink
         href={href}
-        className="block h-full min-w-0 rounded-3xl bg-amber-50/50 group focus-visible:outline-none"
+        className="block h-full min-w-0 rounded-3xl bg-amber-50/50 group focus-visible:outline-hidden"
         data-icon-affordance="right"
       >
         <Card
@@ -62,7 +62,7 @@ export default function ProjectArchiveCard({ project, style, className, imageSiz
           )}
         >
           <CardHeader className="px-5 pt-5 pb-5 sm:px-6 sm:pt-6">
-            <CardTitle className="min-h-[3.75rem] text-2xl font-bold leading-tight" style={titleClampStyle}>
+            <CardTitle className="min-h-15 text-2xl font-bold leading-tight" style={titleClampStyle}>
               {project.title}
             </CardTitle>
           </CardHeader>
@@ -80,12 +80,12 @@ export default function ProjectArchiveCard({ project, style, className, imageSiz
                 className="object-cover transition-transform duration-300 hover:scale-[1.06]"
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
+              <div className="absolute inset-0 bg-linear-to-r from-[#0045d7] to-[#00e3fe]" />
             )}
           </div>
 
           <CardContent className="flex flex-1 flex-col px-5 pt-5 pb-4 sm:px-6 sm:pb-6">
-            <div className="min-h-[5.25rem]">
+            <div className="min-h-21">
               {summary ? (
                 <p className="text-slate-600 leading-7" style={lineClampStyle}>
                   {summary}
@@ -93,7 +93,7 @@ export default function ProjectArchiveCard({ project, style, className, imageSiz
               ) : null}
             </div>
 
-            <div className="mt-5 min-h-[8rem]">
+            <div className="mt-5 min-h-32">
               {hasReview ? (
                 <ProjectReviewSnippet
                   review={project.reviewSnippet}
@@ -103,7 +103,7 @@ export default function ProjectArchiveCard({ project, style, className, imageSiz
               ) : null}
             </div>
 
-            <div className="relative mt-4 min-h-[2.875rem] -mx-5 sm:-mx-6">
+            <div className="relative mt-4 min-h-11.5 -mx-5 sm:-mx-6">
               <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:px-6">
                 {pillItems.map((pill) => (
                   <span key={pill.key} className={pillClass}>
@@ -111,8 +111,8 @@ export default function ProjectArchiveCard({ project, style, className, imageSiz
                   </span>
                 ))}
               </div>
-              <div className="absolute left-0 w-6 pointer-events-none inset-y-1 bg-gradient-to-r from-white to-transparent" />
-              <div className="absolute right-0 w-6 pointer-events-none inset-y-1 bg-gradient-to-l from-white to-transparent" />
+              <div className="absolute left-0 w-6 pointer-events-none inset-y-1 bg-linear-to-r from-white to-transparent" />
+              <div className="absolute right-0 w-6 pointer-events-none inset-y-1 bg-linear-to-l from-white to-transparent" />
             </div>
           </CardContent>
 

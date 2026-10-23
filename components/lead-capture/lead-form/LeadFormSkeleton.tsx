@@ -2,7 +2,7 @@ import Skeleton from '@/components/ui/Skeleton';
 
 function HeaderSkeleton() {
   return (
-    <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
+    <div className="border-b border-blue-100 bg-linear-to-r from-sky-50 via-white to-amber-50 p-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-4">
           <Skeleton className="h-3 w-32 rounded-full" />
@@ -26,7 +26,7 @@ function NeedStepSkeleton() {
       {Array.from({ length: 4 }).map((_, i) => (
         <div
           key={i}
-          className="flex h-full flex-col gap-4 rounded-3xl border border-slate-200 bg-white px-4 py-5 shadow-sm"
+          className="flex h-full flex-col gap-4 rounded-3xl border border-slate-200 bg-white px-4 py-5 shadow-xs"
         >
           <Skeleton className="h-36 w-full rounded-2xl" />
           <Skeleton className="h-6 w-40 rounded-full" />
@@ -49,7 +49,7 @@ function ContextStepSkeleton() {
         <Skeleton className="h-4 w-64 rounded-lg" />
         <div className="grid gap-3 md:grid-cols-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+            <div key={i} className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-xs">
               <Skeleton className="h-32 w-full rounded-xl" />
               <div className="flex items-start justify-between gap-3">
                 <div className="space-y-2">

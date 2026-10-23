@@ -8,9 +8,9 @@ import { Zap } from "lucide-react";
 export const INSTANT_QUOTE_CTA = {
   href: "/instant-quote",
   label: "60-sec Quote",
-  buttonClassName: "bg-neutral-900/60 text-white font-display py-6 md:py-3 items-center text-2xl md:text-xl backdrop-blur hover:bg-neutral-900/90",
+  buttonClassName: "bg-neutral-900/60 text-white font-display py-6 md:py-3 items-center text-2xl md:text-xl backdrop-blur-sm hover:bg-neutral-900/90",
   linkClassName: "flex items-center gap-2",
-  iconClassName: "h-4 w-4 text-[--brand-orange]",
+  iconClassName: "h-4 w-4 text-(--brand-orange)",
 } as const;
 
 type InstantQuoteCTAProps = {

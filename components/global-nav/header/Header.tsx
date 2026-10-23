@@ -1,5 +1,7 @@
 'use client';
 
+import { useHydrated } from '@/lib/ui/use-hydrated';
+
 import SmartLink from '@/components/utils/SmartLink';
 import StaticImage from '@/components/media/StaticMediaProvider';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
@@ -74,10 +76,7 @@ export default function Header({
     return () => ro.disconnect();
   }, []);
 
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    setReady(true);
-  }, []);
+  const ready = useHydrated();
 
   useIsomorphicLayoutEffect(() => {
     const getEffectiveScrollY = () => {
@@ -154,7 +153,7 @@ export default function Header({
         ready
           ? 'transition-[background-color,border-color,backdrop-filter,box-shadow] duration-200 ease-out'
           : 'transition-none',
-        collapsed ? 'shadow-sm' : 'shadow-none',
+        collapsed ? 'shadow-xs' : 'shadow-none',
       )}
       style={{
         backgroundColor: headerBackground,
@@ -169,7 +168,7 @@ export default function Header({
       <div
         className={cn(
           'mx-auto flex max-w-7xl items-center flex-row gap-4 px-4 transition-all duration-300 ease-in-out',
-          collapsed ? 'py-[0.125rem]' : 'py-[0.4rem]',
+          collapsed ? 'py-0.5' : 'py-[0.4rem]',
         )}
       >
         <SmartLink
@@ -193,7 +192,7 @@ export default function Header({
           />
         </SmartLink>
         <SmartLink className="align-baseline phone-affordance text-right" href={phoneHref}>
-          <div className="bg-orange-500 hover:bg-orange-400 transition-colors text-white border shadow-sm md:hidden border-white text-sm font-medium rounded-lg px-3 py-1 phone">
+          <div className="bg-orange-500 hover:bg-orange-400 transition-colors text-white border shadow-xs md:hidden border-white text-sm font-medium rounded-lg px-3 py-1 phone">
             <Smartphone className="hidden phone-affordance-icon sm:inline h-3 w-3 mr-1" />
             {phoneDisplay}
           </div>

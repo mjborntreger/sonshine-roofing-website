@@ -52,61 +52,90 @@
     "postbuild:codex": "node scripts/verify-deployment-contract.mjs --build",
     "verify:html-text": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-html-text.mjs",
     "verify:editorial-dates": "node scripts/verify-editorial-dates.mjs",
-    "verify:special-offer-flow": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-special-offer-flow.mjs"
+    "verify:special-offer-flow": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/verify-special-offer-flow.mjs",
+    "typecheck:compat": "tsc6 --noEmit --incremental false",
+    "verify:lint-contract": "node scripts/verify-lint-contract.mjs",
+    "lint:compiler": "eslint . --max-warnings=0",
+    "verify:tailwind-css": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-tailwind-css.mjs",
+    "verify:build-secrets": "node scripts/verify-build-secrets.mjs",
+    "audit:policy": "node scripts/audit-policy.mjs",
+    "verify:audit-policy": "node --test scripts/audit-policy.test.mjs",
+    "verify:landing-conversions": "node scripts/verify-landing-conversions.mjs",
+    "verify:react-readiness": "node scripts/verify-react-readiness.mjs",
+    "verify:lead-runtime": "node scripts/verify-lead-runtime.mjs"
   },
   "dependencies": {
-    "@radix-ui/react-slot": "^1.4.0",
+    "@radix-ui/react-slot": "^1.5.0",
     "@tailwindcss/typography": "^0.5.20",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel": "^8.6.0",
     "embla-carousel-auto-scroll": "^8.6.0",
-    "fast-glob": "^3.3.2",
     "framer-motion": "^12.43.0",
     "htmlparser2": "^12.0.0",
     "lucide-react": "^0.577.0",
-    "next": "~16.4.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
-    "sanitize-html": "^2.18.0",
-    "tailwind-merge": "^2.6.1",
-    "tailwindcss-animate": "^1.0.7"
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "sanitize-html": "2.18.1",
+    "tailwind-merge": "3.7.0"
   },
   "devDependencies": {
-    "@electric-sql/pglite": "0.5.8",
-    "@eslint/eslintrc": "^3.3.7",
-    "@eslint/js": "9.39.5",
-    "@next/eslint-plugin-next": "~16.4.0",
-    "@types/node": "20.19.43",
+    "@electric-sql/pglite": "0.5.10",
+    "@eslint-react/eslint-plugin": "5.28.6",
+    "@eslint/js": "10.0.1",
+    "@next/eslint-plugin-next": "16.4.2",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "24.19.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@types/sanitize-html": "^2.16.2",
-    "@typescript-eslint/eslint-plugin": "8.71.1",
-    "@typescript-eslint/parser": "8.71.1",
-    "autoprefixer": "10.6.1",
-    "eslint": "^9.39.2",
-    "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-jsx-a11y": "6.10.2",
-    "eslint-plugin-react": "7.37.5",
-    "eslint-plugin-react-hooks": "5.2.0",
+    "@typescript-eslint/eslint-plugin": "8.72.0",
+    "@typescript-eslint/parser": "8.72.0",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "10.13.0",
+    "eslint-plugin-import-x": "4.17.1",
+    "eslint-plugin-jsx-a11y-x": "0.2.0",
+    "eslint-plugin-react-hooks": "7.1.1",
     "globals": "14.0.0",
-    "jsdom": "^30.1.2",
-    "postcss": "8.5.29",
+    "jsdom": "^30.1.3",
+    "postcss": "8.5.31",
     "prettier": "^3.9.10",
-    "tailwindcss": "3.4.19",
-    "typescript": "^5.9.3"
+    "tailwindcss": "4.3.3",
+    "typescript": "npm:@typescript/typescript6@6.0.2"
   },
   "overrides": {
     "minimatch@3": {
-      "brace-expansion": "1.1.18"
+      "brace-expansion": "1.1.21"
     },
     "minimatch@9": {
-      "brace-expansion": "2.1.4"
+      "brace-expansion": "2.1.7"
     },
-    "@eslint/eslintrc": {
-      "js-yaml": "4.3.2"
+    "postcss": "8.5.31",
+    "@tailwindcss/typography": {
+      "postcss-selector-parser": "7.1.7"
+    }
+  },
+  "engines": {
+    "node": ">=24.22.1 <25",
+    "npm": "12.2.1"
+  },
+  "packageManager": "npm@12.2.1",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "24.22.1",
+      "onFail": "error"
     },
-    "sharp@0.34.5": "0.35.3",
-    "postcss": "8.5.29"
+    "packageManager": {
+      "name": "npm",
+      "version": "12.2.1",
+      "onFail": "error"
+    }
+  },
+  "allowScripts": {
+    "fsevents@2.3.3": false,
+    "unrs-resolver@1.12.2": false
   }
 }

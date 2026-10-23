@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { verifyDeploymentSnapshot, snapshotHash } from '../lib/content/deployment-snapshot.mjs';
 import { verifyRuntime } from './verify-deployment-runtime.mjs';
+import { verifyLeadRuntime } from './verify-lead-runtime.mjs';
 
 // Build and run isolated synthetic releases; never replace a developer's capture.
 const source = process.cwd(),
@@ -65,10 +66,17 @@ try {
     else assert.notEqual(manifest.digest, firstDigest);
     // Reuse build caches deliberately: cached editorial content must not survive a new capture.
     await run(['node_modules/next/dist/bin/next', 'build', '--webpack']);
+    // Check the generated route declarations and validator in this build's isolated root.
+    for (const file of ['routes.d.ts', 'validator.ts']) {
+      assert.ok((await readFile(join(root, '.next/types', file), 'utf8')).length > 0);
+    }
+    await run(['node_modules/@typescript/native/bin/tsc', '--noEmit', '--incremental', 'false']);
+    await run(['node_modules/typescript/bin/tsc6', '--noEmit', '--incremental', 'false']);
     assert.ok((await readFile(env.CONTENT_BUILD_AUDIT, 'utf8')).length > 0);
     await rm(env.CONTENT_BUILD_AUDIT);
     await verifyRuntime(root, { revision });
-    console.log(`Synthetic deployment ${revision} build and runtime checks passed.`);
+    if (revision === 'A') await verifyLeadRuntime(root);
+    console.log(`Synthetic deployment ${revision} build, TypeScript 7/6 and runtime checks passed.`);
   }
   const file = join(root, '.generated/editorial.json'),
     original = await readFile(file);

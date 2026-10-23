@@ -147,14 +147,14 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
     return (
         <div className={clsx(className)}>
             <header id="tip-top-roof-checkup">
-                <h2 className="mt-4 text-3xl md:text-4xl text-slate-700 font-semibold">What is a <span className="text-[--brand-blue]">Tip Top Roof Check‑up</span>?</h2>
+                <h2 className="mt-4 text-3xl md:text-4xl text-slate-700 font-semibold">What is a <span className="text-(--brand-blue)">Tip Top Roof Check‑up</span>?</h2>
                 <p className="text-slate-600">
                     The <strong>Tip Top Roof Check-up</strong> is our 18‑point roof inspection that helps catch small issues before they become big problems.
                 </p>
             </header>
-            <div id="how-it-works" className="my-6 max-w-3xl rounded-xl border border-blue-200 bg-blue-50 px-4 shadow-sm">
+            <div id="how-it-works" className="my-6 max-w-3xl rounded-xl border border-blue-200 bg-blue-50 px-4 shadow-xs">
                 <h3 className="mt-4 text-xl md:text-2xl">
-                    <InfoIcon className="inline h-5 md:h-6 w-5 md:w-6 mr-2 align-middle text-[--brand-blue]" />
+                    <InfoIcon className="inline h-5 md:h-6 w-5 md:w-6 mr-2 align-middle text-(--brand-blue)" />
                     <span>How it Works</span>
                 </h3>
                 <p className="text-base md:text-lg text-slate-700">
@@ -169,13 +169,13 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                 </p>
             </div>
 
-            <div className="bg-slate-200 h-[1px] my-6" />
+            <div className="bg-slate-200 h-px my-6" />
 
             <div className="mb-3">
                 <h3 className="mt-0 text-xl md:text-2xl">What do we look for?</h3>
                 <p className="text-slate-500 text-sm leading-none uppercase font-semibold">
                     Select a Category
-                    <SquareMousePointer className="h-4 w-4 ml-2 text-[--brand-blue] inline" />
+                    <SquareMousePointer className="h-4 w-4 ml-2 text-(--brand-blue) inline" />
                 </p>
             </div>
 
@@ -183,7 +183,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
             <JsonLd data={howToLd} />
             <JsonLd data={serviceLd} />
 
-            <div className="flex w-fit flex-row items-center justify-start border overflow-hidden shadow-sm rounded-lg">
+            <div className="flex w-fit flex-row items-center justify-start border overflow-hidden shadow-xs rounded-lg">
                 {PILLS.map(({ key, label }) => {
                     const active = tab === key;
                     return (
@@ -198,7 +198,7 @@ export default function TipTopRoofCheckup({ className, origin }: TipTopRoofCheck
                             className={clsx(
                                 'inline-flex items-center gap-2 text-base px-3 py-1 md:px-4 md:py-2 transition',
                                 active
-                                    ? 'bg-[var(--brand-orange)] font-sans font-semibold text-white border-transparent'
+                                    ? 'bg-(--brand-orange) font-sans font-semibold text-white border-transparent'
                                     : 'bg-white font-sans text-slate-700 border-blue-200 hover:bg-slate-50'
                             )}
                             data-active={active}

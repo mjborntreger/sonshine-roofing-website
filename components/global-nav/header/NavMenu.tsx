@@ -53,11 +53,11 @@ const TARGET_CHILD_PARENTS = new Set(["Roofing Services", "Our Work"]);
 const CONTACT_LABELS = new Set(["Contact", "Contact Us"]);
 const CHILD_CHEVRON_CLASS = "icon-affordance h-4 w-4 text-slate-500";
 const ENTRY_MOTION_CLASS =
-  "transition-all duration-150 ease-out motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none";
+  "transition-all duration-150 ease-out motion-reduce:transform-none motion-reduce:translate-none motion-reduce:rotate-none motion-reduce:scale-none motion-reduce:opacity-100 motion-reduce:transition-none";
 
 function MenuToggleIcon({ open }: { open: boolean }) {
   const barClassName =
-    "absolute h-[1.5px] w-full rounded-full bg-white transition-[transform,opacity] duration-[160ms] ease-[cubic-bezier(0.32,0,0.67,1)] motion-reduce:transition-none";
+    "absolute h-[1.5px] w-full rounded-full bg-white transition-[transform,translate,rotate,scale,opacity] duration-160 ease-[cubic-bezier(0.32,0,0.67,1)] motion-reduce:transition-none";
 
   return (
     <span className="relative flex h-4 w-4 items-center justify-center" aria-hidden="true">
@@ -91,7 +91,7 @@ function LabelWithIcon({ label, iconClassName }: { label: string; iconClassName?
     <span className="inline-flex font-display text-xl font-medium items-center">
       {Icon && (
         <Icon
-          className={cn("h-4 w-4 inline mr-2", iconClassName ?? "text-[--brand-blue]")}
+          className={cn("h-4 w-4 inline mr-2", iconClassName ?? "text-(--brand-blue)")}
           aria-hidden="true"
         />
       )}
@@ -158,14 +158,14 @@ function DesktopMenu({
                 className={cn(
                   "relative flex items-center whitespace-nowrap px-2 py-2 transition-colors duration-200",
                   item.children && "pr-5",
-                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]",
+                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-(--brand-blue)",
                   CONTACT_LABELS.has(item.label) && "phone-affordance"
                 )}
               >
                 <LabelWithIcon
                   label={item.label}
                   iconClassName={cn(
-                    transparent ? "text-[--brand-orange]" : "text-[--brand-blue]",
+                    transparent ? "text-(--brand-orange)" : "text-(--brand-blue)",
                     CONTACT_LABELS.has(item.label) && "phone-affordance-icon"
                   )}
                 />
@@ -190,14 +190,14 @@ function DesktopMenu({
                 className={cn(
                   "relative flex items-center whitespace-nowrap px-2 py-2 cursor-default transition-colors duration-200",
                   item.children && "pr-5",
-                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-[--brand-blue]"
+                  transparent ? "text-white hover:text-white/80" : "text-slate-700 hover:text-(--brand-blue)"
                 )}
                 aria-haspopup={item.children ? "menu" : undefined}
                 aria-expanded={openIndex === i || undefined}
               >
                 <LabelWithIcon
                   label={item.label}
-                  iconClassName={transparent ? "text-[--brand-orange]" : "text-[--brand-blue]"}
+                  iconClassName={transparent ? "text-(--brand-orange)" : "text-(--brand-blue)"}
                 />
                 {item.children && (
                   <>
@@ -284,7 +284,7 @@ function MenuLevel({ items, level, parentLabel }: { items: Item[]; level: number
             {child.href ? (
               <SmartLink
                 href={child.href}
-                className="flex items-center justify-between gap-2 px-3 py-2 text-slate-700 hover:bg-[#0045d7]/5 hover:text-[--brand-blue]"
+                className="flex items-center justify-between gap-2 px-3 py-2 text-slate-700 hover:bg-[#0045d7]/5 hover:text-(--brand-blue)"
                 data-icon-affordance={showChevron ? "right" : undefined}
               >
                 <LabelWithIcon label={child.label} />
@@ -517,7 +517,7 @@ function MobileMenu({ navigation }: { navigation: Item[] }) {
     });
 
   const menuOverlay = open ? (
-    <div className="fixed inset-0 z-[60]">
+    <div className="fixed inset-0 z-60">
       {/* backdrop */}
       <button
         type="button"
@@ -532,7 +532,7 @@ function MobileMenu({ navigation }: { navigation: Item[] }) {
         ref={panelRef}
         role="menu"
         aria-label="Main"
-        className="fixed left-2 right-2 z-[61]
+        className="fixed left-2 right-2 z-61
                    rounded-3xl border border-blue-200 bg-white shadow-xl p-2
                    top-[calc(var(--header-h,56px)+8px)]
                    max-h-[calc(100vh-var(--header-h,56px)-24px)] overflow-auto overscroll-contain"
@@ -685,7 +685,7 @@ function MobileMenu({ navigation }: { navigation: Item[] }) {
       <button
         type="button"
         ref={buttonRef}
-        className="flex items-center gap-2 rounded-xl border px-4 py-2 text-white bg-[--brand-blue]"
+        className="flex items-center gap-2 rounded-xl border px-4 py-2 text-white bg-(--brand-blue)"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="mobile-nav"

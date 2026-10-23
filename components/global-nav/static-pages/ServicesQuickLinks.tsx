@@ -12,11 +12,11 @@ import {
 import type { ServiceSummary } from "@/lib/content/directus-site";
 
 const PALETTE: QuickLinksPalette = {
-  activeBorderClass: "border-[--brand-orange]",
-  hoverBorderClass: "hover:border-[--brand-orange]",
+  activeBorderClass: "border-(--brand-orange)",
+  hoverBorderClass: "hover:border-(--brand-orange)",
   hoverBackgroundClass: "hover:bg-orange-50",
-  focusRingClass: "focus-visible:ring-[--brand-orange]",
-  titleIconClassName: "text-[--brand-orange]",
+  focusRingClass: "focus-visible:ring-(--brand-orange)",
+  titleIconClassName: "text-(--brand-orange)",
   iconGradientFromClass: "from-[#fb9216]",
   iconGradientToClass: "to-[#ffd8a8]",
 };

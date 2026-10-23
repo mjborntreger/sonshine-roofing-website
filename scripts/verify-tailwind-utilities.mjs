@@ -10,9 +10,6 @@ const FORBIDDEN_UTILITIES = [
   { utility: 'text-md', replacement: 'text-base' },
   { utility: 'sm:4xl', replacement: 'sm:text-4xl' },
   { utility: 'rounded3xl', replacement: 'rounded-3xl' },
-  { utility: 'hover:bg-white/18', replacement: 'hover:bg-white/[0.18]' },
-  { utility: 'border-white/12', replacement: 'border-white/[0.12]' },
-  { utility: 'bg-slate-950/72', replacement: 'bg-slate-950/[0.72]' },
   { utility: 'border-[#fb9216/5]', replacement: 'border-[#fb9216]/5' },
 ];
 

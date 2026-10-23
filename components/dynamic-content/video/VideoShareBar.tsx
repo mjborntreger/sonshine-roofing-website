@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 type Props = {
@@ -9,12 +9,10 @@ type Props = {
 
 export default function VideoShareBar({ collectionUrl }: Props) {
   const searchParams = useSearchParams();
-  const [copied, setCopied] = useState(false);
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
   const slug = (searchParams?.get("v") ?? "").trim();
 
-  useEffect(() => {
-    if (!slug) setCopied(false);
-  }, [slug]);
+  const copied = Boolean(slug) && copiedSlug === slug;
 
   if (!slug) return null;
 
@@ -23,8 +21,8 @@ export default function VideoShareBar({ collectionUrl }: Props) {
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      setCopiedSlug(slug);
+      setTimeout(() => setCopiedSlug(null), 1500);
     } catch {
       try {
         const textarea = document.createElement("textarea");
@@ -36,8 +34,8 @@ export default function VideoShareBar({ collectionUrl }: Props) {
         textarea.select();
         document.execCommand("copy");
         document.body.removeChild(textarea);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
+        setCopiedSlug(slug);
+        setTimeout(() => setCopiedSlug(null), 1500);
       } catch {
         // If copy fails, leave copied state as-is.
       }

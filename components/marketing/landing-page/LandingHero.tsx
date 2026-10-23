@@ -34,7 +34,7 @@ export default function Hero({
   const [isNearViewport, setIsNearViewport] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const restoredSuccess = useMemo<LeadSuccessRestore | null>(() => restoreLeadSuccessState(), []);
-  const renderedTitle = renderHighlight(title, highlightText, 'text-[--brand-cyan]');
+  const renderedTitle = renderHighlight(title, highlightText, 'text-(--brand-cyan)');
   const shouldMountVideo = allowsMotion && isNearViewport && Boolean(heroVideo?.url);
 
   useEffect(() => {
@@ -47,11 +47,17 @@ export default function Hero({
     return () => media.removeEventListener('change', updateMotionPreference);
   }, []);
 
-  useEffect(() => {
+  const [previousMotion, setPreviousMotion] = useState(allowsMotion);
+  if (previousMotion !== allowsMotion) {
+    setPreviousMotion(allowsMotion);
     if (!allowsMotion) {
       setIsNearViewport(false);
-      return;
+      setIsVideoPlaying(false);
     }
+  }
+
+  useEffect(() => {
+    if (!allowsMotion) return;
 
     const target = sectionRef.current;
     if (!target) return;
@@ -71,10 +77,7 @@ export default function Hero({
   }, [allowsMotion]);
 
   useEffect(() => {
-    if (!shouldMountVideo) {
-      setIsVideoPlaying(false);
-      return;
-    }
+    if (!shouldMountVideo) return;
 
     const el = videoRef.current;
     if (!el) return;
@@ -127,7 +130,7 @@ export default function Hero({
         <div className="grid gap-10 items-start lg:grid-cols-[minmax(0,1fr)_minmax(360px,520px)]">
           <div className="max-w-3xl mx-auto text-center lg:pb-8 lg:text-left">
             <div>
-              <p className="font-script text-2xl font-semibold text-[--brand-cyan] sm:text-4xl">
+              <p className="font-script text-2xl font-semibold text-(--brand-cyan) sm:text-4xl">
                 Since 1987, we&apos;ve got you covered.
               </p>
               {licenseNumber && licenseUrl ? (
@@ -142,7 +145,7 @@ export default function Hero({
               ) : null}
             </div>
 
-            <h1 className="my-8 text-3xl sm:text-4xl leading-[3rem] text-blue-50 md:leading-[5rem] md:text-7xl lg:leading-[7rem]">
+            <h1 className="my-8 text-3xl sm:text-4xl leading-12 text-blue-50 md:leading-20 md:text-7xl lg:leading-28">
               {renderedTitle}
             </h1>
             {description ? (
@@ -153,7 +156,7 @@ export default function Hero({
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start">
               <SmartLink
-                className="inline-flex items-center gap-2 rounded-xl border border-blue-100/50 bg-[--brand-blue] px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
+                className="inline-flex items-center gap-2 rounded-xl border border-blue-100/50 bg-(--brand-blue) px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
                 href="/contact-us"
                 title="Contact SonShine Roofing"
                 aria-label="Contact SonShine Roofing"
@@ -162,7 +165,7 @@ export default function Hero({
                 Contact Us
               </SmartLink>
               <SmartLink
-                className="backdrop-blur-sm inline-flex items-center gap-2 rounded-xl border border-white/40 px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/[0.18] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
+                className="backdrop-blur-xs inline-flex items-center gap-2 rounded-xl border border-white/40 px-6 py-4 text-xl sm:text-3xl font-semibold tracking-wide text-white transition hover:bg-white/18 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 phone-affordance"
                 href="/about-sonshine-roofing"
                 title="About SonShine Roofing"
                 aria-label="About SonShine Roofing"

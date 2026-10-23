@@ -38,14 +38,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const h2 = 'mb-16 mt-24 text-3xl md:text-4xl text-center font-semibold text-slate-900';
-const h2Icon = "inline mr-4 h-7 w-7 md:h-10 md:w-10 text-[--brand-blue]";
+const h2Icon = "inline mr-4 h-7 w-7 md:h-10 md:w-10 text-(--brand-blue)";
 const h3 = 'text-xl md:text-2xl font-semibold text-slate-900 flex items-center';
 
 const checkList = "flex items-start gap-2";
-const checkIconYgrene = 'mt-0.5 h-4 w-4 text-[--brand-orange] flex-none';
-const checkIconServiceFinance = 'mt-0.5 h-4 w-4 text-[--brand-cyan] flex-none';
+const checkIconYgrene = 'mt-0.5 h-4 w-4 text-(--brand-orange) flex-none';
+const checkIconServiceFinance = 'mt-0.5 h-4 w-4 text-(--brand-cyan) flex-none';
 // Icon style for section headings (fits me / expect / questions)
-const sectionIcon = 'inline mr-2 h-5 w-5 text-[--brand-blue]';
+const sectionIcon = 'inline mr-2 h-5 w-5 text-(--brand-blue)';
 const ctaSecondary = 'btn w-full btn-brand-blue btn-lg phone-affordance';
 
 export default async function FinancingPage() {
@@ -146,12 +146,12 @@ export default async function FinancingPage() {
       <section className="mx-auto max-w-8xl">
         <div className="container-edge py-10 md:py-16">
           <h2 id="get-started" className='mb-4 mt-6 text-3xl md:text-4xl text-center font-semibold text-slate-900'>
-            Free <span className="text-[--brand-blue]">Roof Financing</span> Monthly Payment Estimator
+            Free <span className="text-(--brand-blue)">Roof Financing</span> Monthly Payment Estimator
           </h2>
           <p className="text-center mx-auto max-w-3xl text-slate-600 mb-8 text-sm md:text-base">Get flexible roof financing with clear, no-nonsense numbers. After taking a short quiz, use our free roof financing monthly payment calculator to estimate costs, compare options, and finance your roof replacement or roof repair with confidence.</p>
           <Suspense
             fallback={
-              <div className="rounded-3xl border border-blue-100 bg-white/90 p-6 text-center text-sm text-slate-600 shadow-sm">
+              <div className="rounded-3xl border border-blue-100 bg-white/90 p-6 text-center text-sm text-slate-600 shadow-xs">
                 Loading estimator...
               </div>
             }
@@ -210,7 +210,7 @@ export default async function FinancingPage() {
           {/* Comparison / how it works (custom panels with icons) */}
           <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Which option fits me? */}
-            <section className="rounded-2xl shadow-sm border border-blue-300 bg-white p-4">
+            <section className="rounded-2xl shadow-xs border border-blue-300 bg-white p-4">
               <h3 className={h3}>
                 <ListChecks className={sectionIcon} aria-hidden="true" />
                 Which option fits me?
@@ -232,7 +232,7 @@ export default async function FinancingPage() {
             </section>
 
             {/* What&rsquo;s Next */}
-            <section id="whats-next" className="rounded-2xl border shadow-sm border-blue-300 bg-white p-4">
+            <section id="whats-next" className="rounded-2xl border shadow-xs border-blue-300 bg-white p-4">
               <h3 className={h3}>
                 <ListOrdered className={sectionIcon} aria-hidden="true" />
                 What&rsquo;s next?
@@ -241,7 +241,7 @@ export default async function FinancingPage() {
                 <li>
                   <SmartLink
                     href="#get-started"
-                    className="text-[--brand-blue]"
+                    className="text-(--brand-blue)"
                     data-icon-affordance="right"
                     proseGuard
                   >
@@ -252,7 +252,7 @@ export default async function FinancingPage() {
                 <li>
                   <SmartLink
                     href="/contact-us#book-an-appointment"
-                    className="text-[--brand-blue]"
+                    className="text-(--brand-blue)"
                     data-icon-affordance="right"
                     proseGuard
                   >
@@ -265,7 +265,7 @@ export default async function FinancingPage() {
             </section>
 
             {/* Questions? */}
-            <section className="rounded-2xl border shadow-sm border-blue-300 bg-white p-4 h-full flex flex-col">
+            <section className="rounded-2xl border shadow-xs border-blue-300 bg-white p-4 h-full flex flex-col">
               <h3 className={h3}>
                 <HelpCircle className={sectionIcon} aria-hidden="true" />
                 Questions?
@@ -298,7 +298,7 @@ export default async function FinancingPage() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <section
               aria-labelledby="ygrene-docs"
-              className="rounded-2xl shadow-md border border-[--brand-orange] bg-white p-4">
+              className="rounded-2xl shadow-md border border-(--brand-orange) bg-white p-4">
               <div className="flex justify-between">
                 <h3
                   id="ygrene-docs"
@@ -343,7 +343,7 @@ export default async function FinancingPage() {
 
             <section
               aria-labelledby="service-docs"
-              className="rounded-2xl shadow-md border border-[--brand-cyan] bg-white p-4">
+              className="rounded-2xl shadow-md border border-(--brand-cyan) bg-white p-4">
               <div className="flex justify-between">
                 <h3
                   id="service-docs"

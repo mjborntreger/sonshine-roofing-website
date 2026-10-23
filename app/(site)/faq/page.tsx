@@ -124,7 +124,7 @@ export default async function FAQArchivePage() {
               key={key}
               id={`topic-${key}`}
               aria-labelledby={`topic-heading-${key}`}
-              className="faq-topic overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm"
+              className="faq-topic overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-xs"
             >
               <ResourceGroupHeading
                 title={title}
@@ -143,15 +143,15 @@ export default async function FAQArchivePage() {
                     data-topic={title}
                     data-excerpt=""
                   >
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-slate-800 hover:text-[--brand-blue] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[--brand-blue] group-open/answer:text-[--brand-blue] [&::-webkit-details-marker]:hidden">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-lg py-4 text-slate-800 hover:text-(--brand-blue) focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--brand-blue) group-open/answer:text-(--brand-blue) [&::-webkit-details-marker]:hidden">
                       <h3 className="text-base font-semibold leading-relaxed">{f.title}</h3>
                       <ChevronDown
-                        className="h-5 w-5 shrink-0 text-[--brand-blue] transition-transform group-open/answer:rotate-180 motion-reduce:transition-none"
+                        className="h-5 w-5 shrink-0 text-(--brand-blue) transition-transform group-open/answer:rotate-180 motion-reduce:transition-none"
                         aria-hidden="true"
                       />
                     </summary>
                     <div
-                      className="faq-answer prose prose-slate max-w-none pb-5 text-base leading-relaxed prose-p:my-3 prose-p:text-base prose-li:text-base prose-a:text-[--brand-blue]"
+                      className="faq-answer prose prose-slate max-w-none pb-5 text-base leading-relaxed prose-p:my-3 prose-p:text-base prose-li:text-base prose-a:text-(--brand-blue)"
                       dangerouslySetInnerHTML={{ __html: f.contentHtml || '' }}
                     />
                   </details>

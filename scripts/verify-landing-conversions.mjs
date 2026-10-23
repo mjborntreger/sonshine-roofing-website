@@ -6,6 +6,7 @@ import ts from 'typescript';
 import { JSDOM } from 'jsdom';
 
 // Exercise the real browser storage/event contract without sending a lead or tag.
+process.env.NODE_ENV = 'production';
 const require = createRequire(import.meta.url);
 const root = resolve(new URL('../', import.meta.url).pathname);
 const dom = new JSDOM('', { url: 'https://example.test/landing/financing' });

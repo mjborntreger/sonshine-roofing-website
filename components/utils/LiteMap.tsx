@@ -68,14 +68,14 @@ export default function LiteMap({ addressQuery, brandName, googleBusinessProfile
           title={`Map to ${brandName}`}
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
-          className="w-full aspect-[16/9] border-0"
+          className="w-full aspect-video border-0"
           allowFullScreen
         />
       ) : (
         <button
           type="button"
           onClick={() => setActive(true)}
-          className="w-full aspect-[16/9] bg-slate-100 text-slate-600 grid place-items-center"
+          className="w-full aspect-video bg-slate-100 text-slate-600 grid place-items-center"
           aria-label="Load interactive map"
         >
           View interactive map

@@ -4,7 +4,7 @@ import { SECTION_HEADING, SECTION_SUBTITLE } from "@/components/location/section
 
 const imageHeight = 175;
 const imageWidth = 175;
-const imageClasses = "transition-transform duration-200 ease-out group-hover:translate-y-[1px] group-hover:drop-shadow-sm";
+const imageClasses = "transition-transform duration-200 ease-out group-hover:translate-y-px group-hover:drop-shadow-xs";
 const awards = [
   {
     year: "2021",
@@ -44,7 +44,7 @@ export default async function bestOfTheBest({
     highlightIndex >= 0 ? (
       <>
         {title.slice(0, highlightIndex)}
-        <span className="text-[--brand-blue]">{highlightText}</span>
+        <span className="text-(--brand-blue)">{highlightText}</span>
         {title.slice(highlightIndex + highlightText.length)}
       </>
     ) : (

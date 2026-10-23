@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
+import { useHydrated } from '@/lib/ui/use-hydrated';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, ShieldCheck } from 'lucide-react';
 import SmartLink from '@/components/utils/SmartLink';
 import {
   fireAdsLeadSubmitOnce,
   readThankYouContext,
-  type AdsLeadDataLayerEvent,
+  buildAdsLeadDataLayerEvent,
   type ThankYouLeadContext,
 } from '@/lib/lead-capture/thank-you';
 
@@ -67,20 +68,18 @@ function getLandingConfirmation(context: ThankYouLeadContext | null) {
 export default function ThankYouClient() {
   const searchParams = useSearchParams();
   const leadId = getLeadId(searchParams);
-  const context = useMemo(() => readThankYouContext(leadId), [leadId]);
-  const [debugEvent, setDebugEvent] = useState<AdsLeadDataLayerEvent | null>(null);
+  const hydrated = useHydrated();
+  const context = useMemo(() => hydrated ? readThankYouContext(leadId) : null, [leadId, hydrated]);
+  const debugEvent = context ? buildAdsLeadDataLayerEvent(context) : null;
 
   useEffect(() => {
     if (!context) return;
-    const event = fireAdsLeadSubmitOnce(context);
-    if (process.env.NODE_ENV !== 'production') {
-      setDebugEvent(event);
-    }
+    fireAdsLeadSubmitOnce(context);
   }, [context]);
 
   return (
     <section className="container-edge mx-auto max-w-3xl py-16">
-      <div className="rounded-3xl border border-emerald-200 bg-white p-8 shadow-sm">
+      <div className="rounded-3xl border border-emerald-200 bg-white p-8 shadow-xs">
         <CheckCircle2 className="h-12 w-12 text-emerald-600" aria-hidden="true" />
         <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-900">{getHeading(context)}</h1>
         <p className="mt-4 text-base leading-7 text-slate-600">{getMessage(context)}</p>
@@ -96,7 +95,7 @@ export default function ThankYouClient() {
         </div>
 
         <div className="mt-8 flex items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-slate-600">
-          <ShieldCheck className="h-5 w-5 shrink-0 text-[--brand-blue]" aria-hidden="true" />
+          <ShieldCheck className="h-5 w-5 shrink-0 text-(--brand-blue)" aria-hidden="true" />
           <span>Licensed and insured since 1987. We typically respond quickly during business hours.</span>
         </div>
 

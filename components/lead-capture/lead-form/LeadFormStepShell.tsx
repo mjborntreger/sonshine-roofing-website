@@ -25,14 +25,14 @@ export default function LeadFormStepShell({
 }: LeadFormStepShellProps) {
   return (
     <div className={cn('mx-auto w-full max-w-[1600px] overflow-hidden rounded-3xl border border-blue-200 bg-sky-50 shadow-xl', className)}>
-      <div className="border-b border-blue-100 bg-gradient-to-l from-amber-100 via-amber-50 to-sky-50 p-6">
+      <div className="border-b border-blue-100 bg-linear-to-l from-amber-100 via-amber-50 to-sky-50 p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="text-xs uppercase tracking-wide text-[--brand-blue]">{stepLabel}</p>
+            <p className="text-xs uppercase tracking-wide text-(--brand-blue)">{stepLabel}</p>
             <h3 className="mt-3 mb-4 text-2xl font-semibold text-slate-900 md:text-3xl">{title}</h3>
             <p className="mt-3 text-sm text-slate-600 md:text-base">{description}</p>
           </div>
-          <div className="relative mb-4 aspect-[21/9] h-[27px] w-[79px] sm:h-[54px] sm:w-[158px] shrink-0">
+          <div className="relative mb-4 aspect-21/9 h-[27px] w-[79px] sm:h-[54px] sm:w-[158px] shrink-0">
             <StaticImage
               src="static:sonshine-roofing-wordmark"
               alt="SonShine Roofing"

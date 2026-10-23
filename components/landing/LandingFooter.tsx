@@ -5,7 +5,7 @@ import SmartLink from '@/components/utils/SmartLink';
 import type { SiteSettings } from '@/lib/content/directus-site';
 import { OFFICE_HOURS_PREFIXED, PHONE_HOURS_PREFIXED } from '@/lib/contact-hours';
 
-const linkClass = 'text-[#cad8e6] transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
+const linkClass = 'text-[#cad8e6] transition-colors hover:text-[#ffb45f] focus-visible:rounded-sm focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-[#59ddff] focus-visible:ring-offset-2 focus-visible:ring-offset-[#071b2b]';
 const headingClass = 'text-sm font-bold uppercase tracking-wider text-white after:mt-2 after:block after:h-0.5 after:w-8 after:rounded-full after:bg-[#fb9216]';
 
 export default function LandingFooter({ settings }: { settings: SiteSettings | null }) {

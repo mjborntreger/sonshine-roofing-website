@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 import { CONTACT_TIME_ZONE, OFFICE_HOURS, type WeeklyHours } from "@/lib/contact-hours";
 
 // STYLES
@@ -41,10 +41,13 @@ type OpenOrClosedProps = {
   hideHelperText?: boolean;
 };
 
-function zonedNow(tz: string) {
-  // Convert "now" into a Date object reflecting the target timezone.
-  return new Date(new Date().toLocaleString('en-US', { timeZone: tz }));
-}
+const subscribeClock = (notify: () => void) => {
+  const timer = setInterval(notify, 1000);
+  return () => clearInterval(timer);
+};
+const clockSnapshot = () => Math.floor(Date.now() / 60_000);
+const serverClockSnapshot = () => null;
+
 
 function toMinutes(hhmm: string) {
   const [h, m] = hhmm.split(':').map((n) => parseInt(n, 10));
@@ -155,14 +158,11 @@ export default function OpenOrClosed({
   className = '',
   hideHelperText = false,
 }: OpenOrClosedProps) {
-  const [now, setNow] = useState<Date | null>(null);
-
-  // Tick every 60s to keep the status fresh.
-  useEffect(() => {
-    setNow(zonedNow(timeZone));
-    const id = setInterval(() => setNow(zonedNow(timeZone)), 60_000);
-    return () => clearInterval(id);
-  }, [timeZone]);
+  // A stable minute snapshot preserves the server placeholder and updates at minute boundaries.
+  const minute = useSyncExternalStore(subscribeClock, clockSnapshot, serverClockSnapshot);
+  const now = useMemo(() => minute === null ? null : new Date(
+    new Date(minute * 60_000).toLocaleString('en-US', { timeZone }),
+  ), [minute, timeZone]);
 
   const status: Status | null = useMemo(() => {
     if (!now) return null;

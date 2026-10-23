@@ -1,0 +1,36 @@
+name: Credentialed Docker validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v3
+      - name: Validate committed Dockerfile without publishing
+        env:
+          SONSHINE_BUILD_ENV: ${{ secrets.SONSHINE_BUILD_ENV }}
+          DIRECTUS_URL: ${{ vars.DIRECTUS_URL }}
+          DIRECTUS_CLIENT_SLUG: ${{ vars.DIRECTUS_CLIENT_SLUG }}
+          NEXT_PUBLIC_BASE_URL: ${{ vars.NEXT_PUBLIC_BASE_URL }}
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
+          NEXT_PUBLIC_GTM_ID: ${{ vars.NEXT_PUBLIC_GTM_ID }}
+          NEXT_PUBLIC_META_PIXEL_ID: ${{ vars.NEXT_PUBLIC_META_PIXEL_ID }}
+          NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY: ${{ vars.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY }}
+        run: |
+          test -n "$SONSHINE_BUILD_ENV" || { echo 'Configure SONSHINE_BUILD_ENV before running this workflow'; exit 1; }
+          test -n "$DIRECTUS_URL" && test -n "$DIRECTUS_CLIENT_SLUG" && test -n "$NEXT_PUBLIC_BASE_URL"
+          docker buildx build --load --tag sonshine-validation:${{ github.sha }} \
+            --secret id=build_env,env=SONSHINE_BUILD_ENV \
+            --build-arg CONTENT_BUILD_ID="${{ github.run_id }}-${{ github.run_attempt }}" \
+            --build-arg NEXT_PUBLIC_ENV=production \
+            --build-arg DIRECTUS_URL --build-arg DIRECTUS_CLIENT_SLUG \
+            --build-arg NEXT_PUBLIC_BASE_URL --build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY \
+            --build-arg NEXT_PUBLIC_GTM_ID --build-arg NEXT_PUBLIC_META_PIXEL_ID \
+            --build-arg NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY .

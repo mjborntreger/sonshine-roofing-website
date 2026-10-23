@@ -12,7 +12,7 @@ export type CardSkeletonProps = React.HTMLAttributes<HTMLDivElement> & {
   variant?: "blog" | "project" | "video";
   /** Show an image block that matches the card media slot. */
   withImage?: boolean;
-  /** Tailwind aspect class for the image block (e.g., "aspect-[4/3]"). */
+  /** Tailwind aspect class for the image block (e.g., "aspect-4/3"). */
   imageAspectClass?: string;
   /** How many body lines to render under the title. */
   bodyLines?: number;
@@ -36,7 +36,7 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(functio
 ) {
   const lines = Math.max(0, bodyLines | 0);
   const resolvedAspect =
-    imageAspectClass ?? (variant === "project" ? "aspect-[16/10]" : "aspect-[16/9]");
+    imageAspectClass ?? (variant === "project" ? "aspect-16/10" : "aspect-video");
 
   const cardClassName = cn(
     variant === "video"
@@ -91,13 +91,13 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(functio
       <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:px-6">
         {renderChipRow(DEFAULT_CHIP_COUNT, size)}
       </div>
-      <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent" />
-      <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent" />
+      <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-linear-to-r from-white to-transparent" />
+      <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-linear-to-l from-white to-transparent" />
     </div>
   );
 
   const renderProjectPills = () => (
-    renderPreviewPillStrip("large", "mt-4 min-h-[2.875rem]")
+    renderPreviewPillStrip("large", "mt-4 min-h-11.5")
   );
 
   return (
@@ -106,8 +106,8 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(functio
         <CardTitle
           className={cn(
             variant === "video" ? "font-medium" : "font-semibold",
-            variant === "blog" && "min-h-[3rem]",
-            variant === "project" && "min-h-[3.75rem]",
+            variant === "blog" && "min-h-12",
+            variant === "project" && "min-h-15",
           )}
         >
           <Skeleton className="h-6 w-3/4" />
@@ -136,19 +136,19 @@ const CardSkeleton = React.forwardRef<HTMLDivElement, CardSkeletonProps>(functio
               </div>
             )}
 
-            <div className="mt-3 min-h-[4.5rem]">
+            <div className="mt-3 min-h-18">
               {renderBodyLines(showMeta ? undefined : "mt-2")}
             </div>
-            {renderPreviewPillStrip("small", "mt-3 min-h-[2.75rem]")}
+            {renderPreviewPillStrip("small", "mt-3 min-h-11")}
           </>
         )}
 
         {variant === "project" && (
           <>
-            <div className="min-h-[5.25rem]">
+            <div className="min-h-21">
               {renderBodyLines()}
             </div>
-            <div className="mt-5 min-h-[8rem] space-y-2">
+            <div className="mt-5 min-h-32 space-y-2">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-5/6" />

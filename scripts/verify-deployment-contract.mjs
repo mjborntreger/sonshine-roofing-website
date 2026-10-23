@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import fg from 'fast-glob';
+import { globSync } from 'node:fs';
 import ts from 'typescript';
 import { verifyDeploymentSnapshot } from '../lib/content/deployment-snapshot.mjs';
 
@@ -60,7 +60,7 @@ export function verifyPrerenderContract(root = process.cwd()) {
 }
 
 export function verifySourceContract(root = process.cwd()) {
-  const publicPages = fg.sync(['app/**/page.tsx', 'app/sitemap_index/**/route.ts'], { cwd: root });
+  const publicPages = globSync(['app/**/page.tsx', 'app/sitemap_index/**/route.ts'], { cwd: root });
   for (const path of publicPages) {
     const source = readFileSync(resolve(root, path), 'utf8');
     assert.match(source, /export const revalidate = false;/, `${path} must explicitly disable ISR`);
@@ -125,7 +125,7 @@ export function verifySourceContract(root = process.cwd()) {
       if (target) visit(target);
     }
   }
-  for (const file of fg.sync(['app/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}', 'proxy.ts'], { cwd: root }))
+  for (const file of globSync(['app/**/*.{ts,tsx}', 'components/**/*.{ts,tsx}', 'proxy.ts'], { cwd: root }))
     visit(resolve(root, file));
   return { pages: publicPages.length, modules: visited.size };
 }

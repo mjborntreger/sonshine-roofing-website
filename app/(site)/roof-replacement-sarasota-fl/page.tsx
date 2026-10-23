@@ -37,7 +37,7 @@ import { getPersonProfileImage } from '@/lib/content/persons';
 
 const figureStyles = 'not-prose py-8';
 const liStyles = 'relative pl-4';
-const stepperStyles = 'absolute -left-[5px] top-2 h-2 w-2 rounded-full bg-[#0045d7]';
+const stepperStyles = 'absolute left-[-5px] top-2 h-2 w-2 rounded-full bg-[#0045d7]';
 
 const SERVICE_PATH = '/roof-replacement-sarasota-fl';
 const SERVICE_CONFIG = getServicePageConfig(SERVICE_PATH);
@@ -199,7 +199,7 @@ export default async function Page() {
               </p>
 
               <figure className={figureStyles}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+                <div className="relative aspect-4/3 overflow-hidden rounded-3xl">
                   <StaticImage
                     src={nathanImage.url}
                     alt={nathanImage.altText}
@@ -213,7 +213,7 @@ export default async function Page() {
                   <strong>Nathan Borntreger</strong> — Owner of SonShine Roofing • Insured • LIC: #
                   {settings?.licenseNumber ?? 'Florida contractor'} |{' '}
                   <SmartLink
-                    className="hover:underline no-italic text-[--brand-blue]"
+                    className="hover:underline no-italic text-(--brand-blue)"
                     href="/person/nathan-borntreger"
                   >
                     See full bio
@@ -250,7 +250,7 @@ export default async function Page() {
               </p>
 
               <figure className={figureStyles}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+                <div className="relative aspect-4/3 overflow-hidden rounded-3xl">
                   <StaticImage crop
                     src="static:tile-shingle-metal-roof-comparison"
                     fill
@@ -294,7 +294,7 @@ export default async function Page() {
                 aria-label="Important"
               >
                 <strong className="uppercase block font-display text-[1rem] text-slate-800 mb-1">
-                  <CircleCheckBig className="h-4 w-4 mr-2 text-[--brand-blue] inline" />
+                  <CircleCheckBig className="h-4 w-4 mr-2 text-(--brand-blue) inline" />
                   Fact:
                 </strong>
                 <p className="m-0 text-slate-700">
@@ -359,7 +359,7 @@ export default async function Page() {
               </p>
 
               <figure className={figureStyles}>
-                <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
+                <div className="relative aspect-4/3 overflow-hidden rounded-3xl">
                   <StaticImage crop
                     src="static:clearing-leaves-from-roof-gutter"
                     fill
@@ -390,7 +390,7 @@ export default async function Page() {
                 aria-label="Pro tip"
               >
                 <strong className="uppercase text-[1rem] font-display block text-slate-800 mb-1">
-                  <Lightbulb className="text-[--brand-orange] h-4 w-4 mr-2 inline" />
+                  <Lightbulb className="text-(--brand-orange) h-4 w-4 mr-2 inline" />
                   Pro Tip:
                 </strong>
                 <p className="m-0 text-slate-700">

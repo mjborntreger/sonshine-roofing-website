@@ -43,7 +43,7 @@ export default function BlogArchiveCard({ post, style, className, imageSizes = "
     <div className={cn("min-w-0 h-full", className)} style={style}>
       <SmartLink
         href={href}
-        className="group block h-full min-w-0 rounded-3xl focus-visible:outline-none"
+        className="group block h-full min-w-0 rounded-3xl focus-visible:outline-hidden"
         title={post.title}
         data-icon-affordance="right"
       >
@@ -54,7 +54,7 @@ export default function BlogArchiveCard({ post, style, className, imageSizes = "
           )}
         >
           <CardHeader className="px-5 pb-5 pt-5 sm:px-6 sm:pt-6">
-            <CardTitle className="min-h-[3rem] font-bold leading-tight" style={titleClampStyle}>
+            <CardTitle className="min-h-12 font-bold leading-tight" style={titleClampStyle}>
               {post.title}
             </CardTitle>
           </CardHeader>
@@ -72,7 +72,7 @@ export default function BlogArchiveCard({ post, style, className, imageSizes = "
                 className="object-cover transition-transform duration-300 hover:scale-[1.06]"
               />
             ) : (
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
+              <div className="absolute inset-0 bg-linear-to-r from-[#0045d7] to-[#00e3fe]" />
             )}
           </div>
 
@@ -81,7 +81,7 @@ export default function BlogArchiveCard({ post, style, className, imageSizes = "
               {dateLabel ? <span>{dateLabel}</span> : null}
             </div>
 
-            <div className="mt-3 min-h-[4.5rem]">
+            <div className="mt-3 min-h-18">
               {summary ? (
                 <p className="text-sm leading-6 text-slate-600" style={lineClampStyle}>
                   {summary}
@@ -89,7 +89,7 @@ export default function BlogArchiveCard({ post, style, className, imageSizes = "
               ) : null}
             </div>
 
-            <div className="relative mt-3 min-h-[2.75rem] -mx-5 sm:-mx-6">
+            <div className="relative mt-3 min-h-11 -mx-5 sm:-mx-6">
               <div className="flex flex-nowrap gap-2 overflow-x-auto px-5 pb-2 scrollbar-none sm:px-6">
                 {categories.map((cat) => (
                   <span
@@ -100,8 +100,8 @@ export default function BlogArchiveCard({ post, style, className, imageSizes = "
                   </span>
                 ))}
               </div>
-              <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-gradient-to-r from-white to-transparent" />
-              <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-gradient-to-l from-white to-transparent" />
+              <div className="pointer-events-none absolute inset-y-1 left-0 w-6 bg-linear-to-r from-white to-transparent" />
+              <div className="pointer-events-none absolute inset-y-1 right-0 w-6 bg-linear-to-l from-white to-transparent" />
             </div>
           </CardContent>
 

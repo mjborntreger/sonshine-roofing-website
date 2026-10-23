@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useHydrated } from "@/lib/ui/use-hydrated";
 import Image, { type ImageProps } from "next/image";
 import { DirectusImage } from "@/components/media/DirectusImage";
 import type { PublicImage } from "@/lib/content/public-image";
@@ -25,7 +26,7 @@ const imageClassBase =
 const containerBase = "relative overflow-hidden rounded-xl shadow-xl border border-blue-200 bg-slate-100";
 
 export default function ProjectGallery({ images, projectTitle }: ProjectGalleryProps) {
-  const [mounted, setMounted] = React.useState(false);
+  const mounted = useHydrated();
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
   const modalRef = React.useRef<HTMLDivElement | null>(null);
@@ -38,9 +39,6 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
   const isOpen = activeIndex !== null;
   const currentImage = typeof activeIndex === "number" ? images[activeIndex] : null;
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const closeModal = React.useCallback(() => {
     setActiveIndex(null);
@@ -95,7 +93,8 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
     const body = document.body;
 
     if (isOpen) {
-      previouslyFocused.current = document.activeElement as HTMLElement | null;
+      // Safari does not focus buttons on pointer click. Preserve the actual opener.
+      previouslyFocused.current ??= document.activeElement as HTMLElement | null;
       scrollYRef.current = window.scrollY || window.pageYOffset || 0;
       body.style.position = "fixed";
       body.style.top = `-${scrollYRef.current}px`;
@@ -153,7 +152,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
             {isOpen ? (
               <motion.div
                 key="project-gallery-lightbox"
-                className="fixed inset-0 z-[1000]"
+                className="fixed inset-0 z-1000"
                 role="dialog"
                 aria-modal="true"
                 aria-label="Project photo viewer"
@@ -189,7 +188,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
                 >
                   <motion.div
                     ref={modalRef}
-                    className="relative flex w-full max-w-[74rem] items-center justify-center md:px-12 lg:px-16"
+                    className="relative flex w-full max-w-296 items-center justify-center md:px-12 lg:px-16"
                     initial={{ opacity: 0, scale: 0.96, y: 8 }}
                     animate={{
                       opacity: 1,
@@ -257,7 +256,7 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
       <h2 className="text-xl text-center md:text-left md:text-3xl">Photo Gallery</h2>
       <p className="text-xs flex items-center gap-2 justify-center md:justify-start md:text-sm text-slate-500" aria-live="off">
         <span>Tap to expand an image</span>
-        <Expand className="h-4 w-4 text-[--brand-blue]" aria-hidden="true" />
+        <Expand className="h-4 w-4 text-(--brand-blue)" aria-hidden="true" />
       </p>
       <div className="grid grid-cols-2 mt-4 gap-4 md:gap-6">
         {images.map((image, index) => (
@@ -265,7 +264,10 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
             key={`${image.url}-${index}`}
             image={image}
             projectTitle={projectTitle}
-            onOpen={() => setActiveIndex(index)}
+            onOpen={(event) => {
+              previouslyFocused.current = event.currentTarget;
+              setActiveIndex(index);
+            }}
           />
         ))}
       </div>
@@ -277,28 +279,24 @@ export default function ProjectGallery({ images, projectTitle }: ProjectGalleryP
 type GalleryImageProps = {
   image: GalleryImage;
   projectTitle: string;
-  onOpen: () => void;
+  onOpen: React.MouseEventHandler<HTMLButtonElement>;
 };
 
 function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
-  const [loaded, setLoaded] = React.useState(false);
-  const imageRef = React.useRef<HTMLImageElement | null>(null);
-  const handleLoad = React.useCallback(() => setLoaded(true), []);
+  const [loadedUrl, setLoadedUrl] = React.useState<string | null>(null);
+  const loaded = loadedUrl === image.url;
+  const handleLoad = React.useCallback(() => setLoadedUrl(image.url), [image.url]);
+  const imageRef = React.useCallback((node: HTMLImageElement | null) => {
+    if (node?.complete && node.naturalWidth > 0) setLoadedUrl(image.url);
+  }, [image.url]);
   const alt = image.altText || projectTitle;
 
-  React.useEffect(() => {
-    setLoaded(false);
-    const imgEl = imageRef.current;
-    if (imgEl?.complete) {
-      handleLoad();
-    }
-  }, [image.url, handleLoad]);
 
   return (
     <button
       type="button"
       onClick={onOpen}
-      className={`${containerBase} aspect-[4/3] shadow-md group block w-full cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[--brand-blue]`}
+      className={`${containerBase} aspect-4/3 shadow-md group block w-full cursor-zoom-in focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-(--brand-blue)`}
       aria-label={`Open photo: ${alt}`}
     >
       {!loaded ? <Skeleton className="pointer-events-none absolute inset-0 h-full w-full" /> : null}
@@ -314,10 +312,10 @@ function GalleryImage({ image, projectTitle, onOpen }: GalleryImageProps) {
         loading="lazy"
       />
       <span
-        className="pointer-events-none absolute inset-0 grid place-items-center bg-gradient-to-t from-black/50 via-black/20 to-transparent opacity-0 transition duration-200 ease-out group-active:opacity-100 group-focus-visible:opacity-100 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 grid place-items-center bg-linear-to-t from-black/50 via-black/20 to-transparent opacity-0 transition duration-200 ease-out group-active:opacity-100 group-focus-visible:opacity-100 group-hover:opacity-100"
         aria-hidden="true"
       >
-        <span className="flex items-center justify-center rounded-full bg-white/90 p-3 text-slate-900 shadow-sm transition group-active:scale-105 group-hover:scale-105">
+        <span className="flex items-center justify-center rounded-full bg-white/90 p-3 text-slate-900 shadow-xs transition group-active:scale-105 group-hover:scale-105">
           <Expand className="h-5 w-5" />
         </span>
       </span>
@@ -369,7 +367,7 @@ function NavButton({ ariaLabel, onClick, children, className }: NavButtonProps) 
         e.stopPropagation();
         onClick();
       }}
-      className={`inline-flex items-center justify-center rounded-full bg-white/40 hover:bg-white/80 p-1 backdrop-blur-sm sm:p-2 md:p-3 lg:p-4 text-blue-200 border border-blue-100 hover:text-blue-500 shadow-lg transition-colors hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${className ?? ""}`}
+      className={`inline-flex items-center justify-center rounded-full bg-white/40 hover:bg-white/80 p-1 backdrop-blur-xs sm:p-2 md:p-3 lg:p-4 text-blue-200 border border-blue-100 hover:text-blue-500 shadow-lg transition-colors hover:bg-white focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--brand-blue) focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900 ${className ?? ""}`}
     >
       {children}
     </button>

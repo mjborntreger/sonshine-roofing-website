@@ -89,7 +89,7 @@ check('location hero keeps its CMS title, highlights exact approved case, and sh
   const heading = doc.querySelector('h1');
   assert.equal(heading.textContent, props.page.title);
   assert.deepEqual([...heading.querySelectorAll('span')].map(node => node.textContent), ['BEST', 'Over 39 Years']);
-  assert.ok([...heading.querySelectorAll('span')].every(node => node.className === 'text-[--brand-cyan]'));
+  assert.ok([...heading.querySelectorAll('span')].every(node => node.className === 'text-(--brand-cyan)'));
   assert.equal(heading.nextElementSibling.textContent, page.introduction);
   assert.equal([...doc.querySelectorAll('p')].filter(node => node.textContent === page.introduction).length, 1);
 });

@@ -8,7 +8,7 @@ const providers = [
     name: 'Ygrene',
     logo: 'static:ygrene-logo',
     type: 'Property/lien-based PACE Financing',
-    borderClassName: 'from-[--brand-orange] to-amber-400',
+    borderClassName: 'from-(--brand-orange) to-amber-400',
     tintClassName: 'bg-orange-50',
     description:
       'Eligible roof improvements can be financed through a voluntary property-tax assessment.',
@@ -32,7 +32,7 @@ const providers = [
     name: 'Service Finance',
     logo: 'static:service-finance-logo',
     type: 'Home Improvement Credit-based Financing',
-    borderClassName: 'from-[--brand-cyan] to-sky-400',
+    borderClassName: 'from-(--brand-cyan) to-sky-400',
     tintClassName: 'bg-cyan-50',
     description:
       'Roofing financing is offered through participating contractors for a fixed financed amount and term.',
@@ -65,7 +65,7 @@ export default function FinancingProviders() {
         {providers.map((provider) => (
           <article
             key={provider.name}
-            className={`min-w-0 rounded-2xl bg-gradient-to-r p-[2px] shadow-sm ${provider.borderClassName}`}
+            className={`min-w-0 rounded-2xl bg-linear-to-r p-[2px] shadow-xs ${provider.borderClassName}`}
           >
             <div className="flex h-full flex-col rounded-2xl bg-white">
               <div className={`rounded-t-2xl p-6 md:px-8 ${provider.tintClassName}`}>
@@ -80,7 +80,7 @@ export default function FinancingProviders() {
                   />
                 </div>
                 <h3 className="text-2xl font-semibold text-slate-900">{provider.name}</h3>
-                <p className="mt-2 font-semibold text-[--brand-blue]">{provider.type}</p>
+                <p className="mt-2 font-semibold text-(--brand-blue)">{provider.type}</p>
               </div>
               <div className="flex flex-1 flex-col p-6 md:p-8">
                 <p className="leading-relaxed text-slate-600">{provider.description}</p>
@@ -124,7 +124,7 @@ export default function FinancingProviders() {
                 <div className="mt-auto pt-6">
                   <SmartLink
                     href={provider.source}
-                    className="text-sm text-[--brand-blue] underline underline-offset-4"
+                    className="text-sm text-(--brand-blue) underline underline-offset-4"
                     showExternalIcon
                   >
                     {provider.sourceLabel}

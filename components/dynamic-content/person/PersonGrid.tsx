@@ -18,7 +18,7 @@ export default function PersonGrid({ people }: { people: Person[] }) {
             <li key={p.slug} className="min-w-0">
               <SmartLink
                 href={buildPersonHref(p.slug) ?? ROUTES.about}
-                className="group block rounded-2xl focus-visible:outline-none"
+                className="group block rounded-2xl focus-visible:outline-hidden"
                 data-icon-affordance="right"
               >
                 <Card className="overflow-hidden hover:shadow-lg transition">
@@ -39,7 +39,7 @@ export default function PersonGrid({ people }: { people: Person[] }) {
                       />
                     </div>
                   ) : (
-                    <div className="aspect-[4/3] w-full bg-gradient-to-r from-[#0045d7] to-[#00e3fe]" />
+                    <div className="aspect-4/3 w-full bg-linear-to-r from-[#0045d7] to-[#00e3fe]" />
                   )}
 
                   <CardContent className="px-5 pb-4 pt-5 text-slate-600 sm:px-6 sm:pb-6">

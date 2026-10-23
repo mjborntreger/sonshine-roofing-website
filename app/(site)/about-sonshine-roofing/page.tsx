@@ -114,7 +114,7 @@ export default async function Page() {
             <JsonLd data={webPageLd} />
 
             <Accordion
-              icon={<UserRoundSearch className="h-5 w-5 text-[--brand-blue]" aria-hidden="true" />}
+              icon={<UserRoundSearch className="h-5 w-5 text-(--brand-blue)" aria-hidden="true" />}
               summary={<h2 className="text-2xl">What we do</h2>}
               className="mb-4"
               radius="2xl"
@@ -187,7 +187,7 @@ export default async function Page() {
 
           <aside className="lg:sticky top-16 self-start lg:h-fit">
             <ResourcesQuickLinks activePath={SERVICE_PATH} />
-            <div className="h-[1px] w-full bg-blue-100 my-4" />
+            <div className="h-px w-full bg-blue-100 my-4" />
             <SidebarCta />
           </aside>
         </div>

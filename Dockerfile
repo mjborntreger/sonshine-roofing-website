@@ -1,13 +1,17 @@
-FROM node:22-bookworm-slim AS deps
+# syntax=docker/dockerfile:1.10
+FROM node:24.22.1-bookworm-slim AS toolchain
+RUN npm install --global npm@12.2.1
+
+FROM toolchain AS deps
 
 WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-COPY package.json package-lock.json ./
+COPY package.json package-lock.json .npmrc ./
 RUN npm ci
 
-FROM node:22-bookworm-slim AS builder
+FROM toolchain AS builder
 
 WORKDIR /app
 
@@ -21,10 +25,8 @@ ARG NEXT_PUBLIC_GTM_ID
 ARG NEXT_PUBLIC_META_PIXEL_ID
 ARG NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY
 ARG NEXT_PUBLIC_ENABLE_GTM_PREVIEW
-ARG YOUTUBE_API_KEY
 ARG DIRECTUS_URL
 ARG DIRECTUS_CLIENT_SLUG
-ARG DIRECTUS_TOKEN
 
 ENV NEXT_PUBLIC_ENV=${NEXT_PUBLIC_ENV}
 ENV NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
@@ -34,16 +36,16 @@ ENV NEXT_PUBLIC_GTM_ID=${NEXT_PUBLIC_GTM_ID}
 ENV NEXT_PUBLIC_META_PIXEL_ID=${NEXT_PUBLIC_META_PIXEL_ID}
 ENV NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY=${NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY}
 ENV NEXT_PUBLIC_ENABLE_GTM_PREVIEW=${NEXT_PUBLIC_ENABLE_GTM_PREVIEW}
-ENV YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
 ENV DIRECTUS_URL=${DIRECTUS_URL}
 ENV DIRECTUS_CLIENT_SLUG=${DIRECTUS_CLIENT_SLUG}
-ENV DIRECTUS_TOKEN=${DIRECTUS_TOKEN}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build
+ARG CONTENT_BUILD_ID
+RUN --mount=type=secret,id=build_env,required=true \
+    CONTENT_BUILD_ID="${CONTENT_BUILD_ID}" node scripts/build-with-secrets.mjs
 
-FROM node:22-bookworm-slim AS runner
+FROM node:24.22.1-bookworm-slim AS runner
 
 WORKDIR /app
 

@@ -36,7 +36,7 @@ export type AccordionProps = BaseDetailsProps & {
 };
 
 const DETAIL_BASE =
-  "group/accordion not-prose w-full overflow-hidden border bg-white shadow-sm transition-colors duration-200 ease-out [&_summary::-webkit-details-marker]:hidden";
+  "group/accordion not-prose w-full overflow-hidden border bg-white shadow-xs transition-colors duration-200 ease-out [&_summary::-webkit-details-marker]:hidden";
 
 const SUMMARY_BASE =
   "flex cursor-pointer select-none items-center justify-between gap-4 text-left text-sm font-medium text-slate-900 transition-colors duration-200 ease-out hover:bg-blue-10";
@@ -66,7 +66,7 @@ const RADIUS_MAP: Record<AccordionRadius, string> = {
   "3xl": "rounded-3xl",
 };
 
-const ICON_WRAPPER_BASE = "inline-flex flex-none items-center justify-center text-[--brand-blue]";
+const ICON_WRAPPER_BASE = "inline-flex flex-none items-center justify-center text-(--brand-blue)";
 const META_BASE = "inline-flex flex-none items-center gap-2 text-xs font-medium text-slate-600";
 const CHEVRON_BASE =
   "h-5 w-5 flex-none transform transition-transform duration-200 ease-out group-open/accordion:rotate-180 group-open/accordion:scale-110";

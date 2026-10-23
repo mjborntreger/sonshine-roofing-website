@@ -3,7 +3,7 @@
 This repository is the production-facing SonShine Roofing Next.js application.
 It owns public routes, lead capture, attribution and consent behavior, SEO,
 structured data, sitemaps, analytics integration, and Directus content captured
-in deployment snapshots. Coolify builds the standalone Docker image on Node 22
+in deployment snapshots. Coolify builds the standalone Docker image on Node 24.22.1
 and serves it on port 3000.
 
 ## Sources of Truth
@@ -49,9 +49,12 @@ and serves it on port 3000.
 
 ## Validation
 
-Use Node 22 and install with `npm ci`.
+Use Node 24.22.1 and npm 12.2.1; install with `npm ci`. Review new
+dependency scripts before adding exact-version `allowScripts` decisions.
+Read `docs/runtime-modernization.md` when changing runtime, lint, CSS or compiler
+versions; it records compatibility gates and the rendering experiment decisions.
 
-- Baseline: `npm run lint`, `npm run typecheck`, and
+- Baseline: `npm run lint`, `npm run typecheck`, `npm run typecheck:compat`, and
   `npm run verify:tailwind-utilities`; `npm test` is currently an alias for
   lint.
 - Editorial date/schema work: run `npm run verify:editorial-dates` and

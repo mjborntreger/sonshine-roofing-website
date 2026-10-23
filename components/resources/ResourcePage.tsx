@@ -18,7 +18,7 @@ export default function ResourcePage({
     <Section className="py-8 md:py-10">
       <div className="px-2">
         <nav aria-label="Breadcrumb" className="mb-5 text-sm text-slate-600">
-          <SmartLink href="/" className="text-[--brand-blue] hover:underline">
+          <SmartLink href="/" className="text-(--brand-blue) hover:underline">
             Home
           </SmartLink>
           <span aria-hidden="true" className="mx-2">

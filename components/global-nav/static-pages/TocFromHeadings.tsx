@@ -1,7 +1,7 @@
 'use client';
 
 import { ArrowDown, CornerDownRight, List } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import type { MouseEvent } from 'react';
 import styles from './TocFromHeadings.module.css';
 
@@ -59,37 +59,13 @@ function buildStructure(list: Item[]): StructuredItem[] {
   return roots;
 }
 
-export default function TocFromHeadings({
-  root = '#article-root',
-  className = 'text-sm',
-  /** px to offset scroll for sticky headers; defaults to the global --sticky-offset */
-  offset,
-  levels = [2],
-  title = 'ON THIS PAGE',
-  mobile = false,
-}: {
-  root?: string; // CSS selector for the article container
-  className?: string;
-  offset?: number;
-  levels?: TocLevel[];
-  title?: string;
-  mobile?: boolean;
-}) {
-  const [items, setItems] = useState<Item[]>([]);
-  const [activeId, setActiveId] = useState<string | null>(null);
-
-  const normalizedLevels = useMemo(() => normalizeLevels(levels), [levels]);
-  const levelSelector = useMemo(
-    () => normalizedLevels.map((lvl) => `h${lvl}`).join(', '),
-    [normalizedLevels],
-  );
-
-  // Collect headings and ensure they have stable ids
-  useEffect(() => {
+function createHeadingsStore(root: string, levelSelector: string) {
+    let snapshot: Item[] = [];
+    const empty: Item[] = [];
+    const scan = (): Item[] => {
     const container = document.querySelector(root);
     if (!container) {
-      setItems([]);
-      return;
+      return [];
     }
 
     const headingNodes = levelSelector
@@ -97,8 +73,7 @@ export default function TocFromHeadings({
       : [];
 
     if (!headingNodes.length) {
-      setItems([]);
-      return;
+      return [];
     }
 
     const ids = new Set<string>();
@@ -113,7 +88,6 @@ export default function TocFromHeadings({
       .map((heading): Scanned | null => {
         const text = (heading.textContent || '').trim();
         const rawLevel = Number(heading.tagName.slice(1)) as TocLevel;
-        if (!normalizedLevels.includes(rawLevel)) return null;
 
         // Ensure a stable id
         let id = heading.id;
@@ -142,26 +116,67 @@ export default function TocFromHeadings({
       found.push({ id: it.id, text: it.text, level: it.level });
     }
 
-    setItems((prev) => {
-      if (
-        prev.length === found.length &&
-        prev.every((p, i) => p.id === found[i].id && p.text === found[i].text && p.level === found[i].level)
-      ) {
-        return prev;
-      }
       return found;
-    });
-  }, [root, levelSelector, normalizedLevels]);
+    };
+    return {
+      getSnapshot: () => snapshot,
+      getServerSnapshot: () => empty,
+      subscribe: (notify: () => void) => {
+        const update = () => {
+          const found = scan();
+          if (JSON.stringify(found) !== JSON.stringify(snapshot)) {
+            snapshot = found;
+            notify();
+          }
+        };
+        update();
+        const observer = new MutationObserver(update);
+        observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+        return () => observer.disconnect();
+      },
+    };
+}
 
-  // Respect hash on load
-  useEffect(() => {
-    if (!items.length) return;
-    if (typeof window === 'undefined') return;
-    const hash = window.location.hash;
-    if (hash) {
-      setActiveId(hash.slice(1));
-    }
-  }, [items]);
+
+const subscribeHash = (notify: () => void) => {
+  window.addEventListener('hashchange', notify);
+  return () => window.removeEventListener('hashchange', notify);
+};
+const readHash = () => window.location.hash.slice(1);
+const emptyHash = () => '';
+
+export default function TocFromHeadings({
+  root = '#article-root',
+  className = 'text-sm',
+  /** px to offset scroll for sticky headers; defaults to the global --sticky-offset */
+  offset,
+  levels = [2],
+  title = 'ON THIS PAGE',
+  mobile = false,
+}: {
+  root?: string; // CSS selector for the article container
+  className?: string;
+  offset?: number;
+  levels?: TocLevel[];
+  title?: string;
+  mobile?: boolean;
+}) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const normalizedLevels = useMemo(() => normalizeLevels(levels), [levels]);
+  const levelSelector = useMemo(
+    () => normalizedLevels.map((lvl) => `h${lvl}`).join(', '),
+    [normalizedLevels],
+  );
+
+  const store = useMemo(() => createHeadingsStore(root, levelSelector), [root, levelSelector]);
+  const items = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
+  const hash = useSyncExternalStore(subscribeHash, readHash, emptyHash);
+  const [previousHash, setPreviousHash] = useState<string | null>(null);
+  if (previousHash !== hash) {
+    setPreviousHash(hash);
+    if (hash) setActiveId(hash);
+  }
 
   // Scroll-driven active heading (desktop / non-mobile only)
   useEffect(() => {
@@ -240,7 +255,7 @@ export default function TocFromHeadings({
   const visibilityClass = mobile ? 'block md:hidden' : 'hidden lg:block';
   const navClasses = [
     visibilityClass,
-    'rounded-3xl border border-blue-200 bg-white p-4 mb-4 shadow-sm ',
+    'rounded-3xl border border-blue-200 bg-white p-4 mb-4 shadow-xs ',
     className,
   ]
     .filter(Boolean)
@@ -271,8 +286,8 @@ export default function TocFromHeadings({
 
   const renderLink = (item: Item, active: boolean, isChild: boolean) => {
     const linkClasses = [
-      'flex w-full items-start gap-1 transition-colors hover:text-[--brand-blue]',
-      active ? 'text-[--brand-blue] font-medium' : 'text-slate-700',
+      'flex w-full items-start gap-1 transition-colors hover:text-(--brand-blue)',
+      active ? 'text-(--brand-blue) font-medium' : 'text-slate-700',
     ]
       .filter(Boolean)
       .join(' ');
@@ -284,7 +299,7 @@ export default function TocFromHeadings({
         aria-current={active ? 'true' : undefined}
         className={linkClasses}
       >
-        {isChild && <CornerDownRight className="h-4 w-4 inline text-[--brand-orange]" aria-hidden="true" />}
+        {isChild && <CornerDownRight className="h-4 w-4 inline text-(--brand-orange)" aria-hidden="true" />}
         <span className="flex-1 leading-snug">{item.text}</span>
       </a>
     );
@@ -296,9 +311,9 @@ export default function TocFromHeadings({
       className={navClasses}
     >
       <div className="mb-3 text-[1rem] text-center font-display font-bold tracking-wide text-slate-900">
-        <List className="h-4 w-4 inline mr-2 text-[--brand-blue]" aria-hidden="true" />
+        <List className="h-4 w-4 inline mr-2 text-(--brand-blue)" aria-hidden="true" />
         {title}
-        <ArrowDown className="h-4 w-4 inline ml-2 text-[--brand-blue]" aria-hidden="true" />
+        <ArrowDown className="h-4 w-4 inline ml-2 text-(--brand-blue)" aria-hidden="true" />
       </div>
       <ul className={[styles.tocList, styles.tocListRoot, 'space-y-2 text-base'].join(' ')}>
         {structured.map((section) => {

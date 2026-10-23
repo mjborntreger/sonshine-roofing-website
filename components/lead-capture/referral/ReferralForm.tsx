@@ -58,7 +58,7 @@ const INITIAL_FORM: ReferralFormState = {
 };
 
 const INPUT_CLASS =
-  'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-base shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30';
+  'mt-2 w-full rounded-xl border border-blue-100 px-4 py-2 text-base shadow-xs focus:border-(--brand-blue) focus:ring-2 focus:ring-(--brand-blue)/30';
 const INPUT_ERROR_CLASS = 'border-red-300 focus:border-red-400 focus:ring-red-200';
 const SUCCESS_MESSAGE =
   'Thanks. We received your referral. Check your email for confirmation and details on how you can earn your reward';
@@ -249,7 +249,7 @@ export default function ReferralForm() {
 
   if (status === 'success') {
     return (
-      <div className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
+      <div className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-xs">
         <div className="flex items-start gap-4">
           <CheckCircle2 className="mt-1 h-7 w-7 shrink-0 text-emerald-600" aria-hidden="true" />
           <div>
@@ -266,9 +266,9 @@ export default function ReferralForm() {
       <input type="text" name="company" className="hidden" tabIndex={-1} autoComplete="off" />
 
       <div className="rounded-3xl border border-blue-100 bg-white shadow-md">
-        <div className="border-b border-blue-100 bg-gradient-to-r from-sky-50 via-white to-amber-50 p-6">
+        <div className="border-b border-blue-100 bg-linear-to-r from-sky-50 via-white to-amber-50 p-6">
           <div className="flex items-center gap-3">
-            <Contact className="h-6 w-6 text-[--brand-blue]" aria-hidden="true" />
+            <Contact className="h-6 w-6 text-(--brand-blue)" aria-hidden="true" />
             <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Submit a Referral</h2>
           </div>
           <p className="mt-2 text-sm leading-6 text-slate-600">
@@ -478,7 +478,7 @@ export default function ReferralForm() {
                 autoComplete="off"
                 value={form.notes}
                 onChange={(event) => setField('notes', event.target.value)}
-                className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-base shadow-sm focus:border-[--brand-blue] focus:ring-2 focus:ring-[--brand-blue]/30"
+                className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 text-base shadow-xs focus:border-(--brand-blue) focus:ring-2 focus:ring-(--brand-blue)/30"
               />
             </label>
           </section>

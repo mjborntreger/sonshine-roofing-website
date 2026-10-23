@@ -78,7 +78,7 @@ export default function FaqInlineListClient({ heading, highlightText, descriptio
         <div className="flex items-start justify-start gap-4">
           <h2 className="flex items-center gap-2 text-2xl font-semibold text-slate-800 md:text-4xl">
             <HelpCircle
-              className="mr-1 hidden sm:inline h-7 w-7 text-[--brand-blue] md:h-9 md:w-9"
+              className="mr-1 hidden sm:inline h-7 w-7 text-(--brand-blue) md:h-9 md:w-9"
               aria-hidden="true"
             />
             <span>{renderHighlight(heading, highlightText)}</span>
@@ -99,7 +99,7 @@ export default function FaqInlineListClient({ heading, highlightText, descriptio
         <button
           type="button"
           onClick={handleToggleAll}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[--brand-blue] bg-white px-4 py-2 text-sm font-semibold text-[--brand-blue] transition hover:bg-[--brand-blue]/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--brand-blue] focus-visible:ring-offset-2 sm:w-auto"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-(--brand-blue) bg-white px-4 py-2 text-sm font-semibold text-(--brand-blue) transition hover:bg-(--brand-blue)/10 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-(--brand-blue) focus-visible:ring-offset-2 sm:w-auto"
         >
           {allOpen ? (
             <>

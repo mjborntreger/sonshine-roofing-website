@@ -7,7 +7,7 @@ import type { PageResult, ResourceKind, ResourceQuery } from "@/lib/ui/paginatio
 import type { PostCard } from "@/lib/content/content-types";
 import type { VideoItem } from "@/lib/content/video-types";
 import type { ProjectSummary } from "@/lib/content/project-types";
-import { fetchPage, getCachedPages, setCachedPages } from "@/lib/content/resource-fetch";
+import { fetchPage, setCachedPages } from "@/lib/content/resource-fetch";
 import { useIntersection } from "@/lib/ui/useIntersection";
 import GridLoadingState from "@/components/layout/GridLoadingState";
 import Grid from "@/components/layout/Grid";
@@ -192,7 +192,13 @@ const renderVideoItem = (
 
 const renderProjectItem = (project: ProjectSummary): ReactNode => <ProjectArchiveCard project={project} />;
 
-export default function InfiniteList<T>({
+export default function InfiniteList<T>(props: Props<T>) {
+    // Query/result identity owns pagination state and cancels the old request on unmount.
+    const key = JSON.stringify([props.kind, props.pageSize, props.filters, props.initial]);
+    return <InfiniteListQuery key={key} {...props} />;
+}
+
+function InfiniteListQuery<T>({
     kind,
     initial,
     filters,
@@ -206,25 +212,20 @@ export default function InfiniteList<T>({
     onTotalChange,
 }: Props<T>) {
     const baseQuery: ResourceQuery = useMemo(() => ({ first: pageSize, filters }), [pageSize, filters]);
-    const serializedFilters = useMemo(() => JSON.stringify(baseQuery.filters ?? {}), [baseQuery.filters]);
     const initialPages = useMemo(() => [initial], [initial]);
     const effectiveGridClassName = useMemo(
         () => ["auto-rows-fr", gridClass].filter(Boolean).join(" "),
         [gridClass]
     );
 
-    const [pages, setPages] = useState<PageResult<T>[]>(() => {
-        const cached = getCachedPages<T>(kind, baseQuery);
-        return cached.length ? cached : initialPages;
-    });
+    const [pages, setPages] = useState<PageResult<T>[]>(initialPages);
     const [loading, setLoading] = useState(false);
     const abortRef = useRef<AbortController | null>(null);
 
     useEffect(() => {
-        setPages(initialPages);
         setCachedPages(kind, baseQuery, initialPages);
-        if (abortRef.current) abortRef.current.abort();
-    }, [kind, baseQuery, serializedFilters, initialPages]);
+        return () => abortRef.current?.abort();
+    }, [kind, baseQuery, initialPages]);
 
     const items = pages.flatMap((page) => page.items);
     useEffect(() => {
@@ -282,6 +283,7 @@ export default function InfiniteList<T>({
 
         fetchPage<T>(kind, { ...baseQuery, after }, ac.signal)
             .then((next) => {
+                if (ac.signal.aborted) return;
                 const nextPages = [...pages, next];
                 setPages(nextPages);
                 setCachedPages(kind, baseQuery, nextPages);
@@ -297,24 +299,23 @@ export default function InfiniteList<T>({
             });
     }, [intersecting, hasMore, loading, kind, after, baseQuery, pages]);
 
-    const effectiveRender = useMemo<RenderFn<T>>(() => {
-        if (renderItem) return renderItem;
+    const effectiveRender: RenderFn<T> = (item, index) => {
+        if (renderItem) return renderItem(item, index);
         switch (kind) {
             case "blog":
-                return (item) => renderBlogItem(item as unknown as PostCard);
+                return renderBlogItem(item as unknown as PostCard);
             case "video":
-                return (item, index) =>
-                    renderVideoItem(
+                return renderVideoItem(
                         item as unknown as VideoItem,
                         index,
                         onVideoOpen as ((video: VideoItem) => void) | undefined
                     );
             case "project":
-                return (item) => renderProjectItem(item as unknown as ProjectSummary);
+                return renderProjectItem(item as unknown as ProjectSummary);
             default:
-                return () => null;
+                return null;
         }
-    }, [renderItem, kind, onVideoOpen]);
+    };
 
     const resolveItemKey = (item: T, index: number): string => {
         if (kind === "blog") {

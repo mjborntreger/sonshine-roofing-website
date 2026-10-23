@@ -28,7 +28,10 @@
       ]
     },
     "incremental": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "next-env.d.ts",

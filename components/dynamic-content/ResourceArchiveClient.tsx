@@ -39,7 +39,7 @@ type Props<Item> = {
 };
 
 const controlClass =
-  'min-h-12 w-full min-w-0 rounded-lg border border-blue-300 bg-white px-3 py-2 text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] disabled:bg-slate-100 disabled:text-slate-500';
+  'min-h-12 w-full min-w-0 rounded-lg border border-blue-300 bg-white px-3 py-2 text-base text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan) disabled:bg-slate-100 disabled:text-slate-500';
 
 export default function ResourceArchiveClient<Item>({
   kind,
@@ -76,11 +76,15 @@ export default function ResourceArchiveClient<Item>({
   }));
   const [requestVersion, setRequestVersion] = useState(0);
   const [forceRequest, setForceRequest] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [outcome, setOutcome] = useState({ requested, version: 0, error: false });
+  const needsRequest = forceRequest || JSON.stringify(requested) !== JSON.stringify(applied.filters);
+  const settled = outcome.requested === requested && outcome.version === requestVersion;
+  const loading = needsRequest && !settled;
+  const error = settled && outcome.error;
   const [legacyNotice, setLegacyNotice] = useState(false);
   const appliedKeyRef = useRef(JSON.stringify(draft));
-  const lastLocationRef = useRef<string | null>(null);
+  const locationKey = archiveLocationKey(new URLSearchParams(paramsString), groups, searchParamKey);
+  const [lastLocation, setLastLocation] = useState<string | null>(null);
   const filtersRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
@@ -93,7 +97,7 @@ export default function ResourceArchiveClient<Item>({
         groups,
         searchParamKey,
       ).toString();
-      lastLocationRef.current = archiveLocationKey(url.searchParams, groups, searchParamKey);
+
       if (url.href !== window.location.href) {
         // Next's native history integration updates useSearchParams without a route fetch.
         window.history[replace ? 'replaceState' : 'pushState'](
@@ -106,30 +110,28 @@ export default function ResourceArchiveClient<Item>({
     [groups, searchParamKey],
   );
 
-  useEffect(() => {
-    const params = new URLSearchParams(paramsString);
-    const locationKey = archiveLocationKey(params, groups, searchParamKey);
-    if (lastLocationRef.current === locationKey) return;
-    lastLocationRef.current = locationKey;
-    const restored = readArchiveFilters(params, groups, minSearchLength, searchParamKey);
+  if (lastLocation !== locationKey) {
+    setLastLocation(locationKey);
+    const restored = readArchiveFilters(new URLSearchParams(paramsString), groups, minSearchLength, searchParamKey);
     setDraft(restored.filters);
     setRequested(restored.filters);
     setForceRequest(false);
-    setLegacyNotice(restored.adjustedLegacyLink);
-    publishUrl(restored.filters, true);
+    setLegacyNotice(restored.adjustedLegacyLink || (legacyNotice && JSON.stringify(restored.filters) === JSON.stringify(requested)));
+  }
+
+  useEffect(() => {
+    const restored = readArchiveFilters(new URLSearchParams(paramsString), groups, minSearchLength, searchParamKey);
+    if (restored.adjustedLegacyLink) publishUrl(restored.filters, true);
   }, [paramsString, groups, minSearchLength, searchParamKey, publishUrl]);
 
   useEffect(() => {
     const key = JSON.stringify(requested);
-    setError(false);
     if (key === appliedKeyRef.current && !forceRequest) {
-      setLoading(false);
       return;
     }
     const controller = new AbortController();
     let current = true;
     const payload = buildFiltersPayload(archivePayloadInput(requested));
-    setLoading(true);
     fetch(apiPath, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -144,12 +146,10 @@ export default function ResourceArchiveClient<Item>({
         if (!current) return;
         appliedKeyRef.current = key;
         setApplied({ filters: requested, result, payload });
+        setOutcome({ requested, version: requestVersion, error: false });
       })
       .catch(() => {
-        if (current) setError(true);
-      })
-      .finally(() => {
-        if (current) setLoading(false);
+        if (current) setOutcome({ requested, version: requestVersion, error: true });
       });
     return () => {
       current = false;
@@ -164,6 +164,8 @@ export default function ResourceArchiveClient<Item>({
     setForceRequest(true);
     setRequestVersion((version) => version + 1);
     setLegacyNotice(false);
+    const nextParams = writeArchiveFilters(new URLSearchParams(paramsString), normalized, groups, searchParamKey);
+    setLastLocation(archiveLocationKey(nextParams, groups, searchParamKey));
     publishUrl(normalized);
   };
   const clearFilters = () => applyFilters({ search: '', selections: {} });
@@ -207,7 +209,7 @@ export default function ResourceArchiveClient<Item>({
       >
         <h2 className="text-2xl">
           <Search
-            className="mr-2 inline h-5 w-5 align-text-top text-[--brand-blue]"
+            className="mr-2 inline h-5 w-5 align-text-top text-(--brand-blue)"
             aria-hidden="true"
           />
           Search {labels.itemPlural}
@@ -288,14 +290,14 @@ export default function ResourceArchiveClient<Item>({
             </div>
             <button
               type="submit"
-              className="min-h-12 rounded-lg bg-[--brand-blue] px-5 py-2 font-semibold text-white focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] focus:ring-offset-2"
+              className="min-h-12 rounded-lg bg-(--brand-blue) px-5 py-2 font-semibold text-white focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan) focus:ring-offset-2"
             >
               Search
             </button>
             <button
               type="button"
               onClick={clearFilters}
-              className="min-h-12 rounded-lg border border-blue-300 px-4 py-2 font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] focus:ring-offset-2 disabled:opacity-50"
+              className="min-h-12 rounded-lg border border-blue-300 px-4 py-2 font-medium text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan) focus:ring-offset-2 disabled:opacity-50"
             >
               Clear all
             </button>
@@ -330,7 +332,7 @@ export default function ResourceArchiveClient<Item>({
           <button
             type="button"
             onClick={() => setRequestVersion((version) => version + 1)}
-            className="mt-2 min-h-12 rounded-lg border border-red-300 px-4 underline focus:outline-none focus:ring-2 focus:ring-[--brand-cyan]"
+            className="mt-2 min-h-12 rounded-lg border border-red-300 px-4 underline focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan)"
           >
             Retry search
           </button>
@@ -346,7 +348,7 @@ export default function ResourceArchiveClient<Item>({
             <button
               type="button"
               onClick={clearFilters}
-              className="mt-4 min-h-12 rounded-lg border border-blue-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[--brand-cyan]"
+              className="mt-4 min-h-12 rounded-lg border border-blue-300 px-4 py-2 focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan)"
             >
               Clear all
             </button>
@@ -367,7 +369,7 @@ export default function ResourceArchiveClient<Item>({
             });
             searchRef.current?.focus({ preventScroll: true });
           }}
-          className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-[--brand-blue] px-4 py-2 text-sm font-semibold text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-[--brand-cyan] focus:ring-offset-2"
+          className="pointer-events-auto inline-flex min-h-12 items-center gap-2 rounded-full bg-(--brand-blue) px-4 py-2 text-sm font-semibold text-white shadow-lg focus:outline-hidden focus:ring-2 focus:ring-(--brand-cyan) focus:ring-offset-2"
         >
           To Filters <ArrowUp className="h-4 w-4" aria-hidden="true" />
         </button>
