@@ -59,7 +59,13 @@ wrapper, whose locked compiler API is 6.0.3. Existing transpilation verifiers an
 Next's language-service/build integration keep that API. The alias
 `@typescript/native` supplies TypeScript 7.0.2's `tsc`. Run both `typecheck` and
 `typecheck:compat`; generated Next route types are included after a production
-build. CI requires both, preserving compiler API and route-type coverage.
+build. CI first runs both compilers against the checkout's source. Then
+`verify:deployment-builds` runs each compiler again after each synthetic Next
+build (releases A and B), in that build's isolated root. It requires nonempty
+`.next/types/routes.d.ts` and `.next/types/validator.ts`; the root's `tsconfig.json`
+includes these generated declarations and route/page validators. Both compiler
+checks disable incremental reuse and share the build's synthetic environment,
+so CI covers generated route types without CMS credentials or developer artifacts.
 
 ## Rendering experiment decisions
 

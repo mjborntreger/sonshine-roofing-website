@@ -126,7 +126,9 @@ Publish CMS changes with a successful build and deployment.
   `.generated` artifacts and public build artifacts into the standalone image.
   Node startup validates the bundle hashes before serving requests.
 - Run `npm run verify:deployment-builds` for two synthetic production builds with
-  shared build caches. The tests verify changed/new/removed content across releases,
+  shared build caches. Each build is followed by both TypeScript 7 and compatibility
+  TypeScript 6 checks in the same isolated root, including its generated Next route
+  declarations and validators. The tests verify changed/new/removed content across releases,
   cold restarts, no runtime network reads, complete page inventories and fail-closed
   bundle validation. CI runs this without CMS credentials.
 - For release acceptance, use Node 24.22.1, run all applicable `verify:*` checks, then
